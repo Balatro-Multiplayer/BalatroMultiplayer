@@ -32,7 +32,7 @@ function SMODS.INIT.VirtualizedMultiplayer()
     require "Deck"
     require "Main_Menu"
     require "Utils".get_username()
-	Networking.authorize()
+	require "Networking".authorize()
     require "Mod_Description".load_description_gui()
     require "Game_UI"
 end

@@ -69,6 +69,11 @@ function G.FUNCS.copy_to_clipboard(arg_736_0)
   Utils.copy_to_clipboard(Lobby.code)
 end
 
+function G.FUNCS.reconnect(arg_736_0)
+  Networking.authorize()
+  G.FUNCS:exit_overlay_menu()
+end
+
 function create_UIBox_view_code()
 	local var_495_0 = 0.75
 
