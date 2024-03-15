@@ -1,18 +1,19 @@
 {
-	"scripts": {
-		"build": "tsc",
-		"dev": "tsx watch src/main.ts",
-		"start": "node ./dist/main.js"
-	},
-	"dependencies": {
-		"net": "^1.0.2",
-		"uuid": "^9.0.1"
-	},
-	"devDependencies": {
-		"@types/node": "^20.11.27",
-		"@types/uuid": "^9.0.8",
-		"tsx": "^4.7.1",
-		"typescript": "^5.4.2"
-	},
-	"type": "module"
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsx watch src/main.ts",
+    "start": "node ./dist/main.js"
+  },
+  "dependencies": {
+    "net": "^1.0.2",
+    "uuid": "^9.0.1"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "^1.6.1",
+    "@types/node": "^20.11.27",
+    "@types/uuid": "^9.0.8",
+    "tsx": "^4.7.1",
+    "typescript": "^5.4.2"
+  },
+  "type": "module"
 }
