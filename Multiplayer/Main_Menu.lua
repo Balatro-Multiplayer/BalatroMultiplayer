@@ -322,18 +322,24 @@ function override_main_menu_play_button()
 				button = "setup_run",
 				minw = 5,
 			}),
-			UIBox_button({
+			Lobby.connected and UIBox_button({
 				label = {"Create Lobby"},
 				colour = G.C.GREEN,
 				button = "create_lobby",
 				minw = 5,
-			}),
-			UIBox_button({
+			}) or nil,
+			Lobby.connected and UIBox_button({
 				label = {"Join Lobby"},
 				colour = G.C.RED,
 				button = "join_lobby",
 				minw = 5,
-			}),
+			}) or nil,
+			not Lobby.connected and UIBox_button({
+				label = {"Reconnect"},
+				colour = G.C.RED,
+				button = "reconnect",
+				minw = 5,
+			}) or nil,
 		}
 	}))
 end

@@ -6,7 +6,7 @@
 
 local Lobby = require "Lobby"
 
-local Game_UI = {}
+Game_UI = {}
 
 local create_UIBox_options_ref = create_UIBox_options
 function create_UIBox_options()
