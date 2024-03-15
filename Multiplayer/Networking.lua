@@ -53,6 +53,10 @@ local function action_error(message)
   Utils.overlay_message(message)
 end
 
+local function action_keep_alive()
+  Networking.Client:send('action:keepAliveAck')
+end
+
 local game_update_ref = Game.update
 function Game.update(arg_298_0, arg_298_1)
   if Networking.Client then
@@ -71,6 +75,8 @@ function Game.update(arg_298_0, arg_298_1)
           action_lobbyInfo(t.host, t.guest)
         elseif t.action == 'error' then
           action_error(t.message)
+        elseif t.action == 'keepAlive' then
+          action_keep_alive()
         end
       end
     until not data
@@ -80,9 +86,18 @@ function Game.update(arg_298_0, arg_298_1)
 end
 
 function Networking.authorize()
+  sendDebugMessage(string.format("Attempting to connect to multiplayer server... URL: %s, PORT: %d", Config.URL, Config.PORT))
+
   Networking.Client = socket.tcp()
+
+  Networking.Client:setoption('tcp-nodelay', true)
+  local connectionResult, errorMessage = Networking.Client:connect(Config.URL, Config.PORT) -- Not sure if I want to make these values public yet
+
+  if connectionResult ~= 1 then
+    sendDebugMessage(string.format("%s", errorMessage))
+  end
+
   Networking.Client:settimeout(0)
-  Networking.Client:connect(Config.URL, Config.PORT) -- Not sure if I want to make these values public yet
 end
 
 function Networking.create_lobby()

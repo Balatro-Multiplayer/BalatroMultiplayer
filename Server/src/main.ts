@@ -1,9 +1,16 @@
 import net from 'node:net'
 import Client from './Client.js'
 import { actionHandlers } from './actionHandlers.js'
-import type { ActionClientToServer, ActionServerToClient } from './actions.js'
+import type { Action, ActionClientToServer, ActionUtility } from './actions.js'
 
 const PORT = 8080
+
+/** The amount of milliseconds we wait before sending the initial keepalive packet  */
+const KEEP_ALIVE_INITIAL_TIMEOUT = 5000
+/** The amount of milliseconds we wait after sending a new retry packet  */
+const KEEP_ALIVE_RETRY_TIMEOUT = 2500
+/** The amount of retries we do before we declare the socket dead */
+const KEEP_ALIVE_RETRY_COUNT = 3
 
 // biome-ignore lint/suspicious/noExplicitAny: Object is parsed from string
 const stringToJson = (str: string): any => {
@@ -17,7 +24,7 @@ const stringToJson = (str: string): any => {
 }
 
 /** Serializes an action for transmission to the client */
-export const serializeAction = (action: ActionServerToClient): string => {
+export const serializeAction = (action: Action): string => {
 	const entries = Object.entries(action)
 	const parts = entries
 		.filter(([_key, value]) => value !== undefined && value !== null)
@@ -33,17 +40,54 @@ const sendToSocket = (socket: net.Socket) => (data: string) => {
 }
 
 const server = net.createServer((socket) => {
-	const client = new Client(sendToSocket(socket))
+	socket.allowHalfOpen = false
+	// Do not wait for packets to buffer, helps
+	// improve latency between responses
+	socket.setNoDelay()
+
+	const client = new Client(socket.address(), sendToSocket(socket))
 	client.send(serializeAction({ action: 'connected' }))
 
+	let isRetry = false
+	let retryCount = 0
+
+	const retryTimer: ReturnType<typeof setTimeout> = setTimeout(() => {
+		// Ignore if not retry
+		if (!isRetry) {
+			return
+		}
+
+		client.send(serializeAction({ action: 'keepAlive' }))
+		retryCount++
+
+		if (retryCount >= KEEP_ALIVE_RETRY_COUNT) {
+			socket.end()
+		} else {
+			retryTimer.refresh()
+		}
+	}, KEEP_ALIVE_RETRY_TIMEOUT)
+
+	// Once the client connects, we start a timer
+	const keepAlive: ReturnType<typeof setTimeout> = setTimeout(() => {
+		client.send(serializeAction({ action: 'keepAlive' }))
+		isRetry = true
+		retryTimer.refresh()
+	}, KEEP_ALIVE_INITIAL_TIMEOUT)
+
 	socket.on('data', (data) => {
+		// Data received, reset keepAlive
+		isRetry = false
+		retryCount = 0
+		keepAlive.refresh()
+
 		const messages = data.toString().split('\n')
 
 		for (const msg of messages) {
 			if (!msg) return
 			try {
-				const message: ActionClientToServer = stringToJson(msg)
+				const message: ActionClientToServer | ActionUtility = stringToJson(msg)
 				const { action, ...actionArgs } = message
+				console.log(`Received action ${action} from ${client.id}`)
 
 				// This only works for now, once we add more arguments
 				// we'll need to refactor this
@@ -66,6 +110,7 @@ const server = net.createServer((socket) => {
 	})
 
 	socket.on('end', () => {
+		console.log(`Client disconnected ${client.id}`)
 		actionHandlers.leaveLobby?.(client)
 	})
 

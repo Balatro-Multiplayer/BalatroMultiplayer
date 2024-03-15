@@ -78,21 +78,28 @@ export type ActionClientToServer =
 	| ActionPlayerInfoRequest
 	| ActionEnemyInfoRequest
 
-export type Action = ActionServerToClient | ActionClientToServer
+// Utility actions
+export type ActionKeepAlive = { action: 'keepAlive' }
+export type ActionKeepAliveAck = { action: 'keepAliveAck' }
 
+export type ActionUtility = ActionKeepAlive | ActionKeepAliveAck
+
+export type Action = ActionServerToClient | ActionClientToServer | ActionUtility
+
+type HandledActions = ActionClientToServer | ActionUtility
 export type ActionHandlers = {
-	[K in ActionClientToServer['action']]: keyof ActionFnArgs<
-		Extract<ActionClientToServer, { action: K }>
+	[K in HandledActions['action']]: keyof ActionHandlerArgs<
+		Extract<HandledActions, { action: K }>
 	> extends never
 		? (
 				// biome-ignore lint/suspicious/noExplicitAny: Function can receive any arguments
 				...args: any[]
 		  ) => void
 		: (
-				action: ActionFnArgs<Extract<ActionClientToServer, { action: K }>>,
+				action: ActionHandlerArgs<Extract<HandledActions, { action: K }>>,
 				// biome-ignore lint/suspicious/noExplicitAny: Function can receive any arguments
 				...args: any[]
 		  ) => void
 }
 
-export type ActionFnArgs<T extends ActionClientToServer> = Omit<T, 'action'>
+export type ActionHandlerArgs<T extends HandledActions> = Omit<T, 'action'>

@@ -158,6 +158,16 @@ enemyInfo
 
 ---
 
+### Utility
+
+keepAlive
+- Request a keepAliveAck response.
+
+---
+
+keepAliveAck
+- Send a response to the keepAlive request.
+
 ## Server Types
 
 - attrition

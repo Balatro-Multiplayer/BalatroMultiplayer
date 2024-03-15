@@ -2,7 +2,7 @@ import type Client from './Client.js'
 import Lobby from './Lobby.js'
 import type {
 	ActionCreateLobby,
-	ActionFnArgs,
+	ActionHandlerArgs,
 	ActionHandlers,
 	ActionJoinLobby,
 	ActionUsername,
@@ -10,21 +10,21 @@ import type {
 import { serializeAction } from './main.js'
 
 const usernameAction = (
-	{ username }: ActionFnArgs<ActionUsername>,
+	{ username }: ActionHandlerArgs<ActionUsername>,
 	client: Client,
 ) => {
 	client.setUsername(username)
 }
 
 const createLobbyAction = (
-	{ gameMode }: ActionFnArgs<ActionCreateLobby>,
+	{ gameMode }: ActionHandlerArgs<ActionCreateLobby>,
 	client: Client,
 ) => {
 	new Lobby(client)
 }
 
 const joinLobbyAction = (
-	{ code }: ActionFnArgs<ActionJoinLobby>,
+	{ code }: ActionHandlerArgs<ActionJoinLobby>,
 	client: Client,
 ) => {
 	const newLobby = Lobby.get(code)
@@ -48,6 +48,11 @@ const lobbyInfoAction = (client: Client) => {
 	client.lobby?.broadcast()
 }
 
+const keepAliveAction = (client: Client) => {
+	// Send an ack back to the received keepAlive
+	client.send(serializeAction({ action: 'keepAliveAck' }))
+}
+
 // Declared partial for now untill all action handlers are defined
 export const actionHandlers: Partial<ActionHandlers> = {
 	username: usernameAction,
@@ -55,4 +60,5 @@ export const actionHandlers: Partial<ActionHandlers> = {
 	joinLobby: joinLobbyAction,
 	lobbyInfo: lobbyInfoAction,
 	leaveLobby: leaveLobbyAction,
+	keepAlive: keepAliveAction,
 }
