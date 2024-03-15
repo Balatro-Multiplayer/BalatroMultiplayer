@@ -1,6 +1,6 @@
-import type Client from './Client'
-import type { ActionLobbyInfo } from './actions'
-import { serializeAction } from './main'
+import type Client from './Client.js'
+import type { ActionLobbyInfo } from './actions.js'
+import { serializeAction } from './main.js'
 
 const Lobbies = new Map()
 

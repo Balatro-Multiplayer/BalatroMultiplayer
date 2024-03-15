@@ -1,5 +1,5 @@
 import { v4 as uuidv4 } from 'uuid'
-import type Lobby from './Lobby'
+import type Lobby from './Lobby.js'
 
 type SendFn = (data: string) => void
 

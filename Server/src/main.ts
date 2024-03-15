@@ -1,7 +1,7 @@
 import net from 'node:net'
-import Client from './Client'
-import { actionHandlers } from './actionHandlers'
-import type { ActionClientToServer, ActionServerToClient } from './actions'
+import Client from './Client.js'
+import { actionHandlers } from './actionHandlers.js'
+import type { ActionClientToServer, ActionServerToClient } from './actions.js'
 
 const PORT = 8080
 

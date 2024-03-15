@@ -1,13 +1,13 @@
-import type Client from './Client'
-import Lobby from './Lobby'
+import type Client from './Client.js'
+import Lobby from './Lobby.js'
 import type {
 	ActionCreateLobby,
 	ActionFnArgs,
 	ActionHandlers,
 	ActionJoinLobby,
 	ActionUsername,
-} from './actions'
-import { serializeAction } from './main'
+} from './actions.js'
+import { serializeAction } from './main.js'
 
 const usernameAction = (
 	{ username }: ActionFnArgs<ActionUsername>,
