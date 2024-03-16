@@ -93,7 +93,7 @@ const server = net.createServer((socket) => {
 				// we'll need to refactor this
 				// Maybe add a context type that includes everything
 				// connection related?
-				actionArgs
+				Object.keys(actionArgs).length > 0
 					? actionHandlers[action]?.(actionArgs, client)
 					: actionHandlers[action]?.(client)
 			} catch (error) {

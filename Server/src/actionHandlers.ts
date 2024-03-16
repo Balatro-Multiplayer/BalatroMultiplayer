@@ -20,6 +20,7 @@ const createLobbyAction = (
 	{ gameMode }: ActionHandlerArgs<ActionCreateLobby>,
 	client: Client,
 ) => {
+	/** Also sets the client lobby to this newly created one */
 	new Lobby(client)
 }
 

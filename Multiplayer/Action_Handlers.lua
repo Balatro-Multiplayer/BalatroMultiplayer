@@ -56,7 +56,8 @@ end
 
 -- Client to Server
 function ActionHandlers.create_lobby()
-	ActionHandlers.Client.send('action:createLobby')
+	-- TODO: This is hardcoded to attrition for now, must be changed
+	ActionHandlers.Client.send('action:createLobby,gameMode:attrition')
 end
 
 function ActionHandlers.join_lobby(code)
