@@ -52,6 +52,15 @@ local function action_keep_alive()
 	Client.send("action:keepAliveAck")
 end
 
+local function action_disconnected()
+	G.LOBBY.connected = false
+	if G.LOBBY.code then
+		G.LOBBY.code = nil
+		G.FUNCS.go_to_menu()
+	end
+	G.MULTIPLAYER.update_connection_status()
+end
+
 -- Client to Server
 function G.MULTIPLAYER.create_lobby()
 	-- TODO: This is hardcoded to attrition for now, must be changed
@@ -97,6 +106,8 @@ function Game:update(dt)
 
 			if parsedAction.action == "connected" then
 				action_connected()
+			elseif parsedAction.action == "disconnected" then
+				action_disconnected()
 			elseif parsedAction.action == "joinedLobby" then
 				action_joinedLobby(parsedAction.code)
 			elseif parsedAction.action == "lobbyInfo" then

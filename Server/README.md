@@ -18,6 +18,11 @@ connected
 
 ---
 
+disconnected
+- Only sent from the network thread to the UI and never from the server. Indicates that the socket has gracefully closed or declared dead through the keepAlive mechanism.
+
+---
+
 error: message
 - An error, this should only be used when needed since it is very intrusive
 
