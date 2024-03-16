@@ -29,15 +29,15 @@ end
 
 function SMODS.INIT.VirtualizedMultiplayer()
 	table.insert(package.loaders, 1, customLoader)
-	require "Blind"
-	require "Deck"
-	require "Main_Menu"
-	require "Utils".get_username()
-	require "Action_Handlers"
-	require "Mod_Description".load_description_gui()
-	require "Game_UI"
+	require("Blind")
+	require("Deck")
+	require("Main_Menu")
+	require("Utils").get_username()
+	require("Action_Handlers")
+	require("Mod_Description").load_description_gui()
+	require("Game_UI")
 
-	CONFIG = require "Config"
+	CONFIG = require("Config")
 	NETWORKING_THREAD = love.thread.newThread(relativeModPath .. "Networking.lua")
 	NETWORKING_THREAD:start(CONFIG.URL, CONFIG.PORT)
 

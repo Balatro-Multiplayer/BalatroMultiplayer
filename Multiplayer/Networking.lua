@@ -10,8 +10,8 @@
 -- the necessary modules again
 local CONFIG_URL, CONFIG_PORT = ...
 
-require 'love.filesystem'
-SOCKET = require 'socket'
+require("love.filesystem")
+SOCKET = require("socket")
 
 -- Defining this again, for debugging this thread
 local function initializeThreadDebugSocketConnection()
@@ -32,12 +32,13 @@ initializeThreadDebugSocketConnection()
 Networking = {}
 
 function Networking.connect()
-	SEND_THREAD_DEBUG_MESSAGE(string.format("Attempting to connect to multiplayer server... URL: %s, PORT: %d", CONFIG_URL,
-		CONFIG_PORT))
+	SEND_THREAD_DEBUG_MESSAGE(
+		string.format("Attempting to connect to multiplayer server... URL: %s, PORT: %d", CONFIG_URL, CONFIG_PORT)
+	)
 
 	Networking.Client = SOCKET.tcp()
 
-	Networking.Client:setoption('tcp-nodelay', true)
+	Networking.Client:setoption("tcp-nodelay", true)
 	local connectionResult, errorMessage = Networking.Client:connect(CONFIG_URL, CONFIG_PORT) -- Not sure if I want to make these values public yet
 
 	if connectionResult ~= 1 then

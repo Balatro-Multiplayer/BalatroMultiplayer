@@ -3,51 +3,51 @@
 
 ----------------------------------------------
 ------------MOD DESCRIPTION-------------------
-local Utils = require "Utils"
-local Lobby = require "Lobby"
+local Utils = require("Utils")
+local Lobby = require("Lobby")
 
 Description = {}
 
 function Description.load_description_gui()
-  SMODS.registerUIElement("VirtualizedMultiplayer", {
-    {
-      n = G.UIT.R,
-      config = {
-          padding = 0.5,
-          align = "cm"
-      },
-      nodes = {
-        {
-          n = G.UIT.T,
+	SMODS.registerUIElement("VirtualizedMultiplayer", {
+		{
+			n = G.UIT.R,
+			config = {
+				padding = 0.5,
+				align = "cm",
+			},
+			nodes = {
+				{
+					n = G.UIT.T,
 					config = {
 						scale = 0.6,
-						text = 'Username:',
-						colour = G.C.UI.TEXT_LIGHT
-					}
-        },
-        create_text_input({
-          w = 4, 
-          max_length = 25,
-          prompt_text = "Enter Username",
-          ref_table = Lobby,
-          ref_value = 'username',
-          extended_corpus = true,
-          keyboard_offset = 1,
-          callback = function(val)
-            Utils.save_username(Lobby.username)
-          end
-        }),
-        {
-          n = G.UIT.T,
+						text = "Username:",
+						colour = G.C.UI.TEXT_LIGHT,
+					},
+				},
+				create_text_input({
+					w = 4,
+					max_length = 25,
+					prompt_text = "Enter Username",
+					ref_table = Lobby,
+					ref_value = "username",
+					extended_corpus = true,
+					keyboard_offset = 1,
+					callback = function(val)
+						Utils.save_username(Lobby.username)
+					end,
+				}),
+				{
+					n = G.UIT.T,
 					config = {
 						scale = 0.3,
-						text = 'Press enter to save',
-						colour = G.C.UI.TEXT_LIGHT
-					}
-        }
-      }
-    }
-  })
+						text = "Press enter to save",
+						colour = G.C.UI.TEXT_LIGHT,
+					},
+				},
+			},
+		},
+	})
 end
 
 return Description

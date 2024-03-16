@@ -4,7 +4,7 @@
 ----------------------------------------------
 ------------MOD UTILS-------------------------
 
-local ActionHandlers = require "Action_Handlers"
+local ActionHandlers = require("Action_Handlers")
 
 Utils = {}
 
@@ -24,13 +24,18 @@ function Utils.serialize_table(val, name, skipnewlines, depth)
 
 	local tmp = string.rep(" ", depth)
 
-	if name then tmp = tmp .. name .. " = " end
+	if name then
+		tmp = tmp .. name .. " = "
+	end
 
 	if type(val) == "table" then
 		tmp = tmp .. "{" .. (not skipnewlines and "\n" or "")
 
 		for k, v in pairs(val) do
-			tmp = tmp .. Utils.serialize_table(v, k, skipnewlines, depth + 1) .. "," .. (not skipnewlines and "\n" or "")
+			tmp = tmp
+				.. Utils.serialize_table(v, k, skipnewlines, depth + 1)
+				.. ","
+				.. (not skipnewlines and "\n" or "")
 		end
 
 		tmp = tmp .. string.rep(" ", depth) .. "}"
@@ -41,7 +46,7 @@ function Utils.serialize_table(val, name, skipnewlines, depth)
 	elseif type(val) == "boolean" then
 		tmp = tmp .. (val and "true" or "false")
 	else
-		tmp = tmp .. "\"[inserializeable datatype:" .. type(val) .. "]\""
+		tmp = tmp .. '"[inserializeable datatype:' .. type(val) .. ']"'
 	end
 
 	return tmp
@@ -54,10 +59,10 @@ function Utils.wrapText(text, maxChars)
 
 	for word in text:gmatch("%S+") do
 		if currentLineLength + #word <= maxChars then
-			wrappedText = wrappedText .. word .. ' '
+			wrappedText = wrappedText .. word .. " "
 			currentLineLength = currentLineLength + #word + 1
 		else
-			wrappedText = wrappedText .. '\n' .. word .. ' '
+			wrappedText = wrappedText .. "\n" .. word .. " "
 			currentLineLength = #word + 1
 		end
 	end
@@ -73,7 +78,9 @@ end
 
 function Utils.get_username()
 	local fileContent = love.filesystem.read(usernameFilePath)
-	if not fileContent then return end
+	if not fileContent then
+		return
+	end
 	Lobby.username = fileContent
 end
 
@@ -123,13 +130,13 @@ function Utils.overlay_message(message)
 								scale = 0.6,
 								shadow = true,
 								text = message,
-								colour = G.C.UI.TEXT_LIGHT
-							}
-						}
-					}
-				}
-			}
-		})
+								colour = G.C.UI.TEXT_LIGHT,
+							},
+						},
+					},
+				},
+			},
+		}),
 	})
 end
 
