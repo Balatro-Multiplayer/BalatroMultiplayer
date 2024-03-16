@@ -4,19 +4,18 @@
 ----------------------------------------------
 ------------MOD LOBBY-------------------------
 
+local Disableable_Button = require "Disableable_Button"
+
 Lobby = {
-	connected = false,
-	temp_code = '',
-	code = nil,
-	type = "",
-	config = {},
-	username = "Guest",
-	enemy = {
-		username = "dude_crusher69",
-		score = 0,
-		hands = 4
-	},
-	players = {}
+  connected = false,
+  temp_code = '',
+  code = nil,
+  type = "",
+  config = {},
+  username = "Guest",
+  host = {},
+  guest = nil,
+  is_host = false
 }
 
 Connection_Status_UI = nil
@@ -212,164 +211,169 @@ function G.FUNCS.lobby_leave(arg_736_0)
 end
 
 local function create_UIBox_lobby_menu()
-	local text_scale = 0.45
+  local text_scale = 0.45
 
-	local t = {
-		n = G.UIT.ROOT,
-		config = {
-			align = "cm",
-			colour = G.C.CLEAR
-		},
-		nodes = {
-			{
-				n = G.UIT.C,
-				config = {
-					align = "bm"
-				},
-				nodes = {
-					{
-						n = G.UIT.R,
-						config = {
-							align = "cm",
-							padding = 0.2,
-							r = 0.1,
-							emboss = 0.1,
-							colour = G.C.L_BLACK,
-							mid = true
-						},
-						nodes = {
-							UIBox_button({
-								id = 'lobby_menu_start',
-								button = "lobby_setup_run",
-								colour = G.C.BLUE,
-								minw = 3.65,
-								minh = 1.55,
-								label = { 'START' },
-								scale = text_scale * 2,
-								col = true
-							}),
-							{
-								n = G.UIT.C,
-								config = {
-									align = "cm"
-								},
-								nodes = {
-									UIBox_button {
-										button = 'lobby_options',
-										colour = G.C.ORANGE,
-										minw = 3.15,
-										minh = 1.35,
-										label = { 'LOBBY OPTIONS' },
-										scale = text_scale * 1.2,
-										col = true
-									},
-									{
-										n = G.UIT.C,
-										config = {
-											align = "cm",
-											minw = 0.2
-										},
-										nodes = {}
-									},
-									{
-										n = G.UIT.C,
-										config = {
-											align = "tm",
-											minw = 2.65
-										},
-										nodes = {
-											{
-												n = G.UIT.R,
-												config = {
-													padding = 0.2,
-													align = "cm"
-												},
-												nodes = {
-													{
-														n = G.UIT.T,
-														config = {
-															text = 'Connected Players:',
-															shadow = true,
-															scale = text_scale * 0.8,
-															colour = G.C.UI.TEXT_LIGHT
-														}
-													}
-												},
-											},
-											Lobby.players[1] and {
-												n = G.UIT.R,
-												config = {
-													padding = 0,
-													align = "cm"
-												},
-												nodes = {
-													{
-														n = G.UIT.T,
-														config = {
-															text = Lobby.players[1].username,
-															shadow = true,
-															scale = text_scale * 0.8,
-															colour = G.C.UI.TEXT_LIGHT
-														}
-													}
-												}
-											} or nil,
-											Lobby.players[2] and {
-												n = G.UIT.R,
-												config = {
-													padding = 0,
-													align = "cm"
-												},
-												nodes = {
-													{
-														n = G.UIT.T,
-														config = {
-															text = Lobby.players[2].username,
-															shadow = true,
-															scale = text_scale * 0.8,
-															colour = G.C.UI.TEXT_LIGHT
-														}
-													}
-												}
-											} or nil
-										}
-									},
-									{
-										n = G.UIT.C,
-										config = {
-											align = "cm",
-											minw = 0.2
-										},
-										nodes = {}
-									},
-									UIBox_button {
-										button = 'view_code',
-										colour = G.C.PALE_GREEN,
-										minw = 3.15,
-										minh = 1.35,
-										label = { 'VIEW CODE' },
-										scale = text_scale * 1.2,
-										col = true
-									},
-								}
-							},
-							UIBox_button {
-								id = 'lobby_menu_leave',
-								button = "lobby_leave",
-								colour = G.C.RED,
-								minw = 3.65,
-								minh = 1.55,
-								label = { 'LEAVE' },
-								scale = text_scale * 1.5,
-								col = true
-							},
-						}
-					},
-				}
-			},
-		}
-	}
-	return t
+  local t = {
+    n = G.UIT.ROOT,
+    config = {
+      align = "cm",
+      colour = G.C.CLEAR
+    },
+    nodes = {
+      {
+        n = G.UIT.C,
+        config = {
+          align = "bm"
+        },
+        nodes = {
+          {
+            n = G.UIT.R,
+            config = {
+              align = "cm",
+              padding = 0.2,
+              r = 0.1,
+              emboss = 0.1,
+              colour = G.C.L_BLACK,
+              mid = true
+            }, 
+            nodes = {
+              Disableable_Button{
+                id = 'lobby_menu_start',
+                button = 'lobby_setup_run',
+                colour = G.C.BLUE,
+                minw = 3.65,
+                minh = 1.55,
+                label = {'START'},
+								disabled_text = {'WAITING FOR', 'HOST TO START'},
+                scale = text_scale * 2,
+                col = true,
+                disable_ref_table = Lobby,
+                disable_ref_value = 'is_host'
+              },
+              {
+                n = G.UIT.C, 
+                config = { 
+                  align = "cm"
+                }, 
+                nodes = {
+                  Disableable_Button{
+                    button = 'lobby_options',
+                    colour = G.C.ORANGE,
+                    minw = 3.15,
+                    minh = 1.35,
+                    label = {'LOBBY OPTIONS'},
+                    scale = text_scale * 1.2,
+                    col = true,
+                    disable_ref_table = Lobby,
+                    disable_ref_value = 'is_host'
+                  },
+                  {
+                    n = G.UIT.C, 
+                    config = {
+                      align = "cm", 
+                      minw = 0.2
+                    }, 
+                    nodes = {}
+                  },
+                  {
+                    n = G.UIT.C, 
+                    config = {
+                      align = "tm", 
+                      minw = 2.65
+                    }, 
+                    nodes = {
+                      {
+                        n = G.UIT.R,
+                        config = {
+                          padding = 0.2,
+                          align = "cm"
+                        },
+                        nodes = {
+                          {
+                            n = G.UIT.T,
+                            config = {
+                              text = 'Connected Players:',
+                              shadow = true,
+                              scale = text_scale * 0.8,
+                              colour = G.C.UI.TEXT_LIGHT
+                            }
+                          }
+                        },
+                      },
+                      Lobby.host and Lobby.host.username and {
+                        n = G.UIT.R,
+                        config = {
+                          padding = 0,
+                          align = "cm"
+                        },
+                        nodes = {
+                          {
+                            n = G.UIT.T,
+                            config = {
+                              ref_table = Lobby.host,
+															ref_value = 'username',
+                              shadow = true,
+                              scale = text_scale * 0.8,
+                              colour = G.C.UI.TEXT_LIGHT
+                            }
+                          }
+                        }
+                      } or nil,
+                      Lobby.guest and Lobby.guest.username and {
+                        n = G.UIT.R,
+                        config = {
+                          padding = 0,
+                          align = "cm"
+                        },
+                        nodes = {
+                          {
+                            n = G.UIT.T,
+                            config = {
+                              ref_table = Lobby.guest,
+															ref_value = 'username',
+                              shadow = true,
+                              scale = text_scale * 0.8,
+                              colour = G.C.UI.TEXT_LIGHT
+                            }
+                          }
+                        }
+                      } or nil
+                    }
+                  },
+                  {
+                    n = G.UIT.C, 
+                    config = {
+                      align = "cm", 
+                      minw = 0.2
+                    }, 
+                    nodes = {}
+                  },
+                  UIBox_button{
+                    button = 'view_code', 
+                    colour = G.C.PALE_GREEN, 
+                    minw = 3.15, 
+                    minh = 1.35, 
+                    label = {'VIEW CODE'}, 
+                    scale = text_scale * 1.2, 
+                    col = true
+                  },
+                }
+              },
+              UIBox_button{
+                id = 'lobby_menu_leave', 
+                button = "lobby_leave", 
+                colour = G.C.RED, 
+                minw = 3.65, 
+                minh = 1.55, 
+                label = {'LEAVE'}, 
+                scale = text_scale*1.5, 
+                col = true
+              },
+            }
+          },
+      }},
+    }}
+  return t
 end
 
 local function get_lobby_main_menu_UI()

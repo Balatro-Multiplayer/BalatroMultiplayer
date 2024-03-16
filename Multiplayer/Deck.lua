@@ -24,7 +24,7 @@ local c_multiplayer_1 = {
   },
   restrictions = {
       banned_cards = {
-          {id = 'j_diet_cola'}, -- Intention to disable skipping
+          {id = 'j_diet_cola'},
           {id = 'j_mr_bones'},
           {id = 'v_hieroglyph'},
           {id = 'v_petroglyph'},

@@ -29,10 +29,11 @@ joinedLobby: code
 
 ---
 
-lobbyInfo: host, guest?
+lobbyInfo: host, guest?, isHost
 - Gives clients info on the lobby state
 - host: Lobby host's username
 - guest?: Lobby guest's username
+- isHost: Whether the client is the host, must be a boolean (client will interpret this as a string)
 
 *This will obviously need reworking for 8 players but it is the simplest way of doing it for now
 

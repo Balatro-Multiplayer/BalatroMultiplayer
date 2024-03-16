@@ -30,15 +30,16 @@ end
 local function action_joinedLobby(code)
 	sendDebugMessage("Joining lobby " .. code)
 	Lobby.code = code
-	Lobby.update_connection_status()
 	ActionHandlers.lobby_info()
+	Lobby.update_connection_status()
 end
 
-local function action_lobbyInfo(host, guest)
+local function action_lobbyInfo(host, guest, is_host)
 	Lobby.players = {}
-	table.insert(Lobby.players, { username = host })
+	Lobby.is_host = is_host == 'true'
+	Lobby.host = { username = host }
 	if guest ~= nil then
-		table.insert(Lobby.players, { username = guest })
+		Lobby.guest = { username = guest }
 	end
 	Lobby.update_player_usernames()
 end
@@ -99,7 +100,7 @@ function Game.update(arg_298_0, arg_298_1)
 			elseif parsedAction.action == 'joinedLobby' then
 				action_joinedLobby(parsedAction.code)
 			elseif parsedAction.action == 'lobbyInfo' then
-				action_lobbyInfo(parsedAction.host, parsedAction.guest)
+				action_lobbyInfo(parsedAction.host, parsedAction.guest, parsedAction.isHost)
 			elseif parsedAction.action == 'error' then
 				action_error(parsedAction.message)
 			elseif parsedAction.action == 'keepAlive' then
