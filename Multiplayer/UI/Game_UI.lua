@@ -4,13 +4,10 @@
 ----------------------------------------------
 ------------MOD GAME UI-----------------------
 
-local Lobby = require("Lobby")
-
-Game_UI = {}
-
 local create_UIBox_options_ref = create_UIBox_options
+---@diagnostic disable-next-line: lowercase-global
 function create_UIBox_options()
-	if Lobby.code then
+	if G.LOBBY.code then
 		local current_seed = nil
 		local main_menu = nil
 		local your_collection = nil
@@ -128,8 +125,9 @@ function create_UIBox_options()
 end
 
 local create_UIBox_blind_choice_ref = create_UIBox_blind_choice
+---@diagnostic disable-next-line: lowercase-global
 function create_UIBox_blind_choice(type, run_info)
-	if Lobby.code then
+	if G.LOBBY.code then
 		if not G.GAME.blind_on_deck then
 			G.GAME.blind_on_deck = "Small"
 		end
@@ -259,6 +257,7 @@ function create_UIBox_blind_choice(type, run_info)
 		local blind_state = G.GAME.round_resets.blind_states[type]
 		local _reward = true
 		if G.GAME.modifiers.no_blind_reward and G.GAME.modifiers.no_blind_reward[type] then
+			---@diagnostic disable-next-line: cast-local-type
 			_reward = nil
 		end
 		if blind_state == "Select" then
@@ -408,7 +407,7 @@ function create_UIBox_blind_choice(type, run_info)
 														{ n = G.UIT.O, config = { object = blind_choice.animation } },
 													},
 												},
-												text_table[1] and {
+												text_table and text_table[1] and {
 													n = G.UIT.R,
 													config = {
 														align = "cm",
@@ -540,6 +539,7 @@ function create_UIBox_blind_choice(type, run_info)
 															n = G.UIT.T,
 															config = {
 																text = string.rep(
+																	---@diagnostic disable-next-line: param-type-mismatch
 																	localize("$"),
 																	blind_choice.config.dollars
 																) .. "+",
@@ -569,22 +569,22 @@ function create_UIBox_blind_choice(type, run_info)
 	end
 end
 
-function Game_UI.update_enemy()
-	if Lobby.code then
+local function update_blind_HUD()
+	if G.LOBBY.code then
 		G.HUD_blind.alignment.offset.y = -10
 		G.E_MANAGER:add_event(Event({
 			trigger = "after",
 			delay = 0.3,
 			blockable = false,
 			func = function()
-				G.HUD_blind:get_UIE_by_ID("HUD_blind_count").config.ref_table = Lobby.enemy
+				G.HUD_blind:get_UIE_by_ID("HUD_blind_count").config.ref_table = G.LOBBY.enemy
 				G.HUD_blind:get_UIE_by_ID("HUD_blind_count").config.ref_value = "score"
 				G.HUD_blind:get_UIE_by_ID("HUD_blind").children[2].children[2].children[2].children[1].children[1].config.text =
 					"Current enemy score"
 				G.HUD_blind:get_UIE_by_ID("HUD_blind").children[2].children[2].children[2].children[3].children[1].config.text =
 					"Enemy hands left: "
 				G.HUD_blind:get_UIE_by_ID("dollars_to_be_earned").config.object.config.string =
-					{ { ref_table = Lobby.enemy, ref_value = "hands" } }
+					{ { ref_table = G.LOBBY.enemy, ref_value = "hands" } }
 				G.HUD_blind:get_UIE_by_ID("dollars_to_be_earned").config.object:update_text()
 				G.HUD_blind.alignment.offset.y = 0
 				return true
@@ -593,8 +593,8 @@ function Game_UI.update_enemy()
 	end
 end
 
-function Game_UI.reset_blind_HUD()
-	if Lobby.code then
+local function reset_blind_HUD()
+	if G.LOBBY.code then
 		G.HUD_blind:get_UIE_by_ID("HUD_blind_name").config.object.config.string =
 			{ { ref_table = G.GAME.blind, ref_value = "loc_name" } }
 		G.HUD_blind:get_UIE_by_ID("HUD_blind_name").config.object:update_text()
@@ -612,7 +612,7 @@ end
 
 local update_draw_to_hand_ref = Game.update_draw_to_hand
 function Game:update_draw_to_hand(dt)
-	if Lobby.code then
+	if G.LOBBY.code then
 		if
 			not G.STATE_COMPLETE
 			and G.GAME.current_round.hands_played == 0
@@ -626,14 +626,14 @@ function Game:update_draw_to_hand(dt)
 					blockable = false,
 					func = function()
 						G.HUD_blind:get_UIE_by_ID("HUD_blind_name").config.object:pop_out(0)
-						Game_UI.update_enemy()
+						update_blind_HUD()
 						G.E_MANAGER:add_event(Event({
 							trigger = "after",
 							delay = 0.45,
 							blockable = false,
 							func = function()
 								G.HUD_blind:get_UIE_by_ID("HUD_blind_name").config.object.config.string =
-									{ { ref_table = Lobby.enemy, ref_value = "username" } }
+									{ { ref_table = G.LOBBY.is_host and G.LOBBY.guest or G.LOBBY.host, ref_value = "username" } }
 								G.HUD_blind:get_UIE_by_ID("HUD_blind_name").config.object:update_text()
 								G.HUD_blind:get_UIE_by_ID("HUD_blind_name").config.object:pop_in(0)
 								return true
@@ -651,9 +651,8 @@ end
 local blind_defeat_ref = Blind.defeat
 function Blind:defeat(silent)
 	blind_defeat_ref(self, silent)
-	Game_UI.reset_blind_HUD()
+	reset_blind_HUD()
 end
 
-return Game_UI
 ----------------------------------------------
 ------------MOD GAME UI END-------------------

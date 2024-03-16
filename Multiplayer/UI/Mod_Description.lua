@@ -3,8 +3,8 @@
 
 ----------------------------------------------
 ------------MOD DESCRIPTION-------------------
+
 local Utils = require("Utils")
-local Lobby = require("Lobby")
 
 Description = {}
 
@@ -29,12 +29,12 @@ function Description.load_description_gui()
 					w = 4,
 					max_length = 25,
 					prompt_text = "Enter Username",
-					ref_table = Lobby,
+					ref_table = G.LOBBY,
 					ref_value = "username",
 					extended_corpus = true,
 					keyboard_offset = 1,
 					callback = function(val)
-						Utils.save_username(Lobby.username)
+						Utils.save_username(G.LOBBY.username)
 					end,
 				}),
 				{

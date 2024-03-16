@@ -2,7 +2,7 @@
 --- STEAMODDED SECONDARY FILE
 
 ----------------------------------------------
-------------MOD NETWORKING--------------------
+------------MOD SOCKET------------------------
 
 -- Code for networking stuff that runs in a separate thread
 
@@ -31,6 +31,7 @@ initializeThreadDebugSocketConnection()
 
 Networking = {}
 
+---@diagnostic disable-next-line: duplicate-set-field
 function Networking.connect()
 	SEND_THREAD_DEBUG_MESSAGE(
 		string.format("Attempting to connect to multiplayer server... URL: %s, PORT: %d", CONFIG_URL, CONFIG_PORT)
@@ -75,4 +76,4 @@ while true do
 end
 
 ----------------------------------------------
-------------MOD NETWORKING END----------------
+------------MOD SOCKET END--------------------

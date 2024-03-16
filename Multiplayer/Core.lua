@@ -28,20 +28,23 @@ local function customLoader(moduleName)
 end
 
 function SMODS.INIT.VirtualizedMultiplayer()
+	---@diagnostic disable-next-line: deprecated
 	table.insert(package.loaders, 1, customLoader)
-	require("Blind")
-	require("Deck")
-	require("Main_Menu")
+	require("Items.Blind")
+	require("Items.Deck")
+	require("Lobby")
+	require("Networking.Action_Handlers")
 	require("Utils").get_username()
-	require("Action_Handlers")
-	require("Mod_Description").load_description_gui()
-	require("Game_UI")
+	require("UI.Lobby_UI")
+	require("UI.Main_Menu")
+	require("UI.Mod_Description").load_description_gui()
+	require("UI.Game_UI")
 
 	CONFIG = require("Config")
-	NETWORKING_THREAD = love.thread.newThread(relativeModPath .. "Networking.lua")
+	NETWORKING_THREAD = love.thread.newThread(string.format("%sNetworking/Socket.lua", relativeModPath))
 	NETWORKING_THREAD:start(CONFIG.URL, CONFIG.PORT)
 
-	ActionHandlers.connect()
+	G.MULTIPLAYER.connect()
 end
 
 ----------------------------------------------

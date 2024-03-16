@@ -5,14 +5,13 @@
 ------------MOD MAIN MENU---------------------
 
 local Utils = require("Utils")
-local Lobby = require("Lobby")
-local ActionHandlers = require("Action_Handlers")
 
 MULTIPLAYER_VERSION = "0.1.0-MULTIPLAYER"
 
-local gameMainMenuRef = Game.main_menu
-function Game.main_menu(arg_280_0, arg_280_1)
-	gameMainMenuRef(arg_280_0, arg_280_1)
+local game_main_menu_ref = Game.main_menu
+---@diagnostic disable-next-line: duplicate-set-field
+function Game:main_menu(change_context)
+	game_main_menu_ref(self, change_context)
 	UIBox({
 		definition = {
 			n = G.UIT.ROOT,
@@ -43,7 +42,7 @@ function Game.main_menu(arg_280_0, arg_280_1)
 	})
 end
 
-function create_UIBox_create_lobby_button()
+function G.UIDEF.create_UIBox_create_lobby_button()
 	local var_495_0 = 0.75
 
 	return (
@@ -102,12 +101,12 @@ function create_UIBox_create_lobby_button()
 												},
 												create_toggle({
 													label = "Lose lives on round loss",
-													ref_table = Lobby.config,
+													ref_table = G.LOBBY.config,
 													ref_value = "death_on_round_loss",
 												}),
 												create_toggle({
 													label = "Different seeds",
-													ref_table = Lobby.config,
+													ref_table = G.LOBBY.config,
 													ref_value = "different_seeds",
 												}),
 												UIBox_button({
@@ -270,7 +269,7 @@ function create_UIBox_create_lobby_button()
 	)
 end
 
-function create_UIBox_join_lobby_button()
+function G.UIDEF.create_UIBox_join_lobby_button()
 	return (
 		create_UIBox_generic_options({
 			back_func = "play_options",
@@ -312,13 +311,13 @@ function create_UIBox_join_lobby_button()
 									h = 1,
 									max_length = 5,
 									prompt_text = "Enter Lobby Code",
-									ref_table = Lobby,
+									ref_table = G.LOBBY,
 									ref_value = "temp_code",
 									extended_corpus = false,
 									keyboard_offset = 1,
 									minw = 5,
 									callback = function(val)
-										ActionHandlers.join_lobby(Lobby.temp_code)
+										G.MULTIPLAYER.join_lobby(G.LOBBY.temp_code)
 									end,
 								}),
 							},
@@ -336,7 +335,7 @@ function create_UIBox_join_lobby_button()
 	)
 end
 
-function override_main_menu_play_button()
+function G.UIDEF.override_main_menu_play_button()
 	return (
 		create_UIBox_generic_options({
 			contents = {
@@ -346,19 +345,19 @@ function override_main_menu_play_button()
 					button = "setup_run",
 					minw = 5,
 				}),
-				Lobby.connected and UIBox_button({
+				G.LOBBY.connected and UIBox_button({
 					label = { "Create Lobby" },
 					colour = G.C.GREEN,
 					button = "create_lobby",
 					minw = 5,
 				}) or nil,
-				Lobby.connected and UIBox_button({
+				G.LOBBY.connected and UIBox_button({
 					label = { "Join Lobby" },
 					colour = G.C.RED,
 					button = "join_lobby",
 					minw = 5,
 				}) or nil,
-				not Lobby.connected and UIBox_button({
+				not G.LOBBY.connected and UIBox_button({
 					label = { "Reconnect" },
 					colour = G.C.RED,
 					button = "reconnect",
@@ -369,43 +368,44 @@ function override_main_menu_play_button()
 	)
 end
 
-function G.FUNCS.play_options(arg_736_0)
+function G.FUNCS.play_options(e)
 	G.SETTINGS.paused = true
 
 	G.FUNCS.overlay_menu({
-		definition = override_main_menu_play_button(),
+		definition = G.UIDEF.override_main_menu_play_button(),
 	})
 end
 
-function G.FUNCS.create_lobby(arg_736_0)
+function G.FUNCS.create_lobby(e)
 	G.SETTINGS.paused = true
 
 	G.FUNCS.overlay_menu({
-		definition = create_UIBox_create_lobby_button(),
+		definition = G.UIDEF.create_UIBox_create_lobby_button(),
 	})
 end
 
-function G.FUNCS.join_lobby(arg_736_0)
+function G.FUNCS.join_lobby(e)
 	G.SETTINGS.paused = true
 
 	G.FUNCS.overlay_menu({
-		definition = create_UIBox_join_lobby_button(),
+		definition = G.UIDEF.create_UIBox_join_lobby_button(),
 	})
 end
 
-function G.FUNCS.join_from_clipboard(arg_736_0)
-	Lobby.temp_code = Utils.get_from_clipboard()
-	ActionHandlers.join_lobby(Lobby.temp_code)
+function G.FUNCS.join_from_clipboard(e)
+	G.LOBBY.temp_code = Utils.get_from_clipboard()
+	G.MULTIPLAYER.join_lobby(G.LOBBY.temp_code)
 end
 
-function G.FUNCS.start_lobby(arg_736_0)
+function G.FUNCS.start_lobby(e)
 	G.SETTINGS.paused = false
 
-	ActionHandlers.create_lobby()
+	G.MULTIPLAYER.create_lobby()
 end
 
 -- Modify play button to take you to mode select first
 local create_UIBox_main_menu_buttonsRef = create_UIBox_main_menu_buttons
+---@diagnostic disable-next-line: lowercase-global
 function create_UIBox_main_menu_buttons()
 	local menu = create_UIBox_main_menu_buttonsRef()
 	menu.nodes[1].nodes[1].nodes[1].nodes[1].config.button = "play_options"

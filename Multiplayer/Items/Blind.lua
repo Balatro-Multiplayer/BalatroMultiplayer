@@ -22,7 +22,7 @@ G.P_BLINDS["bl_pvp"] = bl_pvp
 
 local get_new_boss_ref = get_new_boss
 function get_new_boss()
-	if Lobby.code then
+	if G.LOBBY.code then
 		return "bl_pvp"
 	else
 		local boss = get_new_boss_ref()

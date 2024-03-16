@@ -4,11 +4,10 @@
 ----------------------------------------------
 ------------MOD UTILS-------------------------
 
-local ActionHandlers = require("Action_Handlers")
-
 Utils = {}
 
 local localize_ref = localize
+---@diagnostic disable-next-line: lowercase-global
 function localize(args, misc_cat)
 	if args == nil then
 		sendDebugMessage("Caught nil localize args, misc_cat: " .. misc_cat)
@@ -72,7 +71,7 @@ end
 
 local usernameFilePath = "Mods/Multiplayer/Saved/username.txt"
 function Utils.save_username(text)
-	ActionHandlers.set_username(text)
+	G.MULTIPLAYER.set_username(text)
 	love.filesystem.write(usernameFilePath, text)
 end
 
@@ -81,7 +80,7 @@ function Utils.get_username()
 	if not fileContent then
 		return
 	end
-	Lobby.username = fileContent
+	G.LOBBY.username = fileContent
 end
 
 function Utils.string_split(inputstr, sep)
