@@ -22,7 +22,7 @@ local function initializeThreadDebugSocketConnection()
 end
 
 function SEND_THREAD_DEBUG_MESSAGE(message)
-	if CLIENT then
+	if CLIENT and message then
 		CLIENT:send(message .. "\n")
 	end
 end
