@@ -6,7 +6,7 @@
 
 function Disableable_Button(args)
 	local enabled_table = args.enabled_ref_table or {}
-	local enabled = enabled_table[args.disable_ref_value]
+	local enabled = enabled_table[args.enabled_ref_value]
 	args.colour = args.colour or G.C.RED
 	args.text_colour = args.text_colour or G.C.UI.TEXT_LIGHT
 	args.label = not enabled and args.disabled_text or args.label

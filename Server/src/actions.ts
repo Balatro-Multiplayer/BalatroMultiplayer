@@ -6,6 +6,7 @@ export type ActionLobbyInfo = {
 	action: 'lobbyInfo'
 	host: string
 	guest?: string
+	isHost: boolean
 }
 export type ActionStopGame = { action: 'stopGame' }
 export type ActionStartGame = {

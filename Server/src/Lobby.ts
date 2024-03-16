@@ -73,6 +73,7 @@ class Lobby {
 		const action: ActionLobbyInfo = {
 			action: 'lobbyInfo',
 			host: this.host.username,
+			isHost: false,
 		}
 
 		if (this.guest?.username) {
@@ -80,6 +81,8 @@ class Lobby {
 			this.guest.send(serializeAction(action))
 		}
 
+		// Should only sent true to the host
+		action.isHost = true
 		this.host.send(serializeAction(action))
 	}
 }

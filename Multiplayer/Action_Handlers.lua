@@ -96,6 +96,8 @@ function Game.update(arg_298_0, arg_298_1)
 
 			sendDebugMessage("Client got " .. parsedAction.action .. " message")
 
+			sendDebugMessage(msg)
+
 			if parsedAction.action == "connected" then
 				action_connected()
 			elseif parsedAction.action == "joinedLobby" then

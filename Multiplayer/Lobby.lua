@@ -243,8 +243,8 @@ local function create_UIBox_lobby_menu()
 								disabled_text = { "WAITING FOR", "HOST TO START" },
 								scale = text_scale * 2,
 								col = true,
-								disable_ref_table = Lobby,
-								disable_ref_value = "is_host",
+								enabled_ref_table = Lobby,
+								enabled_ref_value = "is_host",
 							}),
 							{
 								n = G.UIT.C,
@@ -260,8 +260,8 @@ local function create_UIBox_lobby_menu()
 										label = { "LOBBY OPTIONS" },
 										scale = text_scale * 1.2,
 										col = true,
-										disable_ref_table = Lobby,
-										disable_ref_value = "is_host",
+										enabled_ref_table = Lobby,
+										enabled_ref_value = "is_host",
 									}),
 									{
 										n = G.UIT.C,
