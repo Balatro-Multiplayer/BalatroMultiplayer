@@ -142,6 +142,11 @@ readyBlind
 
 ---
 
+unreadyBlind
+- Declare not ready to start next blind.
+
+---
+
 playHand: score, handsLeft
 - Client has played a hand.
 - score: The total score of all hands played in the blind so far, must be a number
@@ -161,8 +166,6 @@ playerInfo
 
 enemyInfo
 - Request an enemyInfo update.
-
----
 
 ### Utility
 

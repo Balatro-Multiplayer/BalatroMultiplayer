@@ -1,5 +1,5 @@
 import type Client from './Client.js'
-import type { ActionLobbyInfo } from './actions.js'
+import type { Action, ActionLobbyInfo } from './actions.js'
 import { serializeAction } from './main.js'
 
 const Lobbies = new Map()
@@ -45,7 +45,7 @@ class Lobby {
 		if (this.host === null) {
 			Lobbies.delete(this.code)
 		} else {
-			this.broadcast()
+			this.broadcastLobbyInfo()
 		}
 	}
 
@@ -62,10 +62,15 @@ class Lobby {
 		this.guest = client
 		client.setLobby(this)
 		client.send(serializeAction({ action: 'joinedLobby', code: this.code }))
-		this.broadcast()
+		this.broadcastLobbyInfo()
 	}
 
-	broadcast = () => {
+	broadcast = (action: Action) => {
+		this.host?.send(serializeAction(action))
+		this.guest?.send(serializeAction(action))
+	}
+
+	broadcastLobbyInfo = () => {
 		if (!this.host) {
 			return
 		}

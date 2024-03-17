@@ -123,16 +123,17 @@ function G.UIDEF.create_UIBox_lobby_menu()
 						nodes = {
 							Disableable_Button({
 								id = "lobby_menu_start",
-								button = "lobby_setup_run",
+								button = "lobby_start_game",
 								colour = G.C.BLUE,
 								minw = 3.65,
 								minh = 1.55,
 								label = { "START" },
-								disabled_text = { "WAITING FOR", "HOST TO START" },
+								disabled_text = G.LOBBY.is_host and { "WAITING FOR", "PLAYERS" }
+									or { "WAITING FOR", "HOST TO START" },
 								scale = text_scale * 2,
 								col = true,
 								enabled_ref_table = G.LOBBY,
-								enabled_ref_value = "is_host",
+								enabled_ref_value = "ready_to_start",
 							}),
 							{
 								n = G.UIT.C,
@@ -311,9 +312,11 @@ function G.FUNCS.get_lobby_main_menu_UI(e)
 	})
 end
 
-function G.FUNCS.lobby_setup_run(e)
+---@type fun(e: table | nil, args: { deck: string, stake: number | nil, seed: string | nil })
+function G.FUNCS.lobby_start_run(e, args)
 	G.FUNCS.start_run(e, {
 		stake = 1,
+		seed = args.seed,
 		challenge = {
 			name = "Multiplayer Deck",
 			id = "c_multiplayer_1",
@@ -339,6 +342,10 @@ function G.FUNCS.lobby_setup_run(e)
 			},
 		},
 	})
+end
+
+function G.FUNCS.lobby_start_game(e)
+	G.MULTIPLAYER.start_game()
 end
 
 function G.FUNCS.lobby_options(e)

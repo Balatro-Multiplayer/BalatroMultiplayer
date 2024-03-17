@@ -1,7 +1,16 @@
 import net from 'node:net'
 import Client from './Client.js'
 import { actionHandlers } from './actionHandlers.js'
-import type { Action, ActionClientToServer, ActionUtility } from './actions.js'
+import type {
+	Action,
+	ActionClientToServer,
+	ActionCreateLobby,
+	ActionHandlerArgs,
+	ActionJoinLobby,
+	ActionPlayHand,
+	ActionUsername,
+	ActionUtility,
+} from './actions.js'
 
 const PORT = 8080
 
@@ -89,13 +98,50 @@ const server = net.createServer((socket) => {
 				const { action, ...actionArgs } = message
 				console.log(`Received action ${action} from ${client.id}`)
 
-				// This only works for now, once we add more arguments
-				// we'll need to refactor this
-				// Maybe add a context type that includes everything
-				// connection related?
-				Object.keys(actionArgs).length > 0
-					? actionHandlers[action]?.(actionArgs, client)
-					: actionHandlers[action]?.(client)
+				switch (action) {
+					case 'username':
+						actionHandlers.username(
+							actionArgs as ActionHandlerArgs<ActionUsername>,
+							client,
+						)
+						break
+					case 'createLobby':
+						actionHandlers.createLobby(
+							actionArgs as ActionHandlerArgs<ActionCreateLobby>,
+							client,
+						)
+						break
+					case 'joinLobby':
+						actionHandlers.joinLobby(
+							actionArgs as ActionHandlerArgs<ActionJoinLobby>,
+							client,
+						)
+						break
+					case 'lobbyInfo':
+						actionHandlers.lobbyInfo(client)
+						break
+					case 'leaveLobby':
+						actionHandlers.leaveLobby(client)
+						break
+					case 'startGame':
+						actionHandlers.startGame(client)
+						break
+					case 'readyBlind':
+						actionHandlers.readyBlind(client)
+						break
+					case 'unreadyBlind':
+						actionHandlers.unreadyBlind(client)
+						break
+					case 'keepAlive':
+						actionHandlers.keepAlive(client)
+						break
+					case 'playHand':
+						actionHandlers.playHand(
+							actionArgs as ActionHandlerArgs<ActionPlayHand>,
+							client,
+						)
+						break
+				}
 			} catch (error) {
 				const failedToParseError = 'Failed to parse message'
 				console.error(failedToParseError, error)
