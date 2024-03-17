@@ -38,6 +38,8 @@ local function action_lobbyInfo(host, guest, is_host)
 	G.LOBBY.host = { username = host }
 	if guest ~= nil then
 		G.LOBBY.guest = { username = guest }
+	else
+		G.LOBBY.guest = {}
 	end
 	G.MULTIPLAYER.update_player_usernames()
 end
