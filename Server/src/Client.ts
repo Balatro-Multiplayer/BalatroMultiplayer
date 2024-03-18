@@ -23,6 +23,7 @@ class Client {
 	// TODO: Set lives based on game mode
 	lives = 4
 	score = 0
+	handsLeft = 4
 
 	constructor(address: Address, send: SendFn) {
 		this.id = uuidv4()

@@ -720,12 +720,48 @@ function G.UIDEF.shop()
 end
 
 local update_hand_played_ref = Game.update_hand_played
+---@diagnostic disable-next-line: duplicate-set-field
 function Game:update_hand_played(dt)
-	if not G.STATE_COMPLETE then
-		G.MULTIPLAYER.play_hand(G.GAME.chips, G.GAME.current_round.hands_left)
+	-- Ignore for singleplayer
+	if not G.LOBBY.connected or not G.LOBBY.code then
+		update_hand_played_ref(dt)
+		return
 	end
 
-	update_hand_played_ref(self, dt)
+	if self.buttons then
+		self.buttons:remove()
+		self.buttons = nil
+	end
+	if self.shop then
+		self.shop:remove()
+		self.shop = nil
+	end
+
+	if not G.STATE_COMPLETE then
+		G.STATE_COMPLETE = true
+		G.E_MANAGER:add_event(Event({
+			trigger = "immediate",
+			func = function()
+				G.MULTIPLAYER.play_hand(G.GAME.chips, G.GAME.current_round.hands_left)
+
+				if G.GAME.blind.boss then
+					-- Set blind chips to enemy score
+					G.GAME.blind.chips = G.LOBBY.enemy.score
+					-- For now, never advance to next round
+					G.STATE = G.STATES.DRAW_TO_HAND
+				else
+					if G.GAME.chips - G.GAME.blind.chips >= 0 or G.GAME.current_round.hands_left < 1 then
+						G.STATE = G.STATES.NEW_ROUND
+					else
+						G.STATE = G.STATES.DRAW_TO_HAND
+					end
+				end
+
+				G.STATE_COMPLETE = false
+				return true
+			end,
+		}))
+	end
 end
 
 ----------------------------------------------

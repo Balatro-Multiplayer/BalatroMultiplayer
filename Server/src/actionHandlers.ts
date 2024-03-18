@@ -66,7 +66,7 @@ const startGameAction = (client: Client) => {
 	client.lobby.broadcast({
 		action: 'startGame',
 		deck: 'c_multiplayer_1',
-		seed: generateSeed(),
+		seed: 'JA9C3',
 	})
 }
 
@@ -78,6 +78,14 @@ const readyBlindAction = (client: Client) => {
 		// Reset ready status for next blind
 		client.lobby.host.isReady = false
 		client.lobby.guest.isReady = false
+
+		// Reset scores for next blind
+		client.lobby.host.score = 0
+		client.lobby.guest.score = 0
+
+		// Reset hands left for next blind
+		client.lobby.host.handsLeft = 4
+		client.lobby.guest.handsLeft = 4
 
 		client.lobby.broadcast({ action: 'startBlind' })
 	}
@@ -98,6 +106,7 @@ const playHandAction = (
 	// Should this be additive or just
 	// the latest score?
 	client.score = score
+	client.handsLeft = handsLeft
 
 	const lobby = client.lobby
 	// Update the other party about the

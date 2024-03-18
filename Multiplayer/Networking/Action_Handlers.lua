@@ -44,7 +44,10 @@ local function action_lobbyInfo(host, guest, is_host)
 	-- TODO: This should check for player count instead
 	-- once we enable more than 2 players
 	G.LOBBY.ready_to_start = G.LOBBY.is_host and guest ~= nil
-	G.MULTIPLAYER.update_player_usernames()
+
+	if G.STAGE == G.STAGES.MAIN_MENU then
+		G.MULTIPLAYER.update_player_usernames()
+	end
 end
 
 local function action_error(message)
@@ -92,10 +95,13 @@ local function action_enemy_info(score_str, hands_left_str)
 		return
 	end
 
-	-- TODO: This is not working right now
-	if G.GAME.blind.boss then
-		-- Set blind chips to enemy score
-		G.GAME.blind.chips = score
+	G.LOBBY.enemy.score = score
+	G.LOBBY.enemy.hands = hands_left
+end
+
+local function action_stop_game()
+	if G.STAGE ~= G.STAGES.MAIN_MENU then
+		G.MULTIPLAYER.update_connection_status()
 	end
 end
 
@@ -175,6 +181,8 @@ function Game:update(dt)
 				action_start_blind()
 			elseif parsedAction.action == "enemyInfo" then
 				action_enemy_info(parsedAction.score, parsedAction.handsLeft)
+			elseif parsedAction.action == "stopGame" then
+				action_stop_game()
 			elseif parsedAction.action == "error" then
 				action_error(parsedAction.message)
 			elseif parsedAction.action == "keepAlive" then
