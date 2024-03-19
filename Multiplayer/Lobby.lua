@@ -23,16 +23,20 @@ G.MULTIPLAYER_GAME = {
 	ready_blind_text = "Ready",
 }
 
-PREV_ACHIEVEMENT_VALUE = true
+START_NO_ACHIEVEMENT_VALUE = true
+local init_steamodded_ref = initSteamodded
+function initSteamodded()
+	init_steamodded_ref()
+	START_NO_ACHIEVEMENT_VALUE = G.F_NO_ACHIEVEMENTS
+end
+
 function G.MULTIPLAYER.update_connection_status()
-	-- Save the previous value of the achievement flag
-	PREV_ACHIEVEMENT_VALUE = G.F_NO_ACHIEVEMENTS
 	if G.LOBBY.connected then
 		-- Disable achievements when connected to server
 		G.F_NO_ACHIEVEMENTS = true
 	else
 		-- Restore them when disconnected
-		G.F_NO_ACHIEVEMENTS = PREV_ACHIEVEMENT_VALUE
+		G.F_NO_ACHIEVEMENTS = START_NO_ACHIEVEMENT_VALUE
 	end
 
 	if G.HUD_connection_status then
