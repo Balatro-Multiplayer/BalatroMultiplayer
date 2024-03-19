@@ -1,10 +1,9 @@
 # A Balatro Multiplayer Mod
 
-This is an WIP Balatro multiplayer mod developed by virtualized.
+This is an **WIP** Balatro multiplayer mod developed by virtualized and TGMM.
 
+If you want to get in touch for any reason:
 **Discord:** virtualized
-
-**Twitter:** @v_rtualized
 
 This project will remain free and open source. It will also be continuously maintained, at least within the near future.
 
@@ -12,8 +11,8 @@ If you make a video or stream Balatro using this mod then feel free to send me a
 
 ## Goals for First Release
 
-- Some form of public server available, or a user friendly method to create a server
-  - This was originally to us Steam servers but that doesn't seem to be an options unfortunately
+- A public server everyone will connect to by default
+  - We may support private servers but probably won't be making an non-programmer friendly way of making one (eg. Basic knowledge of Docker and port forwarding)
 - At least 2 out of 4 planned game modes implemented
 
 ## Planned Gamemodes
