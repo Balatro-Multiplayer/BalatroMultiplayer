@@ -26,9 +26,9 @@ G.MULTIPLAYER_GAME = {
 }
 
 START_NO_ACHIEVEMENT_VALUE = true
-local init_steamodded_ref = initSteamodded
-function initSteamodded()
-	init_steamodded_ref()
+local init_mods_ref = initMods
+function initMods()
+	init_mods_ref()
 	START_NO_ACHIEVEMENT_VALUE = G.F_NO_ACHIEVEMENTS
 end
 
