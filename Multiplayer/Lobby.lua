@@ -18,7 +18,7 @@ G.LOBBY = {
 	is_host = false,
 	enemy = {
 		score = 0,
-		hands = 5,
+		hands = 4,
 	},
 }
 

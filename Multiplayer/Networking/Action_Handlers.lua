@@ -97,10 +97,15 @@ local function action_enemy_info(score_str, hands_left_str)
 
 	G.LOBBY.enemy.score = score
 	G.LOBBY.enemy.hands = hands_left
+	if G.GAME.blind.boss then
+		G.HUD_blind:get_UIE_by_ID("HUD_blind_count"):juice_up()
+		G.HUD_blind:get_UIE_by_ID("dollars_to_be_earned"):juice_up()
+	end
 end
 
 local function action_stop_game()
 	if G.STAGE ~= G.STAGES.MAIN_MENU then
+		G.FUNCS.go_to_menu()
 		G.MULTIPLAYER.update_connection_status()
 	end
 end

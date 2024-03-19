@@ -21,6 +21,7 @@ local c_multiplayer_1 = {
 		banned_cards = {
 			{ id = "j_diet_cola" },
 			{ id = "j_mr_bones" },
+			{ id = "j_throwback" },
 			{ id = "v_hieroglyph" },
 			{ id = "v_petroglyph" },
 		},
