@@ -732,8 +732,8 @@ end
 local update_hand_played_ref = Game.update_hand_played
 ---@diagnostic disable-next-line: duplicate-set-field
 function Game:update_hand_played(dt)
-	-- Ignore for singleplayer
-	if not G.LOBBY.connected or not G.LOBBY.code then
+	-- Ignore for singleplayer or regular blinds
+	if not G.LOBBY.connected or not G.LOBBY.code or not G.GAME.blind.boss then
 		update_hand_played_ref(self, dt)
 		return
 	end
@@ -752,30 +752,29 @@ function Game:update_hand_played(dt)
 		G.E_MANAGER:add_event(Event({
 			trigger = "immediate",
 			func = function()
-				if G.GAME.blind.boss then
-					G.MULTIPLAYER.play_hand(G.GAME.chips, G.GAME.current_round.hands_left)
-					-- Set blind chips to enemy score
-					G.GAME.blind.chips = G.LOBBY.enemy.score
-					-- For now, never advance to next round
-					if G.GAME.current_round.hands_left < 1 then
-						if G.hand.cards[1] then
-							attention_text({
-								scale = 0.8, text = 'Waiting for enemy to finish...', hold = 5, align = 'cm', offset = {x = 0,y = -1.5},major = G.play
-							})
-							G.FUNCS.draw_from_hand_to_discard()
-						end
-					else
-						G.STATE = G.STATES.DRAW_TO_HAND
+				G.MULTIPLAYER.play_hand(G.GAME.chips, G.GAME.current_round.hands_left)
+				-- Set blind chips to enemy score
+				G.GAME.blind.chips = G.LOBBY.enemy.score
+				-- For now, never advance to next round
+				if G.GAME.current_round.hands_left < 1 then
+					if G.hand.cards[1] then
+						attention_text({
+							scale = 0.8,
+							text = "Waiting for enemy to finish...",
+							hold = 5,
+							align = "cm",
+							offset = { x = 0, y = -1.5 },
+							major = G.play,
+						})
+						G.FUNCS.draw_from_hand_to_discard()
 					end
+
+					G.MULTIPLAYER_GAME.processed_round_done = true
 				else
-					if G.GAME.chips - G.GAME.blind.chips >= 0 or G.GAME.current_round.hands_left < 1 then
-						G.STATE = G.STATES.NEW_ROUND
-					else
-						G.STATE = G.STATES.DRAW_TO_HAND
-					end
+					G.STATE_COMPLETE = false
+					G.STATE = G.STATES.DRAW_TO_HAND
 				end
 
-				G.STATE_COMPLETE = false
 				return true
 			end,
 		}))
@@ -784,7 +783,7 @@ end
 
 local can_play_ref = G.FUNCS.can_play
 G.FUNCS.can_play = function(e)
-	if G.GAME.current_round.hands_left <= 0 then 
+	if G.GAME.current_round.hands_left <= 0 then
 		e.config.colour = G.C.UI.BACKGROUND_INACTIVE
 		e.config.button = nil
 	else

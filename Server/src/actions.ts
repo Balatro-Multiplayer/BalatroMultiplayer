@@ -46,6 +46,8 @@ export type ActionServerToClient =
 	| ActionPlayerInfo
 	| ActionEnemyInfo
 	| ActionEndPvP
+	| ActionKeepAlive
+	| ActionKeepAliveAck
 
 // Client to Server
 export type ActionUsername = { action: 'username'; username: string }

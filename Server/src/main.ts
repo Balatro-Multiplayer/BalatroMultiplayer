@@ -8,11 +8,12 @@ import type {
 	ActionHandlerArgs,
 	ActionJoinLobby,
 	ActionPlayHand,
+	ActionServerToClient,
 	ActionUsername,
 	ActionUtility,
 } from './actions.js'
 
-const PORT = 8080
+const PORT = 15158
 
 /** The amount of milliseconds we wait before sending the initial keepalive packet  */
 const KEEP_ALIVE_INITIAL_TIMEOUT = 5000
@@ -23,11 +24,10 @@ const KEEP_ALIVE_RETRY_COUNT = 3
 
 // biome-ignore lint/suspicious/noExplicitAny: Object is parsed from string
 const stringToJson = (str: string): any => {
-	// biome-ignore lint/suspicious/noExplicitAny: Object is parsed from string
-	const obj: any = {}
+	const obj: Record<string, string | number> = {}
 	for (const part of str.split(',')) {
 		const [key, value] = part.split(':')
-		obj[key] = value
+		obj[key] = Number.isNaN(value) ? value : +value
 	}
 	return obj
 }
@@ -41,12 +41,21 @@ export const serializeAction = (action: Action): string => {
 	return parts.join(',')
 }
 
-const sendToSocket = (socket: net.Socket) => (data: string) => {
-	if (!socket) {
-		return
+const sendActionToSocket =
+	(socket: net.Socket) => (action: ActionServerToClient) => {
+		if (!socket) {
+			return
+		}
+
+		const data = serializeAction(action)
+
+		const { action: actionName, ...actionArgs } = action
+		console.log(
+			`Sent action ${actionName} to client: ${JSON.stringify(actionArgs)}`,
+		)
+
+		socket.write(`${data}\n`)
 	}
-	socket.write(`${data}\n`)
-}
 
 const server = net.createServer((socket) => {
 	socket.allowHalfOpen = false
@@ -54,8 +63,8 @@ const server = net.createServer((socket) => {
 	// improve latency between responses
 	socket.setNoDelay()
 
-	const client = new Client(socket.address(), sendToSocket(socket))
-	client.send(serializeAction({ action: 'connected' }))
+	const client = new Client(socket.address(), sendActionToSocket(socket))
+	client.sendAction({ action: 'connected' })
 
 	let isRetry = false
 	let retryCount = 0
@@ -66,7 +75,7 @@ const server = net.createServer((socket) => {
 			return
 		}
 
-		client.send(serializeAction({ action: 'keepAlive' }))
+		client.sendAction({ action: 'keepAlive' })
 		retryCount++
 
 		if (retryCount >= KEEP_ALIVE_RETRY_COUNT) {
@@ -78,7 +87,7 @@ const server = net.createServer((socket) => {
 
 	// Once the client connects, we start a timer
 	const keepAlive: ReturnType<typeof setTimeout> = setTimeout(() => {
-		client.send(serializeAction({ action: 'keepAlive' }))
+		client.sendAction({ action: 'keepAlive' })
 		isRetry = true
 		retryTimer.refresh()
 	}, KEEP_ALIVE_INITIAL_TIMEOUT)
@@ -96,7 +105,11 @@ const server = net.createServer((socket) => {
 			try {
 				const message: ActionClientToServer | ActionUtility = stringToJson(msg)
 				const { action, ...actionArgs } = message
-				console.log(`Received action ${action} from ${client.id}`)
+				console.log(
+					`Received action ${action} from ${client.id}: ${JSON.stringify(
+						actionArgs,
+					)}`,
+				)
 
 				switch (action) {
 					case 'username':
@@ -145,12 +158,10 @@ const server = net.createServer((socket) => {
 			} catch (error) {
 				const failedToParseError = 'Failed to parse message'
 				console.error(failedToParseError, error)
-				client.send(
-					serializeAction({
-						action: 'error',
-						message: failedToParseError,
-					}),
-				)
+				client.sendAction({
+					action: 'error',
+					message: failedToParseError,
+				})
 			}
 		}
 	})

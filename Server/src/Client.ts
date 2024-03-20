@@ -1,8 +1,9 @@
 import { v4 as uuidv4 } from 'uuid'
 import type Lobby from './Lobby.js'
 import type net from 'node:net'
+import type { ActionServerToClient } from './actions.js'
 
-type SendFn = (data: string) => void
+type SendFn = (action: ActionServerToClient) => void
 
 /* biome-ignore lint/complexity/noBannedTypes: 
 	This is how the net module does it */
@@ -13,7 +14,7 @@ class Client {
 	id: string
 	// Could be useful later on to detect reconnects
 	address: Address
-	send: SendFn
+	sendAction: SendFn
 
 	// Game info
 	username = 'Guest'
@@ -28,7 +29,7 @@ class Client {
 	constructor(address: Address, send: SendFn) {
 		this.id = uuidv4()
 		this.address = address
-		this.send = send
+		this.sendAction = send
 	}
 
 	setUsername = (username: string) => {

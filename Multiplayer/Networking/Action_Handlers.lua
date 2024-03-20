@@ -110,6 +110,21 @@ local function action_stop_game()
 	end
 end
 
+local function action_end_pvp()
+	-- TODO: Some logic here to say that you won
+	-- or lost the round
+
+	G.STATE = G.STATES.NEW_ROUND
+	G.STATE_COMPLETE = false
+end
+
+---@param lives number
+local function action_player_info(lives)
+	if lives == 0 then
+		action_stop_game()
+	end
+end
+
 -- #region Client to Server
 function G.MULTIPLAYER.create_lobby()
 	-- TODO: This is hardcoded to attrition for now, must be changed
@@ -188,6 +203,10 @@ function Game:update(dt)
 				action_enemy_info(parsedAction.score, parsedAction.handsLeft)
 			elseif parsedAction.action == "stopGame" then
 				action_stop_game()
+			elseif parsedAction.action == "endPvP" then
+				action_end_pvp()
+			elseif parsedAction.action == "playerInfo" then
+				action_player_info(parsedAction.lives)
 			elseif parsedAction.action == "error" then
 				action_error(parsedAction.message)
 			elseif parsedAction.action == "keepAlive" then

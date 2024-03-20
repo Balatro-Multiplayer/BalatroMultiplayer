@@ -1,5 +1,9 @@
 import type Client from './Client.js'
-import type { Action, ActionLobbyInfo } from './actions.js'
+import type {
+	Action,
+	ActionLobbyInfo,
+	ActionServerToClient,
+} from './actions.js'
 import { serializeAction } from './main.js'
 
 const Lobbies = new Map()
@@ -26,7 +30,7 @@ class Lobby {
 		this.host = host
 		this.guest = null
 		host.setLobby(this)
-		host.send(serializeAction({ action: 'joinedLobby', code: this.code }))
+		host.sendAction({ action: 'joinedLobby', code: this.code })
 	}
 
 	static get = (code: string) => {
@@ -46,30 +50,28 @@ class Lobby {
 		} else {
 			// TODO: Refactor for more than 2 players
 			// Stop game if someone leaves
-			client.lobby?.broadcast({ action: 'stopGame' })
+			client.lobby?.broadcastAction({ action: 'stopGame' })
 			this.broadcastLobbyInfo()
 		}
 	}
 
 	join = (client: Client) => {
 		if (this.guest) {
-			client.send(
-				serializeAction({
-					action: 'error',
-					message: 'Lobby is full or does not exist.',
-				}),
-			)
+			client.sendAction({
+				action: 'error',
+				message: 'Lobby is full or does not exist.',
+			})
 			return
 		}
 		this.guest = client
 		client.setLobby(this)
-		client.send(serializeAction({ action: 'joinedLobby', code: this.code }))
+		client.sendAction({ action: 'joinedLobby', code: this.code })
 		this.broadcastLobbyInfo()
 	}
 
-	broadcast = (action: Action) => {
-		this.host?.send(serializeAction(action))
-		this.guest?.send(serializeAction(action))
+	broadcastAction = (action: ActionServerToClient) => {
+		this.host?.sendAction(action)
+		this.guest?.sendAction(action)
 	}
 
 	broadcastLobbyInfo = () => {
@@ -85,12 +87,12 @@ class Lobby {
 
 		if (this.guest?.username) {
 			action.guest = this.guest.username
-			this.guest.send(serializeAction(action))
+			this.guest.sendAction(action)
 		}
 
 		// Should only sent true to the host
 		action.isHost = true
-		this.host.send(serializeAction(action))
+		this.host.sendAction(action)
 	}
 }
 

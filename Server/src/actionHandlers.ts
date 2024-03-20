@@ -8,7 +8,6 @@ import type {
 	ActionPlayHand,
 	ActionUsername,
 } from './actions.js'
-import { serializeAction } from './main.js'
 import { generateSeed } from './utils.js'
 
 const usernameAction = (
@@ -32,12 +31,10 @@ const joinLobbyAction = (
 ) => {
 	const newLobby = Lobby.get(code)
 	if (!newLobby) {
-		client.send(
-			serializeAction({
-				action: 'error',
-				message: 'Lobby does not exist.',
-			}),
-		)
+		client.sendAction({
+			action: 'error',
+			message: 'Lobby does not exist.',
+		})
 		return
 	}
 	newLobby.join(client)
@@ -53,7 +50,7 @@ const lobbyInfoAction = (client: Client) => {
 
 const keepAliveAction = (client: Client) => {
 	// Send an ack back to the received keepAlive
-	client.send(serializeAction({ action: 'keepAliveAck' }))
+	client.sendAction({ action: 'keepAliveAck' })
 }
 
 const startGameAction = (client: Client) => {
@@ -63,7 +60,7 @@ const startGameAction = (client: Client) => {
 	}
 
 	// Hardcoded for testing
-	client.lobby.broadcast({
+	client.lobby.broadcastAction({
 		action: 'startGame',
 		deck: 'c_multiplayer_1',
 		seed: 'JA9C3',
@@ -87,7 +84,7 @@ const readyBlindAction = (client: Client) => {
 		client.lobby.host.handsLeft = 4
 		client.lobby.guest.handsLeft = 4
 
-		client.lobby.broadcast({ action: 'startBlind' })
+		client.lobby.broadcastAction({ action: 'startBlind' })
 	}
 }
 
@@ -106,38 +103,45 @@ const playHandAction = (
 	// Should this be additive or just
 	// the latest score?
 	client.score = score
-	client.handsLeft = handsLeft
+	client.handsLeft =
+		typeof handsLeft === 'number' ? handsLeft : Number(handsLeft)
 
 	const lobby = client.lobby
 	// Update the other party about the
 	// enemy's score and hands left
 	// TODO: Refactor for more than two players
 	if (lobby.host?.id === client.id) {
-		lobby.guest?.send(
-			serializeAction({
-				action: 'enemyInfo',
-				handsLeft,
-				score,
-			}),
-		)
+		lobby.guest?.sendAction({
+			action: 'enemyInfo',
+			handsLeft,
+			score,
+		})
 	} else if (lobby.guest?.id === client.id) {
-		lobby.host?.send(
-			serializeAction({
-				action: 'enemyInfo',
-				handsLeft,
-				score,
-			}),
-		)
+		lobby.host?.sendAction({
+			action: 'enemyInfo',
+			handsLeft,
+			score,
+		})
 	}
 
-	// TODO: This should check if this is the boss blind
-	if (lobby.host?.lives === 0 && lobby.guest?.lives === 0) {
+	console.log(
+		`Host hands: ${lobby.host?.handsLeft}, Guest hands: ${lobby.guest?.handsLeft}`,
+	)
+	// This info is only sent on a boss blind, so it shouldn't
+	// affect other blinds
+	if (lobby.host?.handsLeft === 0 && lobby.guest?.handsLeft === 0) {
 		const winner =
 			lobby.host.score > lobby.guest.score ? lobby.host : lobby.guest
 		const loser = winner.id === lobby.host.id ? lobby.guest : lobby.host
 
-		winner.send(serializeAction({ action: 'endPvP', lost: false }))
-		loser.send(serializeAction({ action: 'endPvP', lost: true }))
+		console.log('Winner:', winner.username)
+		console.log('Loser:', loser.username)
+
+		loser.lives -= 1
+		loser.sendAction({ action: 'playerInfo', lives: loser.lives })
+
+		winner.sendAction({ action: 'endPvP', lost: false })
+		loser.sendAction({ action: 'endPvP', lost: true })
 	}
 }
 
