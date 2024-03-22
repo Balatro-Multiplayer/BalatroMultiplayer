@@ -51,7 +51,7 @@ export type ActionServerToClient =
 
 // Client to Server
 export type ActionUsername = { action: 'username'; username: string }
-export type ActionCreateLobby = { action: 'createLobby'; gameMode: string }
+export type ActionCreateLobby = { action: 'createLobby'; gameMode: GameMode }
 export type ActionJoinLobby = { action: 'joinLobby'; code: string }
 export type ActionLeaveLobby = { action: 'leaveLobby' }
 export type ActionLobbyInfoRequest = { action: 'lobbyInfo' }
@@ -108,3 +108,6 @@ export type ActionHandlers = {
 }
 
 export type ActionHandlerArgs<T extends HandledActions> = Omit<T, 'action'>
+
+// Other types
+export type GameMode = 'attrition' | 'draft'

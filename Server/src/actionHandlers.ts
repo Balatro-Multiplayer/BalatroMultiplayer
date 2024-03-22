@@ -22,7 +22,7 @@ const createLobbyAction = (
 	client: Client,
 ) => {
 	/** Also sets the client lobby to this newly created one */
-	new Lobby(client)
+	new Lobby(client, gameMode)
 }
 
 const joinLobbyAction = (
@@ -54,13 +54,27 @@ const keepAliveAction = (client: Client) => {
 }
 
 const startGameAction = (client: Client) => {
+	const lobby = client.lobby
 	// Only allow the host to start the game
-	if (!client.lobby || client.lobby.host?.id !== client.id) {
+	if (!lobby || lobby.host?.id !== client.id) {
 		return
 	}
 
-	// Hardcoded for testing
-	client.lobby.broadcastAction({
+	let lives = 4
+	// TODO: Put this in a gamemode map that
+	// has more info than just lives
+	switch (lobby.gameMode) {
+		case 'attrition':
+			lives = 4
+			break
+		case 'draft':
+			lives = 2
+			break
+	}
+
+	// Reset players' lives
+	lobby.setPlayersLives(lives)
+	lobby.broadcastAction({
 		action: 'startGame',
 		deck: 'c_multiplayer_1',
 		seed: generateSeed(),

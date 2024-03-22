@@ -1,8 +1,8 @@
 import type Client from './Client.js'
 import type {
-	Action,
 	ActionLobbyInfo,
 	ActionServerToClient,
+	GameMode,
 } from './actions.js'
 import { serializeAction } from './main.js'
 
@@ -21,14 +21,19 @@ class Lobby {
 	code: string
 	host: Client | null
 	guest: Client | null
+	gameMode: GameMode
 
-	constructor(host: Client) {
+	// Attrition is the default game mode
+	constructor(host: Client, gameMode: GameMode = 'attrition') {
 		do {
 			this.code = generateUniqueLobbyCode()
 		} while (Lobbies.get(this.code))
 		Lobbies.set(this.code, this)
+
 		this.host = host
 		this.guest = null
+		this.gameMode = gameMode
+
 		host.setLobby(this)
 		host.sendAction({ action: 'joinedLobby', code: this.code })
 	}
@@ -95,6 +100,14 @@ class Lobby {
 		// Should only sent true to the host
 		action.isHost = true
 		this.host.sendAction(action)
+	}
+
+	setPlayersLives = (lives: number) => {
+		// TODO: Refactor for more than 2 players
+		if (this.host) this.host.lives = lives
+		if (this.guest) this.guest.lives = lives
+
+		this.broadcastAction({ action: 'playerInfo', lives })
 	}
 }
 
