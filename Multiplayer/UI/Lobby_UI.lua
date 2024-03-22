@@ -374,6 +374,11 @@ function G.FUNCS.display_lobby_main_menu_UI(e)
 	G.CONTROLLER:snap_to({ node = G.MAIN_MENU_UI:get_UIE_by_ID("lobby_menu_start") })
 end
 
+function G.FUNCS.return_to_lobby()
+	G.FUNCS.go_to_menu()
+	G.MULTIPLAYER.stop_game()
+end
+
 local set_main_menu_UI_ref = set_main_menu_UI
 ---@diagnostic disable-next-line: lowercase-global
 function set_main_menu_UI()

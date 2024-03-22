@@ -27,7 +27,8 @@ const stringToJson = (str: string): any => {
 	const obj: Record<string, string | number> = {}
 	for (const part of str.split(',')) {
 		const [key, value] = part.split(':')
-		obj[key] = Number.isNaN(value) ? value : +value
+		const numericValue = Number.parseFloat(value)
+		obj[key] = Number.isNaN(numericValue) ? value : numericValue
 	}
 	return obj
 }
@@ -153,6 +154,9 @@ const server = net.createServer((socket) => {
 							actionArgs as ActionHandlerArgs<ActionPlayHand>,
 							client,
 						)
+						break
+					case 'stopGame':
+						actionHandlers.stopGame(client)
 						break
 				}
 			} catch (error) {

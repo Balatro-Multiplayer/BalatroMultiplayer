@@ -130,19 +130,34 @@ const playHandAction = (
 	// This info is only sent on a boss blind, so it shouldn't
 	// affect other blinds
 	if (lobby.host?.handsLeft === 0 && lobby.guest?.handsLeft === 0) {
-		const winner =
+		// If no lives are left, we end the game
+		if (lobby.host.lives === 0 || lobby.guest.lives === 0) {
+			const gameWinner =
+				lobby.host.lives > lobby.guest.lives ? lobby.host : lobby.guest
+			const gameLoser =
+				gameWinner.id === lobby.host.id ? lobby.guest : lobby.host
+
+			stopGameAction(client)
+
+			// TODO: Announce who won
+			return
+		}
+
+		const roundWinner =
 			lobby.host.score > lobby.guest.score ? lobby.host : lobby.guest
-		const loser = winner.id === lobby.host.id ? lobby.guest : lobby.host
+		const roundLoser =
+			roundWinner.id === lobby.host.id ? lobby.guest : lobby.host
 
-		console.log('Winner:', winner.username)
-		console.log('Loser:', loser.username)
+		roundLoser.lives -= 1
+		roundLoser.sendAction({ action: 'playerInfo', lives: roundLoser.lives })
 
-		loser.lives -= 1
-		loser.sendAction({ action: 'playerInfo', lives: loser.lives })
-
-		winner.sendAction({ action: 'endPvP', lost: false })
-		loser.sendAction({ action: 'endPvP', lost: true })
+		roundWinner.sendAction({ action: 'endPvP', lost: false })
+		roundLoser.sendAction({ action: 'endPvP', lost: true })
 	}
+}
+
+const stopGameAction = (client: Client) => {
+	client.lobby?.broadcastAction({ action: 'stopGame' })
 }
 
 // Declared partial for now untill all action handlers are defined
@@ -157,4 +172,5 @@ export const actionHandlers = {
 	readyBlind: readyBlindAction,
 	unreadyBlind: unreadyBlindAction,
 	playHand: playHandAction,
+	stopGame: stopGameAction,
 } satisfies Partial<ActionHandlers>

@@ -22,7 +22,11 @@ function create_UIBox_options()
 		}))
 
 		if G.STAGE == G.STAGES.RUN then
-			main_menu = UIBox_button({ label = { "Return to Lobby" }, button = "go_to_menu", minw = 5 })
+			main_menu = UIBox_button({
+				label = { "Return to Lobby" },
+				button = "return_to_lobby",
+				minw = 5,
+			})
 			your_collection = UIBox_button({
 				label = { localize("b_collection") },
 				button = "your_collection",
@@ -789,6 +793,49 @@ G.FUNCS.can_play = function(e)
 	else
 		can_play_ref(e)
 	end
+end
+
+local update_new_round_ref = Game.update_new_round
+function Game:update_new_round(dt)
+	-- Prevent player from losing
+	G.GAME.blind.chips = 0
+	-- Prevent player from winning
+	G.GAME.win_ante = 999
+
+	update_new_round_ref(self, dt)
+
+	-- Reset ante number
+	G.GAME.win_ante = 8
+end
+
+local start_run_ref = Game.start_run
+function Game:start_run(args)
+	-- if not G.LOBBY.connected or not G.LOBBY.code then
+	-- 	update_run_ref(self, args)
+	-- 	return
+	-- end
+
+	start_run_ref(self, args)
+
+	local scale = 0.4
+	local hud_ante = G.HUD:get_UIE_by_ID("hud_ante")
+	hud_ante.children[1].children[1].config.text = "Lives"
+
+	-- Set lives number
+	hud_ante.children[2].children[1].config.object = DynaText({
+		string = { { ref_table = G.MULTIPLAYER_GAME, ref_value = "lives" } },
+		colours = { G.C.IMPORTANT },
+		shadow = true,
+		font = G.LANGUAGES["en-us"].font,
+		scale = 2 * scale,
+	})
+
+	-- Remove unnecessary HUD elements
+	hud_ante.children[2].children[2] = nil
+	hud_ante.children[2].children[3] = nil
+	hud_ante.children[2].children[4] = nil
+
+	self.HUD:recalculate()
 end
 
 ----------------------------------------------

@@ -120,9 +120,7 @@ end
 
 ---@param lives number
 local function action_player_info(lives)
-	if lives == 0 then
-		action_stop_game()
-	end
+	G.MULTIPLAYER_GAME.lives = lives
 end
 
 -- #region Client to Server
@@ -153,6 +151,10 @@ end
 
 function G.MULTIPLAYER.unready_blind()
 	Client.send("action:unreadyBlind")
+end
+
+function G.MULTIPLAYER.stop_game()
+	Client.send("action:stopGame")
 end
 
 ---@param score number
