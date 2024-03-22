@@ -130,6 +130,14 @@ const playHandAction = (
 	// This info is only sent on a boss blind, so it shouldn't
 	// affect other blinds
 	if (lobby.host?.handsLeft === 0 && lobby.guest?.handsLeft === 0) {
+		const roundWinner =
+			lobby.host.score > lobby.guest.score ? lobby.host : lobby.guest
+		const roundLoser =
+			roundWinner.id === lobby.host.id ? lobby.guest : lobby.host
+
+		roundLoser.lives -= 1
+		roundLoser.sendAction({ action: 'playerInfo', lives: roundLoser.lives })
+
 		// If no lives are left, we end the game
 		if (lobby.host.lives === 0 || lobby.guest.lives === 0) {
 			const gameWinner =
@@ -142,14 +150,6 @@ const playHandAction = (
 			// TODO: Announce who won
 			return
 		}
-
-		const roundWinner =
-			lobby.host.score > lobby.guest.score ? lobby.host : lobby.guest
-		const roundLoser =
-			roundWinner.id === lobby.host.id ? lobby.guest : lobby.host
-
-		roundLoser.lives -= 1
-		roundLoser.sendAction({ action: 'playerInfo', lives: roundLoser.lives })
 
 		roundWinner.sendAction({ action: 'endPvP', lost: false })
 		roundLoser.sendAction({ action: 'endPvP', lost: true })
