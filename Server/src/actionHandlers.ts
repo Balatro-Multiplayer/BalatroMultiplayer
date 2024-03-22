@@ -63,7 +63,7 @@ const startGameAction = (client: Client) => {
 	client.lobby.broadcastAction({
 		action: 'startGame',
 		deck: 'c_multiplayer_1',
-		seed: 'JA9C3',
+		seed: generateSeed(),
 	})
 }
 

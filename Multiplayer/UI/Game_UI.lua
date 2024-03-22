@@ -810,10 +810,10 @@ end
 
 local start_run_ref = Game.start_run
 function Game:start_run(args)
-	-- if not G.LOBBY.connected or not G.LOBBY.code then
-	-- 	update_run_ref(self, args)
-	-- 	return
-	-- end
+	if not G.LOBBY.connected or not G.LOBBY.code then
+		update_run_ref(self, args)
+		return
+	end
 
 	start_run_ref(self, args)
 
