@@ -1560,5 +1560,47 @@ function add_round_eval_row(config)
 		add_round_eval_row_ref(config)
 	end
 end
+
+local ease_ante_ref = ease_ante
+function ease_ante(mod)
+	if not G.LOBBY.code then return ease_ante_ref(mod) end
+	G.E_MANAGER:add_event(Event({
+		trigger = 'immediate',
+		func = function()
+				G.GAME.round_resets.ante = G.GAME.round_resets.ante + mod
+				check_and_set_high_score('furthest_ante', G.GAME.round_resets.ante)
+				return true
+		end
+	}))
+end
+
+function ease_lives(mod)
+	G.E_MANAGER:add_event(Event({
+		trigger = 'immediate',
+		func = function()
+				local lives_UI = G.hand_text_area.ante
+				mod = mod or 0
+				local text = '+'
+				local col = G.C.IMPORTANT
+				if mod < 0 then
+						text = '-'
+						col = G.C.RED
+				end
+				lives_UI.config.object:update()
+				G.HUD:recalculate()
+				attention_text({
+					text = text..tostring(math.abs(mod)),
+					scale = 1, 
+					hold = 0.7,
+					cover = lives_UI.parent,
+					cover_colour = col,
+					align = 'cm',
+					})
+				play_sound('highlight2', 0.685, 0.2)
+				play_sound('generic1')
+				return true
+		end
+	}))
+end
 ----------------------------------------------
 ------------MOD GAME UI END-------------------
