@@ -797,18 +797,22 @@ end
 
 local update_new_round_ref = Game.update_new_round
 function Game:update_new_round(dt)
-	-- Prevent player from losing
-	if G.GAME.chips - G.GAME.blind.chips < 0 then
-		G.GAME.blind.chips = -1
+	if G.LOBBY.code then
+		-- Prevent player from losing
+		if G.GAME.chips - G.GAME.blind.chips < 0 then
+			G.GAME.blind.chips = -1
+		end
+
+		-- Prevent player from winning
+		G.GAME.win_ante = 999
+
+		update_new_round_ref(self, dt)
+
+		-- Reset ante number
+		G.GAME.win_ante = 8
+		return
 	end
-
-	-- Prevent player from winning
-	G.GAME.win_ante = 999
-
 	update_new_round_ref(self, dt)
-
-	-- Reset ante number
-	G.GAME.win_ante = 8
 end
 
 local end_round_ref = end_round
