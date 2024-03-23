@@ -799,7 +799,10 @@ local update_new_round_ref = Game.update_new_round
 function Game:update_new_round(dt)
 	if G.LOBBY.code then
 		-- Prevent player from losing
-		G.GAME.blind.chips = 0
+		if G.GAME.chips - G.GAME.blind.chips < 0 then
+			G.GAME.blind.chips = -1
+		end
+
 		-- Prevent player from winning
 		G.GAME.win_ante = 999
 
@@ -842,5 +845,165 @@ function Game:start_run(args)
 	self.HUD:recalculate()
 end
 
+local add_round_eval_row_ref = add_round_eval_row
+function add_round_eval_row(config)
+	if G.LOBBY.code and config.name == "blind1" and G.GAME.blind.chips == -1 then
+		local config = config or {}
+		local width = G.round_eval.T.w - 0.51
+		local num_dollars = config.dollars or 1
+		local scale = 0.9
+		delay(0.4)
+		G.E_MANAGER:add_event(Event({
+			trigger = "before",
+			delay = 0.5,
+			func = function()
+				--Add the far left text and context first:
+				local left_text = {}
+				local blind_sprite =
+					AnimatedSprite(0, 0, 1.2, 1.2, G.ANIMATION_ATLAS["blind_chips"], copy_table(G.GAME.blind.pos))
+				blind_sprite:define_draw_steps({
+					{ shader = "dissolve", shadow_height = 0.05 },
+					{ shader = "dissolve" },
+				})
+				table.insert(left_text, {
+					n = G.UIT.O,
+					config = { w = 1.2, h = 1.2, object = blind_sprite, hover = true, can_collide = false },
+				})
+
+				table.insert(left_text, {
+					n = G.UIT.C,
+					config = { padding = 0.05, align = "cm" },
+					nodes = {
+						{
+							n = G.UIT.R,
+							config = { align = "cm" },
+							nodes = {
+								{
+									n = G.UIT.O,
+									config = {
+										object = DynaText({
+											string = { G.GAME.blind.boss and " Lost a Life " or " Failed " },
+											colours = { G.C.FILTER },
+											shadow = true,
+											pop_in = 0,
+											scale = 0.5 * scale,
+											silent = true,
+										}),
+									},
+								},
+							},
+						},
+					},
+				})
+				local full_row = {
+					n = G.UIT.R,
+					config = { align = "cm", minw = 5 },
+					nodes = {
+						{
+							n = G.UIT.C,
+							config = { padding = 0.05, minw = width * 0.55, minh = 0.61, align = "cl" },
+							nodes = left_text,
+						},
+						{
+							n = G.UIT.C,
+							config = { padding = 0.05, minw = width * 0.45, align = "cr" },
+							nodes = {
+								{ n = G.UIT.C, config = { align = "cm", id = "dollar_" .. config.name }, nodes = {} },
+							},
+						},
+					},
+				}
+
+				G.GAME.blind:juice_up()
+				G.round_eval:add_child(full_row, G.round_eval:get_UIE_by_ID("base_round_eval"))
+				play_sound("negative", (1.5 * config.pitch) or 1, 0.2)
+				play_sound("whoosh2", 0.9, 0.7)
+				if config.card then
+					config.card:juice_up(0.7, 0.46)
+				end
+				return true
+			end,
+		}))
+		local dollar_row = 0
+		if num_dollars > 60 then
+			G.E_MANAGER:add_event(Event({
+				trigger = "before",
+				delay = 0.38,
+				func = function()
+					G.round_eval:add_child({
+						n = G.UIT.R,
+						config = { align = "cm", id = "dollar_row_" .. (dollar_row + 1) .. "_" .. config.name },
+						nodes = {
+							{
+								n = G.UIT.O,
+								config = {
+									object = DynaText({
+										string = { localize("$") .. num_dollars },
+										colours = { G.C.MONEY },
+										shadow = true,
+										pop_in = 0,
+										scale = 0.65,
+										float = true,
+									}),
+								},
+							},
+						},
+					}, G.round_eval:get_UIE_by_ID("dollar_" .. config.name))
+
+					play_sound("coin3", 0.9 + 0.2 * math.random(), 0.7)
+					play_sound("coin6", 1.3, 0.8)
+					return true
+				end,
+			}))
+		else
+			for i = 1, num_dollars or 1 do
+				G.E_MANAGER:add_event(Event({
+					trigger = "before",
+					delay = 0.18 - ((num_dollars > 20 and 0.13) or (num_dollars > 9 and 0.1) or 0),
+					func = function()
+						if i % 30 == 1 then
+							G.round_eval:add_child({
+								n = G.UIT.R,
+								config = {
+									align = "cm",
+									id = "dollar_row_" .. (dollar_row + 1) .. "_" .. config.name,
+								},
+								nodes = {},
+							}, G.round_eval:get_UIE_by_ID("dollar_" .. config.name))
+							dollar_row = dollar_row + 1
+						end
+
+						local r = {
+							n = G.UIT.T,
+							config = {
+								text = localize("$"),
+								colour = G.C.MONEY,
+								scale = ((num_dollars > 20 and 0.28) or (num_dollars > 9 and 0.43) or 0.58),
+								shadow = true,
+								hover = true,
+								can_collide = false,
+								juice = true,
+							},
+						}
+						play_sound("coin3", 0.9 + 0.2 * math.random(), 0.7 - (num_dollars > 20 and 0.2 or 0))
+
+						if config.name == "blind1" then
+							G.GAME.current_round.dollars_to_be_earned = G.GAME.current_round.dollars_to_be_earned:sub(2)
+						end
+
+						G.round_eval:add_child(
+							r,
+							G.round_eval:get_UIE_by_ID("dollar_row_" .. dollar_row .. "_" .. config.name)
+						)
+						G.VIBRATION = G.VIBRATION + 0.4
+						return true
+					end,
+				}))
+			end
+		end
+	else
+		add_round_eval_row_ref(config)
+	end
+end
 ----------------------------------------------
 ------------MOD GAME UI END-------------------
