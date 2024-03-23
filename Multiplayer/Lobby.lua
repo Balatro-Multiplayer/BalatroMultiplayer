@@ -29,6 +29,10 @@ G.MULTIPLAYER_GAME = {
 	lives = 3,
 }
 
+G.MUTEX = {
+	wipe = false
+}
+
 PREV_ACHIEVEMENT_VALUE = true
 function G.MULTIPLAYER.update_connection_status()
 	-- Save the previous value of the achievement flag
@@ -71,6 +75,13 @@ function G.MULTIPLAYER.update_player_usernames()
 
 		G.FUNCS.display_lobby_main_menu_UI()
 	end
+end
+
+
+local wipe_off_ref = G.FUNCS.wipe_off
+G.FUNCS.wipe_off = function()
+	if not G.screenwipe then return end
+	wipe_off_ref()
 end
 
 ----------------------------------------------
