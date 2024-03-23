@@ -111,16 +111,23 @@ local function action_stop_game()
 end
 
 local function action_end_pvp()
-	-- TODO: Some logic here to say that you won
-	-- or lost the round
-
-	G.STATE = G.STATES.NEW_ROUND
 	G.STATE_COMPLETE = false
+	G.STATE = G.STATES.NEW_ROUND
 end
 
 ---@param lives number
 local function action_player_info(lives)
 	G.MULTIPLAYER_GAME.lives = lives
+end
+
+local function action_win_game()
+	win_game()
+	G.GAME.won = true
+end
+
+local function action_lose_game()
+	G.STATE_COMPLETE = false
+	G.STATE = G.STATES.GAME_OVER
 end
 
 -- #region Client to Server
@@ -209,6 +216,10 @@ function Game:update(dt)
 				action_end_pvp()
 			elseif parsedAction.action == "playerInfo" then
 				action_player_info(parsedAction.lives)
+			elseif parsedAction.action == "winGame" then
+				action_win_game()
+			elseif parsedAction.action == "loseGame" then
+				action_lose_game()
 			elseif parsedAction.action == "error" then
 				action_error(parsedAction.message)
 			elseif parsedAction.action == "keepAlive" then
