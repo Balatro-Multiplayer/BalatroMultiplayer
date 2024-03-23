@@ -122,7 +122,7 @@ end
 
 local function action_win_game()
 	win_game()
-  G.GAME.won = true
+	G.GAME.won = true
 end
 
 local function action_lose_game()
