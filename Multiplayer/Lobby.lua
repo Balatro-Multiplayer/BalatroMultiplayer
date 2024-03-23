@@ -29,10 +29,6 @@ G.MULTIPLAYER_GAME = {
 	lives = 3,
 }
 
-G.MUTEX = {
-	wipe = false
-}
-
 PREV_ACHIEVEMENT_VALUE = true
 function G.MULTIPLAYER.update_connection_status()
 	-- Save the previous value of the achievement flag
