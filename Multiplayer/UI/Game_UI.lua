@@ -1245,7 +1245,6 @@ function create_UIBox_game_over()
 			},
 		}
 
-		--t.nodes[1].config.mid = true
 		return t
 	end
 	return create_UIBox_game_over_ref()
@@ -1391,7 +1390,6 @@ function create_UIBox_win()
 				{ n = G.UIT.C, config = { align = "cm", padding = 0.1 }, nodes = { t.nodes[1] } },
 			},
 		}
-		--t.nodes[1].config.mid = true
 		t.config.id = "you_win_UI"
 		return t
 	end
