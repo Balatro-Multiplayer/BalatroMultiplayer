@@ -141,32 +141,40 @@ const playHandAction = (
 	console.log(
 		`Host hands: ${lobby.host?.handsLeft}, Guest hands: ${lobby.guest?.handsLeft}`,
 	)
+
+	if (!lobby.host || !lobby.guest) {
+		stopGameAction(client)
+		return
+	}
 	// This info is only sent on a boss blind, so it shouldn't
 	// affect other blinds
-	if (lobby.host?.handsLeft === 0 && lobby.guest?.handsLeft === 0) {
-		const roundWinner =
-			lobby.host.score > lobby.guest.score ? lobby.host : lobby.guest
-		const roundLoser =
-			roundWinner.id === lobby.host.id ? lobby.guest : lobby.host
+	if ((lobby.guest.handsLeft === 0 && lobby.host.score > lobby.guest.score) || 
+		(lobby.host.handsLeft === 0 && lobby.guest.score > lobby.host.score) || 
+		(lobby.host.handsLeft === 0 && lobby.guest.handsLeft === 0)) {
+			const roundWinner =
+				lobby.host.score > lobby.guest.score ? lobby.host : lobby.guest
+			const roundLoser =
+				roundWinner.id === lobby.host.id ? lobby.guest : lobby.host
 
-		roundLoser.lives -= 1
-		roundLoser.sendAction({ action: 'playerInfo', lives: roundLoser.lives })
+			if (lobby.host.score !== lobby.guest.score) {
+				roundLoser.lives -= 1
+				roundLoser.sendAction({ action: 'playerInfo', lives: roundLoser.lives })
 
-		// If no lives are left, we end the game
-		if (lobby.host.lives === 0 || lobby.guest.lives === 0) {
-			const gameWinner =
-				lobby.host.lives > lobby.guest.lives ? lobby.host : lobby.guest
-			const gameLoser =
-				gameWinner.id === lobby.host.id ? lobby.guest : lobby.host
+				// If no lives are left, we end the game
+				if (lobby.host.lives === 0 || lobby.guest.lives === 0) {
+					const gameWinner =
+						lobby.host.lives > lobby.guest.lives ? lobby.host : lobby.guest
+					const gameLoser =
+						gameWinner.id === lobby.host.id ? lobby.guest : lobby.host
 
-			stopGameAction(client)
+					gameWinner?.sendAction({ action: 'winGame' })
+					gameLoser?.sendAction({ action: 'loseGame' })
+					return
+				}
+			}
 
-			// TODO: Announce who won
-			return
-		}
-
-		roundWinner.sendAction({ action: 'endPvP', lost: false })
-		roundLoser.sendAction({ action: 'endPvP', lost: true })
+			roundWinner.sendAction({ action: 'endPvP', lost: false })
+			roundLoser.sendAction({ action: 'endPvP', lost: true })
 	}
 }
 

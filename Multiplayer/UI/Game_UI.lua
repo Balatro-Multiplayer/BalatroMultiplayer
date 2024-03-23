@@ -808,6 +808,172 @@ function Game:update_new_round(dt)
 	G.GAME.win_ante = 8
 end
 
+local end_round_ref = end_round
+function end_round()
+	if not G.LOBBY.code then return end_round_ref() end
+	G.E_MANAGER:add_event(Event({
+		trigger = 'after',
+		delay = 0.2,
+		func = function()
+			G.RESET_BLIND_STATES = true
+			G.RESET_JIGGLES = true
+					for i = 1, #G.jokers.cards do
+							local eval = nil
+							eval = G.jokers.cards[i]:calculate_joker({end_of_round = true, game_over = game_over})
+							if eval then
+									card_eval_status_text(G.jokers.cards[i], 'jokers', nil, nil, nil, eval)
+							end
+					end
+					G.GAME.unused_discards = (G.GAME.unused_discards or 0) + G.GAME.current_round.discards_left
+					if G.GAME.blind and G.GAME.blind.config.blind then 
+							discover_card(G.GAME.blind.config.blind)
+					end
+
+					if G.GAME.blind:get_type() == 'Boss' then
+							local _handname, _played, _order = 'High Card', -1, 100
+							for k, v in pairs(G.GAME.hands) do
+									if v.played > _played or (v.played == _played and _order > v.order) then 
+											_played = v.played
+											_handname = k
+									end
+							end
+							G.GAME.current_round.most_played_poker_hand = _handname
+					end
+
+					if G.GAME.blind:get_type() == 'Boss' and not G.GAME.seeded and not G.GAME.challenge  then
+							G.GAME.current_boss_streak = G.GAME.current_boss_streak + 1
+							check_and_set_high_score('boss_streak', G.GAME.current_boss_streak)
+					end
+					
+					if G.GAME.current_round.hands_played == 1 then 
+							inc_career_stat('c_single_hand_round_streak', 1)
+					else
+							if not G.GAME.seeded and not G.GAME.challenge  then
+									G.PROFILES[G.SETTINGS.profile].career_stats.c_single_hand_round_streak = 0
+									G:save_settings()
+							end
+					end
+
+					check_for_unlock({type = 'round_win'})
+					set_joker_usage()
+					for i=1, #G.hand.cards do
+							--Check for hand doubling
+							local reps = {1}
+							local j = 1
+							while j <= #reps do
+									local percent = (i-0.999)/(#G.hand.cards-0.998) + (j-1)*0.1
+									if reps[j] ~= 1 then card_eval_status_text((reps[j].jokers or reps[j].seals).card, 'jokers', nil, nil, nil, (reps[j].jokers or reps[j].seals)) end
+
+									--calculate the hand effects
+									local effects = {G.hand.cards[i]:get_end_of_round_effect()}
+									for k=1, #G.jokers.cards do
+											--calculate the joker individual card effects
+											local eval = G.jokers.cards[k]:calculate_joker({cardarea = G.hand, other_card = G.hand.cards[i], individual = true, end_of_round = true})
+											if eval then 
+													table.insert(effects, eval)
+											end
+									end
+
+									if reps[j] == 1 then 
+											--Check for hand doubling
+											--From Red seal
+											local eval = eval_card(G.hand.cards[i], {end_of_round = true,cardarea = G.hand, repetition = true, repetition_only = true})
+											if next(eval) and (next(effects[1]) or #effects > 1)  then 
+													for h = 1, eval.seals.repetitions do
+															reps[#reps+1] = eval
+													end
+											end
+
+											--from Jokers
+											for j=1, #G.jokers.cards do
+													--calculate the joker effects
+													local eval = eval_card(G.jokers.cards[j], {cardarea = G.hand, other_card = G.hand.cards[i], repetition = true, end_of_round = true, card_effects = effects})
+													if next(eval) then 
+															for h  = 1, eval.jokers.repetitions do
+																	reps[#reps+1] = eval
+															end
+													end
+											end
+									end
+	
+									for ii = 1, #effects do
+											--if this effect came from a joker
+											if effects[ii].card then
+													G.E_MANAGER:add_event(Event({
+															trigger = 'immediate',
+															func = (function() effects[ii].card:juice_up(0.7);return true end)
+													}))
+											end
+											
+											--If dollars
+											if effects[ii].h_dollars then 
+													ease_dollars(effects[ii].h_dollars)
+													card_eval_status_text(G.hand.cards[i], 'dollars', effects[ii].h_dollars, percent)
+											end
+
+											--Any extras
+											if effects[ii].extra then
+													card_eval_status_text(G.hand.cards[i], 'extra', nil, percent, nil, effects[ii].extra)
+											end
+									end
+									j = j + 1
+							end
+					end
+					delay(0.3)
+
+
+					G.FUNCS.draw_from_hand_to_discard()
+					if G.GAME.blind:get_type() == 'Boss' then
+							G.GAME.voucher_restock = nil
+							if G.GAME.modifiers.set_eternal_ante and (G.GAME.round_resets.ante == G.GAME.modifiers.set_eternal_ante) then 
+									for k, v in ipairs(G.jokers.cards) do
+											v:set_eternal(true)
+									end
+							end
+							if G.GAME.modifiers.set_joker_slots_ante and (G.GAME.round_resets.ante == G.GAME.modifiers.set_joker_slots_ante) then 
+									G.jokers.config.card_limit = 0
+							end
+							delay(0.4); ease_ante(1); delay(0.4); check_for_unlock({type = 'ante_up', ante = G.GAME.round_resets.ante + 1})
+					end
+					G.FUNCS.draw_from_discard_to_deck()
+					G.E_MANAGER:add_event(Event({
+							trigger = 'after',
+							delay = 0.3,
+							func = function()
+									G.STATE = G.STATES.ROUND_EVAL
+									G.STATE_COMPLETE = false
+
+									if G.GAME.round_resets.blind == G.P_BLINDS.bl_small then
+											G.GAME.round_resets.blind_states.Small = 'Defeated'
+									elseif G.GAME.round_resets.blind == G.P_BLINDS.bl_big then
+											G.GAME.round_resets.blind_states.Big = 'Defeated'
+									else
+											G.GAME.current_round.voucher = get_next_voucher_key()
+											G.GAME.round_resets.blind_states.Boss = 'Defeated'
+											for k, v in ipairs(G.playing_cards) do
+													v.ability.played_this_ante = nil
+											end
+									end
+
+									if G.GAME.round_resets.temp_handsize then G.hand:change_size(-G.GAME.round_resets.temp_handsize); G.GAME.round_resets.temp_handsize = nil end
+									if G.GAME.round_resets.temp_reroll_cost then G.GAME.round_resets.temp_reroll_cost = nil; calculate_reroll_cost(true) end
+
+									reset_idol_card()
+									reset_mail_rank()
+									reset_ancient_card()
+									reset_castle_card()
+									for k, v in ipairs(G.playing_cards) do
+											v.ability.discarded = nil
+											v.ability.forced_selection = nil
+									end
+							return true
+							end
+					}))
+			return true
+		end
+	}))
+end
+
 local start_run_ref = Game.start_run
 function Game:start_run(args)
 	if not G.LOBBY.connected or not G.LOBBY.code then
@@ -836,6 +1002,122 @@ function Game:start_run(args)
 	hud_ante.children[2].children[4] = nil
 
 	self.HUD:recalculate()
+end
+
+local create_UIBox_game_over_ref = create_UIBox_game_over
+function create_UIBox_game_over()
+	if G.LOBBY.code then
+		local eased_red = copy_table(G.GAME.round_resets.ante <= G.GAME.win_ante and G.C.RED or G.C.BLUE)
+		eased_red[4] = 0
+		ease_value(eased_red, 4, 0.8, nil, nil, true)
+		local t = create_UIBox_generic_options({ bg_colour = eased_red ,no_back = true, padding = 0, contents = {
+			{n=G.UIT.R, config={align = "cm"}, nodes={
+				{n=G.UIT.O, config={object = DynaText({string = {localize('ph_game_over')}, colours = {G.C.RED},shadow = true, float = true, scale = 1.5, pop_in = 0.4, maxw = 6.5})}},
+			}},
+			{n=G.UIT.R, config={align = "cm", padding = 0.15}, nodes={
+				{n=G.UIT.C, config={align = "cm"}, nodes={
+					{n=G.UIT.R, config={align = "cm", padding = 0.05, colour = G.C.BLACK, emboss = 0.05, r = 0.1}, nodes={
+						{n=G.UIT.R, config={align = "cm", padding = 0.08}, nodes={
+							create_UIBox_round_scores_row('hand'),
+							create_UIBox_round_scores_row('poker_hand'),
+						}},
+						{n=G.UIT.R, config={align = "cm"}, nodes={
+							{n=G.UIT.C, config={align = "cm", padding = 0.08}, nodes={
+								create_UIBox_round_scores_row('cards_played', G.C.BLUE),
+								create_UIBox_round_scores_row('cards_discarded', G.C.RED),
+								create_UIBox_round_scores_row('cards_purchased', G.C.MONEY),
+								create_UIBox_round_scores_row('times_rerolled', G.C.GREEN),
+								create_UIBox_round_scores_row('new_collection', G.C.WHITE),
+								create_UIBox_round_scores_row('seed', G.C.WHITE),
+								UIBox_button({button = 'copy_seed', label = {localize('b_copy')}, colour = G.C.BLUE, scale = 0.3, minw = 2.3, minh = 0.4, focus_args = {nav = 'wide'}}),
+							}},
+							{n=G.UIT.C, config={align = "tr", padding = 0.08}, nodes={
+								create_UIBox_round_scores_row('furthest_ante', G.C.FILTER),
+								create_UIBox_round_scores_row('furthest_round', G.C.FILTER),
+								create_UIBox_round_scores_row('defeated_by'),
+							}}
+						}}
+					}},
+					{n=G.UIT.R, config={align = "cm", padding = 0.1}, nodes={
+						{n=G.UIT.R, config={id = 'from_game_over', align = "cm", minw = 5, padding = 0.1, r = 0.1, hover = true, colour = G.C.RED, button = "return_to_lobby", shadow = true, focus_args = {nav = 'wide', snap_to = true}}, nodes={
+							{n=G.UIT.R, config={align = "cm", padding = 0, no_fill = true, maxw = 4.8}, nodes={
+								{n=G.UIT.T, config={text = 'Retun to Lobby', scale = 0.5, colour = G.C.UI.TEXT_LIGHT}}
+							}}
+						}},
+						{n=G.UIT.R, config={align = "cm", minw = 5, padding = 0.1, r = 0.1, hover = true, colour = G.C.RED, button = "lobby_leave", shadow = true, focus_args = {nav = 'wide'}}, nodes={
+							{n=G.UIT.R, config={align = "cm", padding = 0, no_fill = true, maxw = 4.8}, nodes={
+								{n=G.UIT.T, config={text = 'Leave Lobby', scale = 0.5, colour = G.C.UI.TEXT_LIGHT}}
+							}}
+						}}
+					}}
+				}},
+			}}
+		}})
+		t.nodes[1] = {n=G.UIT.R, config={align = "cm", padding = 0.1}, nodes={
+			{n=G.UIT.C, config={align = "cm", padding = 2}, nodes={
+				{n=G.UIT.R, config={align = "cm"}, nodes={
+					{n=G.UIT.O, config={padding = 0, id = 'jimbo_spot', object = Moveable(0,0,G.CARD_W*1.1, G.CARD_H*1.1)}},
+				}},
+			}},
+			{n=G.UIT.C, config={align = "cm", padding = 0.1}, nodes={t.nodes[1]}}}
+		} 
+
+		--t.nodes[1].config.mid = true
+		return t
+	end
+	return create_UIBox_game_over_ref()
+end
+
+local create_UIBox_win_ref = create_UIBox_win
+function create_UIBox_win()
+	if G.LOBBY.code then
+		local eased_green = copy_table(G.C.GREEN)
+		eased_green[4] = 0
+		ease_value(eased_green, 4, 0.5, nil, nil, true)
+		local t = create_UIBox_generic_options({ padding = 0, bg_colour = eased_green , colour = G.C.BLACK, outline_colour = G.C.EDITION, no_back = true, no_esc = true, contents = {
+			{n=G.UIT.R, config={align = "cm"}, nodes={
+				{n=G.UIT.O, config={object = DynaText({string = {localize('ph_you_win')}, colours = {G.C.EDITION},shadow = true, float = true, spacing = 10, rotate = true, scale = 1.5, pop_in = 0.4, maxw = 6.5})}},
+			}},
+			{n=G.UIT.R, config={align = "cm", padding = 0.15}, nodes={
+				{n=G.UIT.C, config={align = "cm"}, nodes={
+			{n=G.UIT.R, config={align = "cm", padding = 0.08}, nodes={
+				create_UIBox_round_scores_row('hand'),
+				create_UIBox_round_scores_row('poker_hand'),
+			}},
+			{n=G.UIT.R, config={align = "cm"}, nodes={
+				{n=G.UIT.C, config={align = "cm", padding = 0.08}, nodes={
+					create_UIBox_round_scores_row('cards_played', G.C.BLUE),
+					create_UIBox_round_scores_row('cards_discarded', G.C.RED),
+					create_UIBox_round_scores_row('cards_purchased', G.C.MONEY),
+					create_UIBox_round_scores_row('times_rerolled', G.C.GREEN),
+					create_UIBox_round_scores_row('new_collection', G.C.WHITE),
+					create_UIBox_round_scores_row('seed', G.C.WHITE),
+					UIBox_button({button = 'copy_seed', label = {localize('b_copy')}, colour = G.C.BLUE, scale = 0.3, minw = 2.3, minh = 0.4,}),
+				}},
+				{n=G.UIT.C, config={align = "tr", padding = 0.08}, nodes={
+					create_UIBox_round_scores_row('furthest_ante', G.C.FILTER),
+					create_UIBox_round_scores_row('furthest_round', G.C.FILTER),
+					{n=G.UIT.R, config={align = "cm", minh = 0.4, minw = 0.1}, nodes={}},
+					UIBox_button({id = 'from_game_won', button = 'return_to_lobby', label = {'Return to','Lobby'}, minw = 2.5, maxw = 2.5, minh = 1, focus_args = {nav = 'wide', snap_to = true}}) or nil,
+					{n=G.UIT.R, config={align = "cm", minh = 0.2, minw = 0.1}, nodes={}} or nil,
+					UIBox_button({button = 'lobby_leave', label = {'Leave','Lobby'}, minw = 2.5, maxw = 2.5, minh = 1, focus_args = {nav = 'wide'}}) or nil,
+				}}
+			}}
+		}}
+		}}
+		}}) 
+		t.nodes[1] = {n=G.UIT.R, config={align = "cm", padding = 0.1}, nodes={
+				{n=G.UIT.C, config={align = "cm", padding = 2}, nodes={
+					{n=G.UIT.O, config={padding = 0, id = 'jimbo_spot', object = Moveable(0,0,G.CARD_W*1.1, G.CARD_H*1.1)}},
+				}},
+				{n=G.UIT.C, config={align = "cm", padding = 0.1}, nodes={t.nodes[1]}
+			}}
+		}
+		--t.nodes[1].config.mid = true
+		t.config.id = 'you_win_UI'
+		return t
+	end
+	return create_UIBox_win_ref()
 end
 
 ----------------------------------------------
