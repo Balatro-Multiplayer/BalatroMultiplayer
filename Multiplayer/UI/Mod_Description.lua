@@ -15,6 +15,7 @@ function Description.load_description_gui()
 			config = {
 				padding = 0.5,
 				align = "cm",
+				id = "username_input_box",
 			},
 			nodes = {
 				{

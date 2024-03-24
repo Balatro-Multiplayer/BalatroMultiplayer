@@ -1564,44 +1564,66 @@ end
 
 local ease_ante_ref = ease_ante
 function ease_ante(mod)
-	if not G.LOBBY.code then return ease_ante_ref(mod) end
+	if not G.LOBBY.code then
+		return ease_ante_ref(mod)
+	end
 	G.E_MANAGER:add_event(Event({
-		trigger = 'immediate',
+		trigger = "immediate",
 		func = function()
-				G.GAME.round_resets.ante = G.GAME.round_resets.ante + mod
-				check_and_set_high_score('furthest_ante', G.GAME.round_resets.ante)
-				return true
-		end
+			G.GAME.round_resets.ante = G.GAME.round_resets.ante + mod
+			check_and_set_high_score("furthest_ante", G.GAME.round_resets.ante)
+			return true
+		end,
 	}))
 end
 
 function ease_lives(mod)
 	G.E_MANAGER:add_event(Event({
-		trigger = 'immediate',
+		trigger = "immediate",
 		func = function()
-				local lives_UI = G.hand_text_area.ante
-				mod = mod or 0
-				local text = '+'
-				local col = G.C.IMPORTANT
-				if mod < 0 then
-						text = '-'
-						col = G.C.RED
-				end
-				lives_UI.config.object:update()
-				G.HUD:recalculate()
-				attention_text({
-					text = text..tostring(math.abs(mod)),
-					scale = 1, 
-					hold = 0.7,
-					cover = lives_UI.parent,
-					cover_colour = col,
-					align = 'cm',
-					})
-				play_sound('highlight2', 0.685, 0.2)
-				play_sound('generic1')
-				return true
-		end
+			local lives_UI = G.hand_text_area.ante
+			mod = mod or 0
+			local text = "+"
+			local col = G.C.IMPORTANT
+			if mod < 0 then
+				text = "-"
+				col = G.C.RED
+			end
+			lives_UI.config.object:update()
+			G.HUD:recalculate()
+			attention_text({
+				text = text .. tostring(math.abs(mod)),
+				scale = 1,
+				hold = 0.7,
+				cover = lives_UI.parent,
+				cover_colour = col,
+				align = "cm",
+			})
+			play_sound("highlight2", 0.685, 0.2)
+			play_sound("generic1")
+			return true
+		end,
 	}))
+end
+
+local exit_overlay_menu_ref = G.FUNCS.exit_overlay_menu
+---@diagnostic disable-next-line: duplicate-set-field
+function G.FUNCS:exit_overlay_menu()
+	-- Saves username if user presses ESC instead of Enter
+	if G.OVERLAY_MENU:get_UIE_by_ID("username_input_box") ~= nil then
+		Utils.save_username(G.LOBBY.username)
+	end
+
+	exit_overlay_menu_ref(self)
+end
+
+local mods_button_ref = G.FUNCS.mods_button
+function G.FUNCS.mods_button(arg_736_0)
+	if G.OVERLAY_MENU and G.OVERLAY_MENU:get_UIE_by_ID("username_input_box") ~= nil then
+		Utils.save_username(G.LOBBY.username)
+	end
+
+	mods_button_ref(arg_736_0)
 end
 ----------------------------------------------
 ------------MOD GAME UI END-------------------
