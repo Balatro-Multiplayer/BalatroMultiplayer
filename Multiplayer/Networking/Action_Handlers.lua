@@ -64,7 +64,6 @@ local function action_disconnected()
 	G.LOBBY.connected = false
 	if G.LOBBY.code then
 		G.LOBBY.code = nil
-		G.FUNCS.go_to_menu()
 	end
 	G.MULTIPLAYER.update_connection_status()
 end
