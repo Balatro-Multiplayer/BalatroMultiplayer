@@ -116,6 +116,9 @@ end
 
 ---@param lives number
 local function action_player_info(lives)
+	if (G.MULTIPLAYER_GAME.lives ~= lives) then
+		ease_lives(lives - G.MULTIPLAYER_GAME.lives)
+	end
 	G.MULTIPLAYER_GAME.lives = lives
 end
 

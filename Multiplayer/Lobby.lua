@@ -26,7 +26,7 @@ G.MULTIPLAYER_GAME = {
 	ready_blind = false,
 	ready_blind_text = "Ready",
 	processed_round_done = false,
-	lives = 3,
+	lives = 0,
 }
 
 PREV_ACHIEVEMENT_VALUE = true
