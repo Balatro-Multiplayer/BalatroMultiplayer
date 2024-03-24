@@ -73,5 +73,12 @@ function G.MULTIPLAYER.update_player_usernames()
 	end
 end
 
+
+local wipe_off_ref = G.FUNCS.wipe_off
+G.FUNCS.wipe_off = function()
+	if not G.screenwipe then return end
+	wipe_off_ref()
+end
+
 ----------------------------------------------
 ------------MOD LOBBY END---------------------
