@@ -801,6 +801,7 @@ function Game:update_new_round(dt)
 		-- Prevent player from losing
 		if G.GAME.chips - G.GAME.blind.chips < 0 then
 			G.GAME.blind.chips = -1
+			G.GAME.blind.dollars = 0
 		end
 
 		-- Prevent player from winning
