@@ -9,6 +9,7 @@ function Disableable_Button(args)
 	local enabled = enabled_table[args.enabled_ref_value]
 	args.colour = args.colour or G.C.RED
 	args.text_colour = args.text_colour or G.C.UI.TEXT_LIGHT
+  args.disabled_text = args.disabled_text or args.label
 	args.label = not enabled and args.disabled_text or args.label
 
 	local button_component = UIBox_button(args)

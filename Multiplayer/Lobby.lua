@@ -11,7 +11,12 @@ G.LOBBY = {
 	temp_code = "",
 	code = nil,
 	type = "",
-	config = {},
+	config = {
+		no_gold_on_round_loss = true,
+		death_on_round_loss = false,
+		different_seeds = false,
+		bsh = false
+	},
 	username = "Guest",
 	host = {},
 	guest = {},

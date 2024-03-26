@@ -5,6 +5,7 @@
 ------------MOD LOBBY UI----------------------
 
 local Disableable_Button = require("Components.Disableable_Button")
+local Disableable_Toggle = require("Components.Disableable_Toggle")
 
 G.HUD_connection_status = nil
 
@@ -141,7 +142,7 @@ function G.UIDEF.create_UIBox_lobby_menu()
 									align = "cm",
 								},
 								nodes = {
-									Disableable_Button({
+									UIBox_button({
 										button = "lobby_options",
 										colour = G.C.ORANGE,
 										minw = 3.15,
@@ -149,8 +150,6 @@ function G.UIDEF.create_UIBox_lobby_menu()
 										label = { "LOBBY OPTIONS" },
 										scale = text_scale * 1.2,
 										col = true,
-										enabled_ref_table = G.LOBBY,
-										enabled_ref_value = "is_host",
 									}),
 									{
 										n = G.UIT.C,
@@ -269,32 +268,129 @@ function G.UIDEF.create_UIBox_lobby_options()
 			{
 				n = G.UIT.R,
 				config = {
-					padding = 0,
+					emboss = 0.05,
+					minh = 6,
+					r = 0.1,
+					minw = 10,
+					padding = 0.2,
+					colour = G.C.BLACK,
 					align = "cm",
 				},
 				nodes = {
 					{
 						n = G.UIT.R,
 						config = {
-							padding = 0.5,
+							padding = 0.3,
 							align = "cm",
 						},
 						nodes = {
-							{
-								n = G.UIT.T,
+							not G.LOBBY.is_host and {
+								n = G.UIT.R,
 								config = {
-									text = "Not Implemented Yet",
-									shadow = true,
-									scale = 0.6,
-									colour = G.C.UI.TEXT_LIGHT,
+									padding = 0,
+									align = "cm",
 								},
+								nodes = {
+									{
+										n = G.UIT.T,
+										config = {
+											scale = 0.6,
+											shadow = true,
+											text = 'Only the Lobby Host can change these options',
+											colour = G.C.UI.TEXT_LIGHT,
+										}
+									}
+								}
+							} or nil,
+							{
+								n = G.UIT.R,
+								config = {
+									padding = 0,
+									align = "cr",
+								},
+								nodes = {
+									create_toggle({
+										enabled_ref_table = G.LOBBY,
+										enabled_ref_value = 'is_host',
+										label = "Don't get blind gold on round loss",
+										ref_table = G.LOBBY.config,
+										ref_value = "no_gold_on_round_loss",
+									}),
+								}
 							},
+							{
+								n = G.UIT.R,
+								config = {
+									padding = 0,
+									align = "cr",
+								},
+								nodes = {
+									create_toggle({
+										enabled_ref_table = G.LOBBY,
+										enabled_ref_value = 'is_host',
+										label = "Lose a life on non-PvP round loss",
+										ref_table = G.LOBBY.config,
+										ref_value = "death_on_round_loss",
+									}),
+								}
+							},
+							{
+								n = G.UIT.R,
+								config = {
+									padding = 0,
+									align = "cr",
+								},
+								nodes = {
+									create_toggle({
+										enabled_ref_table = G.LOBBY,
+										enabled_ref_value = 'is_host',
+										label = "Players have different seeds",
+										ref_table = G.LOBBY.config,
+										ref_value = "different_seeds",
+									}),
+								}
+							},
+							{
+								n = G.UIT.R,
+								config = {
+									padding = 0,
+									align = "cr",
+								},
+								nodes = {
+									create_toggle({
+										enabled_ref_table = G.LOBBY,
+										enabled_ref_value = 'is_host',
+										label = "PvP based on best single hand instead of best round",
+										ref_table = G.LOBBY.config,
+										ref_value = "bsh",
+									})
+								}
+							},
+							Disableable_Button({
+								enabled_ref_table = G.LOBBY,
+								enabled_ref_value = 'is_host',
+								button = "reset_lobby_options",
+								label = { localize("k_reset") },
+								colour = G.C.RED,
+								minw = 5,
+							}),
 						},
 					},
 				},
 			},
 		},
 	})
+end
+
+function G.FUNCS.reset_lobby_options(e)
+	G.LOBBY.config = {
+		no_gold_on_round_loss = true,
+		death_on_round_loss = false,
+		different_seeds = false,
+		bsh = false
+	}
+	G.FUNCS:exit_overlay_menu()
+	G.FUNCS.lobby_options(e)
 end
 
 function G.FUNCS.get_lobby_main_menu_UI(e)
