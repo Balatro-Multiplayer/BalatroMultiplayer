@@ -184,6 +184,10 @@ const stopGameAction = (client: Client) => {
 	client.lobby?.broadcastAction({ action: 'stopGame' })
 }
 
+const lobbyOptionsAction = (options: any, client: Client) => {
+	client.lobby?.setOptions(options)
+}
+
 // Declared partial for now untill all action handlers are defined
 export const actionHandlers = {
 	username: usernameAction,
@@ -197,4 +201,5 @@ export const actionHandlers = {
 	unreadyBlind: unreadyBlindAction,
 	playHand: playHandAction,
 	stopGame: stopGameAction,
+	lobbyOptions: lobbyOptionsAction,
 } satisfies Partial<ActionHandlers>

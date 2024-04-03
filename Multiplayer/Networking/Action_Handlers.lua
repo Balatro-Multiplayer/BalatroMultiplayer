@@ -132,6 +132,24 @@ local function action_lose_game()
 	G.STATE = G.STATES.GAME_OVER
 end
 
+local function action_lobby_options(options)
+	for k, v in pairs(options) do
+		local parsed_v = v
+		if v == "true" then
+			parsed_v = true
+		elseif v == "false" then
+			parsed_v = false
+		end
+		G.LOBBY.config[k] = parsed_v
+		if G.OVERLAY_MENU then
+			local config_uie = G.OVERLAY_MENU:get_UIE_by_ID(k .. '_toggle')
+			if config_uie then
+				G.FUNCS.toggle(config_uie)
+			end
+		end
+	end
+end
+
 -- #region Client to Server
 function G.MULTIPLAYER.create_lobby()
 	-- TODO: This is hardcoded to attrition for now, must be changed
@@ -170,6 +188,14 @@ end
 ---@param hands_left number
 function G.MULTIPLAYER.play_hand(score, hands_left)
 	Client.send(string.format("action:playHand,score:%d,handsLeft:%d", score, hands_left))
+end
+
+function G.MULTIPLAYER.lobby_options()
+	local msg = "action:lobbyOptions"
+	for k, v in pairs(G.LOBBY.config) do
+		msg = msg .. string.format(",%s:%s", k, tostring(v))
+	end
+	Client.send(msg)
 end
 -- #endregion Client to Server
 
@@ -222,6 +248,8 @@ function Game:update(dt)
 				action_win_game()
 			elseif parsedAction.action == "loseGame" then
 				action_lose_game()
+			elseif parsedAction.action == "lobbyOptions" then
+				action_lobby_options(parsedAction)
 			elseif parsedAction.action == "error" then
 				action_error(parsedAction.message)
 			elseif parsedAction.action == "keepAlive" then

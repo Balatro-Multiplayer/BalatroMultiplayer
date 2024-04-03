@@ -7,6 +7,10 @@
 local Disableable_Button = require("Components.Disableable_Button")
 local Disableable_Toggle = require("Components.Disableable_Toggle")
 
+local function toggle_lobby_options(value)
+	G.MULTIPLAYER.lobby_options()
+end
+
 G.HUD_connection_status = nil
 
 function G.UIDEF.get_connection_status_ui()
@@ -309,12 +313,14 @@ function G.UIDEF.create_UIBox_lobby_options()
 									align = "cr",
 								},
 								nodes = {
-									create_toggle({
+									Disableable_Toggle({
+										id = "no_gold_on_round_loss_toggle",
 										enabled_ref_table = G.LOBBY,
 										enabled_ref_value = 'is_host',
 										label = "Don't get blind gold on round loss",
 										ref_table = G.LOBBY.config,
 										ref_value = "no_gold_on_round_loss",
+										callback = toggle_lobby_options
 									}),
 								}
 							},
@@ -325,12 +331,14 @@ function G.UIDEF.create_UIBox_lobby_options()
 									align = "cr",
 								},
 								nodes = {
-									create_toggle({
+									Disableable_Toggle({
+										id = "death_on_round_loss_toggle",
 										enabled_ref_table = G.LOBBY,
 										enabled_ref_value = 'is_host',
 										label = "Lose a life on non-PvP round loss",
 										ref_table = G.LOBBY.config,
 										ref_value = "death_on_round_loss",
+										callback = toggle_lobby_options
 									}),
 								}
 							},
@@ -341,12 +349,14 @@ function G.UIDEF.create_UIBox_lobby_options()
 									align = "cr",
 								},
 								nodes = {
-									create_toggle({
+									Disableable_Toggle({
+										id = "different_seeds_toggle",
 										enabled_ref_table = G.LOBBY,
 										enabled_ref_value = 'is_host',
 										label = "Players have different seeds",
 										ref_table = G.LOBBY.config,
 										ref_value = "different_seeds",
+										callback = toggle_lobby_options
 									}),
 								}
 							},
@@ -357,12 +367,14 @@ function G.UIDEF.create_UIBox_lobby_options()
 									align = "cr",
 								},
 								nodes = {
-									create_toggle({
+									Disableable_Toggle({
+										id = "bsh_toggle",
 										enabled_ref_table = G.LOBBY,
 										enabled_ref_value = 'is_host',
 										label = "PvP based on best single hand instead of best round",
 										ref_table = G.LOBBY.config,
 										ref_value = "bsh",
+										callback = toggle_lobby_options
 									})
 								}
 							},
@@ -389,8 +401,8 @@ function G.FUNCS.reset_lobby_options(e)
 		different_seeds = false,
 		bsh = false
 	}
-	G.FUNCS:exit_overlay_menu()
-	G.FUNCS.lobby_options(e)
+	G.FUNCS.exit_overlay_menu()
+	G.MULTIPLAYER.lobby_options()
 end
 
 function G.FUNCS.get_lobby_main_menu_UI(e)

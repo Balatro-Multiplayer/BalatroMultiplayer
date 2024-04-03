@@ -22,6 +22,7 @@ class Lobby {
 	host: Client | null
 	guest: Client | null
 	gameMode: GameMode
+	options: { [key: string]: string }
 
 	// Attrition is the default game mode
 	constructor(host: Client, gameMode: GameMode = 'attrition') {
@@ -33,6 +34,7 @@ class Lobby {
 		this.host = host
 		this.guest = null
 		this.gameMode = gameMode
+		this.options = {}
 
 		host.setLobby(this)
 		host.sendAction({ action: 'joinedLobby', code: this.code })
@@ -73,6 +75,7 @@ class Lobby {
 		this.guest = client
 		client.setLobby(this)
 		client.sendAction({ action: 'joinedLobby', code: this.code })
+		client.sendAction({ action: 'lobbyOptions', ...this.options })
 		this.broadcastLobbyInfo()
 	}
 
@@ -108,6 +111,11 @@ class Lobby {
 		if (this.guest) this.guest.lives = lives
 
 		this.broadcastAction({ action: 'playerInfo', lives })
+	}
+
+	setOptions = (options: { [key: string]: string }) => {
+		this.options = options
+		this.guest?.sendAction({ action: 'lobbyOptions', ...options })
 	}
 }
 
