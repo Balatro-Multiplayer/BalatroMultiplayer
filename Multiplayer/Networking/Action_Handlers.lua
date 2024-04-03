@@ -184,6 +184,13 @@ function G.MULTIPLAYER.stop_game()
 	Client.send("action:stopGame")
 end
 
+function G.MULTIPLAYER.fail_round()
+	if G.LOBBY.config.no_gold_on_round_loss then
+		G.GAME.blind.dollars = 0
+	end
+	Client.send("action:failRound")
+end
+
 ---@param score number
 ---@param hands_left number
 function G.MULTIPLAYER.play_hand(score, hands_left)

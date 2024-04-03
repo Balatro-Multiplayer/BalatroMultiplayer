@@ -14,8 +14,7 @@ G.LOBBY = {
 	config = {
 		no_gold_on_round_loss = true,
 		death_on_round_loss = false,
-		different_seeds = false,
-		bsh = false
+		different_seeds = false
 	},
 	username = "Guest",
 	host = {},

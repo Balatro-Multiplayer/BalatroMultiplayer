@@ -70,6 +70,7 @@ export type ActionPlayHand = {
 export type ActionGameInfoRequest = { action: 'gameInfo' }
 export type ActionPlayerInfoRequest = { action: 'playerInfo' }
 export type ActionEnemyInfoRequest = { action: 'enemyInfo' }
+export type ActionFailRound = { action: 'failRound' }
 
 export type ActionClientToServer =
 	| ActionUsername
@@ -86,6 +87,7 @@ export type ActionClientToServer =
 	| ActionEnemyInfoRequest
 	| ActionUnreadyBlind
 	| ActionLobbyOptions
+	| ActionFailRound
 
 // Utility actions
 export type ActionKeepAlive = { action: 'keepAlive' }

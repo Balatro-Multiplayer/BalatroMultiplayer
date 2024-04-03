@@ -175,6 +175,11 @@ enemyInfo
 lobbyOptions: {any number of options recognized by the client}
 - Updates the server-side log of lobby options, should be sent on lobby start and when options are changed
 
+---
+
+failRound
+- Declares the client lost a round
+
 ### Utility
 
 keepAlive

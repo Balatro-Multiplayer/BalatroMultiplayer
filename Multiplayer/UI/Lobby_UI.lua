@@ -360,24 +360,6 @@ function G.UIDEF.create_UIBox_lobby_options()
 									}),
 								}
 							},
-							{
-								n = G.UIT.R,
-								config = {
-									padding = 0,
-									align = "cr",
-								},
-								nodes = {
-									Disableable_Toggle({
-										id = "bsh_toggle",
-										enabled_ref_table = G.LOBBY,
-										enabled_ref_value = 'is_host',
-										label = "PvP based on best single hand instead of best round",
-										ref_table = G.LOBBY.config,
-										ref_value = "bsh",
-										callback = toggle_lobby_options
-									})
-								}
-							},
 							Disableable_Button({
 								enabled_ref_table = G.LOBBY,
 								enabled_ref_value = 'is_host',
@@ -398,8 +380,7 @@ function G.FUNCS.reset_lobby_options(e)
 	G.LOBBY.config = {
 		no_gold_on_round_loss = true,
 		death_on_round_loss = false,
-		different_seeds = false,
-		bsh = false
+		different_seeds = false
 	}
 	G.FUNCS.exit_overlay_menu()
 	G.MULTIPLAYER.lobby_options()

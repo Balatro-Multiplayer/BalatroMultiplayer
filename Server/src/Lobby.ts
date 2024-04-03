@@ -22,7 +22,7 @@ class Lobby {
 	host: Client | null
 	guest: Client | null
 	gameMode: GameMode
-	options: { [key: string]: string }
+	options: { [key: string]: any }
 
 	// Attrition is the default game mode
 	constructor(host: Client, gameMode: GameMode = 'attrition') {
@@ -114,7 +114,13 @@ class Lobby {
 	}
 
 	setOptions = (options: { [key: string]: string }) => {
-		this.options = options
+		for (const key of Object.keys(options)) {
+			if (options[key] == "true" || options[key] == "false") {
+				this.options[key] = options[key] == "true"
+			} else{
+				this.options[key] = options[key]
+			}
+		}
 		this.guest?.sendAction({ action: 'lobbyOptions', ...options })
 	}
 }
