@@ -1608,6 +1608,16 @@ function ease_lives(mod)
 	}))
 end
 
+local update_blind_select_ref = Game.update_blind_select
+function Game:update_blind_select(dt)
+	if G.MULTIPLAYER_GAME.loaded_ante == G.GAME.round_resets.ante then
+		update_blind_select_ref(self, dt)
+	elseif not G.MULTIPLAYER.loading_blinds then
+		G.MULTIPLAYER.loading_blinds = true
+		G.MULTIPLAYER.game_info()
+	end
+end
+
 local exit_overlay_menu_ref = G.FUNCS.exit_overlay_menu
 ---@diagnostic disable-next-line: duplicate-set-field
 function G.FUNCS:exit_overlay_menu()
@@ -1629,25 +1639,15 @@ function G.FUNCS.mods_button(arg_736_0)
 end
 
 local get_new_boss_ref = get_new_boss
-local function get_regular_boss()
+function get_new_boss()
+	if G.LOBBY.code and G.GAME.round_resets.blind_choices.Boss then
+		return G.GAME.round_resets.blind_choices.Boss
+	end
 	local boss = get_new_boss_ref()
 	while boss == "bl_pvp" do
 		boss = get_new_boss_ref()
 	end
 	return boss
-end
-
---[[ 
-	We repurpose get_new_boss here because it is called to determine the boss blind, 
-	and we only ever need to do that when we are also determining the small and big blinds for a given ante.
-
-	Note: this is also called when a boss is rerolled, but that should be disabled and is also inconsequential
-]]
-function get_new_boss()
-	if G.LOBBY.code then
-		G.MULTIPLAYER.game_info()
-	end
-	return get_regular_boss()
 end
 ----------------------------------------------
 ------------MOD GAME UI END-------------------

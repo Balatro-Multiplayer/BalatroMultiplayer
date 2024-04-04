@@ -135,10 +135,12 @@ end
 
 local function action_game_info(small, big, boss)
 	G.GAME.round_resets.blind_choices = {
-		Small = small or G.GAME.round_resets.blind_choices.Small,
-		Big = big or G.GAME.round_resets.blind_choices.Big,
-		Boss = boss or G.GAME.round_resets.blind_choices.Boss
+		Small = small or 'bl_small',
+		Big = big or 'bl_big',
+		Boss = boss or get_new_boss()
 	}
+	G.MULTIPLAYER_GAME.loaded_ante = G.GAME.round_resets.ante
+	G.MULTIPLAYER.loading_blinds = false
 end
 
 local function action_lobby_options(options)
