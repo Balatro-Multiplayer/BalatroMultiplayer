@@ -801,7 +801,7 @@ function Game:update_new_round(dt)
 		-- Prevent player from losing
 		if G.GAME.chips - G.GAME.blind.chips < 0 then
 			G.GAME.blind.chips = -1
-			G.GAME.blind.dollars = 0
+			G.MULTIPLAYER.fail_round()
 		end
 
 		-- Prevent player from winning
@@ -1438,7 +1438,7 @@ function add_round_eval_row(config)
 									n = G.UIT.O,
 									config = {
 										object = DynaText({
-											string = { G.GAME.blind.boss and " Lost a Life " or " Failed " },
+											string = { (G.GAME.blind.boss or G.LOBBY.config.death_on_round_loss) and " Lost a Life " or " Failed " },
 											colours = { G.C.FILTER },
 											shadow = true,
 											pop_in = 0,
@@ -1581,6 +1581,7 @@ function ease_lives(mod)
 	G.E_MANAGER:add_event(Event({
 		trigger = "immediate",
 		func = function()
+			if not G.hand_text_area then return end
 			local lives_UI = G.hand_text_area.ante
 			mod = mod or 0
 			local text = "+"

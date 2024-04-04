@@ -97,6 +97,9 @@ endPvP: lost
 
 ---
 
+lobbyOptions: {any number of options recognized by the client}
+- Updates guest clients when host changes options, should be sent when client connects and when options change
+
 ### Client to Server
 
 username: username
@@ -166,6 +169,16 @@ playerInfo
 
 enemyInfo
 - Request an enemyInfo update.
+
+---
+
+lobbyOptions: {any number of options recognized by the client}
+- Updates the server-side log of lobby options, should be sent on lobby start and when options are changed
+
+---
+
+failRound
+- Declares the client lost a round
 
 ### Utility
 

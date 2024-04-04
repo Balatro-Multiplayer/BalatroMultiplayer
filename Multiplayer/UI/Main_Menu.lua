@@ -99,16 +99,6 @@ function G.UIDEF.create_UIBox_create_lobby_button()
 														},
 													},
 												},
-												create_toggle({
-													label = "Lose lives on round loss",
-													ref_table = G.LOBBY.config,
-													ref_value = "death_on_round_loss",
-												}),
-												create_toggle({
-													label = "Different seeds",
-													ref_table = G.LOBBY.config,
-													ref_value = "different_seeds",
-												}),
 												UIBox_button({
 													label = { "Start Lobby" },
 													colour = G.C.RED,
