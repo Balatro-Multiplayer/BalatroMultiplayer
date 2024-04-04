@@ -77,7 +77,7 @@ const startGameAction = (client: Client) => {
 	lobby.broadcastAction({
 		action: 'startGame',
 		deck: 'c_multiplayer_1',
-		seed: generateSeed(),
+		seed: lobby.options.different_seeds? undefined : generateSeed(),
 	})
 }
 
@@ -114,8 +114,6 @@ const playHandAction = (
 		return
 	}
 
-	// Should this be additive or just
-	// the latest score?
 	client.score = score
 	client.handsLeft =
 		typeof handsLeft === 'number' ? handsLeft : Number(handsLeft)
@@ -187,6 +185,34 @@ const stopGameAction = (client: Client) => {
 const gameInfoAction = (client: Client) => {
 	client.sendAction({ action: 'gameInfo', ...client.lobby?.getGameInfo() })
 }
+	
+const lobbyOptionsAction = (options: any, client: Client) => {
+	client.lobby?.setOptions(options)
+}
+
+const failRoundAction = (client: Client) => {
+	const lobby = client.lobby
+
+	if (!lobby) return
+
+	client.lives -= 1
+	client.sendAction({ action: 'playerInfo', lives: client.lives })
+
+	if (client.lives === 0) {
+		let gameLoser = null
+		let gameWinner = null
+		if (client.id === lobby.host?.id) {
+			gameLoser = lobby.host
+			gameWinner = lobby.guest
+		} else {
+			gameLoser = lobby.guest
+			gameWinner = lobby.host
+		}
+
+		gameWinner?.sendAction({ action: 'winGame' })
+		gameLoser?.sendAction({ action: 'loseGame' })
+	}
+}
 
 // Declared partial for now untill all action handlers are defined
 export const actionHandlers = {
@@ -202,4 +228,6 @@ export const actionHandlers = {
 	playHand: playHandAction,
 	stopGame: stopGameAction,
 	gameInfo: gameInfoAction,
+	lobbyOptions: lobbyOptionsAction,
+	failRound: failRoundAction,
 } satisfies Partial<ActionHandlers>

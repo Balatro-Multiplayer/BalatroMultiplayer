@@ -32,6 +32,8 @@ export type ActionEnemyInfo = {
 }
 export type ActionEndPvP = { action: 'endPvP'; lost: boolean }
 
+export type ActionLobbyOptions = { action: 'lobbyOptions' }
+
 export type ActionServerToClient =
 	| ActionConnected
 	| ActionError
@@ -46,6 +48,7 @@ export type ActionServerToClient =
 	| ActionPlayerInfo
 	| ActionEnemyInfo
 	| ActionEndPvP
+	| ActionLobbyOptions
 	| ActionKeepAlive
 	| ActionKeepAliveAck
 
@@ -67,6 +70,7 @@ export type ActionPlayHand = {
 export type ActionGameInfoRequest = { action: 'gameInfo' }
 export type ActionPlayerInfoRequest = { action: 'playerInfo' }
 export type ActionEnemyInfoRequest = { action: 'enemyInfo' }
+export type ActionFailRound = { action: 'failRound' }
 
 export type ActionClientToServer =
 	| ActionUsername
@@ -82,6 +86,8 @@ export type ActionClientToServer =
 	| ActionPlayerInfoRequest
 	| ActionEnemyInfoRequest
 	| ActionUnreadyBlind
+	| ActionLobbyOptions
+	| ActionFailRound
 
 // Utility actions
 export type ActionKeepAlive = { action: 'keepAlive' }

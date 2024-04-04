@@ -22,6 +22,7 @@ class Lobby {
 	host: Client | null
 	guest: Client | null
 	gameMode: GameMode
+	options: { [key: string]: any }
 
 	// Attrition is the default game mode
 	constructor(host: Client, gameMode: GameMode = 'attrition') {
@@ -33,6 +34,7 @@ class Lobby {
 		this.host = host
 		this.guest = null
 		this.gameMode = gameMode
+		this.options = {}
 
 		host.setLobby(this)
 		host.sendAction({ action: 'joinedLobby', code: this.code })
@@ -73,6 +75,7 @@ class Lobby {
 		this.guest = client
 		client.setLobby(this)
 		client.sendAction({ action: 'joinedLobby', code: this.code })
+		client.sendAction({ action: 'lobbyOptions', ...this.options })
 		this.broadcastLobbyInfo()
 	}
 
@@ -112,6 +115,17 @@ class Lobby {
 
 	getGameInfo = () => {
 		return { small: 'bl_pvp', big: 'bl_pvp', boss: 'bl_pvp' }
+	}
+
+	setOptions = (options: { [key: string]: string }) => {
+		for (const key of Object.keys(options)) {
+			if (options[key] == "true" || options[key] == "false") {
+				this.options[key] = options[key] == "true"
+			} else{
+				this.options[key] = options[key]
+			}
+		}
+		this.guest?.sendAction({ action: 'lobbyOptions', ...options })
 	}
 }
 

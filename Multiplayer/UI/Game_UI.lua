@@ -801,7 +801,7 @@ function Game:update_new_round(dt)
 		-- Prevent player from losing
 		if G.GAME.chips - G.GAME.blind.chips < 0 then
 			G.GAME.blind.chips = -1
-			G.GAME.blind.dollars = 0
+			G.MULTIPLAYER.fail_round()
 		end
 
 		-- Prevent player from winning
@@ -1438,7 +1438,7 @@ function add_round_eval_row(config)
 									n = G.UIT.O,
 									config = {
 										object = DynaText({
-											string = { is_pvp_boss() and " Lost a Life " or " Failed " },
+											string = { (is_pvp_boss() or G.LOBBY.config.death_on_round_loss) and " Lost a Life " or " Failed " },
 											colours = { G.C.FILTER },
 											shadow = true,
 											pop_in = 0,
