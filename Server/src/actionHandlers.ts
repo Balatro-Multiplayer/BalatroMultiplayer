@@ -1,4 +1,5 @@
 import type Client from './Client.js'
+import GameModes from './GameMode.js'
 import Lobby from './Lobby.js'
 import type {
 	ActionCreateLobby,
@@ -6,6 +7,7 @@ import type {
 	ActionHandlers,
 	ActionJoinLobby,
 	ActionPlayHand,
+	ActionSetAnte,
 	ActionUsername,
 } from './actions.js'
 import { generateSeed } from './utils.js'
@@ -60,17 +62,7 @@ const startGameAction = (client: Client) => {
 		return
 	}
 
-	let lives = 4
-	// TODO: Put this in a gamemode map that
-	// has more info than just lives
-	switch (lobby.gameMode) {
-		case 'attrition':
-			lives = 4
-			break
-		case 'draft':
-			lives = 2
-			break
-	}
+	let lives = GameModes[lobby.gameMode].startingLives
 
 	// Reset players' lives
 	lobby.setPlayersLives(lives)
@@ -183,7 +175,7 @@ const stopGameAction = (client: Client) => {
 }
 
 const gameInfoAction = (client: Client) => {
-	client.sendAction({ action: 'gameInfo', ...client.lobby?.getGameInfo() })
+	client.lobby?.sendGameInfo(client)
 }
 	
 const lobbyOptionsAction = (options: any, client: Client) => {
@@ -195,8 +187,10 @@ const failRoundAction = (client: Client) => {
 
 	if (!lobby) return
 
-	client.lives -= 1
-	client.sendAction({ action: 'playerInfo', lives: client.lives })
+	if (lobby.options.death_on_round_loss) {
+		client.lives -= 1
+		client.sendAction({ action: 'playerInfo', lives: client.lives })
+	}
 
 	if (client.lives === 0) {
 		let gameLoser = null
@@ -212,6 +206,10 @@ const failRoundAction = (client: Client) => {
 		gameWinner?.sendAction({ action: 'winGame' })
 		gameLoser?.sendAction({ action: 'loseGame' })
 	}
+}
+
+const setAnteAction = ({ ante }: ActionHandlerArgs<ActionSetAnte>, client: Client) => {
+	client.ante = ante
 }
 
 // Declared partial for now untill all action handlers are defined
@@ -230,4 +228,5 @@ export const actionHandlers = {
 	gameInfo: gameInfoAction,
 	lobbyOptions: lobbyOptionsAction,
 	failRound: failRoundAction,
+	setAnte: setAnteAction,
 } satisfies Partial<ActionHandlers>

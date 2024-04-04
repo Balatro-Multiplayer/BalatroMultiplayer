@@ -1,4 +1,5 @@
 import type Client from './Client.js'
+import GameModes from './GameMode.js'
 import type {
 	ActionLobbyInfo,
 	ActionServerToClient,
@@ -113,8 +114,12 @@ class Lobby {
 		this.broadcastAction({ action: 'playerInfo', lives })
 	}
 
-	getGameInfo = () => {
-		return { small: 'bl_pvp', big: 'bl_pvp', boss: 'bl_pvp' }
+	sendGameInfo = (client: Client) => {
+		if (this.host !== client && this.guest !== client) {
+			return client.sendAction({ action: 'error', message: 'Client not in Lobby' })
+		}
+
+		client.sendAction({ action: 'gameInfo', ...GameModes[this.gameMode].getBlindFromAnte(client.ante) })
 	}
 
 	setOptions = (options: { [key: string]: string }) => {

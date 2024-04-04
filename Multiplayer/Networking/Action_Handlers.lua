@@ -135,9 +135,9 @@ end
 
 local function action_game_info(small, big, boss)
 	G.GAME.round_resets.blind_choices = {
-		Small = small or 'bl_small',
-		Big = big or 'bl_big',
-		Boss = boss
+		Small = small or G.GAME.round_resets.blind_choices.Small,
+		Big = big or G.GAME.round_resets.blind_choices.Big,
+		Boss = boss or G.GAME.round_resets.blind_choices.Boss
 	}
 end
 
@@ -215,6 +215,10 @@ function G.MULTIPLAYER.lobby_options()
 		msg = msg .. string.format(",%s:%s", k, tostring(v))
 	end
 	Client.send(msg)
+end
+
+function G.MULTIPLAYER.set_ante(ante)
+	Client.send(string.format("action:setAnte,ante:%d", ante))
 end
 -- #endregion Client to Server
 

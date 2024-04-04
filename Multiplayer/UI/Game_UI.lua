@@ -1564,6 +1564,7 @@ end
 
 local ease_ante_ref = ease_ante
 function ease_ante(mod)
+	G.MULTIPLAYER.set_ante(G.GAME.round_resets.ante + mod)
 	if not G.LOBBY.code then
 		return ease_ante_ref(mod)
 	end
