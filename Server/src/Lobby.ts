@@ -109,6 +109,10 @@ class Lobby {
 
 		this.broadcastAction({ action: 'playerInfo', lives })
 	}
+
+	getGameInfo = () => {
+		return { small: 'bl_pvp', big: 'bl_pvp', boss: 'bl_pvp' }
+	}
 }
 
 export default Lobby

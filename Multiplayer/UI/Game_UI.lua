@@ -646,7 +646,7 @@ function Game:update_draw_to_hand(dt)
 			and G.GAME.current_round.discards_used == 0
 			and G.GAME.facing_blind
 		then
-			if G.GAME.blind.name == "Your Nemesis" then
+			if is_pvp_boss() then
 				G.E_MANAGER:add_event(Event({
 					trigger = "after",
 					delay = 1,
@@ -737,7 +737,7 @@ local update_hand_played_ref = Game.update_hand_played
 ---@diagnostic disable-next-line: duplicate-set-field
 function Game:update_hand_played(dt)
 	-- Ignore for singleplayer or regular blinds
-	if not G.LOBBY.connected or not G.LOBBY.code or not G.GAME.blind.boss then
+	if not G.LOBBY.connected or not G.LOBBY.code or not is_pvp_boss() then
 		update_hand_played_ref(self, dt)
 		return
 	end
@@ -1438,7 +1438,7 @@ function add_round_eval_row(config)
 									n = G.UIT.O,
 									config = {
 										object = DynaText({
-											string = { G.GAME.blind.boss and " Lost a Life " or " Failed " },
+											string = { is_pvp_boss() and " Lost a Life " or " Failed " },
 											colours = { G.C.FILTER },
 											shadow = true,
 											pop_in = 0,
@@ -1581,6 +1581,7 @@ function ease_lives(mod)
 	G.E_MANAGER:add_event(Event({
 		trigger = "immediate",
 		func = function()
+			if not G.hand_text_area then return end
 			local lives_UI = G.hand_text_area.ante
 			mod = mod or 0
 			local text = "+"
@@ -1624,6 +1625,28 @@ function G.FUNCS.mods_button(arg_736_0)
 	end
 
 	mods_button_ref(arg_736_0)
+end
+
+local get_new_boss_ref = get_new_boss
+local function get_regular_boss()
+	local boss = get_new_boss_ref()
+	while boss == "bl_pvp" do
+		boss = get_new_boss_ref()
+	end
+	return boss
+end
+
+--[[ 
+	We repurpose get_new_boss here because it is called to determine the boss blind, 
+	and we only ever need to do that when we are also determining the small and big blinds for a given ante.
+
+	Note: this is also called when a boss is rerolled, but that should be disabled and is also inconsequential
+]]
+function get_new_boss()
+	if G.LOBBY.code then
+		G.MULTIPLAYER.game_info()
+	end
+	return get_regular_boss()
 end
 ----------------------------------------------
 ------------MOD GAME UI END-------------------

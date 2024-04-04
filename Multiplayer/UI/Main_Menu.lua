@@ -110,6 +110,7 @@ function G.UIDEF.create_UIBox_create_lobby_button()
 													ref_value = "different_seeds",
 												}),
 												UIBox_button({
+													id = "start_attrition",
 													label = { "Start Lobby" },
 													colour = G.C.RED,
 													button = "start_lobby",
@@ -158,8 +159,10 @@ function G.UIDEF.create_UIBox_create_lobby_button()
 													},
 												},
 												UIBox_button({
-													label = { "Coming Soon!" },
+													id = "start_draft",
+													label = { "Start Lobby" },
 													colour = G.C.RED,
+													button = "start_lobby",
 													minw = 5,
 												}),
 											},
@@ -399,8 +402,8 @@ end
 
 function G.FUNCS.start_lobby(e)
 	G.SETTINGS.paused = false
-
-	G.MULTIPLAYER.create_lobby()
+	local gamemode = e.config.id == "start_attrition" and "attrition" or "draft"
+	G.MULTIPLAYER.create_lobby(gamemode)
 end
 
 -- Modify play button to take you to mode select first

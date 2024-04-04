@@ -158,6 +158,9 @@ const server = net.createServer((socket) => {
 					case 'stopGame':
 						actionHandlers.stopGame(client)
 						break
+					case 'gameInfo':
+						actionHandlers.gameInfo(client)
+						break
 				}
 			} catch (error) {
 				const failedToParseError = 'Failed to parse message'
