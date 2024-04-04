@@ -24,7 +24,7 @@ const GameModes: {
   'draft': {
     startingLives: 2,
     getBlindFromAnte: (ante) => {
-      if (ante < 2) return { }
+      if (ante < 4) return { }
       else return { small: 'bl_pvp', big: 'bl_pvp', boss: 'bl_pvp' }
     }
   }

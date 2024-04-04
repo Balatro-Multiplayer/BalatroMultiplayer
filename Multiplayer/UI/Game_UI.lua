@@ -170,11 +170,7 @@ function create_UIBox_blind_choice(type, run_info)
 				pseudorandom_element(_poker_hands, pseudoseed("orbital"))
 		end
 
-		if type == "Small" then
-			extras = nil
-		elseif type == "Big" then
-			extras = nil
-		elseif not run_info then
+		if G.GAME.round_resets.blind_choices[type] == 'bl_pvp' then
 			local dt1 = DynaText({
 				string = { { string = "LIFE", colour = G.C.FILTER } },
 				colours = { G.C.BLACK },
@@ -237,6 +233,8 @@ function create_UIBox_blind_choice(type, run_info)
 					},
 				},
 			}
+		else
+			extras = nil
 		end
 		G.GAME.round_resets.blind_ante = G.GAME.round_resets.blind_ante or G.GAME.round_resets.ante
 
@@ -987,9 +985,9 @@ function end_round()
 					G.STATE = G.STATES.ROUND_EVAL
 					G.STATE_COMPLETE = false
 
-					if G.GAME.round_resets.blind == G.P_BLINDS.bl_small then
+					if G.GAME.round_resets.blind_states.Small ~= "Defeated" and G.GAME.round_resets.blind_states.Small ~= "Skipped" then
 						G.GAME.round_resets.blind_states.Small = "Defeated"
-					elseif G.GAME.round_resets.blind == G.P_BLINDS.bl_big then
+					elseif G.GAME.round_resets.blind_states.Big ~= "Defeated" and G.GAME.round_resets.blind_states.Big ~= "Skipped" then
 						G.GAME.round_resets.blind_states.Big = "Defeated"
 					else
 						G.GAME.current_round.voucher = get_next_voucher_key()
