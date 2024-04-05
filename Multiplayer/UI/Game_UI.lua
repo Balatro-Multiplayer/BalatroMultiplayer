@@ -1608,7 +1608,7 @@ end
 
 local update_blind_select_ref = Game.update_blind_select
 function Game:update_blind_select(dt)
-	if G.MULTIPLAYER_GAME.loaded_ante == G.GAME.round_resets.ante then
+	if G.MULTIPLAYER_GAME.loaded_ante == G.GAME.round_resets.ante or not G.LOBBY.code then
 		update_blind_select_ref(self, dt)
 	elseif not G.MULTIPLAYER.loading_blinds then
 		G.MULTIPLAYER.loading_blinds = true
@@ -1637,8 +1637,8 @@ function G.FUNCS.mods_button(arg_736_0)
 end
 
 local get_new_boss_ref = get_new_boss
-function get_new_boss()
-	if G.LOBBY.code and G.GAME.round_resets.blind_choices.Boss then
+function get_new_boss(force_change)
+	if G.LOBBY.code and G.GAME.round_resets.blind_choices.Boss and not force_change then
 		return G.GAME.round_resets.blind_choices.Boss
 	end
 	local boss = get_new_boss_ref()

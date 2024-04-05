@@ -137,7 +137,7 @@ local function action_game_info(small, big, boss)
 	G.GAME.round_resets.blind_choices = {
 		Small = small or 'bl_small',
 		Big = big or 'bl_big',
-		Boss = boss or get_new_boss()
+		Boss = boss or get_new_boss(true)
 	}
 	G.MULTIPLAYER_GAME.loaded_ante = G.GAME.round_resets.ante
 	G.MULTIPLAYER.loading_blinds = false
