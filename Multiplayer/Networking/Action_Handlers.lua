@@ -73,6 +73,7 @@ end
 ---@param stake_str string
 local function action_start_game(deck, seed, stake_str)
 	local stake = tonumber(stake_str)
+	G.MULTIPLAYER.set_ante(0)
 	G.FUNCS.lobby_start_run(nil, { deck = deck, seed = seed, stake = stake })
 end
 
