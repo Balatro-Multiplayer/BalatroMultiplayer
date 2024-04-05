@@ -6,7 +6,7 @@
 
 local Utils = require("Utils")
 
-MULTIPLAYER_VERSION = "0.1.0-MULTIPLAYER"
+MULTIPLAYER_VERSION = "0.1.1-MULTIPLAYER"
 
 local game_main_menu_ref = Game.main_menu
 ---@diagnostic disable-next-line: duplicate-set-field
