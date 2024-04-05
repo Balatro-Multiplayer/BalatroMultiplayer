@@ -464,7 +464,6 @@ function G.FUNCS.display_lobby_main_menu_UI(e)
 end
 
 function G.FUNCS.return_to_lobby()
-	G.FUNCS.go_to_menu()
 	G.MULTIPLAYER.stop_game()
 end
 
