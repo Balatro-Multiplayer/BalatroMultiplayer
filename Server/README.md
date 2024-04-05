@@ -180,6 +180,12 @@ lobbyOptions: {any number of options recognized by the client}
 failRound
 - Declares the client lost a round
 
+---
+
+setAnte: ante
+- Declares the current ante that the client is on to the server, this needs to be handled by the server on a per-client basis since clients can be on different antes at the same time
+- ante: The ante to set the client to on the server side
+
 ### Utility
 
 keepAlive

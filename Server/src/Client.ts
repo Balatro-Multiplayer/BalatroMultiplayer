@@ -21,10 +21,10 @@ class Client {
 	lobby: Lobby | null = null
 	/** Whether player is ready for next blind */
 	isReady = false
-	// TODO: Set lives based on game mode
 	lives = 4
 	score = 0
 	handsLeft = 4
+	ante = 1
 
 	constructor(address: Address, send: SendFn) {
 		this.id = uuidv4()

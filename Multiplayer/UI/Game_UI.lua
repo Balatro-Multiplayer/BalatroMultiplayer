@@ -170,11 +170,7 @@ function create_UIBox_blind_choice(type, run_info)
 				pseudorandom_element(_poker_hands, pseudoseed("orbital"))
 		end
 
-		if type == "Small" then
-			extras = nil
-		elseif type == "Big" then
-			extras = nil
-		elseif not run_info then
+		if G.GAME.round_resets.blind_choices[type] == 'bl_pvp' then
 			local dt1 = DynaText({
 				string = { { string = "LIFE", colour = G.C.FILTER } },
 				colours = { G.C.BLACK },
@@ -237,6 +233,8 @@ function create_UIBox_blind_choice(type, run_info)
 					},
 				},
 			}
+		else
+			extras = nil
 		end
 		G.GAME.round_resets.blind_ante = G.GAME.round_resets.blind_ante or G.GAME.round_resets.ante
 
@@ -646,7 +644,7 @@ function Game:update_draw_to_hand(dt)
 			and G.GAME.current_round.discards_used == 0
 			and G.GAME.facing_blind
 		then
-			if G.GAME.blind.name == "Your Nemesis" then
+			if is_pvp_boss() then
 				G.E_MANAGER:add_event(Event({
 					trigger = "after",
 					delay = 1,
@@ -737,7 +735,7 @@ local update_hand_played_ref = Game.update_hand_played
 ---@diagnostic disable-next-line: duplicate-set-field
 function Game:update_hand_played(dt)
 	-- Ignore for singleplayer or regular blinds
-	if not G.LOBBY.connected or not G.LOBBY.code or not G.GAME.blind.boss then
+	if not G.LOBBY.connected or not G.LOBBY.code or not is_pvp_boss() then
 		update_hand_played_ref(self, dt)
 		return
 	end
@@ -987,9 +985,9 @@ function end_round()
 					G.STATE = G.STATES.ROUND_EVAL
 					G.STATE_COMPLETE = false
 
-					if G.GAME.round_resets.blind == G.P_BLINDS.bl_small then
+					if G.GAME.round_resets.blind_states.Small ~= "Defeated" and G.GAME.round_resets.blind_states.Small ~= "Skipped" then
 						G.GAME.round_resets.blind_states.Small = "Defeated"
-					elseif G.GAME.round_resets.blind == G.P_BLINDS.bl_big then
+					elseif G.GAME.round_resets.blind_states.Big ~= "Defeated" and G.GAME.round_resets.blind_states.Big ~= "Skipped" then
 						G.GAME.round_resets.blind_states.Big = "Defeated"
 					else
 						G.GAME.current_round.voucher = get_next_voucher_key()
@@ -1438,7 +1436,7 @@ function add_round_eval_row(config)
 									n = G.UIT.O,
 									config = {
 										object = DynaText({
-											string = { (G.GAME.blind.boss or G.LOBBY.config.death_on_round_loss) and " Lost a Life " or " Failed " },
+											string = { (is_pvp_boss() or G.LOBBY.config.death_on_round_loss) and " Lost a Life " or " Failed " },
 											colours = { G.C.FILTER },
 											shadow = true,
 											pop_in = 0,
@@ -1564,6 +1562,7 @@ end
 
 local ease_ante_ref = ease_ante
 function ease_ante(mod)
+	G.MULTIPLAYER.set_ante(G.GAME.round_resets.ante + mod)
 	if not G.LOBBY.code then
 		return ease_ante_ref(mod)
 	end
@@ -1607,6 +1606,16 @@ function ease_lives(mod)
 	}))
 end
 
+local update_blind_select_ref = Game.update_blind_select
+function Game:update_blind_select(dt)
+	if G.MULTIPLAYER_GAME.loaded_ante == G.GAME.round_resets.ante then
+		update_blind_select_ref(self, dt)
+	elseif not G.MULTIPLAYER.loading_blinds then
+		G.MULTIPLAYER.loading_blinds = true
+		G.MULTIPLAYER.game_info()
+	end
+end
+
 local exit_overlay_menu_ref = G.FUNCS.exit_overlay_menu
 ---@diagnostic disable-next-line: duplicate-set-field
 function G.FUNCS:exit_overlay_menu()
@@ -1625,6 +1634,18 @@ function G.FUNCS.mods_button(arg_736_0)
 	end
 
 	mods_button_ref(arg_736_0)
+end
+
+local get_new_boss_ref = get_new_boss
+function get_new_boss()
+	if G.LOBBY.code and G.GAME.round_resets.blind_choices.Boss then
+		return G.GAME.round_resets.blind_choices.Boss
+	end
+	local boss = get_new_boss_ref()
+	while boss == "bl_pvp" do
+		boss = get_new_boss_ref()
+	end
+	return boss
 end
 ----------------------------------------------
 ------------MOD GAME UI END-------------------

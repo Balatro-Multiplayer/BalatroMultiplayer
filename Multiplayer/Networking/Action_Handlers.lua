@@ -96,7 +96,7 @@ local function action_enemy_info(score_str, hands_left_str)
 
 	G.LOBBY.enemy.score = score
 	G.LOBBY.enemy.hands = hands_left
-	if G.GAME.blind.boss then
+	if is_pvp_boss() then
 		G.HUD_blind:get_UIE_by_ID("HUD_blind_count"):juice_up()
 		G.HUD_blind:get_UIE_by_ID("dollars_to_be_earned"):juice_up()
 	end
@@ -132,6 +132,17 @@ local function action_lose_game()
 	G.STATE = G.STATES.GAME_OVER
 end
 
+
+local function action_game_info(small, big, boss)
+	G.GAME.round_resets.blind_choices = {
+		Small = small or 'bl_small',
+		Big = big or 'bl_big',
+		Boss = boss or get_new_boss()
+	}
+	G.MULTIPLAYER_GAME.loaded_ante = G.GAME.round_resets.ante
+	G.MULTIPLAYER.loading_blinds = false
+end
+
 local function action_lobby_options(options)
 	for k, v in pairs(options) do
 		local parsed_v = v
@@ -151,9 +162,8 @@ local function action_lobby_options(options)
 end
 
 -- #region Client to Server
-function G.MULTIPLAYER.create_lobby()
-	-- TODO: This is hardcoded to attrition for now, must be changed
-	Client.send("action:createLobby,gameMode:attrition")
+function G.MULTIPLAYER.create_lobby(gamemode)
+	Client.send(string.format("action:createLobby,gameMode:%s", gamemode))
 end
 
 function G.MULTIPLAYER.join_lobby(code)
@@ -184,6 +194,10 @@ function G.MULTIPLAYER.stop_game()
 	Client.send("action:stopGame")
 end
 
+function G.MULTIPLAYER.game_info()
+	Client.send("action:gameInfo")
+end
+
 function G.MULTIPLAYER.fail_round()
 	if G.LOBBY.config.no_gold_on_round_loss then
 		G.GAME.blind.dollars = 0
@@ -203,6 +217,10 @@ function G.MULTIPLAYER.lobby_options()
 		msg = msg .. string.format(",%s:%s", k, tostring(v))
 	end
 	Client.send(msg)
+end
+
+function G.MULTIPLAYER.set_ante(ante)
+	Client.send(string.format("action:setAnte,ante:%d", ante))
 end
 -- #endregion Client to Server
 
@@ -255,6 +273,8 @@ function Game:update(dt)
 				action_win_game()
 			elseif parsedAction.action == "loseGame" then
 				action_lose_game()
+			elseif parsedAction.action == "gameInfo" then
+				action_game_info(parsedAction.small, parsedAction.big, parsedAction.boss)
 			elseif parsedAction.action == "lobbyOptions" then
 				action_lobby_options(parsedAction)
 			elseif parsedAction.action == "error" then

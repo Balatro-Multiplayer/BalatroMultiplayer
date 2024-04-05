@@ -9,6 +9,7 @@ import type {
 	ActionJoinLobby,
 	ActionPlayHand,
 	ActionServerToClient,
+	ActionSetAnte,
 	ActionUsername,
 	ActionUtility,
 } from './actions.js'
@@ -158,11 +159,17 @@ const server = net.createServer((socket) => {
 					case 'stopGame':
 						actionHandlers.stopGame(client)
 						break
+					case 'gameInfo':
+						actionHandlers.gameInfo(client)
+						break
 					case 'lobbyOptions':
 						actionHandlers.lobbyOptions(actionArgs, client)
 						break
 					case 'failRound':
 						actionHandlers.failRound(client)
+						break
+					case 'setAnte':
+						actionHandlers.setAnte(actionArgs as ActionHandlerArgs<ActionSetAnte>, client)
 						break
 				}
 			} catch (error) {
