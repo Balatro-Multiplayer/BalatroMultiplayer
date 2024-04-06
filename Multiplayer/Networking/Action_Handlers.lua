@@ -73,6 +73,7 @@ end
 ---@param stake_str string
 local function action_start_game(deck, seed, stake_str)
 	local stake = tonumber(stake_str)
+	G.MULTIPLAYER.set_ante(0)
 	G.FUNCS.lobby_start_run(nil, { deck = deck, seed = seed, stake = stake })
 end
 
@@ -137,7 +138,7 @@ local function action_game_info(small, big, boss)
 	G.GAME.round_resets.blind_choices = {
 		Small = small or 'bl_small',
 		Big = big or 'bl_big',
-		Boss = boss or get_new_boss()
+		Boss = boss or get_new_boss(true)
 	}
 	G.MULTIPLAYER_GAME.loaded_ante = G.GAME.round_resets.ante
 	G.MULTIPLAYER.loading_blinds = false
