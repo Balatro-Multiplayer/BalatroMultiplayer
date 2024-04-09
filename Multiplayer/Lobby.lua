@@ -49,8 +49,10 @@ function G.MULTIPLAYER.update_connection_status()
 
 	if G.HUD_connection_status then
 		G.HUD_connection_status:remove()
-	end
-	G.HUD_connection_status = G.UIDEF.get_connection_status_ui()
+  end
+  if G.STAGE == G.STAGES.MAIN_MENU then
+	  G.HUD_connection_status = G.UIDEF.get_connection_status_ui()
+  end
 end
 
 local gameMainMenuRef = Game.main_menu
