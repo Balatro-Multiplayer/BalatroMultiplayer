@@ -731,6 +731,72 @@ function G.UIDEF.shop()
 	return t
 end
 
+local function eval_hand_and_jokers()
+	for i=1, #G.hand.cards do
+		--Check for hand doubling
+		local reps = {1}
+		local j = 1
+		while j <= #reps do
+				local percent = (i-0.999)/(#G.hand.cards-0.998) + (j-1)*0.1
+				if reps[j] ~= 1 then card_eval_status_text((reps[j].jokers or reps[j].seals).card, 'jokers', nil, nil, nil, (reps[j].jokers or reps[j].seals)) end
+
+				--calculate the hand effects
+				local effects = {G.hand.cards[i]:get_end_of_round_effect()}
+				for k=1, #G.jokers.cards do
+						--calculate the joker individual card effects
+						local eval = G.jokers.cards[k]:calculate_joker({cardarea = G.hand, other_card = G.hand.cards[i], individual = true, end_of_round = true})
+						if eval then 
+								table.insert(effects, eval)
+						end
+				end
+
+				if reps[j] == 1 then 
+						--Check for hand doubling
+						--From Red seal
+						local eval = eval_card(G.hand.cards[i], {end_of_round = true,cardarea = G.hand, repetition = true, repetition_only = true})
+						if next(eval) and (next(effects[1]) or #effects > 1)  then 
+								for h = 1, eval.seals.repetitions do
+										reps[#reps+1] = eval
+								end
+						end
+
+						--from Jokers
+						for j=1, #G.jokers.cards do
+								--calculate the joker effects
+								local eval = eval_card(G.jokers.cards[j], {cardarea = G.hand, other_card = G.hand.cards[i], repetition = true, end_of_round = true, card_effects = effects})
+								if next(eval) then 
+										for h  = 1, eval.jokers.repetitions do
+												reps[#reps+1] = eval
+										end
+								end
+						end
+				end
+
+				for ii = 1, #effects do
+						--if this effect came from a joker
+						if effects[ii].card then
+								G.E_MANAGER:add_event(Event({
+										trigger = 'immediate',
+										func = (function() effects[ii].card:juice_up(0.7);return true end)
+								}))
+						end
+						
+						--If dollars
+						if effects[ii].h_dollars then 
+								ease_dollars(effects[ii].h_dollars)
+								card_eval_status_text(G.hand.cards[i], 'dollars', effects[ii].h_dollars, percent)
+						end
+
+						--Any extras
+						if effects[ii].extra then
+								card_eval_status_text(G.hand.cards[i], 'extra', nil, percent, nil, effects[ii].extra)
+						end
+				end
+				j = j + 1
+		end
+	end
+end
+
 local update_hand_played_ref = Game.update_hand_played
 ---@diagnostic disable-next-line: duplicate-set-field
 function Game:update_hand_played(dt)
@@ -760,6 +826,7 @@ function Game:update_hand_played(dt)
 				-- For now, never advance to next round
 				if G.GAME.current_round.hands_left < 1 then
 					if G.hand.cards[1] then
+						eval_hand_and_jokers()
 						attention_text({
 							scale = 0.8,
 							text = "Waiting for enemy to finish...",
