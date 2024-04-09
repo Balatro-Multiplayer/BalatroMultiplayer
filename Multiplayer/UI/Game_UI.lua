@@ -1173,7 +1173,7 @@ function create_UIBox_game_over()
 														{
 															n = G.UIT.T,
 															config = {
-																text = "Retun to Lobby",
+																text = "Return to Lobby",
 																scale = 0.5,
 																colour = G.C.UI.TEXT_LIGHT,
 															},
