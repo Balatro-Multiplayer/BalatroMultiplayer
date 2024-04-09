@@ -1647,5 +1647,16 @@ function get_new_boss(force_change)
 	end
 	return boss
 end
+
+G.FUNCS.can_skip_booster = function(e)
+	if G.pack_cards and G.pack_cards.cards and G.pack_cards.cards[1] and 
+	(G.STATE == G.STATES.PLANET_PACK or G.STATE == G.STATES.STANDARD_PACK or G.STATE == G.STATES.BUFFOON_PACK or (G.hand and G.hand.cards[1])) then 
+			e.config.colour = G.C.GREY
+			e.config.button = 'skip_booster'
+	else
+		e.config.colour = G.C.UI.BACKGROUND_INACTIVE
+		e.config.button = nil
+	end
+end
 ----------------------------------------------
 ------------MOD GAME UI END-------------------
