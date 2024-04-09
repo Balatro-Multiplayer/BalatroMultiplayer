@@ -149,7 +149,9 @@ const playHandAction = (
 			roundWinner.id === lobby.host.id ? lobby.guest : lobby.host
 
 		if (lobby.host.score !== lobby.guest.score) {
-			roundLoser.lives -= 1
+			if (!lobby.options.death_on_round_loss) {
+				roundLoser.lives -= 1
+			}
 			roundLoser.sendAction({ action: 'playerInfo', lives: roundLoser.lives })
 
 			// If no lives are left, we end the game
