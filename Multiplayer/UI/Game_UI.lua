@@ -583,14 +583,14 @@ local function update_blind_HUD()
 			delay = 0.3,
 			blockable = false,
 			func = function()
-				G.HUD_blind:get_UIE_by_ID("HUD_blind_count").config.ref_table = G.LOBBY.enemy
+				G.HUD_blind:get_UIE_by_ID("HUD_blind_count").config.ref_table = G.MULTIPLAYER_GAME.enemy
 				G.HUD_blind:get_UIE_by_ID("HUD_blind_count").config.ref_value = "score"
 				G.HUD_blind:get_UIE_by_ID("HUD_blind").children[2].children[2].children[2].children[1].children[1].config.text =
 					"Current enemy score"
 				G.HUD_blind:get_UIE_by_ID("HUD_blind").children[2].children[2].children[2].children[3].children[1].config.text =
 					"Enemy hands left: "
 				G.HUD_blind:get_UIE_by_ID("dollars_to_be_earned").config.object.config.string =
-					{ { ref_table = G.LOBBY.enemy, ref_value = "hands" } }
+					{ { ref_table = G.MULTIPLAYER_GAME.enemy, ref_value = "hands" } }
 				G.HUD_blind:get_UIE_by_ID("dollars_to_be_earned").config.object:update_text()
 				G.HUD_blind.alignment.offset.y = 0
 				return true
@@ -822,7 +822,7 @@ function Game:update_hand_played(dt)
 			func = function()
 				G.MULTIPLAYER.play_hand(G.GAME.chips, G.GAME.current_round.hands_left)
 				-- Set blind chips to enemy score
-				G.GAME.blind.chips = G.LOBBY.enemy.score
+				G.GAME.blind.chips = G.MULTIPLAYER_GAME.enemy.score
 				-- For now, never advance to next round
 				if G.GAME.current_round.hands_left < 1 then
 					if G.hand.cards[1] then
@@ -1765,6 +1765,17 @@ G.FUNCS.can_skip_booster = function(e)
 	else
 		e.config.colour = G.C.UI.BACKGROUND_INACTIVE
 		e.config.button = nil
+	end
+end
+
+local update_selecting_hand_ref = Game.update_selecting_hand
+function Game:update_selecting_hand(dt)
+	update_selecting_hand_ref(self, dt)
+	if G.MULTIPLAYER_GAME.end_pvp then
+		G.STATE_COMPLETE = false
+		G.STATE = G.STATES.NEW_ROUND
+		G.MULTIPLAYER_GAME.end_pvp = false
+		return
 	end
 end
 ----------------------------------------------

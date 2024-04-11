@@ -485,6 +485,7 @@ function Game:update(dt)
 		in_lobby = not in_lobby
 		G.F_NO_SAVING = in_lobby
 		self.FUNCS.go_to_menu()
+		reset_game_states()
 	end
 	gameUpdateRef(self, dt)
 end
