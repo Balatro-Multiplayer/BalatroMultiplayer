@@ -1703,6 +1703,48 @@ function G.FUNCS.mods_button(arg_736_0)
 	mods_button_ref(arg_736_0)
 end
 
+-- Rewritten from the original function to fix typing issues causing crashes
+function get_new_boss()
+	G.GAME.perscribed_bosses = G.GAME.perscribed_bosses or {}
+	if G.GAME.perscribed_bosses and G.GAME.perscribed_bosses[G.GAME.round_resets.ante] then 
+			local ret_boss = G.GAME.perscribed_bosses[G.GAME.round_resets.ante] 
+			G.GAME.perscribed_bosses[G.GAME.round_resets.ante] = nil
+			G.GAME.bosses_used[ret_boss] = G.GAME.bosses_used[ret_boss] + 1
+			return ret_boss
+	end
+	if G.FORCE_BOSS then return G.FORCE_BOSS end
+	
+	local eligible_bosses = {}
+	for k, v in pairs(G.P_BLINDS) do
+			if v.boss then
+					local condition = v.boss.showdown and (G.GAME.round_resets.ante)%G.GAME.win_ante == 0 and G.GAME.round_resets.ante >= 2
+					or not v.boss.showdown and (v.boss.min <= math.max(1, G.GAME.round_resets.ante) and ((math.max(1, G.GAME.round_resets.ante))%G.GAME.win_ante ~= 0 or G.GAME.round_resets.ante < 2))
+					if condition then
+							eligible_bosses[k] = true
+					end
+			end
+	end
+
+	local min_use = 100
+	local bosses_with_min_use = {}
+	for k, _ in pairs(eligible_bosses) do
+			local uses = G.GAME.bosses_used[k] or 0
+			if uses <= min_use then
+					if uses < min_use then
+							bosses_with_min_use = {}
+							min_use = uses
+					end
+					bosses_with_min_use[k] = true
+			end
+	end
+
+	local _, boss = pseudorandom_element(bosses_with_min_use, pseudoseed('boss'))
+	G.GAME.bosses_used[boss] = (G.GAME.bosses_used[boss] or 0) + 1
+	
+	return boss
+end
+
+
 local get_new_boss_ref = get_new_boss
 function get_new_boss(force_change)
 	if G.LOBBY.code and G.GAME.round_resets.blind_choices.Boss and not force_change then
