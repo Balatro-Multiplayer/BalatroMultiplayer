@@ -1477,7 +1477,7 @@ end
 
 local add_round_eval_row_ref = add_round_eval_row
 function add_round_eval_row(config)
-	if G.LOBBY.code and ((config.name == "blind1" and (is_pvp_boss() or (G.LOBBY.config.death_on_round_loss and G.GAME.blind.chips == -1))) or config.name == "comeback") then
+	if G.LOBBY.code and ((config.name == "blind1" and (is_pvp_boss() or G.GAME.blind.chips == -1 or (G.LOBBY.config.death_on_round_loss and G.GAME.blind.chips == -1))) or config.name == "comeback") then
 		local config = config or {}
 		local width = G.round_eval.T.w - 0.51
 		local num_dollars = config.dollars or 1

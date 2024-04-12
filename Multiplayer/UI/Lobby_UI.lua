@@ -314,6 +314,24 @@ function G.UIDEF.create_UIBox_lobby_options()
 								},
 								nodes = {
 									Disableable_Toggle({
+										id = "gold_on_life_loss_toggle",
+										enabled_ref_table = G.LOBBY,
+										enabled_ref_value = 'is_host',
+										label = "Give comeback gold on life loss",
+										ref_table = G.LOBBY.config,
+										ref_value = "gold_on_life_loss",
+										callback = toggle_lobby_options
+									}),
+								}
+							},
+							{
+								n = G.UIT.R,
+								config = {
+									padding = 0,
+									align = "cr",
+								},
+								nodes = {
+									Disableable_Toggle({
 										id = "no_gold_on_round_loss_toggle",
 										enabled_ref_table = G.LOBBY,
 										enabled_ref_value = 'is_host',

@@ -119,7 +119,7 @@ end
 ---@param lives number
 local function action_player_info(lives)
 	if (G.MULTIPLAYER_GAME.lives ~= lives) then
-		if G.MULTIPLAYER_GAME.lives ~= 0 then
+		if G.MULTIPLAYER_GAME.lives ~= 0 and G.LOBBY.config.gold_on_life_loss then
 			G.MULTIPLAYER_GAME.comeback_bonus_given = false
 			G.MULTIPLAYER_GAME.comeback_bonus = G.MULTIPLAYER_GAME.comeback_bonus + 1
 		end

@@ -12,7 +12,8 @@ G.LOBBY = {
 	code = nil,
 	type = "",
 	config = {
-		no_gold_on_round_loss = true,
+    gold_on_life_loss = true,
+		no_gold_on_round_loss = false,
 		death_on_round_loss = false,
 		different_seeds = false
 	},
