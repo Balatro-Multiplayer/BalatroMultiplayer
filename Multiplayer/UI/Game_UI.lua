@@ -1477,7 +1477,7 @@ end
 
 local add_round_eval_row_ref = add_round_eval_row
 function add_round_eval_row(config)
-	if G.LOBBY.code and (config.name == "blind1" or config.name == "comeback") then
+	if G.LOBBY.code and ((config.name == "blind1" and (is_pvp_boss() or (G.LOBBY.config.death_on_round_loss and G.GAME.blind.chips == -1))) or config.name == "comeback") then
 		local config = config or {}
 		local width = G.round_eval.T.w - 0.51
 		local num_dollars = config.dollars or 1
@@ -1501,33 +1501,34 @@ function add_round_eval_row(config)
 						config = { w = 1.2, h = 1.2, object = blind_sprite, hover = true, can_collide = false },
 					})
 
-					table.insert(left_text, {
-						n = G.UIT.C,
-						config = { padding = 0.05, align = "cm" },
-						nodes = {
-							{
-								n = G.UIT.R,
-								config = { align = "cm" },
-								nodes = {
-									{
-										n = G.UIT.O,
-										config = {
-											object = DynaText({
-												string = { G.GAME.blind.chips == -1 and ((is_pvp_boss() or G.LOBBY.config.death_on_round_loss) and " Lost a Life " or " Failed ") or "Defeated the Enemy" },
-												colours = { G.C.FILTER },
-												shadow = true,
-												pop_in = 0,
-												scale = 0.5 * scale,
-												silent = true,
-											}),
+					table.insert(left_text,
+						{
+							n = G.UIT.C,
+							config = { padding = 0.05, align = "cm" },
+							nodes = {
+								{
+									n = G.UIT.R,
+									config = { align = "cm" },
+									nodes = {
+										{
+											n = G.UIT.O,
+											config = {
+												object = DynaText({
+													string = { G.GAME.blind.chips == -1 and ((is_pvp_boss() or G.LOBBY.config.death_on_round_loss) and " Lost a Life " or " Failed ") or "Defeated the Enemy" },
+													colours = { G.C.FILTER },
+													shadow = true,
+													pop_in = 0,
+													scale = 0.5 * scale,
+													silent = true,
+												}),
+											},
 										},
 									},
 								},
 							},
-						},
-					})
+						})
 				elseif config.name == 'comeback' then
-					table.insert(left_text, {n=G.UIT.T, config={text = G.MULTIPLAYER_GAME.comeback_bonus, scale = 0.8*scale, colour = G.C.BLACK, shadow = true, juice = true}})
+					table.insert(left_text, {n=G.UIT.T, config={text = G.MULTIPLAYER_GAME.comeback_bonus, scale = 0.8*scale, colour = G.C.PURPLE, shadow = true, juice = true}})
 					table.insert(left_text, {n=G.UIT.O, config={object = DynaText({string = {" Total Lives Lost ($4 each)"}, colours = {G.C.UI.TEXT_LIGHT}, shadow = true, pop_in = 0, scale = 0.4*scale, silent = true})}})
 				end
 				local full_row = {
@@ -1549,8 +1550,10 @@ function add_round_eval_row(config)
 					},
 				}
 
-				G.GAME.blind:juice_up()
-				G.round_eval:add_child(full_row, G.round_eval:get_UIE_by_ID("base_round_eval"))
+				if config.name == 'blind1' then
+					G.GAME.blind:juice_up()
+				end
+				G.round_eval:add_child(full_row, G.round_eval:get_UIE_by_ID(config.bonus and 'bonus_round_eval' or 'base_round_eval'))
 				play_sound("negative", (1.5 * config.pitch) or 1, 0.2)
 				play_sound("whoosh2", 0.9, 0.7)
 				if config.card then

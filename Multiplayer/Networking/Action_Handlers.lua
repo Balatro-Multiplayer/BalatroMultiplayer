@@ -118,9 +118,11 @@ end
 
 ---@param lives number
 local function action_player_info(lives)
-	G.MULTIPLAYER_GAME.comeback_bonus_given = false
-	G.MULTIPLAYER_GAME.comeback_bonus = G.MULTIPLAYER_GAME.comeback_bonus + (1 * (lives - G.MULTIPLAYER_GAME.lives))
 	if (G.MULTIPLAYER_GAME.lives ~= lives) then
+		if G.MULTIPLAYER_GAME.lives ~= 0 then
+			G.MULTIPLAYER_GAME.comeback_bonus_given = false
+			G.MULTIPLAYER_GAME.comeback_bonus = G.MULTIPLAYER_GAME.comeback_bonus + 1
+		end
 		ease_lives(lives - G.MULTIPLAYER_GAME.lives)
 	end
 	G.MULTIPLAYER_GAME.lives = lives
