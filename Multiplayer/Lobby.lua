@@ -12,7 +12,8 @@ G.LOBBY = {
 	code = nil,
 	type = "",
 	config = {
-		no_gold_on_round_loss = true,
+    gold_on_life_loss = true,
+		no_gold_on_round_loss = false,
 		death_on_round_loss = false,
 		different_seeds = false
 	},
@@ -29,6 +30,8 @@ G.MULTIPLAYER_GAME = {
 	lives = 0,
 	loaded_ante = 0,
 	loading_blinds = false,
+  comeback_bonus_given = true,
+	comeback_bonus = 0,
   end_pvp = false,
 	enemy = {
 		score = 0,
@@ -44,6 +47,8 @@ function reset_game_states()
     lives = 0,
     loaded_ante = 0,
     loading_blinds = false,
+    comeback_bonus_given = true,
+    comeback_bonus = 0,
     end_pvp = false,
     enemy = {
       score = 0,

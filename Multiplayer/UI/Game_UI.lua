@@ -1477,7 +1477,7 @@ end
 
 local add_round_eval_row_ref = add_round_eval_row
 function add_round_eval_row(config)
-	if G.LOBBY.code and config.name == "blind1" and G.GAME.blind.chips == -1 then
+	if G.LOBBY.code and ((config.name == "blind1" and (is_pvp_boss() or G.GAME.blind.chips == -1 or (G.LOBBY.config.death_on_round_loss and G.GAME.blind.chips == -1))) or config.name == "comeback") then
 		local config = config or {}
 		local width = G.round_eval.T.w - 0.51
 		local num_dollars = config.dollars or 1
@@ -1489,42 +1489,48 @@ function add_round_eval_row(config)
 			func = function()
 				--Add the far left text and context first:
 				local left_text = {}
-				local blind_sprite =
-					AnimatedSprite(0, 0, 1.2, 1.2, G.ANIMATION_ATLAS["blind_chips"], copy_table(G.GAME.blind.pos))
-				blind_sprite:define_draw_steps({
-					{ shader = "dissolve", shadow_height = 0.05 },
-					{ shader = "dissolve" },
-				})
-				table.insert(left_text, {
-					n = G.UIT.O,
-					config = { w = 1.2, h = 1.2, object = blind_sprite, hover = true, can_collide = false },
-				})
+				if config.name == "blind1" then
+					local blind_sprite =
+						AnimatedSprite(0, 0, 1.2, 1.2, G.ANIMATION_ATLAS["blind_chips"], copy_table(G.GAME.blind.pos))
+					blind_sprite:define_draw_steps({
+						{ shader = "dissolve", shadow_height = 0.05 },
+						{ shader = "dissolve" },
+					})
+					table.insert(left_text, {
+						n = G.UIT.O,
+						config = { w = 1.2, h = 1.2, object = blind_sprite, hover = true, can_collide = false },
+					})
 
-				table.insert(left_text, {
-					n = G.UIT.C,
-					config = { padding = 0.05, align = "cm" },
-					nodes = {
+					table.insert(left_text,
 						{
-							n = G.UIT.R,
-							config = { align = "cm" },
+							n = G.UIT.C,
+							config = { padding = 0.05, align = "cm" },
 							nodes = {
 								{
-									n = G.UIT.O,
-									config = {
-										object = DynaText({
-											string = { (is_pvp_boss() or G.LOBBY.config.death_on_round_loss) and " Lost a Life " or " Failed " },
-											colours = { G.C.FILTER },
-											shadow = true,
-											pop_in = 0,
-											scale = 0.5 * scale,
-											silent = true,
-										}),
+									n = G.UIT.R,
+									config = { align = "cm" },
+									nodes = {
+										{
+											n = G.UIT.O,
+											config = {
+												object = DynaText({
+													string = { G.GAME.blind.chips == -1 and ((is_pvp_boss() or G.LOBBY.config.death_on_round_loss) and " Lost a Life " or " Failed ") or "Defeated the Enemy" },
+													colours = { G.C.FILTER },
+													shadow = true,
+													pop_in = 0,
+													scale = 0.5 * scale,
+													silent = true,
+												}),
+											},
+										},
 									},
 								},
 							},
-						},
-					},
-				})
+						})
+				elseif config.name == 'comeback' then
+					table.insert(left_text, {n=G.UIT.T, config={text = G.MULTIPLAYER_GAME.comeback_bonus, scale = 0.8*scale, colour = G.C.PURPLE, shadow = true, juice = true}})
+					table.insert(left_text, {n=G.UIT.O, config={object = DynaText({string = {" Total Lives Lost ($4 each)"}, colours = {G.C.UI.TEXT_LIGHT}, shadow = true, pop_in = 0, scale = 0.4*scale, silent = true})}})
+				end
 				local full_row = {
 					n = G.UIT.R,
 					config = { align = "cm", minw = 5 },
@@ -1544,8 +1550,10 @@ function add_round_eval_row(config)
 					},
 				}
 
-				G.GAME.blind:juice_up()
-				G.round_eval:add_child(full_row, G.round_eval:get_UIE_by_ID("base_round_eval"))
+				if config.name == 'blind1' then
+					G.GAME.blind:juice_up()
+				end
+				G.round_eval:add_child(full_row, G.round_eval:get_UIE_by_ID(config.bonus and 'bonus_round_eval' or 'base_round_eval'))
 				play_sound("negative", (1.5 * config.pitch) or 1, 0.2)
 				play_sound("whoosh2", 0.9, 0.7)
 				if config.card then
@@ -1634,6 +1642,86 @@ function add_round_eval_row(config)
 	else
 		add_round_eval_row_ref(config)
 	end
+end
+
+G.FUNCS.evaluate_round = function()
+	local pitch = 0.95
+	local dollars = 0
+
+	if G.GAME.chips - G.GAME.blind.chips >= 0 then
+			add_round_eval_row({dollars = G.GAME.blind.dollars, name='blind1', pitch = pitch})
+			pitch = pitch + 0.06
+			dollars = dollars + G.GAME.blind.dollars
+	else
+			add_round_eval_row({dollars = 0, name='blind1', pitch = pitch, saved = true})
+			pitch = pitch + 0.06
+	end
+
+	G.E_MANAGER:add_event(Event({
+			trigger = 'before',
+			delay = 1.3*math.min(G.GAME.blind.dollars+2, 7)/2*0.15 + 0.5,
+			func = function()
+				G.GAME.blind:defeat()
+				return true
+			end
+		}))
+	delay(0.2)
+	G.E_MANAGER:add_event(Event({
+			func = function()
+					ease_background_colour_blind(G.STATES.ROUND_EVAL, '')
+					return true
+			end
+	}))
+	G.GAME.selected_back:trigger_effect({context = 'eval'})
+
+	if G.GAME.current_round.hands_left > 0 and not G.GAME.modifiers.no_extra_hand_money then
+			add_round_eval_row({dollars = G.GAME.current_round.hands_left*(G.GAME.modifiers.money_per_hand or 1), disp = G.GAME.current_round.hands_left, bonus = true, name='hands', pitch = pitch})
+			pitch = pitch + 0.06
+			dollars = dollars + G.GAME.current_round.hands_left*(G.GAME.modifiers.money_per_hand or 1)
+	end
+	if G.GAME.current_round.discards_left > 0 and G.GAME.modifiers.money_per_discard then
+			add_round_eval_row({dollars = G.GAME.current_round.discards_left*(G.GAME.modifiers.money_per_discard), disp = G.GAME.current_round.discards_left, bonus = true, name='discards', pitch = pitch})
+			pitch = pitch + 0.06
+			dollars = dollars +  G.GAME.current_round.discards_left*(G.GAME.modifiers.money_per_discard)
+	end
+	for i = 1, #G.jokers.cards do
+			local ret = G.jokers.cards[i]:calculate_dollar_bonus()
+			if ret then
+					add_round_eval_row({dollars = ret, bonus = true, name='joker'..i, pitch = pitch, card = G.jokers.cards[i]})
+					pitch = pitch + 0.06
+					dollars = dollars + ret
+			end
+	end
+	for i = 1, #G.GAME.tags do
+			local ret = G.GAME.tags[i]:apply_to_run({type = 'eval'})
+			if ret then
+					add_round_eval_row({dollars = ret.dollars, bonus = true, name='tag'..i, pitch = pitch, condition = ret.condition, pos = ret.pos, tag = ret.tag})
+					pitch = pitch + 0.06
+					dollars = dollars + ret.dollars
+			end
+	end
+	if G.GAME.dollars >= 5 and not G.GAME.modifiers.no_interest then
+			add_round_eval_row({bonus = true, name='interest', pitch = pitch, dollars = G.GAME.interest_amount*math.min(math.floor(G.GAME.dollars/5), G.GAME.interest_cap/5)})
+			pitch = pitch + 0.06
+			if not G.GAME.seeded and not G.GAME.challenge then
+					if G.GAME.interest_amount*math.min(math.floor(G.GAME.dollars/5), G.GAME.interest_cap/5) == G.GAME.interest_amount*G.GAME.interest_cap/5 then 
+							G.PROFILES[G.SETTINGS.profile].career_stats.c_round_interest_cap_streak = G.PROFILES[G.SETTINGS.profile].career_stats.c_round_interest_cap_streak + 1
+					else
+							G.PROFILES[G.SETTINGS.profile].career_stats.c_round_interest_cap_streak = 0
+					end
+			end
+			check_for_unlock({type = 'interest_streak'})
+			dollars = dollars + G.GAME.interest_amount*math.min(math.floor(G.GAME.dollars/5), G.GAME.interest_cap/5)
+	end
+	if not G.MULTIPLAYER_GAME.comeback_bonus_given then
+		G.MULTIPLAYER_GAME.comeback_bonus_given = true
+		add_round_eval_row({bonus = true, name='comeback', pitch = pitch, dollars = 4*G.MULTIPLAYER_GAME.comeback_bonus})
+		dollars = dollars + 4*G.MULTIPLAYER_GAME.comeback_bonus
+	end
+
+	pitch = pitch + 0.06
+
+	add_round_eval_row({name = 'bottom', dollars = dollars})
 end
 
 local ease_ante_ref = ease_ante
