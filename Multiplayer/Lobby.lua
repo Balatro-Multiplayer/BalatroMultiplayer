@@ -32,7 +32,9 @@ G.MULTIPLAYER_GAME = {
 	processed_round_done = false,
 	lives = 0,
 	loaded_ante = 0,
-	loading_blinds = false
+	loading_blinds = false,
+  comeback_bonus_given = true,
+	comeback_bonus = 0
 }
 
 PREV_ACHIEVEMENT_VALUE = true
