@@ -374,8 +374,9 @@ end
 
 function G.FUNCS.start_lobby(e)
 	G.SETTINGS.paused = false
-	local gamemode = e.config.id == "start_attrition" and "attrition" or "draft"
-	G.MULTIPLAYER.create_lobby(gamemode)
+	G.LOBBY.type = e.config.id == "start_attrition" and "attrition" or "draft"
+	reset_gamemode_modifiers()
+	G.MULTIPLAYER.create_lobby(G.LOBBY.type)
 end
 
 -- Modify play button to take you to mode select first

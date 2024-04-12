@@ -157,6 +157,9 @@ local function action_lobby_options(options)
 		elseif v == "false" then
 			parsed_v = false
 		end
+		if k == "starting_lives" then
+			parsed_v = tonumber(v)
+		end
 		G.LOBBY.config[k] = parsed_v
 		if G.OVERLAY_MENU then
 			local config_uie = G.OVERLAY_MENU:get_UIE_by_ID(k .. '_toggle')

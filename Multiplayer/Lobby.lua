@@ -15,7 +15,8 @@ G.LOBBY = {
     gold_on_life_loss = true,
 		no_gold_on_round_loss = false,
 		death_on_round_loss = false,
-		different_seeds = false
+		different_seeds = false,
+    starting_lives = 4,
 	},
 	username = "Guest",
 	host = {},
@@ -55,6 +56,10 @@ function reset_game_states()
       hands = 4,
     },
   }
+end
+
+function reset_gamemode_modifiers()
+  G.LOBBY.config.starting_lives = G.LOBBY.type == "draft" and 2 or 4
 end
 
 PREV_ACHIEVEMENT_VALUE = true
