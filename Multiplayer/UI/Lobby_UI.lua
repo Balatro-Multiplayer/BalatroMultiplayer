@@ -422,6 +422,15 @@ function G.UIDEF.create_UIBox_lobby_options()
 														current_option = G.LOBBY.config.starting_lives < 4 and G.LOBBY.config.starting_lives or G.LOBBY.config.starting_lives == 4 and 3 or G.LOBBY.config.starting_lives == 6 and 4 or 5,
 														opt_callback = 'change_starting_lives'
 													}),
+													G.LOBBY.type == 'draft' and Disableable_Option_Cycle({
+														id = "draft_starting_antes_option",
+														enabled_ref_table = G.LOBBY,
+														enabled_ref_value = 'is_host',
+														label = "Starting Antes",
+														options = {2, 3, 4, 5, 6, 7},
+														current_option = G.LOBBY.config.draft_starting_antes - 1,
+														opt_callback = 'change_draft_starting_antes'
+													}) or nil,
 												}
 											},
 										},
@@ -438,6 +447,11 @@ end
 
 G.FUNCS.change_starting_lives = function(args)
   G.LOBBY.config.starting_lives = args.to_val
+	toggle_lobby_options()
+end
+
+G.FUNCS.change_draft_starting_antes = function(args)
+  G.LOBBY.config.draft_starting_antes = args.to_val
 	toggle_lobby_options()
 end
 

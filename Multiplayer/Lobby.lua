@@ -17,6 +17,7 @@ G.LOBBY = {
 		death_on_round_loss = false,
 		different_seeds = false,
     starting_lives = 4,
+    draft_starting_antes = 3
 	},
 	username = "Guest",
 	host = {},
@@ -60,6 +61,7 @@ end
 
 function reset_gamemode_modifiers()
   G.LOBBY.config.starting_lives = G.LOBBY.type == "draft" and 2 or 4
+  G.LOBBY.config.draft_starting_antes = 3
 end
 
 PREV_ACHIEVEMENT_VALUE = true
