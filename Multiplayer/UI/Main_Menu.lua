@@ -61,7 +61,7 @@ function G.UIDEF.create_UIBox_create_lobby_button()
 							colour = G.C.BOOSTER,
 							tabs = {
 								{
-									label = "Attrition (1v1)",
+									label = "Attrition",
 									chosen = true,
 									tab_definition_function = function()
 										return {
@@ -89,7 +89,7 @@ function G.UIDEF.create_UIBox_create_lobby_button()
 															n = G.UIT.T,
 															config = {
 																text = Utils.wrapText(
-																	"Both players start with 4 lives, every boss round is a competition between players where the player with the lower score loses a life.",
+																	"Every boss round is a competition between players where the player with the lower score loses a life.",
 																	50
 																),
 																shadow = true,
@@ -111,7 +111,7 @@ function G.UIDEF.create_UIBox_create_lobby_button()
 									end,
 								},
 								{
-									label = "Draft (1v1)",
+									label = "Draft",
 									tab_definition_function = function()
 										return {
 											n = G.UIT.ROOT,
@@ -138,7 +138,7 @@ function G.UIDEF.create_UIBox_create_lobby_button()
 															n = G.UIT.T,
 															config = {
 																text = Utils.wrapText(
-																	"Both players play a set amount of antes simultaneously, then they play an ante where every round the player with the higher scorer wins, player with the most round wins in the final ante is the victor.",
+																	"Both players play 3 normal antes, then they play an ante where every round the player with the higher scorer wins.",
 																	50
 																),
 																shadow = true,
@@ -160,7 +160,54 @@ function G.UIDEF.create_UIBox_create_lobby_button()
 									end,
 								},
 								{
-									label = "Heads Up (1v1)",
+									label = "Vanilla+",
+									tab_definition_function = function()
+										return {
+											n = G.UIT.ROOT,
+											config = {
+												emboss = 0.05,
+												minh = 6,
+												r = 0.1,
+												minw = 10,
+												align = "tm",
+												padding = 0.2,
+												colour = G.C.BLACK,
+											},
+											nodes = {
+												{
+													n = G.UIT.R,
+													config = {
+														align = "tm",
+														padding = 0.05,
+														minw = 4,
+														minh = 1,
+													},
+													nodes = {
+														{
+															n = G.UIT.T,
+															config = {
+																text = Utils.wrapText(
+																	"The first person to fail a round loses, no PvP blinds.",
+																	50
+																),
+																shadow = true,
+																scale = var_495_0 * 0.6,
+																colour = G.C.UI.TEXT_LIGHT,
+															},
+														},
+													},
+												},
+												UIBox_button({
+													label = { "Coming Soon!" },
+													colour = G.C.RED,
+													minw = 5,
+												}),
+											},
+										}
+									end,
+								},
+								{
+									label = "Heads Up",
 									tab_definition_function = function()
 										return {
 											n = G.UIT.ROOT,
@@ -207,7 +254,7 @@ function G.UIDEF.create_UIBox_create_lobby_button()
 									end,
 								},
 								{
-									label = "Battle Royale (8p)",
+									label = "Battle Royale",
 									tab_definition_function = function()
 										return {
 											n = G.UIT.ROOT,
@@ -234,7 +281,7 @@ function G.UIDEF.create_UIBox_create_lobby_button()
 															n = G.UIT.T,
 															config = {
 																text = Utils.wrapText(
-																	"Draft, except there are up to 8 players and every player only has 1 life.",
+																	"Attrition, except there are up to 8 players and every player only has 1 life.",
 																	50
 																),
 																shadow = true,
@@ -374,8 +421,7 @@ end
 
 function G.FUNCS.start_lobby(e)
 	G.SETTINGS.paused = false
-	local gamemode = e.config.id == "start_attrition" and "attrition" or "draft"
-	G.MULTIPLAYER.create_lobby(gamemode)
+	G.MULTIPLAYER.create_lobby(e.config.id == "start_attrition" and "attrition" or "draft")
 end
 
 -- Modify play button to take you to mode select first

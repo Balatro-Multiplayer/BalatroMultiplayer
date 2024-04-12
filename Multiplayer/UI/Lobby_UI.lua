@@ -6,6 +6,7 @@
 
 local Disableable_Button = require("Components.Disableable_Button")
 local Disableable_Toggle = require("Components.Disableable_Toggle")
+local Disableable_Option_Cycle = require("Components.Disableable_Option_Cycle")
 
 local function toggle_lobby_options(value)
 	G.MULTIPLAYER.lobby_options()
@@ -272,136 +273,186 @@ function G.UIDEF.create_UIBox_lobby_options()
 			{
 				n = G.UIT.R,
 				config = {
-					emboss = 0.05,
-					minh = 6,
-					r = 0.1,
-					minw = 10,
-					padding = 0.2,
-					colour = G.C.BLACK,
+					padding = 0,
 					align = "cm",
 				},
 				nodes = {
-					{
+					not G.LOBBY.is_host and {
 						n = G.UIT.R,
 						config = {
 							padding = 0.3,
 							align = "cm",
 						},
 						nodes = {
-							not G.LOBBY.is_host and {
-								n = G.UIT.R,
+							{
+								n = G.UIT.T,
 								config = {
-									padding = 0,
-									align = "cm",
-								},
-								nodes = {
-									{
-										n = G.UIT.T,
+									scale = 0.6,
+									shadow = true,
+									text = 'Only the Lobby Host can change these options',
+									colour = G.C.UI.TEXT_LIGHT,
+								}
+							}
+						}
+					} or nil,
+					create_tabs({
+						snap_to_nav = true,
+						colour = G.C.BOOSTER,
+						tabs = {
+							{
+								label = "Lobby Options",
+								chosen = true,
+								tab_definition_function = function()
+									return {
+										n = G.UIT.ROOT,
 										config = {
-											scale = 0.6,
-											shadow = true,
-											text = 'Only the Lobby Host can change these options',
-											colour = G.C.UI.TEXT_LIGHT,
-										}
+											emboss = 0.05,
+											minh = 6,
+											r = 0.1,
+											minw = 10,
+											align = "tm",
+											padding = 0.2,
+											colour = G.C.BLACK,
+										},
+										nodes = {
+											{
+												n = G.UIT.R,
+												config = {
+													padding = 0,
+													align = "cr",
+												},
+												nodes = {
+													Disableable_Toggle({
+														id = "gold_on_life_loss_toggle",
+														enabled_ref_table = G.LOBBY,
+														enabled_ref_value = 'is_host',
+														label = "Give comeback gold on life loss",
+														ref_table = G.LOBBY.config,
+														ref_value = "gold_on_life_loss",
+														callback = toggle_lobby_options
+													}),
+												}
+											},
+											{
+												n = G.UIT.R,
+												config = {
+													padding = 0,
+													align = "cr",
+												},
+												nodes = {
+													Disableable_Toggle({
+														id = "no_gold_on_round_loss_toggle",
+														enabled_ref_table = G.LOBBY,
+														enabled_ref_value = 'is_host',
+														label = "Don't get blind gold on round loss",
+														ref_table = G.LOBBY.config,
+														ref_value = "no_gold_on_round_loss",
+														callback = toggle_lobby_options
+													}),
+												}
+											},
+											{
+												n = G.UIT.R,
+												config = {
+													padding = 0,
+													align = "cr",
+												},
+												nodes = {
+													Disableable_Toggle({
+														id = "death_on_round_loss_toggle",
+														enabled_ref_table = G.LOBBY,
+														enabled_ref_value = 'is_host',
+														label = "Lose a life on non-PvP round loss",
+														ref_table = G.LOBBY.config,
+														ref_value = "death_on_round_loss",
+														callback = toggle_lobby_options
+													}),
+												}
+											},
+											{
+												n = G.UIT.R,
+												config = {
+													padding = 0,
+													align = "cr",
+												},
+												nodes = {
+													Disableable_Toggle({
+														id = "different_seeds_toggle",
+														enabled_ref_table = G.LOBBY,
+														enabled_ref_value = 'is_host',
+														label = "Players have different seeds",
+														ref_table = G.LOBBY.config,
+														ref_value = "different_seeds",
+														callback = toggle_lobby_options
+													}),
+												}
+											},
+										},
 									}
-								}
-							} or nil,
-							{
-								n = G.UIT.R,
-								config = {
-									padding = 0,
-									align = "cr",
-								},
-								nodes = {
-									Disableable_Toggle({
-										id = "gold_on_life_loss_toggle",
-										enabled_ref_table = G.LOBBY,
-										enabled_ref_value = 'is_host',
-										label = "Give comeback gold on life loss",
-										ref_table = G.LOBBY.config,
-										ref_value = "gold_on_life_loss",
-										callback = toggle_lobby_options
-									}),
-								}
+								end
 							},
 							{
-								n = G.UIT.R,
-								config = {
-									padding = 0,
-									align = "cr",
-								},
-								nodes = {
-									Disableable_Toggle({
-										id = "no_gold_on_round_loss_toggle",
-										enabled_ref_table = G.LOBBY,
-										enabled_ref_value = 'is_host',
-										label = "Don't get blind gold on round loss",
-										ref_table = G.LOBBY.config,
-										ref_value = "no_gold_on_round_loss",
-										callback = toggle_lobby_options
-									}),
-								}
-							},
-							{
-								n = G.UIT.R,
-								config = {
-									padding = 0,
-									align = "cr",
-								},
-								nodes = {
-									Disableable_Toggle({
-										id = "death_on_round_loss_toggle",
-										enabled_ref_table = G.LOBBY,
-										enabled_ref_value = 'is_host',
-										label = "Lose a life on non-PvP round loss",
-										ref_table = G.LOBBY.config,
-										ref_value = "death_on_round_loss",
-										callback = toggle_lobby_options
-									}),
-								}
-							},
-							{
-								n = G.UIT.R,
-								config = {
-									padding = 0,
-									align = "cr",
-								},
-								nodes = {
-									Disableable_Toggle({
-										id = "different_seeds_toggle",
-										enabled_ref_table = G.LOBBY,
-										enabled_ref_value = 'is_host',
-										label = "Players have different seeds",
-										ref_table = G.LOBBY.config,
-										ref_value = "different_seeds",
-										callback = toggle_lobby_options
-									}),
-								}
-							},
-							Disableable_Button({
-								enabled_ref_table = G.LOBBY,
-								enabled_ref_value = 'is_host',
-								button = "reset_lobby_options",
-								label = { localize("k_reset") },
-								colour = G.C.RED,
-								minw = 5,
-							}),
-						},
-					},
+								label = "Gamemode Modifiers",
+								tab_definition_function = function()
+									return {
+										n = G.UIT.ROOT,
+										config = {
+											emboss = 0.05,
+											minh = 6,
+											r = 0.1,
+											minw = 10,
+											align = "tm",
+											padding = 0.2,
+											colour = G.C.BLACK,
+										},
+										nodes = {
+											{
+												n = G.UIT.R,
+												config = {
+													padding = 0,
+													align = "cm",
+												},
+												nodes = {
+													Disableable_Option_Cycle({
+														id = "starting_lives_option",
+														enabled_ref_table = G.LOBBY,
+														enabled_ref_value = 'is_host',
+														label = "Lives",
+														options = {1, 2, 4, 6, 8},
+														current_option = G.LOBBY.config.starting_lives < 4 and G.LOBBY.config.starting_lives or G.LOBBY.config.starting_lives == 4 and 3 or G.LOBBY.config.starting_lives == 6 and 4 or 5,
+														opt_callback = 'change_starting_lives'
+													}),
+													G.LOBBY.type == 'draft' and Disableable_Option_Cycle({
+														id = "draft_starting_antes_option",
+														enabled_ref_table = G.LOBBY,
+														enabled_ref_value = 'is_host',
+														label = "Starting Antes",
+														options = {2, 3, 4, 5, 6, 7},
+														current_option = G.LOBBY.config.draft_starting_antes - 1,
+														opt_callback = 'change_draft_starting_antes'
+													}) or nil,
+												}
+											},
+										},
+									}
+								end
+							}
+						}
+					})
 				},
 			},
 		},
 	})
 end
 
-function G.FUNCS.reset_lobby_options(e)
-	G.LOBBY.config = {
-		no_gold_on_round_loss = true,
-		death_on_round_loss = false,
-		different_seeds = false
-	}
-	G.FUNCS.exit_overlay_menu()
-	G.MULTIPLAYER.lobby_options()
+G.FUNCS.change_starting_lives = function(args)
+  G.LOBBY.config.starting_lives = args.to_val
+	toggle_lobby_options()
+end
+
+G.FUNCS.change_draft_starting_antes = function(args)
+  G.LOBBY.config.draft_starting_antes = args.to_val
+	toggle_lobby_options()
 end
 
 function G.FUNCS.get_lobby_main_menu_UI(e)

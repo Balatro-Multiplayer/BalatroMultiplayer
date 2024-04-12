@@ -25,9 +25,11 @@ local function action_connected()
 	Client.send(string.format("action:username,username:%s", G.LOBBY.username))
 end
 
-local function action_joinedLobby(code)
+local function action_joinedLobby(code, type)
 	sendDebugMessage(string.format("Joining lobby %s", code))
 	G.LOBBY.code = code
+	G.LOBBY.type = type
+	reset_gamemode_modifiers()
 	G.MULTIPLAYER.lobby_info()
 	G.MULTIPLAYER.update_connection_status()
 end
@@ -157,6 +159,9 @@ local function action_lobby_options(options)
 		elseif v == "false" then
 			parsed_v = false
 		end
+		if k == "starting_lives" or k == "draft_starting_antes" then
+			parsed_v = tonumber(v)
+		end
 		G.LOBBY.config[k] = parsed_v
 		if G.OVERLAY_MENU then
 			local config_uie = G.OVERLAY_MENU:get_UIE_by_ID(k .. '_toggle')
@@ -260,7 +265,7 @@ function Game:update(dt)
 			elseif parsedAction.action == "disconnected" then
 				action_disconnected()
 			elseif parsedAction.action == "joinedLobby" then
-				action_joinedLobby(parsedAction.code)
+				action_joinedLobby(parsedAction.code, parsedAction.type)
 			elseif parsedAction.action == "lobbyInfo" then
 				action_lobbyInfo(parsedAction.host, parsedAction.guest, parsedAction.isHost)
 			elseif parsedAction.action == "startGame" then

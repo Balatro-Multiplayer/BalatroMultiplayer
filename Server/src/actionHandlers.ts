@@ -62,7 +62,7 @@ const startGameAction = (client: Client) => {
 		return
 	}
 
-	let lives = GameModes[lobby.gameMode].startingLives
+	let lives = lobby.options.starting_lives? parseInt(lobby.options.starting_lives) : GameModes[lobby.gameMode].startingLives
 
 	lobby.broadcastAction({
 		action: 'startGame',

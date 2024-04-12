@@ -1,7 +1,7 @@
 // Server to Client
 export type ActionConnected = { action: 'connected' }
 export type ActionError = { action: 'error'; message: string }
-export type ActionJoinedLobby = { action: 'joinedLobby'; code: string }
+export type ActionJoinedLobby = { action: 'joinedLobby'; code: string; type: GameMode }
 export type ActionLobbyInfo = {
 	action: 'lobbyInfo'
 	host: string
