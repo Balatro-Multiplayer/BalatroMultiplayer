@@ -622,6 +622,7 @@ function G.FUNCS.mp_toggle_ready(e)
 
 	if G.MULTIPLAYER_GAME.ready_blind then
 		G.MULTIPLAYER.ready_blind()
+		stop_use()
 	else
 		G.MULTIPLAYER.unready_blind()
 	end
@@ -1783,6 +1784,16 @@ function Game:update_selecting_hand(dt)
 		G.MULTIPLAYER_GAME.end_pvp = false
 		return
 	end
+end
+
+local can_open_ref = G.FUNCS.can_open
+G.FUNCS.can_open = function(e)
+  if G.MULTIPLAYER_GAME.ready_blind then
+		e.config.colour = G.C.UI.BACKGROUND_INACTIVE
+		e.config.button = nil
+		return
+	end
+	can_open_ref(e)
 end
 ----------------------------------------------
 ------------MOD GAME UI END-------------------
