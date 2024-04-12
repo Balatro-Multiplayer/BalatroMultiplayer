@@ -30,7 +30,8 @@ local c_multiplayer_1 = {
 	},
 }
 
-G.CHALLENGES[21] = c_multiplayer_1
+local c_multiplayer_1_index = #G.CHALLENGES+1
+G.CHALLENGES[c_multiplayer_1_index] = c_multiplayer_1
 
 local localize_ref = localize
 function localize(args, misc_cat)
@@ -42,24 +43,24 @@ end
 
 local set_discover_tallies_ref = set_discover_tallies
 function set_discover_tallies()
-	G.CHALLENGES[21] = nil
+	G.CHALLENGES[c_multiplayer_1_index] = nil
 	local res = set_discover_tallies_ref()
-	G.CHALLENGES[21] = c_multiplayer_1
+	G.CHALLENGES[c_multiplayer_1_index] = c_multiplayer_1
 	return res
 end
 
 local challenge_list_ref = G.FUNCS.challenge_list
 G.FUNCS.challenge_list = function(e)
-	G.CHALLENGES[21] = nil
+	G.CHALLENGES[c_multiplayer_1_index] = nil
 	challenge_list_ref(e)
-	G.CHALLENGES[21] = c_multiplayer_1
+	G.CHALLENGES[c_multiplayer_1_index] = c_multiplayer_1
 end
 
 local challenges_ref = G.UIDEF.challenges
 function G.UIDEF.challenges(from_game_over)
-	G.CHALLENGES[21] = nil
+	G.CHALLENGES[c_multiplayer_1_index] = nil
 	local res = challenges_ref(from_game_over)
-	G.CHALLENGES[21] = c_multiplayer_1
+	G.CHALLENGES[c_multiplayer_1_index] = c_multiplayer_1
 	return res
 end
 

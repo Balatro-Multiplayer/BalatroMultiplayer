@@ -281,24 +281,6 @@ function G.UIDEF.create_UIBox_join_lobby_button()
 								align = "cm",
 							},
 							nodes = {
-								{
-									n = G.UIT.T,
-									config = {
-										scale = 0.6,
-										shadow = true,
-										text = "Lobby Code:",
-										colour = G.C.UI.TEXT_LIGHT,
-									},
-								},
-							},
-						},
-						{
-							n = G.UIT.R,
-							config = {
-								padding = 0.5,
-								align = "cm",
-							},
-							nodes = {
 								create_text_input({
 									w = 4,
 									h = 1,

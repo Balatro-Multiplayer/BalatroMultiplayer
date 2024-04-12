@@ -4,6 +4,8 @@
 ----------------------------------------------
 ------------MOD GAME UI-----------------------
 
+local Utils = require("Utils")
+
 local create_UIBox_options_ref = create_UIBox_options
 ---@diagnostic disable-next-line: lowercase-global
 function create_UIBox_options()
