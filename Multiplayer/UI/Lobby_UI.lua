@@ -116,6 +116,24 @@ function G.UIDEF.create_UIBox_lobby_menu()
 					align = "bm",
 				},
 				nodes = {
+					G.LOBBY.username == "Guest" and {
+						n = G.UIT.R,
+						config = {
+							padding = 0.1,
+							align = "cm",
+						},
+						nodes = {
+							{
+								n = G.UIT.T,
+								config = {
+									scale = 0.3,
+									shadow = true,
+									text = 'Set your username in the main menu! (Mods > Multiplayer)',
+									colour = G.C.UI.TEXT_LIGHT,
+								},
+							},
+						}
+					} or nil,
 					{
 						n = G.UIT.R,
 						config = {
