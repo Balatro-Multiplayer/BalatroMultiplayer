@@ -848,6 +848,12 @@ function Game:update_hand_played(dt)
 			end,
 		}))
 	end
+
+	if G.MULTIPLAYER_GAME.end_pvp then
+		G.STATE_COMPLETE = false
+		G.STATE = G.STATES.NEW_ROUND
+		G.MULTIPLAYER_GAME.end_pvp = false
+	end
 end
 
 local can_play_ref = G.FUNCS.can_play
