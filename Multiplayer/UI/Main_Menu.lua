@@ -89,7 +89,7 @@ function G.UIDEF.create_UIBox_create_lobby_button()
 															n = G.UIT.T,
 															config = {
 																text = Utils.wrapText(
-																	"Both players start with 4 lives, every boss round is a competition between players where the player with the lower score loses a life.",
+																	"Every boss round is a competition between players where the player with the lower score loses a life.",
 																	50
 																),
 																shadow = true,
@@ -138,7 +138,7 @@ function G.UIDEF.create_UIBox_create_lobby_button()
 															n = G.UIT.T,
 															config = {
 																text = Utils.wrapText(
-																	"Both players play a set amount of antes simultaneously, then they play an ante where every round the player with the higher scorer wins, player with the most round wins in the final ante is the victor.",
+																	"Both players play 3 normal antes, then they play an ante where every round the player with the higher scorer wins.",
 																	50
 																),
 																shadow = true,
@@ -234,7 +234,7 @@ function G.UIDEF.create_UIBox_create_lobby_button()
 															n = G.UIT.T,
 															config = {
 																text = Utils.wrapText(
-																	"Draft, except there are up to 8 players and every player only has 1 life.",
+																	"Attrition, except there are up to 8 players and every player only has 1 life.",
 																	50
 																),
 																shadow = true,
