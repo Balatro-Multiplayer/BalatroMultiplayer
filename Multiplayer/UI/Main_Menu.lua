@@ -61,7 +61,7 @@ function G.UIDEF.create_UIBox_create_lobby_button()
 							colour = G.C.BOOSTER,
 							tabs = {
 								{
-									label = "Attrition (1v1)",
+									label = "Attrition",
 									chosen = true,
 									tab_definition_function = function()
 										return {
@@ -111,7 +111,7 @@ function G.UIDEF.create_UIBox_create_lobby_button()
 									end,
 								},
 								{
-									label = "Draft (1v1)",
+									label = "Draft",
 									tab_definition_function = function()
 										return {
 											n = G.UIT.ROOT,
@@ -160,7 +160,54 @@ function G.UIDEF.create_UIBox_create_lobby_button()
 									end,
 								},
 								{
-									label = "Heads Up (1v1)",
+									label = "Vanilla+",
+									tab_definition_function = function()
+										return {
+											n = G.UIT.ROOT,
+											config = {
+												emboss = 0.05,
+												minh = 6,
+												r = 0.1,
+												minw = 10,
+												align = "tm",
+												padding = 0.2,
+												colour = G.C.BLACK,
+											},
+											nodes = {
+												{
+													n = G.UIT.R,
+													config = {
+														align = "tm",
+														padding = 0.05,
+														minw = 4,
+														minh = 1,
+													},
+													nodes = {
+														{
+															n = G.UIT.T,
+															config = {
+																text = Utils.wrapText(
+																	"The first person to fail a round loses, no PvP blinds.",
+																	50
+																),
+																shadow = true,
+																scale = var_495_0 * 0.6,
+																colour = G.C.UI.TEXT_LIGHT,
+															},
+														},
+													},
+												},
+												UIBox_button({
+													label = { "Coming Soon!" },
+													colour = G.C.RED,
+													minw = 5,
+												}),
+											},
+										}
+									end,
+								},
+								{
+									label = "Heads Up",
 									tab_definition_function = function()
 										return {
 											n = G.UIT.ROOT,
@@ -207,7 +254,7 @@ function G.UIDEF.create_UIBox_create_lobby_button()
 									end,
 								},
 								{
-									label = "Battle Royale (8p)",
+									label = "Battle Royale",
 									tab_definition_function = function()
 										return {
 											n = G.UIT.ROOT,
