@@ -23,7 +23,8 @@ class Lobby {
 	host: Client | null;
 	guest: Client | null;
 	gameMode: GameMode;
-	options: { [key: string]: unknown };
+	// biome-ignore lint/suspicious/noExplicitAny: 
+	options: { [key: string]: any };
 
 	// Attrition is the default game mode
 	constructor(host: Client, gameMode: GameMode = "attrition") {
