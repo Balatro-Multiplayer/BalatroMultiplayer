@@ -30,7 +30,7 @@ const stringToJson = (str: string): any => {
 	const obj: Record<string, string | number> = {}
 	for (const part of str.split(',')) {
 		const [key, value] = part.split(':')
-		const numericValue = Number.parseFloat(value)
+		const numericValue = Number(value)
 		obj[key] = Number.isNaN(numericValue) ? value : numericValue
 	}
 	return obj
