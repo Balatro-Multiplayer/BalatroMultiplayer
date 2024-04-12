@@ -839,7 +839,7 @@ function Game:update_hand_played(dt)
 					end
 
 					G.MULTIPLAYER_GAME.processed_round_done = true
-				else
+				elseif not G.MULTIPLAYER_GAME.end_pvp then
 					G.STATE_COMPLETE = false
 					G.STATE = G.STATES.DRAW_TO_HAND
 				end
