@@ -374,8 +374,6 @@ end
 
 function G.FUNCS.start_lobby(e)
 	G.SETTINGS.paused = false
-	G.LOBBY.type = e.config.id == "start_attrition" and "attrition" or "draft"
-	reset_gamemode_modifiers()
 	G.MULTIPLAYER.create_lobby(G.LOBBY.type)
 end
 

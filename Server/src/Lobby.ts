@@ -38,7 +38,7 @@ class Lobby {
 		this.options = {}
 
 		host.setLobby(this)
-		host.sendAction({ action: 'joinedLobby', code: this.code })
+		host.sendAction({ action: 'joinedLobby', code: this.code, type: this.gameMode })
 	}
 
 	static get = (code: string) => {
@@ -75,7 +75,7 @@ class Lobby {
 		}
 		this.guest = client
 		client.setLobby(this)
-		client.sendAction({ action: 'joinedLobby', code: this.code })
+		client.sendAction({ action: 'joinedLobby', code: this.code, type: this.gameMode })
 		client.sendAction({ action: 'lobbyOptions', ...this.options })
 		this.broadcastLobbyInfo()
 	}
@@ -119,7 +119,7 @@ class Lobby {
 			return client.sendAction({ action: 'error', message: 'Client not in Lobby' })
 		}
 
-		client.sendAction({ action: 'gameInfo', ...GameModes[this.gameMode].getBlindFromAnte(client.ante) })
+		client.sendAction({ action: 'gameInfo', ...GameModes[this.gameMode].getBlindFromAnte(client.ante, this.options) })
 	}
 
 	setOptions = (options: { [key: string]: string }) => {
