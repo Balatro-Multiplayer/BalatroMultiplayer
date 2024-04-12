@@ -4,6 +4,8 @@
 ----------------------------------------------
 ------------MOD GAME UI-----------------------
 
+local Utils = require("Utils")
+
 local create_UIBox_options_ref = create_UIBox_options
 ---@diagnostic disable-next-line: lowercase-global
 function create_UIBox_options()
@@ -583,14 +585,14 @@ local function update_blind_HUD()
 			delay = 0.3,
 			blockable = false,
 			func = function()
-				G.HUD_blind:get_UIE_by_ID("HUD_blind_count").config.ref_table = G.LOBBY.enemy
+				G.HUD_blind:get_UIE_by_ID("HUD_blind_count").config.ref_table = G.MULTIPLAYER_GAME.enemy
 				G.HUD_blind:get_UIE_by_ID("HUD_blind_count").config.ref_value = "score"
 				G.HUD_blind:get_UIE_by_ID("HUD_blind").children[2].children[2].children[2].children[1].children[1].config.text =
 					"Current enemy score"
 				G.HUD_blind:get_UIE_by_ID("HUD_blind").children[2].children[2].children[2].children[3].children[1].config.text =
 					"Enemy hands left: "
 				G.HUD_blind:get_UIE_by_ID("dollars_to_be_earned").config.object.config.string =
-					{ { ref_table = G.LOBBY.enemy, ref_value = "hands" } }
+					{ { ref_table = G.MULTIPLAYER_GAME.enemy, ref_value = "hands" } }
 				G.HUD_blind:get_UIE_by_ID("dollars_to_be_earned").config.object:update_text()
 				G.HUD_blind.alignment.offset.y = 0
 				return true
@@ -622,6 +624,7 @@ function G.FUNCS.mp_toggle_ready(e)
 
 	if G.MULTIPLAYER_GAME.ready_blind then
 		G.MULTIPLAYER.ready_blind()
+		stop_use()
 	else
 		G.MULTIPLAYER.unready_blind()
 	end
@@ -731,6 +734,72 @@ function G.UIDEF.shop()
 	return t
 end
 
+local function eval_hand_and_jokers()
+	for i=1, #G.hand.cards do
+		--Check for hand doubling
+		local reps = {1}
+		local j = 1
+		while j <= #reps do
+				local percent = (i-0.999)/(#G.hand.cards-0.998) + (j-1)*0.1
+				if reps[j] ~= 1 then card_eval_status_text((reps[j].jokers or reps[j].seals).card, 'jokers', nil, nil, nil, (reps[j].jokers or reps[j].seals)) end
+
+				--calculate the hand effects
+				local effects = {G.hand.cards[i]:get_end_of_round_effect()}
+				for k=1, #G.jokers.cards do
+						--calculate the joker individual card effects
+						local eval = G.jokers.cards[k]:calculate_joker({cardarea = G.hand, other_card = G.hand.cards[i], individual = true, end_of_round = true})
+						if eval then 
+								table.insert(effects, eval)
+						end
+				end
+
+				if reps[j] == 1 then 
+						--Check for hand doubling
+						--From Red seal
+						local eval = eval_card(G.hand.cards[i], {end_of_round = true,cardarea = G.hand, repetition = true, repetition_only = true})
+						if next(eval) and (next(effects[1]) or #effects > 1)  then 
+								for h = 1, eval.seals.repetitions do
+										reps[#reps+1] = eval
+								end
+						end
+
+						--from Jokers
+						for j=1, #G.jokers.cards do
+								--calculate the joker effects
+								local eval = eval_card(G.jokers.cards[j], {cardarea = G.hand, other_card = G.hand.cards[i], repetition = true, end_of_round = true, card_effects = effects})
+								if next(eval) then 
+										for h  = 1, eval.jokers.repetitions do
+												reps[#reps+1] = eval
+										end
+								end
+						end
+				end
+
+				for ii = 1, #effects do
+						--if this effect came from a joker
+						if effects[ii].card then
+								G.E_MANAGER:add_event(Event({
+										trigger = 'immediate',
+										func = (function() effects[ii].card:juice_up(0.7);return true end)
+								}))
+						end
+						
+						--If dollars
+						if effects[ii].h_dollars then 
+								ease_dollars(effects[ii].h_dollars)
+								card_eval_status_text(G.hand.cards[i], 'dollars', effects[ii].h_dollars, percent)
+						end
+
+						--Any extras
+						if effects[ii].extra then
+								card_eval_status_text(G.hand.cards[i], 'extra', nil, percent, nil, effects[ii].extra)
+						end
+				end
+				j = j + 1
+		end
+	end
+end
+
 local update_hand_played_ref = Game.update_hand_played
 ---@diagnostic disable-next-line: duplicate-set-field
 function Game:update_hand_played(dt)
@@ -756,10 +825,11 @@ function Game:update_hand_played(dt)
 			func = function()
 				G.MULTIPLAYER.play_hand(G.GAME.chips, G.GAME.current_round.hands_left)
 				-- Set blind chips to enemy score
-				G.GAME.blind.chips = G.LOBBY.enemy.score
+				G.GAME.blind.chips = G.MULTIPLAYER_GAME.enemy.score
 				-- For now, never advance to next round
 				if G.GAME.current_round.hands_left < 1 then
 					if G.hand.cards[1] then
+						eval_hand_and_jokers()
 						attention_text({
 							scale = 0.8,
 							text = "Waiting for enemy to finish...",
@@ -772,7 +842,7 @@ function Game:update_hand_played(dt)
 					end
 
 					G.MULTIPLAYER_GAME.processed_round_done = true
-				else
+				elseif not G.MULTIPLAYER_GAME.end_pvp then
 					G.STATE_COMPLETE = false
 					G.STATE = G.STATES.DRAW_TO_HAND
 				end
@@ -780,6 +850,12 @@ function Game:update_hand_played(dt)
 				return true
 			end,
 		}))
+	end
+
+	if G.MULTIPLAYER_GAME.end_pvp then
+		G.STATE_COMPLETE = false
+		G.STATE = G.STATES.NEW_ROUND
+		G.MULTIPLAYER_GAME.end_pvp = false
 	end
 end
 
@@ -1173,7 +1249,7 @@ function create_UIBox_game_over()
 														{
 															n = G.UIT.T,
 															config = {
-																text = "Retun to Lobby",
+																text = "Return to Lobby",
 																scale = 0.5,
 																colour = G.C.UI.TEXT_LIGHT,
 															},
@@ -1721,6 +1797,48 @@ function G.FUNCS.mods_button(arg_736_0)
 	mods_button_ref(arg_736_0)
 end
 
+-- Rewritten from the original function to fix typing issues causing crashes
+function get_new_boss()
+	G.GAME.perscribed_bosses = G.GAME.perscribed_bosses or {}
+	if G.GAME.perscribed_bosses and G.GAME.perscribed_bosses[G.GAME.round_resets.ante] then 
+			local ret_boss = G.GAME.perscribed_bosses[G.GAME.round_resets.ante] 
+			G.GAME.perscribed_bosses[G.GAME.round_resets.ante] = nil
+			G.GAME.bosses_used[ret_boss] = G.GAME.bosses_used[ret_boss] + 1
+			return ret_boss
+	end
+	if G.FORCE_BOSS then return G.FORCE_BOSS end
+	
+	local eligible_bosses = {}
+	for k, v in pairs(G.P_BLINDS) do
+			if v.boss then
+					local condition = v.boss.showdown and (G.GAME.round_resets.ante)%G.GAME.win_ante == 0 and G.GAME.round_resets.ante >= 2
+					or not v.boss.showdown and (v.boss.min <= math.max(1, G.GAME.round_resets.ante) and ((math.max(1, G.GAME.round_resets.ante))%G.GAME.win_ante ~= 0 or G.GAME.round_resets.ante < 2))
+					if condition then
+							eligible_bosses[k] = true
+					end
+			end
+	end
+
+	local min_use = 100
+	local bosses_with_min_use = {}
+	for k, _ in pairs(eligible_bosses) do
+			local uses = G.GAME.bosses_used[k] or 0
+			if uses <= min_use then
+					if uses < min_use then
+							bosses_with_min_use = {}
+							min_use = uses
+					end
+					bosses_with_min_use[k] = true
+			end
+	end
+
+	local _, boss = pseudorandom_element(bosses_with_min_use, pseudoseed('boss'))
+	G.GAME.bosses_used[boss] = (G.GAME.bosses_used[boss] or 0) + 1
+	
+	return boss
+end
+
+
 local get_new_boss_ref = get_new_boss
 function get_new_boss(force_change)
 	if G.LOBBY.code and G.GAME.round_resets.blind_choices.Boss and not force_change then
@@ -1731,6 +1849,46 @@ function get_new_boss(force_change)
 		boss = get_new_boss_ref()
 	end
 	return boss
+end
+
+G.FUNCS.can_skip_booster = function(e)
+	if G.pack_cards and G.pack_cards.cards and G.pack_cards.cards[1] and 
+	(G.STATE == G.STATES.PLANET_PACK or G.STATE == G.STATES.STANDARD_PACK or G.STATE == G.STATES.BUFFOON_PACK or (G.hand and G.hand.cards[1])) then 
+			e.config.colour = G.C.GREY
+			e.config.button = 'skip_booster'
+	else
+		e.config.colour = G.C.UI.BACKGROUND_INACTIVE
+		e.config.button = nil
+	end
+end
+
+local update_selecting_hand_ref = Game.update_selecting_hand
+function Game:update_selecting_hand(dt)
+	update_selecting_hand_ref(self, dt)
+	if G.MULTIPLAYER_GAME.end_pvp then
+		G.STATE_COMPLETE = false
+		G.STATE = G.STATES.NEW_ROUND
+		G.MULTIPLAYER_GAME.end_pvp = false
+		return
+	end
+end
+
+local can_open_ref = G.FUNCS.can_open
+G.FUNCS.can_open = function(e)
+  if G.MULTIPLAYER_GAME.ready_blind then
+		e.config.colour = G.C.UI.BACKGROUND_INACTIVE
+		e.config.button = nil
+		return
+	end
+	can_open_ref(e)
+end
+
+local blind_disable_ref = Blind.disable
+function Blind:disable()
+	if is_pvp_boss() then
+		return
+	end
+	blind_disable_ref(self)
 end
 ----------------------------------------------
 ------------MOD GAME UI END-------------------

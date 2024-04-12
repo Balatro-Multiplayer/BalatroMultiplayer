@@ -6,7 +6,7 @@
 
 local Utils = require("Utils")
 
-MULTIPLAYER_VERSION = "0.1.1-MULTIPLAYER"
+MULTIPLAYER_VERSION = "0.1.2-MULTIPLAYER"
 
 local game_main_menu_ref = Game.main_menu
 ---@diagnostic disable-next-line: duplicate-set-field
@@ -274,24 +274,6 @@ function G.UIDEF.create_UIBox_join_lobby_button()
 						align = "cm",
 					},
 					nodes = {
-						{
-							n = G.UIT.R,
-							config = {
-								padding = 0.5,
-								align = "cm",
-							},
-							nodes = {
-								{
-									n = G.UIT.T,
-									config = {
-										scale = 0.6,
-										shadow = true,
-										text = "Lobby Code:",
-										colour = G.C.UI.TEXT_LIGHT,
-									},
-								},
-							},
-						},
 						{
 							n = G.UIT.R,
 							config = {

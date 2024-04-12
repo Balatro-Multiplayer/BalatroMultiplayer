@@ -72,6 +72,7 @@ end
 ---@param seed string
 ---@param stake_str string
 local function action_start_game(deck, seed, stake_str)
+	reset_game_states()
 	local stake = tonumber(stake_str)
 	G.MULTIPLAYER.set_ante(0)
 	G.FUNCS.lobby_start_run(nil, { deck = deck, seed = seed, stake = stake })
@@ -95,8 +96,8 @@ local function action_enemy_info(score_str, hands_left_str)
 		return
 	end
 
-	G.LOBBY.enemy.score = score
-	G.LOBBY.enemy.hands = hands_left
+	G.MULTIPLAYER_GAME.enemy.score = score
+	G.MULTIPLAYER_GAME.enemy.hands = hands_left
 	if is_pvp_boss() then
 		G.HUD_blind:get_UIE_by_ID("HUD_blind_count"):juice_up()
 		G.HUD_blind:get_UIE_by_ID("dollars_to_be_earned"):juice_up()
@@ -107,12 +108,12 @@ local function action_stop_game()
 	if G.STAGE ~= G.STAGES.MAIN_MENU then
 		G.FUNCS.go_to_menu()
 		G.MULTIPLAYER.update_connection_status()
+		reset_game_states()
 	end
 end
 
 local function action_end_pvp()
-	G.STATE_COMPLETE = false
-	G.STATE = G.STATES.NEW_ROUND
+	G.MULTIPLAYER_GAME.end_pvp = true
 end
 
 ---@param lives number
