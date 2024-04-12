@@ -1795,5 +1795,13 @@ G.FUNCS.can_open = function(e)
 	end
 	can_open_ref(e)
 end
+
+local blind_disable_ref = Blind.disable
+function Blind:disable()
+	if is_pvp_boss() then
+		return
+	end
+	blind_disable_ref(self)
+end
 ----------------------------------------------
 ------------MOD GAME UI END-------------------
