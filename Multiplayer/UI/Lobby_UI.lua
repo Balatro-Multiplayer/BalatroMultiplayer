@@ -406,30 +406,7 @@ function G.FUNCS.lobby_start_run(e, args)
 	G.FUNCS.start_run(e, {
 		stake = 1,
 		seed = args.seed,
-		challenge = {
-			name = "Multiplayer Deck",
-			id = "c_multiplayer_1",
-			rules = {
-				custom = {},
-				modifiers = {},
-			},
-			jokers = {},
-			consumeables = {},
-			vouchers = {},
-			deck = {
-				type = "Challenge Deck",
-			},
-			restrictions = {
-				banned_cards = {
-					{ id = "j_diet_cola" }, -- Intention to disable skipping
-					{ id = "j_mr_bones" },
-					{ id = "v_hieroglyph" },
-					{ id = "v_petroglyph" },
-				},
-				banned_tags = {},
-				banned_other = {},
-			},
-		},
+		challenge = G.CHALLENGES[get_challenge_int_from_id('c_multiplayer_1')],
 	})
 end
 
@@ -485,6 +462,7 @@ function Game:update(dt)
 		in_lobby = not in_lobby
 		G.F_NO_SAVING = in_lobby
 		self.FUNCS.go_to_menu()
+		reset_game_states()
 	end
 	gameUpdateRef(self, dt)
 end

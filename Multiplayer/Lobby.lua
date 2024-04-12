@@ -20,10 +20,6 @@ G.LOBBY = {
 	host = {},
 	guest = {},
 	is_host = false,
-	enemy = {
-		score = 0,
-		hands = 4,
-	},
 }
 
 G.MULTIPLAYER_GAME = {
@@ -32,8 +28,29 @@ G.MULTIPLAYER_GAME = {
 	processed_round_done = false,
 	lives = 0,
 	loaded_ante = 0,
-	loading_blinds = false
+	loading_blinds = false,
+  end_pvp = false,
+	enemy = {
+		score = 0,
+		hands = 4,
+	},
 }
+
+function reset_game_states()
+  G.MULTIPLAYER_GAME = {
+    ready_blind = false,
+    ready_blind_text = "Ready",
+    processed_round_done = false,
+    lives = 0,
+    loaded_ante = 0,
+    loading_blinds = false,
+    end_pvp = false,
+    enemy = {
+      score = 0,
+      hands = 4,
+    },
+  }
+end
 
 PREV_ACHIEVEMENT_VALUE = true
 function G.MULTIPLAYER.update_connection_status()
@@ -49,8 +66,10 @@ function G.MULTIPLAYER.update_connection_status()
 
 	if G.HUD_connection_status then
 		G.HUD_connection_status:remove()
-	end
-	G.HUD_connection_status = G.UIDEF.get_connection_status_ui()
+  end
+  if G.STAGE == G.STAGES.MAIN_MENU then
+	  G.HUD_connection_status = G.UIDEF.get_connection_status_ui()
+  end
 end
 
 local gameMainMenuRef = Game.main_menu
