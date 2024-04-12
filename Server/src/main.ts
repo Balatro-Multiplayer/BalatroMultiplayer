@@ -7,11 +7,13 @@ import type {
 	ActionCreateLobby,
 	ActionHandlerArgs,
 	ActionJoinLobby,
+	ActionLobbyOptions,
 	ActionPlayHand,
 	ActionServerToClient,
 	ActionSetAnte,
 	ActionUsername,
 	ActionUtility,
+	ActionVersion,
 } from './actions.js'
 
 const PORT = 8080
@@ -65,8 +67,9 @@ const server = net.createServer((socket) => {
 	// improve latency between responses
 	socket.setNoDelay()
 
-	const client = new Client(socket.address(), sendActionToSocket(socket))
+	const client = new Client(socket.address(), sendActionToSocket(socket), socket.end)
 	client.sendAction({ action: 'connected' })
+	client.sendAction({ action: 'version' })
 
 	let isRetry = false
 	let retryCount = 0
@@ -114,6 +117,12 @@ const server = net.createServer((socket) => {
 				)
 
 				switch (action) {
+					case 'version':
+						actionHandlers.version(
+							actionArgs as ActionHandlerArgs<ActionVersion>,
+							client,
+						)
+						break
 					case 'username':
 						actionHandlers.username(
 							actionArgs as ActionHandlerArgs<ActionUsername>,
@@ -163,13 +172,19 @@ const server = net.createServer((socket) => {
 						actionHandlers.gameInfo(client)
 						break
 					case 'lobbyOptions':
-						actionHandlers.lobbyOptions(actionArgs, client)
+						actionHandlers.lobbyOptions(
+							actionArgs as ActionHandlerArgs<ActionLobbyOptions>,
+							client,
+						)
 						break
 					case 'failRound':
 						actionHandlers.failRound(client)
 						break
 					case 'setAnte':
-						actionHandlers.setAnte(actionArgs as ActionHandlerArgs<ActionSetAnte>, client)
+						actionHandlers.setAnte(
+							actionArgs as ActionHandlerArgs<ActionSetAnte>,
+							client,
+						)
 						break
 				}
 			} catch (error) {
