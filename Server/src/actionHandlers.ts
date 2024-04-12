@@ -64,13 +64,13 @@ const startGameAction = (client: Client) => {
 
 	let lives = GameModes[lobby.gameMode].startingLives
 
-	// Reset players' lives
-	lobby.setPlayersLives(lives)
 	lobby.broadcastAction({
 		action: 'startGame',
 		deck: 'c_multiplayer_1',
 		seed: lobby.options.different_seeds? undefined : generateSeed(),
 	})
+	// Reset players' lives
+	lobby.setPlayersLives(lives)
 }
 
 const readyBlindAction = (client: Client) => {
