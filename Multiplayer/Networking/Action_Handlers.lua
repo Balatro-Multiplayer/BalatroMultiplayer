@@ -120,7 +120,7 @@ end
 
 ---@param lives number
 local function action_player_info(lives)
-	if (G.MULTIPLAYER_GAME.lives ~= lives) then
+	if G.MULTIPLAYER_GAME.lives ~= lives then
 		if G.MULTIPLAYER_GAME.lives ~= 0 and G.LOBBY.config.gold_on_life_loss then
 			G.MULTIPLAYER_GAME.comeback_bonus_given = false
 			G.MULTIPLAYER_GAME.comeback_bonus = G.MULTIPLAYER_GAME.comeback_bonus + 1
@@ -140,12 +140,11 @@ local function action_lose_game()
 	G.STATE = G.STATES.GAME_OVER
 end
 
-
 local function action_game_info(small, big, boss)
 	G.GAME.round_resets.blind_choices = {
-		Small = small or 'bl_small',
-		Big = big or 'bl_big',
-		Boss = boss or get_new_boss(true)
+		Small = small or "bl_small",
+		Big = big or "bl_big",
+		Boss = boss or get_new_boss(true),
 	}
 	G.MULTIPLAYER_GAME.loaded_ante = G.GAME.round_resets.ante
 	G.MULTIPLAYER.loading_blinds = false
@@ -164,12 +163,16 @@ local function action_lobby_options(options)
 		end
 		G.LOBBY.config[k] = parsed_v
 		if G.OVERLAY_MENU then
-			local config_uie = G.OVERLAY_MENU:get_UIE_by_ID(k .. '_toggle')
+			local config_uie = G.OVERLAY_MENU:get_UIE_by_ID(k .. "_toggle")
 			if config_uie then
 				G.FUNCS.toggle(config_uie)
 			end
 		end
 	end
+end
+
+local function action_version()
+	G.MULTIPLAYER.version()
 end
 
 -- #region Client to Server
@@ -214,6 +217,10 @@ function G.MULTIPLAYER.fail_round()
 		G.GAME.blind.dollars = 0
 	end
 	Client.send("action:failRound")
+end
+
+function G.MULTIPLAYER.version()
+	Client.send(string.format("action:version,version:%s", MULTIPLAYER_VERSION))
 end
 
 ---@param score number
@@ -262,6 +269,8 @@ function Game:update(dt)
 
 			if parsedAction.action == "connected" then
 				action_connected()
+			elseif parsedAction.action == "version" then
+				action_version()
 			elseif parsedAction.action == "disconnected" then
 				action_disconnected()
 			elseif parsedAction.action == "joinedLobby" then
