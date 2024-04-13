@@ -692,6 +692,7 @@ function Game:update_shop(dt)
 	if not G.STATE_COMPLETE then
 		G.MULTIPLAYER_GAME.ready_blind = false
 		G.MULTIPLAYER_GAME.ready_blind_text = "Ready"
+		G.MULTIPLAYER_GAME.end_pvp = false
 	end
 	update_shop_ref(self, dt)
 end
@@ -840,8 +841,6 @@ function Game:update_hand_played(dt)
 						})
 						G.FUNCS.draw_from_hand_to_discard()
 					end
-
-					G.MULTIPLAYER_GAME.processed_round_done = true
 				elseif not G.MULTIPLAYER_GAME.end_pvp then
 					G.STATE_COMPLETE = false
 					G.STATE = G.STATES.DRAW_TO_HAND
@@ -1872,7 +1871,6 @@ function Game:update_selecting_hand(dt)
 		G.STATE_COMPLETE = false
 		G.STATE = G.STATES.NEW_ROUND
 		G.MULTIPLAYER_GAME.end_pvp = false
-		return
 	end
 end
 
