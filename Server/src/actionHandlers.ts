@@ -12,7 +12,6 @@ import type {
 	ActionVersion,
 } from "./actions.js";
 import { generateSeed } from "./utils.js";
-import { version as serverVersion } from "../package.json" with { type: "json" };
 
 const usernameAction = (
 	{ username }: ActionHandlerArgs<ActionUsername>,
@@ -224,6 +223,8 @@ const setAnteAction = (
 	client.ante = ante;
 };
 
+// TODO: Fix this
+const serverVersion = "0.1.2-MULTIPLAYER";
 /** Verifies the client version and allows connection if it matches the server's */
 const versionAction = (
 	{ version }: ActionHandlerArgs<ActionVersion>,
