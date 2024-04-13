@@ -12,7 +12,7 @@ import type {
 	ActionVersion,
 } from "./actions.js";
 import { generateSeed } from "./utils.js";
-import { version as serverVersion } from "../package.json";
+import { version as serverVersion } from "../package.json" with { type: "json" };
 
 const usernameAction = (
 	{ username }: ActionHandlerArgs<ActionUsername>,
