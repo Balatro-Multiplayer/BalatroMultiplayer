@@ -230,7 +230,7 @@ const versionAction = (
 	client: Client,
 ) => {
 	if (version !== serverVersion) {
-		client.sendAction({ action: "error", message: "Version mismatch" });
+		client.sendAction({ action: "error", message: `WARN: Server expecting version ${serverVersion}` });
 	}
 };
 
