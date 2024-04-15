@@ -5,7 +5,7 @@ type GameModeData = {
 
 	getBlindFromAnte: (
 		ante: number,
-		options: unknown,
+		options: any,
 	) => {
 		small?: string;
 		big?: string;
@@ -20,15 +20,16 @@ const GameModes: {
 } = {
 	attrition: {
 		startingLives: 4,
-		getBlindFromAnte: (ante) => {
+		getBlindFromAnte: (ante, options) => {
 			return { boss: "bl_pvp" };
 		},
 	},
 	draft: {
 		startingLives: 2,
-		getBlindFromAnte: (ante) => {
-			if (ante < 4) return {};
-			return { small: "bl_pvp", big: "bl_pvp", boss: "bl_pvp" };
+		getBlindFromAnte: (ante, options) => {
+			const starting_antes = options?.draft_starting_antes ? parseInt(options.draft_starting_antes) : 3
+      if (ante <= starting_antes) return { }
+      else return { small: 'bl_pvp', big: 'bl_pvp', boss: 'bl_pvp' }
 		},
 	},
 };
