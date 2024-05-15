@@ -20,19 +20,6 @@ local bl_pvp = {
 
 G.P_BLINDS["bl_pvp"] = bl_pvp
 
-local get_new_boss_ref = get_new_boss
-function get_new_boss()
-	if G.LOBBY.code then
-		return "bl_pvp"
-	else
-		local boss = get_new_boss_ref()
-		while boss == "bl_pvp" do
-			boss = get_new_boss_ref()
-		end
-		return boss
-	end
-end
-
 local localize_ref = localize
 function localize(args, misc_cat)
 	if type(args) == "table" and args.key == "bl_pvp" and args.set == "Blind" then
@@ -62,6 +49,11 @@ function set_discover_tallies()
 	local res = set_discover_tallies_ref()
 	G.P_BLINDS["bl_pvp"] = bl_pvp
 	return res
+end
+
+function is_pvp_boss()
+	if not G.GAME or not G.GAME.blind then return false end
+	return G.GAME.blind.name == "Your Nemesis"
 end
 
 ----------------------------------------------

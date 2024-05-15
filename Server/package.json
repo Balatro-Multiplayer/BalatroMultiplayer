@@ -1,4 +1,5 @@
 {
+	"version": "0.1.2-MULTIPLAYER",
 	"scripts": {
 		"build": "tsc",
 		"dev": "tsx watch src/main.ts",

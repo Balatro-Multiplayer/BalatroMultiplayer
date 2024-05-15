@@ -1,8 +1,10 @@
+import type net from 'node:net'
 import { v4 as uuidv4 } from 'uuid'
 import type Lobby from './Lobby.js'
-import type net from 'node:net'
+import type { ActionServerToClient } from './actions.js'
 
-type SendFn = (data: string) => void
+type SendFn = (action: ActionServerToClient) => void
+type CloseConnFn = () => void
 
 /* biome-ignore lint/complexity/noBannedTypes: 
 	This is how the net module does it */
@@ -13,21 +15,24 @@ class Client {
 	id: string
 	// Could be useful later on to detect reconnects
 	address: Address
-	send: SendFn
+	sendAction: SendFn
+	closeConnection: CloseConnFn
 
 	// Game info
 	username = 'Guest'
 	lobby: Lobby | null = null
 	/** Whether player is ready for next blind */
 	isReady = false
-	// TODO: Set lives based on game mode
 	lives = 4
 	score = 0
+	handsLeft = 4
+	ante = 1
 
-	constructor(address: Address, send: SendFn) {
+	constructor(address: Address, send: SendFn, closeConnection: CloseConnFn) {
 		this.id = uuidv4()
 		this.address = address
-		this.send = send
+		this.sendAction = send
+		this.closeConnection = closeConnection
 	}
 
 	setUsername = (username: string) => {

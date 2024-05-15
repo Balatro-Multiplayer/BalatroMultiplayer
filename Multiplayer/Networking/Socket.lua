@@ -152,9 +152,9 @@ while true do
 	coroutine.resume(networkCoroutine)
 
 	-- Run Timer
-	if isSocketClosed ~= true and coroutine.status(timerCoroutine) ~= "dead" then
+	if not isSocketClosed and coroutine.status(timerCoroutine) ~= "dead" then
 		coroutine.resume(timerCoroutine, keepAliveInitialTimeout)
-	else
+	elseif not isSocketClosed then
 		-- Timer triggered
 		isRetry = true
 

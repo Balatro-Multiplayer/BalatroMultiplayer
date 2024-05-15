@@ -6,7 +6,7 @@
 
 local Utils = require("Utils")
 
-MULTIPLAYER_VERSION = "0.1.0-MULTIPLAYER"
+MULTIPLAYER_VERSION = "0.1.2-MULTIPLAYER"
 
 local game_main_menu_ref = Game.main_menu
 ---@diagnostic disable-next-line: duplicate-set-field
@@ -61,7 +61,7 @@ function G.UIDEF.create_UIBox_create_lobby_button()
 							colour = G.C.BOOSTER,
 							tabs = {
 								{
-									label = "Attrition (1v1)",
+									label = "Attrition",
 									chosen = true,
 									tab_definition_function = function()
 										return {
@@ -89,7 +89,7 @@ function G.UIDEF.create_UIBox_create_lobby_button()
 															n = G.UIT.T,
 															config = {
 																text = Utils.wrapText(
-																	"Both players start with 4 lives, every boss round is a competition between players where the player with the lower score loses a life.",
+																	"Every boss round is a competition between players where the player with the lower score loses a life.",
 																	50
 																),
 																shadow = true,
@@ -99,17 +99,8 @@ function G.UIDEF.create_UIBox_create_lobby_button()
 														},
 													},
 												},
-												create_toggle({
-													label = "Lose lives on round loss",
-													ref_table = G.LOBBY.config,
-													ref_value = "death_on_round_loss",
-												}),
-												create_toggle({
-													label = "Different seeds",
-													ref_table = G.LOBBY.config,
-													ref_value = "different_seeds",
-												}),
 												UIBox_button({
+													id = "start_attrition",
 													label = { "Start Lobby" },
 													colour = G.C.RED,
 													button = "start_lobby",
@@ -120,7 +111,7 @@ function G.UIDEF.create_UIBox_create_lobby_button()
 									end,
 								},
 								{
-									label = "Draft (1v1)",
+									label = "Draft",
 									tab_definition_function = function()
 										return {
 											n = G.UIT.ROOT,
@@ -147,7 +138,56 @@ function G.UIDEF.create_UIBox_create_lobby_button()
 															n = G.UIT.T,
 															config = {
 																text = Utils.wrapText(
-																	"Both players play a set amount of antes simultaneously, then they play an ante where every round the player with the higher scorer wins, player with the most round wins in the final ante is the victor.",
+																	"Both players play 3 normal antes, then they play an ante where every round the player with the higher scorer wins.",
+																	50
+																),
+																shadow = true,
+																scale = var_495_0 * 0.6,
+																colour = G.C.UI.TEXT_LIGHT,
+															},
+														},
+													},
+												},
+												UIBox_button({
+													id = "start_draft",
+													label = { "Start Lobby" },
+													colour = G.C.RED,
+													button = "start_lobby",
+													minw = 5,
+												}),
+											},
+										}
+									end,
+								},
+								{
+									label = "Vanilla+",
+									tab_definition_function = function()
+										return {
+											n = G.UIT.ROOT,
+											config = {
+												emboss = 0.05,
+												minh = 6,
+												r = 0.1,
+												minw = 10,
+												align = "tm",
+												padding = 0.2,
+												colour = G.C.BLACK,
+											},
+											nodes = {
+												{
+													n = G.UIT.R,
+													config = {
+														align = "tm",
+														padding = 0.05,
+														minw = 4,
+														minh = 1,
+													},
+													nodes = {
+														{
+															n = G.UIT.T,
+															config = {
+																text = Utils.wrapText(
+																	"The first person to fail a round loses, no PvP blinds.",
 																	50
 																),
 																shadow = true,
@@ -167,7 +207,7 @@ function G.UIDEF.create_UIBox_create_lobby_button()
 									end,
 								},
 								{
-									label = "Heads Up (1v1)",
+									label = "Heads Up",
 									tab_definition_function = function()
 										return {
 											n = G.UIT.ROOT,
@@ -214,7 +254,7 @@ function G.UIDEF.create_UIBox_create_lobby_button()
 									end,
 								},
 								{
-									label = "Battle Royale (8p)",
+									label = "Battle Royale",
 									tab_definition_function = function()
 										return {
 											n = G.UIT.ROOT,
@@ -241,7 +281,7 @@ function G.UIDEF.create_UIBox_create_lobby_button()
 															n = G.UIT.T,
 															config = {
 																text = Utils.wrapText(
-																	"Draft, except there are up to 8 players and every player only has 1 life.",
+																	"Attrition, except there are up to 8 players and every player only has 1 life.",
 																	50
 																),
 																shadow = true,
@@ -281,24 +321,6 @@ function G.UIDEF.create_UIBox_join_lobby_button()
 						align = "cm",
 					},
 					nodes = {
-						{
-							n = G.UIT.R,
-							config = {
-								padding = 0.5,
-								align = "cm",
-							},
-							nodes = {
-								{
-									n = G.UIT.T,
-									config = {
-										scale = 0.6,
-										shadow = true,
-										text = "Lobby Code:",
-										colour = G.C.UI.TEXT_LIGHT,
-									},
-								},
-							},
-						},
 						{
 							n = G.UIT.R,
 							config = {
@@ -399,8 +421,7 @@ end
 
 function G.FUNCS.start_lobby(e)
 	G.SETTINGS.paused = false
-
-	G.MULTIPLAYER.create_lobby()
+	G.MULTIPLAYER.create_lobby(e.config.id == "start_attrition" and "attrition" or "draft")
 end
 
 -- Modify play button to take you to mode select first

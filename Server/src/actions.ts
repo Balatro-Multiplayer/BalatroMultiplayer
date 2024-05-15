@@ -1,7 +1,7 @@
 // Server to Client
 export type ActionConnected = { action: 'connected' }
 export type ActionError = { action: 'error'; message: string }
-export type ActionJoinedLobby = { action: 'joinedLobby'; code: string }
+export type ActionJoinedLobby = { action: 'joinedLobby'; code: string; type: GameMode }
 export type ActionLobbyInfo = {
 	action: 'lobbyInfo'
 	host: string
@@ -31,6 +31,8 @@ export type ActionEnemyInfo = {
 	handsLeft: number
 }
 export type ActionEndPvP = { action: 'endPvP'; lost: boolean }
+export type ActionLobbyOptions = { action: 'lobbyOptions' }
+export type ActionRequestVersion = { action: 'version' }
 
 export type ActionServerToClient =
 	| ActionConnected
@@ -46,10 +48,13 @@ export type ActionServerToClient =
 	| ActionPlayerInfo
 	| ActionEnemyInfo
 	| ActionEndPvP
+	| ActionLobbyOptions
+	| ActionRequestVersion
+	| ActionUtility
 
 // Client to Server
 export type ActionUsername = { action: 'username'; username: string }
-export type ActionCreateLobby = { action: 'createLobby'; gameMode: string }
+export type ActionCreateLobby = { action: 'createLobby'; gameMode: GameMode }
 export type ActionJoinLobby = { action: 'joinLobby'; code: string }
 export type ActionLeaveLobby = { action: 'leaveLobby' }
 export type ActionLobbyInfoRequest = { action: 'lobbyInfo' }
@@ -65,6 +70,12 @@ export type ActionPlayHand = {
 export type ActionGameInfoRequest = { action: 'gameInfo' }
 export type ActionPlayerInfoRequest = { action: 'playerInfo' }
 export type ActionEnemyInfoRequest = { action: 'enemyInfo' }
+export type ActionFailRound = { action: 'failRound' }
+export type ActionSetAnte = {
+	action: 'setAnte'
+	ante: number
+}
+export type ActionVersion = { action: 'version'; version: string }
 
 export type ActionClientToServer =
 	| ActionUsername
@@ -80,6 +91,10 @@ export type ActionClientToServer =
 	| ActionPlayerInfoRequest
 	| ActionEnemyInfoRequest
 	| ActionUnreadyBlind
+	| ActionLobbyOptions
+	| ActionFailRound
+	| ActionSetAnte
+	| ActionVersion
 
 // Utility actions
 export type ActionKeepAlive = { action: 'keepAlive' }
@@ -94,15 +109,18 @@ export type ActionHandlers = {
 	[K in HandledActions['action']]: keyof ActionHandlerArgs<
 		Extract<HandledActions, { action: K }>
 	> extends never
-		? (
-				// biome-ignore lint/suspicious/noExplicitAny: Function can receive any arguments
-				...args: any[]
-		  ) => void
-		: (
-				action: ActionHandlerArgs<Extract<HandledActions, { action: K }>>,
-				// biome-ignore lint/suspicious/noExplicitAny: Function can receive any arguments
-				...args: any[]
-		  ) => void
+	? (
+		// biome-ignore lint/suspicious/noExplicitAny: Function can receive any arguments
+		...args: any[]
+	) => void
+	: (
+		action: ActionHandlerArgs<Extract<HandledActions, { action: K }>>,
+		// biome-ignore lint/suspicious/noExplicitAny: Function can receive any arguments
+		...args: any[]
+	) => void
 }
 
 export type ActionHandlerArgs<T extends HandledActions> = Omit<T, 'action'>
+
+// Other types
+export type GameMode = 'attrition' | 'draft'

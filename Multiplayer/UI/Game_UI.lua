@@ -4,6 +4,8 @@
 ----------------------------------------------
 ------------MOD GAME UI-----------------------
 
+local Utils = require("Utils")
+
 local create_UIBox_options_ref = create_UIBox_options
 ---@diagnostic disable-next-line: lowercase-global
 function create_UIBox_options()
@@ -22,7 +24,11 @@ function create_UIBox_options()
 		}))
 
 		if G.STAGE == G.STAGES.RUN then
-			main_menu = UIBox_button({ label = { "Return to Lobby" }, button = "go_to_menu", minw = 5 })
+			main_menu = UIBox_button({
+				label = { "Return to Lobby" },
+				button = "return_to_lobby",
+				minw = 5,
+			})
 			your_collection = UIBox_button({
 				label = { localize("b_collection") },
 				button = "your_collection",
@@ -166,11 +172,7 @@ function create_UIBox_blind_choice(type, run_info)
 				pseudorandom_element(_poker_hands, pseudoseed("orbital"))
 		end
 
-		if type == "Small" then
-			extras = nil
-		elseif type == "Big" then
-			extras = nil
-		elseif not run_info then
+		if G.GAME.round_resets.blind_choices[type] == 'bl_pvp' then
 			local dt1 = DynaText({
 				string = { { string = "LIFE", colour = G.C.FILTER } },
 				colours = { G.C.BLACK },
@@ -233,6 +235,8 @@ function create_UIBox_blind_choice(type, run_info)
 					},
 				},
 			}
+		else
+			extras = nil
 		end
 		G.GAME.round_resets.blind_ante = G.GAME.round_resets.blind_ante or G.GAME.round_resets.ante
 
@@ -581,14 +585,14 @@ local function update_blind_HUD()
 			delay = 0.3,
 			blockable = false,
 			func = function()
-				G.HUD_blind:get_UIE_by_ID("HUD_blind_count").config.ref_table = G.LOBBY.enemy
+				G.HUD_blind:get_UIE_by_ID("HUD_blind_count").config.ref_table = G.MULTIPLAYER_GAME.enemy
 				G.HUD_blind:get_UIE_by_ID("HUD_blind_count").config.ref_value = "score"
 				G.HUD_blind:get_UIE_by_ID("HUD_blind").children[2].children[2].children[2].children[1].children[1].config.text =
 					"Current enemy score"
 				G.HUD_blind:get_UIE_by_ID("HUD_blind").children[2].children[2].children[2].children[3].children[1].config.text =
 					"Enemy hands left: "
 				G.HUD_blind:get_UIE_by_ID("dollars_to_be_earned").config.object.config.string =
-					{ { ref_table = G.LOBBY.enemy, ref_value = "hands" } }
+					{ { ref_table = G.MULTIPLAYER_GAME.enemy, ref_value = "hands" } }
 				G.HUD_blind:get_UIE_by_ID("dollars_to_be_earned").config.object:update_text()
 				G.HUD_blind.alignment.offset.y = 0
 				return true
@@ -620,6 +624,7 @@ function G.FUNCS.mp_toggle_ready(e)
 
 	if G.MULTIPLAYER_GAME.ready_blind then
 		G.MULTIPLAYER.ready_blind()
+		stop_use()
 	else
 		G.MULTIPLAYER.unready_blind()
 	end
@@ -642,7 +647,7 @@ function Game:update_draw_to_hand(dt)
 			and G.GAME.current_round.discards_used == 0
 			and G.GAME.facing_blind
 		then
-			if G.GAME.blind.name == "Your Nemesis" then
+			if is_pvp_boss() then
 				G.E_MANAGER:add_event(Event({
 					trigger = "after",
 					delay = 1,
@@ -679,6 +684,17 @@ local blind_defeat_ref = Blind.defeat
 function Blind:defeat(silent)
 	blind_defeat_ref(self, silent)
 	reset_blind_HUD()
+	G.MULTIPLAYER.play_hand(0, G.GAME.round_resets.hands)
+end
+
+local update_shop_ref = Game.update_shop
+function Game:update_shop(dt)
+	if not G.STATE_COMPLETE then
+		G.MULTIPLAYER_GAME.ready_blind = false
+		G.MULTIPLAYER_GAME.ready_blind_text = "Ready"
+		G.MULTIPLAYER_GAME.end_pvp = false
+	end
+	update_shop_ref(self, dt)
 end
 
 local ui_def_shop_ref = G.UIDEF.shop
@@ -719,14 +735,1161 @@ function G.UIDEF.shop()
 	return t
 end
 
-local update_hand_played_ref = Game.update_hand_played
-function Game:update_hand_played(dt)
-	if not G.STATE_COMPLETE then
-		G.MULTIPLAYER.play_hand(G.GAME.chips, G.GAME.current_round.hands_left)
-	end
+local function eval_hand_and_jokers()
+	for i=1, #G.hand.cards do
+		--Check for hand doubling
+		local reps = {1}
+		local j = 1
+		while j <= #reps do
+				local percent = (i-0.999)/(#G.hand.cards-0.998) + (j-1)*0.1
+				if reps[j] ~= 1 then card_eval_status_text((reps[j].jokers or reps[j].seals).card, 'jokers', nil, nil, nil, (reps[j].jokers or reps[j].seals)) end
 
-	update_hand_played_ref(self, dt)
+				--calculate the hand effects
+				local effects = {G.hand.cards[i]:get_end_of_round_effect()}
+				for k=1, #G.jokers.cards do
+						--calculate the joker individual card effects
+						local eval = G.jokers.cards[k]:calculate_joker({cardarea = G.hand, other_card = G.hand.cards[i], individual = true, end_of_round = true})
+						if eval then 
+								table.insert(effects, eval)
+						end
+				end
+
+				if reps[j] == 1 then 
+						--Check for hand doubling
+						--From Red seal
+						local eval = eval_card(G.hand.cards[i], {end_of_round = true,cardarea = G.hand, repetition = true, repetition_only = true})
+						if next(eval) and (next(effects[1]) or #effects > 1)  then 
+								for h = 1, eval.seals.repetitions do
+										reps[#reps+1] = eval
+								end
+						end
+
+						--from Jokers
+						for j=1, #G.jokers.cards do
+								--calculate the joker effects
+								local eval = eval_card(G.jokers.cards[j], {cardarea = G.hand, other_card = G.hand.cards[i], repetition = true, end_of_round = true, card_effects = effects})
+								if next(eval) then 
+										for h  = 1, eval.jokers.repetitions do
+												reps[#reps+1] = eval
+										end
+								end
+						end
+				end
+
+				for ii = 1, #effects do
+						--if this effect came from a joker
+						if effects[ii].card then
+								G.E_MANAGER:add_event(Event({
+										trigger = 'immediate',
+										func = (function() effects[ii].card:juice_up(0.7);return true end)
+								}))
+						end
+						
+						--If dollars
+						if effects[ii].h_dollars then 
+								ease_dollars(effects[ii].h_dollars)
+								card_eval_status_text(G.hand.cards[i], 'dollars', effects[ii].h_dollars, percent)
+						end
+
+						--Any extras
+						if effects[ii].extra then
+								card_eval_status_text(G.hand.cards[i], 'extra', nil, percent, nil, effects[ii].extra)
+						end
+				end
+				j = j + 1
+		end
+	end
 end
 
+local update_hand_played_ref = Game.update_hand_played
+---@diagnostic disable-next-line: duplicate-set-field
+function Game:update_hand_played(dt)
+	-- Ignore for singleplayer or regular blinds
+	if not G.LOBBY.connected or not G.LOBBY.code or not is_pvp_boss() then
+		update_hand_played_ref(self, dt)
+		return
+	end
+
+	if self.buttons then
+		self.buttons:remove()
+		self.buttons = nil
+	end
+	if self.shop then
+		self.shop:remove()
+		self.shop = nil
+	end
+
+	if not G.STATE_COMPLETE then
+		G.STATE_COMPLETE = true
+		G.E_MANAGER:add_event(Event({
+			trigger = "immediate",
+			func = function()
+				G.MULTIPLAYER.play_hand(G.GAME.chips, G.GAME.current_round.hands_left)
+				-- Set blind chips to enemy score
+				G.GAME.blind.chips = G.MULTIPLAYER_GAME.enemy.score
+				-- For now, never advance to next round
+				if G.GAME.current_round.hands_left < 1 then
+					if G.hand.cards[1] then
+						eval_hand_and_jokers()
+						attention_text({
+							scale = 0.8,
+							text = "Waiting for enemy to finish...",
+							hold = 5,
+							align = "cm",
+							offset = { x = 0, y = -1.5 },
+							major = G.play,
+						})
+						G.FUNCS.draw_from_hand_to_discard()
+					end
+				elseif not G.MULTIPLAYER_GAME.end_pvp then
+					G.STATE_COMPLETE = false
+					G.STATE = G.STATES.DRAW_TO_HAND
+				end
+
+				return true
+			end,
+		}))
+	end
+
+	if G.MULTIPLAYER_GAME.end_pvp then
+		G.STATE_COMPLETE = false
+		G.STATE = G.STATES.NEW_ROUND
+		G.MULTIPLAYER_GAME.end_pvp = false
+	end
+end
+
+local can_play_ref = G.FUNCS.can_play
+G.FUNCS.can_play = function(e)
+	if G.GAME.current_round.hands_left <= 0 then
+		e.config.colour = G.C.UI.BACKGROUND_INACTIVE
+		e.config.button = nil
+	else
+		can_play_ref(e)
+	end
+end
+
+local update_new_round_ref = Game.update_new_round
+function Game:update_new_round(dt)
+	if G.LOBBY.code then
+		-- Prevent player from losing
+		if G.GAME.chips - G.GAME.blind.chips < 0 then
+			G.GAME.blind.chips = -1
+			G.MULTIPLAYER.fail_round()
+		end
+
+		-- Prevent player from winning
+		G.GAME.win_ante = 999
+
+		update_new_round_ref(self, dt)
+
+		-- Reset ante number
+		G.GAME.win_ante = 8
+		return
+	end
+	update_new_round_ref(self, dt)
+end
+
+local end_round_ref = end_round
+function end_round()
+	if not G.LOBBY.code then
+		return end_round_ref()
+	end
+	G.E_MANAGER:add_event(Event({
+		trigger = "after",
+		delay = 0.2,
+		func = function()
+			G.RESET_BLIND_STATES = true
+			G.RESET_JIGGLES = true
+			for i = 1, #G.jokers.cards do
+				local eval = nil
+				eval = G.jokers.cards[i]:calculate_joker({ end_of_round = true, game_over = game_over })
+				if eval then
+					card_eval_status_text(G.jokers.cards[i], "jokers", nil, nil, nil, eval)
+				end
+			end
+			G.GAME.unused_discards = (G.GAME.unused_discards or 0) + G.GAME.current_round.discards_left
+			if G.GAME.blind and G.GAME.blind.config.blind then
+				discover_card(G.GAME.blind.config.blind)
+			end
+
+			if G.GAME.blind:get_type() == "Boss" then
+				local _handname, _played, _order = "High Card", -1, 100
+				for k, v in pairs(G.GAME.hands) do
+					if v.played > _played or (v.played == _played and _order > v.order) then
+						_played = v.played
+						_handname = k
+					end
+				end
+				G.GAME.current_round.most_played_poker_hand = _handname
+			end
+
+			if G.GAME.blind:get_type() == "Boss" and not G.GAME.seeded and not G.GAME.challenge then
+				G.GAME.current_boss_streak = G.GAME.current_boss_streak + 1
+				check_and_set_high_score("boss_streak", G.GAME.current_boss_streak)
+			end
+
+			if G.GAME.current_round.hands_played == 1 then
+				inc_career_stat("c_single_hand_round_streak", 1)
+			else
+				if not G.GAME.seeded and not G.GAME.challenge then
+					G.PROFILES[G.SETTINGS.profile].career_stats.c_single_hand_round_streak = 0
+					G:save_settings()
+				end
+			end
+
+			check_for_unlock({ type = "round_win" })
+			set_joker_usage()
+			for i = 1, #G.hand.cards do
+				--Check for hand doubling
+				local reps = { 1 }
+				local j = 1
+				while j <= #reps do
+					local percent = (i - 0.999) / (#G.hand.cards - 0.998) + (j - 1) * 0.1
+					if reps[j] ~= 1 then
+						card_eval_status_text(
+							(reps[j].jokers or reps[j].seals).card,
+							"jokers",
+							nil,
+							nil,
+							nil,
+							(reps[j].jokers or reps[j].seals)
+						)
+					end
+
+					--calculate the hand effects
+					local effects = { G.hand.cards[i]:get_end_of_round_effect() }
+					for k = 1, #G.jokers.cards do
+						--calculate the joker individual card effects
+						local eval = G.jokers.cards[k]:calculate_joker({
+							cardarea = G.hand,
+							other_card = G.hand.cards[i],
+							individual = true,
+							end_of_round = true,
+						})
+						if eval then
+							table.insert(effects, eval)
+						end
+					end
+
+					if reps[j] == 1 then
+						--Check for hand doubling
+						--From Red seal
+						local eval = eval_card(
+							G.hand.cards[i],
+							{ end_of_round = true, cardarea = G.hand, repetition = true, repetition_only = true }
+						)
+						if next(eval) and (next(effects[1]) or #effects > 1) then
+							for h = 1, eval.seals.repetitions do
+								reps[#reps + 1] = eval
+							end
+						end
+
+						--from Jokers
+						for j = 1, #G.jokers.cards do
+							--calculate the joker effects
+							local eval = eval_card(G.jokers.cards[j], {
+								cardarea = G.hand,
+								other_card = G.hand.cards[i],
+								repetition = true,
+								end_of_round = true,
+								card_effects = effects,
+							})
+							if next(eval) then
+								for h = 1, eval.jokers.repetitions do
+									reps[#reps + 1] = eval
+								end
+							end
+						end
+					end
+
+					for ii = 1, #effects do
+						--if this effect came from a joker
+						if effects[ii].card then
+							G.E_MANAGER:add_event(Event({
+								trigger = "immediate",
+								func = function()
+									effects[ii].card:juice_up(0.7)
+									return true
+								end,
+							}))
+						end
+
+						--If dollars
+						if effects[ii].h_dollars then
+							ease_dollars(effects[ii].h_dollars)
+							card_eval_status_text(G.hand.cards[i], "dollars", effects[ii].h_dollars, percent)
+						end
+
+						--Any extras
+						if effects[ii].extra then
+							card_eval_status_text(G.hand.cards[i], "extra", nil, percent, nil, effects[ii].extra)
+						end
+					end
+					j = j + 1
+				end
+			end
+			delay(0.3)
+
+			G.FUNCS.draw_from_hand_to_discard()
+			if G.GAME.blind:get_type() == "Boss" then
+				G.GAME.voucher_restock = nil
+				if
+					G.GAME.modifiers.set_eternal_ante
+					and (G.GAME.round_resets.ante == G.GAME.modifiers.set_eternal_ante)
+				then
+					for k, v in ipairs(G.jokers.cards) do
+						v:set_eternal(true)
+					end
+				end
+				if
+					G.GAME.modifiers.set_joker_slots_ante
+					and (G.GAME.round_resets.ante == G.GAME.modifiers.set_joker_slots_ante)
+				then
+					G.jokers.config.card_limit = 0
+				end
+				delay(0.4)
+				ease_ante(1)
+				delay(0.4)
+				check_for_unlock({ type = "ante_up", ante = G.GAME.round_resets.ante + 1 })
+			end
+			G.FUNCS.draw_from_discard_to_deck()
+			G.E_MANAGER:add_event(Event({
+				trigger = "after",
+				delay = 0.3,
+				func = function()
+					G.STATE = G.STATES.ROUND_EVAL
+					G.STATE_COMPLETE = false
+
+					if G.GAME.round_resets.blind_states.Small ~= "Defeated" and G.GAME.round_resets.blind_states.Small ~= "Skipped" then
+						G.GAME.round_resets.blind_states.Small = "Defeated"
+					elseif G.GAME.round_resets.blind_states.Big ~= "Defeated" and G.GAME.round_resets.blind_states.Big ~= "Skipped" then
+						G.GAME.round_resets.blind_states.Big = "Defeated"
+					else
+						G.GAME.current_round.voucher = get_next_voucher_key()
+						G.GAME.round_resets.blind_states.Boss = "Defeated"
+						for k, v in ipairs(G.playing_cards) do
+							v.ability.played_this_ante = nil
+						end
+					end
+
+					if G.GAME.round_resets.temp_handsize then
+						G.hand:change_size(-G.GAME.round_resets.temp_handsize)
+						G.GAME.round_resets.temp_handsize = nil
+					end
+					if G.GAME.round_resets.temp_reroll_cost then
+						G.GAME.round_resets.temp_reroll_cost = nil
+						calculate_reroll_cost(true)
+					end
+
+					reset_idol_card()
+					reset_mail_rank()
+					reset_ancient_card()
+					reset_castle_card()
+					for k, v in ipairs(G.playing_cards) do
+						v.ability.discarded = nil
+						v.ability.forced_selection = nil
+					end
+					return true
+				end,
+			}))
+			return true
+		end,
+	}))
+end
+
+local start_run_ref = Game.start_run
+function Game:start_run(args)
+	if not G.LOBBY.connected or not G.LOBBY.code then
+		start_run_ref(self, args)
+		return
+	end
+
+	start_run_ref(self, args)
+
+	local scale = 0.4
+	local hud_ante = G.HUD:get_UIE_by_ID("hud_ante")
+	hud_ante.children[1].children[1].config.text = "Lives"
+
+	-- Set lives number
+	hud_ante.children[2].children[1].config.object = DynaText({
+		string = { { ref_table = G.MULTIPLAYER_GAME, ref_value = "lives" } },
+		colours = { G.C.IMPORTANT },
+		shadow = true,
+		font = G.LANGUAGES["en-us"].font,
+		scale = 2 * scale,
+	})
+
+	-- Remove unnecessary HUD elements
+	hud_ante.children[2].children[2] = nil
+	hud_ante.children[2].children[3] = nil
+	hud_ante.children[2].children[4] = nil
+
+	self.HUD:recalculate()
+end
+
+local create_UIBox_game_over_ref = create_UIBox_game_over
+function create_UIBox_game_over()
+	if G.LOBBY.code then
+		local eased_red = copy_table(G.GAME.round_resets.ante <= G.GAME.win_ante and G.C.RED or G.C.BLUE)
+		eased_red[4] = 0
+		ease_value(eased_red, 4, 0.8, nil, nil, true)
+		local t = create_UIBox_generic_options({
+			bg_colour = eased_red,
+			no_back = true,
+			padding = 0,
+			contents = {
+				{
+					n = G.UIT.R,
+					config = { align = "cm" },
+					nodes = {
+						{
+							n = G.UIT.O,
+							config = {
+								object = DynaText({
+									string = { localize("ph_game_over") },
+									colours = { G.C.RED },
+									shadow = true,
+									float = true,
+									scale = 1.5,
+									pop_in = 0.4,
+									maxw = 6.5,
+								}),
+							},
+						},
+					},
+				},
+				{
+					n = G.UIT.R,
+					config = { align = "cm", padding = 0.15 },
+					nodes = {
+						{
+							n = G.UIT.C,
+							config = { align = "cm" },
+							nodes = {
+								{
+									n = G.UIT.R,
+									config = {
+										align = "cm",
+										padding = 0.05,
+										colour = G.C.BLACK,
+										emboss = 0.05,
+										r = 0.1,
+									},
+									nodes = {
+										{
+											n = G.UIT.R,
+											config = { align = "cm", padding = 0.08 },
+											nodes = {
+												create_UIBox_round_scores_row("hand"),
+												create_UIBox_round_scores_row("poker_hand"),
+											},
+										},
+										{
+											n = G.UIT.R,
+											config = { align = "cm" },
+											nodes = {
+												{
+													n = G.UIT.C,
+													config = { align = "cm", padding = 0.08 },
+													nodes = {
+														create_UIBox_round_scores_row("cards_played", G.C.BLUE),
+														create_UIBox_round_scores_row("cards_discarded", G.C.RED),
+														create_UIBox_round_scores_row("cards_purchased", G.C.MONEY),
+														create_UIBox_round_scores_row("times_rerolled", G.C.GREEN),
+														create_UIBox_round_scores_row("new_collection", G.C.WHITE),
+														create_UIBox_round_scores_row("seed", G.C.WHITE),
+														UIBox_button({
+															button = "copy_seed",
+															label = { localize("b_copy") },
+															colour = G.C.BLUE,
+															scale = 0.3,
+															minw = 2.3,
+															minh = 0.4,
+															focus_args = { nav = "wide" },
+														}),
+													},
+												},
+												{
+													n = G.UIT.C,
+													config = { align = "tr", padding = 0.08 },
+													nodes = {
+														create_UIBox_round_scores_row("furthest_ante", G.C.FILTER),
+														create_UIBox_round_scores_row("furthest_round", G.C.FILTER),
+														create_UIBox_round_scores_row("defeated_by"),
+													},
+												},
+											},
+										},
+									},
+								},
+								{
+									n = G.UIT.R,
+									config = { align = "cm", padding = 0.1 },
+									nodes = {
+										{
+											n = G.UIT.R,
+											config = {
+												id = "from_game_over",
+												align = "cm",
+												minw = 5,
+												padding = 0.1,
+												r = 0.1,
+												hover = true,
+												colour = G.C.RED,
+												button = "return_to_lobby",
+												shadow = true,
+												focus_args = { nav = "wide", snap_to = true },
+											},
+											nodes = {
+												{
+													n = G.UIT.R,
+													config = { align = "cm", padding = 0, no_fill = true, maxw = 4.8 },
+													nodes = {
+														{
+															n = G.UIT.T,
+															config = {
+																text = "Return to Lobby",
+																scale = 0.5,
+																colour = G.C.UI.TEXT_LIGHT,
+															},
+														},
+													},
+												},
+											},
+										},
+										{
+											n = G.UIT.R,
+											config = {
+												align = "cm",
+												minw = 5,
+												padding = 0.1,
+												r = 0.1,
+												hover = true,
+												colour = G.C.RED,
+												button = "lobby_leave",
+												shadow = true,
+												focus_args = { nav = "wide" },
+											},
+											nodes = {
+												{
+													n = G.UIT.R,
+													config = { align = "cm", padding = 0, no_fill = true, maxw = 4.8 },
+													nodes = {
+														{
+															n = G.UIT.T,
+															config = {
+																text = "Leave Lobby",
+																scale = 0.5,
+																colour = G.C.UI.TEXT_LIGHT,
+															},
+														},
+													},
+												},
+											},
+										},
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+		})
+		t.nodes[1] = {
+			n = G.UIT.R,
+			config = { align = "cm", padding = 0.1 },
+			nodes = {
+				{
+					n = G.UIT.C,
+					config = { align = "cm", padding = 2 },
+					nodes = {
+						{
+							n = G.UIT.R,
+							config = { align = "cm" },
+							nodes = {
+								{
+									n = G.UIT.O,
+									config = {
+										padding = 0,
+										id = "jimbo_spot",
+										object = Moveable(0, 0, G.CARD_W * 1.1, G.CARD_H * 1.1),
+									},
+								},
+							},
+						},
+					},
+				},
+				{ n = G.UIT.C, config = { align = "cm", padding = 0.1 }, nodes = { t.nodes[1] } },
+			},
+		}
+
+		return t
+	end
+	return create_UIBox_game_over_ref()
+end
+
+local create_UIBox_win_ref = create_UIBox_win
+function create_UIBox_win()
+	if G.LOBBY.code then
+		local eased_green = copy_table(G.C.GREEN)
+		eased_green[4] = 0
+		ease_value(eased_green, 4, 0.5, nil, nil, true)
+		local t = create_UIBox_generic_options({
+			padding = 0,
+			bg_colour = eased_green,
+			colour = G.C.BLACK,
+			outline_colour = G.C.EDITION,
+			no_back = true,
+			no_esc = true,
+			contents = {
+				{
+					n = G.UIT.R,
+					config = { align = "cm" },
+					nodes = {
+						{
+							n = G.UIT.O,
+							config = {
+								object = DynaText({
+									string = { localize("ph_you_win") },
+									colours = { G.C.EDITION },
+									shadow = true,
+									float = true,
+									spacing = 10,
+									rotate = true,
+									scale = 1.5,
+									pop_in = 0.4,
+									maxw = 6.5,
+								}),
+							},
+						},
+					},
+				},
+				{
+					n = G.UIT.R,
+					config = { align = "cm", padding = 0.15 },
+					nodes = {
+						{
+							n = G.UIT.C,
+							config = { align = "cm" },
+							nodes = {
+								{
+									n = G.UIT.R,
+									config = { align = "cm", padding = 0.08 },
+									nodes = {
+										create_UIBox_round_scores_row("hand"),
+										create_UIBox_round_scores_row("poker_hand"),
+									},
+								},
+								{
+									n = G.UIT.R,
+									config = { align = "cm" },
+									nodes = {
+										{
+											n = G.UIT.C,
+											config = { align = "cm", padding = 0.08 },
+											nodes = {
+												create_UIBox_round_scores_row("cards_played", G.C.BLUE),
+												create_UIBox_round_scores_row("cards_discarded", G.C.RED),
+												create_UIBox_round_scores_row("cards_purchased", G.C.MONEY),
+												create_UIBox_round_scores_row("times_rerolled", G.C.GREEN),
+												create_UIBox_round_scores_row("new_collection", G.C.WHITE),
+												create_UIBox_round_scores_row("seed", G.C.WHITE),
+												UIBox_button({
+													button = "copy_seed",
+													label = { localize("b_copy") },
+													colour = G.C.BLUE,
+													scale = 0.3,
+													minw = 2.3,
+													minh = 0.4,
+												}),
+											},
+										},
+										{
+											n = G.UIT.C,
+											config = { align = "tr", padding = 0.08 },
+											nodes = {
+												create_UIBox_round_scores_row("furthest_ante", G.C.FILTER),
+												create_UIBox_round_scores_row("furthest_round", G.C.FILTER),
+												{
+													n = G.UIT.R,
+													config = { align = "cm", minh = 0.4, minw = 0.1 },
+													nodes = {},
+												},
+												UIBox_button({
+													id = "from_game_won",
+													button = "return_to_lobby",
+													label = { "Return to", "Lobby" },
+													minw = 2.5,
+													maxw = 2.5,
+													minh = 1,
+													focus_args = { nav = "wide", snap_to = true },
+												}) or nil,
+												{
+													n = G.UIT.R,
+													config = { align = "cm", minh = 0.2, minw = 0.1 },
+													nodes = {},
+												} or nil,
+												UIBox_button({
+													button = "lobby_leave",
+													label = { "Leave", "Lobby" },
+													minw = 2.5,
+													maxw = 2.5,
+													minh = 1,
+													focus_args = { nav = "wide" },
+												}) or nil,
+											},
+										},
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+		})
+		t.nodes[1] = {
+			n = G.UIT.R,
+			config = { align = "cm", padding = 0.1 },
+			nodes = {
+				{
+					n = G.UIT.C,
+					config = { align = "cm", padding = 2 },
+					nodes = {
+						{
+							n = G.UIT.O,
+							config = {
+								padding = 0,
+								id = "jimbo_spot",
+								object = Moveable(0, 0, G.CARD_W * 1.1, G.CARD_H * 1.1),
+							},
+						},
+					},
+				},
+				{ n = G.UIT.C, config = { align = "cm", padding = 0.1 }, nodes = { t.nodes[1] } },
+			},
+		}
+		t.config.id = "you_win_UI"
+		return t
+	end
+	return create_UIBox_win_ref()
+end
+
+local add_round_eval_row_ref = add_round_eval_row
+function add_round_eval_row(config)
+	if G.LOBBY.code and ((config.name == "blind1" and (is_pvp_boss() or G.GAME.blind.chips == -1 or (G.LOBBY.config.death_on_round_loss and G.GAME.blind.chips == -1))) or config.name == "comeback") then
+		local config = config or {}
+		local width = G.round_eval.T.w - 0.51
+		local num_dollars = config.dollars or 1
+		local scale = 0.9
+		delay(0.4)
+		G.E_MANAGER:add_event(Event({
+			trigger = "before",
+			delay = 0.5,
+			func = function()
+				--Add the far left text and context first:
+				local left_text = {}
+				if config.name == "blind1" then
+					local blind_sprite =
+						AnimatedSprite(0, 0, 1.2, 1.2, G.ANIMATION_ATLAS["blind_chips"], copy_table(G.GAME.blind.pos))
+					blind_sprite:define_draw_steps({
+						{ shader = "dissolve", shadow_height = 0.05 },
+						{ shader = "dissolve" },
+					})
+					table.insert(left_text, {
+						n = G.UIT.O,
+						config = { w = 1.2, h = 1.2, object = blind_sprite, hover = true, can_collide = false },
+					})
+
+					table.insert(left_text,
+						{
+							n = G.UIT.C,
+							config = { padding = 0.05, align = "cm" },
+							nodes = {
+								{
+									n = G.UIT.R,
+									config = { align = "cm" },
+									nodes = {
+										{
+											n = G.UIT.O,
+											config = {
+												object = DynaText({
+													string = { G.GAME.blind.chips == -1 and ((is_pvp_boss() or G.LOBBY.config.death_on_round_loss) and " Lost a Life " or " Failed ") or "Defeated the Enemy" },
+													colours = { G.C.FILTER },
+													shadow = true,
+													pop_in = 0,
+													scale = 0.5 * scale,
+													silent = true,
+												}),
+											},
+										},
+									},
+								},
+							},
+						})
+				elseif config.name == 'comeback' then
+					table.insert(left_text, {n=G.UIT.T, config={text = G.MULTIPLAYER_GAME.comeback_bonus, scale = 0.8*scale, colour = G.C.PURPLE, shadow = true, juice = true}})
+					table.insert(left_text, {n=G.UIT.O, config={object = DynaText({string = {" Total Lives Lost ($4 each)"}, colours = {G.C.UI.TEXT_LIGHT}, shadow = true, pop_in = 0, scale = 0.4*scale, silent = true})}})
+				end
+				local full_row = {
+					n = G.UIT.R,
+					config = { align = "cm", minw = 5 },
+					nodes = {
+						{
+							n = G.UIT.C,
+							config = { padding = 0.05, minw = width * 0.55, minh = 0.61, align = "cl" },
+							nodes = left_text,
+						},
+						{
+							n = G.UIT.C,
+							config = { padding = 0.05, minw = width * 0.45, align = "cr" },
+							nodes = {
+								{ n = G.UIT.C, config = { align = "cm", id = "dollar_" .. config.name }, nodes = {} },
+							},
+						},
+					},
+				}
+
+				if config.name == 'blind1' then
+					G.GAME.blind:juice_up()
+				end
+				G.round_eval:add_child(full_row, G.round_eval:get_UIE_by_ID(config.bonus and 'bonus_round_eval' or 'base_round_eval'))
+				play_sound("negative", (1.5 * config.pitch) or 1, 0.2)
+				play_sound("whoosh2", 0.9, 0.7)
+				if config.card then
+					config.card:juice_up(0.7, 0.46)
+				end
+				return true
+			end,
+		}))
+		local dollar_row = 0
+		if num_dollars > 60 then
+			G.E_MANAGER:add_event(Event({
+				trigger = "before",
+				delay = 0.38,
+				func = function()
+					G.round_eval:add_child({
+						n = G.UIT.R,
+						config = { align = "cm", id = "dollar_row_" .. (dollar_row + 1) .. "_" .. config.name },
+						nodes = {
+							{
+								n = G.UIT.O,
+								config = {
+									object = DynaText({
+										string = { localize("$") .. num_dollars },
+										colours = { G.C.MONEY },
+										shadow = true,
+										pop_in = 0,
+										scale = 0.65,
+										float = true,
+									}),
+								},
+							},
+						},
+					}, G.round_eval:get_UIE_by_ID("dollar_" .. config.name))
+
+					play_sound("coin3", 0.9 + 0.2 * math.random(), 0.7)
+					play_sound("coin6", 1.3, 0.8)
+					return true
+				end,
+			}))
+		else
+			for i = 1, num_dollars or 1 do
+				G.E_MANAGER:add_event(Event({
+					trigger = "before",
+					delay = 0.18 - ((num_dollars > 20 and 0.13) or (num_dollars > 9 and 0.1) or 0),
+					func = function()
+						if i % 30 == 1 then
+							G.round_eval:add_child({
+								n = G.UIT.R,
+								config = {
+									align = "cm",
+									id = "dollar_row_" .. (dollar_row + 1) .. "_" .. config.name,
+								},
+								nodes = {},
+							}, G.round_eval:get_UIE_by_ID("dollar_" .. config.name))
+							dollar_row = dollar_row + 1
+						end
+
+						local r = {
+							n = G.UIT.T,
+							config = {
+								text = localize("$"),
+								colour = G.C.MONEY,
+								scale = ((num_dollars > 20 and 0.28) or (num_dollars > 9 and 0.43) or 0.58),
+								shadow = true,
+								hover = true,
+								can_collide = false,
+								juice = true,
+							},
+						}
+						play_sound("coin3", 0.9 + 0.2 * math.random(), 0.7 - (num_dollars > 20 and 0.2 or 0))
+
+						if config.name == "blind1" then
+							G.GAME.current_round.dollars_to_be_earned = G.GAME.current_round.dollars_to_be_earned:sub(2)
+						end
+
+						G.round_eval:add_child(
+							r,
+							G.round_eval:get_UIE_by_ID("dollar_row_" .. dollar_row .. "_" .. config.name)
+						)
+						G.VIBRATION = G.VIBRATION + 0.4
+						return true
+					end,
+				}))
+			end
+		end
+	else
+		add_round_eval_row_ref(config)
+	end
+end
+
+G.FUNCS.evaluate_round = function()
+	local pitch = 0.95
+	local dollars = 0
+
+	if G.GAME.chips - G.GAME.blind.chips >= 0 then
+			add_round_eval_row({dollars = G.GAME.blind.dollars, name='blind1', pitch = pitch})
+			pitch = pitch + 0.06
+			dollars = dollars + G.GAME.blind.dollars
+	else
+			add_round_eval_row({dollars = 0, name='blind1', pitch = pitch, saved = true})
+			pitch = pitch + 0.06
+	end
+
+	G.E_MANAGER:add_event(Event({
+			trigger = 'before',
+			delay = 1.3*math.min(G.GAME.blind.dollars+2, 7)/2*0.15 + 0.5,
+			func = function()
+				G.GAME.blind:defeat()
+				return true
+			end
+		}))
+	delay(0.2)
+	G.E_MANAGER:add_event(Event({
+			func = function()
+					ease_background_colour_blind(G.STATES.ROUND_EVAL, '')
+					return true
+			end
+	}))
+	G.GAME.selected_back:trigger_effect({context = 'eval'})
+
+	if G.GAME.current_round.hands_left > 0 and not G.GAME.modifiers.no_extra_hand_money then
+			add_round_eval_row({dollars = G.GAME.current_round.hands_left*(G.GAME.modifiers.money_per_hand or 1), disp = G.GAME.current_round.hands_left, bonus = true, name='hands', pitch = pitch})
+			pitch = pitch + 0.06
+			dollars = dollars + G.GAME.current_round.hands_left*(G.GAME.modifiers.money_per_hand or 1)
+	end
+	if G.GAME.current_round.discards_left > 0 and G.GAME.modifiers.money_per_discard then
+			add_round_eval_row({dollars = G.GAME.current_round.discards_left*(G.GAME.modifiers.money_per_discard), disp = G.GAME.current_round.discards_left, bonus = true, name='discards', pitch = pitch})
+			pitch = pitch + 0.06
+			dollars = dollars +  G.GAME.current_round.discards_left*(G.GAME.modifiers.money_per_discard)
+	end
+	for i = 1, #G.jokers.cards do
+			local ret = G.jokers.cards[i]:calculate_dollar_bonus()
+			if ret then
+					add_round_eval_row({dollars = ret, bonus = true, name='joker'..i, pitch = pitch, card = G.jokers.cards[i]})
+					pitch = pitch + 0.06
+					dollars = dollars + ret
+			end
+	end
+	for i = 1, #G.GAME.tags do
+			local ret = G.GAME.tags[i]:apply_to_run({type = 'eval'})
+			if ret then
+					add_round_eval_row({dollars = ret.dollars, bonus = true, name='tag'..i, pitch = pitch, condition = ret.condition, pos = ret.pos, tag = ret.tag})
+					pitch = pitch + 0.06
+					dollars = dollars + ret.dollars
+			end
+	end
+	if G.GAME.dollars >= 5 and not G.GAME.modifiers.no_interest then
+			add_round_eval_row({bonus = true, name='interest', pitch = pitch, dollars = G.GAME.interest_amount*math.min(math.floor(G.GAME.dollars/5), G.GAME.interest_cap/5)})
+			pitch = pitch + 0.06
+			if not G.GAME.seeded and not G.GAME.challenge then
+					if G.GAME.interest_amount*math.min(math.floor(G.GAME.dollars/5), G.GAME.interest_cap/5) == G.GAME.interest_amount*G.GAME.interest_cap/5 then 
+							G.PROFILES[G.SETTINGS.profile].career_stats.c_round_interest_cap_streak = G.PROFILES[G.SETTINGS.profile].career_stats.c_round_interest_cap_streak + 1
+					else
+							G.PROFILES[G.SETTINGS.profile].career_stats.c_round_interest_cap_streak = 0
+					end
+			end
+			check_for_unlock({type = 'interest_streak'})
+			dollars = dollars + G.GAME.interest_amount*math.min(math.floor(G.GAME.dollars/5), G.GAME.interest_cap/5)
+	end
+	if not G.MULTIPLAYER_GAME.comeback_bonus_given then
+		G.MULTIPLAYER_GAME.comeback_bonus_given = true
+		add_round_eval_row({bonus = true, name='comeback', pitch = pitch, dollars = 4*G.MULTIPLAYER_GAME.comeback_bonus})
+		dollars = dollars + 4*G.MULTIPLAYER_GAME.comeback_bonus
+	end
+
+	pitch = pitch + 0.06
+
+	add_round_eval_row({name = 'bottom', dollars = dollars})
+end
+
+local ease_ante_ref = ease_ante
+function ease_ante(mod)
+	G.MULTIPLAYER.set_ante(G.GAME.round_resets.ante + mod)
+	if not G.LOBBY.code then
+		return ease_ante_ref(mod)
+	end
+	G.E_MANAGER:add_event(Event({
+		trigger = "immediate",
+		func = function()
+			G.GAME.round_resets.ante = G.GAME.round_resets.ante + mod
+			check_and_set_high_score("furthest_ante", G.GAME.round_resets.ante)
+			return true
+		end,
+	}))
+end
+
+function ease_lives(mod)
+	G.E_MANAGER:add_event(Event({
+		trigger = "immediate",
+		func = function()
+			if not G.hand_text_area then return end
+			local lives_UI = G.hand_text_area.ante
+			mod = mod or 0
+			local text = "+"
+			local col = G.C.IMPORTANT
+			if mod < 0 then
+				text = "-"
+				col = G.C.RED
+			end
+			lives_UI.config.object:update()
+			G.HUD:recalculate()
+			attention_text({
+				text = text .. tostring(math.abs(mod)),
+				scale = 1,
+				hold = 0.7,
+				cover = lives_UI.parent,
+				cover_colour = col,
+				align = "cm",
+			})
+			play_sound("highlight2", 0.685, 0.2)
+			play_sound("generic1")
+			return true
+		end,
+	}))
+end
+
+local update_blind_select_ref = Game.update_blind_select
+function Game:update_blind_select(dt)
+	if G.MULTIPLAYER_GAME.loaded_ante == G.GAME.round_resets.ante or not G.LOBBY.code then
+		update_blind_select_ref(self, dt)
+	elseif not G.MULTIPLAYER.loading_blinds then
+		G.MULTIPLAYER.loading_blinds = true
+		G.MULTIPLAYER.game_info()
+	end
+end
+
+local exit_overlay_menu_ref = G.FUNCS.exit_overlay_menu
+---@diagnostic disable-next-line: duplicate-set-field
+function G.FUNCS:exit_overlay_menu()
+	-- Saves username if user presses ESC instead of Enter
+	if G.OVERLAY_MENU:get_UIE_by_ID("username_input_box") ~= nil then
+		Utils.save_username(G.LOBBY.username)
+	end
+
+	exit_overlay_menu_ref(self)
+end
+
+local mods_button_ref = G.FUNCS.mods_button
+function G.FUNCS.mods_button(arg_736_0)
+	if G.OVERLAY_MENU and G.OVERLAY_MENU:get_UIE_by_ID("username_input_box") ~= nil then
+		Utils.save_username(G.LOBBY.username)
+	end
+
+	mods_button_ref(arg_736_0)
+end
+
+-- Rewritten from the original function to fix typing issues causing crashes
+function get_new_boss()
+	G.GAME.perscribed_bosses = G.GAME.perscribed_bosses or {}
+	if G.GAME.perscribed_bosses and G.GAME.perscribed_bosses[G.GAME.round_resets.ante] then 
+			local ret_boss = G.GAME.perscribed_bosses[G.GAME.round_resets.ante] 
+			G.GAME.perscribed_bosses[G.GAME.round_resets.ante] = nil
+			G.GAME.bosses_used[ret_boss] = G.GAME.bosses_used[ret_boss] + 1
+			return ret_boss
+	end
+	if G.FORCE_BOSS then return G.FORCE_BOSS end
+	
+	local eligible_bosses = {}
+	for k, v in pairs(G.P_BLINDS) do
+			if v.boss then
+					local condition = v.boss.showdown and (G.GAME.round_resets.ante)%G.GAME.win_ante == 0 and G.GAME.round_resets.ante >= 2
+					or not v.boss.showdown and (v.boss.min <= math.max(1, G.GAME.round_resets.ante) and ((math.max(1, G.GAME.round_resets.ante))%G.GAME.win_ante ~= 0 or G.GAME.round_resets.ante < 2))
+					if condition then
+							eligible_bosses[k] = true
+					end
+			end
+	end
+
+	local min_use = 100
+	local bosses_with_min_use = {}
+	for k, _ in pairs(eligible_bosses) do
+			local uses = G.GAME.bosses_used[k] or 0
+			if uses <= min_use then
+					if uses < min_use then
+							bosses_with_min_use = {}
+							min_use = uses
+					end
+					bosses_with_min_use[k] = true
+			end
+	end
+
+	local _, boss = pseudorandom_element(bosses_with_min_use, pseudoseed('boss'))
+	G.GAME.bosses_used[boss] = (G.GAME.bosses_used[boss] or 0) + 1
+	
+	return boss
+end
+
+
+local get_new_boss_ref = get_new_boss
+function get_new_boss(force_change)
+	if G.LOBBY.code and G.GAME.round_resets.blind_choices.Boss and not force_change then
+		return G.GAME.round_resets.blind_choices.Boss
+	end
+	local boss = get_new_boss_ref()
+	while boss == "bl_pvp" do
+		boss = get_new_boss_ref()
+	end
+	return boss
+end
+
+G.FUNCS.can_skip_booster = function(e)
+	if G.pack_cards and G.pack_cards.cards and G.pack_cards.cards[1] and 
+	(G.STATE == G.STATES.PLANET_PACK or G.STATE == G.STATES.STANDARD_PACK or G.STATE == G.STATES.BUFFOON_PACK or (G.hand and G.hand.cards[1])) then 
+			e.config.colour = G.C.GREY
+			e.config.button = 'skip_booster'
+	else
+		e.config.colour = G.C.UI.BACKGROUND_INACTIVE
+		e.config.button = nil
+	end
+end
+
+local update_selecting_hand_ref = Game.update_selecting_hand
+function Game:update_selecting_hand(dt)
+	update_selecting_hand_ref(self, dt)
+	if G.MULTIPLAYER_GAME.end_pvp then
+		G.STATE_COMPLETE = false
+		G.STATE = G.STATES.NEW_ROUND
+		G.MULTIPLAYER_GAME.end_pvp = false
+	end
+end
+
+local can_open_ref = G.FUNCS.can_open
+G.FUNCS.can_open = function(e)
+  if G.MULTIPLAYER_GAME.ready_blind then
+		e.config.colour = G.C.UI.BACKGROUND_INACTIVE
+		e.config.button = nil
+		return
+	end
+	can_open_ref(e)
+end
+
+local blind_disable_ref = Blind.disable
+function Blind:disable()
+	if is_pvp_boss() then
+		return
+	end
+	blind_disable_ref(self)
+end
 ----------------------------------------------
 ------------MOD GAME UI END-------------------
