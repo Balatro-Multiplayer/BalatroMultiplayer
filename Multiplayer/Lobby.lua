@@ -4,6 +4,8 @@
 ----------------------------------------------
 ------------MOD LOBBY-------------------------
 
+local Utils = require "Utils"
+
 G.MULTIPLAYER = {}
 
 G.LOBBY = {
@@ -73,7 +75,23 @@ function G.MULTIPLAYER.update_connection_status()
 		G.F_NO_ACHIEVEMENTS = true
 	else
 		-- Restore them when disconnected
-		G.F_NO_ACHIEVEMENTS = PREV_ACHIEVEMENT_VALUE
+		G.F_NO_ACHIEVEMENTS = START_NO_ACHIEVEMENT_VALUE
+	end
+
+	-- Game does not have locatization, and therefore does not support steam_display, status, or text right now, but we can hope
+	-- steam_player_group and steam_player_group_size is functional
+	if G.LOBBY.code then
+		G.STEAM.friends.setRichPresence('steam_display', '#FullStatus')
+		G.STEAM.friends.setRichPresence('status', '#FullStatus')
+		G.STEAM.friends.setRichPresence('text', 'In Multiplayer Lobby')
+		G.STEAM.friends.setRichPresence('steam_player_group', G.LOBBY.code)
+		G.STEAM.friends.setRichPresence('steam_player_group_size', G.LOBBY.guest.username and '2' or '1')
+	else 
+		G.STEAM.friends.setRichPresence('steam_display', '#FullStatus')
+		G.STEAM.friends.setRichPresence('status', '#FullStatus')
+		G.STEAM.friends.setRichPresence('text', 'Using Multiplayer Mod')
+		G.STEAM.friends.setRichPresence('steam_player_group', '')
+		G.STEAM.friends.setRichPresence('steam_player_group_size', '')
 	end
 
 	if G.HUD_connection_status then

@@ -1,10 +1,8 @@
 # A Balatro Multiplayer Mod
 
-This is an WIP Balatro multiplayer mod developed by virtualized.
+This is an **WIP** Balatro multiplayer mod developed by virtualized and TGMM.
 
-**Discord:** virtualized
-
-**Twitter:** @v_rtualized
+If you want to get in touch for any reason add `virtualized` on discord or send an email to `v@virtualized.dev`.
 
 This project will remain free and open source. It will also be continuously maintained, at least within the near future.
 
@@ -12,8 +10,8 @@ If you make a video or stream Balatro using this mod then feel free to send me a
 
 ## Goals for First Release
 
-- Some form of public server available, or a user friendly method to create a server
-  - This was originally to us Steam servers but that doesn't seem to be an options unfortunately
+- A public server everyone will connect to by default
+  - We may support private servers but probably won't be making an non-programmer friendly way of making one (eg. Basic knowledge of Docker and port forwarding)
 - At least 2 out of 4 planned game modes implemented
 
 ## Planned Gamemodes
@@ -49,7 +47,7 @@ If you make a video or stream Balatro using this mod then feel free to send me a
 
 ### 3. Set `Config.lua`
 
-- If there is no `Config.lua` file in the Multiplayer folder, then there is no public server, you need to either [Create a Dedicated Server](#creating-a-dedicated-server) or have a friend that does.
+- If there is no `Config.lua` file in the Multiplayer folder, then there is no public server yet, you need to either [Create a Dedicated Server](#creating-a-dedicated-server) or have a friend that does.
 - The `example.Config.lua` file does nothing and is just there for you to use as a Config template 
   - ie. when you have a dedicated server to connect to, rename this file to `Config.lua` and change the values
 
