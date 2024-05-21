@@ -25,6 +25,7 @@ class Lobby {
 	gameMode: GameMode;
 	// biome-ignore lint/suspicious/noExplicitAny: 
 	options: { [key: string]: any };
+	roundProcessed: boolean;
 
 	// Attrition is the default game mode
 	constructor(host: Client, gameMode: GameMode = "attrition") {
@@ -37,6 +38,7 @@ class Lobby {
 		this.guest = null;
 		this.gameMode = gameMode;
 		this.options = {};
+		this.roundProcessed = false;
 
 		host.setLobby(this);
 		host.sendAction({

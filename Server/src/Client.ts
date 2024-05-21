@@ -28,6 +28,8 @@ class Client {
 	handsLeft = 4
 	ante = 1
 
+	livesBlocker = false
+
 	constructor(address: Address, send: SendFn, closeConnection: CloseConnFn) {
 		this.id = uuidv4()
 		this.address = address
@@ -42,6 +44,18 @@ class Client {
 
 	setLobby = (lobby: Lobby | null) => {
 		this.lobby = lobby
+	}
+
+	resetBlocker = () => {
+		this.livesBlocker = false
+	}
+
+	loseLife = () => {
+		if (!this.livesBlocker) {
+			this.lives -= 1
+			this.livesBlocker = true
+			this.sendAction({ action: "playerInfo", lives: this.lives });
+		}
 	}
 }
 
