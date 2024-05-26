@@ -854,7 +854,6 @@ function Game:update_hand_played(dt)
 	if G.MULTIPLAYER_GAME.end_pvp then
 		G.STATE_COMPLETE = false
 		G.STATE = G.STATES.NEW_ROUND
-		G.MULTIPLAYER_GAME.end_pvp = false
 	end
 end
 
