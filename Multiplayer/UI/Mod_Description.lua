@@ -1,6 +1,3 @@
---- STEAMODDED HEADER
---- STEAMODDED SECONDARY FILE
-
 ----------------------------------------------
 ------------MOD DESCRIPTION-------------------
 

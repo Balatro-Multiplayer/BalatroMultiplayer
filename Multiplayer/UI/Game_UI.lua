@@ -1,6 +1,3 @@
---- STEAMODDED HEADER
---- STEAMODDED SECONDARY FILE
-
 ----------------------------------------------
 ------------MOD GAME UI-----------------------
 
@@ -869,7 +866,7 @@ end
 
 local update_new_round_ref = Game.update_new_round
 function Game:update_new_round(dt)
-	if G.LOBBY.code then
+	if G.LOBBY.code and not G.STATE_COMPLETE then
 		-- Prevent player from losing
 		if G.GAME.chips - G.GAME.blind.chips < 0 then
 			G.GAME.blind.chips = -1
