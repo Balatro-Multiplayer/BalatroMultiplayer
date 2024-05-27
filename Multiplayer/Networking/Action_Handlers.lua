@@ -245,7 +245,7 @@ function G.MULTIPLAYER.connect()
 end
 
 local function string_to_table(str)
-  local tbl = {}
+	local tbl = {}
 	for part in string.gmatch(str, "([^,]+)") do
 		local key, value = string.match(part, "([^:]+):(.+)")
 		if key and value then

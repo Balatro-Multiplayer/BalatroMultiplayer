@@ -169,7 +169,7 @@ function create_UIBox_blind_choice(type, run_info)
 				pseudorandom_element(_poker_hands, pseudoseed("orbital"))
 		end
 
-		if G.GAME.round_resets.blind_choices[type] == 'bl_pvp' then
+		if G.GAME.round_resets.blind_choices[type] == "bl_pvp" then
 			local dt1 = DynaText({
 				string = { { string = "LIFE", colour = G.C.FILTER } },
 				colours = { G.C.BLACK },
@@ -733,67 +733,96 @@ function G.UIDEF.shop()
 end
 
 local function eval_hand_and_jokers()
-	for i=1, #G.hand.cards do
+	for i = 1, #G.hand.cards do
 		--Check for hand doubling
-		local reps = {1}
+		local reps = { 1 }
 		local j = 1
 		while j <= #reps do
-				local percent = (i-0.999)/(#G.hand.cards-0.998) + (j-1)*0.1
-				if reps[j] ~= 1 then card_eval_status_text((reps[j].jokers or reps[j].seals).card, 'jokers', nil, nil, nil, (reps[j].jokers or reps[j].seals)) end
+			local percent = (i - 0.999) / (#G.hand.cards - 0.998) + (j - 1) * 0.1
+			if reps[j] ~= 1 then
+				card_eval_status_text(
+					(reps[j].jokers or reps[j].seals).card,
+					"jokers",
+					nil,
+					nil,
+					nil,
+					(reps[j].jokers or reps[j].seals)
+				)
+			end
 
-				--calculate the hand effects
-				local effects = {G.hand.cards[i]:get_end_of_round_effect()}
-				for k=1, #G.jokers.cards do
-						--calculate the joker individual card effects
-						local eval = G.jokers.cards[k]:calculate_joker({cardarea = G.hand, other_card = G.hand.cards[i], individual = true, end_of_round = true})
-						if eval then 
-								table.insert(effects, eval)
-						end
+			--calculate the hand effects
+			local effects = { G.hand.cards[i]:get_end_of_round_effect() }
+			for k = 1, #G.jokers.cards do
+				--calculate the joker individual card effects
+				local eval = G.jokers.cards[k]:calculate_joker({
+					cardarea = G.hand,
+					other_card = G.hand.cards[i],
+					individual = true,
+					end_of_round = true,
+				})
+				if eval then
+					table.insert(effects, eval)
+				end
+			end
+
+			if reps[j] == 1 then
+				--Check for hand doubling
+				--From Red seal
+				local eval = eval_card(
+					G.hand.cards[i],
+					{ end_of_round = true, cardarea = G.hand, repetition = true, repetition_only = true }
+				)
+				if next(eval) and (next(effects[1]) or #effects > 1) then
+					for h = 1, eval.seals.repetitions do
+						reps[#reps + 1] = eval
+					end
 				end
 
-				if reps[j] == 1 then 
-						--Check for hand doubling
-						--From Red seal
-						local eval = eval_card(G.hand.cards[i], {end_of_round = true,cardarea = G.hand, repetition = true, repetition_only = true})
-						if next(eval) and (next(effects[1]) or #effects > 1)  then 
-								for h = 1, eval.seals.repetitions do
-										reps[#reps+1] = eval
-								end
+				--from Jokers
+				for j = 1, #G.jokers.cards do
+					--calculate the joker effects
+					local eval = eval_card(
+						G.jokers.cards[j],
+						{
+							cardarea = G.hand,
+							other_card = G.hand.cards[i],
+							repetition = true,
+							end_of_round = true,
+							card_effects = effects,
+						}
+					)
+					if next(eval) then
+						for h = 1, eval.jokers.repetitions do
+							reps[#reps + 1] = eval
 						end
+					end
+				end
+			end
 
-						--from Jokers
-						for j=1, #G.jokers.cards do
-								--calculate the joker effects
-								local eval = eval_card(G.jokers.cards[j], {cardarea = G.hand, other_card = G.hand.cards[i], repetition = true, end_of_round = true, card_effects = effects})
-								if next(eval) then 
-										for h  = 1, eval.jokers.repetitions do
-												reps[#reps+1] = eval
-										end
-								end
-						end
+			for ii = 1, #effects do
+				--if this effect came from a joker
+				if effects[ii].card then
+					G.E_MANAGER:add_event(Event({
+						trigger = "immediate",
+						func = function()
+							effects[ii].card:juice_up(0.7)
+							return true
+						end,
+					}))
 				end
 
-				for ii = 1, #effects do
-						--if this effect came from a joker
-						if effects[ii].card then
-								G.E_MANAGER:add_event(Event({
-										trigger = 'immediate',
-										func = (function() effects[ii].card:juice_up(0.7);return true end)
-								}))
-						end
-						
-						--If dollars
-						if effects[ii].h_dollars then 
-								ease_dollars(effects[ii].h_dollars)
-								card_eval_status_text(G.hand.cards[i], 'dollars', effects[ii].h_dollars, percent)
-						end
-
-						--Any extras
-						if effects[ii].extra then
-								card_eval_status_text(G.hand.cards[i], 'extra', nil, percent, nil, effects[ii].extra)
-						end
+				--If dollars
+				if effects[ii].h_dollars then
+					ease_dollars(effects[ii].h_dollars)
+					card_eval_status_text(G.hand.cards[i], "dollars", effects[ii].h_dollars, percent)
 				end
-				j = j + 1
+
+				--Any extras
+				if effects[ii].extra then
+					card_eval_status_text(G.hand.cards[i], "extra", nil, percent, nil, effects[ii].extra)
+				end
+			end
+			j = j + 1
 		end
 	end
 end
@@ -1056,9 +1085,15 @@ function end_round()
 					G.STATE = G.STATES.ROUND_EVAL
 					G.STATE_COMPLETE = false
 
-					if G.GAME.round_resets.blind_states.Small ~= "Defeated" and G.GAME.round_resets.blind_states.Small ~= "Skipped" then
+					if
+						G.GAME.round_resets.blind_states.Small ~= "Defeated"
+						and G.GAME.round_resets.blind_states.Small ~= "Skipped"
+					then
 						G.GAME.round_resets.blind_states.Small = "Defeated"
-					elseif G.GAME.round_resets.blind_states.Big ~= "Defeated" and G.GAME.round_resets.blind_states.Big ~= "Skipped" then
+					elseif
+						G.GAME.round_resets.blind_states.Big ~= "Defeated"
+						and G.GAME.round_resets.blind_states.Big ~= "Skipped"
+					then
 						G.GAME.round_resets.blind_states.Big = "Defeated"
 					else
 						G.GAME.current_round.voucher = get_next_voucher_key()
@@ -1472,7 +1507,19 @@ end
 
 local add_round_eval_row_ref = add_round_eval_row
 function add_round_eval_row(config)
-	if G.LOBBY.code and ((config.name == "blind1" and (is_pvp_boss() or G.GAME.blind.chips == -1 or (G.LOBBY.config.death_on_round_loss and G.GAME.blind.chips == -1))) or config.name == "comeback") then
+	if
+		G.LOBBY.code
+		and (
+			(
+				config.name == "blind1"
+				and (
+					is_pvp_boss()
+					or G.GAME.blind.chips == -1
+					or (G.LOBBY.config.death_on_round_loss and G.GAME.blind.chips == -1)
+				)
+			) or config.name == "comeback"
+		)
+	then
 		local config = config or {}
 		local width = G.round_eval.T.w - 0.51
 		local num_dollars = config.dollars or 1
@@ -1496,35 +1543,65 @@ function add_round_eval_row(config)
 						config = { w = 1.2, h = 1.2, object = blind_sprite, hover = true, can_collide = false },
 					})
 
-					table.insert(left_text,
-						{
-							n = G.UIT.C,
-							config = { padding = 0.05, align = "cm" },
-							nodes = {
-								{
-									n = G.UIT.R,
-									config = { align = "cm" },
-									nodes = {
-										{
-											n = G.UIT.O,
-											config = {
-												object = DynaText({
-													string = { G.GAME.blind.chips == -1 and ((is_pvp_boss() or G.LOBBY.config.death_on_round_loss) and " Lost a Life " or " Failed ") or "Defeated the Enemy" },
-													colours = { G.C.FILTER },
-													shadow = true,
-													pop_in = 0,
-													scale = 0.5 * scale,
-													silent = true,
-												}),
-											},
+					table.insert(left_text, {
+						n = G.UIT.C,
+						config = { padding = 0.05, align = "cm" },
+						nodes = {
+							{
+								n = G.UIT.R,
+								config = { align = "cm" },
+								nodes = {
+									{
+										n = G.UIT.O,
+										config = {
+											object = DynaText({
+												string = {
+													G.GAME.blind.chips == -1
+															and ((is_pvp_boss() or G.LOBBY.config.death_on_round_loss) and " Lost a Life " or " Failed ")
+														or "Defeated the Enemy",
+												},
+												colours = { G.C.FILTER },
+												shadow = true,
+												pop_in = 0,
+												scale = 0.5 * scale,
+												silent = true,
+											}),
 										},
 									},
 								},
 							},
-						})
-				elseif config.name == 'comeback' then
-					table.insert(left_text, {n=G.UIT.T, config={text = G.MULTIPLAYER_GAME.comeback_bonus, scale = 0.8*scale, colour = G.C.PURPLE, shadow = true, juice = true}})
-					table.insert(left_text, {n=G.UIT.O, config={object = DynaText({string = {" Total Lives Lost ($4 each)"}, colours = {G.C.UI.TEXT_LIGHT}, shadow = true, pop_in = 0, scale = 0.4*scale, silent = true})}})
+						},
+					})
+				elseif config.name == "comeback" then
+					table.insert(
+						left_text,
+						{
+							n = G.UIT.T,
+							config = {
+								text = G.MULTIPLAYER_GAME.comeback_bonus,
+								scale = 0.8 * scale,
+								colour = G.C.PURPLE,
+								shadow = true,
+								juice = true,
+							},
+						}
+					)
+					table.insert(
+						left_text,
+						{
+							n = G.UIT.O,
+							config = {
+								object = DynaText({
+									string = { " Total Lives Lost ($4 each)" },
+									colours = { G.C.UI.TEXT_LIGHT },
+									shadow = true,
+									pop_in = 0,
+									scale = 0.4 * scale,
+									silent = true,
+								}),
+							},
+						}
+					)
 				end
 				local full_row = {
 					n = G.UIT.R,
@@ -1545,10 +1622,13 @@ function add_round_eval_row(config)
 					},
 				}
 
-				if config.name == 'blind1' then
+				if config.name == "blind1" then
 					G.GAME.blind:juice_up()
 				end
-				G.round_eval:add_child(full_row, G.round_eval:get_UIE_by_ID(config.bonus and 'bonus_round_eval' or 'base_round_eval'))
+				G.round_eval:add_child(
+					full_row,
+					G.round_eval:get_UIE_by_ID(config.bonus and "bonus_round_eval" or "base_round_eval")
+				)
 				play_sound("negative", (1.5 * config.pitch) or 1, 0.2)
 				play_sound("whoosh2", 0.9, 0.7)
 				if config.card then
@@ -1644,79 +1724,113 @@ G.FUNCS.evaluate_round = function()
 	local dollars = 0
 
 	if G.GAME.chips - G.GAME.blind.chips >= 0 then
-			add_round_eval_row({dollars = G.GAME.blind.dollars, name='blind1', pitch = pitch})
-			pitch = pitch + 0.06
-			dollars = dollars + G.GAME.blind.dollars
+		add_round_eval_row({ dollars = G.GAME.blind.dollars, name = "blind1", pitch = pitch })
+		pitch = pitch + 0.06
+		dollars = dollars + G.GAME.blind.dollars
 	else
-			add_round_eval_row({dollars = 0, name='blind1', pitch = pitch, saved = true})
-			pitch = pitch + 0.06
+		add_round_eval_row({ dollars = 0, name = "blind1", pitch = pitch, saved = true })
+		pitch = pitch + 0.06
 	end
 
 	G.E_MANAGER:add_event(Event({
-			trigger = 'before',
-			delay = 1.3*math.min(G.GAME.blind.dollars+2, 7)/2*0.15 + 0.5,
-			func = function()
-				G.GAME.blind:defeat()
-				return true
-			end
-		}))
+		trigger = "before",
+		delay = 1.3 * math.min(G.GAME.blind.dollars + 2, 7) / 2 * 0.15 + 0.5,
+		func = function()
+			G.GAME.blind:defeat()
+			return true
+		end,
+	}))
 	delay(0.2)
 	G.E_MANAGER:add_event(Event({
-			func = function()
-					ease_background_colour_blind(G.STATES.ROUND_EVAL, '')
-					return true
-			end
+		func = function()
+			ease_background_colour_blind(G.STATES.ROUND_EVAL, "")
+			return true
+		end,
 	}))
-	G.GAME.selected_back:trigger_effect({context = 'eval'})
+	G.GAME.selected_back:trigger_effect({ context = "eval" })
 
 	if G.GAME.current_round.hands_left > 0 and not G.GAME.modifiers.no_extra_hand_money then
-			add_round_eval_row({dollars = G.GAME.current_round.hands_left*(G.GAME.modifiers.money_per_hand or 1), disp = G.GAME.current_round.hands_left, bonus = true, name='hands', pitch = pitch})
-			pitch = pitch + 0.06
-			dollars = dollars + G.GAME.current_round.hands_left*(G.GAME.modifiers.money_per_hand or 1)
+		add_round_eval_row({
+			dollars = G.GAME.current_round.hands_left * (G.GAME.modifiers.money_per_hand or 1),
+			disp = G.GAME.current_round.hands_left,
+			bonus = true,
+			name = "hands",
+			pitch = pitch,
+		})
+		pitch = pitch + 0.06
+		dollars = dollars + G.GAME.current_round.hands_left * (G.GAME.modifiers.money_per_hand or 1)
 	end
 	if G.GAME.current_round.discards_left > 0 and G.GAME.modifiers.money_per_discard then
-			add_round_eval_row({dollars = G.GAME.current_round.discards_left*(G.GAME.modifiers.money_per_discard), disp = G.GAME.current_round.discards_left, bonus = true, name='discards', pitch = pitch})
-			pitch = pitch + 0.06
-			dollars = dollars +  G.GAME.current_round.discards_left*(G.GAME.modifiers.money_per_discard)
+		add_round_eval_row({
+			dollars = G.GAME.current_round.discards_left * G.GAME.modifiers.money_per_discard,
+			disp = G.GAME.current_round.discards_left,
+			bonus = true,
+			name = "discards",
+			pitch = pitch,
+		})
+		pitch = pitch + 0.06
+		dollars = dollars + G.GAME.current_round.discards_left * G.GAME.modifiers.money_per_discard
 	end
 	for i = 1, #G.jokers.cards do
-			local ret = G.jokers.cards[i]:calculate_dollar_bonus()
-			if ret then
-					add_round_eval_row({dollars = ret, bonus = true, name='joker'..i, pitch = pitch, card = G.jokers.cards[i]})
-					pitch = pitch + 0.06
-					dollars = dollars + ret
-			end
+		local ret = G.jokers.cards[i]:calculate_dollar_bonus()
+		if ret then
+			add_round_eval_row({ dollars = ret, bonus = true, name = "joker" .. i, pitch = pitch, card = G.jokers.cards[i] })
+			pitch = pitch + 0.06
+			dollars = dollars + ret
+		end
 	end
 	for i = 1, #G.GAME.tags do
-			local ret = G.GAME.tags[i]:apply_to_run({type = 'eval'})
-			if ret then
-					add_round_eval_row({dollars = ret.dollars, bonus = true, name='tag'..i, pitch = pitch, condition = ret.condition, pos = ret.pos, tag = ret.tag})
-					pitch = pitch + 0.06
-					dollars = dollars + ret.dollars
-			end
+		local ret = G.GAME.tags[i]:apply_to_run({ type = "eval" })
+		if ret then
+			add_round_eval_row({
+				dollars = ret.dollars,
+				bonus = true,
+				name = "tag" .. i,
+				pitch = pitch,
+				condition = ret.condition,
+				pos = ret.pos,
+				tag = ret.tag,
+			})
+			pitch = pitch + 0.06
+			dollars = dollars + ret.dollars
+		end
 	end
 	if G.GAME.dollars >= 5 and not G.GAME.modifiers.no_interest then
-			add_round_eval_row({bonus = true, name='interest', pitch = pitch, dollars = G.GAME.interest_amount*math.min(math.floor(G.GAME.dollars/5), G.GAME.interest_cap/5)})
-			pitch = pitch + 0.06
-			if not G.GAME.seeded and not G.GAME.challenge then
-					if G.GAME.interest_amount*math.min(math.floor(G.GAME.dollars/5), G.GAME.interest_cap/5) == G.GAME.interest_amount*G.GAME.interest_cap/5 then 
-							G.PROFILES[G.SETTINGS.profile].career_stats.c_round_interest_cap_streak = G.PROFILES[G.SETTINGS.profile].career_stats.c_round_interest_cap_streak + 1
-					else
-							G.PROFILES[G.SETTINGS.profile].career_stats.c_round_interest_cap_streak = 0
-					end
+		add_round_eval_row({
+			bonus = true,
+			name = "interest",
+			pitch = pitch,
+			dollars = G.GAME.interest_amount * math.min(math.floor(G.GAME.dollars / 5), G.GAME.interest_cap / 5),
+		})
+		pitch = pitch + 0.06
+		if not G.GAME.seeded and not G.GAME.challenge then
+			if
+				G.GAME.interest_amount * math.min(math.floor(G.GAME.dollars / 5), G.GAME.interest_cap / 5)
+				== G.GAME.interest_amount * G.GAME.interest_cap / 5
+			then
+				G.PROFILES[G.SETTINGS.profile].career_stats.c_round_interest_cap_streak = G.PROFILES[G.SETTINGS.profile].career_stats.c_round_interest_cap_streak
+					+ 1
+			else
+				G.PROFILES[G.SETTINGS.profile].career_stats.c_round_interest_cap_streak = 0
 			end
-			check_for_unlock({type = 'interest_streak'})
-			dollars = dollars + G.GAME.interest_amount*math.min(math.floor(G.GAME.dollars/5), G.GAME.interest_cap/5)
+		end
+		check_for_unlock({ type = "interest_streak" })
+		dollars = dollars + G.GAME.interest_amount * math.min(math.floor(G.GAME.dollars / 5), G.GAME.interest_cap / 5)
 	end
 	if not G.MULTIPLAYER_GAME.comeback_bonus_given then
 		G.MULTIPLAYER_GAME.comeback_bonus_given = true
-		add_round_eval_row({bonus = true, name='comeback', pitch = pitch, dollars = 4*G.MULTIPLAYER_GAME.comeback_bonus})
-		dollars = dollars + 4*G.MULTIPLAYER_GAME.comeback_bonus
+		add_round_eval_row({
+			bonus = true,
+			name = "comeback",
+			pitch = pitch,
+			dollars = 4 * G.MULTIPLAYER_GAME.comeback_bonus,
+		})
+		dollars = dollars + 4 * G.MULTIPLAYER_GAME.comeback_bonus
 	end
 
 	pitch = pitch + 0.06
 
-	add_round_eval_row({name = 'bottom', dollars = dollars})
+	add_round_eval_row({ name = "bottom", dollars = dollars })
 end
 
 local ease_ante_ref = ease_ante
@@ -1739,7 +1853,9 @@ function ease_lives(mod)
 	G.E_MANAGER:add_event(Event({
 		trigger = "immediate",
 		func = function()
-			if not G.hand_text_area then return end
+			if not G.hand_text_area then
+				return
+			end
 			local lives_UI = G.hand_text_area.ante
 			mod = mod or 0
 			local text = "+"
@@ -1798,44 +1914,48 @@ end
 -- Rewritten from the original function to fix typing issues causing crashes
 function get_new_boss()
 	G.GAME.perscribed_bosses = G.GAME.perscribed_bosses or {}
-	if G.GAME.perscribed_bosses and G.GAME.perscribed_bosses[G.GAME.round_resets.ante] then 
-			local ret_boss = G.GAME.perscribed_bosses[G.GAME.round_resets.ante] 
-			G.GAME.perscribed_bosses[G.GAME.round_resets.ante] = nil
-			G.GAME.bosses_used[ret_boss] = G.GAME.bosses_used[ret_boss] + 1
-			return ret_boss
+	if G.GAME.perscribed_bosses and G.GAME.perscribed_bosses[G.GAME.round_resets.ante] then
+		local ret_boss = G.GAME.perscribed_bosses[G.GAME.round_resets.ante]
+		G.GAME.perscribed_bosses[G.GAME.round_resets.ante] = nil
+		G.GAME.bosses_used[ret_boss] = G.GAME.bosses_used[ret_boss] + 1
+		return ret_boss
 	end
-	if G.FORCE_BOSS then return G.FORCE_BOSS end
-	
+	if G.FORCE_BOSS then
+		return G.FORCE_BOSS
+	end
+
 	local eligible_bosses = {}
 	for k, v in pairs(G.P_BLINDS) do
-			if v.boss then
-					local condition = v.boss.showdown and (G.GAME.round_resets.ante)%G.GAME.win_ante == 0 and G.GAME.round_resets.ante >= 2
-					or not v.boss.showdown and (v.boss.min <= math.max(1, G.GAME.round_resets.ante) and ((math.max(1, G.GAME.round_resets.ante))%G.GAME.win_ante ~= 0 or G.GAME.round_resets.ante < 2))
-					if condition then
-							eligible_bosses[k] = true
-					end
+		if v.boss then
+			local condition = v.boss.showdown
+					and G.GAME.round_resets.ante % G.GAME.win_ante == 0
+					and G.GAME.round_resets.ante >= 2
+				or not v.boss.showdown
+					and (v.boss.min <= math.max(1, G.GAME.round_resets.ante) and ((math.max(1, G.GAME.round_resets.ante)) % G.GAME.win_ante ~= 0 or G.GAME.round_resets.ante < 2))
+			if condition then
+				eligible_bosses[k] = true
 			end
+		end
 	end
 
 	local min_use = 100
 	local bosses_with_min_use = {}
 	for k, _ in pairs(eligible_bosses) do
-			local uses = G.GAME.bosses_used[k] or 0
-			if uses <= min_use then
-					if uses < min_use then
-							bosses_with_min_use = {}
-							min_use = uses
-					end
-					bosses_with_min_use[k] = true
+		local uses = G.GAME.bosses_used[k] or 0
+		if uses <= min_use then
+			if uses < min_use then
+				bosses_with_min_use = {}
+				min_use = uses
 			end
+			bosses_with_min_use[k] = true
+		end
 	end
 
-	local _, boss = pseudorandom_element(bosses_with_min_use, pseudoseed('boss'))
+	local _, boss = pseudorandom_element(bosses_with_min_use, pseudoseed("boss"))
 	G.GAME.bosses_used[boss] = (G.GAME.bosses_used[boss] or 0) + 1
-	
+
 	return boss
 end
-
 
 local get_new_boss_ref = get_new_boss
 function get_new_boss(force_change)
@@ -1850,10 +1970,19 @@ function get_new_boss(force_change)
 end
 
 G.FUNCS.can_skip_booster = function(e)
-	if G.pack_cards and G.pack_cards.cards and G.pack_cards.cards[1] and 
-	(G.STATE == G.STATES.PLANET_PACK or G.STATE == G.STATES.STANDARD_PACK or G.STATE == G.STATES.BUFFOON_PACK or (G.hand and G.hand.cards[1])) then 
-			e.config.colour = G.C.GREY
-			e.config.button = 'skip_booster'
+	if
+		G.pack_cards
+		and G.pack_cards.cards
+		and G.pack_cards.cards[1]
+		and (
+			G.STATE == G.STATES.PLANET_PACK
+			or G.STATE == G.STATES.STANDARD_PACK
+			or G.STATE == G.STATES.BUFFOON_PACK
+			or (G.hand and G.hand.cards[1])
+		)
+	then
+		e.config.colour = G.C.GREY
+		e.config.button = "skip_booster"
 	else
 		e.config.colour = G.C.UI.BACKGROUND_INACTIVE
 		e.config.button = nil
@@ -1872,7 +2001,7 @@ end
 
 local can_open_ref = G.FUNCS.can_open
 G.FUNCS.can_open = function(e)
-  if G.MULTIPLAYER_GAME.ready_blind then
+	if G.MULTIPLAYER_GAME.ready_blind then
 		e.config.colour = G.C.UI.BACKGROUND_INACTIVE
 		e.config.button = nil
 		return

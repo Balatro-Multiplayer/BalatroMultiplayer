@@ -27,7 +27,7 @@ local c_multiplayer_1 = {
 	},
 }
 
-local c_multiplayer_1_index = #G.CHALLENGES+1
+local c_multiplayer_1_index = #G.CHALLENGES + 1
 G.CHALLENGES[c_multiplayer_1_index] = c_multiplayer_1
 
 local localize_ref = localize

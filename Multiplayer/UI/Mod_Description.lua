@@ -50,13 +50,13 @@ function Description.load_description_gui()
 								colour = G.C.UI.TEXT_LIGHT,
 							},
 						},
-					}
+					},
 				},
 				{
 					n = G.UIT.R,
 					config = {
 						padding = 0,
-						align = "cm"
+						align = "cm",
 					},
 					nodes = {
 						{
@@ -65,9 +65,9 @@ function Description.load_description_gui()
 								text = "Join the ",
 								shadow = true,
 								scale = 0.6,
-								colour = G.C.UI.TEXT_LIGHT
-							}
-						}
+								colour = G.C.UI.TEXT_LIGHT,
+							},
+						},
 					},
 				},
 				{
@@ -81,16 +81,16 @@ function Description.load_description_gui()
 							minw = 6,
 							button = "multiplayer_discord",
 							label = {
-								"Balatro Multiplayer Discord Server"
-							}
-						})
-					}
+								"Balatro Multiplayer Discord Server",
+							},
+						}),
+					},
 				},
 				{
 					n = G.UIT.R,
 					config = {
 						padding = 0.2,
-						align = "cm"
+						align = "cm",
 					},
 					nodes = {
 						{
@@ -99,11 +99,11 @@ function Description.load_description_gui()
 								text = "You can report any bugs and find people to play with there!",
 								shadow = true,
 								scale = 0.375,
-								colour = G.C.UI.TEXT_LIGHT
-							}
-						}
-					}
-				}
+								colour = G.C.UI.TEXT_LIGHT,
+							},
+						},
+					},
+				},
 			},
 		},
 	})
