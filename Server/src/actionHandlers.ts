@@ -228,7 +228,7 @@ const versionAction = (
 	{ version }: ActionHandlerArgs<ActionVersion>,
 	client: Client,
 ) => {
-	if (version !== serverVersion) {
+	if (version !== serverVersion && version.startsWith("DEV")) {
 		client.sendAction({ action: "error", message: `[WARN] Server expecting version ${serverVersion}` });
 	}
 };

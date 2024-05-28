@@ -2,8 +2,12 @@
 ------------MOD MAIN MENU---------------------
 
 local Utils = require("Utils")
+local success, version = pcall(require, "Version")
+if not success then
+	version = "DEV"
+end
 
-MULTIPLAYER_VERSION = "0.1.3-MULTIPLAYER"
+MULTIPLAYER_VERSION = version .. "-MULTIPLAYER"
 
 local game_main_menu_ref = Game.main_menu
 ---@diagnostic disable-next-line: duplicate-set-field
