@@ -175,7 +175,7 @@ function G.UIDEF.create_UIBox_lobby_menu()
 										colour = G.C.ORANGE,
 										minw = 3.15,
 										minh = 1.35,
-										label = { mp_localize("lobby_options", "LOBBY OPTIONS") },
+										label = { mp_localize("lobby_options_cap", "LOBBY OPTIONS") },
 										scale = text_scale * 1.2,
 										col = true,
 									}),
