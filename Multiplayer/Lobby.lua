@@ -72,7 +72,7 @@ function G.MULTIPLAYER.update_connection_status()
 		G.F_NO_ACHIEVEMENTS = true
 	else
 		-- Restore them when disconnected
-		G.F_NO_ACHIEVEMENTS = START_NO_ACHIEVEMENT_VALUE
+		G.F_NO_ACHIEVEMENTS = PREV_ACHIEVEMENT_VALUE
 	end
 
 	-- Game does not have locatization, and therefore does not support steam_display, status, or text right now, but we can hope
