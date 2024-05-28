@@ -1,3 +1,4 @@
+-- Credit: CUexter
 return {
 	singleplayer = "單人遊戲",
 	join_lobby = "加入大廳",
