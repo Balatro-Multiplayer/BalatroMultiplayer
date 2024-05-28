@@ -24,9 +24,9 @@ function G.UIDEF.get_connection_status_ui()
 					n = G.UIT.T,
 					config = {
 						scale = 0.3,
-						text = (G.LOBBY.code and "In Lobby")
-							or (G.LOBBY.connected and "Connected to Service")
-							or "WARN: Cannot Find Multiplayer Service",
+						text = (G.LOBBY.code and mp_localize("in_lobby", "In Lobby"))
+							or (G.LOBBY.connected and mp_localize("connected", "Connected to Service"))
+							or mp_localize("warn_service", "WARN: Cannot Find Multiplayer Service"),
 						colour = G.C.UI.TEXT_LIGHT,
 					},
 				},
@@ -83,7 +83,7 @@ function G.UIDEF.create_UIBox_view_code()
 							},
 							nodes = {
 								UIBox_button({
-									label = { "Copy to Clipboard" },
+									label = { mp_localize("copy_clipboard", "Copy to Clipboard") },
 									colour = G.C.BLUE,
 									button = "copy_to_clipboard",
 									minw = 5,
@@ -125,7 +125,10 @@ function G.UIDEF.create_UIBox_lobby_menu()
 								config = {
 									scale = 0.3,
 									shadow = true,
-									text = "Set your username in the main menu! (Mods > Multiplayer)",
+									text = modded_localzie(
+										"set_name",
+										"Set your username in the main menu! (Mods > Multiplayer)"
+									),
 									colour = G.C.UI.TEXT_LIGHT,
 								},
 							},
@@ -148,9 +151,14 @@ function G.UIDEF.create_UIBox_lobby_menu()
 								colour = G.C.BLUE,
 								minw = 3.65,
 								minh = 1.55,
-								label = { "START" },
-								disabled_text = G.LOBBY.is_host and { "WAITING FOR", "PLAYERS" }
-									or { "WAITING FOR", "HOST TO START" },
+								label = { mp_localize("start", "START") },
+								disabled_text = G.LOBBY.is_host and {
+									mp_localize("wait_for", "WAITING FOR"),
+									mp_localize("players", "PLAYERS"),
+								} or {
+									mp_localize("wait_for", "WAITING FOR"),
+									mp_localize("host_start", "HOST TO START"),
+								},
 								scale = text_scale * 2,
 								col = true,
 								enabled_ref_table = G.LOBBY,
@@ -167,7 +175,7 @@ function G.UIDEF.create_UIBox_lobby_menu()
 										colour = G.C.ORANGE,
 										minw = 3.15,
 										minh = 1.35,
-										label = { "LOBBY OPTIONS" },
+										label = { mp_localize("lobby_options", "LOBBY OPTIONS") },
 										scale = text_scale * 1.2,
 										col = true,
 									}),
@@ -196,7 +204,7 @@ function G.UIDEF.create_UIBox_lobby_menu()
 													{
 														n = G.UIT.T,
 														config = {
-															text = "Connected Players:",
+															text = mp_localize("connect_player", "Connected Players:"),
 															shadow = true,
 															scale = text_scale * 0.8,
 															colour = G.C.UI.TEXT_LIGHT,
@@ -257,7 +265,7 @@ function G.UIDEF.create_UIBox_lobby_menu()
 										colour = G.C.PALE_GREEN,
 										minw = 3.15,
 										minh = 1.35,
-										label = { "VIEW CODE" },
+										label = { mp_localize("view_code", "VIEW CODE") },
 										scale = text_scale * 1.2,
 										col = true,
 									}),
@@ -269,7 +277,7 @@ function G.UIDEF.create_UIBox_lobby_menu()
 								colour = G.C.RED,
 								minw = 3.65,
 								minh = 1.55,
-								label = { "LEAVE" },
+								label = { mp_localize("leave", "LEAVE") },
 								scale = text_scale * 1.5,
 								col = true,
 							}),
@@ -304,7 +312,10 @@ function G.UIDEF.create_UIBox_lobby_options()
 								config = {
 									scale = 0.6,
 									shadow = true,
-									text = "Only the Lobby Host can change these options",
+									text = mp_localize(
+										"opts_only_host",
+										"Only the Lobby Host can change these options"
+									),
 									colour = G.C.UI.TEXT_LIGHT,
 								},
 							},
@@ -315,7 +326,7 @@ function G.UIDEF.create_UIBox_lobby_options()
 						colour = G.C.BOOSTER,
 						tabs = {
 							{
-								label = "Lobby Options",
+								label = mp_localize("lobby_options", "Lobby Options"),
 								chosen = true,
 								tab_definition_function = function()
 									return {
@@ -341,7 +352,10 @@ function G.UIDEF.create_UIBox_lobby_options()
 														id = "gold_on_life_loss_toggle",
 														enabled_ref_table = G.LOBBY,
 														enabled_ref_value = "is_host",
-														label = "Give comeback gold on life loss",
+														label = mp_localize(
+															"opts_cb_money",
+															"Give comeback gold on life loss"
+														),
 														ref_table = G.LOBBY.config,
 														ref_value = "gold_on_life_loss",
 														callback = toggle_lobby_options,
@@ -359,7 +373,10 @@ function G.UIDEF.create_UIBox_lobby_options()
 														id = "no_gold_on_round_loss_toggle",
 														enabled_ref_table = G.LOBBY,
 														enabled_ref_value = "is_host",
-														label = "Don't get blind gold on round loss",
+														label = mp_localize(
+															"opts_no_gold_on_loss",
+															"Don't get blind gold on round loss"
+														),
 														ref_table = G.LOBBY.config,
 														ref_value = "no_gold_on_round_loss",
 														callback = toggle_lobby_options,
@@ -377,7 +394,10 @@ function G.UIDEF.create_UIBox_lobby_options()
 														id = "death_on_round_loss_toggle",
 														enabled_ref_table = G.LOBBY,
 														enabled_ref_value = "is_host",
-														label = "Lose a life on non-PvP round loss",
+														label = mp_localize(
+															"opts_death_on_loss",
+															"Lose a life on non-PvP round loss"
+														),
 														ref_table = G.LOBBY.config,
 														ref_value = "death_on_round_loss",
 														callback = toggle_lobby_options,
@@ -395,7 +415,10 @@ function G.UIDEF.create_UIBox_lobby_options()
 														id = "different_seeds_toggle",
 														enabled_ref_table = G.LOBBY,
 														enabled_ref_value = "is_host",
-														label = "Players have different seeds",
+														label = mp_localize(
+															"opts_diff_seeds",
+															"Players have different seeds"
+														),
 														ref_table = G.LOBBY.config,
 														ref_value = "different_seeds",
 														callback = toggle_lobby_options,
@@ -407,7 +430,7 @@ function G.UIDEF.create_UIBox_lobby_options()
 								end,
 							},
 							{
-								label = "Gamemode Modifiers",
+								label = mp_localize("opts_gm", "Gamemode Modifiers"),
 								tab_definition_function = function()
 									return {
 										n = G.UIT.ROOT,
@@ -432,7 +455,7 @@ function G.UIDEF.create_UIBox_lobby_options()
 														id = "starting_lives_option",
 														enabled_ref_table = G.LOBBY,
 														enabled_ref_value = "is_host",
-														label = "Lives",
+														label = mp_localize("opts_lives", "Lives"),
 														options = { 1, 2, 4, 6, 8 },
 														current_option = G.LOBBY.config.starting_lives < 4
 																and G.LOBBY.config.starting_lives
@@ -446,7 +469,10 @@ function G.UIDEF.create_UIBox_lobby_options()
 																id = "draft_starting_antes_option",
 																enabled_ref_table = G.LOBBY,
 																enabled_ref_value = "is_host",
-																label = "Starting Antes",
+																label = mp_localize(
+																	"opts_start_antes",
+																	"Starting Antes"
+																),
 																options = { 2, 3, 4, 5, 6, 7 },
 																current_option = G.LOBBY.config.draft_starting_antes
 																	- 1,

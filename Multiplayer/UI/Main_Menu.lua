@@ -58,7 +58,7 @@ function G.UIDEF.create_UIBox_create_lobby_button()
 							colour = G.C.BOOSTER,
 							tabs = {
 								{
-									label = "Attrition",
+									label = mp_localize("attrition_name", "Attrition"),
 									chosen = true,
 									tab_definition_function = function()
 										return {
@@ -86,7 +86,10 @@ function G.UIDEF.create_UIBox_create_lobby_button()
 															n = G.UIT.T,
 															config = {
 																text = Utils.wrapText(
-																	"Every boss round is a competition between players where the player with the lower score loses a life.",
+																	mp_localize(
+																		"attrition_desc",
+																		"Every boss round is a competition between players where the player with the lower score loses a life."
+																	),
 																	50
 																),
 																shadow = true,
@@ -98,7 +101,7 @@ function G.UIDEF.create_UIBox_create_lobby_button()
 												},
 												UIBox_button({
 													id = "start_attrition",
-													label = { "Start Lobby" },
+													label = { mp_localize("start_lobby", "Start Lobby") },
 													colour = G.C.RED,
 													button = "start_lobby",
 													minw = 5,
@@ -108,7 +111,7 @@ function G.UIDEF.create_UIBox_create_lobby_button()
 									end,
 								},
 								{
-									label = "Draft",
+									label = mp_localize("draft_name", "Draft"),
 									tab_definition_function = function()
 										return {
 											n = G.UIT.ROOT,
@@ -135,7 +138,10 @@ function G.UIDEF.create_UIBox_create_lobby_button()
 															n = G.UIT.T,
 															config = {
 																text = Utils.wrapText(
-																	"Both players play 3 normal antes, then they play an ante where every round the player with the higher scorer wins.",
+																	mp_localize(
+																		"draft_desc",
+																		"Both players play 3 normal antes, then they play an ante where every round the player with the higher scorer wins."
+																	),
 																	50
 																),
 																shadow = true,
@@ -147,7 +153,7 @@ function G.UIDEF.create_UIBox_create_lobby_button()
 												},
 												UIBox_button({
 													id = "start_draft",
-													label = { "Start Lobby" },
+													label = { mp_localize("start_lobby", "Start Lobby") },
 													colour = G.C.RED,
 													button = "start_lobby",
 													minw = 5,
@@ -157,7 +163,7 @@ function G.UIDEF.create_UIBox_create_lobby_button()
 									end,
 								},
 								{
-									label = "Vanilla+",
+									label = mp_localize("vanilla_plus_name", "Vanilla+"),
 									tab_definition_function = function()
 										return {
 											n = G.UIT.ROOT,
@@ -184,7 +190,10 @@ function G.UIDEF.create_UIBox_create_lobby_button()
 															n = G.UIT.T,
 															config = {
 																text = Utils.wrapText(
-																	"The first person to fail a round loses, no PvP blinds.",
+																	mp_localize(
+																		"vp_desc",
+																		"The first person to fail a round loses, no PvP blinds."
+																	),
 																	50
 																),
 																shadow = true,
@@ -195,7 +204,7 @@ function G.UIDEF.create_UIBox_create_lobby_button()
 													},
 												},
 												UIBox_button({
-													label = { "Coming Soon!" },
+													label = { mp_localize("coming_soon", "Coming Soon!") },
 													colour = G.C.RED,
 													minw = 5,
 												}),
@@ -204,7 +213,7 @@ function G.UIDEF.create_UIBox_create_lobby_button()
 									end,
 								},
 								{
-									label = "Heads Up",
+									label = mp_localize("headup_name", "Heads Up"),
 									tab_definition_function = function()
 										return {
 											n = G.UIT.ROOT,
@@ -231,7 +240,10 @@ function G.UIDEF.create_UIBox_create_lobby_button()
 															n = G.UIT.T,
 															config = {
 																text = Utils.wrapText(
-																	"Both players play the first ante, then must keep beating the opponents previous score or lose.",
+																	mp_localize(
+																		"hu_desc",
+																		"Both players play the first ante, then must keep beating the opponents previous score or lose."
+																	),
 																	50
 																),
 																shadow = true,
@@ -242,7 +254,7 @@ function G.UIDEF.create_UIBox_create_lobby_button()
 													},
 												},
 												UIBox_button({
-													label = { "Coming Soon!" },
+													label = { mp_localize("coming_soon", "Coming Soon!") },
 													colour = G.C.RED,
 													minw = 5,
 												}),
@@ -251,7 +263,7 @@ function G.UIDEF.create_UIBox_create_lobby_button()
 									end,
 								},
 								{
-									label = "Battle Royale",
+									label = mp_localize("royale_name", "Battle Royale"),
 									tab_definition_function = function()
 										return {
 											n = G.UIT.ROOT,
@@ -278,7 +290,10 @@ function G.UIDEF.create_UIBox_create_lobby_button()
 															n = G.UIT.T,
 															config = {
 																text = Utils.wrapText(
-																	"Attrition, except there are up to 8 players and every player only has 1 life.",
+																	mp_localize(
+																		"royale_desc",
+																		"Attrition, except there are up to 8 players and every player only has 1 life."
+																	),
 																	50
 																),
 																shadow = true,
@@ -289,7 +304,7 @@ function G.UIDEF.create_UIBox_create_lobby_button()
 													},
 												},
 												UIBox_button({
-													label = { "Coming Soon!" },
+													label = { mp_localize("coming_soon", "Coming Soon!") },
 													colour = G.C.RED,
 													minw = 5,
 												}),
@@ -329,7 +344,7 @@ function G.UIDEF.create_UIBox_join_lobby_button()
 									w = 4,
 									h = 1,
 									max_length = 5,
-									prompt_text = "Enter Lobby Code",
+									prompt_text = mp_localize("enter_lobby_code", "Enter Lobby Code"),
 									ref_table = G.LOBBY,
 									ref_value = "temp_code",
 									extended_corpus = false,
@@ -342,7 +357,7 @@ function G.UIDEF.create_UIBox_join_lobby_button()
 							},
 						},
 						UIBox_button({
-							label = { "Paste From Clipboard" },
+							label = { mp_localize("join_clip", "Paste From Clipboard") },
 							colour = G.C.RED,
 							button = "join_from_clipboard",
 							minw = 5,
@@ -359,25 +374,25 @@ function G.UIDEF.override_main_menu_play_button()
 		create_UIBox_generic_options({
 			contents = {
 				UIBox_button({
-					label = { "Singleplayer" },
+					label = { mp_localize("singleplayer", "Singleplayer") },
 					colour = G.C.BLUE,
 					button = "setup_run",
 					minw = 5,
 				}),
 				G.LOBBY.connected and UIBox_button({
-					label = { "Create Lobby" },
+					label = { mp_localize("create_lobby", "Create Lobby") },
 					colour = G.C.GREEN,
 					button = "create_lobby",
 					minw = 5,
 				}) or nil,
 				G.LOBBY.connected and UIBox_button({
-					label = { "Join Lobby" },
+					label = { mp_localize("join_lobby", "Join Lobby") },
 					colour = G.C.RED,
 					button = "join_lobby",
 					minw = 5,
 				}) or nil,
 				not G.LOBBY.connected and UIBox_button({
-					label = { "Reconnect" },
+					label = { mp_localize("reconnect", "Reconnect") },
 					colour = G.C.RED,
 					button = "reconnect",
 					minw = 5,

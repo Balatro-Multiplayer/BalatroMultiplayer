@@ -22,7 +22,7 @@ function create_UIBox_options()
 
 		if G.STAGE == G.STAGES.RUN then
 			main_menu = UIBox_button({
-				label = { "Return to Lobby" },
+				label = { mp_localize("return_lobby", "Return to Lobby") },
 				button = "return_to_lobby",
 				minw = 5,
 			})
@@ -171,7 +171,7 @@ function create_UIBox_blind_choice(type, run_info)
 
 		if G.GAME.round_resets.blind_choices[type] == "bl_pvp" then
 			local dt1 = DynaText({
-				string = { { string = "LIFE", colour = G.C.FILTER } },
+				string = { { string = mp_localize("bl_life", "LIFE"), colour = G.C.FILTER } },
 				colours = { G.C.BLACK },
 				scale = 0.55,
 				silent = true,
@@ -181,7 +181,7 @@ function create_UIBox_blind_choice(type, run_info)
 				maxw = 3,
 			})
 			local dt2 = DynaText({
-				string = { { string = "or", colour = G.C.WHITE } },
+				string = { { string = mp_localize("bl_or", "or"), colour = G.C.WHITE } },
 				colours = { G.C.CHANCE },
 				scale = 0.35,
 				silent = true,
@@ -190,7 +190,7 @@ function create_UIBox_blind_choice(type, run_info)
 				maxw = 3,
 			})
 			local dt3 = DynaText({
-				string = { { string = "DEATH", colour = G.C.FILTER } },
+				string = { { string = mp_localize("bl_death", "DEATH"), colour = G.C.FILTER } },
 				colours = { G.C.BLACK },
 				scale = 0.55,
 				silent = true,
@@ -585,9 +585,9 @@ local function update_blind_HUD()
 				G.HUD_blind:get_UIE_by_ID("HUD_blind_count").config.ref_table = G.MULTIPLAYER_GAME.enemy
 				G.HUD_blind:get_UIE_by_ID("HUD_blind_count").config.ref_value = "score"
 				G.HUD_blind:get_UIE_by_ID("HUD_blind").children[2].children[2].children[2].children[1].children[1].config.text =
-					"Current enemy score"
+					mp_localize("enemy_score", "Current enemy score")
 				G.HUD_blind:get_UIE_by_ID("HUD_blind").children[2].children[2].children[2].children[3].children[1].config.text =
-					"Enemy hands left: "
+					mp_localize("enemy_hands", "Enemy hands left:")
 				G.HUD_blind:get_UIE_by_ID("dollars_to_be_earned").config.object.config.string =
 					{ { ref_table = G.MULTIPLAYER_GAME.enemy, ref_value = "hands" } }
 				G.HUD_blind:get_UIE_by_ID("dollars_to_be_earned").config.object:update_text()
@@ -617,7 +617,8 @@ end
 
 function G.FUNCS.mp_toggle_ready(e)
 	G.MULTIPLAYER_GAME.ready_blind = not G.MULTIPLAYER_GAME.ready_blind
-	G.MULTIPLAYER_GAME.ready_blind_text = G.MULTIPLAYER_GAME.ready_blind and "Unready" or "Ready"
+	G.MULTIPLAYER_GAME.ready_blind_text = G.MULTIPLAYER_GAME.ready_blind and mp_localize("unready", "Unready")
+		or mp_localize("ready", "Ready")
 
 	if G.MULTIPLAYER_GAME.ready_blind then
 		G.MULTIPLAYER.ready_blind()
@@ -688,7 +689,7 @@ local update_shop_ref = Game.update_shop
 function Game:update_shop(dt)
 	if not G.STATE_COMPLETE then
 		G.MULTIPLAYER_GAME.ready_blind = false
-		G.MULTIPLAYER_GAME.ready_blind_text = "Ready"
+		G.MULTIPLAYER_GAME.ready_blind_text = mp_localize("ready", "Ready")
 		G.MULTIPLAYER_GAME.end_pvp = false
 	end
 	update_shop_ref(self, dt)
@@ -781,16 +782,13 @@ local function eval_hand_and_jokers()
 				--from Jokers
 				for j = 1, #G.jokers.cards do
 					--calculate the joker effects
-					local eval = eval_card(
-						G.jokers.cards[j],
-						{
-							cardarea = G.hand,
-							other_card = G.hand.cards[i],
-							repetition = true,
-							end_of_round = true,
-							card_effects = effects,
-						}
-					)
+					local eval = eval_card(G.jokers.cards[j], {
+						cardarea = G.hand,
+						other_card = G.hand.cards[i],
+						repetition = true,
+						end_of_round = true,
+						card_effects = effects,
+					})
 					if next(eval) then
 						for h = 1, eval.jokers.repetitions do
 							reps[#reps + 1] = eval
@@ -859,7 +857,7 @@ function Game:update_hand_played(dt)
 						eval_hand_and_jokers()
 						attention_text({
 							scale = 0.8,
-							text = "Waiting for enemy to finish...",
+							text = mp_localize("wait_enemy", "Waiting for enemy to finish..."),
 							hold = 5,
 							align = "cm",
 							offset = { x = 0, y = -1.5 },
@@ -871,7 +869,6 @@ function Game:update_hand_played(dt)
 					G.STATE_COMPLETE = false
 					G.STATE = G.STATES.DRAW_TO_HAND
 				end
-
 				return true
 			end,
 		}))
@@ -913,7 +910,6 @@ function Game:update_new_round(dt)
 	end
 	update_new_round_ref(self, dt)
 end
-
 local end_round_ref = end_round
 function end_round()
 	if not G.LOBBY.code then
@@ -1139,7 +1135,7 @@ function Game:start_run(args)
 
 	local scale = 0.4
 	local hud_ante = G.HUD:get_UIE_by_ID("hud_ante")
-	hud_ante.children[1].children[1].config.text = "Lives"
+	hud_ante.children[1].children[1].config.text = mp_localize("lives", "Lives")
 
 	-- Set lives number
 	hud_ante.children[2].children[1].config.object = DynaText({
@@ -1279,7 +1275,7 @@ function create_UIBox_game_over()
 														{
 															n = G.UIT.T,
 															config = {
-																text = "Return to Lobby",
+																text = localize("return_lobby", nil, "Return to Lobby"),
 																scale = 0.5,
 																colour = G.C.UI.TEXT_LIGHT,
 															},
@@ -1309,7 +1305,7 @@ function create_UIBox_game_over()
 														{
 															n = G.UIT.T,
 															config = {
-																text = "Leave Lobby",
+																text = localize("leave_lobby", nil, "Leave Lobby"),
 																scale = 0.5,
 																colour = G.C.UI.TEXT_LIGHT,
 															},
@@ -1449,7 +1445,10 @@ function create_UIBox_win()
 												UIBox_button({
 													id = "from_game_won",
 													button = "return_to_lobby",
-													label = { "Return to", "Lobby" },
+													label = {
+														mp_localize("return_to", "Return to"),
+														mp_localize("lobby", "Lobby"),
+													},
 													minw = 2.5,
 													maxw = 2.5,
 													minh = 1,
@@ -1462,7 +1461,10 @@ function create_UIBox_win()
 												} or nil,
 												UIBox_button({
 													button = "lobby_leave",
-													label = { "Leave", "Lobby" },
+													label = {
+														mp_localize("leave", "Leave"),
+														mp_localize("lobby", "Lobby"),
+													},
 													minw = 2.5,
 													maxw = 2.5,
 													minh = 1,
@@ -1557,8 +1559,11 @@ function add_round_eval_row(config)
 											object = DynaText({
 												string = {
 													G.GAME.blind.chips == -1
-															and ((is_pvp_boss() or G.LOBBY.config.death_on_round_loss) and " Lost a Life " or " Failed ")
-														or "Defeated the Enemy",
+															and ((is_pvp_boss() or G.LOBBY.config.death_on_round_loss) and mp_localize(
+																"lost_life",
+																" Lost a Life "
+															) or mp_localize("failed", " Failed "))
+														or mp_localize("defeat_enemy", "Defeated the Enemy"),
 												},
 												colours = { G.C.FILTER },
 												shadow = true,
@@ -1573,35 +1578,31 @@ function add_round_eval_row(config)
 						},
 					})
 				elseif config.name == "comeback" then
-					table.insert(
-						left_text,
-						{
-							n = G.UIT.T,
-							config = {
-								text = G.MULTIPLAYER_GAME.comeback_bonus,
-								scale = 0.8 * scale,
-								colour = G.C.PURPLE,
+					table.insert(left_text, {
+						n = G.UIT.T,
+						config = {
+							text = G.MULTIPLAYER_GAME.comeback_bonus,
+							scale = 0.8 * scale,
+							colour = G.C.PURPLE,
+							shadow = true,
+							juice = true,
+						},
+					})
+					table.insert(left_text, {
+						n = G.UIT.O,
+						config = {
+							object = DynaText({
+								string = {
+									mp_localize("total_lives_lost", " Total Lives Lost ($4 each)"),
+								},
+								colours = { G.C.UI.TEXT_LIGHT },
 								shadow = true,
-								juice = true,
-							},
-						}
-					)
-					table.insert(
-						left_text,
-						{
-							n = G.UIT.O,
-							config = {
-								object = DynaText({
-									string = { " Total Lives Lost ($4 each)" },
-									colours = { G.C.UI.TEXT_LIGHT },
-									shadow = true,
-									pop_in = 0,
-									scale = 0.4 * scale,
-									silent = true,
-								}),
-							},
-						}
-					)
+								pop_in = 0,
+								scale = 0.4 * scale,
+								silent = true,
+							}),
+						},
+					})
 				end
 				local full_row = {
 					n = G.UIT.R,
@@ -1774,7 +1775,13 @@ G.FUNCS.evaluate_round = function()
 	for i = 1, #G.jokers.cards do
 		local ret = G.jokers.cards[i]:calculate_dollar_bonus()
 		if ret then
-			add_round_eval_row({ dollars = ret, bonus = true, name = "joker" .. i, pitch = pitch, card = G.jokers.cards[i] })
+			add_round_eval_row({
+				dollars = ret,
+				bonus = true,
+				name = "joker" .. i,
+				pitch = pitch,
+				card = G.jokers.cards[i],
+			})
 			pitch = pitch + 0.06
 			dollars = dollars + ret
 		end

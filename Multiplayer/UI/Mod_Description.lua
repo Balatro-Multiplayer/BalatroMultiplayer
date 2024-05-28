@@ -26,14 +26,14 @@ function Description.load_description_gui()
 							n = G.UIT.T,
 							config = {
 								scale = 0.6,
-								text = "Username:",
+								text = mp_localize("username", "Username:"),
 								colour = G.C.UI.TEXT_LIGHT,
 							},
 						},
 						create_text_input({
 							w = 4,
 							max_length = 25,
-							prompt_text = "Enter Username",
+							prompt_text = mp_localize("enter_username", "Enter Username"),
 							ref_table = G.LOBBY,
 							ref_value = "username",
 							extended_corpus = true,
@@ -46,7 +46,7 @@ function Description.load_description_gui()
 							n = G.UIT.T,
 							config = {
 								scale = 0.3,
-								text = "Press enter to save",
+								text = mp_localize("enter_to_save", "Press enter to save"),
 								colour = G.C.UI.TEXT_LIGHT,
 							},
 						},
@@ -62,7 +62,7 @@ function Description.load_description_gui()
 						{
 							n = G.UIT.T,
 							config = {
-								text = "Join the ",
+								text = mp_localize("join_discord", "Join the "),
 								shadow = true,
 								scale = 0.6,
 								colour = G.C.UI.TEXT_LIGHT,
@@ -81,7 +81,7 @@ function Description.load_description_gui()
 							minw = 6,
 							button = "multiplayer_discord",
 							label = {
-								"Balatro Multiplayer Discord Server",
+								mp_localize("discord_name", "Balatro Multiplayer Discord Server"),
 							},
 						}),
 					},
@@ -96,7 +96,10 @@ function Description.load_description_gui()
 						{
 							n = G.UIT.T,
 							config = {
-								text = "You can report any bugs and find people to play with there!",
+								text = mp_localize(
+									"discord_msg",
+									"You can report any bugs and find people to play with there!"
+								),
 								shadow = true,
 								scale = 0.375,
 								colour = G.C.UI.TEXT_LIGHT,

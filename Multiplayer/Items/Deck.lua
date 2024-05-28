@@ -33,7 +33,7 @@ G.CHALLENGES[c_multiplayer_1_index] = c_multiplayer_1
 local localize_ref = localize
 function localize(args, misc_cat)
 	if args == "c_multiplayer_1" and misc_cat == "challenge_names" then
-		return "Multiplayer"
+		return mp_localize("multiplayer_c", "Multiplayer Deck")
 	end
 	return localize_ref(args, misc_cat)
 end

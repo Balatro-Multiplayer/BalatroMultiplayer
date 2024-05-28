@@ -21,11 +21,11 @@ local localize_ref = localize
 function localize(args, misc_cat)
 	if type(args) == "table" and args.key == "bl_pvp" and args.set == "Blind" then
 		if args.type == "name_text" then
-			return "Your Nemesis"
+			return mp_localize("bl_pvp_name", "Your Nemesis")
 		elseif args.type == "raw_descriptions" then
 			return {
-				"Face another player,",
-				"most chips wins",
+				mp_localize("bl_pvp_desc1", "Face another player,"),
+				mp_localize("bl_pvp_desc2", "most chips wins"),
 			}
 		end
 	end
