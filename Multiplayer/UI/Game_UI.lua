@@ -1275,7 +1275,7 @@ function create_UIBox_game_over()
 														{
 															n = G.UIT.T,
 															config = {
-																text = localize("return_lobby", nil, "Return to Lobby"),
+																text = mp_localize("return_lobby", "Return to Lobby"),
 																scale = 0.5,
 																colour = G.C.UI.TEXT_LIGHT,
 															},
@@ -1305,7 +1305,7 @@ function create_UIBox_game_over()
 														{
 															n = G.UIT.T,
 															config = {
-																text = localize("leave_lobby", nil, "Leave Lobby"),
+																text = mp_localize("leave_lobby", "Leave Lobby"),
 																scale = 0.5,
 																colour = G.C.UI.TEXT_LIGHT,
 															},

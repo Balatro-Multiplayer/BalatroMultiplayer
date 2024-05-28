@@ -125,7 +125,7 @@ function G.UIDEF.create_UIBox_lobby_menu()
 								config = {
 									scale = 0.3,
 									shadow = true,
-									text = modded_localzie(
+									text = mp_localize(
 										"set_name",
 										"Set your username in the main menu! (Mods > Multiplayer)"
 									),
