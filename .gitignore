@@ -4,3 +4,4 @@ node_modules
 Config.lua
 Server/dist
 .vscode
+Multiplayer/Saved/username.txt
