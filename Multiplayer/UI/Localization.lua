@@ -14,6 +14,6 @@ function mp_localize(args, fallback)
 	if fallback == nil then
 		fallback = args
 	end
-	return G.localization.mods.mp[args] or fallback
+	return localize(args, 'mp')
 end
 G:set_language()
