@@ -1,4 +1,4 @@
--- Credit: KilledByLava
+-- Credit: KilledByLava, falnione
 return {
 	misc = {
 		mp = {
@@ -54,7 +54,7 @@ return {
 			leave = "ВЫЙТИ",
 			opts_only_host = "Только ведущий может менять эти настройки",
 			opts_cb_money = "Давать золото при потере жизней",
-			opts_no_gold_on_loss = "Не двавть золото при поражении раунда",
+			opts_no_gold_on_loss = "Не давать золото при поражении раунда",
 			opts_death_on_loss = "Терять жизнь при поражении ПвП блайнда",
 			opts_start_antes = "Количество анте до ПвП блайндов",
 			opts_diff_seeds = "Игроки имеют разные сиды",
