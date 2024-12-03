@@ -16,7 +16,7 @@ import type {
 	ActionVersion,
 } from './actions.js'
 
-const PORT = 8080
+const PORT = 8788
 
 /** The amount of milliseconds we wait before sending the initial keepalive packet  */
 const KEEP_ALIVE_INITIAL_TIMEOUT = 5000

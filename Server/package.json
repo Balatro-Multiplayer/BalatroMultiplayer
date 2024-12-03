@@ -1,7 +1,7 @@
 {
-	"version": "0.1.4-MULTIPLAYER",
+	"version": "0.1.5-MULTIPLAYER",
 	"scripts": {
-		"build": "tsc",
+		"build": "node build.js",
 		"dev": "tsx watch src/main.ts",
 		"start": "node ./dist/main.js"
 	},
@@ -13,6 +13,7 @@
 		"@biomejs/biome": "^1.6.1",
 		"@types/node": "^20.11.27",
 		"@types/uuid": "^9.0.8",
+		"esbuild": "^0.24.0",
 		"tsx": "^4.7.1",
 		"typescript": "^5.4.2"
 	},
