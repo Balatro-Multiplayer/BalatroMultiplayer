@@ -10,6 +10,8 @@ local CONFIG_URL, CONFIG_PORT = ...
 require("love.filesystem")
 local socket = require("socket")
 
+local DEBUGGING = false
+
 -- Defining this again, for debugging this thread
 local function initializeThreadDebugSocketConnection()
 	CLIENT = socket.connect("localhost", 12346)
@@ -19,13 +21,14 @@ local function initializeThreadDebugSocketConnection()
 end
 
 function SEND_THREAD_DEBUG_MESSAGE(message)
-	if CLIENT and message then
+	if DEBUGGING and CLIENT and message then
 		CLIENT:send(message .. "\n")
 	end
 end
 
--- TODO: Disable this if not in debug mode
-initializeThreadDebugSocketConnection()
+if DEBUGGING then
+	initializeThreadDebugSocketConnection()
+end
 
 Networking = {}
 local isSocketClosed = true
