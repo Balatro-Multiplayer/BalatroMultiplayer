@@ -1,4 +1,4 @@
-import net from 'node:net'
+import { Socket, createServer} from 'node:net'
 import Client from './Client.js'
 import { actionHandlers } from './actionHandlers.js'
 import type {
@@ -46,7 +46,7 @@ export const serializeAction = (action: Action): string => {
 }
 
 const sendActionToSocket =
-	(socket: net.Socket) => (action: ActionServerToClient) => {
+	(socket: Socket) => (action: ActionServerToClient) => {
 		if (!socket) {
 			return
 		}
@@ -61,7 +61,7 @@ const sendActionToSocket =
 		socket.write(`${data}\n`)
 	}
 
-const server = net.createServer((socket) => {
+const server = createServer((socket) => {
 	socket.allowHalfOpen = false
 	// Do not wait for packets to buffer, helps
 	// improve latency between responses
