@@ -73,8 +73,26 @@ function G.UIDEF.create_UIBox_create_lobby_button()
 													config = {
 														align = "tm",
 														padding = 0.05,
-														minw = 4,
-														minh = 1.5,
+														w = 8,
+														h = 2,
+													},
+													nodes = {
+														UIBox_button({
+															id = "start_attrition",
+															label = { mp_localize("start_lobby", "Start Lobby") },
+															colour = G.C.RED,
+															button = "start_lobby",
+															minw = 5,
+														}),
+													},
+												},
+												{
+													n = G.UIT.R,
+													config = {
+														align = "tm",
+														padding = 0.05,
+														minw = 8,
+														minh = 4,
 													},
 													nodes = {
 														{
@@ -92,24 +110,6 @@ function G.UIDEF.create_UIBox_create_lobby_button()
 																colour = G.C.UI.TEXT_LIGHT,
 															},
 														},
-													},
-												},
-												{
-													n = G.UIT.R,
-													config = {
-														align = "bm",
-														padding = 0.05,
-														minw = 4,
-														minh = 1.5,
-													},
-													nodes = {
-														UIBox_button({
-															id = "start_attrition",
-															label = { mp_localize("start_lobby", "Start Lobby") },
-															colour = G.C.RED,
-															button = "start_lobby",
-															minw = 5,
-														}),
 													},
 												},
 											},
@@ -136,8 +136,28 @@ function G.UIDEF.create_UIBox_create_lobby_button()
 													config = {
 														align = "tm",
 														padding = 0.05,
-														minw = 4,
-														minh = 2.5,
+														w = 8,
+														h = 2,
+													},
+													nodes = {
+														UIBox_button({
+															id = "start_draft",
+															label = {
+																mp_localize("start_lobby", "Start Lobby"),
+															},
+															colour = G.C.RED,
+															button = "start_lobby",
+															minw = 5,
+														}),
+													},
+												},
+												{
+													n = G.UIT.R,
+													config = {
+														align = "tm",
+														padding = 0.05,
+														minw = 8,
+														minh = 4,
 													},
 													nodes = {
 														{
@@ -157,13 +177,6 @@ function G.UIDEF.create_UIBox_create_lobby_button()
 														},
 													},
 												},
-												UIBox_button({
-													id = "start_draft",
-													label = { mp_localize("start_lobby", "Start Lobby") },
-													colour = G.C.RED,
-													button = "start_lobby",
-													minw = 5,
-												}),
 											},
 										}
 									end,
@@ -188,8 +201,26 @@ function G.UIDEF.create_UIBox_create_lobby_button()
 													config = {
 														align = "tm",
 														padding = 0.05,
-														minw = 4,
-														minh = 1,
+														w = 8,
+														h = 2,
+													},
+													nodes = {
+														UIBox_button({
+															label = {
+																mp_localize("coming_soon", "Coming Soon!"),
+															},
+															colour = G.C.RED,
+															minw = 5,
+														}),
+													},
+												},
+												{
+													n = G.UIT.R,
+													config = {
+														align = "tm",
+														padding = 0.05,
+														minw = 8,
+														minh = 4,
 													},
 													nodes = {
 														{
@@ -209,11 +240,6 @@ function G.UIDEF.create_UIBox_create_lobby_button()
 														},
 													},
 												},
-												UIBox_button({
-													label = { mp_localize("coming_soon", "Coming Soon!") },
-													colour = G.C.RED,
-													minw = 5,
-												}),
 											},
 										}
 									end,
@@ -238,8 +264,26 @@ function G.UIDEF.create_UIBox_create_lobby_button()
 													config = {
 														align = "tm",
 														padding = 0.05,
-														minw = 4,
-														minh = 1,
+														w = 8,
+														h = 2,
+													},
+													nodes = {
+														UIBox_button({
+															label = {
+																mp_localize("coming_soon", "Coming Soon!"),
+															},
+															colour = G.C.RED,
+															minw = 5,
+														}),
+													},
+												},
+												{
+													n = G.UIT.R,
+													config = {
+														align = "tm",
+														padding = 0.05,
+														minw = 8,
+														minh = 4,
 													},
 													nodes = {
 														{
@@ -259,11 +303,6 @@ function G.UIDEF.create_UIBox_create_lobby_button()
 														},
 													},
 												},
-												UIBox_button({
-													label = { mp_localize("coming_soon", "Coming Soon!") },
-													colour = G.C.RED,
-													minw = 5,
-												}),
 											},
 										}
 									end,
