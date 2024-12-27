@@ -583,7 +583,8 @@ local function update_blind_HUD()
 			blockable = false,
 			func = function()
 				G.HUD_blind:get_UIE_by_ID("HUD_blind_count").config.ref_table = G.MULTIPLAYER_GAME.enemy
-				G.HUD_blind:get_UIE_by_ID("HUD_blind_count").config.ref_value = "score"
+				G.HUD_blind:get_UIE_by_ID("HUD_blind_count").config.ref_value = "score_text"
+				G.HUD_blind:get_UIE_by_ID("HUD_blind_count").config.func = "multiplayer_blind_chip_UI_scale"
 				G.HUD_blind:get_UIE_by_ID("HUD_blind").children[2].children[2].children[2].children[1].children[1].config.text =
 					mp_localize("enemy_score", "Current enemy score")
 				G.HUD_blind:get_UIE_by_ID("HUD_blind").children[2].children[2].children[2].children[3].children[1].config.text =
@@ -2022,6 +2023,12 @@ function Blind:disable()
 		return
 	end
 	blind_disable_ref(self)
+end
+
+G.FUNCS.multiplayer_blind_chip_UI_scale = function(e)
+	if G.GAME.blind and G.MULTIPLAYER_GAME.enemy.score then
+		e.config.scale = scale_number(G.MULTIPLAYER_GAME.enemy.score, 0.7, 100000)
+	end
 end
 ----------------------------------------------
 ------------MOD GAME UI END-------------------

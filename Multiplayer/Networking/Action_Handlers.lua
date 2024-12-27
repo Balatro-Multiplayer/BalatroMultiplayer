@@ -99,6 +99,7 @@ local function action_enemy_info(score_str, hands_left_str)
 	end
 
 	G.MULTIPLAYER_GAME.enemy.score = score
+	G.MULTIPLAYER_GAME.enemy.score_text = number_format(score)
 	G.MULTIPLAYER_GAME.enemy.hands = hands_left
 	if is_pvp_boss() then
 		G.HUD_blind:get_UIE_by_ID("HUD_blind_count"):juice_up()

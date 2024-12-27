@@ -36,6 +36,7 @@ G.MULTIPLAYER_GAME = {
 	end_pvp = false,
 	enemy = {
 		score = 0,
+		score_text = "0",
 		hands = 4,
 	},
 }
@@ -53,6 +54,7 @@ function reset_game_states()
 		end_pvp = false,
 		enemy = {
 			score = 0,
+			score_text = "0",
 			hands = 4,
 		},
 	}
