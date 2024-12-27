@@ -124,7 +124,7 @@ function G.UIDEF.create_UIBox_lobby_menu()
 									shadow = true,
 									text = mp_localize(
 										"set_name",
-										"Set your username in the main menu! (Mods > Multiplayer)"
+										"Set your username in the main menu! (Mods > Multiplayer > Config)"
 									),
 									colour = G.C.UI.TEXT_LIGHT,
 								},
