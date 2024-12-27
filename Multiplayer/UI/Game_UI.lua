@@ -145,8 +145,13 @@ function create_UIBox_blind_choice(type, run_info)
 			config = G.P_BLINDS[G.GAME.round_resets.blind_choices[type]],
 		}
 
-		blind_choice.animation =
-			AnimatedSprite(0, 0, 1.4, 1.4, G.ANIMATION_ATLAS["blind_chips"], blind_choice.config.pos)
+		if G.GAME.round_resets.blind_choices[type] == "bl_pvp" then
+			blind_choice.animation =
+				AnimatedSprite(0, 0, 1.4, 1.4, G.ANIMATION_ATLAS["mp_player_blind_chip"], { x = 0, y = 0 })
+		else
+			blind_choice.animation =
+				AnimatedSprite(0, 0, 1.4, 1.4, G.ANIMATION_ATLAS["blind_chips"], blind_choice.config.pos)
+		end
 		blind_choice.animation:define_draw_steps({
 			{ shader = "dissolve", shadow_height = 0.05 },
 			{ shader = "dissolve" },
@@ -1536,7 +1541,7 @@ function add_round_eval_row(config)
 				local left_text = {}
 				if config.name == "blind1" then
 					local blind_sprite =
-						AnimatedSprite(0, 0, 1.2, 1.2, G.ANIMATION_ATLAS["blind_chips"], copy_table(G.GAME.blind.pos))
+						AnimatedSprite(0, 0, 1.2, 1.2, G.ANIMATION_ATLAS["mp_player_blind_chip"], { x = 0, y = 0 })
 					blind_sprite:define_draw_steps({
 						{ shader = "dissolve", shadow_height = 0.05 },
 						{ shader = "dissolve" },

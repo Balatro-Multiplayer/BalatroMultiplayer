@@ -2,12 +2,15 @@
 ------------MOD BLIND-------------------------
 
 SMODS.Atlas({
-	key = "PlayerBlindChip",
+	key = "mp_player_blind_chip",
 	path = "player_blind_row.png",
 	atlas_table = "ANIMATION_ATLAS",
 	frames = 21,
 	px = 34,
 	py = 34,
+	prefix_config = {
+		key = false,
+	},
 })
 
 SMODS.Blind({
@@ -23,7 +26,7 @@ SMODS.Blind({
 	mult = 0,
 	boss = { min = 1, max = 10 },
 	boss_colour = HEX("ac3232"),
-	atlas = "PlayerBlindChip",
+	atlas = "mp_player_blind_chip",
 	discovered = true,
 	in_pool = function(self)
 		return false
@@ -50,7 +53,7 @@ function is_pvp_boss()
 	if not G.GAME or not G.GAME.blind then
 		return false
 	end
-	return G.GAME.blind.name == mp_localize("bl_pvp_name", "Your Nemesis")
+	return G.GAME.blind.config.blind.key == "bl_pvp"
 end
 
 ----------------------------------------------
