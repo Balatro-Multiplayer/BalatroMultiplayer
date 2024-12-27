@@ -34,6 +34,9 @@ end
 local function action_lobbyInfo(host, guest, is_host)
 	G.LOBBY.players = {}
 	G.LOBBY.is_host = is_host == "true"
+	if is_host == "true" then
+		G.MULTIPLAYER.lobby_options()
+	end
 	G.LOBBY.host = { username = host }
 	if guest ~= nil then
 		G.LOBBY.guest = { username = guest }
