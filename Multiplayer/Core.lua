@@ -18,27 +18,25 @@ local function customLoader(moduleName)
 	return "\nNo module found: " .. moduleName
 end
 
-function LoadMod()
-	---@diagnostic disable-next-line: deprecated
-	table.insert(package.loaders, 1, customLoader)
-	require("Lobby")
-	require("Networking.Action_Handlers")
-	require("Utils").get_username()
-	require("UI.Localization")
-	require("Items.Blind")
-	require("Items.Deck")
-	require("UI.Lobby_UI")
-	require("UI.Main_Menu")
-	require("UI.Game_UI")
-	require("Misc.Disable_Restart")
-	require("Misc.Mod_Hash")
+---@diagnostic disable-next-line: deprecated
+table.insert(package.loaders, 1, customLoader)
+require("Lobby")
+require("Networking.Action_Handlers")
+require("Utils").get_username()
+require("UI.Localization")
+require("Items.Blind")
+require("Items.Deck")
+require("UI.Lobby_UI")
+require("UI.Main_Menu")
+require("UI.Game_UI")
+require("Misc.Disable_Restart")
+require("Misc.Mod_Hash")
 
-	CONFIG = require("Config")
-	NETWORKING_THREAD = love.thread.newThread(string.format("%sNetworking/Socket.lua", relativeModPath))
-	NETWORKING_THREAD:start(CONFIG.URL, CONFIG.PORT)
+CONFIG = require("Config")
+NETWORKING_THREAD = love.thread.newThread(string.format("%sNetworking/Socket.lua", relativeModPath))
+NETWORKING_THREAD:start(CONFIG.URL, CONFIG.PORT)
 
-	G.MULTIPLAYER.connect()
-end
+G.MULTIPLAYER.connect()
 
 SMODS.Mods.VirtualizedMultiplayer.credits_tab = function()
 	return {
@@ -166,5 +164,3 @@ end
 function G.FUNCS.multiplayer_discord(e)
 	love.system.openURL("https://discord.gg/gEemz4ptuF")
 end
-
-LoadMod()

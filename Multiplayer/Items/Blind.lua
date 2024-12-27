@@ -5,9 +5,7 @@ SMODS.Atlas({
 	frames = 21,
 	px = 34,
 	py = 34,
-	prefix_config = {
-		key = false,
-	},
+	prefix_config = { key = false },
 })
 
 SMODS.Blind({
@@ -28,6 +26,7 @@ SMODS.Blind({
 	in_pool = function(self)
 		return false
 	end,
+	prefix_config = { key = false, atlas = false },
 })
 
 --local create_UIBox_your_collection_blinds_ref = create_UIBox_your_collection_blinds

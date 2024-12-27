@@ -30,7 +30,7 @@ local game_update_ref = Game.update
 function Game:update(dt)
 	game_update_ref(self, dt)
 
-	if not hash_generated then
+	if not hash_generated and SMODS.booted then
 		G.MULTIPLAYER:generate_hash()
 		hash_generated = true
 	end
