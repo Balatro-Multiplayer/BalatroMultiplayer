@@ -30,6 +30,7 @@ SMODS.Challenge({
 	unlocked = function(self)
 		return false
 	end,
+	prefix_config = { key = false },
 })
 
 --local set_discover_tallies_ref = set_discover_tallies
