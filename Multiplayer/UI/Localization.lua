@@ -2,9 +2,9 @@ set_language_ref = G.set_language
 function G.set_language(self)
 	set_language_ref(self)
 	if G.localization.mods == nil or G.localization.mods.mp == nil then
-		local localization = require("localization." .. G.SETTINGS.language)
+		local localization = G.MULTIPLAYER.load_mp_file("localization/" .. G.SETTINGS.language .. ".lua")
 		if localization["singleplayer"] == nil then
-			localization = require("localization.en-us")
+			localization = G.MULTIPLAYER.load_mp_file("localization.en-us.lua")
 		end
 		G.localization.mods = { mp = localization.misc.mp }
 	end

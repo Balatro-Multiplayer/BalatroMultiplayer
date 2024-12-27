@@ -1,6 +1,6 @@
 G.MULTIPLAYER = {}
 
-local function load_mp_file(file)
+function G.MULTIPLAYER.load_mp_file(file)
 	local chunk, err = SMODS.load_file(file, "VirtualizedMultiplayer")
 	if chunk then
 		local ok, func = pcall(chunk)
@@ -14,6 +14,8 @@ local function load_mp_file(file)
 	end
 	return nil
 end
+
+local load_mp_file = G.MULTIPLAYER.load_mp_file
 
 load_mp_file("Lobby.lua")
 load_mp_file("Networking/Action_Handlers.lua")
