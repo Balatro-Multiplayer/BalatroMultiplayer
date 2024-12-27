@@ -1,5 +1,0 @@
-EXPORTS
-	_rt0_amd64_windows_lib
-	luaEntryPoint
-    getLobbyCode
-    getUsername
