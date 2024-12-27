@@ -1,10 +1,4 @@
-local Utils = require("Utils")
-local success, version = pcall(require, "Version")
-if not success then
-	version = "DEV"
-end
-
-MULTIPLAYER_VERSION = version .. "-MULTIPLAYER"
+MULTIPLAYER_VERSION = SMODS.Mods["VirtualizedMultiplayer"].version .. "-MULTIPLAYER"
 
 local game_main_menu_ref = Game.main_menu
 ---@diagnostic disable-next-line: duplicate-set-field
@@ -86,7 +80,7 @@ function G.UIDEF.create_UIBox_create_lobby_button()
 														{
 															n = G.UIT.T,
 															config = {
-																text = Utils.wrapText(
+																text = G.MULTIPLAYER.UTILS.wrapText(
 																	mp_localize(
 																		"attrition_desc",
 																		"Every boss round is a competition between players where the player with the lower score loses a life."
@@ -138,7 +132,7 @@ function G.UIDEF.create_UIBox_create_lobby_button()
 														{
 															n = G.UIT.T,
 															config = {
-																text = Utils.wrapText(
+																text = G.MULTIPLAYER.UTILS.wrapText(
 																	mp_localize(
 																		"draft_desc",
 																		"Both players play 3 normal antes, then they play an ante where every round the player with the higher scorer wins."
@@ -190,7 +184,7 @@ function G.UIDEF.create_UIBox_create_lobby_button()
 														{
 															n = G.UIT.T,
 															config = {
-																text = Utils.wrapText(
+																text = G.MULTIPLAYER.UTILS.wrapText(
 																	mp_localize(
 																		"vp_desc",
 																		"The first person to fail a round loses, no PvP blinds."
@@ -240,7 +234,7 @@ function G.UIDEF.create_UIBox_create_lobby_button()
 														{
 															n = G.UIT.T,
 															config = {
-																text = Utils.wrapText(
+																text = G.MULTIPLAYER.UTILS.wrapText(
 																	mp_localize(
 																		"hu_desc",
 																		"Both players play the first ante, then must keep beating the opponents previous score or lose."
@@ -290,7 +284,7 @@ function G.UIDEF.create_UIBox_create_lobby_button()
 														{
 															n = G.UIT.T,
 															config = {
-																text = Utils.wrapText(
+																text = G.MULTIPLAYER.UTILS.wrapText(
 																	mp_localize(
 																		"royale_desc",
 																		"Attrition, except there are up to 8 players and every player only has 1 life."
@@ -428,7 +422,7 @@ function G.FUNCS.join_lobby(e)
 end
 
 function G.FUNCS.join_from_clipboard(e)
-	G.LOBBY.temp_code = Utils.get_from_clipboard()
+	G.LOBBY.temp_code = G.MULTIPLAYER.UTILS.get_from_clipboard()
 	G.MULTIPLAYER.join_lobby(G.LOBBY.temp_code)
 end
 

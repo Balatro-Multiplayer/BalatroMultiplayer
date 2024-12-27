@@ -1,39 +1,46 @@
--- Credit to Nyoxide for this custom loader
-local moduleCache = {}
-local relativeModPath = "Mods/Multiplayer/"
-local function customLoader(moduleName)
-	local filename = moduleName:gsub("%.", "/") .. ".lua"
-	if moduleCache[filename] then
-		return moduleCache[filename]
-	end
+G.MULTIPLAYER = {}
 
-	local filePath = relativeModPath .. filename
-	local fileContent = love.filesystem.read(filePath)
-	if fileContent then
-		local moduleFunc = assert(load(fileContent, "@" .. filePath))
-		moduleCache[filename] = moduleFunc
-		return moduleFunc
+local function load_mp_file(file)
+	local chunk, err = SMODS.load_file(file, "VirtualizedMultiplayer")
+	if chunk then
+		local ok, func = pcall(chunk)
+		if ok then
+			return func
+		else
+			sendWarnMessage("Failed to process file: " .. func, "MULTIPLAYER")
+		end
+	else
+		sendWarnMessage("Failed to find or compile file: " .. tostring(err), "MULTIPLAYER")
 	end
-
-	return "\nNo module found: " .. moduleName
+	return nil
 end
 
----@diagnostic disable-next-line: deprecated
-table.insert(package.loaders, 1, customLoader)
-require("Lobby")
-require("Networking.Action_Handlers")
-require("Utils").get_username()
-require("UI.Localization")
-require("Items.Blind")
-require("Items.Deck")
-require("UI.Lobby_UI")
-require("UI.Main_Menu")
-require("UI.Game_UI")
-require("Misc.Disable_Restart")
-require("Misc.Mod_Hash")
+load_mp_file("Lobby.lua")
+load_mp_file("Networking/Action_Handlers.lua")
 
-CONFIG = require("Config")
-NETWORKING_THREAD = love.thread.newThread(string.format("%sNetworking/Socket.lua", relativeModPath))
+load_mp_file("Utils.lua")
+G.MULTIPLAYER.UTILS.get_username()
+
+load_mp_file("UI/Localization.lua")
+
+load_mp_file("Items/Blind.lua")
+load_mp_file("Items/Deck.lua")
+
+G.MULTIPLAYER.COMPONENTS = {}
+load_mp_file("Components/Disableable_Button.lua")
+load_mp_file("Components/Disableable_Option_Cycle.lua")
+load_mp_file("Components/Disableable_Toggle.lua")
+
+load_mp_file("UI/Lobby_UI.lua")
+load_mp_file("UI/Main_Menu.lua")
+load_mp_file("UI/Game_UI.lua")
+
+load_mp_file("Misc/Disable_Restart.lua")
+load_mp_file("Misc/Mod_Hash.lua")
+
+local CONFIG = load_mp_file("Config.lua")
+local SOCKET = load_mp_file("Networking/Socket.lua")
+NETWORKING_THREAD = love.thread.newThread(SOCKET)
 NETWORKING_THREAD:start(CONFIG.URL, CONFIG.PORT)
 
 G.MULTIPLAYER.connect()
@@ -144,7 +151,7 @@ SMODS.Mods.VirtualizedMultiplayer.config_tab = function()
 						extended_corpus = true,
 						keyboard_offset = 1,
 						callback = function(val)
-							Utils.save_username(G.LOBBY.username)
+							G.MULTIPLAYER.UTILS.save_username(G.LOBBY.username)
 						end,
 					}),
 					{

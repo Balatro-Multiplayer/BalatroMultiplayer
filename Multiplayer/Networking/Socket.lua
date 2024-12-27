@@ -2,6 +2,7 @@
 
 -- Since threads run on a separate lua environment, we need to require
 -- the necessary modules again
+return [[
 local CONFIG_URL, CONFIG_PORT = ...
 
 require("love.filesystem")
@@ -182,3 +183,4 @@ while true do
 	-- Sleeps for 200 milliseconds
 	socket.sleep(0.2)
 end
+]]

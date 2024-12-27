@@ -1,4 +1,4 @@
-function Disableable_Option_Cycle(args)
+function G.MULTIPLAYER.COMPONENTS.Disableable_Option_Cycle(args)
 	local enabled_table = args.enabled_ref_table or {}
 	local enabled = enabled_table[args.enabled_ref_value]
 
@@ -10,8 +10,6 @@ function Disableable_Option_Cycle(args)
 	local option_component = create_option_cycle(args)
 	return option_component
 end
-
-return Disableable_Option_Cycle
 
 --[[ create_option_cycle returns this
   {

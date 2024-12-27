@@ -1,7 +1,7 @@
-Utils = {}
+G.MULTIPLAYER.UTILS = {}
 
 -- Credit to Henrik Ilgen (https://stackoverflow.com/a/6081639)
-function Utils.serialize_table(val, name, skipnewlines, depth)
+function G.MULTIPLAYER.UTILS.serialize_table(val, name, skipnewlines, depth)
 	skipnewlines = skipnewlines or false
 	depth = depth or 0
 
@@ -36,7 +36,7 @@ function Utils.serialize_table(val, name, skipnewlines, depth)
 end
 
 -- Credit to Steamo (https://github.com/Steamopollys/Steamodded/blob/main/core/core.lua)
-function Utils.wrapText(text, maxChars)
+function G.MULTIPLAYER.UTILS.wrapText(text, maxChars)
 	local wrappedText = ""
 	local currentLineLength = 0
 
@@ -54,12 +54,12 @@ function Utils.wrapText(text, maxChars)
 end
 
 local usernameFilePath = "Mods/Multiplayer/Saved/username.txt"
-function Utils.save_username(text)
+function G.MULTIPLAYER.UTILS.save_username(text)
 	G.MULTIPLAYER.set_username(text)
 	love.filesystem.write(usernameFilePath, text)
 end
 
-function Utils.get_username()
+function G.MULTIPLAYER.UTILS.get_username()
 	local fileContent = love.filesystem.read(usernameFilePath)
 	if not fileContent then
 		return
@@ -67,7 +67,7 @@ function Utils.get_username()
 	G.LOBBY.username = fileContent
 end
 
-function Utils.string_split(inputstr, sep)
+function G.MULTIPLAYER.UTILS.string_split(inputstr, sep)
 	if sep == nil then
 		sep = "%s"
 	end
@@ -78,7 +78,7 @@ function Utils.string_split(inputstr, sep)
 	return t
 end
 
-function Utils.copy_to_clipboard(text)
+function G.MULTIPLAYER.UTILS.copy_to_clipboard(text)
 	if G.F_LOCAL_CLIPBOARD then
 		G.CLIPBOARD = text
 	else
@@ -86,7 +86,7 @@ function Utils.copy_to_clipboard(text)
 	end
 end
 
-function Utils.get_from_clipboard()
+function G.MULTIPLAYER.UTILS.get_from_clipboard()
 	if G.F_LOCAL_CLIPBOARD then
 		return G.F_LOCAL_CLIPBOARD
 	else
@@ -94,7 +94,7 @@ function Utils.get_from_clipboard()
 	end
 end
 
-function Utils.overlay_message(message)
+function G.MULTIPLAYER.UTILS.overlay_message(message)
 	G.SETTINGS.paused = true
 
 	G.FUNCS.overlay_menu({
@@ -122,5 +122,3 @@ function Utils.overlay_message(message)
 		}),
 	})
 end
-
-return Utils

@@ -52,7 +52,7 @@ end
 local function action_error(message)
 	sendDebugMessage(message)
 
-	Utils.overlay_message(message)
+	G.MULTIPLAYER.UTILS.overlay_message(message)
 end
 
 local function action_keep_alive()

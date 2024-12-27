@@ -1,6 +1,6 @@
-local Disableable_Button = require("Components.Disableable_Button")
-local Disableable_Toggle = require("Components.Disableable_Toggle")
-local Disableable_Option_Cycle = require("Components.Disableable_Option_Cycle")
+local Disableable_Button = G.MULTIPLAYER.COMPONENTS.Disableable_Button
+local Disableable_Toggle = G.MULTIPLAYER.COMPONENTS.Disableable_Toggle
+local Disableable_Option_Cycle = G.MULTIPLAYER.COMPONENTS.Disableable_Option_Cycle
 
 local function toggle_lobby_options(value)
 	G.MULTIPLAYER.lobby_options()
