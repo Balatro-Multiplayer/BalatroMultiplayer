@@ -86,8 +86,8 @@ const readyBlindAction = (client: Client) => {
 		client.lobby.guest.isReady = false;
 
 		// Reset scores for next blind
-		client.lobby.host.score = 0;
-		client.lobby.guest.score = 0;
+		client.lobby.host.score = 0n;
+		client.lobby.guest.score = 0n;
 
 		// Reset hands left for next blind
 		client.lobby.host.handsLeft = 4;
@@ -111,7 +111,7 @@ const playHandAction = (
 		return;
 	}
 
-	client.score = score;
+	client.score = BigInt(score);
 	client.handsLeft =
 		typeof handsLeft === "number" ? handsLeft : Number(handsLeft);
 

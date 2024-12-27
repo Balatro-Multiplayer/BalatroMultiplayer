@@ -27,7 +27,7 @@ export type ActionGameInfo = {
 export type ActionPlayerInfo = { action: 'playerInfo'; lives: number }
 export type ActionEnemyInfo = {
 	action: 'enemyInfo'
-	score: number
+	score: BigInt
 	handsLeft: number
 }
 export type ActionEndPvP = { action: 'endPvP'; lost: boolean }
@@ -64,7 +64,7 @@ export type ActionReadyBlind = { action: 'readyBlind' }
 export type ActionUnreadyBlind = { action: 'unreadyBlind' }
 export type ActionPlayHand = {
 	action: 'playHand'
-	score: number
+	score: BigInt
 	handsLeft: number
 }
 export type ActionGameInfoRequest = { action: 'gameInfo' }

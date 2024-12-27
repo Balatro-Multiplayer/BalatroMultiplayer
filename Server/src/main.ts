@@ -25,13 +25,32 @@ const KEEP_ALIVE_RETRY_TIMEOUT = 2500
 /** The amount of retries we do before we declare the socket dead */
 const KEEP_ALIVE_RETRY_COUNT = 3
 
+BigInt.prototype.toJSON = function () {
+  return this.toString();
+};
+
+const scientificNotationToBigInt = (value: string): bigint => {
+	const [coefficient, exponent] = value.split('e')
+	const coefficientNum = BigInt(coefficient.replace('.', ''))
+	const exponentNum = BigInt(exponent) - BigInt(coefficient.split('.')[1]?.length || 0)
+	return coefficientNum * 10n ** exponentNum
+}
+
 // biome-ignore lint/suspicious/noExplicitAny: Object is parsed from string
 const stringToJson = (str: string): any => {
-	const obj: Record<string, string | number> = {}
+	const obj: Record<string, string | number | bigint> = {}
 	for (const part of str.split(',')) {
 		const [key, value] = part.split(':')
 		const numericValue = Number(value)
-		obj[key] = Number.isNaN(numericValue) ? value : numericValue
+		let score = null
+		if (key === 'score') {
+			if (value.includes('e')) {
+				score = scientificNotationToBigInt(value)
+			} else {
+				score = BigInt(value)
+			}
+		}
+		obj[key] = score === null ? (Number.isNaN(numericValue) ? value : numericValue) : score
 	}
 	return obj
 }
@@ -54,9 +73,12 @@ const sendActionToSocket =
 		const data = serializeAction(action)
 
 		const { action: actionName, ...actionArgs } = action
-		console.log(
-			`Sent action ${actionName} to client: ${JSON.stringify(actionArgs)}`,
-		)
+
+		if (actionName !== 'keepAlive' && actionName !== 'keepAliveAck') {
+			console.log(
+				`${new Date().toISOString()}: Sent action ${actionName} to client: ${JSON.stringify(actionArgs)}`,
+			)
+		}
 
 		socket.write(`${data}\n`)
 	}
@@ -110,11 +132,14 @@ const server = createServer((socket) => {
 			try {
 				const message: ActionClientToServer | ActionUtility = stringToJson(msg)
 				const { action, ...actionArgs } = message
-				console.log(
-					`Received action ${action} from ${client.id}: ${JSON.stringify(
+				
+				if (action !== 'keepAlive' && action !== 'keepAliveAck') {
+					console.log(
+						`${new Date().toISOString()}: Received action ${action} from ${client.id}: ${JSON.stringify(
 						actionArgs,
 					)}`,
-				)
+					)
+				}
 
 				switch (action) {
 					case 'version':
