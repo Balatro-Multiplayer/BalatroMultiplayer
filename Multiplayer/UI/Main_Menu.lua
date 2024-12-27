@@ -94,13 +94,24 @@ function G.UIDEF.create_UIBox_create_lobby_button()
 														},
 													},
 												},
-												UIBox_button({
-													id = "start_attrition",
-													label = { mp_localize("start_lobby", "Start Lobby") },
-													colour = G.C.RED,
-													button = "start_lobby",
-													minw = 5,
-												}),
+												{
+													n = G.UIT.R,
+													config = {
+														align = "bm",
+														padding = 0.05,
+														minw = 4,
+														minh = 1.5,
+													},
+													nodes = {
+														UIBox_button({
+															id = "start_attrition",
+															label = { mp_localize("start_lobby", "Start Lobby") },
+															colour = G.C.RED,
+															button = "start_lobby",
+															minw = 5,
+														}),
+													},
+												},
 											},
 										}
 									end,
@@ -188,56 +199,6 @@ function G.UIDEF.create_UIBox_create_lobby_button()
 																	mp_localize(
 																		"vp_desc",
 																		"The first person to fail a round loses, no PvP blinds."
-																	),
-																	50
-																),
-																shadow = true,
-																scale = var_495_0 * 0.6,
-																colour = G.C.UI.TEXT_LIGHT,
-															},
-														},
-													},
-												},
-												UIBox_button({
-													label = { mp_localize("coming_soon", "Coming Soon!") },
-													colour = G.C.RED,
-													minw = 5,
-												}),
-											},
-										}
-									end,
-								},
-								{
-									label = mp_localize("headup_name", "Heads Up"),
-									tab_definition_function = function()
-										return {
-											n = G.UIT.ROOT,
-											config = {
-												emboss = 0.05,
-												minh = 6,
-												r = 0.1,
-												minw = 10,
-												align = "tm",
-												padding = 0.2,
-												colour = G.C.BLACK,
-											},
-											nodes = {
-												{
-													n = G.UIT.R,
-													config = {
-														align = "tm",
-														padding = 0.05,
-														minw = 4,
-														minh = 1,
-													},
-													nodes = {
-														{
-															n = G.UIT.T,
-															config = {
-																text = G.MULTIPLAYER.UTILS.wrapText(
-																	mp_localize(
-																		"hu_desc",
-																		"Both players play the first ante, then must keep beating the opponents previous score or lose."
 																	),
 																	50
 																),
