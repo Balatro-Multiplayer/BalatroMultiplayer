@@ -1,6 +1,3 @@
-----------------------------------------------
-------------MOD BLIND-------------------------
-
 SMODS.Atlas({
 	key = "mp_player_blind_chip",
 	path = "player_blind_row.png",
@@ -55,6 +52,3 @@ function is_pvp_boss()
 	end
 	return G.GAME.blind.config.blind.key == "bl_pvp"
 end
-
-----------------------------------------------
-------------MOD BLIND END---------------------

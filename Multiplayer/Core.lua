@@ -1,11 +1,3 @@
---- STEAMODDED HEADER
---- MOD_NAME: Multiplayer
---- MOD_ID: VirtualizedMultiplayer
---- MOD_AUTHOR: [virtualized, TGMM, CUexter]
---- MOD_DESCRIPTION: Allows players to compete with their friends!
-----------------------------------------------
-------------MOD CORE--------------------------
-
 -- Credit to Nyoxide for this custom loader
 local moduleCache = {}
 local relativeModPath = "Mods/Multiplayer/"
@@ -26,7 +18,7 @@ local function customLoader(moduleName)
 	return "\nNo module found: " .. moduleName
 end
 
-function SMODS.INIT.VirtualizedMultiplayer()
+function LoadMod()
 	---@diagnostic disable-next-line: deprecated
 	table.insert(package.loaders, 1, customLoader)
 	require("Lobby")
@@ -39,6 +31,7 @@ function SMODS.INIT.VirtualizedMultiplayer()
 	require("UI.Main_Menu")
 	require("UI.Game_UI")
 	require("Misc.Disable_Restart")
+	require("Misc.Mod_Hash")
 
 	CONFIG = require("Config")
 	NETWORKING_THREAD = love.thread.newThread(string.format("%sNetworking/Socket.lua", relativeModPath))
@@ -174,5 +167,4 @@ function G.FUNCS.multiplayer_discord(e)
 	love.system.openURL("https://discord.gg/gEemz4ptuF")
 end
 
-----------------------------------------------
-------------MOD CORE END----------------------
+LoadMod()

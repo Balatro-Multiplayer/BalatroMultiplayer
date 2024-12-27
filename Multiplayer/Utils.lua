@@ -1,6 +1,3 @@
-----------------------------------------------
-------------MOD UTILS-------------------------
-
 Utils = {}
 
 -- Credit to Henrik Ilgen (https://stackoverflow.com/a/6081639)
@@ -127,6 +124,3 @@ function Utils.overlay_message(message)
 end
 
 return Utils
-
-----------------------------------------------
-------------MOD DEBUG END---------------------

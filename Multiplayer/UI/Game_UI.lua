@@ -1,6 +1,3 @@
-----------------------------------------------
-------------MOD GAME UI-----------------------
-
 local Utils = require("Utils")
 
 local create_UIBox_options_ref = create_UIBox_options
@@ -2035,5 +2032,3 @@ G.FUNCS.multiplayer_blind_chip_UI_scale = function(e)
 		e.config.scale = scale_number(G.MULTIPLAYER_GAME.enemy.score, 0.7, 100000)
 	end
 end
-----------------------------------------------
-------------MOD GAME UI END-------------------

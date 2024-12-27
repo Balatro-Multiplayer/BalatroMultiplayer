@@ -1,6 +1,3 @@
-----------------------------------------------
-------------MOD DISABLEABLE BUTTON------------
-
 function Disableable_Button(args)
 	local enabled_table = args.enabled_ref_table or {}
 	local enabled = enabled_table[args.enabled_ref_value]
@@ -110,6 +107,3 @@ return Disableable_Button
 }
 ]]
 --
-
-----------------------------------------------
-------------MOD DISABLEABLE BUTTON END--------

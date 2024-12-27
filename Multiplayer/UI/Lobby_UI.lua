@@ -1,6 +1,3 @@
-----------------------------------------------
-------------MOD LOBBY UI----------------------
-
 local Disableable_Button = require("Components.Disableable_Button")
 local Disableable_Toggle = require("Components.Disableable_Toggle")
 local Disableable_Option_Cycle = require("Components.Disableable_Option_Cycle")
@@ -583,6 +580,3 @@ function Game:update(dt)
 	end
 	gameUpdateRef(self, dt)
 end
-
-----------------------------------------------
-------------MOD LOBBY UI END------------------

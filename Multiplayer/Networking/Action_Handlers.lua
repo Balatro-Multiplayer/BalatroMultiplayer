@@ -1,6 +1,3 @@
-----------------------------------------------
-------------MOD ACTION HANDLERS---------------
-
 Client = {}
 
 function Client.send(msg)
@@ -309,6 +306,3 @@ function Game:update(dt)
 		end
 	until not msg
 end
-
-----------------------------------------------
-------------MOD ACTION HANDLERS END-----------

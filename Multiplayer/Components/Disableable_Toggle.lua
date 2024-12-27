@@ -1,6 +1,3 @@
-----------------------------------------------
-------------MOD DISABLEABLE TOGGLE------------
-
 function Disableable_Toggle(args)
 	local enabled_table = args.enabled_ref_table or {}
 	local enabled = enabled_table[args.enabled_ref_value]
@@ -102,6 +99,3 @@ return Disableable_Toggle
     }
   }
 ]]
-
-----------------------------------------------
-------------MOD DISABLEABLE TOGGLE END--------

@@ -1,6 +1,3 @@
-----------------------------------------------
-------------MOD DECK--------------------------
-
 SMODS.Challenge({
 	key = "c_multiplayer_1",
 	loc_txt = {
@@ -57,6 +54,3 @@ SMODS.Challenge({
 --	G.CHALLENGES[c_multiplayer_1_index] = c_multiplayer_1
 --	return res
 --end
-
-----------------------------------------------
-------------MOD DECK END----------------------

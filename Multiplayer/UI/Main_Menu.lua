@@ -1,6 +1,3 @@
-----------------------------------------------
-------------MOD MAIN MENU---------------------
-
 local Utils = require("Utils")
 local success, version = pcall(require, "Version")
 if not success then
@@ -448,6 +445,3 @@ function create_UIBox_main_menu_buttons()
 	menu.nodes[1].nodes[1].nodes[1].nodes[1].config.button = "play_options"
 	return menu
 end
-
-----------------------------------------------
-------------MOD MAIN MENU END-----------------
