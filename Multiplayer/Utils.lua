@@ -3,16 +3,6 @@
 
 Utils = {}
 
-local localize_ref = localize
----@diagnostic disable-next-line: lowercase-global
-function localize(args, misc_cat)
-	if args == nil then
-		sendDebugMessage("Caught nil localize args, misc_cat: " .. misc_cat)
-		return nil
-	end
-	return localize_ref(args, misc_cat)
-end
-
 -- Credit to Henrik Ilgen (https://stackoverflow.com/a/6081639)
 function Utils.serialize_table(val, name, skipnewlines, depth)
 	skipnewlines = skipnewlines or false

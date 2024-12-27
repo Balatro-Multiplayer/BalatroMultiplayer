@@ -6,14 +6,17 @@ function G.set_language(self)
 		if localization["singleplayer"] == nil then
 			localization = require("localization.en-us")
 		end
-		G.localization.mods = { mp = localization }
+		G.localization.mods = { mp = localization.misc.mp }
 	end
 end
 
-function mp_localize(args, fallback)
+function mp_localize(key, fallback)
 	if fallback == nil then
 		fallback = args
 	end
-	return localize(args, 'mp')
+	if G.localization.mods.mp then
+		return G.localization.mods.mp[key] or fallback
+	end
+	return fallback
 end
 G:set_language()
