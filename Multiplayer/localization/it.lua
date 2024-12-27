@@ -1,3 +1,4 @@
+-- Localization by @ieatmilk on discord
 return {
 	misc = {
 		mp = {
@@ -68,6 +69,6 @@ return {
 			lobby = "Lobby",
 			return_to = "Ritorna alla",
 			multiplayer_c = "Multigiocatore",
-		}
-	}
+		},
+	},
 }

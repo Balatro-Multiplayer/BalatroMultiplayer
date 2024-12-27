@@ -1,4 +1,4 @@
--- Credit: CUexter
+-- Localization by CUexter on GitHub
 return {
 	misc = {
 		mp = {
@@ -70,6 +70,6 @@ return {
 			lobby = "大廳",
 			return_to = "返回",
 			multiplayer_c = "多人遊戲",
-		}
-	}
+		},
+	},
 }
