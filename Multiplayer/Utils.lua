@@ -53,18 +53,13 @@ function G.MULTIPLAYER.UTILS.wrapText(text, maxChars)
 	return wrappedText
 end
 
-local usernameFilePath = "Mods/Multiplayer/Saved/username.txt"
 function G.MULTIPLAYER.UTILS.save_username(text)
 	G.MULTIPLAYER.set_username(text)
-	love.filesystem.write(usernameFilePath, text)
+	SMODS.Mods["VirtualizedMultiplayer"].config.username = text
 end
 
 function G.MULTIPLAYER.UTILS.get_username()
-	local fileContent = love.filesystem.read(usernameFilePath)
-	if not fileContent then
-		return
-	end
-	G.LOBBY.username = fileContent
+	return SMODS.Mods["VirtualizedMultiplayer"].config.username
 end
 
 function G.MULTIPLAYER.UTILS.string_split(inputstr, sep)

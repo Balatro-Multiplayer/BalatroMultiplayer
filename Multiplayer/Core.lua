@@ -40,12 +40,21 @@ load_mp_file("UI/Game_UI.lua")
 load_mp_file("Misc/Disable_Restart.lua")
 load_mp_file("Misc/Mod_Hash.lua")
 
-local CONFIG = load_mp_file("Config.lua")
 local SOCKET = load_mp_file("Networking/Socket.lua")
 NETWORKING_THREAD = love.thread.newThread(SOCKET)
-NETWORKING_THREAD:start(CONFIG.URL, CONFIG.PORT)
-
+NETWORKING_THREAD:start(
+	SMODS.Mods["VirtualizedMultiplayer"].config.server_url,
+	SMODS.Mods["VirtualizedMultiplayer"].config.server_port
+)
 G.MULTIPLAYER.connect()
+
+local buildAdditionsTab_ref = buildAdditionsTab
+function buildAdditionsTab(mod)
+	if mod.id == "VirtualizedMultiplayer" then
+		return nil
+	end
+	return buildAdditionsTab_ref(mod)
+end
 
 SMODS.Mods.VirtualizedMultiplayer.credits_tab = function()
 	return {
