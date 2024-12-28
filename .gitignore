@@ -1,10 +1,8 @@
 ref.lua
 node_modules
 .env
-Config.lua
+config.lua
 Server/dist
 .vscode
-Multiplayer/Saved/username.txt
-Version.lua
 ref
 Server/releases

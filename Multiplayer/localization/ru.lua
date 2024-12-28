@@ -1,4 +1,4 @@
--- Credit: KilledByLava, minor fix: FaLNioNe, V2 by: astryder75
+-- Localization by @KilledByLava, @FaLNioNe, and @astryder75 on discord
 return {
 	misc = {
 		mp = {
@@ -69,6 +69,6 @@ return {
 			lobby = "Лобби",
 			return_to = "Вернуться в",
 			multiplayer_c = "Сетевая игра",
-		}
-	}
+		},
+	},
 }

@@ -40,7 +40,7 @@ return {
 			in_lobby = "In the lobby",
 			connected = "Connected to Service",
 			warn_service = "WARN: Cannot Find Multiplayer Service",
-			set_name = "Set your username in the main menu! (Mods > Multiplayer)",
+			set_name = "Set your username in the main menu! (Mods > Multiplayer > Config)",
 			start = "START",
 			wait_for = "WAITING FOR",
 			host_start = "HOST TO START",
@@ -68,6 +68,6 @@ return {
 			lobby = "Lobby",
 			return_to = "Return to",
 			multiplayer_c = "Multiplayer",
-		}
-	}
+		},
+	},
 }

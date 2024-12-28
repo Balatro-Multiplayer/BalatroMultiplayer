@@ -86,8 +86,8 @@ const readyBlindAction = (client: Client) => {
 		client.lobby.guest.isReady = false;
 
 		// Reset scores for next blind
-		client.lobby.host.score = 0;
-		client.lobby.guest.score = 0;
+		client.lobby.host.score = 0n;
+		client.lobby.guest.score = 0n;
 
 		// Reset hands left for next blind
 		client.lobby.host.handsLeft = 4;
@@ -111,7 +111,7 @@ const playHandAction = (
 		return;
 	}
 
-	client.score = score;
+	client.score = BigInt(score);
 	client.handsLeft =
 		typeof handsLeft === "number" ? handsLeft : Number(handsLeft);
 
@@ -222,14 +222,28 @@ const setAnteAction = (
 };
 
 // TODO: Fix this
-const serverVersion = "0.1.5-MULTIPLAYER";
+const serverVersion = "0.1.6-MULTIPLAYER";
 /** Verifies the client version and allows connection if it matches the server's */
 const versionAction = (
 	{ version }: ActionHandlerArgs<ActionVersion>,
 	client: Client,
 ) => {
-	if (version !== serverVersion && version.startsWith("DEV")) {
-		client.sendAction({ action: "error", message: `[WARN] Server expecting version ${serverVersion}` });
+	const versionMatch = version.match(/^(\d+\.\d+\.\d+)-MULTIPLAYER$/);
+	if (versionMatch) {
+			const clientVersion = versionMatch[1];
+			const serverVersionNumber = serverVersion.split('-')[0];
+			
+			const [clientMajor, clientMinor, clientPatch] = clientVersion.split('.').map(Number);
+			const [serverMajor, serverMinor, serverPatch] = serverVersionNumber.split('.').map(Number);
+			
+			if (clientMajor < serverMajor || 
+					(clientMajor === serverMajor && clientMinor < serverMinor) ||
+					(clientMajor === serverMajor && clientMinor === serverMinor && clientPatch < serverPatch)) {
+					client.sendAction({ 
+							action: "error", 
+							message: `[WARN] Server expecting version ${serverVersion}` 
+					});
+			}
 	}
 };
 

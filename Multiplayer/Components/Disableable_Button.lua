@@ -1,7 +1,4 @@
-----------------------------------------------
-------------MOD DISABLEABLE BUTTON------------
-
-function Disableable_Button(args)
+function G.MULTIPLAYER.COMPONENTS.Disableable_Button(args)
 	local enabled_table = args.enabled_ref_table or {}
 	local enabled = enabled_table[args.enabled_ref_value]
 	args.colour = args.colour or G.C.RED
@@ -18,8 +15,6 @@ function Disableable_Button(args)
 	button_component.nodes[1].nodes[1].nodes[1].shadow = enabled
 	return button_component
 end
-
-return Disableable_Button
 
 --[[ UIBox_button returns this
 {
@@ -110,6 +105,3 @@ return Disableable_Button
 }
 ]]
 --
-
-----------------------------------------------
-------------MOD DISABLEABLE BUTTON END--------

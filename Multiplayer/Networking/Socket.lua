@@ -1,10 +1,8 @@
-----------------------------------------------
-------------MOD SOCKET------------------------
-
 -- Code for networking stuff that runs in a separate thread
 
 -- Since threads run on a separate lua environment, we need to require
 -- the necessary modules again
+return [[
 local CONFIG_URL, CONFIG_PORT = ...
 
 require("love.filesystem")
@@ -16,7 +14,7 @@ local DEBUGGING = false
 local function initializeThreadDebugSocketConnection()
 	CLIENT = socket.connect("localhost", 12346)
 	if not CLIENT then
-		print("Failed to connect to the debug server")
+		sendWarnMessage("Failed to connect to the debug server", "MULTIPLAYER")
 	end
 end
 
@@ -185,6 +183,4 @@ while true do
 	-- Sleeps for 200 milliseconds
 	socket.sleep(0.2)
 end
-
-----------------------------------------------
-------------MOD SOCKET END--------------------
+]]

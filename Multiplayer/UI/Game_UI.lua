@@ -1,8 +1,3 @@
-----------------------------------------------
-------------MOD GAME UI-----------------------
-
-local Utils = require("Utils")
-
 local create_UIBox_options_ref = create_UIBox_options
 ---@diagnostic disable-next-line: lowercase-global
 function create_UIBox_options()
@@ -145,8 +140,13 @@ function create_UIBox_blind_choice(type, run_info)
 			config = G.P_BLINDS[G.GAME.round_resets.blind_choices[type]],
 		}
 
-		blind_choice.animation =
-			AnimatedSprite(0, 0, 1.4, 1.4, G.ANIMATION_ATLAS["blind_chips"], blind_choice.config.pos)
+		if G.GAME.round_resets.blind_choices[type] == "bl_pvp" then
+			blind_choice.animation =
+				AnimatedSprite(0, 0, 1.4, 1.4, G.ANIMATION_ATLAS["mp_player_blind_chip"], { x = 0, y = 0 })
+		else
+			blind_choice.animation =
+				AnimatedSprite(0, 0, 1.4, 1.4, G.ANIMATION_ATLAS["blind_chips"], blind_choice.config.pos)
+		end
 		blind_choice.animation:define_draw_steps({
 			{ shader = "dissolve", shadow_height = 0.05 },
 			{ shader = "dissolve" },
@@ -583,7 +583,8 @@ local function update_blind_HUD()
 			blockable = false,
 			func = function()
 				G.HUD_blind:get_UIE_by_ID("HUD_blind_count").config.ref_table = G.MULTIPLAYER_GAME.enemy
-				G.HUD_blind:get_UIE_by_ID("HUD_blind_count").config.ref_value = "score"
+				G.HUD_blind:get_UIE_by_ID("HUD_blind_count").config.ref_value = "score_text"
+				G.HUD_blind:get_UIE_by_ID("HUD_blind_count").config.func = "multiplayer_blind_chip_UI_scale"
 				G.HUD_blind:get_UIE_by_ID("HUD_blind").children[2].children[2].children[2].children[1].children[1].config.text =
 					mp_localize("enemy_score", "Current enemy score")
 				G.HUD_blind:get_UIE_by_ID("HUD_blind").children[2].children[2].children[2].children[3].children[1].config.text =
@@ -1535,7 +1536,7 @@ function add_round_eval_row(config)
 				local left_text = {}
 				if config.name == "blind1" then
 					local blind_sprite =
-						AnimatedSprite(0, 0, 1.2, 1.2, G.ANIMATION_ATLAS["blind_chips"], copy_table(G.GAME.blind.pos))
+						AnimatedSprite(0, 0, 1.2, 1.2, G.ANIMATION_ATLAS["mp_player_blind_chip"], { x = 0, y = 0 })
 					blind_sprite:define_draw_steps({
 						{ shader = "dissolve", shadow_height = 0.05 },
 						{ shader = "dissolve" },
@@ -1903,7 +1904,7 @@ local exit_overlay_menu_ref = G.FUNCS.exit_overlay_menu
 function G.FUNCS:exit_overlay_menu()
 	-- Saves username if user presses ESC instead of Enter
 	if G.OVERLAY_MENU:get_UIE_by_ID("username_input_box") ~= nil then
-		Utils.save_username(G.LOBBY.username)
+		G.MULTIPLAYER.UTILS.save_username(G.LOBBY.username)
 	end
 
 	exit_overlay_menu_ref(self)
@@ -1912,7 +1913,7 @@ end
 local mods_button_ref = G.FUNCS.mods_button
 function G.FUNCS.mods_button(arg_736_0)
 	if G.OVERLAY_MENU and G.OVERLAY_MENU:get_UIE_by_ID("username_input_box") ~= nil then
-		Utils.save_username(G.LOBBY.username)
+		G.MULTIPLAYER.UTILS.save_username(G.LOBBY.username)
 	end
 
 	mods_button_ref(arg_736_0)
@@ -2023,5 +2024,9 @@ function Blind:disable()
 	end
 	blind_disable_ref(self)
 end
-----------------------------------------------
-------------MOD GAME UI END-------------------
+
+G.FUNCS.multiplayer_blind_chip_UI_scale = function(e)
+	if G.GAME.blind and G.MULTIPLAYER_GAME.enemy.score then
+		e.config.scale = scale_number(G.MULTIPLAYER_GAME.enemy.score, 0.7, 100000)
+	end
+end

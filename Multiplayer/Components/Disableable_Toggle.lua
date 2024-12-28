@@ -1,7 +1,4 @@
-----------------------------------------------
-------------MOD DISABLEABLE TOGGLE------------
-
-function Disableable_Toggle(args)
+function G.MULTIPLAYER.COMPONENTS.Disableable_Toggle(args)
 	local enabled_table = args.enabled_ref_table or {}
 	local enabled = enabled_table[args.enabled_ref_value]
 
@@ -13,8 +10,6 @@ function Disableable_Toggle(args)
 	toggle_component.nodes[2].nodes[1].nodes[1].config.toggle_callback = enabled and args.callback or nil
 	return toggle_component
 end
-
-return Disableable_Toggle
 
 --[[ create_toggle returns this
   {
@@ -102,6 +97,3 @@ return Disableable_Toggle
     }
   }
 ]]
-
-----------------------------------------------
-------------MOD DISABLEABLE TOGGLE END--------

@@ -1,13 +1,4 @@
-----------------------------------------------
-------------MOD MAIN MENU---------------------
-
-local Utils = require("Utils")
-local success, version = pcall(require, "Version")
-if not success then
-	version = "DEV"
-end
-
-MULTIPLAYER_VERSION = version .. "-MULTIPLAYER"
+MULTIPLAYER_VERSION = SMODS.Mods["VirtualizedMultiplayer"].version .. "-MULTIPLAYER"
 
 local game_main_menu_ref = Game.main_menu
 ---@diagnostic disable-next-line: duplicate-set-field
@@ -82,14 +73,32 @@ function G.UIDEF.create_UIBox_create_lobby_button()
 													config = {
 														align = "tm",
 														padding = 0.05,
-														minw = 4,
-														minh = 1.5,
+														w = 8,
+														h = 2,
+													},
+													nodes = {
+														UIBox_button({
+															id = "start_attrition",
+															label = { mp_localize("start_lobby", "Start Lobby") },
+															colour = G.C.RED,
+															button = "start_lobby",
+															minw = 5,
+														}),
+													},
+												},
+												{
+													n = G.UIT.R,
+													config = {
+														align = "tm",
+														padding = 0.05,
+														minw = 8,
+														minh = 4,
 													},
 													nodes = {
 														{
 															n = G.UIT.T,
 															config = {
-																text = Utils.wrapText(
+																text = G.MULTIPLAYER.UTILS.wrapText(
 																	mp_localize(
 																		"attrition_desc",
 																		"Every boss round is a competition between players where the player with the lower score loses a life."
@@ -103,13 +112,6 @@ function G.UIDEF.create_UIBox_create_lobby_button()
 														},
 													},
 												},
-												UIBox_button({
-													id = "start_attrition",
-													label = { mp_localize("start_lobby", "Start Lobby") },
-													colour = G.C.RED,
-													button = "start_lobby",
-													minw = 5,
-												}),
 											},
 										}
 									end,
@@ -134,14 +136,34 @@ function G.UIDEF.create_UIBox_create_lobby_button()
 													config = {
 														align = "tm",
 														padding = 0.05,
-														minw = 4,
-														minh = 2.5,
+														w = 8,
+														h = 2,
+													},
+													nodes = {
+														UIBox_button({
+															id = "start_draft",
+															label = {
+																mp_localize("start_lobby", "Start Lobby"),
+															},
+															colour = G.C.RED,
+															button = "start_lobby",
+															minw = 5,
+														}),
+													},
+												},
+												{
+													n = G.UIT.R,
+													config = {
+														align = "tm",
+														padding = 0.05,
+														minw = 8,
+														minh = 4,
 													},
 													nodes = {
 														{
 															n = G.UIT.T,
 															config = {
-																text = Utils.wrapText(
+																text = G.MULTIPLAYER.UTILS.wrapText(
 																	mp_localize(
 																		"draft_desc",
 																		"Both players play 3 normal antes, then they play an ante where every round the player with the higher scorer wins."
@@ -155,13 +177,6 @@ function G.UIDEF.create_UIBox_create_lobby_button()
 														},
 													},
 												},
-												UIBox_button({
-													id = "start_draft",
-													label = { mp_localize("start_lobby", "Start Lobby") },
-													colour = G.C.RED,
-													button = "start_lobby",
-													minw = 5,
-												}),
 											},
 										}
 									end,
@@ -186,14 +201,32 @@ function G.UIDEF.create_UIBox_create_lobby_button()
 													config = {
 														align = "tm",
 														padding = 0.05,
-														minw = 4,
-														minh = 1,
+														w = 8,
+														h = 2,
+													},
+													nodes = {
+														UIBox_button({
+															label = {
+																mp_localize("coming_soon", "Coming Soon!"),
+															},
+															colour = G.C.RED,
+															minw = 5,
+														}),
+													},
+												},
+												{
+													n = G.UIT.R,
+													config = {
+														align = "tm",
+														padding = 0.05,
+														minw = 8,
+														minh = 4,
 													},
 													nodes = {
 														{
 															n = G.UIT.T,
 															config = {
-																text = Utils.wrapText(
+																text = G.MULTIPLAYER.UTILS.wrapText(
 																	mp_localize(
 																		"vp_desc",
 																		"The first person to fail a round loses, no PvP blinds."
@@ -207,61 +240,6 @@ function G.UIDEF.create_UIBox_create_lobby_button()
 														},
 													},
 												},
-												UIBox_button({
-													label = { mp_localize("coming_soon", "Coming Soon!") },
-													colour = G.C.RED,
-													minw = 5,
-												}),
-											},
-										}
-									end,
-								},
-								{
-									label = mp_localize("headup_name", "Heads Up"),
-									tab_definition_function = function()
-										return {
-											n = G.UIT.ROOT,
-											config = {
-												emboss = 0.05,
-												minh = 6,
-												r = 0.1,
-												minw = 10,
-												align = "tm",
-												padding = 0.2,
-												colour = G.C.BLACK,
-											},
-											nodes = {
-												{
-													n = G.UIT.R,
-													config = {
-														align = "tm",
-														padding = 0.05,
-														minw = 4,
-														minh = 1,
-													},
-													nodes = {
-														{
-															n = G.UIT.T,
-															config = {
-																text = Utils.wrapText(
-																	mp_localize(
-																		"hu_desc",
-																		"Both players play the first ante, then must keep beating the opponents previous score or lose."
-																	),
-																	50
-																),
-																shadow = true,
-																scale = var_495_0 * 0.6,
-																colour = G.C.UI.TEXT_LIGHT,
-															},
-														},
-													},
-												},
-												UIBox_button({
-													label = { mp_localize("coming_soon", "Coming Soon!") },
-													colour = G.C.RED,
-													minw = 5,
-												}),
 											},
 										}
 									end,
@@ -286,14 +264,32 @@ function G.UIDEF.create_UIBox_create_lobby_button()
 													config = {
 														align = "tm",
 														padding = 0.05,
-														minw = 4,
-														minh = 1,
+														w = 8,
+														h = 2,
+													},
+													nodes = {
+														UIBox_button({
+															label = {
+																mp_localize("coming_soon", "Coming Soon!"),
+															},
+															colour = G.C.RED,
+															minw = 5,
+														}),
+													},
+												},
+												{
+													n = G.UIT.R,
+													config = {
+														align = "tm",
+														padding = 0.05,
+														minw = 8,
+														minh = 4,
 													},
 													nodes = {
 														{
 															n = G.UIT.T,
 															config = {
-																text = Utils.wrapText(
+																text = G.MULTIPLAYER.UTILS.wrapText(
 																	mp_localize(
 																		"royale_desc",
 																		"Attrition, except there are up to 8 players and every player only has 1 life."
@@ -307,11 +303,6 @@ function G.UIDEF.create_UIBox_create_lobby_button()
 														},
 													},
 												},
-												UIBox_button({
-													label = { mp_localize("coming_soon", "Coming Soon!") },
-													colour = G.C.RED,
-													minw = 5,
-												}),
 											},
 										}
 									end,
@@ -431,7 +422,7 @@ function G.FUNCS.join_lobby(e)
 end
 
 function G.FUNCS.join_from_clipboard(e)
-	G.LOBBY.temp_code = Utils.get_from_clipboard()
+	G.LOBBY.temp_code = G.MULTIPLAYER.UTILS.get_from_clipboard()
 	G.MULTIPLAYER.join_lobby(G.LOBBY.temp_code)
 end
 
@@ -448,6 +439,3 @@ function create_UIBox_main_menu_buttons()
 	menu.nodes[1].nodes[1].nodes[1].nodes[1].config.button = "play_options"
 	return menu
 end
-
-----------------------------------------------
-------------MOD MAIN MENU END-----------------

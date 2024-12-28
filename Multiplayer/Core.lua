@@ -1,61 +1,70 @@
---- STEAMODDED HEADER
---- MOD_NAME: Multiplayer
---- MOD_ID: VirtualizedMultiplayer
---- MOD_AUTHOR: [virtualized, TGMM, CUexter]
---- MOD_DESCRIPTION: Allows players to compete with their friends!
-----------------------------------------------
-------------MOD CORE--------------------------
+G.MULTIPLAYER = {}
 
--- Credit to Nyoxide for this custom loader
-local moduleCache = {}
-local relativeModPath = "Mods/Multiplayer/"
-local function customLoader(moduleName)
-	local filename = moduleName:gsub("%.", "/") .. ".lua"
-	if moduleCache[filename] then
-		return moduleCache[filename]
+function G.MULTIPLAYER.load_mp_file(file)
+	local chunk, err = SMODS.load_file(file, "VirtualizedMultiplayer")
+	if chunk then
+		local ok, func = pcall(chunk)
+		if ok then
+			return func
+		else
+			sendWarnMessage("Failed to process file: " .. func, "MULTIPLAYER")
+		end
+	else
+		sendWarnMessage("Failed to find or compile file: " .. tostring(err), "MULTIPLAYER")
 	end
-
-	local filePath = relativeModPath .. filename
-	local fileContent = love.filesystem.read(filePath)
-	if fileContent then
-		local moduleFunc = assert(load(fileContent, "@" .. filePath))
-		moduleCache[filename] = moduleFunc
-		return moduleFunc
-	end
-
-	return "\nNo module found: " .. moduleName
+	return nil
 end
 
-function SMODS.INIT.VirtualizedMultiplayer()
-	---@diagnostic disable-next-line: deprecated
-	table.insert(package.loaders, 1, customLoader)
-	require("Items.Blind")
-	require("Items.Deck")
-	require("Lobby")
-	require("Networking.Action_Handlers")
-	require("Utils").get_username()
-	require("UI.Localization")
-	require("UI.Lobby_UI")
-	require("UI.Main_Menu")
-	require("UI.Game_UI")
-	require("Misc.Disable_Restart")
+local load_mp_file = G.MULTIPLAYER.load_mp_file
 
-	CONFIG = require("Config")
-	NETWORKING_THREAD = love.thread.newThread(string.format("%sNetworking/Socket.lua", relativeModPath))
-	NETWORKING_THREAD:start(CONFIG.URL, CONFIG.PORT)
+load_mp_file("Lobby.lua")
+load_mp_file("Networking/Action_Handlers.lua")
 
-	G.MULTIPLAYER.connect()
+load_mp_file("Utils.lua")
+G.MULTIPLAYER.UTILS.get_username()
+
+load_mp_file("UI/Localization.lua")
+
+load_mp_file("Items/Blind.lua")
+load_mp_file("Items/Deck.lua")
+
+G.MULTIPLAYER.COMPONENTS = {}
+load_mp_file("Components/Disableable_Button.lua")
+load_mp_file("Components/Disableable_Option_Cycle.lua")
+load_mp_file("Components/Disableable_Toggle.lua")
+
+load_mp_file("UI/Lobby_UI.lua")
+load_mp_file("UI/Main_Menu.lua")
+load_mp_file("UI/Game_UI.lua")
+
+load_mp_file("Misc/Disable_Restart.lua")
+load_mp_file("Misc/Mod_Hash.lua")
+
+local SOCKET = load_mp_file("Networking/Socket.lua")
+NETWORKING_THREAD = love.thread.newThread(SOCKET)
+NETWORKING_THREAD:start(
+	SMODS.Mods["VirtualizedMultiplayer"].config.server_url,
+	SMODS.Mods["VirtualizedMultiplayer"].config.server_port
+)
+G.MULTIPLAYER.connect()
+
+local buildAdditionsTab_ref = buildAdditionsTab
+function buildAdditionsTab(mod)
+	if mod.id == "VirtualizedMultiplayer" then
+		return nil
+	end
+	return buildAdditionsTab_ref(mod)
 end
 
 SMODS.Mods.VirtualizedMultiplayer.credits_tab = function()
 	return {
-		n = G.UIT.ROOT, 
+		n = G.UIT.ROOT,
 		config = {
-			r = 0.1, 
-			minw = 5, 
-			align = "cm", 
-			padding = 0.2, 
-			colour = G.C.BLACK
+			r = 0.1,
+			minw = 5,
+			align = "cm",
+			padding = 0.2,
+			colour = G.C.BLACK,
 		},
 		nodes = {
 			{
@@ -119,60 +128,57 @@ end
 
 SMODS.Mods.VirtualizedMultiplayer.config_tab = function()
 	return {
-			n = G.UIT.ROOT, 
-			config = {
-				r = 0.1, 
-				minw = 5, 
-				align = "cm", 
-				padding = 0.2, 
-				colour = G.C.BLACK
-			},
-			nodes = {
-				{
-					n = G.UIT.R,
-					config = {
-						padding = 0.5,
-						align = "cm",
-						id = "username_input_box",
-					},
-					nodes = {
-						{
-							n = G.UIT.T,
-							config = {
-								scale = 0.6,
-								text = mp_localize("username", "Username:"),
-								colour = G.C.UI.TEXT_LIGHT,
-							},
+		n = G.UIT.ROOT,
+		config = {
+			r = 0.1,
+			minw = 5,
+			align = "cm",
+			padding = 0.2,
+			colour = G.C.BLACK,
+		},
+		nodes = {
+			{
+				n = G.UIT.R,
+				config = {
+					padding = 0.5,
+					align = "cm",
+					id = "username_input_box",
+				},
+				nodes = {
+					{
+						n = G.UIT.T,
+						config = {
+							scale = 0.6,
+							text = mp_localize("username", "Username:"),
+							colour = G.C.UI.TEXT_LIGHT,
 						},
-						create_text_input({
-							w = 4,
-							max_length = 25,
-							prompt_text = mp_localize("enter_username", "Enter Username"),
-							ref_table = G.LOBBY,
-							ref_value = "username",
-							extended_corpus = true,
-							keyboard_offset = 1,
-							callback = function(val)
-								Utils.save_username(G.LOBBY.username)
-							end,
-						}),
-						{
-							n = G.UIT.T,
-							config = {
-								scale = 0.3,
-								text = mp_localize("enter_to_save", "Press enter to save"),
-								colour = G.C.UI.TEXT_LIGHT,
-							},
+					},
+					create_text_input({
+						w = 4,
+						max_length = 25,
+						prompt_text = mp_localize("enter_username", "Enter Username"),
+						ref_table = G.LOBBY,
+						ref_value = "username",
+						extended_corpus = true,
+						keyboard_offset = 1,
+						callback = function(val)
+							G.MULTIPLAYER.UTILS.save_username(G.LOBBY.username)
+						end,
+					}),
+					{
+						n = G.UIT.T,
+						config = {
+							scale = 0.3,
+							text = mp_localize("enter_to_save", "Press enter to save"),
+							colour = G.C.UI.TEXT_LIGHT,
 						},
 					},
 				},
 			},
-		}
+		},
+	}
 end
 
 function G.FUNCS.multiplayer_discord(e)
 	love.system.openURL("https://discord.gg/gEemz4ptuF")
 end
-
-----------------------------------------------
-------------MOD CORE END----------------------

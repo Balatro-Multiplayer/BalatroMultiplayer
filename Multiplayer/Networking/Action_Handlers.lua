@@ -1,6 +1,3 @@
-----------------------------------------------
-------------MOD ACTION HANDLERS---------------
-
 Client = {}
 
 function Client.send(msg)
@@ -34,6 +31,9 @@ end
 local function action_lobbyInfo(host, guest, is_host)
 	G.LOBBY.players = {}
 	G.LOBBY.is_host = is_host == "true"
+	if is_host == "true" then
+		G.MULTIPLAYER.lobby_options()
+	end
 	G.LOBBY.host = { username = host }
 	if guest ~= nil then
 		G.LOBBY.guest = { username = guest }
@@ -52,7 +52,7 @@ end
 local function action_error(message)
 	sendDebugMessage(message)
 
-	Utils.overlay_message(message)
+	G.MULTIPLAYER.UTILS.overlay_message(message)
 end
 
 local function action_keep_alive()
@@ -96,6 +96,7 @@ local function action_enemy_info(score_str, hands_left_str)
 	end
 
 	G.MULTIPLAYER_GAME.enemy.score = score
+	G.MULTIPLAYER_GAME.enemy.score_text = number_format(score)
 	G.MULTIPLAYER_GAME.enemy.hands = hands_left
 	if is_pvp_boss() then
 		G.HUD_blind:get_UIE_by_ID("HUD_blind_count"):juice_up()
@@ -223,7 +224,7 @@ end
 ---@param score number
 ---@param hands_left number
 function G.MULTIPLAYER.play_hand(score, hands_left)
-	Client.send(string.format("action:playHand,score:%d,handsLeft:%d", score, hands_left))
+	Client.send(string.format("action:playHand,score:" .. tostring(score) .. ",handsLeft:%d", hands_left))
 end
 
 function G.MULTIPLAYER.lobby_options()
@@ -305,6 +306,3 @@ function Game:update(dt)
 		end
 	until not msg
 end
-
-----------------------------------------------
-------------MOD ACTION HANDLERS END-----------

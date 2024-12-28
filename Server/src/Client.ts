@@ -24,7 +24,7 @@ class Client {
 	/** Whether player is ready for next blind */
 	isReady = false
 	lives = 4
-	score = 0
+	score = 0n
 	handsLeft = 4
 	ante = 1
 

@@ -5,7 +5,6 @@ import type {
 	ActionServerToClient,
 	GameMode,
 } from "./actions.js";
-import { serializeAction } from "./main.js";
 
 const Lobbies = new Map();
 
