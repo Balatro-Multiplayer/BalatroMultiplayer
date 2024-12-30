@@ -17,11 +17,10 @@ end
 
 local load_mp_file = G.MULTIPLAYER.load_mp_file
 
+load_mp_file("Utils.lua")
+
 load_mp_file("Lobby.lua")
 load_mp_file("Networking/Action_Handlers.lua")
-
-load_mp_file("Utils.lua")
-G.MULTIPLAYER.UTILS.get_username()
 
 load_mp_file("UI/Localization.lua")
 

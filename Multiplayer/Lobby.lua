@@ -11,7 +11,7 @@ G.LOBBY = {
 		starting_lives = 4,
 		draft_starting_antes = 3,
 	},
-	username = "Guest",
+	username = G.MULTIPLAYER.UTILS.get_username(),
 	host = {},
 	guest = {},
 	is_host = false,
