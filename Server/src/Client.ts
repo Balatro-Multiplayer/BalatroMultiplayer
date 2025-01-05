@@ -20,6 +20,7 @@ class Client {
 
 	// Game info
 	username = 'Guest'
+	modHash = 'NULL'
 	lobby: Lobby | null = null
 	/** Whether player is ready for next blind */
 	isReady = false
@@ -39,6 +40,11 @@ class Client {
 
 	setUsername = (username: string) => {
 		this.username = username
+		this.lobby?.broadcastLobbyInfo()
+	}
+
+	setModHash = (modHash: string) => {
+		this.modHash = modHash
 		this.lobby?.broadcastLobbyInfo()
 	}
 

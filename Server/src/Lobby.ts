@@ -101,11 +101,13 @@ class Lobby {
 		const action: ActionLobbyInfo = {
 			action: "lobbyInfo",
 			host: this.host.username,
+			hostHash: this.host.modHash,
 			isHost: false,
 		};
 
 		if (this.guest?.username) {
 			action.guest = this.guest.username;
+			action.guestHash = this.guest.modHash;
 			this.guest.sendAction(action);
 		}
 

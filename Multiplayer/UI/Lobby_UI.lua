@@ -111,7 +111,7 @@ function G.UIDEF.create_UIBox_lobby_menu()
 					align = "bm",
 				},
 				nodes = {
-					G.LOBBY.username == "Guest" and {
+					{
 						n = G.UIT.R,
 						config = {
 							padding = 0.1,
@@ -123,8 +123,16 @@ function G.UIDEF.create_UIBox_lobby_menu()
 								config = {
 									scale = 0.3,
 									shadow = true,
-									text = G.localization.misc.dictionary["set_name"]
-										or "Set your username in the main menu! (Mods > Multiplayer > Config)",
+									text = (
+										(
+												(G.LOBBY.host and G.LOBBY.host.hash)
+												and (G.LOBBY.guest and G.LOBBY.guest.hash)
+												and (G.LOBBY.host.hash ~= G.LOBBY.guest.hash)
+											)
+											and (G.localization.misc.dictionary["mod_hash_warning"] or "Players have different mods or mod versions! This can cause problems!")
+										or ((G.LOBBY.username == "Guest") and (G.localization.misc.dictionary["set_name"] or "Set your username in the main menu! (Mods > Multiplayer > Config)"))
+										or " "
+									),
 									colour = G.C.UI.TEXT_LIGHT,
 								},
 							},
@@ -228,6 +236,16 @@ function G.UIDEF.create_UIBox_lobby_menu()
 															colour = G.C.UI.TEXT_LIGHT,
 														},
 													},
+													G.LOBBY.host.hash
+														and {
+															n = G.UIT.T,
+															config = {
+																text = " (" .. G.LOBBY.host.hash .. ")",
+																shadow = true,
+																scale = text_scale * 0.6,
+																colour = G.C.UI.TEXT_LIGHT,
+															},
+														},
 												},
 											} or nil,
 											G.LOBBY.guest.username and {
@@ -247,6 +265,17 @@ function G.UIDEF.create_UIBox_lobby_menu()
 															colour = G.C.UI.TEXT_LIGHT,
 														},
 													},
+
+													G.LOBBY.guest.hash
+														and {
+															n = G.UIT.T,
+															config = {
+																text = " (" .. G.LOBBY.guest.hash .. ")",
+																shadow = true,
+																scale = text_scale * 0.6,
+																colour = G.C.UI.TEXT_LIGHT,
+															},
+														},
 												},
 											} or nil,
 										},

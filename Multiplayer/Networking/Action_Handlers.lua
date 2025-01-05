@@ -8,7 +8,7 @@ end
 function G.MULTIPLAYER.set_username(username)
 	G.LOBBY.username = username or "Guest"
 	if G.LOBBY.connected then
-		Client.send(string.format("action:username,username:%s", G.LOBBY.username))
+		Client.send(string.format("action:username,username:%s,modHash:%s", G.LOBBY.username, G.MULTIPLAYER.MOD_HASH))
 	end
 end
 
@@ -16,7 +16,7 @@ local function action_connected()
 	sendDebugMessage("Client connected to multiplayer server")
 	G.LOBBY.connected = true
 	G.MULTIPLAYER.update_connection_status()
-	Client.send(string.format("action:username,username:%s", G.LOBBY.username))
+	Client.send(string.format("action:username,username:%s,modHash:%s", G.LOBBY.username, G.MULTIPLAYER.MOD_HASH))
 end
 
 local function action_joinedLobby(code, type)
@@ -28,15 +28,15 @@ local function action_joinedLobby(code, type)
 	G.MULTIPLAYER.update_connection_status()
 end
 
-local function action_lobbyInfo(host, guest, is_host)
+local function action_lobbyInfo(host, hostHash, guest, guestHash, is_host)
 	G.LOBBY.players = {}
 	G.LOBBY.is_host = is_host == "true"
 	if is_host == "true" then
 		G.MULTIPLAYER.lobby_options()
 	end
-	G.LOBBY.host = { username = host }
+	G.LOBBY.host = { username = host, hash = hostHash }
 	if guest ~= nil then
-		G.LOBBY.guest = { username = guest }
+		G.LOBBY.guest = { username = guest, hash = guestHash }
 	else
 		G.LOBBY.guest = {}
 	end
@@ -277,7 +277,13 @@ function Game:update(dt)
 			elseif parsedAction.action == "joinedLobby" then
 				action_joinedLobby(parsedAction.code, parsedAction.type)
 			elseif parsedAction.action == "lobbyInfo" then
-				action_lobbyInfo(parsedAction.host, parsedAction.guest, parsedAction.isHost)
+				action_lobbyInfo(
+					parsedAction.host,
+					parsedAction.hostHash,
+					parsedAction.guest,
+					parsedAction.guestHash,
+					parsedAction.isHost
+				)
 			elseif parsedAction.action == "startGame" then
 				action_start_game(parsedAction.deck, parsedAction.seed, parsedAction.stake)
 			elseif parsedAction.action == "startBlind" then

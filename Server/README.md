@@ -102,9 +102,10 @@ lobbyOptions: {any number of options recognized by the client}
 
 ### Client to Server
 
-username: username
+username: username, modHash
 - Set the client's username
 - username: The value
+- modHash: The client's mod hash
 
 ---
 

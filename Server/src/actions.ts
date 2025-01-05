@@ -5,7 +5,9 @@ export type ActionJoinedLobby = { action: 'joinedLobby'; code: string; type: Gam
 export type ActionLobbyInfo = {
 	action: 'lobbyInfo'
 	host: string
+	hostHash: string
 	guest?: string
+	guestHash?: string
 	isHost: boolean
 }
 export type ActionStopGame = { action: 'stopGame' }
@@ -53,7 +55,7 @@ export type ActionServerToClient =
 	| ActionUtility
 
 // Client to Server
-export type ActionUsername = { action: 'username'; username: string }
+export type ActionUsername = { action: 'username'; username: string; modHash: string }
 export type ActionCreateLobby = { action: 'createLobby'; gameMode: GameMode }
 export type ActionJoinLobby = { action: 'joinLobby'; code: string }
 export type ActionLeaveLobby = { action: 'leaveLobby' }

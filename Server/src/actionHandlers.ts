@@ -14,10 +14,11 @@ import type {
 import { generateSeed } from "./utils.js";
 
 const usernameAction = (
-	{ username }: ActionHandlerArgs<ActionUsername>,
+	{ username, modHash }: ActionHandlerArgs<ActionUsername>,
 	client: Client,
 ) => {
 	client.setUsername(username);
+	client.setModHash(modHash);
 };
 
 const createLobbyAction = (
