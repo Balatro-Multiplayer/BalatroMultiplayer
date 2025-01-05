@@ -115,10 +115,8 @@ SMODS.Mods.VirtualizedMultiplayer.credits_tab = function()
 					{
 						n = G.UIT.T,
 						config = {
-							text = mp_localize(
-								"discord_msg",
-								"You can report any bugs and find people to play with there!"
-							),
+							text = G.localization.misc.dictionary["discord_msg"]
+								or "You can report any bugs and find people to play with there!",
 							shadow = true,
 							scale = 0.375,
 							colour = G.C.UI.TEXT_LIGHT,

@@ -102,10 +102,8 @@ function G.UIDEF.create_UIBox_create_lobby_button()
 															n = G.UIT.T,
 															config = {
 																text = G.MULTIPLAYER.UTILS.wrapText(
-																	mp_localize(
-																		"attrition_desc",
-																		"Every boss round is a competition between players where the player with the lower score loses a life."
-																	),
+																	G.localization.misc.dictionary["attrition_desc"]
+																		or "Every boss round is a competition between players where the player with the lower score loses a life.",
 																	50
 																),
 																shadow = true,
@@ -168,10 +166,8 @@ function G.UIDEF.create_UIBox_create_lobby_button()
 															n = G.UIT.T,
 															config = {
 																text = G.MULTIPLAYER.UTILS.wrapText(
-																	mp_localize(
-																		"draft_desc",
-																		"Both players play 3 normal antes, then they play an ante where every round the player with the higher scorer wins."
-																	),
+																	G.localization.misc.dictionary["draft_desc"]
+																		or "Both players play 3 normal antes, then they play an ante where every round the player with the higher scorer wins.",
 																	50
 																),
 																shadow = true,
@@ -232,10 +228,8 @@ function G.UIDEF.create_UIBox_create_lobby_button()
 															n = G.UIT.T,
 															config = {
 																text = G.MULTIPLAYER.UTILS.wrapText(
-																	mp_localize(
-																		"vp_desc",
-																		"The first person to fail a round loses, no PvP blinds."
-																	),
+																	G.localization.misc.dictionary["vp_desc"]
+																		or "The first person to fail a round loses, no PvP blinds.",
 																	50
 																),
 																shadow = true,
@@ -296,10 +290,8 @@ function G.UIDEF.create_UIBox_create_lobby_button()
 															n = G.UIT.T,
 															config = {
 																text = G.MULTIPLAYER.UTILS.wrapText(
-																	mp_localize(
-																		"royale_desc",
-																		"Attrition, except there are up to 8 players and every player only has 1 life."
-																	),
+																	G.localization.misc.dictionary["royale_desc"]
+																		or "Attrition, except there are up to 8 players and every player only has 1 life.",
 																	50
 																),
 																shadow = true,

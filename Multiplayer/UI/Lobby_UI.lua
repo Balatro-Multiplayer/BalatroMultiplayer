@@ -123,10 +123,8 @@ function G.UIDEF.create_UIBox_lobby_menu()
 								config = {
 									scale = 0.3,
 									shadow = true,
-									text = mp_localize(
-										"set_name",
-										"Set your username in the main menu! (Mods > Multiplayer > Config)"
-									),
+									text = G.localization.misc.dictionary["set_name"]
+										or "Set your username in the main menu! (Mods > Multiplayer > Config)",
 									colour = G.C.UI.TEXT_LIGHT,
 								},
 							},
@@ -313,10 +311,8 @@ function G.UIDEF.create_UIBox_lobby_options()
 								config = {
 									scale = 0.6,
 									shadow = true,
-									text = mp_localize(
-										"opts_only_host",
-										"Only the Lobby Host can change these options"
-									),
+									text = G.localization.misc.dictionary["opts_only_host"]
+										or "Only the Lobby Host can change these options",
 									colour = G.C.UI.TEXT_LIGHT,
 								},
 							},
@@ -353,10 +349,8 @@ function G.UIDEF.create_UIBox_lobby_options()
 														id = "gold_on_life_loss_toggle",
 														enabled_ref_table = G.LOBBY,
 														enabled_ref_value = "is_host",
-														label = mp_localize(
-															"opts_cb_money",
-															"Give comeback gold on life loss"
-														),
+														label = G.localization.misc.dictionary["opts_cb_money"]
+															or "Give comeback gold on life loss",
 														ref_table = G.LOBBY.config,
 														ref_value = "gold_on_life_loss",
 														callback = toggle_lobby_options,
@@ -374,10 +368,8 @@ function G.UIDEF.create_UIBox_lobby_options()
 														id = "no_gold_on_round_loss_toggle",
 														enabled_ref_table = G.LOBBY,
 														enabled_ref_value = "is_host",
-														label = mp_localize(
-															"opts_no_gold_on_loss",
-															"Don't get blind gold on round loss"
-														),
+														label = G.localization.misc.dictionary["opts_no_gold_on_loss"]
+															or "Don't get blind gold on round loss",
 														ref_table = G.LOBBY.config,
 														ref_value = "no_gold_on_round_loss",
 														callback = toggle_lobby_options,
@@ -395,10 +387,8 @@ function G.UIDEF.create_UIBox_lobby_options()
 														id = "death_on_round_loss_toggle",
 														enabled_ref_table = G.LOBBY,
 														enabled_ref_value = "is_host",
-														label = mp_localize(
-															"opts_death_on_loss",
-															"Lose a life on non-PvP round loss"
-														),
+														label = G.localization.misc.dictionary["opts_death_on_loss"]
+															or "Lose a life on non-PvP round loss",
 														ref_table = G.LOBBY.config,
 														ref_value = "death_on_round_loss",
 														callback = toggle_lobby_options,
@@ -416,10 +406,8 @@ function G.UIDEF.create_UIBox_lobby_options()
 														id = "different_seeds_toggle",
 														enabled_ref_table = G.LOBBY,
 														enabled_ref_value = "is_host",
-														label = mp_localize(
-															"opts_diff_seeds",
-															"Players have different seeds"
-														),
+														label = G.localization.misc.dictionary["opts_diff_seeds"]
+															or "Players have different seeds",
 														ref_table = G.LOBBY.config,
 														ref_value = "different_seeds",
 														callback = toggle_lobby_options,
@@ -470,10 +458,8 @@ function G.UIDEF.create_UIBox_lobby_options()
 																id = "draft_starting_antes_option",
 																enabled_ref_table = G.LOBBY,
 																enabled_ref_value = "is_host",
-																label = mp_localize(
-																	"opts_start_antes",
-																	"Starting Antes"
-																),
+																label = G.localization.misc.dictionary["opts_start_antes"]
+																	or "Starting Antes",
 																options = { 2, 3, 4, 5, 6, 7 },
 																current_option = G.LOBBY.config.draft_starting_antes
 																	- 1,
