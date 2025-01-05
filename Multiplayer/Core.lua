@@ -19,6 +19,8 @@ local load_mp_file = G.MULTIPLAYER.load_mp_file
 
 load_mp_file("Utils.lua")
 
+load_mp_file("Compatibility/Talisman.lua")
+
 load_mp_file("Lobby.lua")
 load_mp_file("Networking/Action_Handlers.lua")
 

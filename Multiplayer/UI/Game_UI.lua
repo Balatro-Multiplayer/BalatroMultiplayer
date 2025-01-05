@@ -895,7 +895,7 @@ local update_new_round_ref = Game.update_new_round
 function Game:update_new_round(dt)
 	if G.LOBBY.code and not G.STATE_COMPLETE then
 		-- Prevent player from losing
-		if G.GAME.chips - G.GAME.blind.chips < 0 then
+		if to_big(G.GAME.chips) <= to_big(G.GAME.blind.chips) then
 			G.GAME.blind.chips = -1
 			G.MULTIPLAYER.fail_round()
 		end
@@ -1725,7 +1725,7 @@ G.FUNCS.evaluate_round = function()
 	local pitch = 0.95
 	local dollars = 0
 
-	if G.GAME.chips - G.GAME.blind.chips >= 0 then
+	if to_big(G.GAME.chips) >= to_big(G.GAME.blind.chips) then
 		add_round_eval_row({ dollars = G.GAME.blind.dollars, name = "blind1", pitch = pitch })
 		pitch = pitch + 0.06
 		dollars = dollars + G.GAME.blind.dollars
@@ -1903,7 +1903,7 @@ local exit_overlay_menu_ref = G.FUNCS.exit_overlay_menu
 ---@diagnostic disable-next-line: duplicate-set-field
 function G.FUNCS:exit_overlay_menu()
 	-- Saves username if user presses ESC instead of Enter
-	if G.OVERLAY_MENU:get_UIE_by_ID("username_input_box") ~= nil then
+	if G.OVERLAY_MENU and G.OVERLAY_MENU:get_UIE_by_ID("username_input_box") ~= nil then
 		G.MULTIPLAYER.UTILS.save_username(G.LOBBY.username)
 	end
 
