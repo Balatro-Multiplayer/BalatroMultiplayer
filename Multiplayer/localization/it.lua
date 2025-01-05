@@ -1,7 +1,7 @@
 -- Localization by @ieatmilk on discord
 return {
 	misc = {
-		mp = {
+		dictionary = {
 			singleplayer = "Giocatore singolo",
 			join_lobby = "Entra in una Lobby",
 			return_lobby = "Ritorna alla Lobby",

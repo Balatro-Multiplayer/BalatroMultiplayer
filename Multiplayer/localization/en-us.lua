@@ -1,6 +1,6 @@
 return {
 	misc = {
-		mp = {
+		dictionary = {
 			singleplayer = "Singleplayer",
 			join_lobby = "Join Lobby",
 			return_lobby = "Return Lobby",

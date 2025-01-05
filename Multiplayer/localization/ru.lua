@@ -1,7 +1,7 @@
 -- Localization by @KilledByLava, @FaLNioNe, and @astryder75 on discord
 return {
 	misc = {
-		mp = {
+		dictionary = {
 			singleplayer = "Одиночная Игра",
 			join_lobby = "Подключиться к лобби",
 			return_lobby = "Вернуться в лобби",

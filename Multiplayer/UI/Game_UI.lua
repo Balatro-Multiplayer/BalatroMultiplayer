@@ -17,7 +17,7 @@ function create_UIBox_options()
 
 		if G.STAGE == G.STAGES.RUN then
 			main_menu = UIBox_button({
-				label = { mp_localize("return_lobby", "Return to Lobby") },
+				label = { G.localization.misc.dictionary["return_lobby"] or "Return to Lobby" },
 				button = "return_to_lobby",
 				minw = 5,
 			})
@@ -171,7 +171,7 @@ function create_UIBox_blind_choice(type, run_info)
 
 		if G.GAME.round_resets.blind_choices[type] == "bl_pvp" then
 			local dt1 = DynaText({
-				string = { { string = mp_localize("bl_life", "LIFE"), colour = G.C.FILTER } },
+				string = { { string = G.localization.misc.dictionary["bl_life"] or "LIFE", colour = G.C.FILTER } },
 				colours = { G.C.BLACK },
 				scale = 0.55,
 				silent = true,
@@ -181,7 +181,7 @@ function create_UIBox_blind_choice(type, run_info)
 				maxw = 3,
 			})
 			local dt2 = DynaText({
-				string = { { string = mp_localize("bl_or", "or"), colour = G.C.WHITE } },
+				string = { { string = G.localization.misc.dictionary["bl_or"] or "or", colour = G.C.WHITE } },
 				colours = { G.C.CHANCE },
 				scale = 0.35,
 				silent = true,
@@ -190,7 +190,7 @@ function create_UIBox_blind_choice(type, run_info)
 				maxw = 3,
 			})
 			local dt3 = DynaText({
-				string = { { string = mp_localize("bl_death", "DEATH"), colour = G.C.FILTER } },
+				string = { { string = G.localization.misc.dictionary["bl_death"] or "DEATH", colour = G.C.FILTER } },
 				colours = { G.C.BLACK },
 				scale = 0.55,
 				silent = true,
@@ -585,10 +585,10 @@ local function update_blind_HUD()
 				G.HUD_blind:get_UIE_by_ID("HUD_blind_count").config.ref_table = G.MULTIPLAYER_GAME.enemy
 				G.HUD_blind:get_UIE_by_ID("HUD_blind_count").config.ref_value = "score_text"
 				G.HUD_blind:get_UIE_by_ID("HUD_blind_count").config.func = "multiplayer_blind_chip_UI_scale"
-				G.HUD_blind:get_UIE_by_ID("HUD_blind").children[2].children[2].children[2].children[1].children[1].config.text =
-					mp_localize("enemy_score", "Current enemy score")
-				G.HUD_blind:get_UIE_by_ID("HUD_blind").children[2].children[2].children[2].children[3].children[1].config.text =
-					mp_localize("enemy_hands", "Enemy hands left:")
+				G.HUD_blind:get_UIE_by_ID("HUD_blind").children[2].children[2].children[2].children[1].children[1].config.text = G.localization.misc.dictionary["enemy_score"]
+					or "Current enemy score"
+				G.HUD_blind:get_UIE_by_ID("HUD_blind").children[2].children[2].children[2].children[3].children[1].config.text = G.localization.misc.dictionary["enemy_hands"]
+					or "Enemy hands left:"
 				G.HUD_blind:get_UIE_by_ID("dollars_to_be_earned").config.object.config.string =
 					{ { ref_table = G.MULTIPLAYER_GAME.enemy, ref_value = "hands" } }
 				G.HUD_blind:get_UIE_by_ID("dollars_to_be_earned").config.object:update_text()
@@ -618,8 +618,9 @@ end
 
 function G.FUNCS.mp_toggle_ready(e)
 	G.MULTIPLAYER_GAME.ready_blind = not G.MULTIPLAYER_GAME.ready_blind
-	G.MULTIPLAYER_GAME.ready_blind_text = G.MULTIPLAYER_GAME.ready_blind and mp_localize("unready", "Unready")
-		or mp_localize("ready", "Ready")
+	G.MULTIPLAYER_GAME.ready_blind_text = G.MULTIPLAYER_GAME.ready_blind
+			and (G.localization.misc.dictionary["unready"] or "Unready")
+		or (G.localization.misc.dictionary["ready"] or "Ready")
 
 	if G.MULTIPLAYER_GAME.ready_blind then
 		G.MULTIPLAYER.ready_blind()
@@ -690,7 +691,7 @@ local update_shop_ref = Game.update_shop
 function Game:update_shop(dt)
 	if not G.STATE_COMPLETE then
 		G.MULTIPLAYER_GAME.ready_blind = false
-		G.MULTIPLAYER_GAME.ready_blind_text = mp_localize("ready", "Ready")
+		G.MULTIPLAYER_GAME.ready_blind_text = G.localization.misc.dictionary["ready"] or "Ready"
 		G.MULTIPLAYER_GAME.end_pvp = false
 	end
 	update_shop_ref(self, dt)
@@ -858,7 +859,7 @@ function Game:update_hand_played(dt)
 						eval_hand_and_jokers()
 						attention_text({
 							scale = 0.8,
-							text = mp_localize("wait_enemy", "Waiting for enemy to finish..."),
+							text = G.localization.misc.dictionary["wait_enemy"] or "Waiting for enemy to finish...",
 							hold = 5,
 							align = "cm",
 							offset = { x = 0, y = -1.5 },
@@ -1136,7 +1137,7 @@ function Game:start_run(args)
 
 	local scale = 0.4
 	local hud_ante = G.HUD:get_UIE_by_ID("hud_ante")
-	hud_ante.children[1].children[1].config.text = mp_localize("lives", "Lives")
+	hud_ante.children[1].children[1].config.text = G.localization.misc.dictionary["lives"] or "Lives"
 
 	-- Set lives number
 	hud_ante.children[2].children[1].config.object = DynaText({
@@ -1276,7 +1277,8 @@ function create_UIBox_game_over()
 														{
 															n = G.UIT.T,
 															config = {
-																text = mp_localize("return_lobby", "Return to Lobby"),
+																text = G.localization.misc.dictionary["return_lobby"]
+																	or "Return to Lobby",
 																scale = 0.5,
 																colour = G.C.UI.TEXT_LIGHT,
 															},
@@ -1306,7 +1308,8 @@ function create_UIBox_game_over()
 														{
 															n = G.UIT.T,
 															config = {
-																text = mp_localize("leave_lobby", "Leave Lobby"),
+																text = G.localization.misc.dictionary["leave_lobby"]
+																	or "Leave Lobby",
 																scale = 0.5,
 																colour = G.C.UI.TEXT_LIGHT,
 															},
@@ -1447,8 +1450,8 @@ function create_UIBox_win()
 													id = "from_game_won",
 													button = "return_to_lobby",
 													label = {
-														mp_localize("return_to", "Return to"),
-														mp_localize("lobby", "Lobby"),
+														G.localization.misc.dictionary["return_to"] or "Return to",
+														G.localization.misc.dictionary["lobby"] or "Lobby",
 													},
 													minw = 2.5,
 													maxw = 2.5,
@@ -1463,8 +1466,8 @@ function create_UIBox_win()
 												UIBox_button({
 													button = "lobby_leave",
 													label = {
-														mp_localize("leave", "Leave"),
-														mp_localize("lobby", "Lobby"),
+														G.localization.misc.dictionary["leave"] or "Leave",
+														G.localization.misc.dictionary["lobby"] or "Lobby",
 													},
 													minw = 2.5,
 													maxw = 2.5,
@@ -1563,8 +1566,9 @@ function add_round_eval_row(config)
 															and ((is_pvp_boss() or G.LOBBY.config.death_on_round_loss) and mp_localize(
 																"lost_life",
 																" Lost a Life "
-															) or mp_localize("failed", " Failed "))
-														or mp_localize("defeat_enemy", "Defeated the Enemy"),
+															) or G.localization.misc.dictionary["failed"] or " Failed ")
+														or G.localization.misc.dictionary["defeat_enemy"]
+														or "Defeated the Enemy",
 												},
 												colours = { G.C.FILTER },
 												shadow = true,
@@ -1594,7 +1598,7 @@ function add_round_eval_row(config)
 						config = {
 							object = DynaText({
 								string = {
-									mp_localize("total_lives_lost", " Total Lives Lost ($4 each)"),
+									G.localization.misc.dictionary["total_lives_lost"] or " Total Lives Lost ($4 each)",
 								},
 								colours = { G.C.UI.TEXT_LIGHT },
 								shadow = true,

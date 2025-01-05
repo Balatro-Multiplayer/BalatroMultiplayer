@@ -1,7 +1,7 @@
 -- Localization by CUexter on GitHub
 return {
 	misc = {
-		mp = {
+		dictionary = {
 			singleplayer = "單人遊戲",
 			join_lobby = "加入大廳",
 			return_lobby = "返回大廳",

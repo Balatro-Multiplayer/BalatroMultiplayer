@@ -21,9 +21,10 @@ function G.UIDEF.get_connection_status_ui()
 					n = G.UIT.T,
 					config = {
 						scale = 0.3,
-						text = (G.LOBBY.code and mp_localize("in_lobby", "In Lobby"))
-							or (G.LOBBY.connected and mp_localize("connected", "Connected to Service"))
-							or mp_localize("warn_service", "WARN: Cannot Find Multiplayer Service"),
+						text = (G.LOBBY.code and (G.localization.misc.dictionary["in_lobby"] or "In Lobby"))
+							or (G.LOBBY.connected and (G.localization.misc.dictionary["connected"] or "Connected to Service"))
+							or G.localization.misc.dictionary["warn_service"]
+							or "WARN: Cannot Find Multiplayer Service",
 						colour = G.C.UI.TEXT_LIGHT,
 					},
 				},
@@ -80,7 +81,7 @@ function G.UIDEF.create_UIBox_view_code()
 							},
 							nodes = {
 								UIBox_button({
-									label = { mp_localize("copy_clipboard", "Copy to Clipboard") },
+									label = { G.localization.misc.dictionary["copy_clipboard"] or "Copy to Clipboard" },
 									colour = G.C.BLUE,
 									button = "copy_to_clipboard",
 									minw = 5,
@@ -148,13 +149,13 @@ function G.UIDEF.create_UIBox_lobby_menu()
 								colour = G.C.BLUE,
 								minw = 3.65,
 								minh = 1.55,
-								label = { mp_localize("start", "START") },
+								label = { G.localization.misc.dictionary["start"] or "START" },
 								disabled_text = G.LOBBY.is_host and {
-									mp_localize("wait_for", "WAITING FOR"),
-									mp_localize("players", "PLAYERS"),
+									G.localization.misc.dictionary["wait_for"] or "WAITING FOR",
+									G.localization.misc.dictionary["players"] or "PLAYERS",
 								} or {
-									mp_localize("wait_for", "WAITING FOR"),
-									mp_localize("host_start", "HOST TO START"),
+									G.localization.misc.dictionary["wait_for"] or "WAITING FOR",
+									G.localization.misc.dictionary["host_start"] or "HOST TO START",
 								},
 								scale = text_scale * 2,
 								col = true,
@@ -172,7 +173,9 @@ function G.UIDEF.create_UIBox_lobby_menu()
 										colour = G.C.ORANGE,
 										minw = 3.15,
 										minh = 1.35,
-										label = { mp_localize("lobby_options_cap", "LOBBY OPTIONS") },
+										label = {
+											G.localization.misc.dictionary["lobby_options_cap"] or "LOBBY OPTIONS",
+										},
 										scale = text_scale * 1.2,
 										col = true,
 									}),
@@ -201,7 +204,8 @@ function G.UIDEF.create_UIBox_lobby_menu()
 													{
 														n = G.UIT.T,
 														config = {
-															text = mp_localize("connect_player", "Connected Players:"),
+															text = G.localization.misc.dictionary["connect_player"]
+																or "Connected Players:",
 															shadow = true,
 															scale = text_scale * 0.8,
 															colour = G.C.UI.TEXT_LIGHT,
@@ -262,7 +266,7 @@ function G.UIDEF.create_UIBox_lobby_menu()
 										colour = G.C.PALE_GREEN,
 										minw = 3.15,
 										minh = 1.35,
-										label = { mp_localize("view_code", "VIEW CODE") },
+										label = { G.localization.misc.dictionary["view_code"] or "VIEW CODE" },
 										scale = text_scale * 1.2,
 										col = true,
 									}),
@@ -274,7 +278,7 @@ function G.UIDEF.create_UIBox_lobby_menu()
 								colour = G.C.RED,
 								minw = 3.65,
 								minh = 1.55,
-								label = { mp_localize("leave", "LEAVE") },
+								label = { G.localization.misc.dictionary["leave"] or "LEAVE" },
 								scale = text_scale * 1.5,
 								col = true,
 							}),
@@ -323,7 +327,7 @@ function G.UIDEF.create_UIBox_lobby_options()
 						colour = G.C.BOOSTER,
 						tabs = {
 							{
-								label = mp_localize("lobby_options", "Lobby Options"),
+								label = G.localization.misc.dictionary["lobby_options"] or "Lobby Options",
 								chosen = true,
 								tab_definition_function = function()
 									return {
@@ -427,7 +431,7 @@ function G.UIDEF.create_UIBox_lobby_options()
 								end,
 							},
 							{
-								label = mp_localize("opts_gm", "Gamemode Modifiers"),
+								label = G.localization.misc.dictionary["opts_gm"] or "Gamemode Modifiers",
 								tab_definition_function = function()
 									return {
 										n = G.UIT.ROOT,
@@ -452,7 +456,7 @@ function G.UIDEF.create_UIBox_lobby_options()
 														id = "starting_lives_option",
 														enabled_ref_table = G.LOBBY,
 														enabled_ref_value = "is_host",
-														label = mp_localize("opts_lives", "Lives"),
+														label = G.localization.misc.dictionary["opts_lives"] or "Lives",
 														options = { 1, 2, 4, 6, 8 },
 														current_option = G.LOBBY.config.starting_lives < 4
 																and G.LOBBY.config.starting_lives

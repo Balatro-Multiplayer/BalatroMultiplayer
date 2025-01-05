@@ -11,10 +11,10 @@ SMODS.Atlas({
 SMODS.Blind({
 	key = "bl_pvp",
 	loc_txt = {
-		name = mp_localize("bl_pvp_name", "Your Nemesis"),
+		name = G.localization.misc.dictionary["bl_pvp_name"] or "Your Nemesis",
 		text = {
-			mp_localize("bl_pvp_desc1", "Face another player,"),
-			mp_localize("bl_pvp_desc2", "most chips wins"),
+			G.localization.misc.dictionary["bl_pvp_desc1"] or "Face another player,",
+			G.localization.misc.dictionary["bl_pvp_desc2"] or "most chips wins",
 		},
 	},
 	dollars = 5,
