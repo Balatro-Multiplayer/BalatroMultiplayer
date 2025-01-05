@@ -1755,7 +1755,7 @@ G.FUNCS.evaluate_round = function()
 	}))
 	G.GAME.selected_back:trigger_effect({ context = "eval" })
 
-	if G.GAME.current_round.hands_left > 0 and not G.GAME.modifiers.no_extra_hand_money then
+	if G.GAME.current_round.hands_left > 0 and not G.GAME.modifiers.no_extra_hand_money and not is_pvp_boss() then
 		add_round_eval_row({
 			dollars = G.GAME.current_round.hands_left * (G.GAME.modifiers.money_per_hand or 1),
 			disp = G.GAME.current_round.hands_left,
