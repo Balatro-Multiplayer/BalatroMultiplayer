@@ -1,5 +1,12 @@
 G.MULTIPLAYER = {}
 
+SMODS.Atlas({
+	key = "modicon",
+	path = "modicon.png",
+	px = 34,
+	py = 34,
+})
+
 function G.MULTIPLAYER.load_mp_file(file)
 	local chunk, err = SMODS.load_file(file, "VirtualizedMultiplayer")
 	if chunk then
