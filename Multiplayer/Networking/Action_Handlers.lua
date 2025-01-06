@@ -141,11 +141,15 @@ local function action_lose_game()
 end
 
 local function action_game_info(small, big, boss)
-	G.GAME.round_resets.blind_choices = {
-		Small = small or "bl_small",
-		Big = big or "bl_big",
-		Boss = boss or get_new_boss(),
-	}
+	if small then
+		G.GAME.round_resets.blind_choices["Small"] = small
+	end
+	if big then
+		G.GAME.round_resets.blind_choices["Big"] = big
+	end
+	if boss then
+		G.GAME.round_resets.blind_choices["Boss"] = boss
+	end
 	G.MULTIPLAYER_GAME.loaded_ante = G.GAME.round_resets.ante
 	G.MULTIPLAYER.loading_blinds = false
 end
