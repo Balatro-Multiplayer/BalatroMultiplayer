@@ -169,7 +169,11 @@ function create_UIBox_blind_choice(type, run_info)
 				pseudorandom_element(_poker_hands, pseudoseed("orbital"))
 		end
 
-		if G.GAME.round_resets.blind_choices[type] == "bl_pvp" then
+		if type == "Small" then
+			extras = create_UIBox_blind_tag(type, run_info)
+		elseif type == "Big" then
+			extras = create_UIBox_blind_tag(type, run_info)
+		elseif G.GAME.round_resets.blind_choices[type] == "bl_pvp" then
 			local dt1 = DynaText({
 				string = { { string = G.localization.misc.dictionary["bl_life"] or "LIFE", colour = G.C.FILTER } },
 				colours = { G.C.BLACK },
@@ -272,6 +276,7 @@ function create_UIBox_blind_choice(type, run_info)
 				or blind_state == "Current" and G.C.RED
 				or G.C.GOLD
 			)
+
 		local t = {
 			n = G.UIT.R,
 			config = {
@@ -312,6 +317,9 @@ function create_UIBox_blind_choice(type, run_info)
 										shadow = true,
 										hover = true,
 										one_press = true,
+										func = G.GAME.round_resets.blind_choices[type] == "bl_pvp"
+												and "pvp_ready_button"
+											or nil,
 										button = "select_blind",
 									},
 									nodes = {
@@ -574,6 +582,143 @@ function create_UIBox_blind_choice(type, run_info)
 	end
 end
 
+G.FUNCS.blind_choice_handler = function(e)
+	if
+		not e.config.ref_table.run_info
+		and G.blind_select
+		and G.blind_select.VT.y < 10
+		and e.config.id
+		and G.blind_select_opts[string.lower(e.config.id)]
+	then
+		if e.UIBox.role.xy_bond ~= "Weak" then
+			e.UIBox:set_role({ xy_bond = "Weak" })
+		end
+		if
+			(e.config.ref_table.deck ~= "on" and e.config.id == G.GAME.blind_on_deck)
+			or (e.config.ref_table.deck ~= "off" and e.config.id ~= G.GAME.blind_on_deck)
+		then
+			local _blind_choice = G.blind_select_opts[string.lower(e.config.id)]
+			local _top_button = e.UIBox:get_UIE_by_ID("select_blind_button")
+			local _border = e.UIBox.UIRoot.children[1].children[1]
+			local _tag = e.UIBox:get_UIE_by_ID("tag_" .. e.config.id)
+			local _tag_container = e.UIBox:get_UIE_by_ID("tag_container")
+			if
+				_tag_container
+				and not G.SETTINGS.tutorial_complete
+				and not G.SETTINGS.tutorial_progress.completed_parts["shop_1"]
+			then
+				_tag_container.states.visible = false
+			elseif _tag_container then
+				_tag_container.states.visible = true
+			end
+			if e.config.id == G.GAME.blind_on_deck then
+				e.config.ref_table.deck = "on"
+				e.config.draw_after = false
+				e.config.colour = G.C.CLEAR
+				_border.parent.config.outline = 2
+				_border.parent.config.outline_colour = G.C.UI.TRANSPARENT_DARK
+				_border.config.outline_colour = _border.config.outline and _border.config.outline_colour
+					or get_blind_main_colour(e.config.id)
+				_border.config.outline = 1.5
+				_blind_choice.alignment.offset.y = -0.9
+				if _tag and _tag_container then
+					_tag_container.children[2].config.draw_after = false
+					_tag_container.children[2].config.colour = G.C.BLACK
+					_tag.children[2].config.button = "skip_blind"
+					_tag.config.outline_colour = adjust_alpha(G.C.BLUE, 0.5)
+					_tag.children[2].config.hover = true
+					_tag.children[2].config.colour = G.C.RED
+					_tag.children[2].children[1].config.colour = G.C.UI.TEXT_LIGHT
+					local _sprite = _tag.config.ref_table
+					_sprite.config.force_focus = nil
+				end
+				if _top_button then
+					G.E_MANAGER:add_event(Event({
+						func = function()
+							G.CONTROLLER:snap_to({ node = _top_button })
+							return true
+						end,
+					}))
+					if _top_button.config.button ~= "mp_toggle_ready" then
+						_top_button.config.button = "select_blind"
+					end
+					_top_button.config.colour = G.C.FILTER
+					_top_button.config.hover = true
+					_top_button.children[1].config.colour = G.C.WHITE
+				end
+			elseif e.config.id ~= G.GAME.blind_on_deck then
+				e.config.ref_table.deck = "off"
+				e.config.draw_after = true
+				e.config.colour = adjust_alpha(
+					G.GAME.round_resets.blind_states[e.config.id] == "Skipped"
+							and mix_colours(G.C.BLUE, G.C.L_BLACK, 0.1)
+						or G.C.L_BLACK,
+					0.5
+				)
+				_border.parent.config.outline = nil
+				_border.parent.config.outline_colour = nil
+				_border.config.outline_colour = nil
+				_border.config.outline = nil
+				_blind_choice.alignment.offset.y = -0.2
+				if _tag and _tag_container then
+					if
+						G.GAME.round_resets.blind_states[e.config.id] == "Skipped"
+						or G.GAME.round_resets.blind_states[e.config.id] == "Defeated"
+					then
+						_tag_container.children[2]:set_role({ xy_bond = "Weak" })
+						_tag_container.children[2]:align(0, 10)
+						_tag_container.children[1]:set_role({ xy_bond = "Weak" })
+						_tag_container.children[1]:align(0, 10)
+					end
+					if G.GAME.round_resets.blind_states[e.config.id] == "Skipped" then
+						_blind_choice.children.alert = UIBox({
+							definition = create_UIBox_card_alert({
+								text_rot = -0.35,
+								no_bg = true,
+								text = localize("k_skipped_cap"),
+								bump_amount = 1,
+								scale = 0.9,
+								maxw = 3.4,
+							}),
+							config = {
+								align = "tmi",
+								offset = { x = 0, y = 2.2 },
+								major = _blind_choice,
+								parent = _blind_choice,
+							},
+						})
+					end
+					_tag.children[2].config.button = nil
+					_tag.config.outline_colour = G.C.UI.BACKGROUND_INACTIVE
+					_tag.children[2].config.hover = false
+					_tag.children[2].config.colour = G.C.UI.BACKGROUND_INACTIVE
+					_tag.children[2].children[1].config.colour = G.C.UI.TEXT_INACTIVE
+					local _sprite = _tag.config.ref_table
+					_sprite.config.force_focus = true
+				end
+				if _top_button then
+					_top_button.config.colour = G.C.UI.BACKGROUND_INACTIVE
+					_top_button.config.button = nil
+					_top_button.config.hover = false
+					_top_button.children[1].config.colour = G.C.UI.TEXT_INACTIVE
+				end
+			end
+		end
+	end
+end
+
+G.FUNCS.pvp_ready_button = function(e)
+	if e.children[1].config.ref_table[e.children[1].config.ref_value] == "Select" then
+		e.config.button = "mp_toggle_ready"
+		e.config.one_press = false
+		e.children[1].config.ref_table = G.MULTIPLAYER_GAME
+		e.children[1].config.ref_value = "ready_blind_text"
+	end
+	if e.config.button == "mp_toggle_ready" then
+		e.config.colour = (G.MULTIPLAYER_GAME.ready_blind and G.C.GREEN) or G.C.RED
+	end
+end
+
 local function update_blind_HUD()
 	if G.LOBBY.code then
 		G.HUD_blind.alignment.offset.y = -10
@@ -623,19 +768,10 @@ function G.FUNCS.mp_toggle_ready(e)
 		or (G.localization.misc.dictionary["ready"] or "Ready")
 
 	if G.MULTIPLAYER_GAME.ready_blind then
-		G.MULTIPLAYER.ready_blind()
-		stop_use()
+		G.MULTIPLAYER.ready_blind(e)
 	else
 		G.MULTIPLAYER.unready_blind()
 	end
-end
-
-function G.FUNCS.mp_cfg_ready_blind_button(e)
-	-- Override next round button
-	e.config.ref_table = G.FUNCS
-	e.config.button = "mp_toggle_ready"
-	e.config.colour = G.MULTIPLAYER_GAME.ready_blind and G.C.GREEN or G.C.RED
-	e.config.one_press = false
 end
 
 local update_draw_to_hand_ref = Game.update_draw_to_hand
@@ -695,44 +831,6 @@ function Game:update_shop(dt)
 		G.MULTIPLAYER_GAME.end_pvp = false
 	end
 	update_shop_ref(self, dt)
-end
-
-local ui_def_shop_ref = G.UIDEF.shop
----@diagnostic disable-next-line: duplicate-set-field
-function G.UIDEF.shop()
-	-- Only modify the shop if not in a singleplayer game
-	if not G.LOBBY.connected or not G.LOBBY.code then
-		return ui_def_shop_ref()
-	end
-
-	local t = ui_def_shop_ref()
-
-	local inner_table = t.nodes[1].nodes[1].nodes[1].nodes
-
-	local next_round_button = inner_table[1].nodes[1].nodes[1].nodes[1]
-	next_round_button.config.func = "mp_cfg_ready_blind_button"
-
-	-- Text inside the button
-	next_round_button.nodes[1].nodes = {
-		{
-			n = G.UIT.R,
-			config = { align = "cm" },
-			nodes = {
-				{
-					n = G.UIT.T,
-					config = {
-						ref_table = G.MULTIPLAYER_GAME,
-						ref_value = "ready_blind_text",
-						scale = 0.65,
-						colour = G.C.WHITE,
-						shadow = true,
-					},
-				},
-			},
-		},
-	}
-
-	return t
 end
 
 local function eval_hand_and_jokers()

@@ -79,9 +79,11 @@ end
 
 local function action_start_blind()
 	G.MULTIPLAYER_GAME.ready_blind = false
-	-- TODO: This should check that player is in a
-	-- multiplayer game
-	G.FUNCS.toggle_shop()
+	if G.MULTIPLAYER_GAME.next_blind_context then
+		G.FUNCS.select_blind(G.MULTIPLAYER_GAME.next_blind_context)
+	else
+		sendErrorMessage("No next blind context", "MULTIPLAYER")
+	end
 end
 
 ---@param score_str string
@@ -194,7 +196,8 @@ function G.MULTIPLAYER.start_game()
 	Client.send("action:startGame")
 end
 
-function G.MULTIPLAYER.ready_blind()
+function G.MULTIPLAYER.ready_blind(e)
+	G.MULTIPLAYER_GAME.next_blind_context = e
 	Client.send("action:readyBlind")
 end
 

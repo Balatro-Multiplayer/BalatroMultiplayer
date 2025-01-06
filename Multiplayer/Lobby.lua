@@ -32,6 +32,7 @@ G.MULTIPLAYER_GAME = {
 		score_text = "0",
 		hands = 4,
 	},
+	next_blind_context = nil,
 }
 
 function reset_game_states()
@@ -51,6 +52,7 @@ function reset_game_states()
 			score_text = "0",
 			hands = 4,
 		},
+		next_blind_context = nil,
 	}
 end
 
