@@ -13,14 +13,14 @@ function G.MULTIPLAYER.set_username(username)
 end
 
 local function action_connected()
-	sendDebugMessage("Client connected to multiplayer server")
+	sendTraceMessage("Client connected to multiplayer server", "MULTIPLAYER")
 	G.LOBBY.connected = true
 	G.MULTIPLAYER.update_connection_status()
 	Client.send(string.format("action:username,username:%s,modHash:%s", G.LOBBY.username, G.MULTIPLAYER.MOD_HASH))
 end
 
 local function action_joinedLobby(code, type)
-	sendDebugMessage(string.format("Joining lobby %s", code))
+	sendTraceMessage(string.format("Joining lobby %s", code), "MULTIPLAYER")
 	G.LOBBY.code = code
 	G.LOBBY.type = type
 	reset_gamemode_modifiers()
@@ -50,7 +50,7 @@ local function action_lobbyInfo(host, hostHash, guest, guestHash, is_host)
 end
 
 local function action_error(message)
-	sendDebugMessage(message)
+	sendWarnMessage(message, "MULTIPLAYER")
 
 	G.MULTIPLAYER.UTILS.overlay_message(message)
 end
@@ -91,7 +91,7 @@ local function action_enemy_info(score_str, hands_left_str)
 	local hands_left = tonumber(hands_left_str)
 
 	if score == nil or hands_left == nil then
-		sendDebugMessage("Invalid score or hands_left")
+		sendDebugMessage("Invalid score or hands_left", "MULTIPLAYER")
 		return
 	end
 
@@ -266,7 +266,7 @@ function Game:update(dt)
 		if msg then
 			local parsedAction = string_to_table(msg)
 
-			sendDebugMessage(string.format("Client got %s message", parsedAction.action))
+			sendTraceMessage(string.format("Client got %s message", parsedAction.action), "MULTIPLAYER")
 
 			if parsedAction.action == "connected" then
 				action_connected()
