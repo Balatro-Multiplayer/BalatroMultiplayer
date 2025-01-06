@@ -245,6 +245,10 @@ function G.MULTIPLAYER.version()
 end
 
 function G.MULTIPLAYER.set_location(location)
+	if G.MULTIPLAYER_GAME.location == location then
+		return
+	end
+	G.MULTIPLAYER_GAME.location = location
 	Client.send(string.format("action:setLocation,location:%s", location))
 end
 

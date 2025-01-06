@@ -33,6 +33,7 @@ G.MULTIPLAYER_GAME = {
 		hands = 4,
 		location = "Selecting a Blind",
 	},
+	location = "loc_selecting",
 	next_blind_context = nil,
 }
 
@@ -54,6 +55,7 @@ function reset_game_states()
 			hands = 4,
 			location = "Selecting a Blind",
 		},
+		location = "loc_selecting",
 		next_blind_context = nil,
 	}
 end
