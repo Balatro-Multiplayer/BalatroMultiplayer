@@ -1,3 +1,13 @@
+if SMODS.Mods["Cryptid"] and SMODS.Mods["Cryptid"].can_load then
+	sendDebugMessage("Cryptid compatibility detected", "MULTIPLAYER")
+	G.MULTIPLAYER.DECK.ban_card("j_cry_fleshpanopticon")
+	G.MULTIPLAYER.DECK.ban_card("j_cry_candy_sticks")
+	G.MULTIPLAYER.DECK.ban_card("j_cry_redeo")
+	G.MULTIPLAYER.DECK.ban_card("v_cry_asteroglyph")
+	G.MULTIPLAYER.DECK.ban_card("c_cry_semicolon")
+	G.MULTIPLAYER.DECK.ban_card("c_cry_crash")
+end
+
 function save_run()
 	if G.F_NO_SAVING == true then
 		-- Fake culled_table for Cryptid

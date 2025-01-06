@@ -4,7 +4,7 @@
 	"display_name": "MP",
 	"author": ["virtualized", "TGMM", "CUexter"],
 	"description": "Allows players to compete with their friends!",
-	"prefix": "mp_",
+	"prefix": "mp",
 	"main_file": "Core.lua",
 	"priority": 9007199254740990,
 	"badge_colour": "AC3232",
