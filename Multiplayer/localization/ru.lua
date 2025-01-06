@@ -69,6 +69,12 @@ return {
 			lobby = "Лобби",
 			return_to = "Вернуться в",
 			multiplayer_c = "Сетевая игра",
+			enemy_loc_1 = "Статус",
+			enemy_loc_2 = "соперника",
+			loc_ready = "Готов к ПвП",
+			loc_selecting = "Выбирает Блайнд",
+			loc_shop = "В магазине",
+			loc_playing = "Против ",
 		},
 	},
 }
