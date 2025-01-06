@@ -171,6 +171,22 @@ local function action_lobby_options(options)
 	end
 end
 
+local function enemyLocation(options)
+	local location = options.location
+	local value = ""
+
+	if string.find(location, "-") then
+		local split = {}
+		for str in string.gmatch(location, "([^-]+)") do
+			table.insert(split, str)
+		end
+		location = split[1]
+		value = split[2]
+	end
+
+	G.MULTIPLAYER_GAME.enemy.location = G.localization.misc.dictionary[location] .. value
+end
+
 local function action_version()
 	G.MULTIPLAYER.version()
 end
@@ -222,6 +238,10 @@ end
 
 function G.MULTIPLAYER.version()
 	Client.send(string.format("action:version,version:%s", MULTIPLAYER_VERSION))
+end
+
+function G.MULTIPLAYER.set_location(location)
+	Client.send(string.format("action:setLocation,location:%s", location))
 end
 
 ---@param score number
@@ -307,6 +327,8 @@ function Game:update(dt)
 				action_game_info(parsedAction.small, parsedAction.big, parsedAction.boss)
 			elseif parsedAction.action == "lobbyOptions" then
 				action_lobby_options(parsedAction)
+			elseif parsedAction.action == "enemyLocation" then
+				enemyLocation(parsedAction)
 			elseif parsedAction.action == "error" then
 				action_error(parsedAction.message)
 			elseif parsedAction.action == "keepAlive" then

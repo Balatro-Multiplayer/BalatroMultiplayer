@@ -8,6 +8,7 @@ import type {
 	ActionJoinLobby,
 	ActionPlayHand,
 	ActionSetAnte,
+	ActionSetLocation,
 	ActionUsername,
 	ActionVersion,
 } from "./actions.js";
@@ -248,6 +249,10 @@ const versionAction = (
 	}
 };
 
+const setLocation = ({ location }: ActionHandlerArgs<ActionSetLocation>, client: Client) => {
+	client.setLocation(location);
+}
+
 // Declared partial for now untill all action handlers are defined
 export const actionHandlers = {
 	username: usernameAction,
@@ -266,4 +271,5 @@ export const actionHandlers = {
 	failRound: failRoundAction,
 	setAnte: setAnteAction,
 	version: versionAction,
+	setLocation: setLocation
 } satisfies Partial<ActionHandlers>;

@@ -11,6 +11,7 @@ import type {
 	ActionPlayHand,
 	ActionServerToClient,
 	ActionSetAnte,
+	ActionSetLocation,
 	ActionUsername,
 	ActionUtility,
 	ActionVersion,
@@ -142,6 +143,12 @@ const server = createServer((socket) => {
 				}
 
 				switch (action) {
+					case 'setLocation':
+						actionHandlers.setLocation(
+							actionArgs as ActionHandlerArgs<ActionSetLocation>,
+							client,
+						)
+						break
 					case 'version':
 						actionHandlers.version(
 							actionArgs as ActionHandlerArgs<ActionVersion>,

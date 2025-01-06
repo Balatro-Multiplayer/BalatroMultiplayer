@@ -31,11 +31,24 @@ class Client {
 
 	livesBlocker = false
 
+	location = 'Blind Select'
+
 	constructor(address: Address, send: SendFn, closeConnection: CloseConnFn) {
 		this.id = uuidv4()
 		this.address = address
 		this.sendAction = send
 		this.closeConnection = closeConnection
+	}
+
+	setLocation = (location: string) => {
+		this.location = location
+		if (this.lobby) {
+			if (this.lobby.host === this) {
+				this.lobby.guest?.sendAction({ action: "enemyLocation", location: this.location })
+			} else {
+				this.lobby.host?.sendAction({ action: "enemyLocation", location: this.location })
+			}
+		}
 	}
 
 	setUsername = (username: string) => {

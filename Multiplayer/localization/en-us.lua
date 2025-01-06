@@ -68,6 +68,12 @@ return {
 			lobby = "Lobby",
 			return_to = "Return to",
 			multiplayer_c = "Multiplayer",
+			enemy_loc_1 = "Enemy",
+			enemy_loc_2 = "location",
+			loc_ready = "Ready for PvP",
+			loc_selecting = "Selecting a Blind",
+			loc_shop = "Shopping",
+			loc_playing = "Playing ",
 		},
 	},
 }

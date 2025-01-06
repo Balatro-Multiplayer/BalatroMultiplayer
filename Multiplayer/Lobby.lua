@@ -31,6 +31,7 @@ G.MULTIPLAYER_GAME = {
 		score = 0,
 		score_text = "0",
 		hands = 4,
+		location = "Selecting a Blind",
 	},
 	next_blind_context = nil,
 }
@@ -51,6 +52,7 @@ function reset_game_states()
 			score = 0,
 			score_text = "0",
 			hands = 4,
+			location = "Selecting a Blind",
 		},
 		next_blind_context = nil,
 	}
