@@ -1660,9 +1660,19 @@ function add_round_eval_row(config)
 										config = {
 											object = DynaText({
 												string = {
-													G.GAME.blind.chips == -1
-															and ((is_pvp_boss() or G.LOBBY.config.death_on_round_loss) and (G.localization.misc.dictionary["lost_life"] or " Lost a Life "))
-														or (G.localization.misc.dictionary["failed"] or " Failed ")
+													(
+														G.GAME.blind.chips == -1
+														and (
+															(
+																(is_pvp_boss() or G.LOBBY.config.death_on_round_loss)
+																and (
+																	G.localization.misc.dictionary["lost_life"]
+																	or " Lost a Life "
+																)
+															)
+															or (G.localization.misc.dictionary["failed"] or " Failed ")
+														)
+													)
 														or (
 															G.localization.misc.dictionary["defeat_enemy"]
 															or "Defeated the Enemy"
