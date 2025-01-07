@@ -72,14 +72,6 @@ loseGame
 
 ---
 
-gameInfo: small?, big?, boss?
-- Info to send to the client before each blind set is displayed, overwrites the blinds
-- small?: Blind type to set the small blind in the set to, defaults to the normal small blind, must be a [blind type](#blind-types)
-- big?: Blind type to set the big blind in the set to, defaults to the normal big blind, must be a [blind type](#blind-types)
-- boss?: Blind type to set the boss in the set to, defaults to a random boss, must be a [blind type](#blind-types)
-
----
-
 playerInfo: lives
 - Info to send to the client at the start of the game and whenever it is requested
 - lives: Amount of lives the client currently has, must be a number
@@ -97,8 +89,9 @@ endPvP: lost
 
 ---
 
-lobbyOptions: {any number of options recognized by the client}
+lobbyOptions: gamemode, {any number of options recognized by the client}
 - Updates guest clients when host changes options, should be sent when client connects and when options change
+- Requested gamemode type, must be a [server type](#server-types)
 
 ### Client to Server
 
@@ -155,11 +148,6 @@ playHand: score, handsLeft
 - Client has played a hand.
 - score: The total score of all hands played in the blind so far, must be a number
 - handsLeft: The total number of hands left that the client can play this blind, must be a number
-
----
-
-gameInfo
-- Request a gameInfo update.
 
 ---
 

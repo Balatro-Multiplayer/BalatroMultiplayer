@@ -140,22 +140,12 @@ local function action_lose_game()
 	G.STATE = G.STATES.GAME_OVER
 end
 
-local function action_game_info(small, big, boss)
-	if small then
-		G.GAME.round_resets.blind_choices["Small"] = small
-	end
-	if big then
-		G.GAME.round_resets.blind_choices["Big"] = big
-	end
-	if boss then
-		G.GAME.round_resets.blind_choices["Boss"] = boss
-	end
-	G.MULTIPLAYER_GAME.loaded_ante = G.GAME.round_resets.ante
-	G.MULTIPLAYER.loading_blinds = false
-end
-
 local function action_lobby_options(options)
 	for k, v in pairs(options) do
+		if k == "gamemode" then
+			G.LOBBY.config.gamemode = v
+			goto continue
+		end
 		local parsed_v = v
 		if v == "true" then
 			parsed_v = true
@@ -172,6 +162,7 @@ local function action_lobby_options(options)
 				G.FUNCS.toggle(config_uie)
 			end
 		end
+		::continue::
 	end
 end
 
@@ -188,6 +179,13 @@ local function enemyLocation(options)
 		value = split[2]
 	end
 
+	loc_name = localize({ type = "name_text", key = value, set = "Blind" })
+	if loc_name ~= "ERROR" then
+		value = loc_name
+	else
+		value = (G.P_BLINDS[value] and G.P_BLINDS[value].name) or value
+	end
+
 	G.MULTIPLAYER_GAME.enemy.location = G.localization.misc.dictionary[location] .. value
 end
 
@@ -197,6 +195,7 @@ end
 
 -- #region Client to Server
 function G.MULTIPLAYER.create_lobby(gamemode)
+	G.LOBBY.config.gamemode = gamemode
 	Client.send(string.format("action:createLobby,gameMode:%s", gamemode))
 end
 
@@ -227,10 +226,6 @@ end
 
 function G.MULTIPLAYER.stop_game()
 	Client.send("action:stopGame")
-end
-
-function G.MULTIPLAYER.game_info()
-	Client.send("action:gameInfo")
 end
 
 function G.MULTIPLAYER.fail_round()
@@ -331,8 +326,6 @@ function Game:update(dt)
 				action_win_game()
 			elseif parsedAction.action == "loseGame" then
 				action_lose_game()
-			elseif parsedAction.action == "gameInfo" then
-				action_game_info(parsedAction.small, parsedAction.big, parsedAction.boss)
 			elseif parsedAction.action == "lobbyOptions" then
 				action_lobby_options(parsedAction)
 			elseif parsedAction.action == "enemyLocation" then

@@ -10,6 +10,7 @@ G.LOBBY = {
 		different_seeds = false,
 		starting_lives = 4,
 		draft_starting_antes = 3,
+		gamemode = "attrition",
 	},
 	username = G.MULTIPLAYER.UTILS.get_username(),
 	host = {},

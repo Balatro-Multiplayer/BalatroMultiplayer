@@ -180,6 +180,7 @@ const stopGameAction = (client: Client) => {
 	client.lobby?.broadcastAction({ action: "stopGame" });
 };
 
+// Deprecated
 const gameInfoAction = (client: Client) => {
 	client.lobby?.sendGameInfo(client);
 };

@@ -124,6 +124,7 @@ class Lobby {
 		this.broadcastAction({ action: "playerInfo", lives });
 	};
 
+	// Deprecated
 	sendGameInfo = (client: Client) => {
 		if (this.host !== client && this.guest !== client) {
 			return client.sendAction({
@@ -146,7 +147,7 @@ class Lobby {
 				this.options[key] = options[key];
 			}
 		}
-		this.guest?.sendAction({ action: "lobbyOptions", ...options });
+		this.guest?.sendAction({ action: "lobbyOptions", gamemode: this.gameMode, ...options });
 	};
 }
 

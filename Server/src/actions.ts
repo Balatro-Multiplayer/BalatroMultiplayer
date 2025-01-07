@@ -33,7 +33,7 @@ export type ActionEnemyInfo = {
 	handsLeft: number
 }
 export type ActionEndPvP = { action: 'endPvP'; lost: boolean }
-export type ActionLobbyOptions = { action: 'lobbyOptions' }
+export type ActionLobbyOptions = { action: 'lobbyOptions', gamemode: string }
 export type ActionRequestVersion = { action: 'version' }
 export type ActionEnemyLocation = { action: 'enemyLocation'; location: string }
 

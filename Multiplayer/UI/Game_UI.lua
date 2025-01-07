@@ -169,11 +169,7 @@ function create_UIBox_blind_choice(type, run_info)
 				pseudorandom_element(_poker_hands, pseudoseed("orbital"))
 		end
 
-		if type == "Small" then
-			extras = create_UIBox_blind_tag(type, run_info)
-		elseif type == "Big" then
-			extras = create_UIBox_blind_tag(type, run_info)
-		elseif G.GAME.round_resets.blind_choices[type] == "bl_pvp" then
+		if G.GAME.round_resets.blind_choices[type] == "bl_pvp" then
 			local dt1 = DynaText({
 				string = { { string = G.localization.misc.dictionary["bl_life"] or "LIFE", colour = G.C.FILTER } },
 				colours = { G.C.BLACK },
@@ -236,6 +232,10 @@ function create_UIBox_blind_choice(type, run_info)
 					},
 				},
 			}
+		elseif type == "Small" then
+			extras = create_UIBox_blind_tag(type, run_info)
+		elseif type == "Big" then
+			extras = create_UIBox_blind_tag(type, run_info)
 		else
 			extras = nil
 		end
@@ -1228,12 +1228,11 @@ end
 
 local start_run_ref = Game.start_run
 function Game:start_run(args)
+	start_run_ref(self, args)
+
 	if not G.LOBBY.connected or not G.LOBBY.code then
-		start_run_ref(self, args)
 		return
 	end
-
-	start_run_ref(self, args)
 
 	local scale = 0.4
 	local hud_ante = G.HUD:get_UIE_by_ID("hud_ante")
@@ -2003,16 +2002,6 @@ function ease_lives(mod)
 	}))
 end
 
-local update_blind_select_ref = Game.update_blind_select
-function Game:update_blind_select(dt)
-	if G.MULTIPLAYER_GAME.loaded_ante == G.GAME.round_resets.ante or not G.LOBBY.code then
-		update_blind_select_ref(self, dt)
-	elseif not G.MULTIPLAYER.loading_blinds then
-		G.MULTIPLAYER.loading_blinds = true
-		G.MULTIPLAYER.game_info()
-	end
-end
-
 local exit_overlay_menu_ref = G.FUNCS.exit_overlay_menu
 ---@diagnostic disable-next-line: duplicate-set-field
 function G.FUNCS:exit_overlay_menu()
@@ -2033,6 +2022,34 @@ function G.FUNCS.mods_button(arg_736_0)
 	mods_button_ref(arg_736_0)
 end
 
+local reset_blinds_ref = reset_blinds
+function reset_blinds()
+	reset_blinds_ref()
+	if G.LOBBY.code then
+		sendDebugMessage("Gamemode detected: " .. G.LOBBY.config.gamemode)
+		if G.LOBBY.config.gamemode == "attrition" then
+			G.GAME.round_resets.blind_choices.Boss = "bl_pvp"
+		end
+		if G.LOBBY.config.gamemode == "draft" and G.GAME.round_resets.ante >= G.LOBBY.config.draft_starting_antes then
+			G.GAME.round_resets.blind_choices.Small = "bl_pvp"
+			G.GAME.round_resets.blind_choices.Big = "bl_pvp"
+			G.GAME.round_resets.blind_choices.Boss = "bl_pvp"
+		end
+	end
+end
+
+local init_game_object_ref = Game.init_game_object
+function Game:init_game_object()
+	local t = init_game_object_ref(self)
+	if G.LOBBY.code then
+		sendDebugMessage("Gamemode detected: " .. G.LOBBY.config.gamemode)
+		if G.LOBBY.config.gamemode == "attrition" then
+			t.round_resets.blind_choices.Boss = "bl_pvp"
+		end
+	end
+	return t
+end
+
 -- Rewritten from the original function to fix typing issues causing crashes
 function get_new_boss()
 	G.GAME.perscribed_bosses = G.GAME.perscribed_bosses or {}
@@ -2044,6 +2061,9 @@ function get_new_boss()
 	end
 	if G.FORCE_BOSS then
 		return G.FORCE_BOSS
+	end
+	if G.LOBBY.code and G.LOBBY.config.gamemode == "attrition" then
+		return "bl_pvp"
 	end
 
 	local eligible_bosses = {}
@@ -2323,7 +2343,7 @@ local select_blind_ref = G.FUNCS.select_blind
 function G.FUNCS.select_blind(e)
 	select_blind_ref(e)
 	if G.LOBBY.code then
-		G.MULTIPLAYER.set_location("loc_playing-" .. e.config.ref_table.name)
+		G.MULTIPLAYER.set_location("loc_playing-" .. (e.config.ref_table.key or e.config.ref_table.name))
 		hide_enemy_location()
 	end
 end
