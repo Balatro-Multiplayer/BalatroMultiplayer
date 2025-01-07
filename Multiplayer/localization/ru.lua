@@ -1,6 +1,20 @@
 -- Localization by @KilledByLava, @FaLNioNe, and @astryder75 on discord
 return {
+	descriptions = {
+		Blind = {
+			bl_pvp = {
+				name = "Ваш соперник",
+				text = {
+					"Сражение с вашим соперником,",
+					"наибольший счёт побеждает",
+				},
+			},
+		},
+	},
 	misc = {
+		challenge_names = {
+			c_multiplayer_1 = "Сетевая игра",
+		},
 		dictionary = {
 			singleplayer = "Одиночная Игра",
 			join_lobby = "Подключиться к лобби",
@@ -60,15 +74,11 @@ return {
 			opts_diff_seeds = "Игроки имеют разные сиды",
 			opts_lives = "Количество жизней",
 			opts_gm = "Настройки игры",
-			bl_pvp_name = "Ваш соперник",
-			bl_pvp_desc1 = "Сражение с вашим соперником,",
-			bl_pvp_desc2 = "наибольший счёт побеждает",
 			bl_or = "или",
 			bl_life = "Жизнь",
 			bl_death = "Смерть",
 			lobby = "Лобби",
 			return_to = "Вернуться в",
-			multiplayer_c = "Сетевая игра",
 			enemy_loc_1 = "Статус",
 			enemy_loc_2 = "соперника",
 			loc_ready = "Готов к ПвП",

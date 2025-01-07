@@ -1,6 +1,20 @@
 -- Localization by CUexter on GitHub
 return {
+	descriptions = {
+		Blind = {
+			bl_pvp = {
+				name = "你的對手",
+				text = {
+					"面對其他玩家，",
+					"得分最多的人贏",
+				},
+			},
+		},
+	},
 	misc = {
+		challenge_names = {
+			c_multiplayer_1 = "多人遊戲",
+		},
 		dictionary = {
 			singleplayer = "單人遊戲",
 			join_lobby = "加入大廳",
@@ -61,15 +75,11 @@ return {
 			opts_diff_seeds = "玩家有不同的SEED",
 			opts_lives = "命數",
 			opts_gm = "模式修改效果",
-			bl_pvp_name = "你的對手",
-			bl_pvp_desc1 = "面對其他玩家，",
-			bl_pvp_desc2 = "得分最多的人贏",
 			bl_or = "或",
 			bl_life = "生",
 			bl_death = "死",
 			lobby = "大廳",
 			return_to = "返回",
-			multiplayer_c = "多人遊戲",
 		},
 	},
 }

@@ -1,6 +1,20 @@
 -- Localization by @panbimbogd on discord
 return {
+	descriptions = {
+		Blind = {
+			bl_pvp = {
+				name = "Tu Némesis",
+				text = {
+					"Enfrentándote a otros jugadores,",
+					"mas fichas gana",
+				},
+			},
+		},
+	},
 	misc = {
+		challenge_names = {
+			c_multiplayer_1 = "Multijugador",
+		},
 		dictionary = {
 			singleplayer = "Un jugador",
 			join_lobby = "Entrar a la Lobby",
@@ -60,15 +74,11 @@ return {
 			opts_diff_seeds = "Los jugadores tienen diferentes semillas",
 			opts_lives = "Vidas",
 			opts_gm = "Modificadores de juego",
-			bl_pvp_name = "Tu Némesis",
-			bl_pvp_desc1 = "Enfrentándote a otros jugadores,",
-			bl_pvp_desc2 = "mas fichas gana",
 			bl_or = "o",
 			bl_life = "Vida",
 			bl_death = "Muerte",
 			lobby = "Lobby",
 			return_to = "Vuelve a la",
-			multiplayer_c = "Multijugador",
 			enemy_loc_1 = "enemigo",
 			enemy_loc_2 = "Ubicación del",
 			loc_ready = "Listo para el PvP",

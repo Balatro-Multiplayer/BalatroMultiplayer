@@ -1,8 +1,5 @@
 SMODS.Challenge({
 	key = "c_multiplayer_1",
-	loc_txt = {
-		name = G.localization.misc.dictionary["multiplayer_c"] or "Multiplayer Deck",
-	},
 	rules = {
 		custom = {},
 		modifiers = {},

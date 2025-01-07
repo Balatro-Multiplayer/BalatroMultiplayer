@@ -1,5 +1,19 @@
 return {
+	descriptions = {
+		Blind = {
+			bl_pvp = {
+				name = "Your Nemesis",
+				text = {
+					"Face another player,",
+					"most chips wins",
+				},
+			},
+		},
+	},
 	misc = {
+		challenge_names = {
+			c_multiplayer_1 = "Multiplayer",
+		},
 		dictionary = {
 			singleplayer = "Singleplayer",
 			join_lobby = "Join Lobby",
@@ -59,15 +73,11 @@ return {
 			opts_diff_seeds = "Players have different seeds",
 			opts_lives = "Lives",
 			opts_gm = "Gamemode Modifiers",
-			bl_pvp_name = "Your Nemesis",
-			bl_pvp_desc1 = "Facing another players,",
-			bl_pvp_desc2 = "most chips wins",
 			bl_or = "or",
 			bl_life = "Life",
 			bl_death = "Death",
 			lobby = "Lobby",
 			return_to = "Return to",
-			multiplayer_c = "Multiplayer",
 			enemy_loc_1 = "Enemy",
 			enemy_loc_2 = "location",
 			loc_ready = "Ready for PvP",
