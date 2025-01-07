@@ -31,7 +31,7 @@ class Client {
 
 	livesBlocker = false
 
-	location = 'Blind Select'
+	location = 'loc_selecting'
 
 	constructor(address: Address, send: SendFn, closeConnection: CloseConnFn) {
 		this.id = uuidv4()

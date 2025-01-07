@@ -186,7 +186,17 @@ local function enemyLocation(options)
 		value = (G.P_BLINDS[value] and G.P_BLINDS[value].name) or value
 	end
 
-	G.MULTIPLAYER_GAME.enemy.location = G.localization.misc.dictionary[location] .. value
+	loc_location = G.localization.misc.dictionary[location]
+
+	if loc_location == nil then
+		if location ~= nil then
+			loc_location = location
+		else
+			loc_location = "Unknown"
+		end
+	end
+
+	G.MULTIPLAYER_GAME.enemy.location = loc_location .. value
 end
 
 local function action_version()
