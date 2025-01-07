@@ -250,7 +250,8 @@ end
 ---@param score number
 ---@param hands_left number
 function G.MULTIPLAYER.play_hand(score, hands_left)
-	Client.send(string.format("action:playHand,score:" .. tostring(score) .. ",handsLeft:%d", hands_left))
+	local fixed_score = string.gsub(tostring(to_big(score)), ",", "")
+	Client.send(string.format("action:playHand,score:" .. fixed_score .. ",handsLeft:%d", hands_left))
 end
 
 function G.MULTIPLAYER.lobby_options()
