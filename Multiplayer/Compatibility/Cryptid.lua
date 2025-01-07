@@ -8,6 +8,14 @@ if SMODS.Mods["Cryptid"] and SMODS.Mods["Cryptid"].can_load then
 	G.MULTIPLAYER.DECK.ban_card("c_cry_crash")
 end
 
+local defeat_ref = Blind.defeat
+function Blind:defeat(silent)
+	if self.config.blind.key == nil then
+		self.config.blind.key = "bl_nil"
+	end
+	defeat_ref(self, silent)
+end
+
 function save_run()
 	if G.F_NO_SAVING == true then
 		-- Fake culled_table for Cryptid
