@@ -149,6 +149,19 @@ class Lobby {
 		}
 		this.guest?.sendAction({ action: "lobbyOptions", gamemode: this.gameMode, ...options });
 	};
+
+	resetPlayers = () => {
+		if (this.host) {
+			this.host.isReady = false;
+			this.host.resetBlocker();
+			this.host.setLocation("Blind Select");
+		}
+		if (this.guest) {
+			this.guest.isReady = false;
+			this.guest.resetBlocker();
+			this.guest.setLocation("Blind Select");
+		}
+	}
 }
 
 export default Lobby;

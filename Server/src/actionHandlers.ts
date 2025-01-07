@@ -171,7 +171,11 @@ const playHandAction = (
 };
 
 const stopGameAction = (client: Client) => {
-	client.lobby?.broadcastAction({ action: "stopGame" });
+	if (!client.lobby) {
+		return;
+	}
+	client.lobby.broadcastAction({ action: "stopGame" });
+	client.lobby.resetPlayers();
 };
 
 // Deprecated
