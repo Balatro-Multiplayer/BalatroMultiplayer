@@ -57,14 +57,14 @@ class Lobby {
 			this.guest = null;
 		}
 
-		const lobby = client.lobby;
 		client.setLobby(null);
 		if (this.host === null) {
 			Lobbies.delete(this.code);
 		} else {
 			// TODO: Refactor for more than 2 players
 			// Stop game if someone leaves
-			lobby?.broadcastAction({ action: "stopGame" });
+			this.broadcastAction({ action: "stopGame" });
+			this.resetPlayers();
 			this.broadcastLobbyInfo();
 		}
 	};
