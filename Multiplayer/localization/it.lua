@@ -1,7 +1,21 @@
 -- Localization by @ieatmilk on discord
 return {
+	descriptions = {
+		Blind = {
+			bl_pvp = {
+				name = "Il tuo Nemico",
+				text = {
+					"Sei contro un altro giocatore,",
+					"chi fa più punteggio vince",
+				},
+			},
+		},
+	},
 	misc = {
-		mp = {
+		challenge_names = {
+			c_multiplayer_1 = "Multigiocatore",
+		},
+		dictionary = {
 			singleplayer = "Giocatore singolo",
 			join_lobby = "Entra in una Lobby",
 			return_lobby = "Ritorna alla Lobby",
@@ -60,15 +74,17 @@ return {
 			opts_diff_seeds = "I giocatori hanno seed diversi",
 			opts_lives = "Vite",
 			opts_gm = "Modificatori Modalità",
-			bl_pvp_name = "Il tuo Nemico",
-			bl_pvp_desc1 = "Sei contro un altro giocatore,",
-			bl_pvp_desc2 = "chi fa più punteggio vince",
 			bl_or = "oppure",
 			bl_life = "Vita",
 			bl_death = "Morte",
 			lobby = "Lobby",
 			return_to = "Ritorna alla",
-			multiplayer_c = "Multigiocatore",
+			enemy_loc_1 = "Posizione del",
+			enemy_loc_2 = "Nemico",
+			loc_ready = "Pronto per lo scontro",
+			loc_selecting = "Selezionando un buio",
+			loc_shop = "Nel negozio",
+			loc_playing = "Combattendo ",
 		},
 	},
 }

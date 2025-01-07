@@ -5,7 +5,9 @@ export type ActionJoinedLobby = { action: 'joinedLobby'; code: string; type: Gam
 export type ActionLobbyInfo = {
 	action: 'lobbyInfo'
 	host: string
+	hostHash: string
 	guest?: string
+	guestHash?: string
 	isHost: boolean
 }
 export type ActionStopGame = { action: 'stopGame' }
@@ -31,8 +33,9 @@ export type ActionEnemyInfo = {
 	handsLeft: number
 }
 export type ActionEndPvP = { action: 'endPvP'; lost: boolean }
-export type ActionLobbyOptions = { action: 'lobbyOptions' }
+export type ActionLobbyOptions = { action: 'lobbyOptions', gamemode: string }
 export type ActionRequestVersion = { action: 'version' }
+export type ActionEnemyLocation = { action: 'enemyLocation'; location: string }
 
 export type ActionServerToClient =
 	| ActionConnected
@@ -51,9 +54,10 @@ export type ActionServerToClient =
 	| ActionLobbyOptions
 	| ActionRequestVersion
 	| ActionUtility
+	| ActionEnemyLocation
 
 // Client to Server
-export type ActionUsername = { action: 'username'; username: string }
+export type ActionUsername = { action: 'username'; username: string; modHash: string }
 export type ActionCreateLobby = { action: 'createLobby'; gameMode: GameMode }
 export type ActionJoinLobby = { action: 'joinLobby'; code: string }
 export type ActionLeaveLobby = { action: 'leaveLobby' }
@@ -76,6 +80,8 @@ export type ActionSetAnte = {
 	ante: number
 }
 export type ActionVersion = { action: 'version'; version: string }
+export type ActionSetLocation = { action: 'setLocation'; location: string }
+export type ActionNewRound = { action: 'newRound' }
 
 export type ActionClientToServer =
 	| ActionUsername
@@ -95,6 +101,8 @@ export type ActionClientToServer =
 	| ActionFailRound
 	| ActionSetAnte
 	| ActionVersion
+	| ActionSetLocation
+	| ActionNewRound
 
 // Utility actions
 export type ActionKeepAlive = { action: 'keepAlive' }

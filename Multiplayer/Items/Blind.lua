@@ -10,13 +10,6 @@ SMODS.Atlas({
 
 SMODS.Blind({
 	key = "bl_pvp",
-	loc_txt = {
-		name = mp_localize("bl_pvp_name", "Your Nemesis"),
-		text = {
-			mp_localize("bl_pvp_desc1", "Face another player,"),
-			mp_localize("bl_pvp_desc2", "most chips wins"),
-		},
-	},
 	dollars = 5,
 	mult = 0,
 	boss = { min = 1, max = 10 },

@@ -53,7 +53,7 @@ function G.UIDEF.create_UIBox_create_lobby_button()
 							colour = G.C.BOOSTER,
 							tabs = {
 								{
-									label = mp_localize("attrition_name", "Attrition"),
+									label = G.localization.misc.dictionary["attrition_name"] or "Attrition",
 									chosen = true,
 									tab_definition_function = function()
 										return {
@@ -79,7 +79,10 @@ function G.UIDEF.create_UIBox_create_lobby_button()
 													nodes = {
 														UIBox_button({
 															id = "start_attrition",
-															label = { mp_localize("start_lobby", "Start Lobby") },
+															label = {
+																G.localization.misc.dictionary["start_lobby"]
+																	or "Start Lobby",
+															},
 															colour = G.C.RED,
 															button = "start_lobby",
 															minw = 5,
@@ -99,10 +102,8 @@ function G.UIDEF.create_UIBox_create_lobby_button()
 															n = G.UIT.T,
 															config = {
 																text = G.MULTIPLAYER.UTILS.wrapText(
-																	mp_localize(
-																		"attrition_desc",
-																		"Every boss round is a competition between players where the player with the lower score loses a life."
-																	),
+																	G.localization.misc.dictionary["attrition_desc"]
+																		or "Every boss round is a competition between players where the player with the lower score loses a life.",
 																	50
 																),
 																shadow = true,
@@ -117,7 +118,7 @@ function G.UIDEF.create_UIBox_create_lobby_button()
 									end,
 								},
 								{
-									label = mp_localize("draft_name", "Draft"),
+									label = G.localization.misc.dictionary["draft_name"] or "Draft",
 									tab_definition_function = function()
 										return {
 											n = G.UIT.ROOT,
@@ -143,7 +144,8 @@ function G.UIDEF.create_UIBox_create_lobby_button()
 														UIBox_button({
 															id = "start_draft",
 															label = {
-																mp_localize("start_lobby", "Start Lobby"),
+																G.localization.misc.dictionary["start_lobby"]
+																	or "Start Lobby",
 															},
 															colour = G.C.RED,
 															button = "start_lobby",
@@ -164,10 +166,8 @@ function G.UIDEF.create_UIBox_create_lobby_button()
 															n = G.UIT.T,
 															config = {
 																text = G.MULTIPLAYER.UTILS.wrapText(
-																	mp_localize(
-																		"draft_desc",
-																		"Both players play 3 normal antes, then they play an ante where every round the player with the higher scorer wins."
-																	),
+																	G.localization.misc.dictionary["draft_desc"]
+																		or "Both players play 3 normal antes, then they play an ante where every round the player with the higher scorer wins.",
 																	50
 																),
 																shadow = true,
@@ -182,7 +182,7 @@ function G.UIDEF.create_UIBox_create_lobby_button()
 									end,
 								},
 								{
-									label = mp_localize("vanilla_plus_name", "Vanilla+"),
+									label = G.localization.misc.dictionary["vanilla_plus_name"] or "Vanilla+",
 									tab_definition_function = function()
 										return {
 											n = G.UIT.ROOT,
@@ -207,7 +207,8 @@ function G.UIDEF.create_UIBox_create_lobby_button()
 													nodes = {
 														UIBox_button({
 															label = {
-																mp_localize("coming_soon", "Coming Soon!"),
+																G.localization.misc.dictionary["coming_soon"]
+																	or "Coming Soon!",
 															},
 															colour = G.C.RED,
 															minw = 5,
@@ -227,10 +228,8 @@ function G.UIDEF.create_UIBox_create_lobby_button()
 															n = G.UIT.T,
 															config = {
 																text = G.MULTIPLAYER.UTILS.wrapText(
-																	mp_localize(
-																		"vp_desc",
-																		"The first person to fail a round loses, no PvP blinds."
-																	),
+																	G.localization.misc.dictionary["vp_desc"]
+																		or "The first person to fail a round loses, no PvP blinds.",
 																	50
 																),
 																shadow = true,
@@ -245,7 +244,7 @@ function G.UIDEF.create_UIBox_create_lobby_button()
 									end,
 								},
 								{
-									label = mp_localize("royale_name", "Battle Royale"),
+									label = G.localization.misc.dictionary["royale_name"] or "Battle Royale",
 									tab_definition_function = function()
 										return {
 											n = G.UIT.ROOT,
@@ -270,7 +269,8 @@ function G.UIDEF.create_UIBox_create_lobby_button()
 													nodes = {
 														UIBox_button({
 															label = {
-																mp_localize("coming_soon", "Coming Soon!"),
+																G.localization.misc.dictionary["coming_soon"]
+																	or "Coming Soon!",
 															},
 															colour = G.C.RED,
 															minw = 5,
@@ -290,10 +290,8 @@ function G.UIDEF.create_UIBox_create_lobby_button()
 															n = G.UIT.T,
 															config = {
 																text = G.MULTIPLAYER.UTILS.wrapText(
-																	mp_localize(
-																		"royale_desc",
-																		"Attrition, except there are up to 8 players and every player only has 1 life."
-																	),
+																	G.localization.misc.dictionary["royale_desc"]
+																		or "Attrition, except there are up to 8 players and every player only has 1 life.",
 																	50
 																),
 																shadow = true,
@@ -339,7 +337,8 @@ function G.UIDEF.create_UIBox_join_lobby_button()
 									w = 4,
 									h = 1,
 									max_length = 5,
-									prompt_text = mp_localize("enter_lobby_code", "Enter Lobby Code"),
+									prompt_text = G.localization.misc.dictionary["enter_lobby_code"]
+										or "Enter Lobby Code",
 									ref_table = G.LOBBY,
 									ref_value = "temp_code",
 									extended_corpus = false,
@@ -352,7 +351,7 @@ function G.UIDEF.create_UIBox_join_lobby_button()
 							},
 						},
 						UIBox_button({
-							label = { mp_localize("join_clip", "Paste From Clipboard") },
+							label = { G.localization.misc.dictionary["join_clip"] or "Paste From Clipboard" },
 							colour = G.C.RED,
 							button = "join_from_clipboard",
 							minw = 5,
@@ -369,25 +368,25 @@ function G.UIDEF.override_main_menu_play_button()
 		create_UIBox_generic_options({
 			contents = {
 				UIBox_button({
-					label = { mp_localize("singleplayer", "Singleplayer") },
+					label = { G.localization.misc.dictionary["singleplayer"] or "Singleplayer" },
 					colour = G.C.BLUE,
 					button = "setup_run",
 					minw = 5,
 				}),
 				G.LOBBY.connected and UIBox_button({
-					label = { mp_localize("create_lobby", "Create Lobby") },
+					label = { G.localization.misc.dictionary["create_lobby"] or "Create Lobby" },
 					colour = G.C.GREEN,
 					button = "create_lobby",
 					minw = 5,
 				}) or nil,
 				G.LOBBY.connected and UIBox_button({
-					label = { mp_localize("join_lobby", "Join Lobby") },
+					label = { G.localization.misc.dictionary["join_lobby"] or "Join Lobby" },
 					colour = G.C.RED,
 					button = "join_lobby",
 					minw = 5,
 				}) or nil,
 				not G.LOBBY.connected and UIBox_button({
-					label = { mp_localize("reconnect", "Reconnect") },
+					label = { G.localization.misc.dictionary["reconnect"] or "Reconnect" },
 					colour = G.C.RED,
 					button = "reconnect",
 					minw = 5,

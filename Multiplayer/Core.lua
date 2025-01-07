@@ -1,5 +1,12 @@
 G.MULTIPLAYER = {}
 
+SMODS.Atlas({
+	key = "modicon",
+	path = "modicon.png",
+	px = 34,
+	py = 34,
+})
+
 function G.MULTIPLAYER.load_mp_file(file)
 	local chunk, err = SMODS.load_file(file, "VirtualizedMultiplayer")
 	if chunk then
@@ -19,10 +26,14 @@ local load_mp_file = G.MULTIPLAYER.load_mp_file
 
 load_mp_file("Utils.lua")
 
+load_mp_file("Compatibility/CompatibilityUtils.lua")
+load_mp_file("Compatibility/Talisman.lua")
+load_mp_file("Compatibility/Cryptid.lua")
+load_mp_file("Compatibility/Pokermon.lua")
+load_mp_file("Compatibility/Ortalab.lua")
+
 load_mp_file("Lobby.lua")
 load_mp_file("Networking/Action_Handlers.lua")
-
-load_mp_file("UI/Localization.lua")
 
 load_mp_file("Items/Blind.lua")
 load_mp_file("Items/Deck.lua")
@@ -76,7 +87,7 @@ SMODS.Mods.VirtualizedMultiplayer.credits_tab = function()
 					{
 						n = G.UIT.T,
 						config = {
-							text = mp_localize("join_discord", "Join the "),
+							text = G.localization.misc.dictionary["join_discord"] or "Join the ",
 							shadow = true,
 							scale = 0.6,
 							colour = G.C.UI.TEXT_LIGHT,
@@ -95,7 +106,7 @@ SMODS.Mods.VirtualizedMultiplayer.credits_tab = function()
 						minw = 6,
 						button = "multiplayer_discord",
 						label = {
-							mp_localize("discord_name", "Balatro Multiplayer Discord Server"),
+							G.localization.misc.dictionary["discord_name"] or "Balatro Multiplayer Discord Server",
 						},
 					}),
 				},
@@ -110,10 +121,8 @@ SMODS.Mods.VirtualizedMultiplayer.credits_tab = function()
 					{
 						n = G.UIT.T,
 						config = {
-							text = mp_localize(
-								"discord_msg",
-								"You can report any bugs and find people to play with there!"
-							),
+							text = G.localization.misc.dictionary["discord_msg"]
+								or "You can report any bugs and find people to play with there!",
 							shadow = true,
 							scale = 0.375,
 							colour = G.C.UI.TEXT_LIGHT,
@@ -148,14 +157,14 @@ SMODS.Mods.VirtualizedMultiplayer.config_tab = function()
 						n = G.UIT.T,
 						config = {
 							scale = 0.6,
-							text = mp_localize("username", "Username:"),
+							text = G.localization.misc.dictionary["username"] or "Username:",
 							colour = G.C.UI.TEXT_LIGHT,
 						},
 					},
 					create_text_input({
 						w = 4,
 						max_length = 25,
-						prompt_text = mp_localize("enter_username", "Enter Username"),
+						prompt_text = G.localization.misc.dictionary["enter_username"] or "Enter Username",
 						ref_table = G.LOBBY,
 						ref_value = "username",
 						extended_corpus = true,
@@ -168,7 +177,7 @@ SMODS.Mods.VirtualizedMultiplayer.config_tab = function()
 						n = G.UIT.T,
 						config = {
 							scale = 0.3,
-							text = mp_localize("enter_to_save", "Press enter to save"),
+							text = G.localization.misc.dictionary["enter_to_save"] or "Press enter to save",
 							colour = G.C.UI.TEXT_LIGHT,
 						},
 					},

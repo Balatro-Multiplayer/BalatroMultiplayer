@@ -11,6 +11,7 @@ import type {
 	ActionPlayHand,
 	ActionServerToClient,
 	ActionSetAnte,
+	ActionSetLocation,
 	ActionUsername,
 	ActionUtility,
 	ActionVersion,
@@ -25,7 +26,13 @@ const KEEP_ALIVE_RETRY_TIMEOUT = 2500
 /** The amount of retries we do before we declare the socket dead */
 const KEEP_ALIVE_RETRY_COUNT = 3
 
-BigInt.prototype.toJSON = function () {
+interface BigIntWithToJSON {
+	prototype: {
+		toJSON: () => string
+	}
+}
+
+(BigInt as unknown as BigIntWithToJSON).prototype.toJSON = function () {
   return this.toString();
 };
 
@@ -142,6 +149,12 @@ const server = createServer((socket) => {
 				}
 
 				switch (action) {
+					case 'setLocation':
+						actionHandlers.setLocation(
+							actionArgs as ActionHandlerArgs<ActionSetLocation>,
+							client,
+						)
+						break
 					case 'version':
 						actionHandlers.version(
 							actionArgs as ActionHandlerArgs<ActionVersion>,
@@ -193,6 +206,7 @@ const server = createServer((socket) => {
 					case 'stopGame':
 						actionHandlers.stopGame(client)
 						break
+					// Deprecated
 					case 'gameInfo':
 						actionHandlers.gameInfo(client)
 						break
@@ -201,6 +215,9 @@ const server = createServer((socket) => {
 							actionArgs as ActionHandlerArgs<ActionLobbyOptions>,
 							client,
 						)
+						break
+					case 'newRound':
+						actionHandlers.newRound(client)
 						break
 					case 'failRound':
 						actionHandlers.failRound(client)

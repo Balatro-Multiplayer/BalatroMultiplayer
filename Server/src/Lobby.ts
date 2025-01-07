@@ -84,7 +84,7 @@ class Lobby {
 			code: this.code,
 			type: this.gameMode,
 		});
-		client.sendAction({ action: "lobbyOptions", ...this.options });
+		client.sendAction({ action: "lobbyOptions", gamemode: this.gameMode, ...this.options });
 		this.broadcastLobbyInfo();
 	};
 
@@ -101,11 +101,13 @@ class Lobby {
 		const action: ActionLobbyInfo = {
 			action: "lobbyInfo",
 			host: this.host.username,
+			hostHash: this.host.modHash,
 			isHost: false,
 		};
 
 		if (this.guest?.username) {
 			action.guest = this.guest.username;
+			action.guestHash = this.guest.modHash;
 			this.guest.sendAction(action);
 		}
 
@@ -122,6 +124,7 @@ class Lobby {
 		this.broadcastAction({ action: "playerInfo", lives });
 	};
 
+	// Deprecated
 	sendGameInfo = (client: Client) => {
 		if (this.host !== client && this.guest !== client) {
 			return client.sendAction({
@@ -144,7 +147,7 @@ class Lobby {
 				this.options[key] = options[key];
 			}
 		}
-		this.guest?.sendAction({ action: "lobbyOptions", ...options });
+		this.guest?.sendAction({ action: "lobbyOptions", gamemode: this.gameMode, ...options });
 	};
 }
 

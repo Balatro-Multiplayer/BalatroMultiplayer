@@ -1,8 +1,5 @@
 SMODS.Challenge({
 	key = "c_multiplayer_1",
-	loc_txt = {
-		name = mp_localize("multiplayer_c", "Multiplayer Deck"),
-	},
 	rules = {
 		custom = {},
 		modifiers = {},
@@ -11,17 +8,8 @@ SMODS.Challenge({
 	consumeables = {},
 	vouchers = {},
 	restrictions = {
-		banned_cards = {
-			{ id = "j_diet_cola" },
-			{ id = "j_mr_bones" },
-			{ id = "j_throwback" },
-			{ id = "j_luchador" },
-			{ id = "j_matador" },
-			{ id = "j_chicot" },
-			{ id = "v_hieroglyph" },
-			{ id = "v_petroglyph" },
-		},
-		banned_tags = {},
+		banned_cards = G.MULTIPLAYER.DECK.BANNED_CARDS,
+		banned_tags = G.MULTIPLAYER.DECK.BANNED_TAGS,
 		banned_other = {},
 	},
 	deck = {

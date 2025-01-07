@@ -6,10 +6,11 @@ G.LOBBY = {
 	config = {
 		gold_on_life_loss = true,
 		no_gold_on_round_loss = false,
-		death_on_round_loss = false,
+		death_on_round_loss = true,
 		different_seeds = false,
 		starting_lives = 4,
 		draft_starting_antes = 3,
+		gamemode = "attrition",
 	},
 	username = G.MULTIPLAYER.UTILS.get_username(),
 	host = {},
@@ -31,11 +32,14 @@ G.MULTIPLAYER_GAME = {
 		score = 0,
 		score_text = "0",
 		hands = 4,
+		location = "Selecting a Blind",
 	},
+	location = "loc_selecting",
+	next_blind_context = nil,
 }
 
 function reset_game_states()
-	sendDebugMessage("Resetting game states", "VirtualizedMultiplayer")
+	sendDebugMessage("Resetting game states", "MULTIPLAYER")
 	G.MULTIPLAYER_GAME = {
 		ready_blind = false,
 		ready_blind_text = "Ready",
@@ -50,7 +54,10 @@ function reset_game_states()
 			score = 0,
 			score_text = "0",
 			hands = 4,
+			location = "Selecting a Blind",
 		},
+		location = "loc_selecting",
+		next_blind_context = nil,
 	}
 end
 

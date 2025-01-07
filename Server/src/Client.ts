@@ -20,6 +20,7 @@ class Client {
 
 	// Game info
 	username = 'Guest'
+	modHash = 'NULL'
 	lobby: Lobby | null = null
 	/** Whether player is ready for next blind */
 	isReady = false
@@ -30,6 +31,8 @@ class Client {
 
 	livesBlocker = false
 
+	location = 'Blind Select'
+
 	constructor(address: Address, send: SendFn, closeConnection: CloseConnFn) {
 		this.id = uuidv4()
 		this.address = address
@@ -37,8 +40,24 @@ class Client {
 		this.closeConnection = closeConnection
 	}
 
+	setLocation = (location: string) => {
+		this.location = location
+		if (this.lobby) {
+			if (this.lobby.host === this) {
+				this.lobby.guest?.sendAction({ action: "enemyLocation", location: this.location })
+			} else {
+				this.lobby.host?.sendAction({ action: "enemyLocation", location: this.location })
+			}
+		}
+	}
+
 	setUsername = (username: string) => {
 		this.username = username
+		this.lobby?.broadcastLobbyInfo()
+	}
+
+	setModHash = (modHash: string) => {
+		this.modHash = modHash
 		this.lobby?.broadcastLobbyInfo()
 	}
 

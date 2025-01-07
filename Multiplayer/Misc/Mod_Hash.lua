@@ -21,6 +21,7 @@ function G.MULTIPLAYER:generate_hash()
 	self.MOD_STRING = mod_str
 	self.MOD_HASH = hash(mod_str)
 	sendInfoMessage("Generated Mod Hash: " .. self.MOD_HASH, "MULTIPLAYER")
+	self.set_username(G.LOBBY.username)
 end
 
 local hash_generated = false
