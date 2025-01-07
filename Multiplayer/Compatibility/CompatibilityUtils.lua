@@ -1,9 +1,7 @@
 G.MULTIPLAYER.DECK = {}
 
 G.MULTIPLAYER.DECK.BANNED_CARDS = {
-	{ id = "j_diet_cola" },
 	{ id = "j_mr_bones" },
-	{ id = "j_throwback" },
 	{ id = "j_luchador" },
 	{ id = "j_matador" },
 	{ id = "j_chicot" },
