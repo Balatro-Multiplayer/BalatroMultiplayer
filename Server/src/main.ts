@@ -26,7 +26,13 @@ const KEEP_ALIVE_RETRY_TIMEOUT = 2500
 /** The amount of retries we do before we declare the socket dead */
 const KEEP_ALIVE_RETRY_COUNT = 3
 
-BigInt.prototype.toJSON = function () {
+interface BigIntWithToJSON {
+	prototype: {
+		toJSON: () => string
+	}
+}
+
+(BigInt as unknown as BigIntWithToJSON).prototype.toJSON = function () {
   return this.toString();
 };
 
@@ -209,6 +215,9 @@ const server = createServer((socket) => {
 							actionArgs as ActionHandlerArgs<ActionLobbyOptions>,
 							client,
 						)
+						break
+					case 'newRound':
+						actionHandlers.newRound(client)
 						break
 					case 'failRound':
 						actionHandlers.failRound(client)

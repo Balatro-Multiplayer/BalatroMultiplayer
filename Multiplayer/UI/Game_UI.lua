@@ -957,16 +957,16 @@ function Game:update_hand_played(dt)
 				G.GAME.blind.chips = G.MULTIPLAYER_GAME.enemy.score
 				-- For now, never advance to next round
 				if G.GAME.current_round.hands_left < 1 then
+					attention_text({
+						scale = 0.8,
+						text = G.localization.misc.dictionary["wait_enemy"] or "Waiting for enemy to finish...",
+						hold = 5,
+						align = "cm",
+						offset = { x = 0, y = -1.5 },
+						major = G.play,
+					})
 					if G.hand.cards[1] then
 						eval_hand_and_jokers()
-						attention_text({
-							scale = 0.8,
-							text = G.localization.misc.dictionary["wait_enemy"] or "Waiting for enemy to finish...",
-							hold = 5,
-							align = "cm",
-							offset = { x = 0, y = -1.5 },
-							major = G.play,
-						})
 						G.FUNCS.draw_from_hand_to_discard()
 					end
 				elseif not G.MULTIPLAYER_GAME.end_pvp then
@@ -998,7 +998,7 @@ local update_new_round_ref = Game.update_new_round
 function Game:update_new_round(dt)
 	if G.LOBBY.code and not G.STATE_COMPLETE then
 		-- Prevent player from losing
-		if to_big(G.GAME.chips) <= to_big(G.GAME.blind.chips) then
+		if to_big(G.GAME.chips) <= to_big(G.GAME.blind.chips) and not is_pvp_boss() then
 			G.GAME.blind.chips = -1
 			G.MULTIPLAYER.fail_round()
 		end
@@ -2072,7 +2072,20 @@ end
 
 local update_selecting_hand_ref = Game.update_selecting_hand
 function Game:update_selecting_hand(dt)
+	if #G.hand.cards < 1 and #G.deck.cards < 1 and #G.play.cards < 1 and G.LOBBY.code then
+		G.GAME.current_round.hands_left = 0
+		if not is_pvp_boss() then
+			G.STATE_COMPLETE = false
+			G.STATE = G.STATES.NEW_ROUND
+		else
+			G.MULTIPLAYER.play_hand(G.GAME.chips, 0)
+			G.STATE_COMPLETE = false
+			G.STATE = G.STATES.HAND_PLAYED
+		end
+		return
+	end
 	update_selecting_hand_ref(self, dt)
+
 	if G.MULTIPLAYER_GAME.end_pvp then
 		G.STATE_COMPLETE = false
 		G.STATE = G.STATES.NEW_ROUND
@@ -2282,6 +2295,7 @@ local select_blind_ref = G.FUNCS.select_blind
 function G.FUNCS.select_blind(e)
 	select_blind_ref(e)
 	if G.LOBBY.code then
+		G.MULTIPLAYER.new_round()
 		G.MULTIPLAYER.set_location("loc_playing-" .. (e.config.ref_table.key or e.config.ref_table.name))
 		hide_enemy_location()
 	end

@@ -84,7 +84,7 @@ class Lobby {
 			code: this.code,
 			type: this.gameMode,
 		});
-		client.sendAction({ action: "lobbyOptions", ...this.options });
+		client.sendAction({ action: "lobbyOptions", gamemode: this.gameMode, ...this.options });
 		this.broadcastLobbyInfo();
 	};
 

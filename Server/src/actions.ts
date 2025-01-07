@@ -81,6 +81,7 @@ export type ActionSetAnte = {
 }
 export type ActionVersion = { action: 'version'; version: string }
 export type ActionSetLocation = { action: 'setLocation'; location: string }
+export type ActionNewRound = { action: 'newRound' }
 
 export type ActionClientToServer =
 	| ActionUsername
@@ -101,6 +102,7 @@ export type ActionClientToServer =
 	| ActionSetAnte
 	| ActionVersion
 	| ActionSetLocation
+	| ActionNewRound
 
 // Utility actions
 export type ActionKeepAlive = { action: 'keepAlive' }

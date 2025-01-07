@@ -264,6 +264,10 @@ end
 function G.MULTIPLAYER.set_ante(ante)
 	Client.send(string.format("action:setAnte,ante:%d", ante))
 end
+
+function G.MULTIPLAYER.new_round()
+	Client.send("action:newRound")
+end
 -- #endregion Client to Server
 
 -- Utils

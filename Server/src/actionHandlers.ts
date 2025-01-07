@@ -96,8 +96,6 @@ const readyBlindAction = (client: Client) => {
 		client.lobby.guest.handsLeft = 4;
 
 		client.lobby.broadcastAction({ action: "startBlind" });
-		client.lobby.host.resetBlocker()
-		client.lobby.guest.resetBlocker()
 	}
 };
 
@@ -113,7 +111,7 @@ const playHandAction = (
 		return;
 	}
 
-	client.score = BigInt(score);
+	client.score = BigInt(String(score));
 	client.handsLeft =
 		typeof handsLeft === "number" ? handsLeft : Number(handsLeft);
 
@@ -134,10 +132,6 @@ const playHandAction = (
 			score,
 		});
 	}
-
-	console.log(
-		`Host hands: ${lobby.host?.handsLeft}, Guest hands: ${lobby.guest?.handsLeft}`,
-	);
 
 	if (!lobby.host || !lobby.guest) {
 		stopGameAction(client);
@@ -254,6 +248,10 @@ const setLocation = ({ location }: ActionHandlerArgs<ActionSetLocation>, client:
 	client.setLocation(location);
 }
 
+const newRound = (client: Client) => {
+	client.resetBlocker()
+}
+
 // Declared partial for now untill all action handlers are defined
 export const actionHandlers = {
 	username: usernameAction,
@@ -272,5 +270,6 @@ export const actionHandlers = {
 	failRound: failRoundAction,
 	setAnte: setAnteAction,
 	version: versionAction,
-	setLocation: setLocation
+	setLocation: setLocation,
+	newRound: newRound,
 } satisfies Partial<ActionHandlers>;
