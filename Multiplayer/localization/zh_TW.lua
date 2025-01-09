@@ -43,8 +43,6 @@ return {
 			royale_desc = "類似消耗戰，但有八個玩家且每人只有一條命",
 			vanilla_plus_name = "經典+",
 			vp_desc = "第一個輸的人就輸，沒有PVP的盲注",
-			headup_name = "先拔頭籌",
-			hu_desc = "雙方玩家玩完第一次底注，然後必須打出高於對方上一手的分數，否則就輸",
 			enter_lobby_code = "輸入大廳代碼",
 			join_clip = "從剪貼簿貼上",
 			username = "用戶名稱：",
