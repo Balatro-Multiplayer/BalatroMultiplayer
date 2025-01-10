@@ -1,6 +1,9 @@
 Client = {}
 
 function Client.send(msg)
+	if not (msg == "action:keepAliveAck") then
+		sendTraceMessage(string.format("Client sent message: %s", msg), "MULTIPLAYER")
+	end
 	love.thread.getChannel("uiToNetwork"):push(msg)
 end
 
@@ -13,14 +16,12 @@ function G.MULTIPLAYER.set_username(username)
 end
 
 local function action_connected()
-	sendTraceMessage("Client connected to multiplayer server", "MULTIPLAYER")
 	G.LOBBY.connected = true
 	G.MULTIPLAYER.update_connection_status()
 	Client.send(string.format("action:username,username:%s,modHash:%s", G.LOBBY.username, G.MULTIPLAYER.MOD_HASH))
 end
 
 local function action_joinedLobby(code, type)
-	sendTraceMessage(string.format("Joining lobby %s", code), "MULTIPLAYER")
 	G.LOBBY.code = code
 	G.LOBBY.type = type
 	reset_gamemode_modifiers()
@@ -307,7 +308,13 @@ function Game:update(dt)
 		if msg then
 			local parsedAction = string_to_table(msg)
 
-			sendTraceMessage(string.format("Client got %s message", parsedAction.action), "MULTIPLAYER")
+			if not ((parsedAction.action == "keepAlive") or (parsedAction.action == "keepAliveAck")) then
+				local log = string.format("Client got %s message: ", parsedAction.action)
+				for k, v in pairs(parsedAction) do
+					log = log .. string.format(" (%s: %s) ", k, v)
+				end
+				sendTraceMessage(log, "MULTIPLAYER")
+			end
 
 			if parsedAction.action == "connected" then
 				action_connected()
