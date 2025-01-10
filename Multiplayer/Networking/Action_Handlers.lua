@@ -261,7 +261,13 @@ end
 ---@param score number
 ---@param hands_left number
 function G.MULTIPLAYER.play_hand(score, hands_left)
-	local fixed_score = string.match(string.gsub(tostring(to_big(score)), ",", ""), "([^%.]+)")
+	local fixed_score = tostring(to_big(score))
+	-- Credit to sidmeierscivilizationv on discord for this fix for Talisman
+	if string.match(fixed_score, "[eE]") == nil and string.match(fixed_score, "[.]") then
+		-- Remove decimal from non-exponential numbers
+		fixed_score = string.sub(string.gsub(fixed_score, "%.", ","), 1, -3)
+	end
+	fixed_score = string.gsub(fixed_score, ",", "") -- Remove commas
 	Client.send(string.format("action:playHand,score:" .. fixed_score .. ",handsLeft:%d", hands_left))
 end
 
