@@ -20,7 +20,7 @@ G.LOBBY = {
 
 G.MULTIPLAYER_GAME = {
 	ready_blind = false,
-	ready_blind_text = "Ready",
+	ready_blind_text = G.localization.misc.dictionary["ready"] or "Ready",
 	processed_round_done = false,
 	lives = 0,
 	loaded_ante = 0,
@@ -42,7 +42,7 @@ function reset_game_states()
 	sendDebugMessage("Resetting game states", "MULTIPLAYER")
 	G.MULTIPLAYER_GAME = {
 		ready_blind = false,
-		ready_blind_text = "Ready",
+		ready_blind_text = G.localization.misc.dictionary["ready"] or "Ready",
 		processed_round_done = false,
 		lives = 0,
 		loaded_ante = 0,
