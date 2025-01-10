@@ -16,3 +16,11 @@ function Blind:defeat(silent)
 	end
 	defeat_ref(self, silent)
 end
+
+local save_run_ref = save_run
+function save_run()
+	if G.F_NO_SAVING then
+		return
+	end
+	save_run_ref()
+end
