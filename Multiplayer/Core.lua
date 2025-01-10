@@ -31,6 +31,7 @@ load_mp_file("Compatibility/Talisman.lua")
 load_mp_file("Compatibility/Cryptid.lua")
 load_mp_file("Compatibility/Pokermon.lua")
 load_mp_file("Compatibility/Ortalab.lua")
+load_mp_file("Compatibility/Jen.lua")
 
 load_mp_file("Lobby.lua")
 load_mp_file("Networking/Action_Handlers.lua")
