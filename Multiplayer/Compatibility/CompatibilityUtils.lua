@@ -22,3 +22,30 @@ end
 function G.MULTIPLAYER.DECK.ban_tag(tag_id)
 	table.insert(G.MULTIPLAYER.DECK.BANNED_TAGS, { id = tag_id })
 end
+
+local j_broken = {
+	order = 1,
+	unlocked = true,
+	start_alerted = true,
+	discovered = true,
+	blueprint_compat = true,
+	perishable_compat = true,
+	eternal_compat = true,
+	rarity = 4,
+	cost = 10000,
+	name = "BROKEN",
+	pos = { x = 9, y = 9 },
+	set = "Joker",
+	effect = "",
+	cost_mult = 1.0,
+	config = {},
+	key = "j_broken",
+}
+
+local card_init_ref = Card.init
+function Card:init(X, Y, W, H, card, center, params)
+	if center == nil then
+		center = j_broken
+	end
+	card_init_ref(self, X, Y, W, H, card, center, params)
+end

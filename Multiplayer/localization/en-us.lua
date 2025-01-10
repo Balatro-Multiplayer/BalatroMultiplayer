@@ -1,5 +1,15 @@
 return {
 	descriptions = {
+		Joker = {
+			j_broken = {
+				name = "BROKEN",
+				text = {
+					"This card is either broken or",
+					"not implemented in the current",
+					"version of a mod you are using.",
+				},
+			},
+		},
 		Blind = {
 			bl_pvp = {
 				name = "Your Nemesis",
