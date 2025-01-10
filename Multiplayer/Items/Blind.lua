@@ -11,7 +11,7 @@ SMODS.Atlas({
 SMODS.Blind({
 	key = "bl_pvp",
 	dollars = 5,
-	mult = 0,
+	mult = 1,
 	boss = { min = 1, max = 10 },
 	boss_colour = HEX("ac3232"),
 	atlas = "mp_player_blind_chip",
