@@ -710,7 +710,7 @@ G.FUNCS.blind_choice_handler = function(e)
 end
 
 G.FUNCS.pvp_ready_button = function(e)
-	if e.children[1].config.ref_table[e.children[1].config.ref_value] == "Select" then
+	if e.children[1].config.ref_table[e.children[1].config.ref_value] == localize("Select", "blind_states") then
 		e.config.button = "mp_toggle_ready"
 		e.config.one_press = false
 		e.children[1].config.ref_table = G.MULTIPLAYER_GAME
@@ -764,6 +764,7 @@ local function reset_blind_HUD()
 end
 
 function G.FUNCS.mp_toggle_ready(e)
+	sendTraceMessage("Toggling Ready", "MULTIPLAYER")
 	G.MULTIPLAYER_GAME.ready_blind = not G.MULTIPLAYER_GAME.ready_blind
 	G.MULTIPLAYER_GAME.ready_blind_text = G.MULTIPLAYER_GAME.ready_blind
 			and (G.localization.misc.dictionary["unready"] or "Unready")
