@@ -2,7 +2,8 @@ local Disableable_Button = G.MULTIPLAYER.COMPONENTS.Disableable_Button
 local Disableable_Toggle = G.MULTIPLAYER.COMPONENTS.Disableable_Toggle
 local Disableable_Option_Cycle = G.MULTIPLAYER.COMPONENTS.Disableable_Option_Cycle
 
-local function toggle_lobby_options(value)
+-- This needs to have a parameter because its a callback for inputs
+local function send_lobby_options(value)
 	G.MULTIPLAYER.lobby_options()
 end
 
@@ -382,7 +383,7 @@ function G.UIDEF.create_UIBox_lobby_options()
 															or "Give comeback gold on life loss",
 														ref_table = G.LOBBY.config,
 														ref_value = "gold_on_life_loss",
-														callback = toggle_lobby_options,
+														callback = send_lobby_options,
 													}),
 												},
 											},
@@ -401,7 +402,7 @@ function G.UIDEF.create_UIBox_lobby_options()
 															or "Don't get blind gold on round loss",
 														ref_table = G.LOBBY.config,
 														ref_value = "no_gold_on_round_loss",
-														callback = toggle_lobby_options,
+														callback = send_lobby_options,
 													}),
 												},
 											},
@@ -420,7 +421,7 @@ function G.UIDEF.create_UIBox_lobby_options()
 															or "Lose a life on non-PvP round loss",
 														ref_table = G.LOBBY.config,
 														ref_value = "death_on_round_loss",
-														callback = toggle_lobby_options,
+														callback = send_lobby_options,
 													}),
 												},
 											},
@@ -439,10 +440,117 @@ function G.UIDEF.create_UIBox_lobby_options()
 															or "Players have different seeds",
 														ref_table = G.LOBBY.config,
 														ref_value = "different_seeds",
-														callback = toggle_lobby_options,
+														callback = toggle_different_seeds,
 													}),
 												},
 											},
+											not G.LOBBY.config.different_seeds
+													and {
+														n = G.UIT.R,
+														config = {
+															padding = 0,
+															align = "cr",
+														},
+														nodes = {
+															{
+																n = G.UIT.C,
+																config = {
+																	padding = 0,
+																	align = "cm",
+																},
+																nodes = {
+																	{
+																		n = G.UIT.R,
+																		config = {
+																			padding = 0.2,
+																			align = "cr",
+																		},
+																		nodes = {
+																			{
+																				n = G.UIT.T,
+																				config = {
+																					scale = 0.45,
+																					text = G.localization.misc.dictionary["current_seed"]
+																						or "Current seed: ",
+																					colour = G.C.UI.TEXT_LIGHT,
+																				},
+																			},
+																			{
+																				n = G.UIT.T,
+																				config = {
+																					scale = 0.45,
+																					ref_table = G.LOBBY.config,
+																					ref_value = "custom_seed",
+																					colour = G.C.UI.TEXT_LIGHT,
+																				},
+																			},
+																		},
+																	},
+																	{
+																		n = G.UIT.R,
+																		config = {
+																			padding = 0.2,
+																			align = "cr",
+																		},
+																		nodes = {
+																			Disableable_Button({
+																				id = "custom_seed_overlay",
+																				button = "custom_seed_overlay",
+																				colour = G.C.BLUE,
+																				minw = 3.65,
+																				minh = 0.6,
+																				label = {
+																					G.localization.misc.dictionary["set_custom_seed"]
+																						or "Set Custom Seed",
+																				},
+																				disabled_text = {
+																					G.localization.misc.dictionary["set_custom_seed"]
+																						or "Set Custom Seed",
+																				},
+																				scale = 0.45,
+																				col = true,
+																				enabled_ref_table = G.LOBBY,
+																				enabled_ref_value = "is_host",
+																			}),
+																			{
+																				n = G.UIT.B,
+																				config = {
+																					w = 0.1,
+																					h = 0.1,
+																				},
+																			},
+																			Disableable_Button({
+																				id = "custom_seed_reset",
+																				button = "custom_seed_reset",
+																				colour = G.C.RED,
+																				minw = 1.65,
+																				minh = 0.6,
+																				label = {
+																					G.localization.misc.dictionary["reset"]
+																						or "Reset",
+																				},
+																				disabled_text = {
+																					G.localization.misc.dictionary["reset"]
+																						or "Reset",
+																				},
+																				scale = 0.45,
+																				col = true,
+																				enabled_ref_table = G.LOBBY,
+																				enabled_ref_value = "is_host",
+																			}),
+																		},
+																	},
+																},
+															},
+														},
+													}
+												or {
+													n = G.UIT.B,
+													config = {
+														w = 0.1,
+														h = 0.1,
+													},
+												},
 										},
 									}
 								end,
@@ -474,12 +582,25 @@ function G.UIDEF.create_UIBox_lobby_options()
 														enabled_ref_table = G.LOBBY,
 														enabled_ref_value = "is_host",
 														label = G.localization.misc.dictionary["opts_lives"] or "Lives",
-														options = { 1, 2, 4, 6, 8 },
-														current_option = G.LOBBY.config.starting_lives < 4
-																and G.LOBBY.config.starting_lives
-															or G.LOBBY.config.starting_lives == 4 and 3
-															or G.LOBBY.config.starting_lives == 6 and 4
-															or 5,
+														options = {
+															1,
+															2,
+															3,
+															4,
+															5,
+															6,
+															7,
+															8,
+															9,
+															10,
+															11,
+															12,
+															13,
+															14,
+															15,
+															16,
+														},
+														current_option = G.LOBBY.config.starting_lives,
 														opt_callback = "change_starting_lives",
 													}),
 													G.LOBBY.type == "draft"
@@ -489,9 +610,8 @@ function G.UIDEF.create_UIBox_lobby_options()
 																enabled_ref_value = "is_host",
 																label = G.localization.misc.dictionary["opts_start_antes"]
 																	or "Starting Antes",
-																options = { 2, 3, 4, 5, 6, 7 },
-																current_option = G.LOBBY.config.draft_starting_antes
-																	- 1,
+																options = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12 },
+																current_option = G.LOBBY.config.draft_starting_antes,
 																opt_callback = "change_draft_starting_antes",
 															})
 														or nil,
@@ -509,14 +629,62 @@ function G.UIDEF.create_UIBox_lobby_options()
 	})
 end
 
+function G.UIDEF.create_UIBox_custom_seed_overlay()
+	return create_UIBox_generic_options({
+		back_func = "lobby_options",
+		contents = {
+			{
+				n = G.UIT.R,
+				config = { align = "cm", colour = G.C.CLEAR },
+				nodes = {
+					{
+						n = G.UIT.C,
+						config = { align = "cm", minw = 0.1 },
+						nodes = {
+							create_text_input({
+								max_length = 8,
+								all_caps = true,
+								ref_table = G.LOBBY,
+								ref_value = "temp_seed",
+								prompt_text = localize("k_enter_seed"),
+								callback = function(val)
+									G.LOBBY.config.custom_seed = G.LOBBY.temp_seed
+									send_lobby_options()
+								end,
+							}),
+							{
+								n = G.UIT.B,
+								config = { w = 0.1, h = 0.1 },
+							},
+							{
+								n = G.UIT.T,
+								config = {
+									scale = 0.3,
+									text = G.localization.misc.dictionary["enter_to_save"] or "Press enter to save",
+									colour = G.C.UI.TEXT_LIGHT,
+								},
+							},
+						},
+					},
+				},
+			},
+		},
+	})
+end
+
+function toggle_different_seeds()
+	G.FUNCS.lobby_options()
+	send_lobby_options()
+end
+
 G.FUNCS.change_starting_lives = function(args)
 	G.LOBBY.config.starting_lives = args.to_val
-	toggle_lobby_options()
+	send_lobby_options()
 end
 
 G.FUNCS.change_draft_starting_antes = function(args)
 	G.LOBBY.config.draft_starting_antes = args.to_val
-	toggle_lobby_options()
+	send_lobby_options()
 end
 
 function G.FUNCS.get_lobby_main_menu_UI(e)
@@ -575,6 +743,17 @@ end
 
 function G.FUNCS.return_to_lobby()
 	G.MULTIPLAYER.stop_game()
+end
+
+function G.FUNCS.custom_seed_overlay(e)
+	G.FUNCS.overlay_menu({
+		definition = G.UIDEF.create_UIBox_custom_seed_overlay(),
+	})
+end
+
+function G.FUNCS.custom_seed_reset(e)
+	G.LOBBY.config.custom_seed = G.localization.misc.dictionary["random"] or "Random"
+	send_lobby_options()
 end
 
 local set_main_menu_UI_ref = set_main_menu_UI

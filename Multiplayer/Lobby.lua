@@ -1,6 +1,7 @@
 G.LOBBY = {
 	connected = false,
 	temp_code = "",
+	temp_seed = "",
 	code = nil,
 	type = "",
 	config = {
@@ -11,6 +12,7 @@ G.LOBBY = {
 		starting_lives = 4,
 		draft_starting_antes = 3,
 		gamemode = "attrition",
+		custom_seed = G.localization.misc.dictionary["random"] or "Random",
 	},
 	username = G.MULTIPLAYER.UTILS.get_username(),
 	host = {},

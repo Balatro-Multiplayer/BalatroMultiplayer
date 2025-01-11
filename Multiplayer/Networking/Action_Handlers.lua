@@ -75,6 +75,12 @@ local function action_start_game(deck, seed, stake_str)
 	reset_game_states()
 	local stake = tonumber(stake_str)
 	G.MULTIPLAYER.set_ante(0)
+	if
+		not G.LOBBY.config.different_seeds
+		and G.LOBBY.config.custom_seed ~= (G.localization.misc.dictionary["random"] or "Random")
+	then
+		seed = G.LOBBY.config.custom_seed
+	end
 	G.FUNCS.lobby_start_run(nil, { deck = deck, seed = seed, stake = stake })
 end
 
