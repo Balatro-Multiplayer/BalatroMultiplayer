@@ -204,7 +204,7 @@ function G.UIDEF.create_UIBox_lobby_menu()
 											{
 												n = G.UIT.R,
 												config = {
-													padding = 0.2,
+													padding = 0.15,
 													align = "cm",
 												},
 												nodes = {
@@ -223,7 +223,7 @@ function G.UIDEF.create_UIBox_lobby_menu()
 											G.LOBBY.host.username and {
 												n = G.UIT.R,
 												config = {
-													padding = 0,
+													padding = 0.1,
 													align = "cm",
 												},
 												nodes = {
@@ -237,22 +237,30 @@ function G.UIDEF.create_UIBox_lobby_menu()
 															colour = G.C.UI.TEXT_LIGHT,
 														},
 													},
-													G.LOBBY.host.hash
-														and {
-															n = G.UIT.T,
-															config = {
-																text = " (" .. G.LOBBY.host.hash .. ")",
-																shadow = true,
-																scale = text_scale * 0.6,
-																colour = G.C.UI.TEXT_LIGHT,
-															},
+													{
+														n = G.UIT.B,
+														config = {
+															w = 0.1,
+															h = 0.1,
 														},
+													},
+													G.LOBBY.host.hash and UIBox_button({
+														id = "host_hash",
+														button = "view_host_hash",
+														label = { G.LOBBY.host.hash },
+														minw = 0.75,
+														minh = 0.3,
+														scale = 0.25,
+														shadow = false,
+														colour = G.C.PURPLE,
+														col = true,
+													}),
 												},
 											} or nil,
 											G.LOBBY.guest.username and {
 												n = G.UIT.R,
 												config = {
-													padding = 0,
+													padding = 0.1,
 													align = "cm",
 												},
 												nodes = {
@@ -266,17 +274,24 @@ function G.UIDEF.create_UIBox_lobby_menu()
 															colour = G.C.UI.TEXT_LIGHT,
 														},
 													},
-
-													G.LOBBY.guest.hash
-														and {
-															n = G.UIT.T,
-															config = {
-																text = " (" .. G.LOBBY.guest.hash .. ")",
-																shadow = true,
-																scale = text_scale * 0.6,
-																colour = G.C.UI.TEXT_LIGHT,
-															},
+													{
+														n = G.UIT.B,
+														config = {
+															w = 0.1,
+															h = 0.1,
 														},
+													},
+													G.LOBBY.guest.hash and UIBox_button({
+														id = "host_guest",
+														button = "view_guest_hash",
+														label = { G.LOBBY.guest.hash },
+														minw = 0.75,
+														minh = 0.3,
+														scale = 0.25,
+														shadow = false,
+														colour = G.C.PURPLE,
+														col = true,
+													}),
 												},
 											} or nil,
 										},
@@ -669,6 +684,60 @@ function G.UIDEF.create_UIBox_custom_seed_overlay()
 				},
 			},
 		},
+	})
+end
+
+function G.UIDEF.create_UIBox_view_hash(type)
+	return (
+		create_UIBox_generic_options({
+			contents = {
+				{
+					n = G.UIT.C,
+					config = {
+						padding = 0.2,
+						align = "cm",
+					},
+					nodes = hash_str_to_view(type == "host" and G.LOBBY.host.hash_str or G.LOBBY.guest.hash_str),
+				},
+			},
+		})
+	)
+end
+
+function hash_str_to_view(str)
+	local t = {}
+	for s in str:gmatch("[^;]+") do
+		table.insert(t, {
+			n = G.UIT.R,
+			config = {
+				padding = 0.05,
+				align = "cm",
+			},
+			nodes = {
+				{
+					n = G.UIT.T,
+					config = {
+						text = s,
+						shadow = true,
+						scale = 0.45,
+						colour = G.C.UI.TEXT_LIGHT,
+					},
+				},
+			},
+		})
+	end
+	return t
+end
+
+G.FUNCS.view_host_hash = function(e)
+	G.FUNCS.overlay_menu({
+		definition = G.UIDEF.create_UIBox_view_hash("host"),
+	})
+end
+
+G.FUNCS.view_guest_hash = function(e)
+	G.FUNCS.overlay_menu({
+		definition = G.UIDEF.create_UIBox_view_hash("guest"),
 	})
 end
 

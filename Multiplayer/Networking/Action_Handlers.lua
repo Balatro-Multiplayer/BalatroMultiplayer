@@ -11,14 +11,14 @@ end
 function G.MULTIPLAYER.set_username(username)
 	G.LOBBY.username = username or "Guest"
 	if G.LOBBY.connected then
-		Client.send(string.format("action:username,username:%s,modHash:%s", G.LOBBY.username, G.MULTIPLAYER.MOD_HASH))
+		Client.send(string.format("action:username,username:%s,modHash:%s", G.LOBBY.username, G.MULTIPLAYER.MOD_STRING))
 	end
 end
 
 local function action_connected()
 	G.LOBBY.connected = true
 	G.MULTIPLAYER.update_connection_status()
-	Client.send(string.format("action:username,username:%s,modHash:%s", G.LOBBY.username, G.MULTIPLAYER.MOD_HASH))
+	Client.send(string.format("action:username,username:%s,modHash:%s", G.LOBBY.username, G.MULTIPLAYER.MOD_STRING))
 end
 
 local function action_joinedLobby(code, type)
@@ -35,9 +35,9 @@ local function action_lobbyInfo(host, hostHash, guest, guestHash, is_host)
 	if is_host == "true" then
 		G.MULTIPLAYER.lobby_options()
 	end
-	G.LOBBY.host = { username = host, hash = hostHash }
+	G.LOBBY.host = { username = host, hash_str = hostHash, hash = hash(hostHash) }
 	if guest ~= nil then
-		G.LOBBY.guest = { username = guest, hash = guestHash }
+		G.LOBBY.guest = { username = guest, hash_str = guestHash, hash = hash(guestHash) }
 	else
 		G.LOBBY.guest = {}
 	end
