@@ -14,5 +14,8 @@
     "Steamodded (>=1.0.0~ALPHA-1220a)",
     "Lovely (>=0.6)",
     "Balatro (>=1.*)"
-  ]
+  ],
+	"conflicts": [
+		"Cryptid (<=0.5.3b)"
+	]
 }
