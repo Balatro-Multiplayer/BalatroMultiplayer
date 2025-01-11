@@ -825,7 +825,6 @@ local blind_defeat_ref = Blind.defeat
 function Blind:defeat(silent)
 	blind_defeat_ref(self, silent)
 	reset_blind_HUD()
-	G.MULTIPLAYER.play_hand(0, G.GAME.round_resets.hands)
 end
 
 local update_shop_ref = Game.update_shop
@@ -1665,7 +1664,10 @@ function add_round_eval_row(config)
 											object = DynaText({
 												string = {
 													(
-														G.GAME.blind.chips == -1
+														(
+															G.GAME.blind.chips == -1
+															or to_big(G.GAME.chips) < to_big(G.GAME.blind.chips)
+														)
 														and (
 															(
 																(is_pvp_boss() or G.LOBBY.config.death_on_round_loss)
@@ -2296,6 +2298,7 @@ local select_blind_ref = G.FUNCS.select_blind
 function G.FUNCS.select_blind(e)
 	select_blind_ref(e)
 	if G.LOBBY.code then
+		G.MULTIPLAYER.play_hand(0, G.GAME.round_resets.hands)
 		G.MULTIPLAYER.new_round()
 		G.MULTIPLAYER.set_location("loc_playing-" .. (e.config.ref_table.key or e.config.ref_table.name))
 		hide_enemy_location()
