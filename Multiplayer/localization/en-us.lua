@@ -92,6 +92,10 @@ return {
 			loc_selecting = "Selecting a Blind",
 			loc_shop = "Shopping",
 			loc_playing = "Playing ",
+			random = "Random",
+			reset = "Reset",
+			set_custom_seed = "Set Custom Seed",
+			mod_hash_warning = "Players have different mods or mod versions! This can cause problems!",
 		},
 	},
 }
