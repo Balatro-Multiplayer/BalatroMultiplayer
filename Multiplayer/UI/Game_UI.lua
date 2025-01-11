@@ -2096,6 +2096,7 @@ function Game:update_selecting_hand(dt)
 	update_selecting_hand_ref(self, dt)
 
 	if G.MULTIPLAYER_GAME.end_pvp then
+		G.hand:unhighlight_all()
 		G.STATE_COMPLETE = false
 		G.STATE = G.STATES.NEW_ROUND
 		G.MULTIPLAYER_GAME.end_pvp = false
