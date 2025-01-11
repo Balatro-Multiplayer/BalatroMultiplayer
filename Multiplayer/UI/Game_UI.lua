@@ -981,6 +981,7 @@ function Game:update_hand_played(dt)
 	if G.MULTIPLAYER_GAME.end_pvp then
 		G.STATE_COMPLETE = false
 		G.STATE = G.STATES.NEW_ROUND
+		G.MULTIPLAYER_GAME.end_pvp = false
 	end
 end
 
@@ -996,6 +997,11 @@ end
 
 local update_new_round_ref = Game.update_new_round
 function Game:update_new_round(dt)
+	if G.MULTIPLAYER.end_pvp then
+		G.FUNCS.draw_from_hand_to_deck()
+		G.FUNCS.draw_from_discard_to_deck()
+		G.MULTIPLAYER.end_pvp = false
+	end
 	if G.LOBBY.code and not G.STATE_COMPLETE then
 		-- Prevent player from losing
 		if to_big(G.GAME.chips) < to_big(G.GAME.blind.chips) and not is_pvp_boss() then
