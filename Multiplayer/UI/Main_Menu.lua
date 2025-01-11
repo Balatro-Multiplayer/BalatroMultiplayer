@@ -64,6 +64,7 @@ function add_custom_multiplayer_cards(change_context)
 	title_card.T.w = title_card.T.w * 1.1 * 1.2
 	title_card.T.h = title_card.T.h * 1.1 * 1.2
 	title_card.no_ui = true
+	title_card.states.visible = false
 
 	G.E_MANAGER:add_event(Event({
 		trigger = "after",
@@ -109,7 +110,7 @@ local game_main_menu_ref = Game.main_menu
 function Game:main_menu(change_context)
 	local ret = game_main_menu_ref(self, change_context)
 
-	add_custom_multiplayer_cards()
+	add_custom_multiplayer_cards(change_context)
 
 	-- Add version to main menu
 	UIBox({
