@@ -2,6 +2,10 @@ G.MULTIPLAYER.MOD_HASH = "0000"
 G.MULTIPLAYER.MOD_STRING = ""
 
 function hash(str)
+	if not str then
+		return "0000"
+	end
+
 	local bit = require("bit")
 	h = 5381
 

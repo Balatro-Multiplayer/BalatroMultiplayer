@@ -706,6 +706,11 @@ end
 
 function hash_str_to_view(str)
 	local t = {}
+
+	if not str then
+		return t
+	end
+
 	for s in str:gmatch("[^;]+") do
 		table.insert(t, {
 			n = G.UIT.R,
