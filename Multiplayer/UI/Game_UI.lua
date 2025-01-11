@@ -2122,8 +2122,10 @@ function Blind:disable()
 end
 
 G.FUNCS.multiplayer_blind_chip_UI_scale = function(e)
-	if G.GAME.blind and G.MULTIPLAYER_GAME.enemy.score then
+	local new_score_text = number_format(G.MULTIPLAYER_GAME.enemy.score)
+	if G.GAME.blind and G.MULTIPLAYER_GAME.enemy.score and G.MULTIPLAYER_GAME.enemy.score_text ~= new_score_text then
 		e.config.scale = scale_number(G.MULTIPLAYER_GAME.enemy.score, 0.7, 100000)
+		G.MULTIPLAYER_GAME.enemy.score_text = new_score_text
 	end
 end
 

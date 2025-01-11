@@ -104,9 +104,21 @@ local function action_enemy_info(score_str, hands_left_str)
 		return
 	end
 
-	G.MULTIPLAYER_GAME.enemy.score = score
-	G.MULTIPLAYER_GAME.enemy.score_text = number_format(score)
+	G.E_MANAGER:add_event(Event({
+		blockable = false,
+		blocking = false,
+		trigger = "ease",
+		delay = 3,
+		ref_table = G.MULTIPLAYER_GAME.enemy,
+		ref_value = "score",
+		ease_to = score,
+		func = function(t)
+			return math.floor(t)
+		end,
+	}))
+
 	G.MULTIPLAYER_GAME.enemy.hands = hands_left
+
 	if is_pvp_boss() then
 		G.HUD_blind:get_UIE_by_ID("HUD_blind_count"):juice_up()
 		G.HUD_blind:get_UIE_by_ID("dollars_to_be_earned"):juice_up()
