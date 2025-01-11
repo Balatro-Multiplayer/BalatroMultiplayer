@@ -447,6 +447,7 @@ function G.UIDEF.create_UIBox_join_lobby_button()
 									w = 4,
 									h = 1,
 									max_length = 5,
+									all_caps = true,
 									prompt_text = G.localization.misc.dictionary["enter_lobby_code"]
 										or "Enter Lobby Code",
 									ref_table = G.LOBBY,
