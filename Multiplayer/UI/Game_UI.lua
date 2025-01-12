@@ -1964,10 +1964,15 @@ end
 
 local ease_ante_ref = ease_ante
 function ease_ante(mod)
-	G.MULTIPLAYER.set_ante(G.GAME.round_resets.ante + mod)
 	if not G.LOBBY.code then
 		return ease_ante_ref(mod)
 	end
+	-- Prevents easing multiple times at once
+	if G.MULTIPLAYER_GAME.antes_keyed[G.MULTIPLAYER_GAME.ante_key] then
+		return
+	end
+	G.MULTIPLAYER_GAME.antes_keyed[G.MULTIPLAYER_GAME.ante_key] = true
+	G.MULTIPLAYER.set_ante(G.GAME.round_resets.ante + mod)
 	G.E_MANAGER:add_event(Event({
 		trigger = "immediate",
 		func = function()
@@ -2276,7 +2281,7 @@ end
 local update_shop_ref = Game.update_shop
 function Game:update_shop(dt)
 	local updated_location = false
-	if G.LOBBY.code and not G.STATE_COMPLETE and not updated_location then
+	if G.LOBBY.code and not G.STATE_COMPLETE and not updated_location and not G.GAME.USING_RUN then
 		G.MULTIPLAYER.set_location("loc_shop")
 		show_enemy_location()
 	end

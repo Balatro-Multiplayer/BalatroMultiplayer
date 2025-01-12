@@ -38,6 +38,8 @@ G.MULTIPLAYER_GAME = {
 	},
 	location = "loc_selecting",
 	next_blind_context = nil,
+	ante_key = tostring(math.random()),
+	antes_keyed = {},
 }
 
 function reset_game_states()
@@ -60,6 +62,8 @@ function reset_game_states()
 		},
 		location = "loc_selecting",
 		next_blind_context = nil,
+		ante_key = tostring(math.random()),
+		antes_keyed = {},
 	}
 end
 
