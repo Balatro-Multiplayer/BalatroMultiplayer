@@ -10,3 +10,13 @@ position = 'at'
 payload = "function end_round()$pre func = G.LOBBY.code and G.MULTIPLAYER.end_round or function()"
 match_indent = false
 times = 1
+
+[[patches]]
+[patches.regex]
+target = "game.lua"
+pattern = '''function Game:update_round_eval\(dt\)(?<pre>[\s\S]+?)if not G.STATE_COMPLETE then'''
+position = 'at'
+payload = '''function Game:update_round_eval(dt)$pre if not G.STATE_COMPLETE and not G.MULTIPLAYER_GAME.prevent_eval then
+        G.MULTIPLAYER_GAME.prevent_eval = true'''
+match_indent = true
+times = 1

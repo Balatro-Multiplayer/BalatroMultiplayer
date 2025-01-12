@@ -2298,6 +2298,7 @@ end
 
 local select_blind_ref = G.FUNCS.select_blind
 function G.FUNCS.select_blind(e)
+	G.MULTIPLAYER_GAME.prevent_eval = false
 	select_blind_ref(e)
 	if G.LOBBY.code then
 		G.MULTIPLAYER.play_hand(0, G.GAME.round_resets.hands)

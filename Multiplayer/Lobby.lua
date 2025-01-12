@@ -40,6 +40,7 @@ G.MULTIPLAYER_GAME = {
 	next_blind_context = nil,
 	ante_key = tostring(math.random()),
 	antes_keyed = {},
+	prevent_eval = false,
 }
 
 function reset_game_states()
@@ -64,6 +65,7 @@ function reset_game_states()
 		next_blind_context = nil,
 		ante_key = tostring(math.random()),
 		antes_keyed = {},
+		prevent_eval = false,
 	}
 end
 
