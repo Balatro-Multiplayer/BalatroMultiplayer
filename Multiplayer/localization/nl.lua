@@ -1,4 +1,14 @@
 return {
+	Joker = {
+		j_broken = {
+			name = "GEBROKEN",
+			text = {
+				"Deze kaart is gebroken of niet",
+				"geïmplementeerd in de huidige versie",
+				"van een mod die je gebruikt.",
+			},
+		},
+	},
 	descriptions = {
 		Blind = {
 			bl_pvp = {
@@ -84,6 +94,11 @@ return {
 			loc_selecting = "Blind aan het kiezen",
 			loc_shop = "Shoppen",
 			loc_playing = "Spelen ",
+			current_seed = "Huidige seed: ",
+			random = "Willekeurig",
+			set_custom_seed = "Stel Aangepaste Seed In",
+			reset = "Reset",
+			mod_hash_warning = "Spelers hebben verschillende mods of mod versies! Dit kan problemen veroorzaken! Players have different mods or mod versions! This can cause problems!",
 		},
 	},
 }

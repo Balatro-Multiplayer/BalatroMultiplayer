@@ -92,6 +92,7 @@ return {
 			loc_selecting = "Selecting a Blind",
 			loc_shop = "Shopping",
 			loc_playing = "Playing ",
+			current_seed = "Current seed: ",
 			random = "Random",
 			reset = "Reset",
 			set_custom_seed = "Set Custom Seed",

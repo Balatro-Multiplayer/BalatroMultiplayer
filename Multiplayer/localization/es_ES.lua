@@ -1,5 +1,15 @@
 -- Localization by @panbimbogd on discord
 return {
+	Joker = {
+		j_broken = {
+			name = "ROTA",
+			text = {
+				"Esta carta está rota o no está",
+				"implementada en la versión actual",
+				"de un mod que estás usando.",
+			},
+		},
+	},
 	descriptions = {
 		Blind = {
 			bl_pvp = {
@@ -83,6 +93,11 @@ return {
 			loc_selecting = "Seleccionando una ciega",
 			loc_shop = "Comprando",
 			loc_playing = "Enfrentandose a ",
+			current_seed = "Semilla actual: ",
+			random = "Aleatoria",
+			set_custom_seed = "Semilla personalizada",
+			reset = "Resetear",
+			mod_hash_warning = "¡Los jugadores tienen diferentes mods o diferentes versiones de mods! ¡Esto puede causar problemas!",
 		},
 	},
 }

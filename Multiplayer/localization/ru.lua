@@ -1,5 +1,15 @@
 -- Localization by @KilledByLava, @FaLNioNe, and @astryder75 on discord
 return {
+	Joker = {
+		j_broken = {
+			name = "Ошибка",
+			text = {
+				"Эта карта либо сломана",
+				"либо ещё не добавлена в",
+				"данной версии мода.",
+			},
+		},
+	},
 	descriptions = {
 		Blind = {
 			bl_pvp = {
@@ -83,6 +93,11 @@ return {
 			loc_selecting = "Выбирает Блайнд",
 			loc_shop = "В магазине",
 			loc_playing = "Против ",
+			current_seed = "Сид лобби: ",
+			random = "Случайный",
+			set_custom_seed = "Использовать Свой",
+			reset = "Сбросить",
+			mod_hash_warning = "У игроков разные моды либо разные версии модов! Это может привести к ошибкам!",
 		},
 	},
 }
