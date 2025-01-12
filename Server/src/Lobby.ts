@@ -57,14 +57,14 @@ class Lobby {
 			this.guest = null;
 		}
 
-		const lobby = client.lobby;
 		client.setLobby(null);
 		if (this.host === null) {
 			Lobbies.delete(this.code);
 		} else {
 			// TODO: Refactor for more than 2 players
 			// Stop game if someone leaves
-			lobby?.broadcastAction({ action: "stopGame" });
+			this.broadcastAction({ action: "stopGame" });
+			this.resetPlayers();
 			this.broadcastLobbyInfo();
 		}
 	};
@@ -149,6 +149,19 @@ class Lobby {
 		}
 		this.guest?.sendAction({ action: "lobbyOptions", gamemode: this.gameMode, ...options });
 	};
+
+	resetPlayers = () => {
+		if (this.host) {
+			this.host.isReady = false;
+			this.host.resetBlocker();
+			this.host.setLocation("Blind Select");
+		}
+		if (this.guest) {
+			this.guest.isReady = false;
+			this.guest.resetBlocker();
+			this.guest.setLocation("Blind Select");
+		}
+	}
 }
 
 export default Lobby;

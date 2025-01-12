@@ -1,5 +1,15 @@
 -- Localization by @panbimbogd on discord
 return {
+	Joker = {
+		j_broken = {
+			name = "ROTA",
+			text = {
+				"Esta carta está rota o no está",
+				"implementada en la versión actual",
+				"de un mod que estás usando.",
+			},
+		},
+	},
 	descriptions = {
 		Blind = {
 			bl_pvp = {
@@ -42,8 +52,6 @@ return {
 			royale_desc = "Desgaste, excepto que hay hasta 8 jugadores y cada jugador solo tiene 1 vida.",
 			vanilla_plus_name = "Vanilla+",
 			vp_desc = "La primera persona que falle una ronda pierde, no hay ciegas en PvP.",
-			headup_name = "Heads Up",
-			hu_desc = "Ambos jugadores juegan la primera apuesta, luego deben seguir superando la puntuación anterior del oponente o perderán.",
 			enter_lobby_code = "Escribe el Código de la Lobby",
 			join_clip = "Pega desde el portapapeles",
 			username = "Nombre de usuario:",
@@ -64,7 +72,7 @@ return {
 			lobby_options = "Opciones de Lobby",
 			copy_clipboard = "Copiar al portapapeles",
 			connect_player = "Jugadores conectados:",
-			view_code = "VER_CÓDIGO",
+			view_code = "VER CÓDIGO",
 			leave = "SALIR",
 			opts_only_host = "Solo el anfitrión puede cambiar estas opciones",
 			opts_cb_money = "Recibe oro al perder una vida para ayudarte a remontar",
@@ -85,6 +93,11 @@ return {
 			loc_selecting = "Seleccionando una ciega",
 			loc_shop = "Comprando",
 			loc_playing = "Enfrentandose a ",
+			current_seed = "Semilla actual: ",
+			random = "Aleatoria",
+			set_custom_seed = "Semilla personalizada",
+			reset = "Resetear",
+			mod_hash_warning = "¡Los jugadores tienen diferentes mods o diferentes versiones de mods! ¡Esto puede causar problemas!",
 		},
 	},
 }

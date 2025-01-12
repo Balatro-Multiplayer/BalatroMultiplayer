@@ -9,10 +9,13 @@
 	"priority": 9007199254740990,
 	"badge_colour": "AC3232",
 	"badge_text_colour": "FFFFFF",
-	"version": "0.1.7",
+	"version": "0.1.7.7",
 	"dependencies": [
     "Steamodded (>=1.0.0~ALPHA-1220a)",
     "Lovely (>=0.6)",
     "Balatro (>=1.*)"
-  ]
+  ],
+	"conflicts": [
+		"Cryptid (<=0.5.3b)"
+	]
 }

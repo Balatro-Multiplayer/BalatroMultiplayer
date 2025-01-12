@@ -1,6 +1,7 @@
 G.LOBBY = {
 	connected = false,
 	temp_code = "",
+	temp_seed = "",
 	code = nil,
 	type = "",
 	config = {
@@ -11,6 +12,7 @@ G.LOBBY = {
 		starting_lives = 4,
 		draft_starting_antes = 3,
 		gamemode = "attrition",
+		custom_seed = G.localization.misc.dictionary["random"] or "Random",
 	},
 	username = G.MULTIPLAYER.UTILS.get_username(),
 	host = {},
@@ -20,7 +22,7 @@ G.LOBBY = {
 
 G.MULTIPLAYER_GAME = {
 	ready_blind = false,
-	ready_blind_text = "Ready",
+	ready_blind_text = G.localization.misc.dictionary["ready"] or "Ready",
 	processed_round_done = false,
 	lives = 0,
 	loaded_ante = 0,
@@ -36,13 +38,16 @@ G.MULTIPLAYER_GAME = {
 	},
 	location = "loc_selecting",
 	next_blind_context = nil,
+	ante_key = tostring(math.random()),
+	antes_keyed = {},
+	prevent_eval = false,
 }
 
 function reset_game_states()
 	sendDebugMessage("Resetting game states", "MULTIPLAYER")
 	G.MULTIPLAYER_GAME = {
 		ready_blind = false,
-		ready_blind_text = "Ready",
+		ready_blind_text = G.localization.misc.dictionary["ready"] or "Ready",
 		processed_round_done = false,
 		lives = 0,
 		loaded_ante = 0,
@@ -58,6 +63,9 @@ function reset_game_states()
 		},
 		location = "loc_selecting",
 		next_blind_context = nil,
+		ante_key = tostring(math.random()),
+		antes_keyed = {},
+		prevent_eval = false,
 	}
 end
 

@@ -171,7 +171,11 @@ const playHandAction = (
 };
 
 const stopGameAction = (client: Client) => {
-	client.lobby?.broadcastAction({ action: "stopGame" });
+	if (!client.lobby) {
+		return;
+	}
+	client.lobby.broadcastAction({ action: "stopGame" });
+	client.lobby.resetPlayers();
 };
 
 // Deprecated
@@ -225,7 +229,7 @@ const versionAction = (
 	{ version }: ActionHandlerArgs<ActionVersion>,
 	client: Client,
 ) => {
-	const versionMatch = version.match(/^(\d+\.\d+\.\d+)-MULTIPLAYER$/);
+	const versionMatch = version.match(/^(\d+\.\d+\.\d+)$/);
 	if (versionMatch) {
 			const clientVersion = versionMatch[1];
 			const serverVersionNumber = serverVersion.split('-')[0];

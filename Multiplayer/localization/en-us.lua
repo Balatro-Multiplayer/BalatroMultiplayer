@@ -1,5 +1,15 @@
 return {
 	descriptions = {
+		Joker = {
+			j_broken = {
+				name = "BROKEN",
+				text = {
+					"This card is either broken or",
+					"not implemented in the current",
+					"version of a mod you are using.",
+				},
+			},
+		},
 		Blind = {
 			bl_pvp = {
 				name = "Your Nemesis",
@@ -41,8 +51,6 @@ return {
 			royale_desc = "Attrition, except there are up to 8 players and every player only has 1 life.",
 			vanilla_plus_name = "Vanilla+",
 			vp_desc = "The first person to fail a round loses, no PvP blinds.",
-			headup_name = "Heads Up",
-			hu_desc = "Both players play the first ante, then must keep beating the opponents previous score or lose.",
 			enter_lobby_code = "Enter Lobby Code",
 			join_clip = "Paste From Clipboard",
 			username = "Username:",
@@ -63,11 +71,11 @@ return {
 			lobby_options = "Lobby Options",
 			copy_clipboard = "Copy to clipboard",
 			connect_player = "Connected Players:",
-			view_code = "VIEW_CODE",
+			view_code = "VIEW CODE",
 			leave = "LEAVE",
 			opts_only_host = "Only the Lobby Host can change these options",
-			opts_cb_money = "Give comeback gold on life loss",
-			opts_no_gold_on_loss = "Don't get blind gold on round loss",
+			opts_cb_money = "Give comeback $ on life loss",
+			opts_no_gold_on_loss = "Don't get blind rewards on round loss",
 			opts_death_on_loss = "Lose a life on non-PvP round loss",
 			opts_start_antes = "Starting Antes",
 			opts_diff_seeds = "Players have different seeds",
@@ -84,6 +92,11 @@ return {
 			loc_selecting = "Selecting a Blind",
 			loc_shop = "Shopping",
 			loc_playing = "Playing ",
+			current_seed = "Current seed: ",
+			random = "Random",
+			reset = "Reset",
+			set_custom_seed = "Set Custom Seed",
+			mod_hash_warning = "Players have different mods or mod versions! This can cause problems!",
 		},
 	},
 }

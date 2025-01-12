@@ -42,8 +42,6 @@ return {
 			royale_desc = "Una partita di Logoramento, ma si può giocare fino ad 8 giocatori e ognuno ha 1 sola vita.",
 			vanilla_plus_name = "Vanilla+",
 			vp_desc = "La prima persona che fallisce un round perde, non ci sono competizioni tra i giocatori.",
-			headup_name = "Avvertimento",
-			hu_desc = "Si gioca il primo Ante, poi ogni giocatore deve battere il punteggio precedente del nemico o perde.",
 			enter_lobby_code = "Inserisci il codice della Lobby",
 			join_clip = "Incolla dagli Appunti",
 			username = "Nome utente:",

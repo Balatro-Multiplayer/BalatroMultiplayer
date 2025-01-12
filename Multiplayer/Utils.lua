@@ -96,19 +96,46 @@ function G.MULTIPLAYER.UTILS.overlay_message(message)
 		definition = create_UIBox_generic_options({
 			contents = {
 				{
-					n = G.UIT.R,
+					n = G.UIT.C,
 					config = {
-						padding = 0.5,
+						padding = 0.2,
 						align = "cm",
 					},
 					nodes = {
 						{
-							n = G.UIT.T,
+							n = G.UIT.R,
 							config = {
-								scale = 0.6,
-								shadow = true,
-								text = message,
-								colour = G.C.UI.TEXT_LIGHT,
+								padding = 0.2,
+								align = "cm",
+							},
+							nodes = {
+								{
+									n = G.UIT.T,
+									config = {
+										scale = 0.8,
+										shadow = true,
+										text = "MULTIPLAYER",
+										colour = G.C.UI.TEXT_LIGHT,
+									},
+								},
+							},
+						},
+						{
+							n = G.UIT.R,
+							config = {
+								padding = 0.1,
+								align = "cm",
+							},
+							nodes = {
+								{
+									n = G.UIT.T,
+									config = {
+										scale = 0.6,
+										shadow = true,
+										text = message,
+										colour = G.C.UI.TEXT_LIGHT,
+									},
+								},
 							},
 						},
 					},
