@@ -36,20 +36,24 @@ if SMODS.Mods["Cryptid"] and SMODS.Mods["Cryptid"].can_load then
 			return get_random_consumable_ref(seed, excluded_flags, banned_card, pool, no_undiscovered)
 		end
 		local tries = 5
-		while true do
-			local card = get_random_consumable_ref(seed, excluded_flags, banned_card, pool, no_undiscovered)
+		local card = nil
+		repeat
+			card = get_random_consumable_ref(seed, excluded_flags, banned_card, pool, no_undiscovered)
+			local is_banned = false
+
 			for _, banned in ipairs(G.MULTIPLAYER.DECK.BANNED_CARDS) do
 				if card.key == banned.id then
 					sendWarnMessage("Attempted to create banned card: " .. card.key .. ", trying again", "MULTIPLAYER")
 					tries = tries - 1
+					is_banned = true
 					if tries <= 0 then
 						sendWarnMessage("Attempted to create banned cards too many times, giving up.", "MULTIPLAYER")
-						return card -- Giving up
+						return card
 					end
 					break
 				end
 			end
-			return card
-		end
+		until not is_banned
+		return card
 	end
 end
