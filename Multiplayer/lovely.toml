@@ -1,0 +1,15 @@
+[manifest]
+version = "1.0.0"
+priority = 2147483647
+
+[[patches]]
+[patches.regex]
+target = "functions/state_events.lua"
+pattern = "(?<pre>function end_round.*[\\n\\r]+[^\\n\\r]*G\\.E_MANAGER:add_event[\\s\\S]*?)(?<indent>[ \\t]*)func = function\\(\\)"
+position = 'at'
+line_prepend = ''
+payload = '''function end_round()
+$pre$indentfunc = G.LOBBY.code and G.MULTIPLAYER.end_round or function()
+'''
+match_indent = false
+times = 1

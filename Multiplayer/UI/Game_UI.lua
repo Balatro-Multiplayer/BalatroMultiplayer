@@ -1020,11 +1020,8 @@ function Game:update_new_round(dt)
 	end
 	update_new_round_ref(self, dt)
 end
-local end_round_ref = end_round
-function end_round()
-	if not G.LOBBY.code then
-		return end_round_ref()
-	end
+
+function G.MULTIPLAYER.end_round()
 	G.E_MANAGER:add_event(Event({
 		trigger = "after",
 		delay = 0.2,
