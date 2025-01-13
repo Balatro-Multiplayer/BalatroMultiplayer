@@ -1,6 +1,16 @@
 -- Localization by @ieatmilk on discord
 return {
 	descriptions = {
+		Joker = {
+			j_broken = {
+				name = "ERRORE",
+				text = {
+					"Questa carta non funziona o non è",
+					"ancora stata implementata nella versione",
+					"attuale di una mod che stai usando.",
+				},
+			},
+		},
 		Blind = {
 			bl_pvp = {
 				name = "Il tuo Nemico",
@@ -83,6 +93,11 @@ return {
 			loc_selecting = "Selezionando un buio",
 			loc_shop = "Nel negozio",
 			loc_playing = "Combattendo ",
+			current_seed = "Seed attuale: ",
+			random = "Casuale",
+			set_custom_seed = "Usa Seed personalizzato",
+			reset = "Resetta",
+			mod_hash_warning = "I giocatori hanno mod diverse o versioni di mod diverse! Potrebbero esserci degli errori!",
 		},
 	},
 }
