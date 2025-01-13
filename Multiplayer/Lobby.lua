@@ -12,7 +12,7 @@ G.LOBBY = {
 		starting_lives = 4,
 		draft_starting_antes = 3,
 		gamemode = "attrition",
-		custom_seed = G.localization.misc.dictionary["random"] or "Random",
+		custom_seed = "random",
 	},
 	username = G.MULTIPLAYER.UTILS.get_username(),
 	host = {},

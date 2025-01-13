@@ -479,6 +479,7 @@ function G.UIDEF.create_UIBox_lobby_options()
 																		config = {
 																			padding = 0.2,
 																			align = "cr",
+																			func = "display_custom_seed",
 																		},
 																		nodes = {
 																			{
@@ -494,8 +495,7 @@ function G.UIDEF.create_UIBox_lobby_options()
 																				n = G.UIT.T,
 																				config = {
 																					scale = 0.45,
-																					ref_table = G.LOBBY.config,
-																					ref_value = "custom_seed",
+																					text = G.LOBBY.config.custom_seed,
 																					colour = G.C.UI.TEXT_LIGHT,
 																				},
 																			},
@@ -642,6 +642,15 @@ function G.UIDEF.create_UIBox_lobby_options()
 			},
 		},
 	})
+end
+
+function G.FUNCS.display_custom_seed(e)
+	local display = G.LOBBY.config.custom_seed == "random" and G.localization.misc.dictionary["random"]
+		or G.LOBBY.config.custom_seed
+	if display ~= e.children[1].config.text then
+		e.children[2].config.text = display
+		e.UIBox:recalculate(true)
+	end
 end
 
 function G.UIDEF.create_UIBox_custom_seed_overlay()
@@ -826,7 +835,7 @@ function G.FUNCS.custom_seed_overlay(e)
 end
 
 function G.FUNCS.custom_seed_reset(e)
-	G.LOBBY.config.custom_seed = G.localization.misc.dictionary["random"] or "Random"
+	G.LOBBY.config.custom_seed = "random"
 	send_lobby_options()
 end
 
