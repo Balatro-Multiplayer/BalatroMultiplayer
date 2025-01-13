@@ -1,3 +1,4 @@
+-- Localization by @blablabla_c on discord
 return {
 	Joker = {
 		j_broken = {

@@ -1,5 +1,16 @@
+-- Localization by @xphrogx on discord
 return {
 	descriptions = {
+		Joker = {
+			j_broken = {
+				name = "Defekt",
+				text = {
+					"Diese Karte is entweder",
+					"defekt oder nicht verfügbar in der",
+					"Version der Mod die benutzt wird.",
+				},
+			},
+		},
 		Blind = {
 			bl_pvp = {
 				name = "Dein Erzfeind",
@@ -82,6 +93,11 @@ return {
 			loc_selecting = "Eine Blind am auswählen",
 			loc_shop = "Einkaufen",
 			loc_playing = "Spielen",
+			current_seed = "Aktueller seed: ",
+			random = "Zufällig",
+			reset = "Neustart",
+			set_custom_seed = "Setzt eigenen Seed fest",
+			mod_hash_warning = "Spieler haben andere Mods oder unterschidliche Mod versionen! Dies kann probleme verursachen!",
 		},
 	},
 }
