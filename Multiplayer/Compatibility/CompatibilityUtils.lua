@@ -49,3 +49,5 @@ function Card:init(X, Y, W, H, card, center, params)
 	end
 	card_init_ref(self, X, Y, W, H, card, center, params)
 end
+
+G.MULTIPLAYER.DECK_TYPE = "Challenge Deck"

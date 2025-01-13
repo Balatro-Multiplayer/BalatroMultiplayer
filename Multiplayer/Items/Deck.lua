@@ -13,7 +13,7 @@ SMODS.Challenge({
 		banned_other = {},
 	},
 	deck = {
-		type = "Challenge Deck",
+		type = G.MULTIPLAYER.DECK_TYPE,
 	},
 	unlocked = function(self)
 		return false
