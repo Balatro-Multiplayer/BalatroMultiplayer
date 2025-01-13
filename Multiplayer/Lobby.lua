@@ -13,6 +13,7 @@ G.LOBBY = {
 		draft_starting_antes = 3,
 		gamemode = "attrition",
 		custom_seed = "random",
+		stake = 1,
 	},
 	username = G.MULTIPLAYER.UTILS.get_username(),
 	host = {},

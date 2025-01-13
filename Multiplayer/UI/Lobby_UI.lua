@@ -618,6 +618,24 @@ function G.UIDEF.create_UIBox_lobby_options()
 														current_option = G.LOBBY.config.starting_lives,
 														opt_callback = "change_starting_lives",
 													}),
+													Disableable_Option_Cycle({
+														id = "stake_option",
+														enabled_ref_table = G.LOBBY,
+														enabled_ref_value = "is_host",
+														label = localize("b_stake"),
+														options = {
+															G.localization.descriptions.Stake.stake_white.name,
+															G.localization.descriptions.Stake.stake_red.name,
+															G.localization.descriptions.Stake.stake_green.name,
+															G.localization.descriptions.Stake.stake_blue.name,
+															G.localization.descriptions.Stake.stake_black.name,
+															G.localization.descriptions.Stake.stake_purple.name,
+															G.localization.descriptions.Stake.stake_orange.name,
+															G.localization.descriptions.Stake.stake_gold.name,
+														},
+														current_option = G.LOBBY.config.stake,
+														opt_callback = "change_stake",
+													}),
 													G.LOBBY.type == "draft"
 															and Disableable_Option_Cycle({
 																id = "draft_starting_antes_option",
@@ -760,6 +778,11 @@ function toggle_different_seeds()
 	send_lobby_options()
 end
 
+G.FUNCS.change_stake = function(args)
+	G.LOBBY.config.stake = args.to_key
+	send_lobby_options()
+end
+
 G.FUNCS.change_starting_lives = function(args)
 	G.LOBBY.config.starting_lives = args.to_val
 	send_lobby_options()
@@ -788,7 +811,7 @@ end
 ---@type fun(e: table | nil, args: { deck: string, stake: number | nil, seed: string | nil })
 function G.FUNCS.lobby_start_run(e, args)
 	G.FUNCS.start_run(e, {
-		stake = 1,
+		stake = args.stake,
 		seed = args.seed,
 		challenge = G.CHALLENGES[get_challenge_int_from_id("c_multiplayer_1")],
 	})

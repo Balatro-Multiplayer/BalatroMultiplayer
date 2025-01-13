@@ -71,14 +71,13 @@ end
 ---@param deck string
 ---@param seed string
 ---@param stake_str string
-local function action_start_game(deck, seed, stake_str)
+local function action_start_game(deck, seed)
 	reset_game_states()
-	local stake = tonumber(stake_str)
 	G.MULTIPLAYER.set_ante(0)
 	if not G.LOBBY.config.different_seeds and G.LOBBY.config.custom_seed ~= "random" then
 		seed = G.LOBBY.config.custom_seed
 	end
-	G.FUNCS.lobby_start_run(nil, { deck = deck, seed = seed, stake = stake })
+	G.FUNCS.lobby_start_run(nil, { deck = deck, seed = seed, stake = G.LOBBY.config.stake })
 end
 
 local function action_start_blind()
@@ -169,7 +168,7 @@ local function action_lobby_options(options)
 		elseif v == "false" then
 			parsed_v = false
 		end
-		if k == "starting_lives" or k == "draft_starting_antes" then
+		if k == "starting_lives" or k == "draft_starting_antes" or k == "stake" then
 			parsed_v = tonumber(v)
 		end
 		G.LOBBY.config[k] = parsed_v
@@ -355,7 +354,7 @@ function Game:update(dt)
 					parsedAction.isHost
 				)
 			elseif parsedAction.action == "startGame" then
-				action_start_game(parsedAction.deck, parsedAction.seed, parsedAction.stake)
+				action_start_game(parsedAction.deck, parsedAction.seed)
 			elseif parsedAction.action == "startBlind" then
 				action_start_blind()
 			elseif parsedAction.action == "enemyInfo" then
