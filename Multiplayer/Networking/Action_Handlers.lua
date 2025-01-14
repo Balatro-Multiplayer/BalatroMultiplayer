@@ -33,6 +33,7 @@ local function action_lobbyInfo(host, hostHash, guest, guestHash, is_host)
 	G.LOBBY.players = {}
 	G.LOBBY.is_host = is_host == "true"
 	if is_host == "true" then
+		G.LOBBY.different_decks_btn = true
 		G.MULTIPLAYER.lobby_options()
 	end
 	G.LOBBY.host = { username = host, hash_str = hostHash, hash = hash(hostHash) }
@@ -71,13 +72,14 @@ end
 ---@param deck string
 ---@param seed string
 ---@param stake_str string
-local function action_start_game(deck, seed)
+local function action_start_game(deck, seed, stake_str)
 	reset_game_states()
+	local stake = tonumber(stake_str)
 	G.MULTIPLAYER.set_ante(0)
 	if not G.LOBBY.config.different_seeds and G.LOBBY.config.custom_seed ~= "random" then
 		seed = G.LOBBY.config.custom_seed
 	end
-	G.FUNCS.lobby_start_run(nil, { deck = deck, seed = seed, stake = G.LOBBY.config.stake })
+	G.FUNCS.lobby_start_run(nil, { deck = deck, seed = seed, stake = stake })
 end
 
 local function action_start_blind()
@@ -156,6 +158,7 @@ local function action_lose_game()
 end
 
 local function action_lobby_options(options)
+	local different_decks_before = G.LOBBY.config.different_decks
 	for k, v in pairs(options) do
 		if k == "gamemode" then
 			G.LOBBY.config.gamemode = v
@@ -167,7 +170,7 @@ local function action_lobby_options(options)
 		elseif v == "false" then
 			parsed_v = false
 		end
-		if k == "starting_lives" or k == "draft_starting_antes" or k == "stake" then
+		if k == "starting_lives" or k == "draft_starting_antes" then
 			parsed_v = tonumber(v)
 		end
 		G.LOBBY.config[k] = parsed_v
@@ -178,6 +181,15 @@ local function action_lobby_options(options)
 			end
 		end
 		::continue::
+	end
+	if G.LOBBY.is_host or G.LOBBY.config.different_decks then
+		G.LOBBY.different_decks_btn = true
+	else
+		G.LOBBY.different_decks_btn = false
+	end
+	if different_decks_before ~= G.LOBBY.config.different_decks then
+		G.FUNCS.exit_overlay_menu() -- throw out guest from any menu.
+		G.MULTIPLAYER.update_player_usernames() -- render new DECK button state
 	end
 end
 
@@ -353,7 +365,7 @@ function Game:update(dt)
 					parsedAction.isHost
 				)
 			elseif parsedAction.action == "startGame" then
-				action_start_game(parsedAction.deck, parsedAction.seed)
+				action_start_game(parsedAction.deck, parsedAction.seed, parsedAction.stake)
 			elseif parsedAction.action == "startBlind" then
 				action_start_blind()
 			elseif parsedAction.action == "enemyInfo" then

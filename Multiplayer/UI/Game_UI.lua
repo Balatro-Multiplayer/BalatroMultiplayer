@@ -1030,8 +1030,6 @@ function G.MULTIPLAYER.end_round()
 		if eval then
 			card_eval_status_text(G.jokers.cards[i], "jokers", nil, nil, nil, eval)
 		end
-		G.jokers.cards[i]:calculate_rental()
-		G.jokers.cards[i]:calculate_perishable()
 	end
 	G.GAME.unused_discards = (G.GAME.unused_discards or 0) + G.GAME.current_round.discards_left
 	if G.GAME.blind and G.GAME.blind.config.blind then

@@ -97,6 +97,8 @@ return {
 			reset = "Reset",
 			set_custom_seed = "Set Custom Seed",
 			mod_hash_warning = "Players have different mods or mod versions! This can cause problems!",
+			lobby_choose_deck = "DECK",
+			opts_player_diff_deck = "Players have different decks",
 		},
 	},
 }

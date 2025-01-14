@@ -186,6 +186,20 @@ function G.UIDEF.create_UIBox_lobby_menu()
 										scale = text_scale * 1.2,
 										col = true,
 									}),
+									Disableable_Button({ -- I hate the UI stuff. (ref to CardSleeves.lua:1329) 
+										id = "lobby_choose_deck",
+										button = "lobby_choose_deck",
+										colour = G.C.PURPLE,
+										minw = 2.15,
+										minh = 1.35,
+										label = {
+											G.localization.misc.dictionary["lobby_choose_deck"] or "DECK",
+										},
+										scale = text_scale * 1.2,
+										col = true,
+										enabled_ref_table = G.LOBBY,
+										enabled_ref_value = "different_decks_btn",
+									}),
 									{
 										n = G.UIT.C,
 										config = {
@@ -459,6 +473,25 @@ function G.UIDEF.create_UIBox_lobby_options()
 													}),
 												},
 											},
+											{
+												n = G.UIT.R,
+												config = {
+													padding = 0,
+													align = "cr",
+												},
+												nodes = {
+													Disableable_Toggle({
+														id = "different_decks_toggle",
+														enabled_ref_table = G.LOBBY,
+														enabled_ref_value = "is_host",
+														label = G.localization.misc.dictionary["opts_player_diff_deck"]
+															or "Players have different decks",
+														ref_table = G.LOBBY.config,
+														ref_value = "different_decks",
+														callback = send_lobby_options,
+													}),
+												},
+											},
 											not G.LOBBY.config.different_seeds
 													and {
 														n = G.UIT.R,
@@ -618,24 +651,6 @@ function G.UIDEF.create_UIBox_lobby_options()
 														current_option = G.LOBBY.config.starting_lives,
 														opt_callback = "change_starting_lives",
 													}),
-													Disableable_Option_Cycle({
-														id = "stake_option",
-														enabled_ref_table = G.LOBBY,
-														enabled_ref_value = "is_host",
-														label = localize("b_stake"),
-														options = {
-															G.localization.descriptions.Stake.stake_white.name,
-															G.localization.descriptions.Stake.stake_red.name,
-															G.localization.descriptions.Stake.stake_green.name,
-															G.localization.descriptions.Stake.stake_blue.name,
-															G.localization.descriptions.Stake.stake_black.name,
-															G.localization.descriptions.Stake.stake_purple.name,
-															G.localization.descriptions.Stake.stake_orange.name,
-															G.localization.descriptions.Stake.stake_gold.name,
-														},
-														current_option = G.LOBBY.config.stake,
-														opt_callback = "change_stake",
-													}),
 													G.LOBBY.type == "draft"
 															and Disableable_Option_Cycle({
 																id = "draft_starting_antes_option",
@@ -778,11 +793,6 @@ function toggle_different_seeds()
 	send_lobby_options()
 end
 
-G.FUNCS.change_stake = function(args)
-	G.LOBBY.config.stake = args.to_key
-	send_lobby_options()
-end
-
 G.FUNCS.change_starting_lives = function(args)
 	G.LOBBY.config.starting_lives = args.to_val
 	send_lobby_options()
@@ -810,11 +820,30 @@ end
 
 ---@type fun(e: table | nil, args: { deck: string, stake: number | nil, seed: string | nil })
 function G.FUNCS.lobby_start_run(e, args)
+	if G.LOBBY.config.different_decks == false then 
+		G.FUNCS.copy_host_deck()
+	end
+	
+	local challenge = G.CHALLENGES[get_challenge_int_from_id("c_multiplayer_1")]
+	challenge.deck.type = G.LOBBY.client.deck
+	challenge.sleeve = G.LOBBY.client.sleeve
+	
+	if tonumber(G.LOBBY.client.stake) > 23 then 
+		G.LOBBY.client.stake = 23 -- Cryptid Diamond stake REMOVES SMALL BLINDS. After shop of big blind UI is fucked up
+	end
+
 	G.FUNCS.start_run(e, {
-		stake = args.stake,
+		ignoreMPWrapper = true,
+		challenge = challenge,
+		stake = tonumber(G.LOBBY.client.stake), 
 		seed = args.seed,
-		challenge = G.CHALLENGES[get_challenge_int_from_id("c_multiplayer_1")],
 	})
+end
+
+function G.FUNCS.copy_host_deck()
+	G.LOBBY.client.deck = G.LOBBY.config.host_deck
+	G.LOBBY.client.stake = G.LOBBY.config.host_stake
+	G.LOBBY.client.sleeve = G.LOBBY.config.host_sleeve
 end
 
 function G.FUNCS.lobby_start_game(e)
@@ -837,6 +866,40 @@ function G.FUNCS.lobby_leave(e)
 	G.LOBBY.code = nil
 	G.MULTIPLAYER.leave_lobby()
 	G.MULTIPLAYER.update_connection_status()
+end
+
+function G.FUNCS.lobby_choose_deck(e)
+	G.FUNCS.setup_run(e)
+end
+
+local start_run_ref = G.FUNCS.start_run
+function G.FUNCS.wrap_start_run(func)
+	return function(...)
+		local args = {...}
+		local deck = nil
+		if args[2].deck == nil then 
+			deck = G.GAME.viewed_back
+		else 
+			deck = args[2].deck
+		end
+		if args[2].stake == nil then
+			args[2].stake = 1
+		end
+		if not args[2].ignoreMPWrapper then
+			if G.LOBBY.is_host then 
+				G.LOBBY.config.host_deck = deck.name
+				G.LOBBY.config.host_stake = args[2].stake
+				G.LOBBY.config.host_sleeve = G.viewed_sleeve
+				send_lobby_options()
+			end
+			G.LOBBY.client.deck = deck.name
+			G.LOBBY.client.stake = args[2].stake
+			G.LOBBY.client.sleeve = G.viewed_sleeve
+			G.FUNCS.exit_overlay_menu()
+			return nil
+		end
+		func(...)
+	end
 end
 
 function G.FUNCS.display_lobby_main_menu_UI(e)
@@ -866,6 +929,7 @@ local set_main_menu_UI_ref = set_main_menu_UI
 ---@diagnostic disable-next-line: lowercase-global
 function set_main_menu_UI()
 	if G.LOBBY.code then
+		G.FUNCS.start_run = G.FUNCS.wrap_start_run(G.FUNCS.start_run)
 		G.FUNCS.display_lobby_main_menu_UI()
 	else
 		set_main_menu_UI_ref()
@@ -879,6 +943,7 @@ function Game:update(dt)
 	if (G.LOBBY.code and not in_lobby) or (not G.LOBBY.code and in_lobby) then
 		in_lobby = not in_lobby
 		G.F_NO_SAVING = in_lobby
+		G.FUNCS.start_run = start_run_ref
 		self.FUNCS.go_to_menu()
 		reset_game_states()
 	end

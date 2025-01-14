@@ -4,6 +4,7 @@ G.LOBBY = {
 	temp_seed = "",
 	code = nil,
 	type = "",
+	different_decks_btn = true,
 	config = {
 		gold_on_life_loss = true,
 		no_gold_on_round_loss = false,
@@ -13,6 +14,14 @@ G.LOBBY = {
 		draft_starting_antes = 3,
 		gamemode = "attrition",
 		custom_seed = "random",
+		different_decks = true,
+		host_deck = "Challenge Deck",
+		host_sleeve = "sleeve_casl_none",
+		host_stake = 1,
+	},
+	client = {
+		deck = "Challenge Deck",
+		sleeve = "sleeve_casl_none",
 		stake = 1,
 	},
 	username = G.MULTIPLAYER.UTILS.get_username(),
