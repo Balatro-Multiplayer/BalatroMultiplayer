@@ -84,7 +84,6 @@ local function action_start_blind()
 	G.MULTIPLAYER_GAME.ready_blind = false
 	if G.MULTIPLAYER_GAME.next_blind_context then
 		G.FUNCS.select_blind(G.MULTIPLAYER_GAME.next_blind_context)
-		G.MULTIPLAYER_GAME.ante_key = tostring(math.random())
 	else
 		sendErrorMessage("No next blind context", "MULTIPLAYER")
 	end
