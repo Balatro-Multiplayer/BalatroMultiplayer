@@ -2033,6 +2033,8 @@ function reset_blinds()
 		if G.LOBBY.config.gamemode == "attrition" then
 			G.GAME.round_resets.blind_choices.Boss = "bl_pvp"
 		end
+		sendDebugMessage(G.GAME.round_resets.ante, "MULTIPLAYER")
+		sendDebugMessage(G.LOBBY.config.draft_starting_antes, "MULTIPLAYER")
 		if G.LOBBY.config.gamemode == "draft" and G.GAME.round_resets.ante >= G.LOBBY.config.draft_starting_antes then
 			G.GAME.round_resets.blind_choices.Small = "bl_pvp"
 			G.GAME.round_resets.blind_choices.Big = "bl_pvp"
@@ -2301,6 +2303,7 @@ function G.FUNCS.select_blind(e)
 	G.MULTIPLAYER_GAME.prevent_eval = false
 	select_blind_ref(e)
 	if G.LOBBY.code then
+		G.MULTIPLAYER_GAME.ante_key = tostring(math.random())
 		G.MULTIPLAYER.play_hand(0, G.GAME.round_resets.hands)
 		G.MULTIPLAYER.new_round()
 		G.MULTIPLAYER.set_location("loc_playing-" .. (e.config.ref_table.key or e.config.ref_table.name))
