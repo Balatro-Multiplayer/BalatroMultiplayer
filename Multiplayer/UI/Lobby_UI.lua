@@ -186,7 +186,15 @@ function G.UIDEF.create_UIBox_lobby_menu()
 										scale = text_scale * 1.2,
 										col = true,
 									}),
-									Disableable_Button({ -- I hate the UI stuff. (ref to CardSleeves.lua:1329) 
+									{
+										n = G.UIT.C,
+										config = {
+											align = "cm",
+											minw = 0.2,
+										},
+										nodes = {},
+									},
+									Disableable_Button({ -- I hate the UI stuff. (ref to CardSleeves.lua:1329)
 										id = "lobby_choose_deck",
 										button = "lobby_choose_deck",
 										colour = G.C.PURPLE,
@@ -820,22 +828,22 @@ end
 
 ---@type fun(e: table | nil, args: { deck: string, stake: number | nil, seed: string | nil })
 function G.FUNCS.lobby_start_run(e, args)
-	if G.LOBBY.config.different_decks == false then 
+	if G.LOBBY.config.different_decks == false then
 		G.FUNCS.copy_host_deck()
 	end
-	
+
 	local challenge = G.CHALLENGES[get_challenge_int_from_id("c_multiplayer_1")]
 	challenge.deck.type = G.LOBBY.client.deck
 	challenge.sleeve = G.LOBBY.client.sleeve
-	
-	if tonumber(G.LOBBY.client.stake) > 23 then 
+
+	if tonumber(G.LOBBY.client.stake) > 23 then
 		G.LOBBY.client.stake = 23 -- Cryptid Diamond stake REMOVES SMALL BLINDS. After shop of big blind UI is fucked up
 	end
 
 	G.FUNCS.start_run(e, {
 		ignoreMPWrapper = true,
 		challenge = challenge,
-		stake = tonumber(G.LOBBY.client.stake), 
+		stake = tonumber(G.LOBBY.client.stake),
 		seed = args.seed,
 	})
 end
@@ -875,18 +883,18 @@ end
 local start_run_ref = G.FUNCS.start_run
 function G.FUNCS.wrap_start_run(func)
 	return function(...)
-		local args = {...}
+		local args = { ... }
 		local deck = nil
-		if args[2].deck == nil then 
+		if args[2].deck == nil then
 			deck = G.GAME.viewed_back
-		else 
+		else
 			deck = args[2].deck
 		end
 		if args[2].stake == nil then
 			args[2].stake = 1
 		end
 		if not args[2].ignoreMPWrapper then
-			if G.LOBBY.is_host then 
+			if G.LOBBY.is_host then
 				G.LOBBY.config.host_deck = deck.name
 				G.LOBBY.config.host_stake = args[2].stake
 				G.LOBBY.config.host_sleeve = G.viewed_sleeve
