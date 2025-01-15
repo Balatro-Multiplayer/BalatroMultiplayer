@@ -847,10 +847,6 @@ function G.FUNCS.lobby_start_run(e, args)
 
 	local challenge = G.CHALLENGES[get_challenge_int_from_id("c_multiplayer_1")]
 
-	if tonumber(G.LOBBY.deck.stake) > 23 then
-		G.LOBBY.deck.stake = 23 -- Cryptid Diamond stake REMOVES SMALL BLINDS. After shop of big blind UI is fucked up
-	end
-
 	G.FUNCS.start_run(e, {
 		mp_start = true,
 		challenge = challenge,
@@ -898,16 +894,24 @@ local start_run_ref = G.FUNCS.start_run
 G.FUNCS.start_run = function(e, args)
 	if G.LOBBY.code then
 		if not args.mp_start then
+			G.FUNCS.exit_overlay_menu()
+			local chosen_stake = args.stake
+			if chosen_stake > G.MULTIPLAYER.MAX_STAKE then
+				G.MULTIPLAYER.UTILS.overlay_message(
+					"Selected stake is incompatible with Multiplayer, stake set to "
+						.. SMODS.stake_from_index(G.MULTIPLAYER.MAX_STAKE)
+				)
+				chosen_stake = G.MULTIPLAYER.MAX_STAKE
+			end
 			if G.LOBBY.is_host then
 				G.LOBBY.config.back = (args.deck and args.deck.name) or G.GAME.viewed_back.name
-				G.LOBBY.config.stake = args.stake
+				G.LOBBY.config.stake = chosen_stake
 				G.LOBBY.config.sleeve = G.viewed_sleeve
 				send_lobby_options()
 			end
 			G.LOBBY.deck.back = (args.deck and args.deck.name) or G.GAME.viewed_back.name
-			G.LOBBY.deck.stake = args.stake
+			G.LOBBY.deck.stake = chosen_stake
 			G.LOBBY.deck.sleeve = G.viewed_sleeve
-			G.FUNCS.exit_overlay_menu()
 		else
 			local back = args.challenge
 			back.deck.type = G.LOBBY.deck.back

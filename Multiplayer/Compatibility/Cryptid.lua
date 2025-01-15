@@ -56,4 +56,6 @@ if SMODS.Mods["Cryptid"] and SMODS.Mods["Cryptid"].can_load then
 		until not is_banned
 		return card
 	end
+
+	G.MULTIPLAYER.set_max_stake("stake_cry_emerald")
 end
