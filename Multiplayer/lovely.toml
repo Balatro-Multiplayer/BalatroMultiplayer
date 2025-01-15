@@ -44,7 +44,7 @@ pattern = '''G.FUNCS.change_stake({to_key = G.viewed_stake})
   else'''
 position = 'after'
 payload = '''if type == "Multiplayer" then
-    G.viewed_stake = G.LOBBY.config.stake
+    G.viewed_stake = G.LOBBY.deck.stake
     G.FUNCS.change_stake({to_key = G.viewed_stake})
   end'''
 match_indent = true
@@ -64,6 +64,6 @@ times = 1
 target = "functions/UI_definitions.lua"
 pattern = '''G.GAME.viewed_back = Back(get_deck_from_name(G.PROFILES[G.SETTINGS.profile].MEMORY.deck))'''
 position = 'at'
-payload = '''G.GAME.viewed_back = G.LOBBY.code and Back(get_deck_from_name(G.LOBBY.config.back)) or Back(get_deck_from_name(G.PROFILES[G.SETTINGS.profile].MEMORY.deck))'''
+payload = '''G.GAME.viewed_back = G.LOBBY.code and Back(get_deck_from_name(G.LOBBY.deck.back)) or Back(get_deck_from_name(G.PROFILES[G.SETTINGS.profile].MEMORY.deck))'''
 match_indent = true
 times = 1

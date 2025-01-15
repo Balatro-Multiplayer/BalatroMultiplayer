@@ -846,15 +846,13 @@ function G.FUNCS.lobby_start_run(e, args)
 	end
 
 	local challenge = G.CHALLENGES[get_challenge_int_from_id("c_multiplayer_1")]
-	challenge.deck.type = G.LOBBY.deck.back
-	challenge.sleeve = G.LOBBY.deck.sleeve
 
 	if tonumber(G.LOBBY.deck.stake) > 23 then
 		G.LOBBY.deck.stake = 23 -- Cryptid Diamond stake REMOVES SMALL BLINDS. After shop of big blind UI is fucked up
 	end
 
 	G.FUNCS.start_run(e, {
-		ignoreMPWrapper = true,
+		mp_start = true,
 		challenge = challenge,
 		stake = tonumber(G.LOBBY.deck.stake),
 		seed = args.seed,
@@ -894,32 +892,31 @@ function G.FUNCS.lobby_choose_deck(e)
 end
 
 local start_run_ref = G.FUNCS.start_run
-function G.FUNCS.wrap_start_run(func)
-	return function(...)
-		local args = { ... }
-		local deck = nil
-		if args[2].deck == nil then
-			deck = G.GAME.viewed_back
-		else
-			deck = args[2].deck
-		end
-		if args[2].stake == nil then
-			args[2].stake = 1
-		end
-		if not args[2].ignoreMPWrapper then
+G.FUNCS.start_run = function(e, args)
+	if G.LOBBY.code then
+		if not args.mp_start then
 			if G.LOBBY.is_host then
-				G.LOBBY.config.back = deck.name
-				G.LOBBY.config.stake = args[2].stake
-				G.LOBBY.config.sleeve = G.viewed_sleeve
+				G.LOBBY.config.back = (args.deck and args.deck.name) or G.GAME.viewed_back.name
+				G.LOBBY.config.stake = args.stake
+				G.LOBBY.config.sleeve = G.GAME.viewed_sleeve
 				send_lobby_options()
 			end
-			G.LOBBY.deck.deck = deck.name
-			G.LOBBY.deck.stake = args[2].stake
-			G.LOBBY.deck.sleeve = G.viewed_sleeve
+			G.LOBBY.deck.back = (args.deck and args.deck.name) or G.GAME.viewed_back.name
+			G.LOBBY.deck.stake = args.stake
+			G.LOBBY.deck.sleeve = G.GAME.viewed_sleeve
 			G.FUNCS.exit_overlay_menu()
-			return nil
+		else
+			local back = args.challenge
+			back.deck.type = G.LOBBY.deck.back
+			back.sleeve = G.LOBBY.deck.sleeve
+			start_run_ref(e, {
+				challenge = back,
+				stake = tonumber(G.LOBBY.deck.stake),
+				seed = args.seed,
+			})
 		end
-		func(...)
+	else
+		start_run_ref(e, args)
 	end
 end
 
@@ -950,7 +947,6 @@ local set_main_menu_UI_ref = set_main_menu_UI
 ---@diagnostic disable-next-line: lowercase-global
 function set_main_menu_UI()
 	if G.LOBBY.code then
-		G.FUNCS.start_run = G.FUNCS.wrap_start_run(G.FUNCS.start_run)
 		G.FUNCS.display_lobby_main_menu_UI()
 	else
 		set_main_menu_UI_ref()
@@ -964,7 +960,6 @@ function Game:update(dt)
 	if (G.LOBBY.code and not in_lobby) or (not G.LOBBY.code and in_lobby) then
 		in_lobby = not in_lobby
 		G.F_NO_SAVING = in_lobby
-		G.FUNCS.start_run = start_run_ref
 		self.FUNCS.go_to_menu()
 		reset_game_states()
 	end
