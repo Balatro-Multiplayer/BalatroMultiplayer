@@ -4,7 +4,6 @@ G.LOBBY = {
 	temp_seed = "",
 	code = nil,
 	type = "",
-	different_decks_btn = false,
 	config = {
 		gold_on_life_loss = true,
 		no_gold_on_round_loss = false,
@@ -15,12 +14,12 @@ G.LOBBY = {
 		gamemode = "attrition",
 		custom_seed = "random",
 		different_decks = false,
-		host_deck = "Challenge Deck",
-		host_sleeve = "sleeve_casl_none",
-		host_stake = 1,
+		back = "Red Deck",
+		sleeve = "sleeve_casl_none",
+		stake = 1,
 	},
-	client = {
-		deck = "Challenge Deck",
+	deck = {
+		back = "Red Deck",
 		sleeve = "sleeve_casl_none",
 		stake = 1,
 	},

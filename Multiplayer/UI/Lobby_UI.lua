@@ -194,7 +194,7 @@ function G.UIDEF.create_UIBox_lobby_menu()
 										},
 										nodes = {},
 									},
-									Disableable_Button({ -- I hate the UI stuff. (ref to CardSleeves.lua:1329)
+									G.LOBBY.is_host and Disableable_Button({
 										id = "lobby_choose_deck",
 										button = "lobby_choose_deck",
 										colour = G.C.PURPLE,
@@ -206,7 +206,20 @@ function G.UIDEF.create_UIBox_lobby_menu()
 										scale = text_scale * 1.2,
 										col = true,
 										enabled_ref_table = G.LOBBY,
-										enabled_ref_value = "different_decks_btn",
+										enabled_ref_value = "is_host",
+									}) or Disableable_Button({
+										id = "lobby_choose_deck",
+										button = "lobby_choose_deck",
+										colour = G.C.PURPLE,
+										minw = 2.15,
+										minh = 1.35,
+										label = {
+											G.localization.misc.dictionary["lobby_choose_deck"] or "DECK",
+										},
+										scale = text_scale * 1.2,
+										col = true,
+										enabled_ref_table = G.LOBBY.config,
+										enabled_ref_value = "different_decks",
 									}),
 									{
 										n = G.UIT.C,
@@ -833,25 +846,25 @@ function G.FUNCS.lobby_start_run(e, args)
 	end
 
 	local challenge = G.CHALLENGES[get_challenge_int_from_id("c_multiplayer_1")]
-	challenge.deck.type = G.LOBBY.client.deck
-	challenge.sleeve = G.LOBBY.client.sleeve
+	challenge.deck.type = G.LOBBY.deck.back
+	challenge.sleeve = G.LOBBY.deck.sleeve
 
-	if tonumber(G.LOBBY.client.stake) > 23 then
-		G.LOBBY.client.stake = 23 -- Cryptid Diamond stake REMOVES SMALL BLINDS. After shop of big blind UI is fucked up
+	if tonumber(G.LOBBY.deck.stake) > 23 then
+		G.LOBBY.deck.stake = 23 -- Cryptid Diamond stake REMOVES SMALL BLINDS. After shop of big blind UI is fucked up
 	end
 
 	G.FUNCS.start_run(e, {
 		ignoreMPWrapper = true,
 		challenge = challenge,
-		stake = tonumber(G.LOBBY.client.stake),
+		stake = tonumber(G.LOBBY.deck.stake),
 		seed = args.seed,
 	})
 end
 
 function G.FUNCS.copy_host_deck()
-	G.LOBBY.client.deck = G.LOBBY.config.host_deck
-	G.LOBBY.client.stake = G.LOBBY.config.host_stake
-	G.LOBBY.client.sleeve = G.LOBBY.config.host_sleeve
+	G.LOBBY.deck.back = G.LOBBY.config.back
+	G.LOBBY.deck.sleeve = G.LOBBY.config.sleeve
+	G.LOBBY.deck.stake = G.LOBBY.config.stake
 end
 
 function G.FUNCS.lobby_start_game(e)
@@ -895,14 +908,14 @@ function G.FUNCS.wrap_start_run(func)
 		end
 		if not args[2].ignoreMPWrapper then
 			if G.LOBBY.is_host then
-				G.LOBBY.config.host_deck = deck.name
-				G.LOBBY.config.host_stake = args[2].stake
-				G.LOBBY.config.host_sleeve = G.viewed_sleeve
+				G.LOBBY.config.back = deck.name
+				G.LOBBY.config.stake = args[2].stake
+				G.LOBBY.config.sleeve = G.viewed_sleeve
 				send_lobby_options()
 			end
-			G.LOBBY.client.deck = deck.name
-			G.LOBBY.client.stake = args[2].stake
-			G.LOBBY.client.sleeve = G.viewed_sleeve
+			G.LOBBY.deck.deck = deck.name
+			G.LOBBY.deck.stake = args[2].stake
+			G.LOBBY.deck.sleeve = G.viewed_sleeve
 			G.FUNCS.exit_overlay_menu()
 			return nil
 		end

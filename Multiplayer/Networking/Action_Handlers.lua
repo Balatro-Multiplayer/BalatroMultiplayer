@@ -32,10 +32,6 @@ end
 local function action_lobbyInfo(host, hostHash, guest, guestHash, is_host)
 	G.LOBBY.players = {}
 	G.LOBBY.is_host = is_host == "true"
-	if is_host == "true" then
-		G.LOBBY.different_decks_btn = true
-		G.MULTIPLAYER.lobby_options()
-	end
 	G.LOBBY.host = { username = host, hash_str = hostHash, hash = hash(hostHash) }
 	if guest ~= nil then
 		G.LOBBY.guest = { username = guest, hash_str = guestHash, hash = hash(guestHash) }
@@ -181,11 +177,6 @@ local function action_lobby_options(options)
 			end
 		end
 		::continue::
-	end
-	if G.LOBBY.is_host or G.LOBBY.config.different_decks then
-		G.LOBBY.different_decks_btn = true
-	else
-		G.LOBBY.different_decks_btn = false
 	end
 	if different_decks_before ~= G.LOBBY.config.different_decks then
 		G.FUNCS.exit_overlay_menu() -- throw out guest from any menu.
