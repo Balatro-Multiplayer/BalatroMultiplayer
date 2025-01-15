@@ -889,6 +889,9 @@ end
 
 function G.FUNCS.lobby_choose_deck(e)
 	G.FUNCS.setup_run(e)
+	if G.OVERLAY_MENU then
+		G.OVERLAY_MENU:get_UIE_by_ID("run_setup_seed"):remove()
+	end
 end
 
 local start_run_ref = G.FUNCS.start_run
@@ -898,12 +901,12 @@ G.FUNCS.start_run = function(e, args)
 			if G.LOBBY.is_host then
 				G.LOBBY.config.back = (args.deck and args.deck.name) or G.GAME.viewed_back.name
 				G.LOBBY.config.stake = args.stake
-				G.LOBBY.config.sleeve = G.GAME.viewed_sleeve
+				G.LOBBY.config.sleeve = G.viewed_sleeve
 				send_lobby_options()
 			end
 			G.LOBBY.deck.back = (args.deck and args.deck.name) or G.GAME.viewed_back.name
 			G.LOBBY.deck.stake = args.stake
-			G.LOBBY.deck.sleeve = G.GAME.viewed_sleeve
+			G.LOBBY.deck.sleeve = G.viewed_sleeve
 			G.FUNCS.exit_overlay_menu()
 		else
 			local back = args.challenge

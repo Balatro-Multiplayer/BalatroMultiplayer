@@ -30,7 +30,7 @@ position = 'at'
 payload = '''local t = G.LOBBY.code and create_UIBox_generic_options({contents ={
     {n=G.UIT.R, config={padding = 0.0, align = "cm", colour = G.C.CLEAR}, nodes={
       {n=G.UIT.R, config={align = 'cm', padding = 0.1, no_fill = true, minh = 0, minw = 0}, nodes={
-        {n=G.UIT.O, config={id = 'tab_contents', object = UIBox{definition = G.UIDEF.run_setup_option('Multiplayer'), config = {offset = {x=0,y=0}}}}}
+        {n=G.UIT.O, config={id = 'tab_contents', object = UIBox{definition = G.UIDEF.run_setup_option('New Run'), config = {offset = {x=0,y=0}}}}}
       }},
     }},
   }}) or create_UIBox_generic_options({no_back = from_game_over, no_esc = from_game_over, contents ={'''
@@ -40,10 +40,19 @@ times = 1
 [[patches]]
 [patches.pattern]
 target = "functions/UI_definitions.lua"
+pattern = '''if type == 'New Run' then'''
+position = 'at'
+payload = '''if type == 'New Run' and not G.LOBBY.code then'''
+match_indent = true
+times = 1
+
+[[patches]]
+[patches.pattern]
+target = "functions/UI_definitions.lua"
 pattern = '''G.FUNCS.change_stake({to_key = G.viewed_stake})
   else'''
 position = 'after'
-payload = '''if type == "Multiplayer" then
+payload = '''if G.LOBBY.code then
     G.viewed_stake = G.LOBBY.deck.stake
     G.FUNCS.change_stake({to_key = G.viewed_stake})
   end'''
@@ -90,5 +99,15 @@ target = "functions/UI_definitions.lua"
 pattern = '''not is_row and {n=G.UIT.R, config={align = "cm", minh = 0.9}, nodes={'''
 position = 'at'
 payload = '''(not G.LOBBY.code) and (not is_row) and {n=G.UIT.R, config={align = "cm", minh = 0.9}, nodes={'''
+match_indent = true
+times = 1
+
+# Have to use regex because it doesnt match otherwise for some reason
+[[patches]]
+[patches.regex]
+target = "functions/UI_definitions.lua"
+pattern = '''function G.UIDEF.run_setup_option(?<pre>[\s\S]+?)localize\('b_play_cap'\)'''
+position = 'at'
+payload = '''function G.UIDEF.run_setup_option$pre G.LOBBY.code and localize('b_select') or localize('b_play_cap')'''
 match_indent = true
 times = 1
