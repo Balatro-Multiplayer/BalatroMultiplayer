@@ -2310,3 +2310,7 @@ function G.FUNCS.select_blind(e)
 		hide_enemy_location()
 	end
 end
+
+function G.UIDEF.multiplayer_deck()
+	return G.UIDEF.challenge_description(get_challenge_int_from_id("c_multiplayer_1"), nil, false)
+end

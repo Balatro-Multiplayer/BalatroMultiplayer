@@ -67,3 +67,28 @@ position = 'at'
 payload = '''G.GAME.viewed_back = G.LOBBY.code and Back(get_deck_from_name(G.LOBBY.deck.back)) or Back(get_deck_from_name(G.PROFILES[G.SETTINGS.profile].MEMORY.deck))'''
 match_indent = true
 times = 1
+
+[[patches]]
+[patches.pattern]
+target = "functions/UI_definitions.lua"
+pattern = '''{
+        label = localize('b_full_deck'),
+        chosen = true,
+        tab_definition_function = G.UIDEF.view_deck
+      },'''
+position = 'after'
+payload = '''G.LOBBY.code and {
+              label = G.localization.misc.challenge_names.c_multiplayer_1 or "Multiplayer",
+              tab_definition_function = G.UIDEF.multiplayer_deck,
+            },'''
+match_indent = true
+times = 1
+
+[[patches]]
+[patches.pattern]
+target = "functions/UI_definitions.lua"
+pattern = '''not is_row and {n=G.UIT.R, config={align = "cm", minh = 0.9}, nodes={'''
+position = 'at'
+payload = '''(not G.LOBBY.code) and (not is_row) and {n=G.UIT.R, config={align = "cm", minh = 0.9}, nodes={'''
+match_indent = true
+times = 1
