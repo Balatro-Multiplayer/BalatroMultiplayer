@@ -896,7 +896,7 @@ G.FUNCS.start_run = function(e, args)
 		if not args.mp_start then
 			G.FUNCS.exit_overlay_menu()
 			local chosen_stake = args.stake
-			if chosen_stake > G.MULTIPLAYER.MAX_STAKE then
+			if G.MULTIPLAYER.MAX_STAKE > 0 and chosen_stake > G.MULTIPLAYER.MAX_STAKE then
 				G.MULTIPLAYER.UTILS.overlay_message(
 					"Selected stake is incompatible with Multiplayer, stake set to "
 						.. SMODS.stake_from_index(G.MULTIPLAYER.MAX_STAKE)
