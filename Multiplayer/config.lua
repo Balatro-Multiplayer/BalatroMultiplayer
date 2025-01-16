@@ -1,5 +1,5 @@
 return {
 	["username"] = "Guest",
-	["server_url"] = "localhost",
+	["server_url"] = "balatro.virtualized.dev",
 	["server_port"] = 8788,
 }

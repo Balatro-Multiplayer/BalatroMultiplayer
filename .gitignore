@@ -1,7 +1,6 @@
 ref.lua
 node_modules
 .env
-config.lua
 Server/dist
 .vscode
 ref
