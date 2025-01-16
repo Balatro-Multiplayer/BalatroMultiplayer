@@ -32,9 +32,6 @@ end
 local function action_lobbyInfo(host, hostHash, guest, guestHash, is_host)
 	G.LOBBY.players = {}
 	G.LOBBY.is_host = is_host == "true"
-	if is_host == "true" then
-		G.MULTIPLAYER.lobby_options()
-	end
 	G.LOBBY.host = { username = host, hash_str = hostHash, hash = hash(hostHash) }
 	if guest ~= nil then
 		G.LOBBY.guest = { username = guest, hash_str = guestHash, hash = hash(guestHash) }
@@ -157,6 +154,7 @@ local function action_lose_game()
 end
 
 local function action_lobby_options(options)
+	local different_decks_before = G.LOBBY.config.different_decks
 	for k, v in pairs(options) do
 		if k == "gamemode" then
 			G.LOBBY.config.gamemode = v
@@ -179,6 +177,10 @@ local function action_lobby_options(options)
 			end
 		end
 		::continue::
+	end
+	if different_decks_before ~= G.LOBBY.config.different_decks then
+		G.FUNCS.exit_overlay_menu() -- throw out guest from any menu.
+		G.MULTIPLAYER.update_player_usernames() -- render new DECK button state
 	end
 end
 
