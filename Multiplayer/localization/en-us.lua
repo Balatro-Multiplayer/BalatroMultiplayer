@@ -21,8 +21,8 @@ return {
 			j_mp_lets_go_gambling = {
 				name = "Let's Go Gambling",
 				text = {
-					"When sold, {C:green}#1# in #2#{} chance to",
-					"be destroyed, otherwise gain {X:mult,C:white} +X#3# {}",
+					"{C:green}#1# in #2#{} chance to be destroyed",
+					"when sold, otherwise gain {X:mult,C:white} +X#3# {}",
 					"{C:inactive}(Scaling increases by {X:mult,C:white}+X#4#{C:inactive} after each {C:attention}Boss Blind{C:inactive})",
 					"{C:inactive}(Currently {X:mult,C:white}X#5#{C:inactive} Mult)",
 				},
@@ -38,9 +38,9 @@ return {
 			j_mp_speedrun = {
 				name = "SPEEDRUN",
 				text = {
-					"If you spend all your {C:blue}Hands{} before",
-					"your {X:purple,C:white}Nemesis{} on a {C:attention}PvP Blind{},",
-					"{C:attention}triple{} your total score",
+					"{C:attention}Triple{} your total score",
+					"when you spend all your {C:blue}Hands{} before",
+					"your {X:purple,C:white}Nemesis{} on a {C:attention}PvP Blind{}",
 				},
 			},
 			j_broken = {
