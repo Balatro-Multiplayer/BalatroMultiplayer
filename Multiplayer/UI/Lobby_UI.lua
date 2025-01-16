@@ -618,16 +618,16 @@ function G.UIDEF.create_UIBox_lobby_options()
 														current_option = G.LOBBY.config.starting_lives,
 														opt_callback = "change_starting_lives",
 													}),
-													G.LOBBY.type == "draft"
+													G.LOBBY.type == "showdown"
 															and Disableable_Option_Cycle({
-																id = "draft_starting_antes_option",
+																id = "showdown_starting_antes_option",
 																enabled_ref_table = G.LOBBY,
 																enabled_ref_value = "is_host",
 																label = G.localization.misc.dictionary["opts_start_antes"]
 																	or "Starting Antes",
 																options = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12 },
-																current_option = G.LOBBY.config.draft_starting_antes,
-																opt_callback = "change_draft_starting_antes",
+																current_option = G.LOBBY.config.showdown_starting_antes,
+																opt_callback = "change_showdown_starting_antes",
 															})
 														or nil,
 												},
@@ -765,8 +765,8 @@ G.FUNCS.change_starting_lives = function(args)
 	send_lobby_options()
 end
 
-G.FUNCS.change_draft_starting_antes = function(args)
-	G.LOBBY.config.draft_starting_antes = args.to_val
+G.FUNCS.change_showdown_starting_antes = function(args)
+	G.LOBBY.config.showdown_starting_antes = args.to_val
 	send_lobby_options()
 end
 

@@ -24,10 +24,10 @@ const GameModes: {
 			return { boss: "bl_pvp" };
 		},
 	},
-	draft: {
+	showdown: {
 		startingLives: 2,
 		getBlindFromAnte: (ante, options) => {
-			const starting_antes = options?.draft_starting_antes ? parseInt(options.draft_starting_antes) : 3
+			const starting_antes = options?.showdown_starting_antes ? parseInt(options.showdown_starting_antes) : 3
       if (ante <= starting_antes) return { }
       else return { small: 'bl_pvp', big: 'bl_pvp', boss: 'bl_pvp' }
 		},

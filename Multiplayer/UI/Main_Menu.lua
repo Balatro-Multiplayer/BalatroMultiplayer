@@ -229,7 +229,7 @@ function G.UIDEF.create_UIBox_create_lobby_button()
 									end,
 								},
 								{
-									label = G.localization.misc.dictionary["draft_name"] or "Draft",
+									label = G.localization.misc.dictionary["showdown_name"] or "Showdown",
 									tab_definition_function = function()
 										return {
 											n = G.UIT.ROOT,
@@ -253,7 +253,7 @@ function G.UIDEF.create_UIBox_create_lobby_button()
 													},
 													nodes = {
 														UIBox_button({
-															id = "start_draft",
+															id = "start_showdown",
 															label = {
 																G.localization.misc.dictionary["start_lobby"]
 																	or "Start Lobby",
@@ -277,7 +277,7 @@ function G.UIDEF.create_UIBox_create_lobby_button()
 															n = G.UIT.T,
 															config = {
 																text = G.MULTIPLAYER.UTILS.wrapText(
-																	G.localization.misc.dictionary["draft_desc"]
+																	G.localization.misc.dictionary["showdown_desc"]
 																		or "Both players play 3 normal antes, then they play an ante where every round the player with the higher scorer wins.",
 																	50
 																),
@@ -539,7 +539,7 @@ end
 
 function G.FUNCS.start_lobby(e)
 	G.SETTINGS.paused = false
-	G.MULTIPLAYER.create_lobby(e.config.id == "start_attrition" and "attrition" or "draft")
+	G.MULTIPLAYER.create_lobby(e.config.id == "start_attrition" and "attrition" or "showdown")
 end
 
 -- Modify play button to take you to mode select first

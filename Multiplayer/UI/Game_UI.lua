@@ -2034,8 +2034,11 @@ function reset_blinds()
 			G.GAME.round_resets.blind_choices.Boss = "bl_pvp"
 		end
 		sendDebugMessage(G.GAME.round_resets.ante, "MULTIPLAYER")
-		sendDebugMessage(G.LOBBY.config.draft_starting_antes, "MULTIPLAYER")
-		if G.LOBBY.config.gamemode == "draft" and G.GAME.round_resets.ante >= G.LOBBY.config.draft_starting_antes then
+		sendDebugMessage(G.LOBBY.config.showdown_starting_antes, "MULTIPLAYER")
+		if
+			G.LOBBY.config.gamemode == "showdown"
+			and G.GAME.round_resets.ante >= G.LOBBY.config.showdown_starting_antes
+		then
 			G.GAME.round_resets.blind_choices.Small = "bl_pvp"
 			G.GAME.round_resets.blind_choices.Big = "bl_pvp"
 			G.GAME.round_resets.blind_choices.Boss = "bl_pvp"

@@ -190,7 +190,7 @@ keepAliveAck
 - attrition
   - Both players start with 4 lives
   - Every set's boss should be PvP
-- draft
+- showdown
   - Both players start with 2 lives
   - First 4 antes are normal, rest of antes are only PvP blinds
 

@@ -131,4 +131,4 @@ export type ActionHandlers = {
 export type ActionHandlerArgs<T extends HandledActions> = Omit<T, 'action'>
 
 // Other types
-export type GameMode = 'attrition' | 'draft'
+export type GameMode = 'attrition' | 'showdown'

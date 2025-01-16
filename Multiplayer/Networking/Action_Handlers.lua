@@ -168,7 +168,7 @@ local function action_lobby_options(options)
 		elseif v == "false" then
 			parsed_v = false
 		end
-		if k == "starting_lives" or k == "draft_starting_antes" then
+		if k == "starting_lives" or k == "showdown_starting_antes" then
 			parsed_v = tonumber(v)
 		end
 		G.LOBBY.config[k] = parsed_v
