@@ -1,4 +1,4 @@
--- Localization by @KilledByLava, @FaLNioNe, and @astryder75 on discord
+-- Localization by @KilledByLava, @FaLNioNe, @astryder75, and @sidmeierscivilizationv on discord
 return {
 	Joker = {
 		j_broken = {
