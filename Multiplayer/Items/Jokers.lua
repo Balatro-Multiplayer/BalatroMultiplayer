@@ -21,6 +21,11 @@ SMODS.Joker({
 	in_pool = function(self)
 		return G.LOBBY.code
 	end,
+	mp_credits = {
+		idea = { "didon't" },
+		art = { "TheTrueRaven" },
+		code = { "Virtualized" },
+	},
 })
 
 SMODS.Atlas({
@@ -47,6 +52,11 @@ SMODS.Joker({
 	in_pool = function(self)
 		return G.LOBBY.code
 	end,
+	mp_credits = {
+		idea = { "Dr. Monty", "Carter" },
+		art = { "Aura!" },
+		code = { "Virtualized" },
+	},
 })
 
 SMODS.Joker({
@@ -64,6 +74,11 @@ SMODS.Joker({
 	in_pool = function(self)
 		return G.LOBBY.code
 	end,
+	mp_credits = {
+		idea = { "Dr. Monty", "Carter" },
+		art = {},
+		code = { "Virtualized" },
+	},
 })
 
 SMODS.Joker({
@@ -82,6 +97,11 @@ SMODS.Joker({
 	in_pool = function(self)
 		return G.LOBBY.code
 	end,
+	mp_credits = {
+		idea = { "Dr. Monty", "Carter" },
+		art = {},
+		code = { "Virtualized" },
+	},
 })
 
 SMODS.Atlas({
@@ -108,4 +128,9 @@ SMODS.Joker({
 	in_pool = function(self)
 		return G.LOBBY.code
 	end,
+	mp_credits = {
+		idea = { "Dr. Monty", "Carter" },
+		art = { "Aura!" },
+		code = { "Virtualized" },
+	},
 })

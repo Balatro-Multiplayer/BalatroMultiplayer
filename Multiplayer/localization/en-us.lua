@@ -176,5 +176,10 @@ return {
 			lobby_choose_deck = "DECK",
 			opts_player_diff_deck = "Players have different decks",
 		},
+		v_dictionary = {
+			mp_art = { "Art: #1#" },
+			mp_code = { "Code: #1#" },
+			mp_idea = { "Idea: #1#" },
+		},
 	},
 }

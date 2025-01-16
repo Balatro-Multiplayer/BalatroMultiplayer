@@ -99,5 +99,10 @@ return {
 			set_custom_seed = "Setzt eigenen Seed fest",
 			mod_hash_warning = "Spieler haben andere Mods oder unterschidliche Mod versionen! Dies kann probleme verursachen!",
 		},
+		v_dictionary = {
+			mp_art = { "Bild: #1#" },
+			mp_code = { "Code: #1#" },
+			mp_idea = { "Idee: #1#" },
+		},
 	},
 }

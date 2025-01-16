@@ -187,3 +187,5 @@ end
 function G.FUNCS.multiplayer_discord(e)
 	love.system.openURL("https://discord.gg/gEemz4ptuF")
 end
+
+G.C.MULITPLAYER = HEX("AC3232")

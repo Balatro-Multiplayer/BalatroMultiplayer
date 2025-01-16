@@ -16,4 +16,9 @@ SMODS.Consumable({
 		add_nemesis_info(info_queue)
 		return { vars = { 1 } }
 	end,
+	mp_credits = {
+		idea = { "Zilver" },
+		art = { "TheTrueRaven" },
+		code = { "Virtualized" },
+	},
 })
