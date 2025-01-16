@@ -71,6 +71,13 @@ return {
 					"most chips wins",
 				},
 			},
+			bl_precision = {
+				name = "Precision",
+				text = {
+					"Face another player,",
+					"closest to the target score wins",
+				},
+			},
 		},
 		Other = {
 			current_nemesis = {
@@ -111,8 +118,11 @@ return {
 			showdown_desc = "Both players play 3 normal antes, then they play an ante where every round the player with the higher scorer wins.",
 			draft_name = "Draft",
 			draft_desc = "Players play the Evolving Deck from the Balatro Draft mod, where they each gain a Draft Tag after every PvP Blind.",
+			draft_req = "Requires the Balatro Draft mod",
 			monty_special_name = "The Dr. Monty Special",
-			monty_special_desc = "A special game mode designed by @dr_monty_the_snek on the discord server. I guess you'll have to find out what it is! (Gamemode changes with each minor update)",
+			monty_special_desc = "A special gamemode designed by @dr_monty_the_snek on the discord server. I guess you'll have to find out what it is! (Gamemode changes with each minor update)",
+			precision_name = "Precision",
+			precision_desc = "The same as Attrition, except the person closest to the target score wins PvP blinds (instead of the person with the highest score).",
 			royale_name = "Battle Royale",
 			royale_desc = "Attrition, except there are up to 8 players and every player only has 1 life.",
 			vanilla_plus_name = "Vanilla+",
@@ -163,6 +173,8 @@ return {
 			reset = "Reset",
 			set_custom_seed = "Set Custom Seed",
 			mod_hash_warning = "Players have different mods or mod versions! This can cause problems!",
+			lobby_choose_deck = "DECK",
+			opts_player_diff_deck = "Players have different decks",
 		},
 	},
 }
