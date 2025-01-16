@@ -1,6 +1,48 @@
 return {
 	descriptions = {
 		Joker = {
+			j_mp_defensive_joker = {
+				name = "Defensive Joker",
+				text = {
+					"This Joker gains {C:chips}+#1#{} Chips",
+					"per {C:red,E:1}life{} lost this run",
+					"{C:inactive}(Currently {C:chips}+#2#{C:inactive} Chips)",
+				},
+			},
+			j_mp_skip_off = {
+				name = "Skip-Off",
+				text = {
+					"{C:blue}+#1#{} Hands and {C:red}+#2#{} Discards",
+					"per additional {C:attention}Blind{} skipped",
+					"compared to your {X:purple,C:white}Nemesis{}",
+					"{C:inactive}(Currently {C:blue}+#3#{C:inactive}/{C:red}+#4#{C:inactive})",
+				},
+			},
+			j_mp_lets_go_gambling = {
+				name = "Let's Go Gambling",
+				text = {
+					"When sold, {C:green}#1# in #2#{} chance to",
+					"be destroyed, otherwise gain {X:mult,C:white} +X#3# {}",
+					"{C:inactive}(Scaling increases by {X:mult,C:white}+X#4#{C:inactive} after each {C:attention}Boss Blind{C:inactive})",
+					"{C:inactive}(Currently {X:mult,C:white}X#5#{C:inactive} Mult)",
+				},
+			},
+			j_mp_hanging_bad = {
+				name = "Hanging Bad",
+				text = {
+					"During {X:purple,C:white}Nemesis{} {C:attention}Blinds{} the",
+					"{C:attention}first{} played card used in scoring",
+					"is {C:attention}debuffed{} for both players",
+				},
+			},
+			j_mp_speedrun = {
+				name = "SPEEDRUN",
+				text = {
+					"If you spend all your {C:blue}Hands{} before",
+					"your {X:purple,C:white}Nemesis{} on a {C:attention}PvP Blind{},",
+					"{C:attention}triple{} your total score",
+				},
+			},
 			j_broken = {
 				name = "BROKEN",
 				text = {
@@ -10,12 +52,32 @@ return {
 				},
 			},
 		},
+		Planet = {
+			c_mp_asteroid = {
+				name = "Asteroid",
+				text = {
+					"Remove #1# level from",
+					"your {X:purple,C:white}Nemesis'{}",
+					"highest level",
+					"{C:legendary,E:1}poker hand{}",
+				},
+			},
+		},
 		Blind = {
 			bl_pvp = {
 				name = "Your Nemesis",
 				text = {
 					"Face another player,",
 					"most chips wins",
+				},
+			},
+		},
+		Other = {
+			current_nemesis = {
+				name = "Nemesis",
+				text = {
+					"{X:purple,C:white}#1#{}",
+					"Your one and only Nemesis",
 				},
 			},
 		},
