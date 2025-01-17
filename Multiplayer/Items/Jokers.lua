@@ -1,3 +1,40 @@
+function apply_phantom(card)
+	if card.cardarea then
+		card.cardarea.config.card_limit = card.cardarea.config.card_limit + 1
+	end
+	card.ability.eternal = true
+end
+
+function remove_phantom(card)
+	if card.cardarea then
+		card.cardarea.config.card_limit = card.cardarea.config.card_limit - 1
+	end
+	card.ability.eternal = false
+end
+
+SMODS.Edition({
+	key = "phantom",
+	shader = "voucher",
+	discovered = true,
+	unlocked = true,
+	in_shop = false,
+	apply_to_float = true,
+	badge_colour = G.C.PURPLE,
+	sound = { sound = "negative", per = 1.5, vol = 0.4 },
+	disable_shadow = false,
+	disable_base_shader = true,
+	extra_cost = 0, -- Min sell value is set to -1 by Multiplayer (1 by default) so this is a hack to make the card this is applied to not have a sell value
+	on_apply = apply_phantom,
+	on_remove = remove_phantom,
+	on_load = apply_phantom,
+	prefix_config = { shader = false },
+	mp_credits = {
+		idea = { "Virtualized" },
+		art = {},
+		code = { "Virtualized" },
+	},
+})
+
 SMODS.Atlas({
 	key = "defensive_joker",
 	path = "j_defensive_joker.png",
