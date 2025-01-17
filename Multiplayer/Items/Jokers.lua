@@ -15,11 +15,29 @@ SMODS.Joker({
 	blueprint_compat = false,
 	eternal_compat = true,
 	perishable_compat = true,
+	ability = { extra = 60, chips = 0 },
 	loc_vars = function(self, info_queue, card)
-		return { vars = { 60, 0 } }
+		return { vars = { self.ability.extra, self.ability.chips } }
 	end,
 	in_pool = function(self)
 		return G.LOBBY.code
+	end,
+	update = function(self, card, dt)
+		if G.STAGE == G.STAGES.RUN then
+			self.ability.chips = (G.LOBBY.config.starting_lives - G.MULTIPLAYER_GAME.lives) * self.ability.extra
+		end
+	end,
+	calculate = function(self, card, context)
+		if context.cardarea == G.jokers and context.joker_main then
+			return {
+				message = localize({
+					type = "variable",
+					key = "a_chips",
+					vars = { self.ability.chips },
+				}),
+				chip_mod = self.ability.chips,
+			}
+		end
 	end,
 	mp_credits = {
 		idea = { "didon't" },
