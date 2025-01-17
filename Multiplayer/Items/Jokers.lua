@@ -63,12 +63,45 @@ SMODS.Joker({
 	blueprint_compat = false,
 	eternal_compat = true,
 	perishable_compat = true,
+	ability = { extra_hands = 1, extra_discards = 1, hands = 0, discards = 0 },
 	loc_vars = function(self, info_queue, card)
 		add_nemesis_info(info_queue)
-		return { vars = { 1, 1, 0, 0 } }
+		return {
+			vars = {
+				self.ability.extra_hands,
+				self.ability.extra_discards,
+				self.ability.hands,
+				self.ability.discards,
+				localize({
+					type = "variable",
+					key = G.MULTIPLAYER_GAME.enemy.skips > G.GAME.skips and "mp_skips_behind"
+						or G.MULTIPLAYER_GAME.enemy.skips == G.GAME.skips and "mp_skips_tied"
+						or "mp_skips_ahead",
+					vars = { math.abs(G.MULTIPLAYER_GAME.enemy.skips - G.GAME.skips) },
+				})[1],
+			},
+		}
 	end,
 	in_pool = function(self)
 		return G.LOBBY.code
+	end,
+	update = function(self, card, dt)
+		if G.STAGE == G.STAGES.RUN then
+			local skip_diff = (math.max(G.GAME.skips - G.MULTIPLAYER_GAME.enemy.skips, 0))
+			self.ability.hands = skip_diff * self.ability.extra_hands
+			self.ability.discards = skip_diff * self.ability.extra_discards
+		end
+	end,
+	calculate = function(self, card, context)
+		if context.cardarea == G.jokers and context.setting_blind then
+			G.E_MANAGER:add_event(Event({
+				func = function()
+					ease_hands_played(self.ability.hands)
+					ease_discard(self.ability.discards, nil, true)
+					return true
+				end,
+			}))
+		end
 	end,
 	mp_credits = {
 		idea = { "Dr. Monty", "Carter" },

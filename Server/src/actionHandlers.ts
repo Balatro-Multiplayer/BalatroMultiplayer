@@ -9,6 +9,7 @@ import type {
 	ActionPlayHand,
 	ActionSetAnte,
 	ActionSetLocation,
+	ActionSkip,
 	ActionUsername,
 	ActionVersion,
 } from "./actions.js";
@@ -124,12 +125,14 @@ const playHandAction = (
 			action: "enemyInfo",
 			handsLeft,
 			score,
+			skips: client.skips,
 		});
 	} else if (lobby.guest?.id === client.id) {
 		lobby.host?.sendAction({
 			action: "enemyInfo",
 			handsLeft,
 			score,
+			skips: client.skips,
 		});
 	}
 
@@ -248,12 +251,33 @@ const versionAction = (
 	}
 };
 
-const setLocation = ({ location }: ActionHandlerArgs<ActionSetLocation>, client: Client) => {
+const setLocationAction = ({ location }: ActionHandlerArgs<ActionSetLocation>, client: Client) => {
 	client.setLocation(location);
 }
 
-const newRound = (client: Client) => {
+const newRoundAction = (client: Client) => {
 	client.resetBlocker()
+}
+
+const skipAction = ({ skips }: ActionHandlerArgs<ActionSkip>, client: Client) => {
+	const lobby = client.lobby;
+	client.setSkips(skips)
+	if (!lobby) return;
+	if (lobby.host?.id === client.id) {
+		lobby.guest?.sendAction({
+			action: "enemyInfo",
+			handsLeft: client.handsLeft,
+			score: client.score,
+			skips: client.skips,
+		});
+	} else if (lobby.guest?.id === client.id) {
+		lobby.host?.sendAction({
+			action: "enemyInfo",
+			handsLeft: client.handsLeft,
+			score: client.score,
+			skips: client.skips,
+		});
+	}
 }
 
 // Declared partial for now untill all action handlers are defined
@@ -274,6 +298,7 @@ export const actionHandlers = {
 	failRound: failRoundAction,
 	setAnte: setAnteAction,
 	version: versionAction,
-	setLocation: setLocation,
-	newRound: newRound,
+	setLocation: setLocationAction,
+	newRound: newRoundAction,
+	skip: skipAction,
 } satisfies Partial<ActionHandlers>;

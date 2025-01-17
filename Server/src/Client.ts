@@ -28,6 +28,7 @@ class Client {
 	score = 0n
 	handsLeft = 4
 	ante = 1
+	skips = 0
 
 	livesBlocker = false
 
@@ -75,6 +76,10 @@ class Client {
 			this.livesBlocker = true
 			this.sendAction({ action: "playerInfo", lives: this.lives });
 		}
+	}
+
+	setSkips = (skips: number) => {
+		this.skips = skips
 	}
 }
 

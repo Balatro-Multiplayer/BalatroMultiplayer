@@ -31,6 +31,7 @@ export type ActionEnemyInfo = {
 	action: 'enemyInfo'
 	score: BigInt
 	handsLeft: number
+	skips: number
 }
 export type ActionEndPvP = { action: 'endPvP'; lost: boolean }
 export type ActionLobbyOptions = { action: 'lobbyOptions', gamemode: string }
@@ -82,6 +83,7 @@ export type ActionSetAnte = {
 export type ActionVersion = { action: 'version'; version: string }
 export type ActionSetLocation = { action: 'setLocation'; location: string }
 export type ActionNewRound = { action: 'newRound' }
+export type ActionSkip = { action: 'skip', skips: number }
 
 export type ActionClientToServer =
 	| ActionUsername
@@ -103,6 +105,7 @@ export type ActionClientToServer =
 	| ActionVersion
 	| ActionSetLocation
 	| ActionNewRound
+	| ActionSkip
 
 // Utility actions
 export type ActionKeepAlive = { action: 'keepAlive' }

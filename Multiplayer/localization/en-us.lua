@@ -15,7 +15,7 @@ return {
 					"{C:blue}+#1#{} Hands and {C:red}+#2#{} Discards",
 					"per additional {C:attention}Blind{} skipped",
 					"compared to your {X:purple,C:white}Nemesis{}",
-					"{C:inactive}(Currently {C:blue}+#3#{C:inactive}/{C:red}+#4#{C:inactive})",
+					"{C:inactive}(Currently {C:blue}+#3#{C:inactive}/{C:red}+#4#{C:inactive}, #5#)",
 				},
 			},
 			j_mp_lets_go_gambling = {
@@ -180,6 +180,9 @@ return {
 			mp_art = { "Art: #1#" },
 			mp_code = { "Code: #1#" },
 			mp_idea = { "Idea: #1#" },
+			mp_skips_ahead = { "#1# Skips Ahead" },
+			mp_skips_behind = { "#1# Skips Behind" },
+			mp_skips_tied = { "Tied" },
 		},
 	},
 }

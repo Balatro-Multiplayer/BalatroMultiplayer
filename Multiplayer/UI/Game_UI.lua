@@ -2317,3 +2317,11 @@ end
 function G.UIDEF.multiplayer_deck()
 	return G.UIDEF.challenge_description(get_challenge_int_from_id("c_multiplayer_1"), nil, false)
 end
+
+local skip_blind_ref = G.FUNCS.skip_blind
+G.FUNCS.skip_blind = function(e)
+	skip_blind_ref(e)
+	if G.LOBBY.code then
+		G.MULTIPLAYER.skip(G.GAME.skips)
+	end
+end

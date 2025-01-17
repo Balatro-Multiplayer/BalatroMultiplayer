@@ -12,6 +12,7 @@ import type {
 	ActionServerToClient,
 	ActionSetAnte,
 	ActionSetLocation,
+	ActionSkip,
 	ActionUsername,
 	ActionUtility,
 	ActionVersion,
@@ -225,6 +226,12 @@ const server = createServer((socket) => {
 					case 'setAnte':
 						actionHandlers.setAnte(
 							actionArgs as ActionHandlerArgs<ActionSetAnte>,
+							client,
+						)
+						break
+					case 'skip':
+						actionHandlers.skip(
+							actionArgs as ActionHandlerArgs<ActionSkip>,
 							client,
 						)
 						break

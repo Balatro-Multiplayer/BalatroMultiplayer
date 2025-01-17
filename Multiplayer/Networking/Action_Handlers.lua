@@ -89,9 +89,11 @@ end
 
 ---@param score_str string
 ---@param hands_left_str string
-local function action_enemy_info(score_str, hands_left_str)
+---@param skips_str string
+local function action_enemy_info(score_str, hands_left_str, skips_str)
 	local score = tonumber(score_str)
 	local hands_left = tonumber(hands_left_str)
+	local skips = tonumber(skips_str)
 
 	if score == nil or hands_left == nil then
 		sendDebugMessage("Invalid score or hands_left", "MULTIPLAYER")
@@ -112,6 +114,7 @@ local function action_enemy_info(score_str, hands_left_str)
 	}))
 
 	G.MULTIPLAYER_GAME.enemy.hands = hands_left
+	G.MULTIPLAYER_GAME.enemy.skips = skips
 
 	if is_pvp_boss() then
 		G.HUD_blind:get_UIE_by_ID("HUD_blind_count"):juice_up()
@@ -303,6 +306,10 @@ end
 function G.MULTIPLAYER.new_round()
 	Client.send("action:newRound")
 end
+
+function G.MULTIPLAYER.skip(skips)
+	Client.send("action:skip,skips:" .. tostring(skips))
+end
 -- #endregion Client to Server
 
 -- Utils
@@ -360,7 +367,7 @@ function Game:update(dt)
 			elseif parsedAction.action == "startBlind" then
 				action_start_blind()
 			elseif parsedAction.action == "enemyInfo" then
-				action_enemy_info(parsedAction.score, parsedAction.handsLeft)
+				action_enemy_info(parsedAction.score, parsedAction.handsLeft, parsedAction.skips)
 			elseif parsedAction.action == "stopGame" then
 				action_stop_game()
 			elseif parsedAction.action == "endPvP" then
