@@ -82,7 +82,6 @@ return {
 		Edition = {
 			e_mp_phantom = {
 				name = "Phantom",
-				label = "Phantom",
 				text = {
 					"{C:attention}Eternal{} and {C:dark_edition}Negative{}",
 					"Created and destroyed by your {X:purple,C:white}Nemesis{}",
@@ -100,6 +99,9 @@ return {
 		},
 	},
 	misc = {
+		labels = {
+			mp_phantom = "Phantom",
+		},
 		challenge_names = {
 			c_multiplayer_1 = "Multiplayer",
 		},

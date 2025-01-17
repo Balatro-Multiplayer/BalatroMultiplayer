@@ -52,16 +52,17 @@ SMODS.Joker({
 	blueprint_compat = false,
 	eternal_compat = true,
 	perishable_compat = true,
-	ability = { extra = 60, chips = 0 },
+	config = { extra = { extra = 60, chips = 0 } },
 	loc_vars = function(self, info_queue, card)
-		return { vars = { self.ability.extra, self.ability.chips } }
+		return { vars = { card.ability.extra.extra, card.ability.extra.chips } }
 	end,
 	in_pool = function(self)
 		return G.LOBBY.code
 	end,
 	update = function(self, card, dt)
 		if G.STAGE == G.STAGES.RUN then
-			self.ability.chips = (G.LOBBY.config.starting_lives - G.MULTIPLAYER_GAME.lives) * self.ability.extra
+			card.ability.extra.chips = (G.LOBBY.config.starting_lives - G.MULTIPLAYER_GAME.lives)
+				* card.ability.extra.extra
 		end
 	end,
 	calculate = function(self, card, context)
@@ -70,9 +71,9 @@ SMODS.Joker({
 				message = localize({
 					type = "variable",
 					key = "a_chips",
-					vars = { self.ability.chips },
+					vars = { card.ability.extra.chips },
 				}),
-				chip_mod = self.ability.chips,
+				chip_mod = card.ability.extra.chips,
 			}
 		end
 	end,
@@ -100,15 +101,15 @@ SMODS.Joker({
 	blueprint_compat = false,
 	eternal_compat = true,
 	perishable_compat = true,
-	ability = { extra_hands = 1, extra_discards = 1, hands = 0, discards = 0 },
+	config = { extra = { extra_hands = 1, extra_discards = 1, hands = 0, discards = 0 } },
 	loc_vars = function(self, info_queue, card)
 		add_nemesis_info(info_queue)
 		return {
 			vars = {
-				self.ability.extra_hands,
-				self.ability.extra_discards,
-				self.ability.hands,
-				self.ability.discards,
+				card.ability.extra.extra_hands,
+				card.ability.extra.extra_discards,
+				card.ability.extra.hands,
+				card.ability.extra.discards,
 				localize({
 					type = "variable",
 					key = G.MULTIPLAYER_GAME.enemy.skips > G.GAME.skips and "mp_skips_behind"
@@ -125,16 +126,16 @@ SMODS.Joker({
 	update = function(self, card, dt)
 		if G.STAGE == G.STAGES.RUN then
 			local skip_diff = (math.max(G.GAME.skips - G.MULTIPLAYER_GAME.enemy.skips, 0))
-			self.ability.hands = skip_diff * self.ability.extra_hands
-			self.ability.discards = skip_diff * self.ability.extra_discards
+			card.ability.extra.hands = skip_diff * card.ability.extra.extra_hands
+			card.ability.extra.discards = skip_diff * card.ability.extra.extra_discards
 		end
 	end,
 	calculate = function(self, card, context)
 		if context.cardarea == G.jokers and context.setting_blind then
 			G.E_MANAGER:add_event(Event({
 				func = function()
-					ease_hands_played(self.ability.hands)
-					ease_discard(self.ability.discards, nil, true)
+					ease_hands_played(card.ability.extra.hands)
+					ease_discard(card.ability.extra.discards, nil, true)
 					return true
 				end,
 			}))
@@ -164,11 +165,57 @@ SMODS.Joker({
 	blueprint_compat = false,
 	eternal_compat = true,
 	perishable_compat = true,
+	config = { extra = { denominator = 4, extra = 0.5, extra_extra = 0.2, x_mult = 1 } },
 	loc_vars = function(self, info_queue, card)
-		return { vars = { 1, 4, 0.5, 0.2, 1 } }
+		return {
+			vars = {
+				G.GAME.probabilities.normal,
+				card.ability.extra.denominator,
+				card.ability.extra.extra,
+				card.ability.extra.extra_extra,
+				card.ability.extra.x_mult,
+			},
+		}
 	end,
 	in_pool = function(self)
 		return G.LOBBY.code
+	end,
+	calculate = function(self, card, context)
+		if context.selling_self then
+			if pseudorandom(self.key) > G.GAME.probabilities.normal / card.ability.extra.denominator then
+				local new_card = copy_card(card)
+				new_card:start_materialize()
+				new_card:add_to_deck()
+				G.jokers:emplace(new_card)
+				new_card.ability.extra.x_mult = card.ability.extra.x_mult + card.ability.extra.extra
+				new_card.ability.extra.extra = card.ability.extra.extra
+			else
+				G.E_MANAGER:add_event(Event({
+					trigger = "after",
+					delay = 0.06 * G.SETTINGS.GAMESPEED,
+					blockable = false,
+					blocking = false,
+					func = function()
+						play_sound("tarot2", 0.76, 0.4)
+						return true
+					end,
+				}))
+				play_sound("tarot2", 1, 0.4)
+				attention_text({
+					text = localize("k_nope_ex"),
+					scale = 0.8,
+					hold = 0.8,
+					major = card,
+					backdrop_colour = G.C.SECONDARY_SET.Tarot,
+					align = (G.STATE == G.STATES.TAROT_PACK or G.STATE == G.STATES.SPECTRAL_PACK) and "tm" or "cm",
+					offset = {
+						x = 0,
+						y = (G.STATE == G.STATES.TAROT_PACK or G.STATE == G.STATES.SPECTRAL_PACK) and -0.2 or 0,
+					},
+					silent = true,
+				})
+			end
+		end
 	end,
 	mp_credits = {
 		idea = { "Dr. Monty", "Carter" },
