@@ -110,8 +110,16 @@ SMODS.Joker({
 	},
 })
 
+SMODS.Atlas({
+	key = "lets_go_gambling",
+	path = "j_lets_go_gambling.png",
+	px = 71,
+	py = 95,
+})
+
 SMODS.Joker({
 	key = "lets_go_gambling",
+	atlas = "lets_go_gambling",
 	rarity = 2,
 	cost = 6,
 	unlocked = true,
@@ -127,7 +135,7 @@ SMODS.Joker({
 	end,
 	mp_credits = {
 		idea = { "Dr. Monty", "Carter" },
-		art = {},
+		art = { "Carter" },
 		code = { "Virtualized" },
 	},
 })
