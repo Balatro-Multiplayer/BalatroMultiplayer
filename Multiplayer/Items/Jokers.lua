@@ -224,8 +224,16 @@ SMODS.Joker({
 	},
 })
 
+SMODS.Atlas({
+	key = "hanging_bad",
+	path = "j_hanging_bad.png",
+	px = 71,
+	py = 95,
+})
+
 SMODS.Joker({
 	key = "hanging_bad",
+	atlas = "hanging_bad",
 	rarity = 1,
 	cost = 4,
 	unlocked = true,
@@ -242,7 +250,7 @@ SMODS.Joker({
 	end,
 	mp_credits = {
 		idea = { "Dr. Monty", "Carter" },
-		art = {},
+		art = { "TheTrueRaven" },
 		code = { "Virtualized" },
 	},
 })
