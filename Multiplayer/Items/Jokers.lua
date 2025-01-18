@@ -49,7 +49,7 @@ SMODS.Joker({
 	cost = 4,
 	unlocked = true,
 	discovered = true,
-	blueprint_compat = false,
+	blueprint_compat = true,
 	eternal_compat = true,
 	perishable_compat = true,
 	config = { extra = { extra = 60, chips = 0 } },
@@ -135,7 +135,7 @@ SMODS.Joker({
 		end
 	end,
 	calculate = function(self, card, context)
-		if context.cardarea == G.jokers and context.setting_blind then
+		if context.cardarea == G.jokers and context.setting_blind and not context.blueprint then
 			G.E_MANAGER:add_event(Event({
 				func = function()
 					ease_hands_played(card.ability.extra.hands)
@@ -166,7 +166,7 @@ SMODS.Joker({
 	cost = 6,
 	unlocked = true,
 	discovered = true,
-	blueprint_compat = false,
+	blueprint_compat = true,
 	eternal_compat = true,
 	perishable_compat = true,
 	config = { extra = { denominator = 4, extra = 0.3, extra_extra = 0.2, x_mult = 1 } },
