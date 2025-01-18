@@ -195,6 +195,7 @@ return {
 			mp_skips_ahead = { "#1# Skips Ahead" },
 			mp_skips_behind = { "#1# Skips Behind" },
 			mp_skips_tied = { "Tied" },
+			a_xmult_plus = "+X#1# Mult",
 		},
 	},
 }

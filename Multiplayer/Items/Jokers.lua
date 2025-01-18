@@ -60,9 +60,13 @@ SMODS.Joker({
 		return G.LOBBY.code
 	end,
 	update = function(self, card, dt)
-		if G.STAGE == G.STAGES.RUN then
-			card.ability.extra.chips = (G.LOBBY.config.starting_lives - G.MULTIPLAYER_GAME.lives)
-				* card.ability.extra.extra
+		if G.LOBBY.code then
+			if G.STAGE == G.STAGES.RUN then
+				card.ability.extra.chips = (G.LOBBY.config.starting_lives - G.MULTIPLAYER_GAME.lives)
+					* card.ability.extra.extra
+			end
+		else
+			card.ability.extra.chips = 0
 		end
 	end,
 	calculate = function(self, card, context)
@@ -165,7 +169,7 @@ SMODS.Joker({
 	blueprint_compat = false,
 	eternal_compat = true,
 	perishable_compat = true,
-	config = { extra = { denominator = 4, extra = 0.5, extra_extra = 0.2, x_mult = 1 } },
+	config = { extra = { denominator = 4, extra = 0.3, extra_extra = 0.2, x_mult = 1 } },
 	loc_vars = function(self, info_queue, card)
 		return {
 			vars = {
@@ -181,7 +185,29 @@ SMODS.Joker({
 		return G.LOBBY.code
 	end,
 	calculate = function(self, card, context)
-		if context.selling_self then
+		if context.cardarea == G.jokers then
+			if context.joker_main then
+				return {
+					message = localize({
+						type = "variable",
+						key = "a_xmult",
+						vars = { card.ability.extra.x_mult },
+					}),
+					Xmult_mod = card.ability.extra.x_mult,
+				}
+			end
+			if context.end_of_round and not context.blueprint and not context.repetition and G.GAME.blind.boss then
+				card.ability.extra.extra = card.ability.extra.extra + card.ability.extra.extra_extra
+				return {
+					message = localize({
+						type = "variable",
+						key = "a_xmult_plus",
+						vars = { card.ability.extra.extra_extra },
+					}),
+				}
+			end
+		end
+		if context.selling_self and not context.blueprint then
 			if pseudorandom(self.key) > G.GAME.probabilities.normal / card.ability.extra.denominator then
 				local new_card = copy_card(card)
 				new_card:start_materialize()
