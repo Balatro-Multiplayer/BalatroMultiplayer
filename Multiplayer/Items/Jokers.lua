@@ -1,14 +1,8 @@
 function apply_phantom(card)
-	if card.cardarea then
-		card.cardarea.config.card_limit = card.cardarea.config.card_limit + 1
-	end
 	card.ability.eternal = true
 end
 
 function remove_phantom(card)
-	if card.cardarea then
-		card.cardarea.config.card_limit = card.cardarea.config.card_limit - 1
-	end
 	card.ability.eternal = false
 end
 
@@ -17,6 +11,7 @@ SMODS.Edition({
 	shader = "voucher",
 	discovered = true,
 	unlocked = true,
+	config = { card_limit = 1 },
 	in_shop = false,
 	apply_to_float = true,
 	badge_colour = G.C.PURPLE,
@@ -52,9 +47,9 @@ SMODS.Joker({
 	blueprint_compat = true,
 	eternal_compat = true,
 	perishable_compat = true,
-	config = { extra = { extra = 60, chips = 0 } },
+	config = { t_chips = 0, extra = { extra = 60 } },
 	loc_vars = function(self, info_queue, card)
-		return { vars = { card.ability.extra.extra, card.ability.extra.chips } }
+		return { vars = { card.ability.extra.extra, card.ability.t_chips } }
 	end,
 	in_pool = function(self)
 		return G.LOBBY.code
@@ -62,11 +57,11 @@ SMODS.Joker({
 	update = function(self, card, dt)
 		if G.LOBBY.code then
 			if G.STAGE == G.STAGES.RUN then
-				card.ability.extra.chips = (G.LOBBY.config.starting_lives - G.MULTIPLAYER_GAME.lives)
+				card.ability.t_chips = (G.LOBBY.config.starting_lives - G.MULTIPLAYER_GAME.lives)
 					* card.ability.extra.extra
 			end
 		else
-			card.ability.extra.chips = 0
+			card.ability.t_chips = 0
 		end
 	end,
 	calculate = function(self, card, context)
@@ -75,9 +70,9 @@ SMODS.Joker({
 				message = localize({
 					type = "variable",
 					key = "a_chips",
-					vars = { card.ability.extra.chips },
+					vars = { card.ability.t_chips },
 				}),
-				chip_mod = card.ability.extra.chips,
+				chip_mod = card.ability.t_chips,
 			}
 		end
 	end,
@@ -105,15 +100,15 @@ SMODS.Joker({
 	blueprint_compat = false,
 	eternal_compat = true,
 	perishable_compat = true,
-	config = { extra = { extra_hands = 1, extra_discards = 1, hands = 0, discards = 0 } },
+	config = { h_size = 0, d_size = 0, extra = { extra_hands = 1, extra_discards = 1 } },
 	loc_vars = function(self, info_queue, card)
 		add_nemesis_info(info_queue)
 		return {
 			vars = {
 				card.ability.extra.extra_hands,
 				card.ability.extra.extra_discards,
-				card.ability.extra.hands,
-				card.ability.extra.discards,
+				card.ability.h_size,
+				card.ability.d_size,
 				localize({
 					type = "variable",
 					key = G.MULTIPLAYER_GAME.enemy.skips > G.GAME.skips and "mp_skips_behind"
@@ -130,16 +125,16 @@ SMODS.Joker({
 	update = function(self, card, dt)
 		if G.STAGE == G.STAGES.RUN then
 			local skip_diff = (math.max(G.GAME.skips - G.MULTIPLAYER_GAME.enemy.skips, 0))
-			card.ability.extra.hands = skip_diff * card.ability.extra.extra_hands
-			card.ability.extra.discards = skip_diff * card.ability.extra.extra_discards
+			card.ability.h_size = skip_diff * card.ability.extra.extra_hands
+			card.ability.d_size = skip_diff * card.ability.extra.extra_discards
 		end
 	end,
 	calculate = function(self, card, context)
 		if context.cardarea == G.jokers and context.setting_blind and not context.blueprint then
 			G.E_MANAGER:add_event(Event({
 				func = function()
-					ease_hands_played(card.ability.extra.hands)
-					ease_discard(card.ability.extra.discards, nil, true)
+					ease_hands_played(card.ability.h_size)
+					ease_discard(card.ability.d_size, nil, true)
 					return true
 				end,
 			}))
@@ -270,6 +265,28 @@ SMODS.Joker({
 	loc_vars = function(self, info_queue, card)
 		add_nemesis_info(info_queue)
 		return { vars = {} }
+	end,
+	add_to_deck = function(self, card, from_debuff)
+		if card.edition and card.edition.type ~= "e_mp_phantom" then
+			return
+		end
+		G.MULTIPLAYER.send_phantom("j_mp_hanging_bad")
+	end,
+	calculate = function(self, card, context)
+		if context.cardarea == G.jokers then
+			if context.before and context.scoring_hand then
+				context.scoring_hand[1]:set_debuff(true)
+			end
+			if context.after and context.scoring_hand then
+				context.scoring_hand[1]:set_debuff(false)
+			end
+		end
+	end,
+	remove_from_deck = function(self, card, from_debuff)
+		if card.edition and card.edition.type ~= "e_mp_phantom" then
+			return
+		end
+		G.MULTIPLAYER.remove_phantom("j_mp_hanging_bad")
 	end,
 	in_pool = function(self)
 		return G.LOBBY.code

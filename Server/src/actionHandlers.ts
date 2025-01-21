@@ -7,6 +7,8 @@ import type {
 	ActionHandlers,
 	ActionJoinLobby,
 	ActionPlayHand,
+	ActionRemovePhantom,
+	ActionSendPhantom,
 	ActionSetAnte,
 	ActionSetLocation,
 	ActionSkip,
@@ -280,6 +282,38 @@ const skipAction = ({ skips }: ActionHandlerArgs<ActionSkip>, client: Client) =>
 	}
 }
 
+const sendPhantomAction = ({ key }: ActionHandlerArgs<ActionSendPhantom>, client: Client) => {
+	const lobby = client.lobby;
+	if (!lobby) return;
+	if (lobby.host?.id === client.id) {
+		lobby.guest?.sendAction({
+			action: "sendPhantom",
+			key
+		});
+	} else if (lobby.guest?.id === client.id) {
+		lobby.host?.sendAction({
+			action: "sendPhantom",
+			key
+		});
+	}
+} 
+
+const removePhantomAction = ({ key }: ActionHandlerArgs<ActionRemovePhantom>, client: Client) => {
+	const lobby = client.lobby;
+	if (!lobby) return;
+	if (lobby.host?.id === client.id) {
+		lobby.guest?.sendAction({
+			action: "removePhantom",
+			key
+		});
+	} else if (lobby.guest?.id === client.id) {
+		lobby.host?.sendAction({
+			action: "removePhantom",
+			key
+		});
+	}
+}
+
 // Declared partial for now untill all action handlers are defined
 export const actionHandlers = {
 	username: usernameAction,
@@ -301,4 +335,6 @@ export const actionHandlers = {
 	setLocation: setLocationAction,
 	newRound: newRoundAction,
 	skip: skipAction,
+	sendPhantom: sendPhantomAction,
+	removePhantom: removePhantomAction
 } satisfies Partial<ActionHandlers>;

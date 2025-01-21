@@ -187,6 +187,25 @@ local function action_lobby_options(options)
 	end
 end
 
+local function action_send_phantom(key)
+	local new_card = create_card("Joker", G.jokers, false, nil, nil, nil, key)
+	new_card:set_edition("e_mp_phantom")
+	new_card:add_to_deck()
+	G.jokers:emplace(new_card)
+end
+
+local function action_remove_phantom(key)
+	for i = 1, #G.jokers.cards do
+		if G.jokers.cards[i].ability.name == key then
+			local card = G.jokers.cards[i]
+			card:remove_from_deck()
+			card:start_dissolve({ G.C.RED }, nil, 1.6)
+			G.jokers:remove_card(card)
+			return
+		end
+	end
+end
+
 local function enemyLocation(options)
 	local location = options.location
 	local value = ""
@@ -310,6 +329,14 @@ end
 function G.MULTIPLAYER.skip(skips)
 	Client.send("action:skip,skips:" .. tostring(skips))
 end
+
+function G.MULTIPLAYER.send_phantom(key)
+	Client.send("action:sendPhantom,key:" .. key)
+end
+
+function G.MULTIPLAYER.remove_phantom(key)
+	Client.send("action:removePhantom,key:" .. key)
+end
 -- #endregion Client to Server
 
 -- Utils
@@ -382,6 +409,10 @@ function Game:update(dt)
 				action_lobby_options(parsedAction)
 			elseif parsedAction.action == "enemyLocation" then
 				enemyLocation(parsedAction)
+			elseif parsedAction.action == "sendPhantom" then
+				action_send_phantom(parsedAction.key)
+			elseif parsedAction.action == "removePhantom" then
+				action_remove_phantom(parsedAction.key)
 			elseif parsedAction.action == "error" then
 				action_error(parsedAction.message)
 			elseif parsedAction.action == "keepAlive" then

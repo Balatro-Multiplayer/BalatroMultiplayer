@@ -37,6 +37,8 @@ export type ActionEndPvP = { action: 'endPvP'; lost: boolean }
 export type ActionLobbyOptions = { action: 'lobbyOptions', gamemode: string }
 export type ActionRequestVersion = { action: 'version' }
 export type ActionEnemyLocation = { action: 'enemyLocation'; location: string }
+export type ActionSendPhantom = { action: 'sendPhantom', key: string }
+export type ActionRemovePhantom = { action: 'removePhantom', key: string }
 
 export type ActionServerToClient =
 	| ActionConnected
@@ -56,6 +58,8 @@ export type ActionServerToClient =
 	| ActionRequestVersion
 	| ActionUtility
 	| ActionEnemyLocation
+	| ActionSendPhantom
+	| ActionRemovePhantom
 
 // Client to Server
 export type ActionUsername = { action: 'username'; username: string; modHash: string }
@@ -106,6 +110,8 @@ export type ActionClientToServer =
 	| ActionSetLocation
 	| ActionNewRound
 	| ActionSkip
+	| ActionSendPhantom
+	| ActionRemovePhantom
 
 // Utility actions
 export type ActionKeepAlive = { action: 'keepAlive' }

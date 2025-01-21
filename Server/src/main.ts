@@ -9,6 +9,8 @@ import type {
 	ActionJoinLobby,
 	ActionLobbyOptions,
 	ActionPlayHand,
+	ActionRemovePhantom,
+	ActionSendPhantom,
 	ActionServerToClient,
 	ActionSetAnte,
 	ActionSetLocation,
@@ -232,6 +234,18 @@ const server = createServer((socket) => {
 					case 'skip':
 						actionHandlers.skip(
 							actionArgs as ActionHandlerArgs<ActionSkip>,
+							client,
+						)
+						break
+					case 'sendPhantom':
+						actionHandlers.sendPhantom(
+							actionArgs as ActionHandlerArgs<ActionSendPhantom>,
+							client,
+						)
+						break
+					case 'removePhantom':
+						actionHandlers.removePhantom(
+							actionArgs as ActionHandlerArgs<ActionRemovePhantom>,
 							client,
 						)
 						break
