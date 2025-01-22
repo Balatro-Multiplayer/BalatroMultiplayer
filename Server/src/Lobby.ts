@@ -17,6 +17,17 @@ const generateUniqueLobbyCode = (): string => {
 	return Lobbies.get(result) ? generateUniqueLobbyCode() : result;
 };
 
+export const getEnemy = (client: Client): [Lobby | null, Client | null] => {
+	const lobby = client.lobby
+	if (!lobby) return [null, null]
+	if (lobby.host?.id === client.id) {
+		return [lobby, lobby.guest]
+	} else if (lobby.guest?.id === client.id) {
+		return [lobby, lobby.host]
+	}
+	return [lobby, null]
+}
+
 class Lobby {
 	code: string;
 	host: Client | null;

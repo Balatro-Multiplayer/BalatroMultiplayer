@@ -39,6 +39,7 @@ export type ActionRequestVersion = { action: 'version' }
 export type ActionEnemyLocation = { action: 'enemyLocation'; location: string }
 export type ActionSendPhantom = { action: 'sendPhantom', key: string }
 export type ActionRemovePhantom = { action: 'removePhantom', key: string }
+export type ActionSpeedrun = { action: 'speedrun' }
 
 export type ActionServerToClient =
 	| ActionConnected
@@ -60,6 +61,7 @@ export type ActionServerToClient =
 	| ActionEnemyLocation
 	| ActionSendPhantom
 	| ActionRemovePhantom
+	| ActionSpeedrun
 
 // Client to Server
 export type ActionUsername = { action: 'username'; username: string; modHash: string }
@@ -75,6 +77,7 @@ export type ActionPlayHand = {
 	action: 'playHand'
 	score: BigInt
 	handsLeft: number
+	hasSpeedrun: boolean
 }
 export type ActionGameInfoRequest = { action: 'gameInfo' }
 export type ActionPlayerInfoRequest = { action: 'playerInfo' }

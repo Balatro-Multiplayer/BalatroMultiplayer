@@ -48,9 +48,13 @@ const scientificNotationToBigInt = (value: string): bigint => {
 
 // biome-ignore lint/suspicious/noExplicitAny: Object is parsed from string
 const stringToJson = (str: string): any => {
-	const obj: Record<string, string | number | bigint> = {}
+	const obj: Record<string, string | number | bigint | boolean> = {}
 	for (const part of str.split(',')) {
 		const [key, value] = part.split(':')
+		if (value === 'true' || value === 'false') {
+			obj[key] = value === 'true'
+			continue
+		}
 		const numericValue = Number(value)
 		let score = null
 		if (key === 'score') {

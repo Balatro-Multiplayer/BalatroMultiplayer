@@ -952,7 +952,8 @@ function Game:update_hand_played(dt)
 		G.E_MANAGER:add_event(Event({
 			trigger = "immediate",
 			func = function()
-				G.MULTIPLAYER.play_hand(G.GAME.chips, G.GAME.current_round.hands_left)
+				local card = G.MULTIPLAYER.UTILS.get_joker("j_mp_speedrun")
+				G.MULTIPLAYER.play_hand(G.GAME.chips, G.GAME.current_round.hands_left, card ~= nil)
 				-- Set blind chips to enemy score
 				G.GAME.blind.chips = G.MULTIPLAYER_GAME.enemy.score
 				-- For now, never advance to next round
@@ -2083,7 +2084,7 @@ function Game:update_selecting_hand(dt)
 			G.STATE_COMPLETE = false
 			G.STATE = G.STATES.NEW_ROUND
 		else
-			G.MULTIPLAYER.play_hand(G.GAME.chips, 0)
+			G.MULTIPLAYER.play_hand(G.GAME.chips, 0, false)
 			G.STATE_COMPLETE = false
 			G.STATE = G.STATES.HAND_PLAYED
 		end
@@ -2305,7 +2306,7 @@ function G.FUNCS.select_blind(e)
 	select_blind_ref(e)
 	if G.LOBBY.code then
 		G.MULTIPLAYER_GAME.ante_key = tostring(math.random())
-		G.MULTIPLAYER.play_hand(0, G.GAME.round_resets.hands)
+		G.MULTIPLAYER.play_hand(0, G.GAME.round_resets.hands, false)
 		G.MULTIPLAYER.new_round()
 		G.MULTIPLAYER.set_location("loc_playing-" .. (e.config.ref_table.key or e.config.ref_table.name))
 		hide_enemy_location()

@@ -195,14 +195,19 @@ local function action_send_phantom(key)
 end
 
 local function action_remove_phantom(key)
-	for i = 1, #G.jokers.cards do
-		if G.jokers.cards[i].ability.name == key then
-			local card = G.jokers.cards[i]
-			card:remove_from_deck()
-			card:start_dissolve({ G.C.RED }, nil, 1.6)
-			G.jokers:remove_card(card)
-			return
-		end
+	local card = G.MULTIPLAYER.UTILS.get_joker(key)
+	if card then
+		card:remove_from_deck()
+		card:start_dissolve({ G.C.RED }, nil, 1.6)
+		G.jokers:remove_card(card)
+	end
+end
+
+local function action_speedrun()
+	local card = G.MULTIPLAYER.UTILS.get_joker("j_mp_speedrun")
+	if card then
+		card:juice_up()
+		G.GAME.chips = to_big(G.GAME.chips) * to_big(3)
 	end
 end
 
@@ -299,7 +304,8 @@ end
 
 ---@param score number
 ---@param hands_left number
-function G.MULTIPLAYER.play_hand(score, hands_left)
+function G.MULTIPLAYER.play_hand(score, hands_left, speedrun_check)
+	speedrun_check = speedrun_check or false
 	local fixed_score = tostring(to_big(score))
 	-- Credit to sidmeierscivilizationv on discord for this fix for Talisman
 	if string.match(fixed_score, "[eE]") == nil and string.match(fixed_score, "[.]") then
@@ -307,7 +313,12 @@ function G.MULTIPLAYER.play_hand(score, hands_left)
 		fixed_score = string.sub(string.gsub(fixed_score, "%.", ","), 1, -3)
 	end
 	fixed_score = string.gsub(fixed_score, ",", "") -- Remove commas
-	Client.send(string.format("action:playHand,score:" .. fixed_score .. ",handsLeft:%d", hands_left))
+	Client.send(
+		string.format(
+			"action:playHand,score:" .. fixed_score .. ",handsLeft:%d,hasSpeedrun:" .. tostring(speedrun_check),
+			hands_left
+		)
+	)
 end
 
 function G.MULTIPLAYER.lobby_options()
@@ -413,6 +424,8 @@ function Game:update(dt)
 				action_send_phantom(parsedAction.key)
 			elseif parsedAction.action == "removePhantom" then
 				action_remove_phantom(parsedAction.key)
+			elseif parsedAction.action == "speedrun" then
+				action_speedrun()
 			elseif parsedAction.action == "error" then
 				action_error(parsedAction.message)
 			elseif parsedAction.action == "keepAlive" then
