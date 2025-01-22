@@ -31,3 +31,19 @@ SMODS.Edition({
 		code = { "Virtualized" },
 	},
 })
+
+SMODS.Joker:take_ownership("abstract", {
+	loc_vars = function(self, info_queue, card)
+		local jokers = G.MULTIPLAYER.UTILS.get_non_phantom_jokers()
+		return {
+			vars = { card.ability.extra, (#jokers or 0) * card.ability.extra },
+		}
+	end,
+	calculate = function(self, card, context)
+		local x = #G.MULTIPLAYER.UTILS.get_non_phantom_jokers()
+		return {
+			message = localize({ type = "variable", key = "a_mult", vars = { x * self.ability.extra } }),
+			mult_mod = x * self.ability.extra,
+		}
+	end,
+}, true)

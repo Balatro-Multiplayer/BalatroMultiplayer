@@ -153,3 +153,16 @@ function G.MULTIPLAYER.UTILS.get_joker(key)
 	end
 	return nil
 end
+
+function G.MULTIPLAYER.UTILS.get_non_phantom_jokers()
+	if not G.jokers or not G.jokers.cards then
+		return {}
+	end
+	local jokers = {}
+	for _, v in ipairs(G.jokers.cards) do
+		if v.ability.set == "Joker" and (not v.edition or v.edition.type ~= "mp_phantom") then
+			table.insert(jokers, v)
+		end
+	end
+	return jokers
+end
