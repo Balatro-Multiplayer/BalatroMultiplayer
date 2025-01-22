@@ -40,6 +40,7 @@ export type ActionEnemyLocation = { action: 'enemyLocation'; location: string }
 export type ActionSendPhantom = { action: 'sendPhantom', key: string }
 export type ActionRemovePhantom = { action: 'removePhantom', key: string }
 export type ActionSpeedrun = { action: 'speedrun' }
+export type ActionAsteroid = { action: 'asteroid' }
 
 export type ActionServerToClient =
 	| ActionConnected
@@ -62,6 +63,7 @@ export type ActionServerToClient =
 	| ActionSendPhantom
 	| ActionRemovePhantom
 	| ActionSpeedrun
+	| ActionAsteroid
 
 // Client to Server
 export type ActionUsername = { action: 'username'; username: string; modHash: string }
@@ -115,6 +117,7 @@ export type ActionClientToServer =
 	| ActionSkip
 	| ActionSendPhantom
 	| ActionRemovePhantom
+	| ActionAsteroid
 
 // Utility actions
 export type ActionKeepAlive = { action: 'keepAlive' }

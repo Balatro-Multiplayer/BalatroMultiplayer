@@ -253,6 +253,9 @@ const server = createServer((socket) => {
 							client,
 						)
 						break
+					case 'asteroid':
+						actionHandlers.asteroid(client)
+						break
 				}
 			} catch (error) {
 				const failedToParseError = 'Failed to parse message'

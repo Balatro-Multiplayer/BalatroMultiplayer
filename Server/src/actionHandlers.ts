@@ -254,56 +254,41 @@ const newRoundAction = (client: Client) => {
 }
 
 const skipAction = ({ skips }: ActionHandlerArgs<ActionSkip>, client: Client) => {
-	const lobby = client.lobby;
+	const [lobby, enemy] = getEnemy(client)
 	client.setSkips(skips)
-	if (!lobby) return;
-	if (lobby.host?.id === client.id) {
-		lobby.guest?.sendAction({
-			action: "enemyInfo",
-			handsLeft: client.handsLeft,
-			score: client.score,
-			skips: client.skips,
-		});
-	} else if (lobby.guest?.id === client.id) {
-		lobby.host?.sendAction({
-			action: "enemyInfo",
-			handsLeft: client.handsLeft,
-			score: client.score,
-			skips: client.skips,
-		});
-	}
+	if (!lobby || !enemy) return;
+	enemy.sendAction({
+		action: "enemyInfo",
+		handsLeft: client.handsLeft,
+		score: client.score,
+		skips: client.skips,
+	});
 }
 
 const sendPhantomAction = ({ key }: ActionHandlerArgs<ActionSendPhantom>, client: Client) => {
-	const lobby = client.lobby;
-	if (!lobby) return;
-	if (lobby.host?.id === client.id) {
-		lobby.guest?.sendAction({
-			action: "sendPhantom",
-			key
-		});
-	} else if (lobby.guest?.id === client.id) {
-		lobby.host?.sendAction({
-			action: "sendPhantom",
-			key
-		});
-	}
+	const [lobby, enemy] = getEnemy(client)
+	if (!lobby || !enemy) return;
+	enemy.sendAction({
+		action: "sendPhantom",
+		key
+	});
 } 
 
 const removePhantomAction = ({ key }: ActionHandlerArgs<ActionRemovePhantom>, client: Client) => {
-	const lobby = client.lobby;
-	if (!lobby) return;
-	if (lobby.host?.id === client.id) {
-		lobby.guest?.sendAction({
-			action: "removePhantom",
-			key
-		});
-	} else if (lobby.guest?.id === client.id) {
-		lobby.host?.sendAction({
-			action: "removePhantom",
-			key
-		});
-	}
+	const [lobby, enemy] = getEnemy(client)
+	if (!lobby || !enemy) return;
+	enemy.sendAction({
+		action: "removePhantom",
+		key
+	});
+}
+
+const asteroidAction = (client: Client) => {
+	const [lobby, enemy] = getEnemy(client)
+	if (!lobby || !enemy) return;
+	enemy.sendAction({
+		action: "asteroid"
+	});
 }
 
 // Declared partial for now untill all action handlers are defined
@@ -328,5 +313,6 @@ export const actionHandlers = {
 	newRound: newRoundAction,
 	skip: skipAction,
 	sendPhantom: sendPhantomAction,
-	removePhantom: removePhantomAction
+	removePhantom: removePhantomAction,
+	asteroid: asteroidAction,
 } satisfies Partial<ActionHandlers>;

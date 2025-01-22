@@ -248,6 +248,28 @@ local function action_version()
 	G.MULTIPLAYER.version()
 end
 
+local function action_asteroid()
+	local hand_type = "High Card"
+	local max_played = 0
+	for k, v in pairs(G.GAME.hands) do
+		if v.played > max_played then
+			hand_type = k
+			max_played = v.played
+		end
+	end
+	update_hand_text({ sound = "button", volume = 0.7, pitch = 0.8, delay = 0.3 }, {
+		handname = localize(hand_type, "poker_hands"),
+		chips = G.GAME.hands[hand_type].chips,
+		mult = G.GAME.hands[hand_type].mult,
+		level = G.GAME.hands[hand_type].level,
+	})
+	level_up_hand(nil, hand_type, false, -1)
+	update_hand_text(
+		{ sound = "button", volume = 0.7, pitch = 1.1, delay = 0 },
+		{ mult = 0, chips = 0, handname = "", level = "" }
+	)
+end
+
 -- #region Client to Server
 function G.MULTIPLAYER.create_lobby(gamemode)
 	G.LOBBY.config.gamemode = gamemode
@@ -348,6 +370,10 @@ end
 function G.MULTIPLAYER.remove_phantom(key)
 	Client.send("action:removePhantom,key:" .. key)
 end
+
+function G.MULTIPLAYER.asteroid()
+	Client.send("action:asteroid")
+end
 -- #endregion Client to Server
 
 -- Utils
@@ -426,6 +452,8 @@ function Game:update(dt)
 				action_remove_phantom(parsedAction.key)
 			elseif parsedAction.action == "speedrun" then
 				action_speedrun()
+			elseif parsedAction.action == "asteroid" then
+				action_asteroid()
 			elseif parsedAction.action == "error" then
 				action_error(parsedAction.message)
 			elseif parsedAction.action == "keepAlive" then
