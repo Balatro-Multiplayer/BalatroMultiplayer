@@ -1,5 +1,6 @@
 SMODS.Challenge({
 	key = "c_multiplayer_1",
+	name = "MULTIPLAYER",
 	rules = {
 		custom = {},
 		modifiers = {},
