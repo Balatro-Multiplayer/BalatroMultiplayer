@@ -107,3 +107,11 @@ function add_nemesis_info(info_queue)
 		}
 	end
 end
+
+local get_joker_win_sticker_ref = get_joker_win_sticker
+function get_joker_win_sticker(_center, index)
+	if string.find(_center.key, "_mp_") then
+		return "mp"
+	end
+	return get_joker_win_sticker_ref(_center, index)
+end

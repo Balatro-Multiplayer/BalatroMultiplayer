@@ -39,6 +39,8 @@ load_mp_file("Lobby.lua")
 load_mp_file("Networking/Action_Handlers.lua")
 
 load_mp_file("Items/ItemUtils.lua")
+load_mp_file("Items/Edition.lua")
+load_mp_file("Items/Sticker.lua")
 load_mp_file("Items/Blind.lua")
 load_mp_file("Items/Deck.lua")
 load_mp_file("Items/Jokers.lua")
