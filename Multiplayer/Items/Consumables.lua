@@ -16,6 +16,9 @@ SMODS.Consumable({
 		add_nemesis_info(info_queue)
 		return { vars = { 1 } }
 	end,
+	in_pool = function(self)
+		return G.LOBBY.code
+	end,
 	can_use = function(self, card)
 		return true
 	end,

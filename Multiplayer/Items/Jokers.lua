@@ -241,7 +241,7 @@ SMODS.Joker({
 		G.MULTIPLAYER.send_phantom("j_mp_hanging_bad")
 	end,
 	calculate = function(self, card, context)
-		if context.cardarea == G.jokers then
+		if context.cardarea == G.jokers and is_pvp_boss() then
 			if context.before and context.scoring_hand then
 				context.scoring_hand[1]:set_debuff(true)
 			end
