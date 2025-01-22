@@ -250,11 +250,11 @@ end
 
 local function action_asteroid()
 	local hand_type = "High Card"
-	local max_played = 0
+	local max_level = 0
 	for k, v in pairs(G.GAME.hands) do
-		if v.played > max_played then
+		if v.level > max_level then
 			hand_type = k
-			max_played = v.played
+			max_level = v.level
 		end
 	end
 	update_hand_text({ sound = "button", volume = 0.7, pitch = 0.8, delay = 0.3 }, {
