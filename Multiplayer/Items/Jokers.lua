@@ -77,13 +77,13 @@ SMODS.Joker({
 				card.ability.extra.extra_discards,
 				card.ability.h_size,
 				card.ability.d_size,
-				localize({
+				G.GAME.skips ~= nil and G.MULTIPLAYER_GAME.enemy.skips ~= nil and localize({
 					type = "variable",
 					key = G.MULTIPLAYER_GAME.enemy.skips > G.GAME.skips and "mp_skips_behind"
 						or G.MULTIPLAYER_GAME.enemy.skips == G.GAME.skips and "mp_skips_tied"
 						or "mp_skips_ahead",
 					vars = { math.abs(G.MULTIPLAYER_GAME.enemy.skips - G.GAME.skips) },
-				})[1],
+				})[1] or "",
 			},
 		}
 	end,
@@ -91,7 +91,7 @@ SMODS.Joker({
 		return G.LOBBY.code
 	end,
 	update = function(self, card, dt)
-		if G.STAGE == G.STAGES.RUN then
+		if G.STAGE == G.STAGES.RUN and G.GAME.skips ~= nil and G.MULTIPLAYER_GAME.enemy.skips ~= nil then
 			local skip_diff = (math.max(G.GAME.skips - G.MULTIPLAYER_GAME.enemy.skips, 0))
 			card.ability.h_size = skip_diff * card.ability.extra.extra_hands
 			card.ability.d_size = skip_diff * card.ability.extra.extra_discards
