@@ -164,7 +164,7 @@ SMODS.Joker({
 	blueprint_compat = true,
 	eternal_compat = true,
 	perishable_compat = true,
-	config = { extra = { denominator = 4, extra = 0.3, extra_extra = 0.2, x_mult = 1 } },
+	config = { x_mult = 1, extra = { denominator = 4, extra = 0.3, extra_extra = 0.2 } },
 	loc_vars = function(self, info_queue, card)
 		return {
 			vars = {
@@ -172,7 +172,7 @@ SMODS.Joker({
 				card.ability.extra.denominator,
 				card.ability.extra.extra,
 				card.ability.extra.extra_extra,
-				card.ability.extra.x_mult,
+				card.ability.x_mult,
 			},
 		}
 	end,
@@ -186,9 +186,9 @@ SMODS.Joker({
 					message = localize({
 						type = "variable",
 						key = "a_xmult",
-						vars = { card.ability.extra.x_mult },
+						vars = { card.ability.x_mult },
 					}),
-					Xmult_mod = card.ability.extra.x_mult,
+					Xmult_mod = card.ability.x_mult,
 				}
 			end
 			if context.end_of_round and not context.blueprint and not context.repetition and G.GAME.blind.boss then
@@ -208,7 +208,7 @@ SMODS.Joker({
 				new_card:start_materialize()
 				new_card:add_to_deck()
 				G.jokers:emplace(new_card)
-				new_card.ability.extra.x_mult = card.ability.extra.x_mult + card.ability.extra.extra
+				new_card.ability.x_mult = card.ability.x_mult + card.ability.extra.extra
 				new_card.ability.extra.extra = card.ability.extra.extra
 			else
 				G.E_MANAGER:add_event(Event({
