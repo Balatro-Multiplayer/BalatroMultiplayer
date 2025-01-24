@@ -1,4 +1,24 @@
 if SMODS.Mods["Distro"] and SMODS.Mods["Distro"].can_load then
+	G.E_MANAGER:add_event(Event({
+		trigger = "immediate",
+		no_delete = true,
+		blockable = false,
+		blocking = false,
+		timer = "REAL",
+		func = function()
+			if DiscordIPC and DiscordIPC.send_activity then
+				local send_activity_ref = DiscordIPC.send_activity
+				DiscordIPC.send_activity = function(bypass_block)
+					if G.LOBBY.code and not bypass_block then
+						return
+					end
+					send_activity_ref()
+				end
+				return true
+			end
+		end,
+	}))
+
 	function get_multiplayer_details()
 		local enemy_username = G.LOBBY.is_host and G.LOBBY.guest.username or G.LOBBY.host.username
 
@@ -27,49 +47,37 @@ if SMODS.Mods["Distro"] and SMODS.Mods["Distro"].can_load then
 				},
 			}
 
-			DiscordIPC.send_activity()
+			DiscordIPC.send_activity(true)
 		end
 	end
 
 	local update_selecting_hand_ref = Game.update_selecting_hand
 	function Game:update_selecting_hand(dt)
-		local updating = false
 		if not G.STATE_COMPLETE then
-			updating = true
-		end
-
-		update_selecting_hand_ref(self, dt)
-
-		if updating then
-			updating = false
 			if G.LOBBY.code then
 				DiscordIPC.activity.details = get_multiplayer_details()
 				DiscordIPC.activity.state = G.GAME.current_round.hands_left
 					.. " Hands, "
 					.. G.GAME.current_round.discards_left
 					.. " Discards left"
-				DiscordIPC.send_activity()
+				DiscordIPC.send_activity(true)
 			end
 		end
+
+		update_selecting_hand_ref(self, dt)
 	end
 
 	local update_shop_ref = Game.update_shop
 	function Game:update_shop(dt)
-		local updating = false
 		if not G.STATE_COMPLETE then
-			updating = true
-		end
-
-		update_shop_ref(self, dt)
-
-		if updating then
-			updating = false
 			if G.LOBBY.code then
 				DiscordIPC.activity.details = get_multiplayer_details()
 				DiscordIPC.activity.state = "Shopping"
-				DiscordIPC.send_activity()
+				DiscordIPC.send_activity(true)
 			end
 		end
+
+		update_shop_ref(self, dt)
 	end
 
 	local main_menu_ref = Game.main_menu
@@ -95,7 +103,7 @@ if SMODS.Mods["Distro"] and SMODS.Mods["Distro"].can_load then
 					large_image = "default",
 				},
 			}
-			DiscordIPC.send_activity()
+			DiscordIPC.send_activity(true)
 		end
 	end
 end
