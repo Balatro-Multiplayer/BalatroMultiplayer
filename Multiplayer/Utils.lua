@@ -146,6 +146,9 @@ function G.MULTIPLAYER.UTILS.overlay_message(message)
 end
 
 function G.MULTIPLAYER.UTILS.get_joker(key)
+	if not G.jokers then
+		return nil
+	end
 	for i = 1, #G.jokers.cards do
 		if G.jokers.cards[i].ability.name == key then
 			return G.jokers.cards[i]
