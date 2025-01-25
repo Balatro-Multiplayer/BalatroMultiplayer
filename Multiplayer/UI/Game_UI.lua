@@ -2078,7 +2078,13 @@ end
 
 local update_selecting_hand_ref = Game.update_selecting_hand
 function Game:update_selecting_hand(dt)
-	if #G.hand.cards < 1 and #G.deck.cards < 1 and #G.play.cards < 1 and G.LOBBY.code then
+	if
+		G.GAME.current_round.hands_left < G.GAME.round_resets.hands
+		and #G.hand.cards < 1
+		and #G.deck.cards < 1
+		and #G.play.cards < 1
+		and G.LOBBY.code
+	then
 		G.GAME.current_round.hands_left = 0
 		if not is_pvp_boss() then
 			G.STATE_COMPLETE = false
