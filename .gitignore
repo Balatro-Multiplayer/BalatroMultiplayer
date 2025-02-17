@@ -1,7 +1,2 @@
-ref.lua
-node_modules
-.env
-Server/dist
 .vscode
-ref
-Server/releases
+.luarc.json
