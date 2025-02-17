@@ -188,6 +188,13 @@ return {
 			mod_hash_warning = "Players have different mods or mod versions! This can cause problems!",
 			lobby_choose_deck = "DECK",
 			opts_player_diff_deck = "Players have different decks",
+			k_mp_kofi_message = {
+				"This mod and game server is",
+				"developed and maintained by ",
+				"one person, if",
+				"you like it consider",
+			},
+			k_mp_kofi_button = "Supporting me on Ko-fi",
 		},
 		v_dictionary = {
 			mp_art = { "Art: #1#" },

@@ -1255,6 +1255,7 @@ end
 local create_UIBox_game_over_ref = create_UIBox_game_over
 function create_UIBox_game_over()
 	if G.LOBBY.code then
+		G.SETTINGS.paused = false
 		local eased_red = copy_table(G.GAME.round_resets.ante <= G.GAME.win_ante and G.C.RED or G.C.BLUE)
 		eased_red[4] = 0
 		ease_value(eased_red, 4, 0.8, nil, nil, true)
@@ -1340,7 +1341,100 @@ function create_UIBox_game_over()
 													nodes = {
 														create_UIBox_round_scores_row("furthest_ante", G.C.FILTER),
 														create_UIBox_round_scores_row("furthest_round", G.C.FILTER),
-														create_UIBox_round_scores_row("defeated_by"),
+														{
+															n = G.UIT.R,
+															config = { align = "cm", padding = 0.08, minw = 5 },
+															nodes = {
+																{
+																	n = G.UIT.T,
+																	config = {
+																		text = localize("k_mp_kofi_message")[1],
+																		scale = 0.35,
+																		colour = G.C.UI.TEXT_LIGHT,
+																		col = true,
+																	},
+																},
+															},
+														},
+														{
+															n = G.UIT.R,
+															config = { align = "cm", padding = 0.08, minw = 5 },
+															nodes = {
+																{
+																	n = G.UIT.T,
+																	config = {
+																		text = localize("k_mp_kofi_message")[2],
+																		scale = 0.35,
+																		colour = G.C.UI.TEXT_LIGHT,
+																		col = true,
+																	},
+																},
+															},
+														},
+														{
+															n = G.UIT.R,
+															config = { align = "cm", padding = 0.08, minw = 5 },
+															nodes = {
+																{
+																	n = G.UIT.T,
+																	config = {
+																		text = localize("k_mp_kofi_message")[3],
+																		scale = 0.35,
+																		colour = G.C.UI.TEXT_LIGHT,
+																		col = true,
+																	},
+																},
+															},
+														},
+														{
+															n = G.UIT.R,
+															config = { align = "cm", padding = 0.08, minw = 5 },
+															nodes = {
+																{
+																	n = G.UIT.T,
+																	config = {
+																		text = localize("k_mp_kofi_message")[4],
+																		scale = 0.35,
+																		colour = G.C.UI.TEXT_LIGHT,
+																		col = true,
+																	},
+																},
+															},
+														},
+														{
+															n = G.UIT.R,
+															config = {
+																id = "ko-fi_button",
+																align = "cm",
+																padding = 0.1,
+																r = 0.1,
+																hover = true,
+																colour = HEX("72A5F2"),
+																button = "open_kofi",
+																shadow = true,
+															},
+															nodes = {
+																{
+																	n = G.UIT.R,
+																	config = {
+																		align = "cm",
+																		padding = 0,
+																		no_fill = true,
+																		maxw = 4.8,
+																	},
+																	nodes = {
+																		{
+																			n = G.UIT.T,
+																			config = {
+																				text = localize("k_mp_kofi_button"),
+																				scale = 0.35,
+																				colour = G.C.UI.TEXT_LIGHT,
+																			},
+																		},
+																	},
+																},
+															},
+														},
 													},
 												},
 											},
@@ -1458,6 +1552,7 @@ end
 local create_UIBox_win_ref = create_UIBox_win
 function create_UIBox_win()
 	if G.LOBBY.code then
+		G.SETTINGS.paused = false
 		local eased_green = copy_table(G.C.GREEN)
 		eased_green[4] = 0
 		ease_value(eased_green, 4, 0.5, nil, nil, true)
@@ -1539,37 +1634,167 @@ function create_UIBox_win()
 												create_UIBox_round_scores_row("furthest_round", G.C.FILTER),
 												{
 													n = G.UIT.R,
-													config = { align = "cm", minh = 0.4, minw = 0.1 },
-													nodes = {},
-												},
-												UIBox_button({
-													id = "from_game_won",
-													button = "return_to_lobby",
-													label = {
-														G.localization.misc.dictionary["return_to"] or "Return to",
-														G.localization.misc.dictionary["lobby"] or "Lobby",
+													config = { align = "cm", padding = 0.08, minw = 5 },
+													nodes = {
+														{
+															n = G.UIT.T,
+															config = {
+																text = localize("k_mp_kofi_message")[1],
+																scale = 0.35,
+																colour = G.C.UI.TEXT_LIGHT,
+																col = true,
+															},
+														},
 													},
-													minw = 2.5,
-													maxw = 2.5,
-													minh = 1,
-													focus_args = { nav = "wide", snap_to = true },
-												}) or nil,
+												},
 												{
 													n = G.UIT.R,
-													config = { align = "cm", minh = 0.2, minw = 0.1 },
-													nodes = {},
-												} or nil,
-												UIBox_button({
-													button = "lobby_leave",
-													label = {
-														G.localization.misc.dictionary["leave"] or "Leave",
-														G.localization.misc.dictionary["lobby"] or "Lobby",
+													config = { align = "cm", padding = 0.08, minw = 5 },
+													nodes = {
+														{
+															n = G.UIT.T,
+															config = {
+																text = localize("k_mp_kofi_message")[2],
+																scale = 0.35,
+																colour = G.C.UI.TEXT_LIGHT,
+																col = true,
+															},
+														},
 													},
-													minw = 2.5,
-													maxw = 2.5,
-													minh = 1,
-													focus_args = { nav = "wide" },
-												}) or nil,
+												},
+												{
+													n = G.UIT.R,
+													config = { align = "cm", padding = 0.08, minw = 5 },
+													nodes = {
+														{
+															n = G.UIT.T,
+															config = {
+																text = localize("k_mp_kofi_message")[3],
+																scale = 0.35,
+																colour = G.C.UI.TEXT_LIGHT,
+																col = true,
+															},
+														},
+													},
+												},
+												{
+													n = G.UIT.R,
+													config = { align = "cm", padding = 0.08, minw = 5 },
+													nodes = {
+														{
+															n = G.UIT.T,
+															config = {
+																text = localize("k_mp_kofi_message")[4],
+																scale = 0.35,
+																colour = G.C.UI.TEXT_LIGHT,
+																col = true,
+															},
+														},
+													},
+												},
+												{
+													n = G.UIT.R,
+													config = {
+														id = "ko-fi_button",
+														align = "cm",
+														padding = 0.1,
+														r = 0.1,
+														hover = true,
+														colour = HEX("72A5F2"),
+														button = "open_kofi",
+														shadow = true,
+													},
+													nodes = {
+														{
+															n = G.UIT.R,
+															config = {
+																align = "cm",
+																padding = 0,
+																no_fill = true,
+																maxw = 4.8,
+															},
+															nodes = {
+																{
+																	n = G.UIT.T,
+																	config = {
+																		text = localize("k_mp_kofi_button"),
+																		scale = 0.35,
+																		colour = G.C.UI.TEXT_LIGHT,
+																	},
+																},
+															},
+														},
+													},
+												},
+											},
+										},
+									},
+								},
+								{
+									n = G.UIT.R,
+									config = { align = "cm", padding = 0.1 },
+									nodes = {
+										{
+											n = G.UIT.R,
+											config = {
+												id = "from_game_won",
+												align = "cm",
+												minw = 5,
+												padding = 0.1,
+												r = 0.1,
+												hover = true,
+												colour = G.C.RED,
+												button = "return_to_lobby",
+												shadow = true,
+												focus_args = { nav = "wide", snap_to = true },
+											},
+											nodes = {
+												{
+													n = G.UIT.R,
+													config = { align = "cm", padding = 0, no_fill = true, maxw = 4.8 },
+													nodes = {
+														{
+															n = G.UIT.T,
+															config = {
+																text = G.localization.misc.dictionary["return_lobby"]
+																	or "Return to Lobby",
+																scale = 0.5,
+																colour = G.C.UI.TEXT_LIGHT,
+															},
+														},
+													},
+												},
+											},
+										},
+										{
+											n = G.UIT.R,
+											config = {
+												align = "cm",
+												minw = 5,
+												padding = 0.1,
+												r = 0.1,
+												hover = true,
+												colour = G.C.RED,
+												button = "lobby_leave",
+												shadow = true,
+												focus_args = { nav = "wide" },
+											},
+											nodes = {
+												{
+													n = G.UIT.R,
+													config = { align = "cm", padding = 0, no_fill = true, maxw = 4.8 },
+													nodes = {
+														{
+															n = G.UIT.T,
+															config = {
+																text = G.localization.misc.dictionary["leave_lobby"]
+																	or "Leave Lobby",
+																scale = 0.5,
+																colour = G.C.UI.TEXT_LIGHT,
+															},
+														},
+													},
+												},
 											},
 										},
 									},
@@ -1982,4 +2207,8 @@ G.FUNCS.skip_blind = function(e)
 	if G.LOBBY.code then
 		G.MULTIPLAYER.skip(G.GAME.skips)
 	end
+end
+
+function G.FUNCS.open_kofi(e)
+	love.system.openURL("https://ko-fi.com/virtualized")
 end
