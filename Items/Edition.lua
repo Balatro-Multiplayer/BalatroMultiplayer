@@ -42,8 +42,11 @@ SMODS.Joker:take_ownership("abstract", {
 	calculate = function(self, card, context)
 		local x = #G.MULTIPLAYER.UTILS.get_non_phantom_jokers()
 		return {
-			message = localize({ type = "variable", key = "a_mult", vars = { x * self.ability.extra } }),
-			mult_mod = x * self.ability.extra,
+			message = localize({ type = "variable", key = "a_mult", vars = { x * card.ability.extra } }),
+			mult_mod = x * card.ability.extra,
 		}
+	end,
+	in_pool = function(self)
+		return not G.LOBBY.code
 	end,
 }, true)
