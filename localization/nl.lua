@@ -1,22 +1,91 @@
--- Localization by @blablabla_c on discord
+-- Localization by @blablabla_c and @koenveck on discord
 return {
-	Joker = {
-		j_broken = {
-			name = "GEBROKEN",
-			text = {
-				"Deze kaart is gebroken of niet",
-				"geïmplementeerd in de huidige versie",
-				"van een mod die je gebruikt.",
+	descriptions = {
+		Joker = {
+			j_mp_defensive_joker = {
+				name = "Verdedigende Joker",
+				text = {
+					"Deze joker krijgt {C:chips}+#1#{} fiches",
+					"per {C:red,E:1}leven{} die je bent verloren",
+					"{C:inactive}(Momenteel {C:chips}+#2#{C:inactive} fiches)",
+				},
+			},
+			j_mp_skip_off = {
+				name = "Over-Slag",
+				text = {
+					"{C:blue}+#1#{} handen en {C:red}+#2#{} weggooimogelijkheden",
+					"per {C:attention}blind{} die je meer hebt overgeslagen",
+					"dan jouw {X:purple,C:white}Aartsvijand{}",
+					"{C:inactive}(Momenteel {C:blue}+#3#{C:inactive}/{C:red}+#4#{C:inactive})",
+				},
+			},
+			j_mp_lets_go_gambling = {
+				name = "Let's Go Gambling",
+				text = {
+					"Na verkoop, {C:green}#1# in #2#{} kans om",
+					"vernietigd te worden, ontvang anders {X:mult,C:white} +X#3# {}",
+					"{C:inactive}(Verandering vergroot met {X:mult,C:white}+X#4#{C:inactive} na elke {C:attention}blind van een baas{C:inactive})",
+					"{C:inactive}(Momenteel {X:mult,C:white}X#5#{C:inactive} Multi)",
+				},
+			},
+			j_mp_hanging_bad = {
+				name = "Ongeldige Stemming",
+				text = {
+					"Tijdens {X:purple,C:white}Aartsvijand{} {C:attention}blinds{}, de",
+					"{C:attention}eerst{} gescoorde kaart",
+					"{C:attention}verliest zijn buff{} voor beide spelers",
+				},
+			},
+			j_mp_speedrun = {
+				name = "SPEEDRUN",
+				text = {
+					"Als je al je {C:blue}handen{} gebruikt voor",
+					"jouw {X:purple,C:white}Aartsvijand{} tijdens een {C:attention}PvP blind{},",
+					"{C:attention}verdriedubbel{} jouw totale score",
+				},
+			},
+			j_broken = {
+				name = "KAPOT",
+				text = {
+					"Deze kaart is kapot of niet",
+					"geïmplementeerd in de huidige versie",
+					"van een mod die je gebruikt.",
+				},
 			},
 		},
-	},
-	descriptions = {
+		Planet = {
+			c_mp_asteroid = {
+				name = "Asteroïde",
+				text = {
+					"Verwijder #1# level van",
+					"jouw {X:purple,C:white}Aartsvijands{}",
+					"hoogste level",
+					"{C:legendary,E:1}poker hand{}",
+				},
+			},
+		},
 		Blind = {
 			bl_pvp = {
-				name = "Je Nemesis",
+				name = "Je Aartsvijand",
 				text = {
 					"Neem het op tegen een andere speler,",
-					"meeste chips wint",
+					"meeste fiches wint",
+				},
+			},
+			bl_precision = {
+				name = "Precisie",
+				text = {
+					"Neem het op tegen een andere speler,",
+					"degene het dichts bij de doelscore wint",
+				},
+			},
+		},
+		Other = {
+			current_nemesis = {
+				name = "Aartsvijand",
+				text = {
+					"{X:purple,C:white}#1#{}",
+					"Je enige echte Aartsvijand",
 				},
 			},
 		},
@@ -27,27 +96,36 @@ return {
 		},
 		dictionary = {
 			singleplayer = "Singleplayer",
-			join_lobby = "Sluit je aan bij de lobby",
+			join_lobby = "Sluit je aan bij een lobby",
 			return_lobby = "Ga terug naar lobby",
-			reconnect = "Reconnect",
+			reconnect = "Opnieuw verbinding maken",
 			create_lobby = "Creëer Lobby",
 			start_lobby = "Start Lobby",
 			enemy_score = "Huidige score van je vijand",
 			enemy_hands = "Handen van vijand over: ",
 			coming_soon = "Binnenkort Beschikbaar!",
 			ready = "Klaar",
-			unready = "Unready",
-			wait_enemy = "Wacht op vijand om te eindigen...",
+			unready = "Niet meer klaar",
+			wait_enemy = "Wachten tot vijand is geëindigt...",
 			lives = "Levens",
 			leave_lobby = "Verlaat de Lobby",
 			lost_life = "Leven verloren",
 			failed = "Mislukt",
 			defeat_enemy = "Vijand verslagen",
-			total_lives_lost = " Aantal Levens Verloren ($4 elk)",
+			total_lives_lost = " Aantal Levens Verloren ($4 per stuk)",
 			attrition_name = "Standaard",
-			attrition_desc = "Elke boss ronde is een competitie tussen spelers waarbij de speler met de laagste score een level verliest.",
-			draft_name = "Draft",
-			draft_desc = "Beide speleres spelen 3 normale antes, dan spelen ze een ante waarbij elke ronde de speler met de hoogste score wint.",
+			attrition_desc = "Elke boss ronde is een competitie tussen spelers waarbij de speler met de laagste score een leven verliest.",
+			-- New stuff here
+			showdown_name = "Showdown",
+			showdown_desc = "Beide speleres spelen 3 normale antes, dan spelen ze een ante waarbij elke ronde de speler met de hoogste score wint.",
+			draft_name = "Keuzegevecht",
+			draft_desc = "Beide spelers spelen het 'Evolving Deck' uit de Balatro 'Draft' mod, waarin ze allebei een 'Draft Tag' krijgen na elke PvP Blind.",
+			draft_req = "Vereist de Balatro 'Draft' mod",
+			monty_special_name = "De Dr. Monty Special",
+			monty_special_desc = "Een speciale modus ontworpen door @dr_monty_the_snek in de discord server. Je moet zelf maar uitzoeken wat het is! (Modus verandert na elke ~kleine~ update)",
+			precision_name = "Precisie",
+			precision_desc = "Hetzelfde als Standaard, behalve dat de speler met de score zo dicht mogelijk bij de doelscore zit de PvP blinds wint (inplaats van de persoon met de hoogste score).",
+			-- New stuff ends here
 			royale_name = "Battle Royale",
 			royale_desc = "Standaard, behalve dat er maximaal 8 spelers zijn en elke speler 1 leven heeft.",
 			vanilla_plus_name = "Vanilla+",
@@ -78,7 +156,7 @@ return {
 			leave = "VERLAAT",
 			opts_only_host = "Enkel de Lobby Host kan deze opties veranderen",
 			opts_cb_money = "Geef comeback $ bij levensverlies.",
-			opts_no_gold_on_loss = "Krijg geen blind beloning op verlies van ronde",
+			opts_no_gold_on_loss = "Krijg geen blind beloning na verlies van ronde",
 			opts_death_on_loss = "Verlies een leven op non-PvP ronde verlies",
 			opts_start_antes = "Beginnende Antes",
 			opts_diff_seeds = "Spelers hebben verschillende seeds",
@@ -100,6 +178,9 @@ return {
 			set_custom_seed = "Stel Aangepaste Seed In",
 			reset = "Reset",
 			mod_hash_warning = "Spelers hebben verschillende mods of mod versies! Dit kan problemen veroorzaken! Players have different mods or mod versions! This can cause problems!",
+			-- New stuff here
+			lobby_choose_deck = "KAARTSPEL",
+			opts_player_diff_deck = "Spelers hebben verschillende kaartspellen",
 		},
 	},
 }

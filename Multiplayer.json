@@ -12,7 +12,7 @@
 	"version": "0.1.8.2",
 	"dependencies": [
     "Steamodded (>>1.0.0~ALPHA-1304a)",
-    "Lovely (>=0.6)",
+    "Lovely (>=0.7)",
     "Balatro (>=1.0.1n)"
   ],
 	"conflicts": [

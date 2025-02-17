@@ -17,7 +17,7 @@ SMODS.Consumable({
 		return { vars = { 1 } }
 	end,
 	in_pool = function(self)
-		return G.LOBBY.code
+		return G.LOBBY.code and G.LOBBY.config.multiplayer_jokers
 	end,
 	can_use = function(self, card)
 		return true

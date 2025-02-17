@@ -2,6 +2,48 @@
 return {
 	descriptions = {
 		Joker = {
+			j_mp_defensive_joker = {
+				name = "Defensive Joker",
+				text = {
+					"This Joker gains {C:chips}+#1#{} Chips",
+					"per {C:red,E:1}life{} lost this run",
+					"{C:inactive}(Currently {C:chips}+#2#{C:inactive} Chips)",
+				},
+			},
+			j_mp_skip_off = {
+				name = "Skip-Off",
+				text = {
+					"{C:blue}+#1#{} Hände und {C:red}+#2#{} Abwürfe",
+					"pro zusätzliche {C:attention}Blind{} die übersprungen wurde",
+					"im vergleich zu deinen {X:purple,C:white}Erzfeind{}",
+					"{C:inactive}(Zurzeit {C:blue}+#3#{C:inactive}/{C:red}+#4#{C:inactive})",
+				},
+			},
+			j_mp_lets_go_gambling = {
+				name = "Lets Go Gambling",
+				text = {
+					"Wenn verkauft, {C:green}#1# in #2#{} chance zu",
+					"verschwinden,  {X:mult,C:white} +X#3# {}",
+					"{C:inactive}(Skalierung erhöht sich um {X:mult,C:white}+X#4#{C:inactive} nach jeder {C:attention}Boss Blind{C:inactive})",
+					"{C:inactive}(Zurzeit {X:mult,C:white}X#5#{C:inaktive} Mult)",
+				},
+			},
+			j_mp_hanging_bad = {
+				name = "Hanging Bad",
+				text = {
+					"Während {X:purple,C:white}Erzfeind{} {C:attention}Blinds{} ist die",
+					"{C:attention}erste{} gespielte karte während der punktezählung",
+					" {C:attention}	Geschwächt{} fϋr beide spieler",
+				},
+			},
+			j_mp_speedrun = {
+				name = "SPEEDRUN",
+				text = {
+					"When du alle deine {C:blue}Hānde{} vor",
+					"deinem {X:purple,C:white}Gegner{} benutzt in einem {C:attention}PvP Blind{},",
+					"{C:attention}verdreifache{} deine gesamte Punktzahl",
+				},
+			},
 			j_broken = {
 				name = "Defekt",
 				text = {
@@ -11,12 +53,39 @@ return {
 				},
 			},
 		},
+		Planet = {
+			c_mp_asteroid = {
+				name = "Asteroid",
+				text = {
+					"Entferne #1# level Von",
+					"Dein {X:purple,C:white}Gegners'{}",
+					"Höchste verbesserte",
+					"{C:legendary,E:1}Poker Hand{}",
+				},
+			},
+		},
 		Blind = {
 			bl_pvp = {
 				name = "Dein Erzfeind",
 				text = {
 					"Spiel gegen dein Erzfeind,",
 					"Höste Punktzahl gewinnt",
+				},
+			},
+			bl_precision = {
+				name = "Präzision",
+				text = {
+					"Spiel gegen ein spieler,",
+					"Spieler am nähesten zu der ziel punktzahl gewinnt",
+				},
+			},
+		},
+		Other = {
+			current_nemesis = {
+				name = "Erzfeind",
+				text = {
+					"{X:purple,C:white}#1#{}",
+					"Dein größter und einziger Erzfein",
 				},
 			},
 		},
@@ -46,8 +115,17 @@ return {
 			total_lives_lost = "Gesamtzahl an verloren Leben ($4 Pro Leben)",
 			attrition_name = "Standard",
 			attrition_desc = "Jeder Boss Blind is ein kampf gegen deine Gegner. Wer die niedrigste Punktzahl hat verliert ein Leben",
+			-- New stuff here
+			showdown_name = "Showdown",
+			showdown_desc = "Beide spieler spielen 3 Antes, dann spielen sie eine Ante wo jede Runde der Spieler mit der hösten Punktzahl gewinnt.",
 			draft_name = "Draft",
-			draft_desc = "Beide spieler spielen 3 Antes, dann spielen sie eine Ante wo jede Runde der Spieler mit der hösten Punktzahl gewinnt.",
+			draft_desc = "Spieler spielen das Evolving Deck von der Balatro Draft mod, wo sie beide einen Draft tag bekommen nach jeden Pvp Blind.",
+			draft_req = "Benötigt die Balatro Draft Mod",
+			monty_special_name = "Das Dr. Monty Special",
+			monty_special_desc = "Ein spielmodus erstellt bei @dr_monty_the_snek von dem discord server. Scheinbar musst du selber rausfinden was es ist! (Spielmodus ändert sich mit jeden kleinen update)",
+			precision_name = "Präzision",
+			precision_desc = "Das selbe wie Standard, aber die person die am nähesten an der ziel punktzahl ist gewinnt denn Pvp Blind (statt der person mit der höchsten punkzahl).",
+			-- New stuff ends here
 			royale_name = "Battle Royale",
 			royale_desc = "Standard, aber ihr seid bis zu 8 Spieler und jeder hat nur 1 Leben.",
 			vanilla_plus_name = "Vanilla+",
@@ -98,11 +176,9 @@ return {
 			reset = "Neustart",
 			set_custom_seed = "Setzt eigenen Seed fest",
 			mod_hash_warning = "Spieler haben andere Mods oder unterschidliche Mod versionen! Dies kann probleme verursachen!",
-		},
-		v_dictionary = {
-			mp_art = { "Bild: #1#" },
-			mp_code = { "Code: #1#" },
-			mp_idea = { "Idee: #1#" },
+			-- New stuff here
+			lobby_choose_deck = "DECK",
+			opts_player_diff_deck = "Spieler haben andere decks ",
 		},
 	},
 }

@@ -20,7 +20,7 @@ SMODS.Joker({
 		return { vars = { card.ability.extra.extra, card.ability.t_chips } }
 	end,
 	in_pool = function(self)
-		return G.LOBBY.code
+		return G.LOBBY.code and G.LOBBY.config.multiplayer_jokers
 	end,
 	update = function(self, card, dt)
 		if G.LOBBY.code then
@@ -88,7 +88,7 @@ SMODS.Joker({
 		}
 	end,
 	in_pool = function(self)
-		return G.LOBBY.code
+		return G.LOBBY.code and G.LOBBY.config.multiplayer_jokers
 	end,
 	update = function(self, card, dt)
 		if G.STAGE == G.STAGES.RUN and G.GAME.skips ~= nil and G.MULTIPLAYER_GAME.enemy.skips ~= nil then
@@ -145,7 +145,7 @@ SMODS.Joker({
 		}
 	end,
 	in_pool = function(self)
-		return G.LOBBY.code
+		return G.LOBBY.code and G.LOBBY.config.multiplayer_jokers
 	end,
 	calculate = function(self, card, context)
 		if context.cardarea == G.jokers then
@@ -257,7 +257,7 @@ SMODS.Joker({
 		G.MULTIPLAYER.remove_phantom("j_mp_hanging_bad")
 	end,
 	in_pool = function(self)
-		return G.LOBBY.code
+		return G.LOBBY.code and G.LOBBY.config.multiplayer_jokers
 	end,
 	mp_credits = {
 		idea = { "Dr. Monty", "Carter" },
@@ -288,7 +288,7 @@ SMODS.Joker({
 		return { vars = {} }
 	end,
 	in_pool = function(self)
-		return G.LOBBY.code
+		return G.LOBBY.code and G.LOBBY.config.multiplayer_jokers
 	end,
 	mp_credits = {
 		idea = { "Dr. Monty", "Carter" },

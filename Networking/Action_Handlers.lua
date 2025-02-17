@@ -42,6 +42,10 @@ local function action_lobbyInfo(host, hostHash, guest, guestHash, is_host)
 	-- once we enable more than 2 players
 	G.LOBBY.ready_to_start = G.LOBBY.is_host and guest ~= nil
 
+	if G.LOBBY.is_host then
+		G.MULTIPLAYER.lobby_options()
+	end
+
 	if G.STAGE == G.STAGES.MAIN_MENU then
 		G.MULTIPLAYER.update_player_usernames()
 	end
@@ -183,8 +187,8 @@ local function action_lobby_options(options)
 	end
 	if different_decks_before ~= G.LOBBY.config.different_decks then
 		G.FUNCS.exit_overlay_menu() -- throw out guest from any menu.
-		G.MULTIPLAYER.update_player_usernames() -- render new DECK button state
 	end
+	G.MULTIPLAYER.update_player_usernames() -- render new DECK button state
 end
 
 local function action_send_phantom(key)
@@ -252,7 +256,7 @@ local function action_asteroid()
 	local hand_type = "High Card"
 	local max_level = 0
 	for k, v in pairs(G.GAME.hands) do
-		if v.level > max_level then
+		if to_big(v.level) > to_big(max_level) then
 			hand_type = k
 			max_level = v.level
 		end
@@ -305,9 +309,12 @@ function G.MULTIPLAYER.stop_game()
 	Client.send("action:stopGame")
 end
 
-function G.MULTIPLAYER.fail_round()
+function G.MULTIPLAYER.fail_round(hands_used)
 	if G.LOBBY.config.no_gold_on_round_loss then
 		G.GAME.blind.dollars = 0
+	end
+	if hands_used == 0 then
+		return
 	end
 	Client.send("action:failRound")
 end

@@ -201,7 +201,16 @@ function G.UIDEF.create_UIBox_lobby_menu()
 										minw = 2.15,
 										minh = 1.35,
 										label = {
-											G.localization.misc.dictionary["lobby_choose_deck"] or "DECK",
+											G.LOBBY.config.back,
+											localize({
+												type = "name_text",
+												key = SMODS.stake_from_index(
+													type(G.LOBBY.config.stake) == "string"
+															and tonumber(G.LOBBY.config.stake)
+														or G.LOBBY.config.stake
+												),
+												set = "Stake",
+											}),
 										},
 										scale = text_scale * 1.2,
 										col = true,
@@ -214,7 +223,16 @@ function G.UIDEF.create_UIBox_lobby_menu()
 										minw = 2.15,
 										minh = 1.35,
 										label = {
-											G.localization.misc.dictionary["lobby_choose_deck"] or "DECK",
+											G.LOBBY.config.back,
+											localize({
+												type = "name_text",
+												key = SMODS.stake_from_index(
+													type(G.LOBBY.config.stake) == "string"
+															and tonumber(G.LOBBY.config.stake)
+														or G.LOBBY.config.stake
+												),
+												set = "Stake",
+											}),
 										},
 										scale = text_scale * 1.2,
 										col = true,
@@ -509,6 +527,25 @@ function G.UIDEF.create_UIBox_lobby_options()
 															or "Players have different decks",
 														ref_table = G.LOBBY.config,
 														ref_value = "different_decks",
+														callback = send_lobby_options,
+													}),
+												},
+											},
+											{
+												n = G.UIT.R,
+												config = {
+													padding = 0,
+													align = "cr",
+												},
+												nodes = {
+													Disableable_Toggle({
+														id = "multiplayer_jokers_toggle",
+														enabled_ref_table = G.LOBBY,
+														enabled_ref_value = "is_host",
+														label = G.localization.misc.dictionary["opts_multiplayer_jokers"]
+															or "Enable Multiplayer Jokers",
+														ref_table = G.LOBBY.config,
+														ref_value = "multiplayer_jokers",
 														callback = send_lobby_options,
 													}),
 												},

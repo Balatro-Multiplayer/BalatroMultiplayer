@@ -169,6 +169,7 @@ return {
 			opts_diff_seeds = "Players have different seeds",
 			opts_lives = "Lives",
 			opts_gm = "Gamemode Modifiers",
+			opts_multiplayer_jokers = "Enable Multiplayer Cards",
 			bl_or = "or",
 			bl_life = "Life",
 			bl_death = "Death",
