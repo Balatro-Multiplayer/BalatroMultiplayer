@@ -1,5 +1,32 @@
 MULTIPLAYER_VERSION = SMODS.Mods["VirtualizedMultiplayer"].version .. "-MULTIPLAYER"
 
+function nope_a_joker(card)
+	attention_text({
+		text = localize("k_nope_ex"),
+		scale = 0.8,
+		hold = 0.8,
+		major = card,
+		backdrop_colour = G.C.SECONDARY_SET.Tarot,
+		align = (G.STATE == G.STATES.TAROT_PACK or G.STATE == G.STATES.SPECTRAL_PACK) and "tm" or "cm",
+		offset = {
+			x = 0,
+			y = (G.STATE == G.STATES.TAROT_PACK or G.STATE == G.STATES.SPECTRAL_PACK) and -0.2 or 0,
+		},
+		silent = true,
+	})
+	G.E_MANAGER:add_event(Event({
+		trigger = "after",
+		delay = 0.06 * G.SETTINGS.GAMESPEED,
+		blockable = false,
+		blocking = false,
+		func = function()
+			play_sound("tarot2", 0.76, 0.4)
+			return true
+		end,
+	}))
+	play_sound("tarot2", 1, 0.4)
+end
+
 function wheel_of_fortune_the_card(card)
 	math.randomseed(os.time())
 	local chance = math.random(4)
@@ -8,30 +35,7 @@ function wheel_of_fortune_the_card(card)
 		card:set_edition(edition, true)
 		card:juice_up(0.3, 0.5)
 	else
-		attention_text({
-			text = localize("k_nope_ex"),
-			scale = 0.8,
-			hold = 0.8,
-			major = card,
-			backdrop_colour = G.C.SECONDARY_SET.Tarot,
-			align = (G.STATE == G.STATES.TAROT_PACK or G.STATE == G.STATES.SPECTRAL_PACK) and "tm" or "cm",
-			offset = {
-				x = 0,
-				y = (G.STATE == G.STATES.TAROT_PACK or G.STATE == G.STATES.SPECTRAL_PACK) and -0.2 or 0,
-			},
-			silent = true,
-		})
-		G.E_MANAGER:add_event(Event({
-			trigger = "after",
-			delay = 0.06 * G.SETTINGS.GAMESPEED,
-			blockable = false,
-			blocking = false,
-			func = function()
-				play_sound("tarot2", 0.76, 0.4)
-				return true
-			end,
-		}))
-		play_sound("tarot2", 1, 0.4)
+		nope_a_joker(card)
 		card:juice_up(0.3, 0.5)
 	end
 end
@@ -229,7 +233,7 @@ function G.UIDEF.create_UIBox_create_lobby_button()
 									end,
 								},
 								{
-									label = G.localization.misc.dictionary["draft_name"] or "Draft",
+									label = G.localization.misc.dictionary["showdown_name"] or "Showdown",
 									tab_definition_function = function()
 										return {
 											n = G.UIT.ROOT,
@@ -253,7 +257,7 @@ function G.UIDEF.create_UIBox_create_lobby_button()
 													},
 													nodes = {
 														UIBox_button({
-															id = "start_draft",
+															id = "start_showdown",
 															label = {
 																G.localization.misc.dictionary["start_lobby"]
 																	or "Start Lobby",
@@ -277,7 +281,7 @@ function G.UIDEF.create_UIBox_create_lobby_button()
 															n = G.UIT.T,
 															config = {
 																text = G.MULTIPLAYER.UTILS.wrapText(
-																	G.localization.misc.dictionary["draft_desc"]
+																	G.localization.misc.dictionary["showdown_desc"]
 																		or "Both players play 3 normal antes, then they play an ante where every round the player with the higher scorer wins.",
 																	50
 																),
@@ -539,7 +543,7 @@ end
 
 function G.FUNCS.start_lobby(e)
 	G.SETTINGS.paused = false
-	G.MULTIPLAYER.create_lobby(e.config.id == "start_attrition" and "attrition" or "draft")
+	G.MULTIPLAYER.create_lobby(e.config.id == "start_attrition" and "attrition" or "showdown")
 end
 
 -- Modify play button to take you to mode select first

@@ -9,10 +9,20 @@ G.LOBBY = {
 		no_gold_on_round_loss = false,
 		death_on_round_loss = true,
 		different_seeds = false,
-		starting_lives = 4,
-		draft_starting_antes = 3,
+		starting_lives = 5,
+		showdown_starting_antes = 3,
 		gamemode = "attrition",
 		custom_seed = "random",
+		different_decks = false,
+		back = "Red Deck",
+		sleeve = "sleeve_casl_none",
+		stake = 1,
+		multiplayer_jokers = true,
+	},
+	deck = {
+		back = "Red Deck",
+		sleeve = "sleeve_casl_none",
+		stake = 1,
 	},
 	username = G.MULTIPLAYER.UTILS.get_username(),
 	host = {},
@@ -35,6 +45,7 @@ G.MULTIPLAYER_GAME = {
 		score_text = "0",
 		hands = 4,
 		location = "Selecting a Blind",
+		skips = 0,
 	},
 	location = "loc_selecting",
 	next_blind_context = nil,
@@ -60,6 +71,7 @@ function reset_game_states()
 			score_text = "0",
 			hands = 4,
 			location = "Selecting a Blind",
+			skips = 0,
 		},
 		location = "loc_selecting",
 		next_blind_context = nil,
@@ -70,8 +82,8 @@ function reset_game_states()
 end
 
 function reset_gamemode_modifiers()
-	G.LOBBY.config.starting_lives = G.LOBBY.type == "draft" and 2 or 4
-	G.LOBBY.config.draft_starting_antes = 3
+	G.LOBBY.config.starting_lives = G.LOBBY.type == "showdown" and 2 or 5
+	G.LOBBY.config.showdown_starting_antes = 3
 end
 
 PREV_ACHIEVEMENT_VALUE = true

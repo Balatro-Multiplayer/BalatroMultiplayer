@@ -99,5 +99,10 @@ return {
 			reset = "Resetear",
 			mod_hash_warning = "¡Los jugadores tienen diferentes mods o diferentes versiones de mods! ¡Esto puede causar problemas!",
 		},
+		v_dictionary = {
+			mp_art = { "Arte: #1#" },
+			mp_code = { "Código: #1#" },
+			mp_idea = { "Idea: #1#" },
+		},
 	},
 }

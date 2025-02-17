@@ -1,12 +1,65 @@
 return {
 	descriptions = {
 		Joker = {
+			j_mp_defensive_joker = {
+				name = "Defensive Joker",
+				text = {
+					"This Joker gains {C:chips}+#1#{} Chips",
+					"per {C:red,E:1}life{} lost this run",
+					"{C:inactive}(Currently {C:chips}+#2#{C:inactive} Chips)",
+				},
+			},
+			j_mp_skip_off = {
+				name = "Skip-Off",
+				text = {
+					"{C:blue}+#1#{} Hands and {C:red}+#2#{} Discards",
+					"per additional {C:attention}Blind{} skipped",
+					"compared to your {X:purple,C:white}Nemesis{}",
+					"{C:inactive}(Currently {C:blue}+#3#{C:inactive}/{C:red}+#4#{C:inactive}, #5#)",
+				},
+			},
+			j_mp_lets_go_gambling = {
+				name = "Let's Go Gambling",
+				text = {
+					"{C:green}#1# in #2#{} chance to be destroyed",
+					"when sold, otherwise gain {X:mult,C:white} +X#3# {}",
+					"{C:inactive}(Scaling increases by {X:mult,C:white}+X#4#{C:inactive} after each {C:attention}Boss Blind{C:inactive})",
+					"{C:inactive}(Currently {X:mult,C:white}X#5#{C:inactive} Mult)",
+				},
+			},
+			j_mp_hanging_bad = {
+				name = "Hanging Bad",
+				text = {
+					"During {X:purple,C:white}Nemesis{} {C:attention}Blinds{} the",
+					"{C:attention}first{} played card used in scoring",
+					"is {C:attention}debuffed{} for both players",
+				},
+			},
+			j_mp_speedrun = {
+				name = "SPEEDRUN",
+				text = {
+					"{C:attention}Triple{} your total score",
+					"when you spend all your {C:blue}Hands{} before",
+					"your {X:purple,C:white}Nemesis{} on a {C:attention}PvP Blind{}",
+				},
+			},
 			j_broken = {
 				name = "BROKEN",
 				text = {
 					"This card is either broken or",
 					"not implemented in the current",
 					"version of a mod you are using.",
+				},
+			},
+		},
+		Planet = {
+			c_mp_asteroid = {
+				name = "Asteroid",
+				text = {
+					"Remove #1# level from",
+					"your {X:purple,C:white}Nemesis'{}",
+					"highest level",
+					"{C:legendary,E:1}poker hand{}",
 				},
 			},
 		},
@@ -18,9 +71,37 @@ return {
 					"most chips wins",
 				},
 			},
+			bl_precision = {
+				name = "Precision",
+				text = {
+					"Face another player,",
+					"closest to the target score wins",
+				},
+			},
+		},
+		Edition = {
+			e_mp_phantom = {
+				name = "Phantom",
+				text = {
+					"{C:attention}Eternal{} and {C:dark_edition}Negative{}",
+					"Created and destroyed by your {X:purple,C:white}Nemesis{}",
+				},
+			},
+		},
+		Other = {
+			current_nemesis = {
+				name = "Nemesis",
+				text = {
+					"{X:purple,C:white}#1#{}",
+					"Your one and only Nemesis",
+				},
+			},
 		},
 	},
 	misc = {
+		labels = {
+			mp_phantom = "Phantom",
+		},
 		challenge_names = {
 			c_multiplayer_1 = "Multiplayer",
 		},
@@ -45,8 +126,15 @@ return {
 			total_lives_lost = " Total Lives Lost ($4 each)",
 			attrition_name = "Attrition",
 			attrition_desc = "Every boss round is a competition between players where the player with the lower score loses a life.",
+			showdown_name = "Showdown",
+			showdown_desc = "Both players play 3 normal antes, then they play an ante where every round the player with the higher scorer wins.",
 			draft_name = "Draft",
-			draft_desc = "Both players play 3 normal antes, then they play an ante where every round the player with the higher scorer wins.",
+			draft_desc = "Players play the Evolving Deck from the Balatro Draft mod, where they each gain a Draft Tag after every PvP Blind.",
+			draft_req = "Requires the Balatro Draft mod",
+			monty_special_name = "The Dr. Monty Special",
+			monty_special_desc = "A special gamemode designed by @dr_monty_the_snek on the discord server. I guess you'll have to find out what it is! (Gamemode changes with each minor update)",
+			precision_name = "Precision",
+			precision_desc = "The same as Attrition, except the person closest to the target score wins PvP blinds (instead of the person with the highest score).",
 			royale_name = "Battle Royale",
 			royale_desc = "Attrition, except there are up to 8 players and every player only has 1 life.",
 			vanilla_plus_name = "Vanilla+",
@@ -81,6 +169,7 @@ return {
 			opts_diff_seeds = "Players have different seeds",
 			opts_lives = "Lives",
 			opts_gm = "Gamemode Modifiers",
+			opts_multiplayer_jokers = "Enable Multiplayer Cards",
 			bl_or = "or",
 			bl_life = "Life",
 			bl_death = "Death",
@@ -97,6 +186,24 @@ return {
 			reset = "Reset",
 			set_custom_seed = "Set Custom Seed",
 			mod_hash_warning = "Players have different mods or mod versions! This can cause problems!",
+			lobby_choose_deck = "DECK",
+			opts_player_diff_deck = "Players have different decks",
+			k_mp_kofi_message = {
+				"This mod and game server is",
+				"developed and maintained by ",
+				"one person, if",
+				"you like it consider",
+			},
+			k_mp_kofi_button = "Supporting me on Ko-fi",
+		},
+		v_dictionary = {
+			mp_art = { "Art: #1#" },
+			mp_code = { "Code: #1#" },
+			mp_idea = { "Idea: #1#" },
+			mp_skips_ahead = { "#1# Skips Ahead" },
+			mp_skips_behind = { "#1# Skips Behind" },
+			mp_skips_tied = { "Tied" },
+			a_xmult_plus = "+X#1# Mult",
 		},
 	},
 }

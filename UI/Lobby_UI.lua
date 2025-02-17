@@ -194,6 +194,59 @@ function G.UIDEF.create_UIBox_lobby_menu()
 										},
 										nodes = {},
 									},
+									G.LOBBY.is_host and Disableable_Button({
+										id = "lobby_choose_deck",
+										button = "lobby_choose_deck",
+										colour = G.C.PURPLE,
+										minw = 2.15,
+										minh = 1.35,
+										label = {
+											G.LOBBY.config.back,
+											localize({
+												type = "name_text",
+												key = SMODS.stake_from_index(
+													type(G.LOBBY.config.stake) == "string"
+															and tonumber(G.LOBBY.config.stake)
+														or G.LOBBY.config.stake
+												),
+												set = "Stake",
+											}),
+										},
+										scale = text_scale * 1.2,
+										col = true,
+										enabled_ref_table = G.LOBBY,
+										enabled_ref_value = "is_host",
+									}) or Disableable_Button({
+										id = "lobby_choose_deck",
+										button = "lobby_choose_deck",
+										colour = G.C.PURPLE,
+										minw = 2.15,
+										minh = 1.35,
+										label = {
+											G.LOBBY.config.back,
+											localize({
+												type = "name_text",
+												key = SMODS.stake_from_index(
+													type(G.LOBBY.config.stake) == "string"
+															and tonumber(G.LOBBY.config.stake)
+														or G.LOBBY.config.stake
+												),
+												set = "Stake",
+											}),
+										},
+										scale = text_scale * 1.2,
+										col = true,
+										enabled_ref_table = G.LOBBY.config,
+										enabled_ref_value = "different_decks",
+									}),
+									{
+										n = G.UIT.C,
+										config = {
+											align = "cm",
+											minw = 0.2,
+										},
+										nodes = {},
+									},
 									{
 										n = G.UIT.C,
 										config = {
@@ -459,6 +512,44 @@ function G.UIDEF.create_UIBox_lobby_options()
 													}),
 												},
 											},
+											{
+												n = G.UIT.R,
+												config = {
+													padding = 0,
+													align = "cr",
+												},
+												nodes = {
+													Disableable_Toggle({
+														id = "different_decks_toggle",
+														enabled_ref_table = G.LOBBY,
+														enabled_ref_value = "is_host",
+														label = G.localization.misc.dictionary["opts_player_diff_deck"]
+															or "Players have different decks",
+														ref_table = G.LOBBY.config,
+														ref_value = "different_decks",
+														callback = send_lobby_options,
+													}),
+												},
+											},
+											{
+												n = G.UIT.R,
+												config = {
+													padding = 0,
+													align = "cr",
+												},
+												nodes = {
+													Disableable_Toggle({
+														id = "multiplayer_jokers_toggle",
+														enabled_ref_table = G.LOBBY,
+														enabled_ref_value = "is_host",
+														label = G.localization.misc.dictionary["opts_multiplayer_jokers"]
+															or "Enable Multiplayer Jokers",
+														ref_table = G.LOBBY.config,
+														ref_value = "multiplayer_jokers",
+														callback = send_lobby_options,
+													}),
+												},
+											},
 											not G.LOBBY.config.different_seeds
 													and {
 														n = G.UIT.R,
@@ -618,16 +709,16 @@ function G.UIDEF.create_UIBox_lobby_options()
 														current_option = G.LOBBY.config.starting_lives,
 														opt_callback = "change_starting_lives",
 													}),
-													G.LOBBY.type == "draft"
+													G.LOBBY.type == "showdown"
 															and Disableable_Option_Cycle({
-																id = "draft_starting_antes_option",
+																id = "showdown_starting_antes_option",
 																enabled_ref_table = G.LOBBY,
 																enabled_ref_value = "is_host",
 																label = G.localization.misc.dictionary["opts_start_antes"]
 																	or "Starting Antes",
 																options = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12 },
-																current_option = G.LOBBY.config.draft_starting_antes,
-																opt_callback = "change_draft_starting_antes",
+																current_option = G.LOBBY.config.showdown_starting_antes,
+																opt_callback = "change_showdown_starting_antes",
 															})
 														or nil,
 												},
@@ -765,8 +856,8 @@ G.FUNCS.change_starting_lives = function(args)
 	send_lobby_options()
 end
 
-G.FUNCS.change_draft_starting_antes = function(args)
-	G.LOBBY.config.draft_starting_antes = args.to_val
+G.FUNCS.change_showdown_starting_antes = function(args)
+	G.LOBBY.config.showdown_starting_antes = args.to_val
 	send_lobby_options()
 end
 
@@ -787,11 +878,24 @@ end
 
 ---@type fun(e: table | nil, args: { deck: string, stake: number | nil, seed: string | nil })
 function G.FUNCS.lobby_start_run(e, args)
+	if G.LOBBY.config.different_decks == false then
+		G.FUNCS.copy_host_deck()
+	end
+
+	local challenge = G.CHALLENGES[get_challenge_int_from_id("c_multiplayer_1")]
+
 	G.FUNCS.start_run(e, {
-		stake = 1,
+		mp_start = true,
+		challenge = challenge,
+		stake = tonumber(G.LOBBY.deck.stake),
 		seed = args.seed,
-		challenge = G.CHALLENGES[get_challenge_int_from_id("c_multiplayer_1")],
 	})
+end
+
+function G.FUNCS.copy_host_deck()
+	G.LOBBY.deck.back = G.LOBBY.config.back
+	G.LOBBY.deck.sleeve = G.LOBBY.config.sleeve
+	G.LOBBY.deck.stake = G.LOBBY.config.stake
 end
 
 function G.FUNCS.lobby_start_game(e)
@@ -814,6 +918,50 @@ function G.FUNCS.lobby_leave(e)
 	G.LOBBY.code = nil
 	G.MULTIPLAYER.leave_lobby()
 	G.MULTIPLAYER.update_connection_status()
+end
+
+function G.FUNCS.lobby_choose_deck(e)
+	G.FUNCS.setup_run(e)
+	if G.OVERLAY_MENU then
+		G.OVERLAY_MENU:get_UIE_by_ID("run_setup_seed"):remove()
+	end
+end
+
+local start_run_ref = G.FUNCS.start_run
+G.FUNCS.start_run = function(e, args)
+	if G.LOBBY.code then
+		if not args.mp_start then
+			G.FUNCS.exit_overlay_menu()
+			local chosen_stake = args.stake
+			if G.MULTIPLAYER.MAX_STAKE > 0 and chosen_stake > G.MULTIPLAYER.MAX_STAKE then
+				G.MULTIPLAYER.UTILS.overlay_message(
+					"Selected stake is incompatible with Multiplayer, stake set to "
+						.. SMODS.stake_from_index(G.MULTIPLAYER.MAX_STAKE)
+				)
+				chosen_stake = G.MULTIPLAYER.MAX_STAKE
+			end
+			if G.LOBBY.is_host then
+				G.LOBBY.config.back = (args.deck and args.deck.name) or G.GAME.viewed_back.name
+				G.LOBBY.config.stake = chosen_stake
+				G.LOBBY.config.sleeve = G.viewed_sleeve
+				send_lobby_options()
+			end
+			G.LOBBY.deck.back = (args.deck and args.deck.name) or G.GAME.viewed_back.name
+			G.LOBBY.deck.stake = chosen_stake
+			G.LOBBY.deck.sleeve = G.viewed_sleeve
+		else
+			local back = args.challenge
+			back.deck.type = G.LOBBY.deck.back
+			back.sleeve = G.LOBBY.deck.sleeve
+			start_run_ref(e, {
+				challenge = back,
+				stake = tonumber(G.LOBBY.deck.stake),
+				seed = args.seed,
+			})
+		end
+	else
+		start_run_ref(e, args)
+	end
 end
 
 function G.FUNCS.display_lobby_main_menu_UI(e)

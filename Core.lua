@@ -32,12 +32,20 @@ load_mp_file("Compatibility/Cryptid.lua")
 load_mp_file("Compatibility/Pokermon.lua")
 load_mp_file("Compatibility/Ortalab.lua")
 load_mp_file("Compatibility/Jen.lua")
+load_mp_file("Compatibility/Draft.lua")
+load_mp_file("Compatibility/JokerDisplay.lua")
+load_mp_file("Compatibility/Distro.lua")
 
 load_mp_file("Lobby.lua")
 load_mp_file("Networking/Action_Handlers.lua")
 
+load_mp_file("Items/ItemUtils.lua")
+load_mp_file("Items/Edition.lua")
+load_mp_file("Items/Sticker.lua")
 load_mp_file("Items/Blind.lua")
 load_mp_file("Items/Deck.lua")
+load_mp_file("Items/Jokers.lua")
+load_mp_file("Items/Consumables.lua")
 
 G.MULTIPLAYER.COMPONENTS = {}
 load_mp_file("Components/Disableable_Button.lua")
@@ -58,14 +66,6 @@ NETWORKING_THREAD:start(
 	SMODS.Mods["VirtualizedMultiplayer"].config.server_port
 )
 G.MULTIPLAYER.connect()
-
-local buildAdditionsTab_ref = buildAdditionsTab
-function buildAdditionsTab(mod)
-	if mod.id == "VirtualizedMultiplayer" then
-		return nil
-	end
-	return buildAdditionsTab_ref(mod)
-end
 
 SMODS.Mods.VirtualizedMultiplayer.credits_tab = function()
 	return {
@@ -191,3 +191,5 @@ end
 function G.FUNCS.multiplayer_discord(e)
 	love.system.openURL("https://discord.gg/gEemz4ptuF")
 end
+
+G.C.MULITPLAYER = HEX("AC3232")

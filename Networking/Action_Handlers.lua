@@ -32,9 +32,6 @@ end
 local function action_lobbyInfo(host, hostHash, guest, guestHash, is_host)
 	G.LOBBY.players = {}
 	G.LOBBY.is_host = is_host == "true"
-	if is_host == "true" then
-		G.MULTIPLAYER.lobby_options()
-	end
 	G.LOBBY.host = { username = host, hash_str = hostHash, hash = hash(hostHash) }
 	if guest ~= nil then
 		G.LOBBY.guest = { username = guest, hash_str = guestHash, hash = hash(guestHash) }
@@ -44,6 +41,10 @@ local function action_lobbyInfo(host, hostHash, guest, guestHash, is_host)
 	-- TODO: This should check for player count instead
 	-- once we enable more than 2 players
 	G.LOBBY.ready_to_start = G.LOBBY.is_host and guest ~= nil
+
+	if G.LOBBY.is_host then
+		G.MULTIPLAYER.lobby_options()
+	end
 
 	if G.STAGE == G.STAGES.MAIN_MENU then
 		G.MULTIPLAYER.update_player_usernames()
@@ -92,9 +93,11 @@ end
 
 ---@param score_str string
 ---@param hands_left_str string
-local function action_enemy_info(score_str, hands_left_str)
+---@param skips_str string
+local function action_enemy_info(score_str, hands_left_str, skips_str)
 	local score = tonumber(score_str)
 	local hands_left = tonumber(hands_left_str)
+	local skips = tonumber(skips_str)
 
 	if score == nil or hands_left == nil then
 		sendDebugMessage("Invalid score or hands_left", "MULTIPLAYER")
@@ -115,6 +118,7 @@ local function action_enemy_info(score_str, hands_left_str)
 	}))
 
 	G.MULTIPLAYER_GAME.enemy.hands = hands_left
+	G.MULTIPLAYER_GAME.enemy.skips = skips
 
 	if is_pvp_boss() then
 		G.HUD_blind:get_UIE_by_ID("HUD_blind_count"):juice_up()
@@ -157,6 +161,7 @@ local function action_lose_game()
 end
 
 local function action_lobby_options(options)
+	local different_decks_before = G.LOBBY.config.different_decks
 	for k, v in pairs(options) do
 		if k == "gamemode" then
 			G.LOBBY.config.gamemode = v
@@ -168,7 +173,7 @@ local function action_lobby_options(options)
 		elseif v == "false" then
 			parsed_v = false
 		end
-		if k == "starting_lives" or k == "draft_starting_antes" then
+		if k == "starting_lives" or k == "showdown_starting_antes" then
 			parsed_v = tonumber(v)
 		end
 		G.LOBBY.config[k] = parsed_v
@@ -179,6 +184,34 @@ local function action_lobby_options(options)
 			end
 		end
 		::continue::
+	end
+	if different_decks_before ~= G.LOBBY.config.different_decks then
+		G.FUNCS.exit_overlay_menu() -- throw out guest from any menu.
+	end
+	G.MULTIPLAYER.update_player_usernames() -- render new DECK button state
+end
+
+local function action_send_phantom(key)
+	local new_card = create_card("Joker", G.jokers, false, nil, nil, nil, key)
+	new_card:set_edition("e_mp_phantom")
+	new_card:add_to_deck()
+	G.jokers:emplace(new_card)
+end
+
+local function action_remove_phantom(key)
+	local card = G.MULTIPLAYER.UTILS.get_joker(key)
+	if card then
+		card:remove_from_deck()
+		card:start_dissolve({ G.C.RED }, nil, 1.6)
+		G.jokers:remove_card(card)
+	end
+end
+
+local function action_speedrun()
+	local card = G.MULTIPLAYER.UTILS.get_joker("j_mp_speedrun")
+	if card then
+		card:juice_up()
+		G.GAME.chips = to_big(G.GAME.chips) * to_big(3)
 	end
 end
 
@@ -219,6 +252,28 @@ local function action_version()
 	G.MULTIPLAYER.version()
 end
 
+local function action_asteroid()
+	local hand_type = "High Card"
+	local max_level = 0
+	for k, v in pairs(G.GAME.hands) do
+		if to_big(v.level) > to_big(max_level) then
+			hand_type = k
+			max_level = v.level
+		end
+	end
+	update_hand_text({ sound = "button", volume = 0.7, pitch = 0.8, delay = 0.3 }, {
+		handname = localize(hand_type, "poker_hands"),
+		chips = G.GAME.hands[hand_type].chips,
+		mult = G.GAME.hands[hand_type].mult,
+		level = G.GAME.hands[hand_type].level,
+	})
+	level_up_hand(nil, hand_type, false, -1)
+	update_hand_text(
+		{ sound = "button", volume = 0.7, pitch = 1.1, delay = 0 },
+		{ mult = 0, chips = 0, handname = "", level = "" }
+	)
+end
+
 -- #region Client to Server
 function G.MULTIPLAYER.create_lobby(gamemode)
 	G.LOBBY.config.gamemode = gamemode
@@ -254,9 +309,12 @@ function G.MULTIPLAYER.stop_game()
 	Client.send("action:stopGame")
 end
 
-function G.MULTIPLAYER.fail_round()
+function G.MULTIPLAYER.fail_round(hands_used)
 	if G.LOBBY.config.no_gold_on_round_loss then
 		G.GAME.blind.dollars = 0
+	end
+	if hands_used == 0 then
+		return
 	end
 	Client.send("action:failRound")
 end
@@ -275,7 +333,8 @@ end
 
 ---@param score number
 ---@param hands_left number
-function G.MULTIPLAYER.play_hand(score, hands_left)
+function G.MULTIPLAYER.play_hand(score, hands_left, speedrun_check)
+	speedrun_check = speedrun_check or false
 	local fixed_score = tostring(to_big(score))
 	-- Credit to sidmeierscivilizationv on discord for this fix for Talisman
 	if string.match(fixed_score, "[eE]") == nil and string.match(fixed_score, "[.]") then
@@ -283,7 +342,12 @@ function G.MULTIPLAYER.play_hand(score, hands_left)
 		fixed_score = string.sub(string.gsub(fixed_score, "%.", ","), 1, -3)
 	end
 	fixed_score = string.gsub(fixed_score, ",", "") -- Remove commas
-	Client.send(string.format("action:playHand,score:" .. fixed_score .. ",handsLeft:%d", hands_left))
+	Client.send(
+		string.format(
+			"action:playHand,score:" .. fixed_score .. ",handsLeft:%d,hasSpeedrun:" .. tostring(speedrun_check),
+			hands_left
+		)
+	)
 end
 
 function G.MULTIPLAYER.lobby_options()
@@ -300,6 +364,22 @@ end
 
 function G.MULTIPLAYER.new_round()
 	Client.send("action:newRound")
+end
+
+function G.MULTIPLAYER.skip(skips)
+	Client.send("action:skip,skips:" .. tostring(skips))
+end
+
+function G.MULTIPLAYER.send_phantom(key)
+	Client.send("action:sendPhantom,key:" .. key)
+end
+
+function G.MULTIPLAYER.remove_phantom(key)
+	Client.send("action:removePhantom,key:" .. key)
+end
+
+function G.MULTIPLAYER.asteroid()
+	Client.send("action:asteroid")
 end
 -- #endregion Client to Server
 
@@ -358,7 +438,7 @@ function Game:update(dt)
 			elseif parsedAction.action == "startBlind" then
 				action_start_blind()
 			elseif parsedAction.action == "enemyInfo" then
-				action_enemy_info(parsedAction.score, parsedAction.handsLeft)
+				action_enemy_info(parsedAction.score, parsedAction.handsLeft, parsedAction.skips)
 			elseif parsedAction.action == "stopGame" then
 				action_stop_game()
 			elseif parsedAction.action == "endPvP" then
@@ -373,6 +453,14 @@ function Game:update(dt)
 				action_lobby_options(parsedAction)
 			elseif parsedAction.action == "enemyLocation" then
 				enemyLocation(parsedAction)
+			elseif parsedAction.action == "sendPhantom" then
+				action_send_phantom(parsedAction.key)
+			elseif parsedAction.action == "removePhantom" then
+				action_remove_phantom(parsedAction.key)
+			elseif parsedAction.action == "speedrun" then
+				action_speedrun()
+			elseif parsedAction.action == "asteroid" then
+				action_asteroid()
 			elseif parsedAction.action == "error" then
 				action_error(parsedAction.message)
 			elseif parsedAction.action == "keepAlive" then

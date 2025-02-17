@@ -1,5 +1,6 @@
 SMODS.Challenge({
 	key = "c_multiplayer_1",
+	name = "MULTIPLAYER",
 	rules = {
 		custom = {},
 		modifiers = {},
@@ -13,7 +14,7 @@ SMODS.Challenge({
 		banned_other = {},
 	},
 	deck = {
-		type = "Challenge Deck",
+		type = G.MULTIPLAYER.DECK_TYPE,
 	},
 	unlocked = function(self)
 		return false

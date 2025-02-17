@@ -1,4 +1,4 @@
--- Localization by @KilledByLava, @FaLNioNe, and @astryder75 on discord
+-- Localization by @KilledByLava, @FaLNioNe, @astryder75, and @sidmeierscivilizationv on discord
 return {
 	Joker = {
 		j_broken = {
@@ -98,6 +98,8 @@ return {
 			set_custom_seed = "Использовать Свой",
 			reset = "Сбросить",
 			mod_hash_warning = "У игроков разные моды либо разные версии модов! Это может привести к ошибкам!",
+			lobby_choose_deck = "КОЛОДА",
+			opts_player_diff_deck = "Игроки имеют разные колоды",
 		},
 	},
 }
