@@ -199,7 +199,7 @@ local function action_send_phantom(key)
 end
 
 local function action_remove_phantom(key)
-	local card = G.MULTIPLAYER.UTILS.get_joker(key)
+	local card = G.MULTIPLAYER.UTILS.get_phantom_joker(key)
 	if card then
 		card:remove_from_deck()
 		card:start_dissolve({ G.C.RED }, nil, 1.6)
