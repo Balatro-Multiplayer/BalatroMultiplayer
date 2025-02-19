@@ -91,6 +91,48 @@ end
 
 function G.MULTIPLAYER.UTILS.overlay_message(message)
 	G.SETTINGS.paused = true
+	local message_table = G.MULTIPLAYER.UTILS.string_split(message, "\n")
+	local message_ui = {
+		{
+			n = G.UIT.R,
+			config = {
+				padding = 0.2,
+				align = "cm",
+			},
+			nodes = {
+				{
+					n = G.UIT.T,
+					config = {
+						scale = 0.8,
+						shadow = true,
+						text = "MULTIPLAYER",
+						colour = G.C.UI.TEXT_LIGHT,
+					},
+				},
+			},
+		},
+	}
+
+	for _, v in ipairs(message_table) do
+		table.insert(message_ui, {
+			n = G.UIT.R,
+			config = {
+				padding = 0.1,
+				align = "cm",
+			},
+			nodes = {
+				{
+					n = G.UIT.T,
+					config = {
+						scale = 0.6,
+						shadow = true,
+						text = v,
+						colour = G.C.UI.TEXT_LIGHT,
+					},
+				},
+			},
+		})
+	end
 
 	G.FUNCS.overlay_menu({
 		definition = create_UIBox_generic_options({
@@ -101,44 +143,7 @@ function G.MULTIPLAYER.UTILS.overlay_message(message)
 						padding = 0.2,
 						align = "cm",
 					},
-					nodes = {
-						{
-							n = G.UIT.R,
-							config = {
-								padding = 0.2,
-								align = "cm",
-							},
-							nodes = {
-								{
-									n = G.UIT.T,
-									config = {
-										scale = 0.8,
-										shadow = true,
-										text = "MULTIPLAYER",
-										colour = G.C.UI.TEXT_LIGHT,
-									},
-								},
-							},
-						},
-						{
-							n = G.UIT.R,
-							config = {
-								padding = 0.1,
-								align = "cm",
-							},
-							nodes = {
-								{
-									n = G.UIT.T,
-									config = {
-										scale = 0.6,
-										shadow = true,
-										text = message,
-										colour = G.C.UI.TEXT_LIGHT,
-									},
-								},
-							},
-						},
-					},
+					nodes = message_ui,
 				},
 			},
 		}),
