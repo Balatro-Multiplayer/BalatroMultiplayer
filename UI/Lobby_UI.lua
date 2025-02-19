@@ -98,6 +98,8 @@ end
 
 function G.UIDEF.create_UIBox_lobby_menu()
 	local text_scale = 0.45
+	local back = G.LOBBY.config.different_decks and G.LOBBY.deck.back or G.LOBBY.config.back
+	local stake = G.LOBBY.config.different_decks and G.LOBBY.deck.stake or G.LOBBY.config.stake
 
 	local t = {
 		n = G.UIT.ROOT,
@@ -201,13 +203,11 @@ function G.UIDEF.create_UIBox_lobby_menu()
 										minw = 2.15,
 										minh = 1.35,
 										label = {
-											G.LOBBY.config.back,
+											back,
 											localize({
 												type = "name_text",
 												key = SMODS.stake_from_index(
-													type(G.LOBBY.config.stake) == "string"
-															and tonumber(G.LOBBY.config.stake)
-														or G.LOBBY.config.stake
+													type(stake) == "string" and tonumber(stake) or stake
 												),
 												set = "Stake",
 											}),
@@ -223,13 +223,11 @@ function G.UIDEF.create_UIBox_lobby_menu()
 										minw = 2.15,
 										minh = 1.35,
 										label = {
-											G.LOBBY.config.back,
+											back,
 											localize({
 												type = "name_text",
 												key = SMODS.stake_from_index(
-													type(G.LOBBY.config.stake) == "string"
-															and tonumber(G.LOBBY.config.stake)
-														or G.LOBBY.config.stake
+													type(stake) == "string" and tonumber(stake) or stake
 												),
 												set = "Stake",
 											}),
@@ -949,6 +947,7 @@ G.FUNCS.start_run = function(e, args)
 			G.LOBBY.deck.back = (args.deck and args.deck.name) or G.GAME.viewed_back.name
 			G.LOBBY.deck.stake = chosen_stake
 			G.LOBBY.deck.sleeve = G.viewed_sleeve
+			G.MULTIPLAYER.update_player_usernames()
 		else
 			local back = args.challenge
 			back.deck.type = G.LOBBY.deck.back
