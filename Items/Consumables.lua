@@ -1,8 +1,8 @@
 SMODS.Atlas({
 	key = "asteroid",
 	path = "c_asteroid.png",
-	px = 63,
-	py = 93,
+	px = 71,
+	py = 95,
 })
 
 SMODS.Consumable({
