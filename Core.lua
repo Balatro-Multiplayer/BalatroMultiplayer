@@ -1,12 +1,5 @@
 G.MULTIPLAYER = {}
 
-SMODS.Atlas({
-	key = "modicon",
-	path = "modicon.png",
-	px = 34,
-	py = 34,
-})
-
 function G.MULTIPLAYER.load_mp_file(file)
 	local chunk, err = SMODS.load_file(file, "VirtualizedMultiplayer")
 	if chunk then
@@ -25,6 +18,34 @@ end
 local load_mp_file = G.MULTIPLAYER.load_mp_file
 
 load_mp_file("Utils.lua")
+
+if true then
+	G.E_MANAGER:add_event(Event({
+		no_delete = true,
+		trigger = "immediate",
+		blockable = false,
+		blocking = false,
+		func = function()
+			if G.MAIN_MENU_UI then
+				G.MULTIPLAYER.UTILS.overlay_message(
+					G.MULTIPLAYER.UTILS.wrapText(
+						"Your Multiplayer Mod is not loaded correctly, make sure the Multiplayer folder does not have an extra Multiplayer folder around it.",
+						50
+					)
+				)
+				return true
+			end
+		end,
+	}))
+	return
+end
+
+SMODS.Atlas({
+	key = "modicon",
+	path = "modicon.png",
+	px = 34,
+	py = 34,
+})
 
 load_mp_file("Compatibility/CompatibilityUtils.lua")
 load_mp_file("Compatibility/Talisman.lua")

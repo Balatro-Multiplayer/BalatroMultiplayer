@@ -5,6 +5,15 @@ priority = 2147483647
 
 [[patches]]
 [patches.regex]
+target = '''=[SMODS VirtualizedMultiplayer "Core.lua"]'''
+pattern = '''if true then'''
+position = 'at'
+payload = "if false then"
+match_indent = true
+times = 1
+
+[[patches]]
+[patches.regex]
 target = "functions/state_events.lua"
 pattern = '''function end_round\(\)(?<pre>[\s\S]+?)func = function\(\)'''
 position = 'at'
