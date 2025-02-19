@@ -1023,15 +1023,16 @@ function Game:update_new_round(dt)
 end
 
 function G.MULTIPLAYER.end_round()
+	G.GAME.blind.in_blind = false
+	local game_over = false
+	local game_won = false
 	G.RESET_BLIND_STATES = true
 	G.RESET_JIGGLES = true
-	for i = 1, #G.jokers.cards do
-		local eval = nil
-		eval = G.jokers.cards[i]:calculate_joker({ end_of_round = true, game_over = game_over })
-		if eval then
-			card_eval_status_text(G.jokers.cards[i], "jokers", nil, nil, nil, eval)
-		end
-	end
+	-- context.end_of_round calculations
+	SMODS.saved = false
+	sendDebugMessage("calculate_context")
+	SMODS.calculate_context({ end_of_round = true, game_over = false })
+
 	G.GAME.unused_discards = (G.GAME.unused_discards or 0) + G.GAME.current_round.discards_left
 	if G.GAME.blind and G.GAME.blind.config.blind then
 		discover_card(G.GAME.blind.config.blind)
@@ -1064,96 +1065,9 @@ function G.MULTIPLAYER.end_round()
 
 	check_for_unlock({ type = "round_win" })
 	set_joker_usage()
-	for i = 1, #G.hand.cards do
-		--Check for hand doubling
-		local reps = { 1 }
-		local j = 1
-		while j <= #reps do
-			local percent = (i - 0.999) / (#G.hand.cards - 0.998) + (j - 1) * 0.1
-			if reps[j] ~= 1 then
-				card_eval_status_text(
-					(reps[j].jokers or reps[j].seals).card,
-					"jokers",
-					nil,
-					nil,
-					nil,
-					(reps[j].jokers or reps[j].seals)
-				)
-			end
-
-			--calculate the hand effects
-			local effects = { G.hand.cards[i]:get_end_of_round_effect() }
-			for k = 1, #G.jokers.cards do
-				--calculate the joker individual card effects
-				local eval = G.jokers.cards[k]:calculate_joker({
-					cardarea = G.hand,
-					other_card = G.hand.cards[i],
-					individual = true,
-					end_of_round = true,
-				})
-				if eval then
-					table.insert(effects, eval)
-				end
-			end
-
-			if reps[j] == 1 then
-				--Check for hand doubling
-				--From Red seal
-				local eval = eval_card(
-					G.hand.cards[i],
-					{ end_of_round = true, cardarea = G.hand, repetition = true, repetition_only = true }
-				)
-				if next(eval) and (next(effects[1]) or #effects > 1) then
-					for h = 1, eval.seals.repetitions do
-						reps[#reps + 1] = eval
-					end
-				end
-
-				--from Jokers
-				for j = 1, #G.jokers.cards do
-					--calculate the joker effects
-					local eval = eval_card(G.jokers.cards[j], {
-						cardarea = G.hand,
-						other_card = G.hand.cards[i],
-						repetition = true,
-						end_of_round = true,
-						card_effects = effects,
-					})
-					if next(eval) then
-						for h = 1, eval.jokers.repetitions do
-							reps[#reps + 1] = eval
-						end
-					end
-				end
-			end
-
-			for ii = 1, #effects do
-				--if this effect came from a joker
-				if effects[ii].card then
-					G.E_MANAGER:add_event(Event({
-						trigger = "immediate",
-						func = function()
-							effects[ii].card:juice_up(0.7)
-							return true
-						end,
-					}))
-				end
-
-				--If dollars
-				if effects[ii].h_dollars then
-					ease_dollars(effects[ii].h_dollars)
-					card_eval_status_text(G.hand.cards[i], "dollars", effects[ii].h_dollars, percent)
-				end
-
-				--Any extras
-				if effects[ii].extra then
-					card_eval_status_text(G.hand.cards[i], "extra", nil, percent, nil, effects[ii].extra)
-				end
-			end
-			j = j + 1
-		end
+	for _, v in ipairs(SMODS.get_card_areas("playing_cards", "end_of_round")) do
+		SMODS.calculate_end_of_round_effects({ cardarea = v, end_of_round = true })
 	end
-	delay(0.3)
 
 	G.FUNCS.draw_from_hand_to_discard()
 	if G.GAME.blind:get_type() == "Boss" then
@@ -1182,15 +1096,9 @@ function G.MULTIPLAYER.end_round()
 			G.STATE = G.STATES.ROUND_EVAL
 			G.STATE_COMPLETE = false
 
-			if
-				G.GAME.round_resets.blind_states.Small ~= "Defeated"
-				and G.GAME.round_resets.blind_states.Small ~= "Skipped"
-			then
+			if G.GAME.round_resets.blind == G.P_BLINDS.bl_small then
 				G.GAME.round_resets.blind_states.Small = "Defeated"
-			elseif
-				G.GAME.round_resets.blind_states.Big ~= "Defeated"
-				and G.GAME.round_resets.blind_states.Big ~= "Skipped"
-			then
+			elseif G.GAME.round_resets.blind == G.P_BLINDS.bl_big then
 				G.GAME.round_resets.blind_states.Big = "Defeated"
 			else
 				G.GAME.current_round.voucher = get_next_voucher_key()
@@ -1213,6 +1121,11 @@ function G.MULTIPLAYER.end_round()
 			reset_mail_rank()
 			reset_ancient_card()
 			reset_castle_card()
+			for _, mod in ipairs(SMODS.mod_list) do
+				if mod.reset_game_globals and type(mod.reset_game_globals) == "function" then
+					mod.reset_game_globals(false)
+				end
+			end
 			for k, v in ipairs(G.playing_cards) do
 				v.ability.discarded = nil
 				v.ability.forced_selection = nil
