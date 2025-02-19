@@ -45,7 +45,4 @@ SMODS.Joker:take_ownership("abstract", {
 			return { mult = x * card.ability.extra }
 		end
 	end,
-	in_pool = function(self)
-		return true
-	end,
 }, true)
