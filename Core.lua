@@ -19,7 +19,7 @@ local load_mp_file = G.MULTIPLAYER.load_mp_file
 
 load_mp_file("Utils.lua")
 
-if true then
+if not SMODS.current_mod.lovely then
 	G.E_MANAGER:add_event(Event({
 		no_delete = true,
 		trigger = "immediate",
