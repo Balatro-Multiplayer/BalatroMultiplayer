@@ -108,7 +108,7 @@ return {
 		dictionary = {
 			singleplayer = "Singleplayer",
 			join_lobby = "Join Lobby",
-			return_lobby = "Return Lobby",
+			return_lobby = "Return to Lobby",
 			reconnect = "Reconnect",
 			create_lobby = "Create Lobby",
 			start_lobby = "Start Lobby",
@@ -195,6 +195,9 @@ return {
 				"you like it consider",
 			},
 			k_mp_kofi_button = "Supporting me on Ko-fi",
+			b_unstuck = "Unstuck",
+			b_unstuck_arcana = "Stuck In Booster Pack",
+			b_unstuck_blind = "Stuck Outside PvP",
 		},
 		v_dictionary = {
 			mp_art = { "Art: #1#" },

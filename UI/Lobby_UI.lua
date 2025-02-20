@@ -971,8 +971,12 @@ function G.FUNCS.display_lobby_main_menu_UI(e)
 	G.CONTROLLER:snap_to({ node = G.MAIN_MENU_UI:get_UIE_by_ID("lobby_menu_start") })
 end
 
-function G.FUNCS.return_to_lobby()
+function G.FUNCS.mp_return_to_lobby()
 	G.MULTIPLAYER.stop_game()
+end
+
+function G.FUNCS.mp_leave_lobby()
+	G.MULTIPLAYER.leave_lobby()
 end
 
 function G.FUNCS.custom_seed_overlay(e)
@@ -1007,4 +1011,47 @@ function Game:update(dt)
 		reset_game_states()
 	end
 	gameUpdateRef(self, dt)
+end
+
+function G.UIDEF.create_UIBox_unstuck()
+	return (
+		create_UIBox_generic_options({
+			contents = {
+				{
+					n = G.UIT.C,
+					config = {
+						padding = 0.2,
+						align = "cm",
+					},
+					nodes = {
+						UIBox_button({
+							label = { localize("b_unstuck_arcana") },
+							button = "mp_unstuck_arcana",
+							minw = 5,
+						}),
+						UIBox_button({ label = { localize("b_unstuck_blind") }, button = "mp_unstuck_blind", minw = 5 }),
+					},
+				},
+			},
+		})
+	)
+end
+
+function G.FUNCS.mp_unstuck()
+	G.FUNCS.overlay_menu({
+		definition = G.UIDEF.create_UIBox_unstuck(),
+	})
+end
+
+function G.FUNCS.mp_unstuck_arcana()
+	G.FUNCS.skip_booster()
+end
+
+function G.FUNCS.mp_unstuck_blind()
+	G.MULTIPLAYER_GAME.ready_blind = false
+	if G.MULTIPLAYER_GAME.next_blind_context then
+		G.FUNCS.select_blind(G.MULTIPLAYER_GAME.next_blind_context)
+	else
+		sendErrorMessage("No next blind context", "MULTIPLAYER")
+	end
 end
