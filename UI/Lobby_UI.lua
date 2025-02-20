@@ -975,10 +975,6 @@ function G.FUNCS.mp_return_to_lobby()
 	G.MULTIPLAYER.stop_game()
 end
 
-function G.FUNCS.mp_leave_lobby()
-	G.MULTIPLAYER.leave_lobby()
-end
-
 function G.FUNCS.custom_seed_overlay(e)
 	G.FUNCS.overlay_menu({
 		definition = G.UIDEF.create_UIBox_custom_seed_overlay(),
