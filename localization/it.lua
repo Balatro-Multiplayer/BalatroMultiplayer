@@ -2,6 +2,48 @@
 return {
 	descriptions = {
 		Joker = {
+			j_mp_defensive_joker = {
+				name = "Jolly difensivo",
+				text = {
+					"Questo Jolly guadagna {C:chips}+#1#{} fiche",
+					"per ogni {C:red,E:1}vita{} persa in questa partita",
+					"{C:inactive}(Attualmente {C:chips}+#2#{C:inactive} fiche)",
+				},
+			},
+			j_mp_skip_off = {
+				name = "Salta tutto",
+				text = {
+					"{C:blue}+#1#{} Mani e {C:red}+#2#{} Scarti",
+					"per ogni {C:attention}Buio{} saltato in più",
+					"rispetto al tuo {X:purple,C:white}Nemico{}",
+					"{C:inactive}(Attualmente {C:blue}+#3#{C:inactive}/{C:red}+#4#{C:inactive})",
+				},
+			},
+			j_mp_lets_go_gambling = {
+                name = "Scommessa",
+                text = {
+                    "{C:green}#1# probabilità su #2#{} che questa carta venga distrutta",
+                    "quando viene venduta, altrimenti ottiene {X:mult,C:white} +X#3# {}",
+                    "{C:inactive}(Il moltiplicatore aumenta di {X:mult,C:white}+X#4#{C:inactive} dopo ogni {C:attention}Buio Boss{C:inactive})",
+                    "{C:inactive}(Attualmente {X:mult,C:white}X#5#{C:inactive} Molt)",
+                },
+            },
+			j_mp_hanging_bad = {
+				name = "Scheda penalizzata",
+				text = {
+					"Durante i {C:attention}Bui{} {X:purple,C:white}Nemici{} la",
+					"{C:attention}prima{} carta giocata che assegna punteggio",
+					"è {C:attention}penalizzata{} per entrambi i giocatori",
+				},
+			},
+			j_mp_speedrun = {
+                name = "SPEEDRUN",
+                text = {
+                    "{C:attention}Triplica{} il tuo punteggio totale",
+                    "quando usi tutte le tue {C:blue}Mani{} prima",
+                    "del tuo {X:purple,C:white}Nemico{} in un {C:attention}Buio PvP{}",
+                },
+            },
 			j_broken = {
 				name = "ERRORE",
 				text = {
@@ -11,12 +53,39 @@ return {
 				},
 			},
 		},
+		Planet = {
+			c_mp_asteroid = {
+				name = "Asteroide",
+				text = {
+					"Rimuove #1# livello dalla",
+					"{C:legendary,E:1}mano di poker{}",
+					"di livello più alto",
+					"del tuo {X:purple,C:white}Nemico{}",
+				},
+			},
+		},
 		Blind = {
 			bl_pvp = {
 				name = "Il tuo Nemico",
 				text = {
 					"Sei contro un altro giocatore,",
 					"chi fa più punteggio vince",
+				},
+			},
+			bl_precision = {
+				name = "Precisione",
+				text = {
+					"Sei contro un altro giocatore,",
+					"chi si avvicina di più al punteggio prestabilito vince",
+				},
+			},
+		},
+		Other = {
+			current_nemesis = {
+				name = "Nemico",
+				text = {
+					"{X:purple,C:white}#1#{}",
+					"Il tuo solo e unico Nemico",
 				},
 			},
 		},
@@ -46,8 +115,17 @@ return {
 			total_lives_lost = " Vite perse in totale ($4 l'una)",
 			attrition_name = "Logoramento",
 			attrition_desc = "Ogni buio boss è una competizione tra i giocatori e il giocatore che ottiene il punteggio minore perde una vita.",
+			-- New stuff here
+			showdown_name = "Showdown",
+			showdown_desc = "Entrambi i giocatori giocano 3 normali Ante, dopo giocano un Ante dove ogni round il giocatore col punteggio maggiore vince.",
 			draft_name = "Tratta",
-			draft_desc = "Entrambi i giocatori giocano 3 normali Ante, dopo giocano un Ante dove ogni round il giocatore col punteggio maggiore vince.",
+			draft_desc = "I giocatori usano il Mazzo in evoluzione della mod Balatro Draft, si guadagna un Tag Draft dopo ogni Buio PvP.",
+			draft_req = "Richiede la mod Balatro Draft",
+			monty_special_name = "La Special di Dr. Monty",
+			monty_special_desc = "Una modalità speciale creata da @dr_monty_the_snek sul server Discord. Entra per capire di cosa si tratta! (La modalità cambia con ogni aggiornamento)",
+			precision_name = "Precisione",
+			precision_desc = "Una partita di Logoramento, ad eccezione che la persone più vicina al punteggio prestabilito vince i Bui PvP (invece della persona col punteggio più alto).",
+			-- New stuff ends here
 			royale_name = "Battaglia Reale",
 			royale_desc = "Una partita di Logoramento, ma si può giocare fino ad 8 giocatori e ognuno ha 1 sola vita.",
 			vanilla_plus_name = "Vanilla+",
@@ -98,6 +176,9 @@ return {
 			set_custom_seed = "Usa Seed personalizzato",
 			reset = "Resetta",
 			mod_hash_warning = "I giocatori hanno mod diverse o versioni di mod diverse! Potrebbero esserci degli errori!",
+			-- New stuff here
+			lobby_choose_deck = "MAZZO",
+			opts_player_diff_deck = "I giocatori hanno mazzi diversi",
 		},
 	},
 }
