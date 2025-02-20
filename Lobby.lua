@@ -9,7 +9,7 @@ G.LOBBY = {
 		no_gold_on_round_loss = false,
 		death_on_round_loss = true,
 		different_seeds = false,
-		starting_lives = 5,
+		starting_lives = 4,
 		showdown_starting_antes = 3,
 		gamemode = "attrition",
 		custom_seed = "random",
@@ -82,7 +82,7 @@ function reset_game_states()
 end
 
 function reset_gamemode_modifiers()
-	G.LOBBY.config.starting_lives = G.LOBBY.type == "showdown" and 2 or 5
+	G.LOBBY.config.starting_lives = G.LOBBY.type == "showdown" and 2 or 4
 	G.LOBBY.config.showdown_starting_antes = 3
 end
 

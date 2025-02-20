@@ -1822,7 +1822,7 @@ local reset_blinds_ref = reset_blinds
 function reset_blinds()
 	reset_blinds_ref()
 	if G.LOBBY.code then
-		if G.LOBBY.config.gamemode == "attrition" then
+		if G.LOBBY.config.gamemode == "attrition" and G.GAME.round_resets.ante > 1 then
 			G.GAME.round_resets.blind_choices.Boss = "bl_pvp"
 		end
 		if
