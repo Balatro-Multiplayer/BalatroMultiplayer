@@ -30,7 +30,7 @@ position = 'at'
 payload = '''local t = G.LOBBY.code and create_UIBox_generic_options({contents ={
     {n=G.UIT.R, config={padding = 0.0, align = "cm", colour = G.C.CLEAR}, nodes={
       {n=G.UIT.R, config={align = 'cm', padding = 0.1, no_fill = true, minh = 0, minw = 0}, nodes={
-        {n=G.UIT.O, config={id = 'tab_contents', object = UIBox{definition = G.UIDEF.run_setup_option('New Run'), config = {offset = {x=0,y=0}}}}}
+        {n=G.UIT.O, config={id = 'tab_contents', object = UIBox{definition = ((Galdur and Galdur.config.use) and G.UIDEF.run_setup_option_new_model or G.UIDEF.run_setup_option)('New Run'), config = {offset = {x=0,y=0}}}}}
       }},
     }},
   }}) or create_UIBox_generic_options({no_back = from_game_over, no_esc = from_game_over, contents ={'''
