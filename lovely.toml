@@ -1,7 +1,7 @@
 [manifest]
 version = "1.0.0"
 dump_lua = true
-priority = 2147483647
+priority = 2147483600
 
 [[patches]]
 [patches.regex]
