@@ -16,6 +16,7 @@
     "Balatro (>=1.0.1n)"
   ],
 	"conflicts": [
+		"SystemClock (<<1.6.3)",
 		"Cryptid (<=0.5.3c)",
 		"Talisman (<<2.1.0~dev)"
 	]
