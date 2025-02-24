@@ -11,7 +11,7 @@ SMODS.Challenge({
 	restrictions = {
 		banned_cards = G.MULTIPLAYER.DECK.BANNED_CARDS,
 		banned_tags = G.MULTIPLAYER.DECK.BANNED_TAGS,
-		banned_other = {},
+		banned_other = G.MULTIPLAYER.DECK.BANNED_BLINDS,
 	},
 	deck = {
 		type = G.MULTIPLAYER.DECK_TYPE,

@@ -4,11 +4,14 @@ if SMODS.Mods["Cryptid"] and SMODS.Mods["Cryptid"].can_load then
 	G.MULTIPLAYER.DECK.ban_card("j_cry_candy_sticks")
 	G.MULTIPLAYER.DECK.ban_card("j_cry_redeo")
 	G.MULTIPLAYER.DECK.ban_card("j_cry_chocolate_dice")
+	G.MULTIPLAYER.DECK.ban_card("j_cry_carved_pumpkin")
+	G.MULTIPLAYER.DECK.ban_card("j_cry_pumpkin")
 	G.MULTIPLAYER.DECK.ban_card("v_cry_asteroglyph")
 	G.MULTIPLAYER.DECK.ban_card("c_cry_semicolon")
 	G.MULTIPLAYER.DECK.ban_card("c_cry_crash")
 	G.MULTIPLAYER.DECK.ban_card("c_cry_revert")
 	G.MULTIPLAYER.DECK.ban_card("c_cry_analog")
+	G.MULTIPLAYER.DECK.ban_blind("bl_cry_joke")
 
 	local defeat_ref = Blind.defeat
 	function Blind:defeat(silent)

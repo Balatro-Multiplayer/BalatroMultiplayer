@@ -32,17 +32,12 @@ SMODS.Edition({
 	},
 })
 
-SMODS.Joker:take_ownership("abstract", {
-	loc_vars = function(self, info_queue, card)
-		local jokers = G.MULTIPLAYER.UTILS.get_non_phantom_jokers()
-		return {
-			vars = { card.ability.extra, (#jokers or 0) * card.ability.extra },
-		}
-	end,
-	calculate = function(self, card, context)
-		if context.joker_main then
-			local x = #G.MULTIPLAYER.UTILS.get_non_phantom_jokers()
-			return { mult = x * card.ability.extra }
-		end
-	end,
-}, true)
+local get_card_areas_ref = SMODS.get_card_areas
+function SMODS.get_card_areas(_type, _context)
+	if _type == "jokers" and G.shared then
+		local t = get_card_areas_ref(_type, _context)
+		table.insert(t, G.shared)
+		return t
+	end
+	return get_card_areas_ref(_type, _context)
+end

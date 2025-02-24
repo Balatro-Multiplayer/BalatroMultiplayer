@@ -163,30 +163,17 @@ function G.MULTIPLAYER.UTILS.get_joker(key)
 end
 
 function G.MULTIPLAYER.UTILS.get_phantom_joker(key)
-	if not G.jokers then
+	if not G.shared then
 		return nil
 	end
-	for i = 1, #G.jokers.cards do
+	for i = 1, #G.shared.cards do
 		if
-			G.jokers.cards[i].ability.name == key
-			and G.jokers.cards[i].edition
-			and G.jokers.cards[i].edition.type == "mp_phantom"
+			G.shared.cards[i].ability.name == key
+			and G.shared.cards[i].edition
+			and G.shared.cards[i].edition.type == "mp_phantom"
 		then
-			return G.jokers.cards[i]
+			return G.shared.cards[i]
 		end
 	end
 	return nil
-end
-
-function G.MULTIPLAYER.UTILS.get_non_phantom_jokers()
-	if not G.jokers or not G.jokers.cards then
-		return {}
-	end
-	local jokers = {}
-	for _, v in ipairs(G.jokers.cards) do
-		if v.ability.set == "Joker" and (not v.edition or v.edition.type ~= "mp_phantom") then
-			table.insert(jokers, v)
-		end
-	end
-	return jokers
 end

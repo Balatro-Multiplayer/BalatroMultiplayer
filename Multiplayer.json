@@ -9,7 +9,7 @@
 	"priority": 9007199254740990,
 	"badge_colour": "AC3232",
 	"badge_text_colour": "FFFFFF",
-	"version": "0.1.8.3",
+	"version": "0.1.8.4",
 	"dependencies": [
     "Steamodded (>>1.0.0~ALPHA-1304a)",
     "Lovely (>=0.7)",
@@ -17,7 +17,7 @@
   ],
 	"conflicts": [
 		"SystemClock (<<1.6.3)",
-		"Cryptid (<=0.5.3c)",
-		"Talisman (<<2.1.0~dev)"
+		"Cryptid (<<0.5.4)",
+		"Talisman (<=2.0.2)"
 	]
 }

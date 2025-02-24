@@ -249,3 +249,31 @@ payload = '''if self.config.center.key == "j_mp_hanging_bad" and is_pvp_boss() t
 end'''
 match_indent = true
 times = 1
+
+[[patches]]
+[patches.regex]
+target = 'game.lua'
+pattern = 'self\.jokers = CardArea'
+position = 'before'
+payload = '''if G.LOBBY.code then 
+      self.shared = CardArea(
+        0, CAI.consumeable_H + 0.3,
+        CAI.consumeable_W / 2,
+        CAI.consumeable_H, 
+        {card_limit = 0, type = 'joker', highlight_limit = 1})
+    end
+'''
+times = 1
+
+[[patches]]
+[patches.pattern]
+target = 'functions/common_events.lua'
+pattern = 'G.consumeables.T.y = 0'
+position = 'after'
+payload = '''if G.shared then
+  G.shared.T.x = G.consumeables.T.x + (G.consumeables.T.w / 2)
+  G.shared.T.y = G.consumeables.T.y + G.consumeables.T.h + 0.4
+end
+'''
+match_indent = true
+times = 1

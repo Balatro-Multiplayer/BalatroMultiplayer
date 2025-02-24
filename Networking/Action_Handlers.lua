@@ -192,10 +192,10 @@ local function action_lobby_options(options)
 end
 
 local function action_send_phantom(key)
-	local new_card = create_card("Joker", G.jokers, false, nil, nil, nil, key)
+	local new_card = create_card("Joker", G.shared, false, nil, nil, nil, key)
 	new_card:set_edition("e_mp_phantom")
 	new_card:add_to_deck()
-	G.jokers:emplace(new_card)
+	G.shared:emplace(new_card)
 end
 
 local function action_remove_phantom(key)
@@ -203,7 +203,7 @@ local function action_remove_phantom(key)
 	if card then
 		card:remove_from_deck()
 		card:start_dissolve({ G.C.RED }, nil, 1.6)
-		G.jokers:remove_card(card)
+		G.shared:remove_card(card)
 	end
 end
 

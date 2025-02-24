@@ -15,12 +15,18 @@ G.MULTIPLAYER.DECK.BANNED_TAGS = {
 	{ id = "tag_boss" },
 }
 
+G.MULTIPLAYER.DECK.BANNED_BLINDS = {}
+
 function G.MULTIPLAYER.DECK.ban_card(card_id)
 	table.insert(G.MULTIPLAYER.DECK.BANNED_CARDS, { id = card_id })
 end
 
 function G.MULTIPLAYER.DECK.ban_tag(tag_id)
 	table.insert(G.MULTIPLAYER.DECK.BANNED_TAGS, { id = tag_id })
+end
+
+function G.MULTIPLAYER.DECK.ban_blind(blind_id)
+	table.insert(G.MULTIPLAYER.DECK.BANNED_BLINDS, { id = blind_id, type = "blind" })
 end
 
 local j_broken = {
