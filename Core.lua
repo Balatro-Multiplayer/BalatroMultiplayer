@@ -50,6 +50,7 @@ SMODS.Atlas({
 load_mp_file("Compatibility/CompatibilityUtils.lua")
 load_mp_file("Compatibility/Talisman.lua")
 load_mp_file("Compatibility/Cryptid.lua")
+load_mp_file("Compatibility/CodexArcanum.lua")
 load_mp_file("Compatibility/Pokermon.lua")
 load_mp_file("Compatibility/Ortalab.lua")
 load_mp_file("Compatibility/Jen.lua")
