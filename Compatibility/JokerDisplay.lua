@@ -21,9 +21,5 @@ if SMODS.Mods["JokerDisplay"] and SMODS.Mods["JokerDisplay"].can_load then
 				},
 			},
 		}
-		jd_def["j_abstract"].calc_function = function(card)
-			local x = #G.MULTIPLAYER.UTILS.get_non_phantom_jokers()
-			card.joker_display_values.mult = (x or 0) * card.ability.extra
-		end
 	end
 end
