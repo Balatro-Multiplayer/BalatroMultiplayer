@@ -11,6 +11,7 @@ if SMODS.Mods["Cryptid"] and SMODS.Mods["Cryptid"].can_load then
 	G.MULTIPLAYER.DECK.ban_card("c_cry_crash")
 	G.MULTIPLAYER.DECK.ban_card("c_cry_revert")
 	G.MULTIPLAYER.DECK.ban_card("c_cry_analog")
+	G.MULTIPLAYER.DECK.ban_card("c_cry_reboot")
 	G.MULTIPLAYER.DECK.ban_blind("bl_cry_joke")
 
 	local defeat_ref = Blind.defeat
