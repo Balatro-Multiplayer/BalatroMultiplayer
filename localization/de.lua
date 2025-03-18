@@ -65,14 +65,14 @@ return {
 			},
 		},
 		Blind = {
-			bl_pvp = {
+			bl_mp_nemesis = {
 				name = "Dein Erzfeind",
 				text = {
 					"Spiel gegen dein Erzfeind,",
 					"Höste Punktzahl gewinnt",
 				},
 			},
-			bl_precision = {
+			bl_mp_precision = {
 				name = "Präzision",
 				text = {
 					"Spiel gegen ein spieler,",

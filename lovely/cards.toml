@@ -1,0 +1,48 @@
+[manifest]
+version = "1.0.0"
+dump_lua = true
+priority = 2147483600
+
+[[patches]]
+[patches.regex]
+target = "card.lua"
+pattern = '''\) then self.cost = 0 end'''
+position = 'after'
+payload = '''
+  if self.edition and self.edition.type == 'mp_phantom' then self.sell_cost = 0 end
+  if self.ability.name == 'j_mp_lets_go_gambling' then self.sell_cost = -1 end'''
+times = 1
+
+[[patches]]
+[patches.pattern]
+target = "card.lua"
+pattern = '''if G.jokers.cards[i] ~= self then'''
+position = 'at'
+payload = '''if G.jokers.cards[i] ~= self and (not G.jokers.cards[i].edition or G.jokers.cards[i].edition.type ~= "mp_phantom") then'''
+match_indent = true
+times = 1
+
+[[patches]]
+[patches.pattern]
+target = "card.lua"
+pattern = '''local chosen_joker = pseudorandom_element(G.jokers.cards, pseudoseed('ankh_choice'))'''
+position = 'at'
+payload = '''local copyable_jokers = {}
+    for i, v in ipairs(G.jokers.cards) do
+      if not G.jokers.cards[i].edition or G.jokers.cards[i].edition.type ~= "mp_phantom" then copyable_jokers[#copyable_jokers + 1] = v end
+    end
+    local chosen_joker = pseudorandom_element(copyable_jokers, pseudoseed('ankh_choice'))'''
+match_indent = true
+times = 1
+
+[[patches]]
+[patches.regex]
+target = "card.lua"
+pattern = '''--if there is at least one joker(?<pre>[\s\S]+?)for k, v in pairs\(G.jokers.cards\) do'''
+position = 'at'
+payload = '''--if there is at least one joker$pre local copyable_jokers = {}
+      for i, v in ipairs(G.jokers.cards) do
+        if not G.jokers.cards[i].edition or G.jokers.cards[i].edition.type ~= "mp_phantom" then copyable_jokers[#copyable_jokers + 1] = v end
+      end
+      for k, v in pairs(copyable_jokers) do'''
+times = 1

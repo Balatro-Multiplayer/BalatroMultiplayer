@@ -38,10 +38,11 @@ return {
 			j_mp_speedrun = {
 				name = "SPEEDRUN",
 				text = {
-					"{C:attention}Triple{} your total score",
-					"when you spend all your {C:blue}Hands{} before",
-					"your {X:purple,C:white}Nemesis{} on a {C:attention}PvP Blind{}",
-				},
+					"If you reach a {C:attention}PvP Blind",
+					"before your {X:purple,C:white}Nemesis{},",
+					"create a random {C:spectral}Spectral{} card",
+					"{C:inactive}(Must have room)",
+				}
 			},
 			j_mp_conjoined_joker = {
 				name = "Conjoined Joker",
@@ -95,6 +96,14 @@ return {
 					"Eaten when your {X:purple,C:white}Nemesis{} skips",
 				},
 			},
+			j_mp_hanging_chad = {
+				name = "Hanging Chad",
+				text = {
+					"Retrigger {C:attention}first{} and {C:attention}second{}",
+					"played card used in scoring",
+					"{C:attention}#1#{} additional times",
+				},
+			},
 		},
 		Planet = {
 			c_mp_asteroid = {
@@ -108,14 +117,14 @@ return {
 			},
 		},
 		Blind = {
-			bl_pvp = {
+			bl_mp_nemesis = {
 				name = "Your Nemesis",
 				text = {
 					"Face another player,",
 					"most chips wins",
 				},
 			},
-			bl_precision = {
+			bl_mp_precision = {
 				name = "Precision",
 				text = {
 					"Face another player,",
@@ -129,6 +138,16 @@ return {
 				text = {
 					"{C:attention}Eternal{} and {C:dark_edition}Negative{}",
 					"Created and destroyed by your {X:purple,C:white}Nemesis{}",
+				},
+			},
+		},
+		Enhanced = {
+			m_mp_glass = {
+				name = "Glass Card",
+				text = {
+					"{X:mult,C:white} X#1# {} Mult",
+					"{C:green}#2# in #3#{} chance to",
+					"destroy card",
 				},
 			},
 		},
@@ -147,7 +166,11 @@ return {
 			mp_phantom = "Phantom",
 		},
 		challenge_names = {
-			c_multiplayer_1 = "Multiplayer",
+			c_mp_standard = "Standard",
+			c_mp_badlatro = "Badlatro",
+			c_mp_tournament = "Tournament",
+			c_mp_weekly = "Weekly",
+			c_mp_vanilla = "Vanilla",
 		},
 		dictionary = {
 			singleplayer = "Singleplayer",
@@ -250,6 +273,8 @@ return {
 			k_weekly_description = "A special ruleset that changes weekly or bi-weekly. I guess you'll have to find out what it is! Currently: ",
 			k_tournament = "Tournament",
 			k_tournament_description = "The tournament ruleset, this is the same as the standard ruleset but doesn't allow changing the lobby options.",
+			k_badlatro = "Badlatro",
+			k_badlatro_description = "A weekly ruleset designed by @dr_monty_the_snek on the discord server that has been added to the mod permanently.",
 		},
 		v_dictionary = {
 			mp_art = { "Art: #1#" },
@@ -260,5 +285,9 @@ return {
 			mp_skips_tied = { "Tied" },
 			a_xmult_plus = "+X#1# Mult",
 		},
+		v_text = {
+			ch_c_hanging_chad_rework = { "{C:attention}Hanging Chad{} is {C:dark_edition}reworked" },
+			ch_c_glass_cards_rework = { "{C:attention}Glass Cards{} are {C:dark_edition}reworked" },
+		}
 	},
 }

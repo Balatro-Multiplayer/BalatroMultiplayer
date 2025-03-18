@@ -1,0 +1,18 @@
+[manifest]
+version = "1.0.0"
+dump_lua = true
+priority = 2147483600
+
+[[patches]]
+[patches.pattern]
+target = 'game.lua'
+pattern = 'G.playing_cards = {}'
+position = 'before'
+payload = '''if MP.LOBBY.code then
+        MP.MISPRINT_DISPLAY = UIBox{
+            definition = MP.UI.create_UIBox_Misprint_Display(),
+            config = { align=('cr'), offset = { x = -2.4, y = 2.5 }, major = G.ROOM_ATTACH }
+        }
+    end'''
+match_indent = true
+times = 1

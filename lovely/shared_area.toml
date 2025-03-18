@@ -1,0 +1,32 @@
+[manifest]
+version = "1.0.0"
+dump_lua = true
+priority = 2147483600
+
+[[patches]]
+[patches.regex]
+target = 'game.lua'
+pattern = 'self\.jokers = CardArea'
+position = 'before'
+payload = '''if MP.LOBBY.code then 
+      MP.shared = CardArea(
+        0, CAI.consumeable_H + 0.3,
+        CAI.consumeable_W / 2,
+        CAI.consumeable_H, 
+        {card_limit = 0, type = 'joker', highlight_limit = 1})
+    end
+'''
+times = 1
+
+[[patches]]
+[patches.pattern]
+target = 'functions/common_events.lua'
+pattern = 'G.consumeables.T.y = 0'
+position = 'after'
+payload = '''if MP.shared then
+  MP.shared.T.x = G.consumeables.T.x + (G.consumeables.T.w / 2)
+  MP.shared.T.y = G.consumeables.T.y + G.consumeables.T.h + 0.4
+end
+'''
+match_indent = true
+times = 1

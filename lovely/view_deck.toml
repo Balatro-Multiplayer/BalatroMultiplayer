@@ -1,0 +1,29 @@
+[manifest]
+version = "1.0.0"
+dump_lua = true
+priority = 2147483600
+
+[[patches]]
+[patches.pattern]
+target = "functions/UI_definitions.lua"
+pattern = '''{
+        label = localize('b_full_deck'),
+        chosen = true,
+        tab_definition_function = G.UIDEF.view_deck
+      },'''
+position = 'after'
+payload = '''MP.LOBBY.code and {
+              label = G.localization.misc.challenge_names[MP.Rulesets[MP.LOBBY.config.ruleset].challenge_deck],
+              tab_definition_function = G.UIDEF.multiplayer_deck,
+            },'''
+match_indent = true
+times = 1
+
+[[patches]]
+[patches.pattern]
+target = "functions/UI_definitions.lua"
+pattern = '''not is_row and {n=G.UIT.R, config={align = "cm", minh = 0.9}, nodes={'''
+position = 'at'
+payload = '''(not MP.LOBBY.code) and (not is_row) and {n=G.UIT.R, config={align = "cm", minh = 0.9}, nodes={'''
+match_indent = true
+times = 1
