@@ -1,11 +1,19 @@
 return {
 	descriptions = {
 		Joker = {
+			j_broken = {
+				name = "BROKEN",
+				text = {
+					"This card is either broken or",
+					"not implemented in the current",
+					"version of a mod you are using.",
+				},
+			},
 			j_mp_defensive_joker = {
 				name = "Defensive Joker",
 				text = {
-					"This Joker gains {C:chips}+#1#{} Chips",
-					"per {C:red,E:1}life{} lost this run",
+					"{C:chips}+#1#{} Chips for every {C:red,E:1}life{}",
+					"less than your {X:purple,C:white}Nemesis{}",
 					"{C:inactive}(Currently {C:chips}+#2#{C:inactive} Chips)",
 				},
 			},
@@ -21,18 +29,10 @@ return {
 			j_mp_lets_go_gambling = {
 				name = "Let's Go Gambling",
 				text = {
-					"{C:green}#1# in #2#{} chance to be destroyed",
-					"when sold, otherwise gain {X:mult,C:white} +X#3# {}",
-					"{C:inactive}(Scaling increases by {X:mult,C:white}+X#4#{C:inactive} after each {C:attention}Boss Blind{C:inactive})",
-					"{C:inactive}(Currently {X:mult,C:white}X#5#{C:inactive} Mult)",
-				},
-			},
-			j_mp_hanging_bad = {
-				name = "Hanging Bad",
-				text = {
-					"During {X:purple,C:white}Nemesis{} {C:attention}Blinds{} the",
-					"{C:attention}first{} played card used in scoring",
-					"is {C:attention}debuffed{} for both players",
+					"{C:green}#1# in #2#{} chance for",
+					"{X:mult,C:white}X#3#{} Mult and {C:money}$#4#{}",
+					"{C:green}#5# in #6#{} chance to give",
+					"your {X:purple,C:white}Nemesis{} {C:money}$#7#",
 				},
 			},
 			j_mp_speedrun = {
@@ -43,12 +43,56 @@ return {
 					"your {X:purple,C:white}Nemesis{} on a {C:attention}PvP Blind{}",
 				},
 			},
-			j_broken = {
-				name = "BROKEN",
+			j_mp_conjoined_joker = {
+				name = "Conjoined Joker",
 				text = {
-					"This card is either broken or",
-					"not implemented in the current",
-					"version of a mod you are using.",
+					"While in a {C:attention}PvP Blind{}, gain",
+					"{X:mult,C:white}X#1#{} Mult for every {C:blue}Hand{}",
+					"your {X:purple,C:white}Nemesis{} has left",
+					"{C:inactive}(Max {X:mult,C:white}X#2#{C:inactive} Mult, Current {X:mult,C:white}X#3#{C:inactive} Mult)",
+				},
+			},
+			j_mp_penny_pincher = {
+				name = "Penny Pincher",
+				text = {
+					"At start of shop, gain",
+					"{C:money}$#1#{} for every {C:money}$#2#{}",
+					"your {X:purple,C:white}Nemesis{} spent last shop",
+				},
+			},
+			j_mp_taxes = {
+				name = "Taxes",
+				text = {
+					"When your opponent sells",
+					"a card gain {C:mult}+#1#{} Mult",
+					"{C:inactive}(Currently {C:mult}+#2#{C:inactive} Mult)",
+				},
+			},
+			j_mp_copycat = {
+				name = "Copycat",
+				text = {
+					"When a blind is selected,",
+					"copies the ability of your {X:purple,C:white}Nemesis'{}",
+					"leftmost or rightmost compatible {C:attention}Joker{}",
+				},
+			},
+			j_mp_magnet = {
+				name = "Magnet",
+				text = {
+					"After {C:attention}#1#{} rounds,",
+					"sell this card to {C:attention}Copy{}",
+					"your {X:purple,C:white}Nemesis'{} highest ",
+					"sell cost {C:attention}Joker{}",
+					"{C:inactive}(Currently {C:attention}#2#{C:inactive}/#3# rounds)",
+				}
+			},
+			j_mp_pizza = {
+				name = "Pizza",
+				text = {
+					"{C:red}+#1#{} Discards for all players",
+					"{C:red}-#2#{} Discard when any player",
+					"selects a blind",
+					"Eaten when your {X:purple,C:white}Nemesis{} skips",
 				},
 			},
 		},
@@ -198,6 +242,14 @@ return {
 			b_unstuck = "Unstuck",
 			b_unstuck_arcana = "Stuck In Booster Pack",
 			b_unstuck_blind = "Stuck Outside PvP",
+			k_standard = "Standard",
+			k_standard_description = "The standard ruleset, includes Multiplayer cards and changes to the base game to fit the Multiplayer meta.",
+			k_vanilla = "Vanilla",
+			k_vanilla_description = "The vanilla ruleset, no Multiplayer cards, no modifications to base game content.",
+			k_weekly = "Weekly",
+			k_weekly_description = "A special ruleset that changes weekly or bi-weekly. I guess you'll have to find out what it is! Currently: ",
+			k_tournament = "Tournament",
+			k_tournament_description = "The tournament ruleset, this is the same as the standard ruleset but doesn't allow changing the lobby options.",
 		},
 		v_dictionary = {
 			mp_art = { "Art: #1#" },

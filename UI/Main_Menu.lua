@@ -168,7 +168,7 @@ function G.UIDEF.create_UIBox_create_lobby_button()
 							colour = G.C.BOOSTER,
 							tabs = {
 								{
-									label = G.localization.misc.dictionary["attrition_name"] or "Attrition",
+									label = localize("k_standard"),
 									chosen = true,
 									tab_definition_function = function()
 										return {
@@ -193,10 +193,9 @@ function G.UIDEF.create_UIBox_create_lobby_button()
 													},
 													nodes = {
 														UIBox_button({
-															id = "start_attrition",
+															id = "start_standard",
 															label = {
-																G.localization.misc.dictionary["start_lobby"]
-																	or "Start Lobby",
+																localize("start_lobby"),
 															},
 															colour = G.C.RED,
 															button = "start_lobby",
@@ -217,8 +216,7 @@ function G.UIDEF.create_UIBox_create_lobby_button()
 															n = G.UIT.T,
 															config = {
 																text = G.MULTIPLAYER.UTILS.wrapText(
-																	G.localization.misc.dictionary["attrition_desc"]
-																		or "Every boss round is a competition between players where the player with the lower score loses a life.",
+																	localize("k_standard_description"),
 																	50
 																),
 																shadow = true,
@@ -233,7 +231,7 @@ function G.UIDEF.create_UIBox_create_lobby_button()
 									end,
 								},
 								{
-									label = G.localization.misc.dictionary["showdown_name"] or "Showdown",
+									label = localize("k_vanilla"),
 									tab_definition_function = function()
 										return {
 											n = G.UIT.ROOT,
@@ -257,10 +255,9 @@ function G.UIDEF.create_UIBox_create_lobby_button()
 													},
 													nodes = {
 														UIBox_button({
-															id = "start_showdown",
+															id = "start_vanilla",
 															label = {
-																G.localization.misc.dictionary["start_lobby"]
-																	or "Start Lobby",
+																localize("start_lobby"),
 															},
 															colour = G.C.RED,
 															button = "start_lobby",
@@ -281,8 +278,7 @@ function G.UIDEF.create_UIBox_create_lobby_button()
 															n = G.UIT.T,
 															config = {
 																text = G.MULTIPLAYER.UTILS.wrapText(
-																	G.localization.misc.dictionary["showdown_desc"]
-																		or "Both players play 3 normal antes, then they play an ante where every round the player with the higher scorer wins.",
+																	localize("k_vanilla_description"),
 																	50
 																),
 																shadow = true,
@@ -297,7 +293,7 @@ function G.UIDEF.create_UIBox_create_lobby_button()
 									end,
 								},
 								{
-									label = G.localization.misc.dictionary["vanilla_plus_name"] or "Vanilla+",
+									label = localize("k_weekly"),
 									tab_definition_function = function()
 										return {
 											n = G.UIT.ROOT,
@@ -321,11 +317,12 @@ function G.UIDEF.create_UIBox_create_lobby_button()
 													},
 													nodes = {
 														UIBox_button({
+															id = "start_weekly",
 															label = {
-																G.localization.misc.dictionary["coming_soon"]
-																	or "Coming Soon!",
+																localize("start_lobby"),
 															},
 															colour = G.C.RED,
+															button = "start_lobby",
 															minw = 5,
 														}),
 													},
@@ -343,8 +340,7 @@ function G.UIDEF.create_UIBox_create_lobby_button()
 															n = G.UIT.T,
 															config = {
 																text = G.MULTIPLAYER.UTILS.wrapText(
-																	G.localization.misc.dictionary["vp_desc"]
-																		or "The first person to fail a round loses, no PvP blinds.",
+																	localize("k_weekly_description"),
 																	50
 																),
 																shadow = true,
@@ -359,7 +355,7 @@ function G.UIDEF.create_UIBox_create_lobby_button()
 									end,
 								},
 								{
-									label = G.localization.misc.dictionary["royale_name"] or "Battle Royale",
+									label = localize("k_tournament"),
 									tab_definition_function = function()
 										return {
 											n = G.UIT.ROOT,
@@ -383,11 +379,12 @@ function G.UIDEF.create_UIBox_create_lobby_button()
 													},
 													nodes = {
 														UIBox_button({
+															id = "start_tournament",
 															label = {
-																G.localization.misc.dictionary["coming_soon"]
-																	or "Coming Soon!",
+																localize("start_lobby"),
 															},
 															colour = G.C.RED,
+															button = "start_lobby",
 															minw = 5,
 														}),
 													},
@@ -405,8 +402,7 @@ function G.UIDEF.create_UIBox_create_lobby_button()
 															n = G.UIT.T,
 															config = {
 																text = G.MULTIPLAYER.UTILS.wrapText(
-																	G.localization.misc.dictionary["royale_desc"]
-																		or "Attrition, except there are up to 8 players and every player only has 1 life.",
+																	localize("k_tournament_description"),
 																	50
 																),
 																shadow = true,
@@ -543,7 +539,12 @@ end
 
 function G.FUNCS.start_lobby(e)
 	G.SETTINGS.paused = false
-	G.MULTIPLAYER.create_lobby(e.config.id == "start_attrition" and "attrition" or "showdown")
+	G.MULTIPLAYER.create_lobby(
+		e.config.id == "start_vanilla" and "vanilla"
+			or e.config.id == "start_weekly" and "weekly"
+			or e.config.id == "start_tournament" and "tournament"
+			or "standard"
+	)
 end
 
 -- Modify play button to take you to mode select first

@@ -15,7 +15,7 @@ SMODS.Joker({
 	blueprint_compat = true,
 	eternal_compat = true,
 	perishable_compat = true,
-	config = { t_chips = 0, extra = { extra = 120 } },
+	config = { t_chips = 0, extra = { extra = 125 } },
 	loc_vars = function(self, info_queue, card)
 		return { vars = { card.ability.extra.extra, card.ability.t_chips } }
 	end,
@@ -132,15 +132,17 @@ SMODS.Joker({
 	blueprint_compat = true,
 	eternal_compat = true,
 	perishable_compat = true,
-	config = { x_mult = 1, extra = { denominator = 4, extra = 0.3, extra_extra = 0.2 } },
+	config = { extra = { denominator = 4, xmult = 4, dollars = 10, nemesis_denominator = 8, nemesis_dollars = 5 } },
 	loc_vars = function(self, info_queue, card)
 		return {
 			vars = {
 				G.GAME.probabilities.normal,
 				card.ability.extra.denominator,
-				card.ability.extra.extra,
-				card.ability.extra.extra_extra,
-				card.ability.x_mult,
+				card.ability.extra.xmult,
+				card.ability.extra.dollars,
+				G.GAME.probabilities.normal,
+				card.ability.extra.nemesis_denominator,
+				card.ability.extra.nemesis_dollars,
 			},
 		}
 	end,
@@ -148,120 +150,11 @@ SMODS.Joker({
 		return G.LOBBY.code and G.LOBBY.config.multiplayer_jokers
 	end,
 	calculate = function(self, card, context)
-		if context.cardarea == G.jokers then
-			if context.joker_main then
-				return {
-					message = localize({
-						type = "variable",
-						key = "a_xmult",
-						vars = { card.ability.x_mult },
-					}),
-					Xmult_mod = card.ability.x_mult,
-				}
-			end
-			if context.end_of_round and not context.blueprint and not context.repetition and G.GAME.blind.boss then
-				card.ability.extra.extra = card.ability.extra.extra + card.ability.extra.extra_extra
-				return {
-					message = localize({
-						type = "variable",
-						key = "a_xmult_plus",
-						vars = { card.ability.extra.extra_extra },
-					}),
-				}
-			end
-		end
-		if context.selling_self and not context.blueprint then
-			if pseudorandom(self.key) > G.GAME.probabilities.normal / card.ability.extra.denominator then
-				local new_card = copy_card(card)
-				new_card:start_materialize()
-				new_card:add_to_deck()
-				G.jokers:emplace(new_card)
-				new_card.ability.x_mult = card.ability.x_mult + card.ability.extra.extra
-				new_card.ability.extra.extra = card.ability.extra.extra
-			else
-				G.E_MANAGER:add_event(Event({
-					trigger = "after",
-					delay = 0.06 * G.SETTINGS.GAMESPEED,
-					blockable = false,
-					blocking = false,
-					func = function()
-						play_sound("tarot2", 0.76, 0.4)
-						return true
-					end,
-				}))
-				play_sound("tarot2", 1, 0.4)
-				attention_text({
-					text = localize("k_nope_ex"),
-					scale = 0.8,
-					hold = 0.8,
-					major = card,
-					backdrop_colour = G.C.SECONDARY_SET.Tarot,
-					align = (G.STATE == G.STATES.TAROT_PACK or G.STATE == G.STATES.SPECTRAL_PACK) and "tm" or "cm",
-					offset = {
-						x = 0,
-						y = (G.STATE == G.STATES.TAROT_PACK or G.STATE == G.STATES.SPECTRAL_PACK) and -0.2 or 0,
-					},
-					silent = true,
-				})
-			end
-		end
+		
 	end,
 	mp_credits = {
 		idea = { "Dr. Monty", "Carter" },
 		art = { "Carter" },
-		code = { "Virtualized" },
-	},
-})
-
-SMODS.Atlas({
-	key = "hanging_bad",
-	path = "j_hanging_bad.png",
-	px = 71,
-	py = 95,
-})
-
-SMODS.Joker({
-	key = "hanging_bad",
-	atlas = "hanging_bad",
-	rarity = 1,
-	cost = 4,
-	unlocked = true,
-	discovered = true,
-	blueprint_compat = false,
-	eternal_compat = true,
-	perishable_compat = true,
-	loc_vars = function(self, info_queue, card)
-		add_nemesis_info(info_queue)
-		return { vars = {} }
-	end,
-	add_to_deck = function(self, card, from_debuff)
-		if card.edition and card.edition.type ~= "e_mp_phantom" then
-			return
-		end
-		G.MULTIPLAYER.send_phantom("j_mp_hanging_bad")
-	end,
-	calculate = function(self, card, context)
-		if context.cardarea == G.jokers and is_pvp_boss() then
-			if context.before and context.scoring_hand then
-				context.scoring_hand[1]:set_debuff(true)
-			end
-			if context.after and context.scoring_hand then
-				context.scoring_hand[1]:set_debuff(false)
-			end
-		end
-	end,
-	remove_from_deck = function(self, card, from_debuff)
-		if card.edition and card.edition.type ~= "e_mp_phantom" then
-			return
-		end
-		G.MULTIPLAYER.remove_phantom("j_mp_hanging_bad")
-	end,
-	in_pool = function(self)
-		return G.LOBBY.code and G.LOBBY.config.multiplayer_jokers
-	end,
-	mp_credits = {
-		idea = { "Dr. Monty", "Carter" },
-		art = { "TheTrueRaven" },
 		code = { "Virtualized" },
 	},
 })
@@ -293,6 +186,197 @@ SMODS.Joker({
 	mp_credits = {
 		idea = { "Dr. Monty", "Carter" },
 		art = { "Aura!" },
+		code = { "Virtualized" },
+	},
+})
+
+SMODS.Atlas({
+	key = "conjoined_joker",
+	path = "j_conjoined_joker.png",
+	px = 71,
+	py = 95,
+})
+
+SMODS.Joker({
+	key = "conjoined_joker",
+	atlas = "conjoined_joker",
+	rarity = 2,
+	cost = 6,
+	unlocked = true,
+	discovered = true,
+	blueprint_compat = true,
+	eternal_compat = true,
+	perishable_compat = true,
+	config = { extra = { xmult_gain = 1, max_xmult = 5, xmult = 1 } },
+	loc_vars = function(self, info_queue, card)
+		add_nemesis_info(info_queue)
+		return { vars = { card.ability.extra.xmult_gain, card.ability.extra.max_xmult, card.ability.extra.xmult } }
+	end,
+	in_pool = function(self)
+		return G.LOBBY.code and G.LOBBY.config.multiplayer_jokers
+	end,
+	mp_credits = {
+		idea = { "Zilver" },
+		art = { "Nas4xou" },
+		code = { "Virtualized" },
+	},
+})
+
+SMODS.Atlas({
+	key = "copycat",
+	path = "j_copycat.png",
+	px = 71,
+	py = 95,
+})
+
+SMODS.Joker({
+	key = "copycat",
+	atlas = "copycat",
+	rarity = 3,
+	cost = 8,
+	unlocked = true,
+	discovered = true,
+	blueprint_compat = true,
+	eternal_compat = true,
+	perishable_compat = true,
+	loc_vars = function(self, info_queue, card)
+		add_nemesis_info(info_queue)
+		return { vars = {} }
+	end,
+	in_pool = function(self)
+		return G.LOBBY.code and G.LOBBY.config.multiplayer_jokers
+	end,
+	mp_credits = {
+		idea = { "Zilver" },
+		art = { "zeathemays" },
+		code = { "Virtualized" },
+	},
+})
+
+SMODS.Atlas({
+	key = "magnet",
+	path = "j_magnet.png",
+	px = 71,
+	py = 95,
+})
+
+SMODS.Joker({
+	key = "magnet",
+	atlas = "magnet",
+	rarity = 3,
+	cost = 8,
+	unlocked = true,
+	discovered = true,
+	blueprint_compat = false,
+	eternal_compat = true,
+	perishable_compat = true,
+	config = { extra = { rounds = 2, current_rounds = 0 } },
+	loc_vars = function(self, info_queue, card)
+		add_nemesis_info(info_queue)
+		return { vars = { card.ability.extra.rounds, card.ability.extra.current_rounds, card.ability.extra.rounds } }
+	end,
+	in_pool = function(self)
+		return G.LOBBY.code and G.LOBBY.config.multiplayer_jokers
+	end,
+	mp_credits = {
+		idea = { "Zilver" },
+		art = { "Ganpan140" },
+		code = { "Virtualized" },
+	},
+})
+
+SMODS.Atlas({
+	key = "penny_pincher",
+	path = "j_penny_pincher.png",
+	px = 71,
+	py = 95,
+})
+
+SMODS.Joker({
+	key = "penny_pincher",
+	atlas = "penny_pincher",
+	rarity = 1,
+	cost = 4,
+	unlocked = true,
+	discovered = true,
+	blueprint_compat = true,
+	eternal_compat = true,
+	perishable_compat = true,
+	config = { extra = { dollars = 1, nemesis_dollars = 3 } },
+	loc_vars = function(self, info_queue, card)
+		add_nemesis_info(info_queue)
+		return { vars = { card.ability.extra.dollars, card.ability.extra.nemesis_dollars } }
+	end,
+	in_pool = function(self)
+		return G.LOBBY.code and G.LOBBY.config.multiplayer_jokers
+	end,
+	mp_credits = {
+		idea = { "Nxkoozie" },
+		art = { "Coo29" },
+		code = { "Virtualized" },
+	},
+})
+
+SMODS.Atlas({
+	key = "pizza",
+	path = "j_pizza.png",
+	px = 71,
+	py = 95,
+})
+
+SMODS.Joker({
+	key = "pizza",
+	atlas = "pizza",
+	rarity = 1,
+	cost = 4,
+	unlocked = true,
+	discovered = true,
+	blueprint_compat = true,
+	eternal_compat = true,
+	perishable_compat = true,
+	config = { extra = { discards = 6, discards_loss = 1 } },
+	loc_vars = function(self, info_queue, card)
+		add_nemesis_info(info_queue)
+		return { vars = { card.ability.extra.discards, card.ability.extra.discards_loss } }
+	end,
+	in_pool = function(self)
+		return G.LOBBY.code and G.LOBBY.config.multiplayer_jokers
+	end,
+	mp_credits = {
+		idea = { "Virtualized" },
+		art = { "TheTrueRaven" },
+		code = { "Virtualized" },
+	},
+})
+
+SMODS.Atlas({
+	key = "taxes",
+	path = "j_taxes.png",
+	px = 71,
+	py = 95,
+})
+
+SMODS.Joker({
+	key = "taxes",
+	atlas = "taxes",
+	rarity = 2,
+	cost = 6,
+	unlocked = true,
+	discovered = true,
+	blueprint_compat = true,
+	eternal_compat = true,
+	perishable_compat = true,
+	config = { extra = { mult_gain = 5, mult = 1 } },
+	loc_vars = function(self, info_queue, card)
+		add_nemesis_info(info_queue)
+		return { vars = { card.ability.extra.mult_gain, card.ability.extra.mult } }
+	end,
+	in_pool = function(self)
+		return G.LOBBY.code and G.LOBBY.config.multiplayer_jokers
+	end,
+	mp_credits = {
+		idea = { "Zwei" },
+		art = { "Kittyknight" },
 		code = { "Virtualized" },
 	},
 })
