@@ -15,265 +15,280 @@ function G.MULTIPLAYER.set_username(username)
 	end
 end
 
-local function action_connected()
-	G.LOBBY.connected = true
-	G.MULTIPLAYER.update_connection_status()
-	Client.send(string.format("action:username,username:%s,modHash:%s", G.LOBBY.username, G.MULTIPLAYER.MOD_STRING))
-end
-
-local function action_joinedLobby(code, type)
-	G.LOBBY.code = code
-	G.LOBBY.type = type
-	reset_gamemode_modifiers()
-	G.MULTIPLAYER.lobby_info()
-	G.MULTIPLAYER.update_connection_status()
-end
-
-local function action_lobbyInfo(host, hostHash, guest, guestHash, is_host)
-	G.LOBBY.players = {}
-	G.LOBBY.is_host = is_host == "true"
-	G.LOBBY.host = { username = host, hash_str = hostHash, hash = hash(hostHash) }
-	if guest ~= nil then
-		G.LOBBY.guest = { username = guest, hash_str = guestHash, hash = hash(guestHash) }
-	else
-		G.LOBBY.guest = {}
-	end
-	-- TODO: This should check for player count instead
-	-- once we enable more than 2 players
-	G.LOBBY.ready_to_start = G.LOBBY.is_host and guest ~= nil
-
-	if G.LOBBY.is_host then
-		G.MULTIPLAYER.lobby_options()
+local action_connected = action_connected
+	or function()
+		G.LOBBY.connected = true
+		G.MULTIPLAYER.update_connection_status()
+		Client.send(string.format("action:username,username:%s,modHash:%s", G.LOBBY.username, G.MULTIPLAYER.MOD_STRING))
 	end
 
-	if G.STAGE == G.STAGES.MAIN_MENU then
-		G.MULTIPLAYER.update_player_usernames()
+local action_joinedLobby = action_joinedLobby
+	or function(code, type)
+		G.LOBBY.code = code
+		G.LOBBY.type = type
+		reset_gamemode_modifiers()
+		G.MULTIPLAYER.lobby_info()
+		G.MULTIPLAYER.update_connection_status()
 	end
-end
 
-local function action_error(message)
-	sendWarnMessage(message, "MULTIPLAYER")
+local action_lobbyInfo = action_lobbyInfo
+	or function(host, hostHash, guest, guestHash, is_host)
+		G.LOBBY.players = {}
+		G.LOBBY.is_host = is_host == "true"
+		G.LOBBY.host = { username = host, hash_str = hostHash, hash = hash(hostHash) }
+		if guest ~= nil then
+			G.LOBBY.guest = { username = guest, hash_str = guestHash, hash = hash(guestHash) }
+		else
+			G.LOBBY.guest = {}
+		end
+		-- TODO: This should check for player count instead
+		-- once we enable more than 2 players
+		G.LOBBY.ready_to_start = G.LOBBY.is_host and guest ~= nil
 
-	G.MULTIPLAYER.UTILS.overlay_message(message)
-end
+		if G.LOBBY.is_host then
+			G.MULTIPLAYER.lobby_options()
+		end
 
-local function action_keep_alive()
+		if G.STAGE == G.STAGES.MAIN_MENU then
+			G.MULTIPLAYER.update_player_usernames()
+		end
+	end
+
+local action_error = action_error
+	or function(message)
+		sendWarnMessage(message, "MULTIPLAYER")
+
+		G.MULTIPLAYER.UTILS.overlay_message(message)
+	end
+
+local action_keep_alive = action_keep_alive or function()
 	Client.send("action:keepAliveAck")
 end
 
-local function action_disconnected()
-	G.LOBBY.connected = false
-	if G.LOBBY.code then
-		G.LOBBY.code = nil
+local action_disconnected = action_disconnected
+	or function()
+		G.LOBBY.connected = false
+		if G.LOBBY.code then
+			G.LOBBY.code = nil
+		end
+		G.MULTIPLAYER.update_connection_status()
 	end
-	G.MULTIPLAYER.update_connection_status()
-end
 
 ---@param deck string
 ---@param seed string
 ---@param stake_str string
-local function action_start_game(deck, seed, stake_str)
-	reset_game_states()
-	local stake = tonumber(stake_str)
-	G.MULTIPLAYER.set_ante(0)
-	if not G.LOBBY.config.different_seeds and G.LOBBY.config.custom_seed ~= "random" then
-		seed = G.LOBBY.config.custom_seed
+local action_start_game = action_start_game
+	or function(deck, seed, stake_str)
+		reset_game_states()
+		local stake = tonumber(stake_str)
+		G.MULTIPLAYER.set_ante(0)
+		if not G.LOBBY.config.different_seeds and G.LOBBY.config.custom_seed ~= "random" then
+			seed = G.LOBBY.config.custom_seed
+		end
+		G.FUNCS.lobby_start_run(nil, { deck = deck, seed = seed, stake = stake })
 	end
-	G.FUNCS.lobby_start_run(nil, { deck = deck, seed = seed, stake = stake })
-end
 
-local function action_start_blind()
-	G.MULTIPLAYER_GAME.ready_blind = false
-	if G.MULTIPLAYER_GAME.next_blind_context then
-		G.FUNCS.select_blind(G.MULTIPLAYER_GAME.next_blind_context)
-	else
-		sendErrorMessage("No next blind context", "MULTIPLAYER")
+local action_start_blind = action_start_blind
+	or function()
+		G.MULTIPLAYER_GAME.ready_blind = false
+		if G.MULTIPLAYER_GAME.next_blind_context then
+			G.FUNCS.select_blind(G.MULTIPLAYER_GAME.next_blind_context)
+		else
+			sendErrorMessage("No next blind context", "MULTIPLAYER")
+		end
 	end
-end
 
 ---@param score_str string
 ---@param hands_left_str string
 ---@param skips_str string
-local function action_enemy_info(score_str, hands_left_str, skips_str)
-	local score = tonumber(score_str)
-	local hands_left = tonumber(hands_left_str)
-	local skips = tonumber(skips_str)
+local action_enemy_info = action_enemy_info
+	or function(score_str, hands_left_str, skips_str)
+		local score = tonumber(score_str)
+		local hands_left = tonumber(hands_left_str)
+		local skips = tonumber(skips_str)
 
-	if score == nil or hands_left == nil then
-		sendDebugMessage("Invalid score or hands_left", "MULTIPLAYER")
-		return
+		if score == nil or hands_left == nil then
+			sendDebugMessage("Invalid score or hands_left", "MULTIPLAYER")
+			return
+		end
+
+		G.E_MANAGER:add_event(Event({
+			blockable = false,
+			blocking = false,
+			trigger = "ease",
+			delay = 3,
+			ref_table = G.MULTIPLAYER_GAME.enemy,
+			ref_value = "score",
+			ease_to = score,
+			func = function(t)
+				return math.floor(t)
+			end,
+		}))
+
+		G.MULTIPLAYER_GAME.enemy.hands = hands_left
+		G.MULTIPLAYER_GAME.enemy.skips = skips
+
+		if is_pvp_boss() then
+			G.HUD_blind:get_UIE_by_ID("HUD_blind_count"):juice_up()
+			G.HUD_blind:get_UIE_by_ID("dollars_to_be_earned"):juice_up()
+		end
 	end
 
-	G.E_MANAGER:add_event(Event({
-		blockable = false,
-		blocking = false,
-		trigger = "ease",
-		delay = 3,
-		ref_table = G.MULTIPLAYER_GAME.enemy,
-		ref_value = "score",
-		ease_to = score,
-		func = function(t)
-			return math.floor(t)
-		end,
-	}))
-
-	G.MULTIPLAYER_GAME.enemy.hands = hands_left
-	G.MULTIPLAYER_GAME.enemy.skips = skips
-
-	if is_pvp_boss() then
-		G.HUD_blind:get_UIE_by_ID("HUD_blind_count"):juice_up()
-		G.HUD_blind:get_UIE_by_ID("dollars_to_be_earned"):juice_up()
+local action_stop_game = action_stop_game
+	or function()
+		if G.STAGE ~= G.STAGES.MAIN_MENU then
+			G.FUNCS.go_to_menu()
+			G.MULTIPLAYER.update_connection_status()
+			reset_game_states()
+		end
 	end
-end
 
-local function action_stop_game()
-	if G.STAGE ~= G.STAGES.MAIN_MENU then
-		G.FUNCS.go_to_menu()
-		G.MULTIPLAYER.update_connection_status()
-		reset_game_states()
-	end
-end
-
-local function action_end_pvp()
+local action_end_pvp = action_end_pvp or function()
 	G.MULTIPLAYER_GAME.end_pvp = true
 end
 
 ---@param lives number
-local function action_player_info(lives)
-	if G.MULTIPLAYER_GAME.lives ~= lives then
-		if G.MULTIPLAYER_GAME.lives ~= 0 and G.LOBBY.config.gold_on_life_loss then
-			G.MULTIPLAYER_GAME.comeback_bonus_given = false
-			G.MULTIPLAYER_GAME.comeback_bonus = G.MULTIPLAYER_GAME.comeback_bonus + 1
+local action_player_info = action_player_info
+	or function(lives)
+		if G.MULTIPLAYER_GAME.lives ~= lives then
+			if G.MULTIPLAYER_GAME.lives ~= 0 and G.LOBBY.config.gold_on_life_loss then
+				G.MULTIPLAYER_GAME.comeback_bonus_given = false
+				G.MULTIPLAYER_GAME.comeback_bonus = G.MULTIPLAYER_GAME.comeback_bonus + 1
+			end
+			ease_lives(lives - G.MULTIPLAYER_GAME.lives)
 		end
-		ease_lives(lives - G.MULTIPLAYER_GAME.lives)
+		G.MULTIPLAYER_GAME.lives = lives
 	end
-	G.MULTIPLAYER_GAME.lives = lives
-end
 
-local function action_win_game()
+local action_win_game = action_win_game or function()
 	win_game()
 	G.GAME.won = true
 end
 
-local function action_lose_game()
+local action_lose_game = action_lose_game or function()
 	G.STATE_COMPLETE = false
 	G.STATE = G.STATES.GAME_OVER
 end
 
-local function action_lobby_options(options)
-	local different_decks_before = G.LOBBY.config.different_decks
-	for k, v in pairs(options) do
-		if k == "gamemode" then
-			G.LOBBY.config.gamemode = v
-			goto continue
+local action_lobby_options = action_lobby_options
+	or function(options)
+		local different_decks_before = G.LOBBY.config.different_decks
+		for k, v in pairs(options) do
+			if k == "gamemode" then
+				G.LOBBY.config.gamemode = v
+				goto continue
+			end
+			local parsed_v = v
+			if v == "true" then
+				parsed_v = true
+			elseif v == "false" then
+				parsed_v = false
+			end
+			if k == "starting_lives" or k == "showdown_starting_antes" then
+				parsed_v = tonumber(v)
+			end
+			G.LOBBY.config[k] = parsed_v
+			if G.OVERLAY_MENU then
+				local config_uie = G.OVERLAY_MENU:get_UIE_by_ID(k .. "_toggle")
+				if config_uie then
+					G.FUNCS.toggle(config_uie)
+				end
+			end
+			::continue::
 		end
-		local parsed_v = v
-		if v == "true" then
-			parsed_v = true
-		elseif v == "false" then
-			parsed_v = false
+		if different_decks_before ~= G.LOBBY.config.different_decks then
+			G.FUNCS.exit_overlay_menu() -- throw out guest from any menu.
 		end
-		if k == "starting_lives" or k == "showdown_starting_antes" then
-			parsed_v = tonumber(v)
+		G.MULTIPLAYER.update_player_usernames() -- render new DECK button state
+	end
+
+local action_send_phantom = action_send_phantom
+	or function(key)
+		local new_card = create_card("Joker", G.shared, false, nil, nil, nil, key)
+		new_card:set_edition("e_mp_phantom")
+		new_card:add_to_deck()
+		G.shared:emplace(new_card)
+	end
+
+local action_remove_phantom = action_remove_phantom
+	or function(key)
+		local card = G.MULTIPLAYER.UTILS.get_phantom_joker(key)
+		if card then
+			card:remove_from_deck()
+			card:start_dissolve({ G.C.RED }, nil, 1.6)
+			G.shared:remove_card(card)
 		end
-		G.LOBBY.config[k] = parsed_v
-		if G.OVERLAY_MENU then
-			local config_uie = G.OVERLAY_MENU:get_UIE_by_ID(k .. "_toggle")
-			if config_uie then
-				G.FUNCS.toggle(config_uie)
+	end
+
+local action_speedrun = action_speedrun
+	or function()
+		local card = G.MULTIPLAYER.UTILS.get_joker("j_mp_speedrun")
+		if card then
+			card:juice_up()
+			G.GAME.chips = to_big(G.GAME.chips) * to_big(3)
+		end
+	end
+
+local action_enemyLocation = action_enemyLocation
+	or function(options)
+		local location = options.location
+		local value = ""
+
+		if string.find(location, "-") then
+			local split = {}
+			for str in string.gmatch(location, "([^-]+)") do
+				table.insert(split, str)
+			end
+			location = split[1]
+			value = split[2]
+		end
+
+		loc_name = localize({ type = "name_text", key = value, set = "Blind" })
+		if loc_name ~= "ERROR" then
+			value = loc_name
+		else
+			value = (G.P_BLINDS[value] and G.P_BLINDS[value].name) or value
+		end
+
+		loc_location = G.localization.misc.dictionary[location]
+
+		if loc_location == nil then
+			if location ~= nil then
+				loc_location = location
+			else
+				loc_location = "Unknown"
 			end
 		end
-		::continue::
-	end
-	if different_decks_before ~= G.LOBBY.config.different_decks then
-		G.FUNCS.exit_overlay_menu() -- throw out guest from any menu.
-	end
-	G.MULTIPLAYER.update_player_usernames() -- render new DECK button state
-end
 
-local function action_send_phantom(key)
-	local new_card = create_card("Joker", G.shared, false, nil, nil, nil, key)
-	new_card:set_edition("e_mp_phantom")
-	new_card:add_to_deck()
-	G.shared:emplace(new_card)
-end
-
-local function action_remove_phantom(key)
-	local card = G.MULTIPLAYER.UTILS.get_phantom_joker(key)
-	if card then
-		card:remove_from_deck()
-		card:start_dissolve({ G.C.RED }, nil, 1.6)
-		G.shared:remove_card(card)
-	end
-end
-
-local function action_speedrun()
-	local card = G.MULTIPLAYER.UTILS.get_joker("j_mp_speedrun")
-	if card then
-		card:juice_up()
-		G.GAME.chips = to_big(G.GAME.chips) * to_big(3 + (speedrun_factor or 0.25)*((effect_level or 1) - 1))
-	end
-end
-
-local function enemyLocation(options)
-	local location = options.location
-	local value = ""
-
-	if string.find(location, "-") then
-		local split = {}
-		for str in string.gmatch(location, "([^-]+)") do
-			table.insert(split, str)
-		end
-		location = split[1]
-		value = split[2]
+		G.MULTIPLAYER_GAME.enemy.location = loc_location .. value
 	end
 
-	loc_name = localize({ type = "name_text", key = value, set = "Blind" })
-	if loc_name ~= "ERROR" then
-		value = loc_name
-	else
-		value = (G.P_BLINDS[value] and G.P_BLINDS[value].name) or value
-	end
-
-	loc_location = G.localization.misc.dictionary[location]
-
-	if loc_location == nil then
-		if location ~= nil then
-			loc_location = location
-		else
-			loc_location = "Unknown"
-		end
-	end
-
-	G.MULTIPLAYER_GAME.enemy.location = loc_location .. value
-end
-
-local function action_version()
+local action_version = action_version or function()
 	G.MULTIPLAYER.version()
 end
 
-local function action_asteroid()
-        
-	local hand_type = "High Card"
-	local max_level = 0
-	for k, v in pairs(G.GAME.hands) do
-		if to_big(v.level) > to_big(max_level) then
-			hand_type = k
-			max_level = v.level
+local action_asteroid = action_asteroid
+	or function()
+		local hand_type = "High Card"
+		local max_level = 0
+		for k, v in pairs(G.GAME.hands) do
+			if to_big(v.level) > to_big(max_level) then
+				hand_type = k
+				max_level = v.level
+			end
 		end
+		update_hand_text({ sound = "button", volume = 0.7, pitch = 0.8, delay = 0.3 }, {
+			handname = localize(hand_type, "poker_hands"),
+			chips = G.GAME.hands[hand_type].chips,
+			mult = G.GAME.hands[hand_type].mult,
+			level = G.GAME.hands[hand_type].level,
+		})
+		level_up_hand(nil, hand_type, false, -1)
+		update_hand_text(
+			{ sound = "button", volume = 0.7, pitch = 1.1, delay = 0 },
+			{ mult = 0, chips = 0, handname = "", level = "" }
+		)
 	end
-	update_hand_text({ sound = "button", volume = 0.7, pitch = 0.8, delay = 0.3 }, {
-		handname = localize(hand_type, "poker_hands"),
-		chips = G.GAME.hands[hand_type].chips,
-		mult = G.GAME.hands[hand_type].mult,
-		level = G.GAME.hands[hand_type].level,
-	})
-	level_up_hand(nil, hand_type, false, -((asteroid_factor or 1) * (planet_level or 1)))
-	update_hand_text(
-		{ sound = "button", volume = 0.7, pitch = 1.1, delay = 0 },
-		{ mult = 0, chips = 0, handname = "", level = "" }
-	)
-end
 
 -- #region Client to Server
 function G.MULTIPLAYER.create_lobby(gamemode)
