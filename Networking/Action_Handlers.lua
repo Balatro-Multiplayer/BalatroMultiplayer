@@ -211,7 +211,7 @@ local function action_speedrun()
 	local card = G.MULTIPLAYER.UTILS.get_joker("j_mp_speedrun")
 	if card then
 		card:juice_up()
-		G.GAME.chips = to_big(G.GAME.chips) * to_big(3)
+		G.GAME.chips = to_big(G.GAME.chips) * to_big(3 + 0.25*((effect_level or 1) - 1))
 	end
 end
 
@@ -253,6 +253,7 @@ local function action_version()
 end
 
 local function action_asteroid()
+        
 	local hand_type = "High Card"
 	local max_level = 0
 	for k, v in pairs(G.GAME.hands) do
@@ -263,11 +264,11 @@ local function action_asteroid()
 	end
 	update_hand_text({ sound = "button", volume = 0.7, pitch = 0.8, delay = 0.3 }, {
 		handname = localize(hand_type, "poker_hands"),
-		chips = G.GAME.hands[hand_type].chips,
-		mult = G.GAME.hands[hand_type].mult,
-		level = G.GAME.hands[hand_type].level,
+		chips = (planet_level or 1) * G.GAME.hands[hand_type].chips,
+		mult = (planet_level or 1) * G.GAME.hands[hand_type].mult,
+		level = (planet_level or 1) * G.GAME.hands[hand_type].level,
 	})
-	level_up_hand(nil, hand_type, false, -1)
+	level_up_hand(nil, hand_type, false, -(planet_level or 1))
 	update_hand_text(
 		{ sound = "button", volume = 0.7, pitch = 1.1, delay = 0 },
 		{ mult = 0, chips = 0, handname = "", level = "" }
