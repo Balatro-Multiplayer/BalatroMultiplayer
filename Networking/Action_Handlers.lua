@@ -262,8 +262,6 @@ local function action_asteroid()
 			max_level = v.level
 		end
 	end
-        print(asteroid_factor)
-        print(speedrun_factor)
 	update_hand_text({ sound = "button", volume = 0.7, pitch = 0.8, delay = 0.3 }, {
 		handname = localize(hand_type, "poker_hands"),
 		chips = G.GAME.hands[hand_type].chips,
