@@ -61,7 +61,7 @@ payload = '''elseif config.name == "comeback" then
     config = {
       object = DynaText({
         string = {
-          localize("total_lives_lost"),
+          localize("k_total_lives_lost"),
         },
         colours = { G.C.UI.TEXT_LIGHT },
         shadow = true,

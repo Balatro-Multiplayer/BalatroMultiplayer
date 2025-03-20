@@ -22,10 +22,9 @@ function G.UIDEF.get_connection_status_ui()
 					n = G.UIT.T,
 					config = {
 						scale = 0.3,
-						text = (MP.LOBBY.code and (G.localization.misc.dictionary["in_lobby"] or "In Lobby"))
-							or (MP.LOBBY.connected and (G.localization.misc.dictionary["connected"] or "Connected to Service"))
-							or G.localization.misc.dictionary["warn_service"]
-							or "WARN: Cannot Find Multiplayer Service",
+						text = (MP.LOBBY.code and localize("k_in_lobby")) or (MP.LOBBY.connected and localize(
+							"k_connected"
+						)) or localize("k_warn_service"),
 						colour = G.C.UI.TEXT_LIGHT,
 					},
 				},
@@ -82,7 +81,7 @@ function G.UIDEF.create_UIBox_view_code()
 							},
 							nodes = {
 								UIBox_button({
-									label = { G.localization.misc.dictionary["copy_clipboard"] or "Copy to Clipboard" },
+									label = { localize("b_copy_clipboard") },
 									colour = G.C.BLUE,
 									button = "copy_to_clipboard",
 									minw = 5,
@@ -132,8 +131,8 @@ function G.UIDEF.create_UIBox_lobby_menu()
 												and (MP.LOBBY.guest and MP.LOBBY.guest.hash)
 												and (MP.LOBBY.host.hash ~= MP.LOBBY.guest.hash)
 											)
-											and (G.localization.misc.dictionary["mod_hash_warning"] or "Players have different mods or mod versions! This can cause problems!")
-										or ((MP.LOBBY.username == "Guest") and (G.localization.misc.dictionary["set_name"] or "Set your username in the main menu! (Mods > Multiplayer > Config)"))
+											and (localize("k_mod_hash_warning"))
+										or ((MP.LOBBY.username == "Guest") and (localize("k_set_name")))
 										or " "
 									),
 									colour = G.C.UI.TEXT_LIGHT,
@@ -158,14 +157,9 @@ function G.UIDEF.create_UIBox_lobby_menu()
 								colour = G.C.BLUE,
 								minw = 3.65,
 								minh = 1.55,
-								label = { G.localization.misc.dictionary["start"] or "START" },
-								disabled_text = MP.LOBBY.is_host and {
-									G.localization.misc.dictionary["wait_for"] or "WAITING FOR",
-									G.localization.misc.dictionary["players"] or "PLAYERS",
-								} or {
-									G.localization.misc.dictionary["wait_for"] or "WAITING FOR",
-									G.localization.misc.dictionary["host_start"] or "HOST TO START",
-								},
+								label = { localize("b_start") },
+								disabled_text = MP.LOBBY.is_host and localize("b_wait_for_players")
+									or localize("b_wait_for_host_start"),
 								scale = text_scale * 2,
 								col = true,
 								enabled_ref_table = MP.LOBBY,
@@ -183,7 +177,7 @@ function G.UIDEF.create_UIBox_lobby_menu()
 										minw = 3.15,
 										minh = 1.35,
 										label = {
-											G.localization.misc.dictionary["lobby_options_cap"] or "LOBBY OPTIONS",
+											localize("b_lobby_options"),
 										},
 										scale = text_scale * 1.2,
 										col = true,
@@ -262,8 +256,7 @@ function G.UIDEF.create_UIBox_lobby_menu()
 													{
 														n = G.UIT.T,
 														config = {
-															text = G.localization.misc.dictionary["connect_player"]
-																or "Connected Players:",
+															text = localize("k_connect_player"),
 															shadow = true,
 															scale = text_scale * 0.8,
 															colour = G.C.UI.TEXT_LIGHT,
@@ -360,7 +353,7 @@ function G.UIDEF.create_UIBox_lobby_menu()
 										colour = G.C.PALE_GREEN,
 										minw = 3.15,
 										minh = 1.35,
-										label = { G.localization.misc.dictionary["view_code"] or "VIEW CODE" },
+										label = { localize("b_view_code") },
 										scale = text_scale * 1.2,
 										col = true,
 									}),
@@ -372,7 +365,7 @@ function G.UIDEF.create_UIBox_lobby_menu()
 								colour = G.C.RED,
 								minw = 3.65,
 								minh = 1.55,
-								label = { G.localization.misc.dictionary["leave"] or "LEAVE" },
+								label = { localize("b_leave") },
 								scale = text_scale * 1.5,
 								col = true,
 							}),
@@ -407,8 +400,7 @@ function G.UIDEF.create_UIBox_lobby_options()
 								config = {
 									scale = 0.6,
 									shadow = true,
-									text = G.localization.misc.dictionary["opts_only_host"]
-										or "Only the Lobby Host can change these options",
+									text = localize("k_opts_only_host"),
 									colour = G.C.UI.TEXT_LIGHT,
 								},
 							},
@@ -419,7 +411,7 @@ function G.UIDEF.create_UIBox_lobby_options()
 						colour = G.C.BOOSTER,
 						tabs = {
 							{
-								label = G.localization.misc.dictionary["lobby_options"] or "Lobby Options",
+								label = localize("k_lobby_options"),
 								chosen = true,
 								tab_definition_function = function()
 									return {
@@ -445,8 +437,7 @@ function G.UIDEF.create_UIBox_lobby_options()
 														id = "gold_on_life_loss_toggle",
 														enabled_ref_table = MP.LOBBY,
 														enabled_ref_value = "is_host",
-														label = G.localization.misc.dictionary["opts_cb_money"]
-															or "Give comeback gold on life loss",
+														label = localize("b_opts_cb_money"),
 														ref_table = MP.LOBBY.config,
 														ref_value = "gold_on_life_loss",
 														callback = send_lobby_options,
@@ -464,8 +455,7 @@ function G.UIDEF.create_UIBox_lobby_options()
 														id = "no_gold_on_round_loss_toggle",
 														enabled_ref_table = MP.LOBBY,
 														enabled_ref_value = "is_host",
-														label = G.localization.misc.dictionary["opts_no_gold_on_loss"]
-															or "Don't get blind gold on round loss",
+														label = localize("b_opts_no_gold_on_loss"),
 														ref_table = MP.LOBBY.config,
 														ref_value = "no_gold_on_round_loss",
 														callback = send_lobby_options,
@@ -483,8 +473,7 @@ function G.UIDEF.create_UIBox_lobby_options()
 														id = "death_on_round_loss_toggle",
 														enabled_ref_table = MP.LOBBY,
 														enabled_ref_value = "is_host",
-														label = G.localization.misc.dictionary["opts_death_on_loss"]
-															or "Lose a life on non-PvP round loss",
+														label = localize("b_opts_death_on_loss"),
 														ref_table = MP.LOBBY.config,
 														ref_value = "death_on_round_loss",
 														callback = send_lobby_options,
@@ -502,8 +491,7 @@ function G.UIDEF.create_UIBox_lobby_options()
 														id = "different_seeds_toggle",
 														enabled_ref_table = MP.LOBBY,
 														enabled_ref_value = "is_host",
-														label = G.localization.misc.dictionary["opts_diff_seeds"]
-															or "Players have different seeds",
+														label = localize("b_opts_diff_seeds"),
 														ref_table = MP.LOBBY.config,
 														ref_value = "different_seeds",
 														callback = toggle_different_seeds,
@@ -521,8 +509,7 @@ function G.UIDEF.create_UIBox_lobby_options()
 														id = "different_decks_toggle",
 														enabled_ref_table = MP.LOBBY,
 														enabled_ref_value = "is_host",
-														label = G.localization.misc.dictionary["opts_player_diff_deck"]
-															or "Players have different decks",
+														label = localize("b_opts_player_diff_deck"),
 														ref_table = MP.LOBBY.config,
 														ref_value = "different_decks",
 														callback = send_lobby_options,
@@ -540,127 +527,119 @@ function G.UIDEF.create_UIBox_lobby_options()
 														id = "multiplayer_jokers_toggle",
 														enabled_ref_table = MP.LOBBY,
 														enabled_ref_value = "is_host",
-														label = G.localization.misc.dictionary["opts_multiplayer_jokers"]
-															or "Enable Multiplayer Jokers",
+														label = localize("b_opts_multiplayer_jokers"),
 														ref_table = MP.LOBBY.config,
 														ref_value = "multiplayer_jokers",
 														callback = send_lobby_options,
 													}),
 												},
 											},
-											not MP.LOBBY.config.different_seeds
-													and {
-														n = G.UIT.R,
+											not MP.LOBBY.config.different_seeds and {
+												n = G.UIT.R,
+												config = {
+													padding = 0,
+													align = "cr",
+												},
+												nodes = {
+													{
+														n = G.UIT.C,
 														config = {
 															padding = 0,
-															align = "cr",
+															align = "cm",
 														},
 														nodes = {
 															{
-																n = G.UIT.C,
+																n = G.UIT.R,
 																config = {
-																	padding = 0,
-																	align = "cm",
+																	padding = 0.2,
+																	align = "cr",
+																	func = "display_custom_seed",
 																},
 																nodes = {
 																	{
-																		n = G.UIT.R,
+																		n = G.UIT.T,
 																		config = {
-																			padding = 0.2,
-																			align = "cr",
-																			func = "display_custom_seed",
-																		},
-																		nodes = {
-																			{
-																				n = G.UIT.T,
-																				config = {
-																					scale = 0.45,
-																					text = G.localization.misc.dictionary["current_seed"]
-																						or "Current seed: ",
-																					colour = G.C.UI.TEXT_LIGHT,
-																				},
-																			},
-																			{
-																				n = G.UIT.T,
-																				config = {
-																					scale = 0.45,
-																					text = MP.LOBBY.config.custom_seed,
-																					colour = G.C.UI.TEXT_LIGHT,
-																				},
-																			},
+																			scale = 0.45,
+																			text = localize("k_current_seed"),
+																			colour = G.C.UI.TEXT_LIGHT,
 																		},
 																	},
 																	{
-																		n = G.UIT.R,
+																		n = G.UIT.T,
 																		config = {
-																			padding = 0.2,
-																			align = "cr",
-																		},
-																		nodes = {
-																			Disableable_Button({
-																				id = "custom_seed_overlay",
-																				button = "custom_seed_overlay",
-																				colour = G.C.BLUE,
-																				minw = 3.65,
-																				minh = 0.6,
-																				label = {
-																					G.localization.misc.dictionary["set_custom_seed"]
-																						or "Set Custom Seed",
-																				},
-																				disabled_text = {
-																					G.localization.misc.dictionary["set_custom_seed"]
-																						or "Set Custom Seed",
-																				},
-																				scale = 0.45,
-																				col = true,
-																				enabled_ref_table = MP.LOBBY,
-																				enabled_ref_value = "is_host",
-																			}),
-																			{
-																				n = G.UIT.B,
-																				config = {
-																					w = 0.1,
-																					h = 0.1,
-																				},
-																			},
-																			Disableable_Button({
-																				id = "custom_seed_reset",
-																				button = "custom_seed_reset",
-																				colour = G.C.RED,
-																				minw = 1.65,
-																				minh = 0.6,
-																				label = {
-																					G.localization.misc.dictionary["reset"]
-																						or "Reset",
-																				},
-																				disabled_text = {
-																					G.localization.misc.dictionary["reset"]
-																						or "Reset",
-																				},
-																				scale = 0.45,
-																				col = true,
-																				enabled_ref_table = MP.LOBBY,
-																				enabled_ref_value = "is_host",
-																			}),
+																			scale = 0.45,
+																			text = MP.LOBBY.config.custom_seed,
+																			colour = G.C.UI.TEXT_LIGHT,
 																		},
 																	},
 																},
 															},
+															{
+																n = G.UIT.R,
+																config = {
+																	padding = 0.2,
+																	align = "cr",
+																},
+																nodes = {
+																	Disableable_Button({
+																		id = "custom_seed_overlay",
+																		button = "custom_seed_overlay",
+																		colour = G.C.BLUE,
+																		minw = 3.65,
+																		minh = 0.6,
+																		label = {
+																			localize("b_set_custom_seed"),
+																		},
+																		disabled_text = {
+																			localize("b_set_custom_seed"),
+																		},
+																		scale = 0.45,
+																		col = true,
+																		enabled_ref_table = MP.LOBBY,
+																		enabled_ref_value = "is_host",
+																	}),
+																	{
+																		n = G.UIT.B,
+																		config = {
+																			w = 0.1,
+																			h = 0.1,
+																		},
+																	},
+																	Disableable_Button({
+																		id = "custom_seed_reset",
+																		button = "custom_seed_reset",
+																		colour = G.C.RED,
+																		minw = 1.65,
+																		minh = 0.6,
+																		label = {
+																			localize("b_reset"),
+																		},
+																		disabled_text = {
+																			localize("b_reset"),
+																		},
+																		scale = 0.45,
+																		col = true,
+																		enabled_ref_table = MP.LOBBY,
+																		enabled_ref_value = "is_host",
+																	}),
+																},
+															},
 														},
-													}
-												or {
-													n = G.UIT.B,
-													config = {
-														w = 0.1,
-														h = 0.1,
 													},
 												},
+											} or {
+												n = G.UIT.B,
+												config = {
+													w = 0.1,
+													h = 0.1,
+												},
+											},
 										},
 									}
 								end,
 							},
 							{
-								label = G.localization.misc.dictionary["opts_gm"] or "Gamemode Modifiers",
+								label = localize("k_opts_gm"),
 								tab_definition_function = function()
 									return {
 										n = G.UIT.ROOT,
@@ -685,7 +664,7 @@ function G.UIDEF.create_UIBox_lobby_options()
 														id = "starting_lives_option",
 														enabled_ref_table = MP.LOBBY,
 														enabled_ref_value = "is_host",
-														label = G.localization.misc.dictionary["opts_lives"] or "Lives",
+														label = localize("b_opts_lives"),
 														options = {
 															1,
 															2,
@@ -707,18 +686,6 @@ function G.UIDEF.create_UIBox_lobby_options()
 														current_option = MP.LOBBY.config.starting_lives,
 														opt_callback = "change_starting_lives",
 													}),
-													MP.LOBBY.type == "showdown"
-															and Disableable_Option_Cycle({
-																id = "showdown_starting_antes_option",
-																enabled_ref_table = MP.LOBBY,
-																enabled_ref_value = "is_host",
-																label = G.localization.misc.dictionary["opts_start_antes"]
-																	or "Starting Antes",
-																options = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12 },
-																current_option = MP.LOBBY.config.showdown_starting_antes,
-																opt_callback = "change_showdown_starting_antes",
-															})
-														or nil,
 												},
 											},
 										},
@@ -734,8 +701,7 @@ function G.UIDEF.create_UIBox_lobby_options()
 end
 
 function G.FUNCS.display_custom_seed(e)
-	local display = MP.LOBBY.config.custom_seed == "random" and G.localization.misc.dictionary["random"]
-		or MP.LOBBY.config.custom_seed
+	local display = MP.LOBBY.config.custom_seed == "random" and localize("k_random") or MP.LOBBY.config.custom_seed
 	if display ~= e.children[1].config.text then
 		e.children[2].config.text = display
 		e.UIBox:recalculate(true)
@@ -773,7 +739,7 @@ function G.UIDEF.create_UIBox_custom_seed_overlay()
 								n = G.UIT.T,
 								config = {
 									scale = 0.3,
-									text = G.localization.misc.dictionary["enter_to_save"] or "Press enter to save",
+									text = localize("k_enter_to_save"),
 									colour = G.C.UI.TEXT_LIGHT,
 								},
 							},
@@ -879,7 +845,7 @@ function G.FUNCS.lobby_start_run(e, args)
 	if MP.LOBBY.config.different_decks == false then
 		G.FUNCS.copy_host_deck()
 	end
-	
+
 	local challenge = G.CHALLENGES[get_challenge_int_from_id(MP.Rulesets[MP.LOBBY.config.ruleset].challenge_deck)]
 
 	G.FUNCS.start_run(e, {

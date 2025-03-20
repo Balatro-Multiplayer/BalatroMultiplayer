@@ -49,7 +49,7 @@ function create_UIBox_blind_choice(type, run_info)
 
 		if G.GAME.round_resets.blind_choices[type] == "bl_mp_nemesis" then
 			local dt1 = DynaText({
-				string = { { string = G.localization.misc.dictionary["bl_life"] or "LIFE", colour = G.C.FILTER } },
+				string = { { string = localize("k_bl_life"), colour = G.C.FILTER } },
 				colours = { G.C.BLACK },
 				scale = 0.55,
 				silent = true,
@@ -59,7 +59,7 @@ function create_UIBox_blind_choice(type, run_info)
 				maxw = 3,
 			})
 			local dt2 = DynaText({
-				string = { { string = G.localization.misc.dictionary["bl_or"] or "or", colour = G.C.WHITE } },
+				string = { { string = localize("k_bl_or"), colour = G.C.WHITE } },
 				colours = { G.C.CHANCE },
 				scale = 0.35,
 				silent = true,
@@ -68,7 +68,7 @@ function create_UIBox_blind_choice(type, run_info)
 				maxw = 3,
 			})
 			local dt3 = DynaText({
-				string = { { string = G.localization.misc.dictionary["bl_death"] or "DEATH", colour = G.C.FILTER } },
+				string = { { string = localize("k_bl_death"), colour = G.C.FILTER } },
 				colours = { G.C.BLACK },
 				scale = 0.55,
 				silent = true,
@@ -611,10 +611,10 @@ local function update_blind_HUD()
 				G.HUD_blind:get_UIE_by_ID("HUD_blind_count").config.ref_table = MP.GAME.enemy
 				G.HUD_blind:get_UIE_by_ID("HUD_blind_count").config.ref_value = "score_text"
 				G.HUD_blind:get_UIE_by_ID("HUD_blind_count").config.func = "multiplayer_blind_chip_UI_scale"
-				G.HUD_blind:get_UIE_by_ID("HUD_blind").children[2].children[2].children[2].children[1].children[1].config.text = G.localization.misc.dictionary["enemy_score"]
-					or "Current enemy score"
-				G.HUD_blind:get_UIE_by_ID("HUD_blind").children[2].children[2].children[2].children[3].children[1].config.text = G.localization.misc.dictionary["enemy_hands"]
-					or "Enemy hands left:"
+				G.HUD_blind:get_UIE_by_ID("HUD_blind").children[2].children[2].children[2].children[1].children[1].config.text =
+					localize("k_enemy_score")
+				G.HUD_blind:get_UIE_by_ID("HUD_blind").children[2].children[2].children[2].children[3].children[1].config.text =
+					localize("k_enemy_hands")
 				G.HUD_blind:get_UIE_by_ID("dollars_to_be_earned").config.object.config.string =
 					{ { ref_table = MP.GAME.enemy, ref_value = "hands" } }
 				G.HUD_blind:get_UIE_by_ID("dollars_to_be_earned").config.object:update_text()
@@ -645,8 +645,7 @@ end
 function G.FUNCS.mp_toggle_ready(e)
 	sendTraceMessage("Toggling Ready", "MULTIPLAYER")
 	MP.GAME.ready_blind = not MP.GAME.ready_blind
-	MP.GAME.ready_blind_text = MP.GAME.ready_blind and (G.localization.misc.dictionary["unready"] or "Unready")
-		or (G.localization.misc.dictionary["ready"] or "Ready")
+	MP.GAME.ready_blind_text = MP.GAME.ready_blind and localize("b_unready") or localize("b_ready")
 
 	if MP.GAME.ready_blind then
 		MP.ACTIONS.set_location("loc_ready")
@@ -709,7 +708,7 @@ local update_shop_ref = Game.update_shop
 function Game:update_shop(dt)
 	if not G.STATE_COMPLETE then
 		MP.GAME.ready_blind = false
-		MP.GAME.ready_blind_text = G.localization.misc.dictionary["ready"] or "Ready"
+		MP.GAME.ready_blind_text = localize("b_ready")
 		MP.GAME.end_pvp = false
 	end
 	update_shop_ref(self, dt)
@@ -837,7 +836,7 @@ function Game:update_hand_played(dt)
 				if G.GAME.current_round.hands_left < 1 then
 					attention_text({
 						scale = 0.8,
-						text = G.localization.misc.dictionary["wait_enemy"] or "Waiting for enemy to finish...",
+						text = localize("k_wait_enemy"),
 						hold = 5,
 						align = "cm",
 						offset = { x = 0, y = -1.5 },
@@ -1022,7 +1021,7 @@ function Game:start_run(args)
 
 	local scale = 0.4
 	local hud_ante = G.HUD:get_UIE_by_ID("hud_ante")
-	hud_ante.children[1].children[1].config.text = G.localization.misc.dictionary["lives"] or "Lives"
+	hud_ante.children[1].children[1].config.text = localize("k_lives")
 
 	-- Set lives number
 	hud_ante.children[2].children[1].config.object = DynaText({
@@ -1137,7 +1136,7 @@ function create_UIBox_game_over()
 																{
 																	n = G.UIT.T,
 																	config = {
-																		text = localize("k_mp_kofi_message")[1],
+																		text = localize("ml_mp_kofi_message")[1],
 																		scale = 0.35,
 																		colour = G.C.UI.TEXT_LIGHT,
 																		col = true,
@@ -1152,7 +1151,7 @@ function create_UIBox_game_over()
 																{
 																	n = G.UIT.T,
 																	config = {
-																		text = localize("k_mp_kofi_message")[2],
+																		text = localize("ml_mp_kofi_message")[2],
 																		scale = 0.35,
 																		colour = G.C.UI.TEXT_LIGHT,
 																		col = true,
@@ -1167,7 +1166,7 @@ function create_UIBox_game_over()
 																{
 																	n = G.UIT.T,
 																	config = {
-																		text = localize("k_mp_kofi_message")[3],
+																		text = localize("ml_mp_kofi_message")[3],
 																		scale = 0.35,
 																		colour = G.C.UI.TEXT_LIGHT,
 																		col = true,
@@ -1182,7 +1181,7 @@ function create_UIBox_game_over()
 																{
 																	n = G.UIT.T,
 																	config = {
-																		text = localize("k_mp_kofi_message")[4],
+																		text = localize("ml_mp_kofi_message")[4],
 																		scale = 0.35,
 																		colour = G.C.UI.TEXT_LIGHT,
 																		col = true,
@@ -1215,7 +1214,7 @@ function create_UIBox_game_over()
 																		{
 																			n = G.UIT.T,
 																			config = {
-																				text = localize("k_mp_kofi_button"),
+																				text = localize("b_mp_kofi_button"),
 																				scale = 0.35,
 																				colour = G.C.UI.TEXT_LIGHT,
 																			},
@@ -1256,8 +1255,7 @@ function create_UIBox_game_over()
 														{
 															n = G.UIT.T,
 															config = {
-																text = G.localization.misc.dictionary["return_lobby"]
-																	or "Return to Lobby",
+																text = localize("b_return_lobby"),
 																scale = 0.5,
 																colour = G.C.UI.TEXT_LIGHT,
 															},
@@ -1539,8 +1537,7 @@ function create_UIBox_win()
 														{
 															n = G.UIT.T,
 															config = {
-																text = G.localization.misc.dictionary["return_lobby"]
-																	or "Return to Lobby",
+																text = localize("b_return_lobby"),
 																scale = 0.5,
 																colour = G.C.UI.TEXT_LIGHT,
 															},
@@ -1774,7 +1771,7 @@ local function show_enemy_location()
 								{
 									n = G.UIT.T,
 									config = {
-										text = G.localization.misc.dictionary["enemy_loc_1"] or "Enemy",
+										text = localize("ml_enemy_loc")[1],
 										scale = 0.42,
 										colour = G.C.UI.TEXT_LIGHT,
 										shadow = true,
@@ -1789,7 +1786,7 @@ local function show_enemy_location()
 								{
 									n = G.UIT.T,
 									config = {
-										text = G.localization.misc.dictionary["enemy_loc_2"] or "location",
+										text = localize("ml_enemy_loc")[2],
 										scale = 0.42,
 										colour = G.C.UI.TEXT_LIGHT,
 										shadow = true,

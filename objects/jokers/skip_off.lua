@@ -26,9 +26,9 @@ SMODS.Joker({
 				card.ability.extra.discards,
 				G.GAME.skips ~= nil and MP.GAME.enemy.skips ~= nil and localize({
 					type = "variable",
-					key = MP.GAME.enemy.skips > G.GAME.skips and "mp_skips_behind"
-						or MP.GAME.enemy.skips == G.GAME.skips and "mp_skips_tied"
-						or "mp_skips_ahead",
+					key = MP.GAME.enemy.skips > G.GAME.skips and "a_mp_skips_behind"
+						or MP.GAME.enemy.skips == G.GAME.skips and "a_mp_skips_tied"
+						or "a_mp_skips_ahead",
 					vars = { math.abs(MP.GAME.enemy.skips - G.GAME.skips) },
 				})[1] or "",
 			},

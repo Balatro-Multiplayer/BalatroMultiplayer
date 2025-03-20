@@ -205,8 +205,8 @@ local create_mod_badges_ref = SMODS.create_mod_badges
 function SMODS.create_mod_badges(obj, badges)
 	create_mod_badges_ref(obj, badges)
 	if obj and obj.mp_credits then
-		obj.mp_credits.idea = obj.mp_credits.idea or {}
 		obj.mp_credits.art = obj.mp_credits.art or {}
+		obj.mp_credits.idea = obj.mp_credits.idea or {}
 		obj.mp_credits.code = obj.mp_credits.code or {}
 		local function calc_scale_fac(text)
 			local size = 0.9
@@ -226,11 +226,11 @@ function SMODS.create_mod_badges(obj, badges)
 			local scale_fac = {}
 			local min_scale_fac = 1
 			local strings = { "MULTIPLAYER" }
-			for _, v in ipairs({ "idea", "art", "code" }) do
+			for _, v in ipairs({ "art", "idea", "code" }) do
 				if obj.mp_credits[v] then
 					for i = 1, #obj.mp_credits[v] do
 						strings[#strings + 1] =
-							localize({ type = "variable", key = "mp_" .. v, vars = { obj.mp_credits[v][i] } })[1]
+							localize({ type = "variable", key = "a_mp_" .. v, vars = { obj.mp_credits[v][i] } })[1]
 					end
 				end
 			end

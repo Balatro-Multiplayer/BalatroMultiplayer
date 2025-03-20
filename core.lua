@@ -40,7 +40,7 @@ function MP.reset_game_states()
 	sendDebugMessage("Resetting game states", "MULTIPLAYER")
 	MP.GAME = {
 		ready_blind = false,
-		ready_blind_text = G.localization.misc.dictionary["ready"] or "Ready",
+		ready_blind_text = localize("b_ready"),
 		processed_round_done = false,
 		lives = 0,
 		loaded_ante = 0,

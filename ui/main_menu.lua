@@ -195,7 +195,7 @@ function G.UIDEF.create_UIBox_create_lobby_button()
 														UIBox_button({
 															id = "start_standard",
 															label = {
-																localize("start_lobby"),
+																localize("b_start_lobby"),
 															},
 															colour = G.C.RED,
 															button = "start_lobby",
@@ -257,7 +257,7 @@ function G.UIDEF.create_UIBox_create_lobby_button()
 														UIBox_button({
 															id = "start_vanilla",
 															label = {
-																localize("start_lobby"),
+																localize("b_start_lobby"),
 															},
 															colour = G.C.RED,
 															button = "start_lobby",
@@ -319,7 +319,7 @@ function G.UIDEF.create_UIBox_create_lobby_button()
 														UIBox_button({
 															id = "start_weekly",
 															label = {
-																localize("coming_soon"),
+																localize("b_coming_soon"),
 															},
 															colour = G.C.RED,
 															--button = "start_lobby",
@@ -381,7 +381,7 @@ function G.UIDEF.create_UIBox_create_lobby_button()
 														UIBox_button({
 															id = "start_badlatro",
 															label = {
-																localize("start_lobby"),
+																localize("b_start_lobby"),
 															},
 															colour = G.C.RED,
 															button = "start_lobby",
@@ -449,8 +449,7 @@ function G.UIDEF.create_UIBox_join_lobby_button()
 									h = 1,
 									max_length = 5,
 									all_caps = true,
-									prompt_text = G.localization.misc.dictionary["enter_lobby_code"]
-										or "Enter Lobby Code",
+									prompt_text = localize("k_enter_lobby_code"),
 									ref_table = MP.LOBBY,
 									ref_value = "temp_code",
 									extended_corpus = false,
@@ -463,7 +462,7 @@ function G.UIDEF.create_UIBox_join_lobby_button()
 							},
 						},
 						UIBox_button({
-							label = { G.localization.misc.dictionary["join_clip"] or "Paste From Clipboard" },
+							label = { localize("k_paste") },
 							colour = G.C.RED,
 							button = "join_from_clipboard",
 							minw = 5,
@@ -480,25 +479,25 @@ function G.UIDEF.override_main_menu_play_button()
 		create_UIBox_generic_options({
 			contents = {
 				UIBox_button({
-					label = { G.localization.misc.dictionary["singleplayer"] or "Singleplayer" },
+					label = { localize("b_singleplayer") },
 					colour = G.C.BLUE,
 					button = "setup_run",
 					minw = 5,
 				}),
 				MP.LOBBY.connected and UIBox_button({
-					label = { G.localization.misc.dictionary["create_lobby"] or "Create Lobby" },
+					label = { localize("b_create_lobby") },
 					colour = G.C.GREEN,
 					button = "create_lobby",
 					minw = 5,
 				}) or nil,
 				MP.LOBBY.connected and UIBox_button({
-					label = { G.localization.misc.dictionary["join_lobby"] or "Join Lobby" },
+					label = { localize("b_join_lobby") },
 					colour = G.C.RED,
 					button = "join_lobby",
 					minw = 5,
 				}) or nil,
 				not MP.LOBBY.connected and UIBox_button({
-					label = { G.localization.misc.dictionary["reconnect"] or "Reconnect" },
+					label = { localize("b_reconnect") },
 					colour = G.C.RED,
 					button = "reconnect",
 					minw = 5,

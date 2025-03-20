@@ -19,7 +19,7 @@ SMODS.Mods.Multiplayer.credits_tab = function()
 					{
 						n = G.UIT.T,
 						config = {
-							text = G.localization.misc.dictionary["join_discord"] or "Join the ",
+							text = localize("k_join_discord"),
 							shadow = true,
 							scale = 0.6,
 							colour = G.C.UI.TEXT_LIGHT,
@@ -38,7 +38,7 @@ SMODS.Mods.Multiplayer.credits_tab = function()
 						minw = 6,
 						button = "multiplayer_discord",
 						label = {
-							G.localization.misc.dictionary["discord_name"] or "Balatro Multiplayer Discord Server",
+							localize("b_mp_discord"),
 						},
 					}),
 				},
@@ -53,8 +53,7 @@ SMODS.Mods.Multiplayer.credits_tab = function()
 					{
 						n = G.UIT.T,
 						config = {
-							text = G.localization.misc.dictionary["discord_msg"]
-								or "You can report any bugs and find people to play with there!",
+							text = localize("k_discord_msg"),
 							shadow = true,
 							scale = 0.375,
 							colour = G.C.UI.TEXT_LIGHT,
@@ -89,14 +88,14 @@ SMODS.Mods.Multiplayer.config_tab = function()
 						n = G.UIT.T,
 						config = {
 							scale = 0.6,
-							text = G.localization.misc.dictionary["username"] or "Username:",
+							text = localize("k_username"),
 							colour = G.C.UI.TEXT_LIGHT,
 						},
 					},
 					create_text_input({
 						w = 4,
 						max_length = 25,
-						prompt_text = G.localization.misc.dictionary["enter_username"] or "Enter Username",
+						prompt_text = localize("k_enter_username"),
 						ref_table = MP.LOBBY,
 						ref_value = "username",
 						extended_corpus = true,
