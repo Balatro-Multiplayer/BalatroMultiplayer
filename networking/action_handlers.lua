@@ -93,10 +93,11 @@ end
 ---@param score_str string
 ---@param hands_left_str string
 ---@param skips_str string
-local function action_enemy_info(score_str, hands_left_str, skips_str)
+local function action_enemy_info(score_str, hands_left_str, skips_str, lives_str)
 	local score = tonumber(score_str)
 	local hands_left = tonumber(hands_left_str)
 	local skips = tonumber(skips_str)
+	local lives = tonumber(lives_str)
 
 	if score == nil or hands_left == nil then
 		sendDebugMessage("Invalid score or hands_left", "MULTIPLAYER")
@@ -118,10 +119,10 @@ local function action_enemy_info(score_str, hands_left_str, skips_str)
 
 	MP.GAME.enemy.hands = hands_left
 	MP.GAME.enemy.skips = skips
-
-	if is_pvp_boss() then
-		MP.HUD_blind:get_UIE_by_ID("HUD_blind_count"):juice_up()
-		MP.HUD_blind:get_UIE_by_ID("dollars_to_be_earned"):juice_up()
+	MP.GAME.enemy.lives = lives
+	if MP.is_pvp_boss() then
+		G.HUD_blind:get_UIE_by_ID("HUD_blind_count"):juice_up()
+		G.HUD_blind:get_UIE_by_ID("dollars_to_be_earned"):juice_up()
 	end
 end
 
@@ -201,17 +202,21 @@ local function action_remove_phantom(key)
 	local card = MP.UTILS.get_phantom_joker(key)
 	if card then
 		card:remove_from_deck()
-		card:start_dissolve({ MP.C.RED }, nil, 1.6)
+		card:start_dissolve({ G.C.RED }, nil, 1.6)
 		MP.shared:remove_card(card)
 	end
 end
 
 local function action_speedrun()
-	local card = MP.UTILS.get_joker("j_mp_speedrun")
-	if card then
+	local function speedrun(card)
 		card:juice_up()
-		MP.GAME.chips = to_big(MP.GAME.chips) * to_big(3)
+		if #G.consumeables.cards < G.consumeables.config.card_limit then
+			local card = create_card("Spectral", G.consumeables, nil, nil, nil, nil, nil, "speedrun")
+			card:add_to_deck()
+			G.consumeables:emplace(card)
+		end
 	end
+	MP.UTILS.run_for_each_joker("j_mp_speedrun", speedrun)
 end
 
 local function enemyLocation(options)
@@ -254,7 +259,7 @@ end
 local function action_asteroid()
 	local hand_type = "High Card"
 	local max_level = 0
-	for k, v in pairs(MP.GAME.hands) do
+	for k, v in pairs(G.GAME.hands) do
 		if to_big(v.level) > to_big(max_level) then
 			hand_type = k
 			max_level = v.level
@@ -262,15 +267,114 @@ local function action_asteroid()
 	end
 	update_hand_text({ sound = "button", volume = 0.7, pitch = 0.8, delay = 0.3 }, {
 		handname = localize(hand_type, "poker_hands"),
-		chips = MP.GAME.hands[hand_type].chips,
-		mult = MP.GAME.hands[hand_type].mult,
-		level = MP.GAME.hands[hand_type].level,
+		chips = G.GAME.hands[hand_type].chips,
+		mult = G.GAME.hands[hand_type].mult,
+		level = G.GAME.hands[hand_type].level,
 	})
 	level_up_hand(nil, hand_type, false, -1)
 	update_hand_text(
 		{ sound = "button", volume = 0.7, pitch = 1.1, delay = 0 },
 		{ mult = 0, chips = 0, handname = "", level = "" }
 	)
+end
+
+local function action_sold_joker()
+	local function juice_taxes(card)
+		if card then
+			card.ability.extra.mult = card.ability.extra.mult_gain + card.ability.extra.mult
+			card:juice_up()
+		end
+	end
+	MP.UTILS.run_for_each_joker("j_mp_taxes", juice_taxes)
+end
+
+local function action_lets_go_gambling_nemesis()
+	local card = MP.UTILS.get_phantom_joker("j_mp_lets_go_gambling")
+	if card then
+		card:juice_up()
+	end
+	ease_dollars(card and card.ability and card.ability.extra and card.ability.extra.nemesis_dollars or 5)
+end
+
+local function action_eat_pizza(whole)
+	local function eat_whole(card)
+		card:remove_from_deck()
+		G.E_MANAGER:add_event(Event({
+			trigger = "after",
+			delay = 0.2,
+			func = function()
+				attention_text({
+					text = localize("k_eaten_ex"),
+					scale = 0.6,
+					hold = 1.4,
+					major = card,
+					backdrop_colour = G.C.FILTER,
+					align = "bm",
+					offset = {
+						x = 0,
+						y = 0,
+					},
+				})
+				card:start_dissolve({ G.C.RED }, nil, 1.6)
+				return true
+			end,
+		}))
+	end
+
+	whole = whole == "true"
+	local card = MP.UTILS.get_joker("j_mp_pizza") or MP.UTILS.get_phantom_joker("j_mp_pizza")
+	if card then
+		if whole then
+			eat_whole(card)
+			return
+		end
+		card:juice_up()
+		card.ability.extra.discards = card.ability.extra.discards - card.ability.extra.discards_loss
+		if card.ability.extra.discards <= 0 then
+			eat_whole(card)
+			return
+		end
+		G.E_MANAGER:add_event(Event({
+			trigger = "after",
+			delay = 0.2,
+			func = function()
+				attention_text({
+					text = localize({
+						type = "variable",
+						key = "a_remaining",
+						vars = { card.ability.extra.discards },
+					}),
+					scale = 0.6,
+					hold = 1.4,
+					major = card,
+					backdrop_colour = G.C.RED,
+					align = "bm",
+					offset = {
+						x = 0,
+						y = 0,
+					},
+				})
+				return true
+			end,
+		}))
+	end
+end
+
+local function action_spent_last_shop(amount)
+	MP.GAME.enemy.spent_last_shop = tonumber(amount)
+end
+
+local function action_magnet()
+	if #G.jokers.cards > 0 then
+		local chosen_joker = pseudorandom_element(G.jokers.cards, pseudoseed("magnet"))
+		MP.ACTIONS.magnet_response(chosen_joker.config.center.key)
+	end
+end
+
+local function action_magnet_response(key)
+	local card = create_card("Joker", G.jokers, false, nil, nil, nil, key)
+	card:add_to_deck()
+	G.jokers:emplace(card)
 end
 
 -- #region Client to Server
@@ -332,8 +436,7 @@ end
 
 ---@param score number
 ---@param hands_left number
-function MP.ACTIONS.play_hand(score, hands_left, speedrun_check)
-	speedrun_check = speedrun_check or false
+function MP.ACTIONS.play_hand(score, hands_left)
 	local fixed_score = tostring(to_big(score))
 	-- Credit to sidmeierscivilizationv on discord for this fix for Talisman
 	if string.match(fixed_score, "[eE]") == nil and string.match(fixed_score, "[.]") then
@@ -341,12 +444,7 @@ function MP.ACTIONS.play_hand(score, hands_left, speedrun_check)
 		fixed_score = string.sub(string.gsub(fixed_score, "%.", ","), 1, -3)
 	end
 	fixed_score = string.gsub(fixed_score, ",", "") -- Remove commas
-	Client.send(
-		string.format(
-			"action:playHand,score:" .. fixed_score .. ",handsLeft:%d,hasSpeedrun:" .. tostring(speedrun_check),
-			hands_left
-		)
-	)
+	Client.send(string.format("action:playHand,score:" .. fixed_score .. ",handsLeft:%d", hands_left))
 end
 
 function MP.ACTIONS.lobby_options()
@@ -380,6 +478,31 @@ end
 function MP.ACTIONS.asteroid()
 	Client.send("action:asteroid")
 end
+
+function MP.ACTIONS.sold_joker()
+	Client.send("action:soldJoker")
+end
+
+function MP.ACTIONS.lets_go_gambling_nemesis()
+	Client.send("action:letsGoGamblingNemesis")
+end
+
+function MP.ACTIONS.eat_pizza(whole)
+	Client.send("action:eatPizza,whole:" .. tostring(whole and true))
+end
+
+function MP.ACTIONS.spent_last_shop(amount)
+	Client.send("action:spentLastShop,amount:" .. tostring(amount))
+end
+
+function MP.ACTIONS.magnet()
+	Client.send("action:magnet")
+end
+
+function MP.ACTIONS.magnet_response(key)
+	Client.send("action:magnetResponse,key:" .. key)
+end
+
 -- #endregion Client to Server
 
 -- Utils
@@ -446,7 +569,7 @@ function Game:update(dt)
 			elseif parsedAction.action == "startBlind" then
 				action_start_blind()
 			elseif parsedAction.action == "enemyInfo" then
-				action_enemy_info(parsedAction.score, parsedAction.handsLeft, parsedAction.skips)
+				action_enemy_info(parsedAction.score, parsedAction.handsLeft, parsedAction.skips, parsedAction.lives)
 			elseif parsedAction.action == "stopGame" then
 				action_stop_game()
 			elseif parsedAction.action == "endPvP" then
@@ -469,6 +592,18 @@ function Game:update(dt)
 				action_speedrun()
 			elseif parsedAction.action == "asteroid" then
 				action_asteroid()
+			elseif parsedAction.action == "soldJoker" then
+				action_sold_joker()
+			elseif parsedAction.action == "letsGoGamblingNemesis" then
+				action_lets_go_gambling_nemesis()
+			elseif parsedAction.action == "eatPizza" then
+				action_eat_pizza(parsedAction.whole)
+			elseif parsedAction.action == "spentLastShop" then
+				action_spent_last_shop(parsedAction.amount)
+			elseif parsedAction.action == "magnet" then
+				action_magnet()
+			elseif parsedAction.action == "magnetResponse" then
+				action_magnet_response(parsedAction.key)
 			elseif parsedAction.action == "error" then
 				action_error(parsedAction.message)
 			elseif parsedAction.action == "keepAlive" then

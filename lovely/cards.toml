@@ -46,3 +46,19 @@ payload = '''--if there is at least one joker$pre local copyable_jokers = {}
       end
       for k, v in pairs(copyable_jokers) do'''
 times = 1
+
+# Sets the balanced sticker on multiplayer glass cards
+[[patches]]
+[patches.pattern]
+target = "card.lua"
+pattern = '''local old_center = self.config.center'''
+position = 'after'
+payload = '''if old_center ~= center then
+    if center.name == "m_mp_glass" then
+      self.ability.mp_sticker_balanced = true
+    else
+      self.ability.mp_sticker_balanced = false
+    end
+  end'''
+match_indent = true
+times = 1

@@ -27,4 +27,4 @@ SMODS.Joker({
 		art = { "Aura!" },
 		code = { "Virtualized" },
 	},
-}) 
+})

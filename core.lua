@@ -54,6 +54,9 @@ function MP.reset_game_states()
 			hands = 4,
 			location = "Selecting a Blind",
 			skips = 0,
+			lives = 4,
+			sells = 0,
+			spent_last_shop = 0,
 		},
 		location = "loc_selecting",
 		next_blind_context = nil,
@@ -61,6 +64,8 @@ function MP.reset_game_states()
 		antes_keyed = {},
 		prevent_eval = false,
 		misprint_display = "",
+		spent_total = 0,
+		spent_before_shop = 0,
 	}
 end
 
@@ -84,7 +89,7 @@ end
 function MP.load_mp_dir(directory)
 	local files = NFS.getDirectoryItems(MP.path .. "/" .. directory)
 	local regular_files = {}
-	
+
 	for _, filename in ipairs(files) do
 		local file_path = directory .. "/" .. filename
 		if file_path:match(".lua$") then
@@ -95,7 +100,7 @@ function MP.load_mp_dir(directory)
 			end
 		end
 	end
-	
+
 	for _, file_path in ipairs(regular_files) do
 		MP.load_mp_file(file_path)
 	end
@@ -154,9 +159,5 @@ MP.load_mp_file("misc/mod_hash.lua")
 
 local SOCKET = MP.load_mp_file("networking/socket.lua")
 MP.NETWORKING_THREAD = love.thread.newThread(SOCKET)
-MP.NETWORKING_THREAD:start(
-	SMODS.Mods["Multiplayer"].config.server_url,
-	SMODS.Mods["Multiplayer"].config.server_port
-)
+MP.NETWORKING_THREAD:start(SMODS.Mods["Multiplayer"].config.server_url, SMODS.Mods["Multiplayer"].config.server_port)
 MP.ACTIONS.connect()
-

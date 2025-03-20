@@ -42,7 +42,7 @@ return {
 					"before your {X:purple,C:white}Nemesis{},",
 					"create a random {C:spectral}Spectral{} card",
 					"{C:inactive}(Must have room)",
-				}
+				},
 			},
 			j_mp_conjoined_joker = {
 				name = "Conjoined Joker",
@@ -50,7 +50,7 @@ return {
 					"While in a {C:attention}PvP Blind{}, gain",
 					"{X:mult,C:white}X#1#{} Mult for every {C:blue}Hand{}",
 					"your {X:purple,C:white}Nemesis{} has left",
-					"{C:inactive}(Max {X:mult,C:white}X#2#{C:inactive} Mult, Current {X:mult,C:white}X#3#{C:inactive} Mult)",
+					"{C:inactive}(Max {X:mult,C:white}X#2#{C:inactive} Mult, Currently {X:mult,C:white}X#3#{C:inactive} Mult)",
 				},
 			},
 			j_mp_penny_pincher = {
@@ -64,7 +64,7 @@ return {
 			j_mp_taxes = {
 				name = "Taxes",
 				text = {
-					"When your opponent sells",
+					"When your {X:purple,C:white}Nemesis'{} sells",
 					"a card gain {C:mult}+#1#{} Mult",
 					"{C:inactive}(Currently {C:mult}+#2#{C:inactive} Mult)",
 				},
@@ -85,7 +85,7 @@ return {
 					"your {X:purple,C:white}Nemesis'{} highest ",
 					"sell cost {C:attention}Joker{}",
 					"{C:inactive}(Currently {C:attention}#2#{C:inactive}/#3# rounds)",
-				}
+				},
 			},
 			j_mp_pizza = {
 				name = "Pizza",
@@ -101,7 +101,14 @@ return {
 				text = {
 					"Retrigger {C:attention}first{} and {C:attention}second{}",
 					"played card used in scoring",
-					"{C:attention}#1#{} additional times",
+					"{C:attention}#1#{} additional time",
+				},
+			},
+			j_mp_pacifist = {
+				name = "Pacifist",
+				text = {
+					"{X:mult,C:white}X#1#{} Mult while",
+					"not in a {C:attention}PvP Blind{}",
 				},
 			},
 		},
@@ -275,6 +282,7 @@ return {
 			k_tournament_description = "The tournament ruleset, this is the same as the standard ruleset but doesn't allow changing the lobby options.",
 			k_badlatro = "Badlatro",
 			k_badlatro_description = "A weekly ruleset designed by @dr_monty_the_snek on the discord server that has been added to the mod permanently.",
+			k_oops_ex = "Oops!",
 		},
 		v_dictionary = {
 			mp_art = { "Art: #1#" },
@@ -288,6 +296,6 @@ return {
 		v_text = {
 			ch_c_hanging_chad_rework = { "{C:attention}Hanging Chad{} is {C:dark_edition}reworked" },
 			ch_c_glass_cards_rework = { "{C:attention}Glass Cards{} are {C:dark_edition}reworked" },
-		}
+		},
 	},
 }

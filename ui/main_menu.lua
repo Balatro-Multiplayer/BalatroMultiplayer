@@ -539,6 +539,11 @@ end
 
 function G.FUNCS.start_lobby(e)
 	G.SETTINGS.paused = false
+	if e.config.id == "start_vanilla" then
+		MP.LOBBY.config.multiplayer_jokers = false
+	else
+		MP.LOBBY.config.multiplayer_jokers = true
+	end
 	MP.ACTIONS.create_lobby(
 		e.config.id == "start_vanilla" and "ruleset_mp_vanilla"
 			or e.config.id == "start_weekly" and "ruleset_mp_weekly"

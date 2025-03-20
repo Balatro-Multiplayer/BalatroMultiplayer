@@ -91,7 +91,8 @@ function create_UIBox_blind_choice(type, run_info)
 								nodes = {
 									{
 										n = G.UIT.O,
-										config = { object = dt1 } },
+										config = { object = dt1 },
+									},
 								},
 							},
 							{
@@ -608,7 +609,7 @@ local function update_blind_HUD()
 			blockable = false,
 			func = function()
 				G.HUD_blind:get_UIE_by_ID("HUD_blind_count").config.ref_table = MP.GAME.enemy
-				G.HUD_blind:get_UIE_by_ID("HUD_blind_count").config.ref_value = "hands"
+				G.HUD_blind:get_UIE_by_ID("HUD_blind_count").config.ref_value = "score_text"
 				G.HUD_blind:get_UIE_by_ID("HUD_blind_count").config.func = "multiplayer_blind_chip_UI_scale"
 				G.HUD_blind:get_UIE_by_ID("HUD_blind").children[2].children[2].children[2].children[1].children[1].config.text = G.localization.misc.dictionary["enemy_score"]
 					or "Current enemy score"
@@ -644,8 +645,7 @@ end
 function G.FUNCS.mp_toggle_ready(e)
 	sendTraceMessage("Toggling Ready", "MULTIPLAYER")
 	MP.GAME.ready_blind = not MP.GAME.ready_blind
-	MP.GAME.ready_blind_text = MP.GAME.ready_blind
-			and (G.localization.misc.dictionary["unready"] or "Unready")
+	MP.GAME.ready_blind_text = MP.GAME.ready_blind and (G.localization.misc.dictionary["unready"] or "Unready")
 		or (G.localization.misc.dictionary["ready"] or "Ready")
 
 	if MP.GAME.ready_blind then
@@ -666,7 +666,7 @@ function Game:update_draw_to_hand(dt)
 			and G.GAME.current_round.discards_used == 0
 			and G.GAME.facing_blind
 		then
-			if is_pvp_boss() then
+			if MP.is_pvp_boss() then
 				G.E_MANAGER:add_event(Event({
 					trigger = "after",
 					delay = 1,
@@ -811,7 +811,7 @@ local update_hand_played_ref = Game.update_hand_played
 ---@diagnostic disable-next-line: duplicate-set-field
 function Game:update_hand_played(dt)
 	-- Ignore for singleplayer or regular blinds
-	if not MP.LOBBY.connected or not MP.LOBBY.code or not is_pvp_boss() then
+	if not MP.LOBBY.connected or not MP.LOBBY.code or not MP.is_pvp_boss() then
 		update_hand_played_ref(self, dt)
 		return
 	end
@@ -830,8 +830,7 @@ function Game:update_hand_played(dt)
 		G.E_MANAGER:add_event(Event({
 			trigger = "immediate",
 			func = function()
-				local card = MP.UTILS.get_joker("j_mp_speedrun")
-				MP.ACTIONS.play_hand(G.GAME.chips, G.GAME.current_round.hands_left, card ~= nil)
+				MP.ACTIONS.play_hand(G.GAME.chips, G.GAME.current_round.hands_left)
 				-- Set blind chips to enemy score
 				G.GAME.blind.chips = MP.GAME.enemy.score
 				-- For now, never advance to next round
@@ -883,7 +882,7 @@ function Game:update_new_round(dt)
 	end
 	if MP.LOBBY.code and not G.STATE_COMPLETE then
 		-- Prevent player from losing
-		if to_big(G.GAME.chips) < to_big(G.GAME.blind.chips) and not is_pvp_boss() then
+		if to_big(G.GAME.chips) < to_big(G.GAME.blind.chips) and not MP.is_pvp_boss() then
 			G.GAME.blind.chips = -1
 			MP.ACTIONS.fail_round(G.GAME.current_round.hands_played)
 		end
@@ -908,7 +907,6 @@ function MP.end_round()
 	G.RESET_JIGGLES = true
 	-- context.end_of_round calculations
 	SMODS.saved = false
-	sendDebugMessage("calculate_context")
 	SMODS.calculate_context({ end_of_round = true, game_over = false })
 
 	G.GAME.unused_discards = (G.GAME.unused_discards or 0) + G.GAME.current_round.discards_left
@@ -1694,19 +1692,10 @@ local reset_blinds_ref = reset_blinds
 function reset_blinds()
 	reset_blinds_ref()
 	if MP.LOBBY.code then
-		G.GAME.round_resets.blind_choices.Boss = "bl_mp_nemesis"
-	end
-end
-
-local init_game_object_ref = Game.init_game_object
-function Game:init_game_object()
-	local t = init_game_object_ref(self)
-	if MP.LOBBY.code then
-		if MP.LOBBY.config.ruleset == "attrition" then
-			t.round_resets.blind_choices.Boss = "bl_mp_nemesis"
+		if G.GAME.round_resets.ante > 1 then
+			G.GAME.round_resets.blind_choices.Boss = "bl_mp_nemesis"
 		end
 	end
-	return t
 end
 
 local update_selecting_hand_ref = Game.update_selecting_hand
@@ -1719,11 +1708,11 @@ function Game:update_selecting_hand(dt)
 		and MP.LOBBY.code
 	then
 		G.GAME.current_round.hands_left = 0
-		if not is_pvp_boss() then
+		if not MP.is_pvp_boss() then
 			G.STATE_COMPLETE = false
 			G.STATE = G.STATES.NEW_ROUND
 		else
-			MP.play_hand(G.GAME.chips, 0, false)
+			MP.ACTIONS.play_hand(G.GAME.chips, 0)
 			G.STATE_COMPLETE = false
 			G.STATE = G.STATES.HAND_PLAYED
 		end
@@ -1751,7 +1740,7 @@ end
 
 local blind_disable_ref = Blind.disable
 function Blind:disable()
-	if is_pvp_boss() then
+	if MP.is_pvp_boss() then
 		return
 	end
 	blind_disable_ref(self)
@@ -1918,6 +1907,8 @@ function Game:update_shop(dt)
 	if MP.LOBBY.code and not G.STATE_COMPLETE and not updated_location and not G.GAME.USING_RUN then
 		updated_location = true
 		MP.ACTIONS.set_location("loc_shop")
+		MP.GAME.spent_before_shop = to_big(MP.GAME.spent_total) + to_big(0)
+		show_enemy_location()
 	end
 	if G.STATE_COMPLETE and updated_location then
 		updated_location = false
@@ -1931,6 +1922,7 @@ function Game:update_blind_select(dt)
 	if MP.LOBBY.code and not G.STATE_COMPLETE and not updated_location then
 		updated_location = true
 		MP.ACTIONS.set_location("loc_selecting")
+		show_enemy_location()
 	end
 	if G.STATE_COMPLETE and updated_location then
 		updated_location = false
@@ -1944,7 +1936,7 @@ function G.FUNCS.select_blind(e)
 	select_blind_ref(e)
 	if MP.LOBBY.code then
 		MP.GAME.ante_key = tostring(math.random())
-		MP.ACTIONS.play_hand(0, G.GAME.round_resets.hands, false)
+		MP.ACTIONS.play_hand(0, G.GAME.round_resets.hands)
 		MP.ACTIONS.new_round()
 		MP.ACTIONS.set_location("loc_playing-" .. (e.config.ref_table.key or e.config.ref_table.name))
 		hide_enemy_location()
@@ -1952,7 +1944,11 @@ function G.FUNCS.select_blind(e)
 end
 
 function G.UIDEF.multiplayer_deck()
-	return G.UIDEF.challenge_description(get_challenge_int_from_id(MP.Rulesets[MP.LOBBY.config.ruleset].challenge_deck), nil, false)
+	return G.UIDEF.challenge_description(
+		get_challenge_int_from_id(MP.Rulesets[MP.LOBBY.config.ruleset].challenge_deck),
+		nil,
+		false
+	)
 end
 
 local skip_blind_ref = G.FUNCS.skip_blind
@@ -1968,45 +1964,73 @@ function G.FUNCS.open_kofi(e)
 end
 
 function MP.UI.create_UIBox_Misprint_Display()
-	return {n=G.UIT.ROOT, config = {align = "cm", padding = 0.03, colour = G.C.CLEAR}, nodes={
-		{n=G.UIT.R, config = {align = "cm", padding= 0.05, colour = G.C.UI.TRANSPARENT_DARK, r=0.1}, nodes={
-			{n=G.UIT.O, config={id = 'misprint_display', func = 'misprint_display_set', object = DynaText({string = {{ref_table = MP.GAME, ref_value = "misprint_display"}}, colours = {G.C.UI.TEXT_LIGHT}, shadow = true, float = true, scale = 0.5})}}
-		}}
-	  }}
+	return {
+		n = G.UIT.ROOT,
+		config = { align = "cm", padding = 0.03, colour = G.C.CLEAR },
+		nodes = {
+			{
+				n = G.UIT.R,
+				config = { align = "cm", padding = 0.05, colour = G.C.UI.TRANSPARENT_DARK, r = 0.1 },
+				nodes = {
+					{
+						n = G.UIT.O,
+						config = {
+							id = "misprint_display",
+							func = "misprint_display_set",
+							object = DynaText({
+								string = { { ref_table = MP.GAME, ref_value = "misprint_display" } },
+								colours = { G.C.UI.TEXT_LIGHT },
+								shadow = true,
+								float = true,
+								scale = 0.5,
+							}),
+						},
+					},
+				},
+			},
+		},
+	}
 end
 
 function G.FUNCS.misprint_display_set(e)
-	local misprint_raw = (G.deck and G.deck.cards[1] and G.deck.cards[#G.deck.cards].base.id or 11)..(G.deck and G.deck.cards[1] and G.deck.cards[#G.deck.cards].base.suit:sub(1,1) or 'D')
-	if misprint_raw == e.config.last_misprint then return end
+	local misprint_raw = (G.deck and G.deck.cards[1] and G.deck.cards[#G.deck.cards].base.id or 11)
+		.. (G.deck and G.deck.cards[1] and G.deck.cards[#G.deck.cards].base.suit:sub(1, 1) or "D")
+	if misprint_raw == e.config.last_misprint then
+		return
+	end
 	e.config.last_misprint = misprint_raw
 
-	local value = tonumber(misprint_raw:sub(1,-2))
+	local value = tonumber(misprint_raw:sub(1, -2))
 	local suit = misprint_raw:sub(-1)
-	
-	local suit_full = {H = "Hearts", D = "Diamonds", C = "Clubs", S = "Spades"}
-	
+
+	local suit_full = { H = "Hearts", D = "Diamonds", C = "Clubs", S = "Spades" }
+
 	local value_key = tostring(value)
-	if value == 14 then value_key = "Ace"
-	elseif value == 11 then value_key = "Jack"
-	elseif value == 12 then value_key = "Queen"
-	elseif value == 13 then value_key = "King"
+	if value == 14 then
+		value_key = "Ace"
+	elseif value == 11 then
+		value_key = "Jack"
+	elseif value == 12 then
+		value_key = "Queen"
+	elseif value == 13 then
+		value_key = "King"
 	end
-	
+
 	local localized_card = {}
 
 	localize({
-		type = 'other',
-		key = 'playing_card',
-		set = 'Other',
+		type = "other",
+		key = "playing_card",
+		set = "Other",
 		nodes = localized_card,
 		vars = {
-			localize(value_key, 'ranks'),
-			localize(suit_full[suit], 'suits_plural'),
-			colours = {G.C.UI.TEXT_LIGHT}
+			localize(value_key, "ranks"),
+			localize(suit_full[suit], "suits_plural"),
+			colours = { G.C.UI.TEXT_LIGHT },
 		},
 	})
 
 	-- Yes I know this is stupid
 	MP.GAME.misprint_display = localized_card[1][2].config.text .. localized_card[1][3].config.text
-	e.config.object.colours = {G.C.SUITS[suit_full[suit]]}
+	e.config.object.colours = { G.C.SUITS[suit_full[suit]] }
 end

@@ -95,16 +95,6 @@ SMODS.Enhancement({
 		}}
 	end,
 	pos = { x = 5, y = 1 },
-	add_to_deck = function(self, card, from_debuff)
-		if not from_debuff then
-			card.ability.mp_sticker_balanced = true
-		end
-	end,
-	remove_from_deck = function(self, card, from_debuff)
-		if not from_debuff then
-			card.ability.mp_sticker_balanced = false
-		end
-	end,
 	in_pool = function(self)
 		return MP.LOBBY.config.ruleset == "ruleset_mp_standard" and MP.LOBBY.code
 	end,

@@ -73,3 +73,56 @@ payload = '''elseif config.name == "comeback" then
   })'''
 match_indent = true
 times = 1
+
+[[patches]]
+[patches.pattern]
+target = "functions/state_events.lua"
+pattern = '''if G.GAME.current_round.hands_left > 0 and not G.GAME.modifiers.no_extra_hand_money then'''
+position = 'at'
+payload = '''if G.GAME.current_round.hands_left > 0 and not G.GAME.modifiers.no_extra_hand_money and G.GAME.blind.name ~= "bl_mp_nemesis" then'''
+match_indent = true
+times = 1
+
+[[patches]]
+[patches.pattern]
+target = "functions/common_events.lua"
+pattern = '''G.GAME.current_round.hands_left = G.GAME.current_round.hands_left + mod'''
+position = 'after'
+payload = '''if MP.LOBBY.code and MP.is_pvp_boss() then
+		MP.ACTIONS.play_hand(G.GAME.chips, G.GAME.current_round.hands_left)
+	end'''
+match_indent = true
+times = 1
+
+[[patches]]
+[patches.pattern]
+target = "card.lua"
+pattern = '''function Card:sell_card()'''
+position = 'after'
+payload = '''if MP.LOBBY.code and self.area == G.jokers then
+  MP.ACTIONS.sold_joker()
+end'''
+match_indent = true
+times = 1
+
+[[patches]]
+[patches.pattern]
+target = "functions/button_callbacks.lua"
+pattern = '''G.FUNCS.toggle_shop = function(e)'''
+position = 'after'
+payload = '''if MP.LOBBY.code then
+  MP.ACTIONS.spent_last_shop(to_big(MP.GAME.spent_total) - to_big(MP.GAME.spent_before_shop))
+end'''
+match_indent = true
+times = 1
+
+[[patches]]
+[patches.pattern]
+target = "functions/common_events.lua"
+pattern = '''G.GAME.dollars = G.GAME.dollars + mod'''
+position = 'after'
+payload = '''if MP.LOBBY.code and to_big(mod) < to_big(0) then
+  MP.GAME.spent_total = to_big(MP.GAME.spent_total) + (to_big(mod) * to_big(-1))
+end'''
+match_indent = true
+times = 1

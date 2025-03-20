@@ -22,8 +22,8 @@ SMODS.Joker({
 			vars = {
 				card.ability.extra.extra_hands,
 				card.ability.extra.extra_discards,
-				card.ability.hands,
-				card.ability.discards,
+				card.ability.extra.hands,
+				card.ability.extra.discards,
 				G.GAME.skips ~= nil and MP.GAME.enemy.skips ~= nil and localize({
 					type = "variable",
 					key = MP.GAME.enemy.skips > G.GAME.skips and "mp_skips_behind"
@@ -40,16 +40,16 @@ SMODS.Joker({
 	update = function(self, card, dt)
 		if G.STAGE == G.STAGES.RUN and G.GAME.skips ~= nil and MP.GAME.enemy.skips ~= nil then
 			local skip_diff = (math.max(G.GAME.skips - MP.GAME.enemy.skips, 0))
-			card.ability.hands = skip_diff * card.ability.extra.extra_hands
-			card.ability.discards = skip_diff * card.ability.extra.extra_discards
+			card.ability.extra.hands = skip_diff * card.ability.extra.extra_hands
+			card.ability.extra.discards = skip_diff * card.ability.extra.extra_discards
 		end
 	end,
 	calculate = function(self, card, context)
 		if context.cardarea == G.jokers and context.setting_blind and not context.blueprint then
 			G.E_MANAGER:add_event(Event({
 				func = function()
-					ease_hands_played(card.ability.hands)
-					ease_discard(card.ability.discards, nil, true)
+					ease_hands_played(card.ability.extra.hands)
+					ease_discard(card.ability.extra.discards, nil, true)
 					return true
 				end,
 			}))
@@ -60,4 +60,4 @@ SMODS.Joker({
 		art = { "Aura!" },
 		code = { "Virtualized" },
 	},
-}) 
+})

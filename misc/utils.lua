@@ -163,19 +163,41 @@ function MP.UTILS.get_joker(key)
 end
 
 function MP.UTILS.get_phantom_joker(key)
-	if not G.shared then
+	if not MP.shared then
 		return nil
 	end
-	for i = 1, #G.shared.cards do
+	for i = 1, #MP.shared.cards do
 		if
-			G.shared.cards[i].ability.name == key
-			and G.shared.cards[i].edition
-			and G.shared.cards[i].edition.type == "mp_phantom"
+			MP.shared.cards[i].ability.name == key
+			and MP.shared.cards[i].edition
+			and MP.shared.cards[i].edition.type == "mp_phantom"
 		then
-			return G.shared.cards[i]
+			return MP.shared.cards[i]
 		end
 	end
 	return nil
+end
+
+function MP.UTILS.run_for_each_joker(key, func)
+	if not G.jokers then
+		return
+	end
+	for i = 1, #G.jokers.cards do
+		if G.jokers.cards[i].ability.name == key then
+			func(G.jokers.cards[i])
+		end
+	end
+end
+
+function MP.UTILS.run_for_each_phantom_joker(key, func)
+	if not MP.shared then
+		return
+	end
+	for i = 1, #MP.shared.cards do
+		if MP.shared.cards[i].ability.name == key then
+			func(MP.shared.cards[i])
+		end
+	end
 end
 
 -- Credit to Cryptid devs for this function

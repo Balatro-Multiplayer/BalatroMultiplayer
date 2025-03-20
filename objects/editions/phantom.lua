@@ -34,9 +34,9 @@ SMODS.Edition({
 
 local get_card_areas_ref = SMODS.get_card_areas
 function SMODS.get_card_areas(_type, _context)
-	if _type == "jokers" and G.shared then
+	if _type == "jokers" and MP.shared then
 		local t = get_card_areas_ref(_type, _context)
-		table.insert(t, G.shared)
+		table.insert(t, MP.shared)
 		return t
 	end
 	return get_card_areas_ref(_type, _context)

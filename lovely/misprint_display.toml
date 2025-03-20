@@ -1,18 +1,78 @@
+# Some code below are marked as "Adapted from Pokermon"
+# Marked code is licensed under GPL3 license and come from the Pokermon project
+# lovely original source: https://github.com/InertSteak/Pokermon/blob/main/lovely.toml on 2025-03-19
+
 [manifest]
 version = "1.0.0"
 dump_lua = true
 priority = 2147483600
 
+# Adapted from Pokermon (lovely)
 [[patches]]
 [patches.pattern]
-target = 'game.lua'
-pattern = 'G.playing_cards = {}'
-position = 'before'
-payload = '''if MP.LOBBY.code then
-        MP.MISPRINT_DISPLAY = UIBox{
-            definition = MP.UI.create_UIBox_Misprint_Display(),
-            config = { align=('cr'), offset = { x = -2.4, y = 2.5 }, major = G.ROOM_ATTACH }
-        }
-    end'''
+target = "game.lua"
+pattern = "if #G.hand.cards < 1 and #G.deck.cards < 1 and #G.play.cards < 1 then"
+position = "before"
+payload = '''
+if not MP.misprint_view and type(MP.create_misprint_cardarea) == "function" then
+  MP.misprint_view = MP.create_misprint_cardarea()
+elseif MP.misprint_view then
+  MP.update_misprint_cardarea(MP.misprint_view)
+end
+'''
 match_indent = true
-times = 1
+
+# Adapted from Pokermon (lovely)
+[[patches]]
+[patches.pattern]
+target = "cardarea.lua"
+pattern = "if self.config.type == 'hand' or self.config.type == 'play' or self.config.type == 'title' or self.config.type == 'voucher' then"
+position = "at"
+payload = "if self.config.type == 'hand' or self.config.type == 'misprint' or self.config.type == 'play' or self.config.type == 'title' or self.config.type == 'voucher' then"
+match_indent = true
+overwrite = true
+
+
+# Adapted from Pokermon (lovely)
+[[patches]]
+[patches.pattern]
+target = "cardarea.lua"
+pattern = "if self.config.type == 'hand' and not (G.STATE == G.STATES.TAROT_PACK or G.STATE == G.STATES.SPECTRAL_PACK or G.STATE == G.STATES.PLANET_PACK or G.STATE == G.STATES.SMODS_BOOSTER_OPENED) then"
+position = "at"
+payload = "if self.config.type == 'misprint' or self.config.type == 'hand' and not (G.STATE == G.STATES.TAROT_PACK or G.STATE == G.STATES.SPECTRAL_PACK or G.STATE == G.STATES.PLANET_PACK or G.STATE == G.STATES.SMODS_BOOSTER_OPENED) then"
+match_indent = true
+overwrite = true
+
+# Adapted from Pokermon (lovely)
+[[patches]]
+[patches.pattern]
+target = "game.lua"
+pattern = "function Game:update_round_eval(dt)"
+position = "after"
+payload = '''
+    if MP.misprint_view then MP.misprint_view.states.visible = false end
+'''
+match_indent = true
+
+# Adapted from Pokermon (lovely)
+[[patches]]
+[patches.pattern]
+target = '=[SMODS _ "src/utils.lua"]'
+pattern = "-- TARGET: add your own CardAreas for playing card evaluation"
+position = "after"
+payload = "t[#t+1] = MP.misprint_view"
+match_indent = true
+
+# Adapted from Pokermon (lovely)
+[[patches]]
+[patches.pattern]
+target = "functions/common_events.lua"
+pattern = "local config = {}"
+position = "before"
+payload = '''
+if card.area == MP.misprint_view then
+    y_off = -0.05*G.CARD_H
+    card_aligned = 'tm'
+end
+'''
+match_indent = true

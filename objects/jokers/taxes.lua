@@ -23,9 +23,16 @@ SMODS.Joker({
 	in_pool = function(self)
 		return MP.LOBBY.code and MP.LOBBY.config.multiplayer_jokers
 	end,
+	calculate = function(self, card, context)
+		if context.joker_main then
+			return {
+				mult = card.ability.extra.mult,
+			}
+		end
+	end,
 	mp_credits = {
 		idea = { "Zwei" },
 		art = { "Kittyknight" },
 		code = { "Virtualized" },
 	},
-}) 
+})

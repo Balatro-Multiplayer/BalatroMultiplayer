@@ -12,6 +12,7 @@ SMODS.Blind({
 	dollars = 5,
 	mult = 1, -- Jen's Almanac crashes the game if the mult is 0
 	boss_colour = G.C.MULITPLAYER,
+	boss = { min = 1, max = 10 },
 	atlas = "player_blind_chip",
 	discovered = true,
 	in_pool = function(self)
@@ -19,9 +20,9 @@ SMODS.Blind({
 	end,
 })
 
-function is_pvp_boss()
+function MP.is_pvp_boss()
 	if not G.GAME or not G.GAME.blind then
 		return false
 	end
-	return G.GAME.blind.config.blind.key == "nemesis"
+	return G.GAME.blind.config.blind.key == "bl_mp_nemesis"
 end
