@@ -229,7 +229,7 @@ local action_speedrun = action_speedrun
 		end
 	end
 
-local action_enemyLocation = action_enemyLocation
+local action_enemy_location = action_enemy_location
 	or function(options)
 		local location = options.location
 		local value = ""
@@ -468,7 +468,7 @@ function Game:update(dt)
 			elseif parsedAction.action == "lobbyOptions" then
 				action_lobby_options(parsedAction)
 			elseif parsedAction.action == "enemyLocation" then
-				enemyLocation(parsedAction)
+				action_enemy_location(parsedAction)
 			elseif parsedAction.action == "sendPhantom" then
 				action_send_phantom(parsedAction.key)
 			elseif parsedAction.action == "removePhantom" then
