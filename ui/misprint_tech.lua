@@ -44,7 +44,7 @@ MP.update_misprint_cardarea = function(misprint_view)
 		end
 		misprint_view.states.visible = true
 	end
-	if misprint_view.children.area_uibox then
+	if misprint_view.children and misprint_view.children.area_uibox then
 		misprint_view.children.area_uibox.states.visible = false
 	end
 	if misprint_view.adjusting_cards then
@@ -68,13 +68,17 @@ MP.update_misprint_cardarea = function(misprint_view)
 			misprint_view.cards[i]:start_dissolve({ G.C.PURPLE })
 			i = i + 1
 		end
-		if k <= G.GAME.misprint_amount and MP.cards_dont_match(card, misprint_view.cards[i]) then
+		if
+			k <= G.GAME.misprint_amount
+			and MP.cards_dont_match(card, misprint_view.cards[i])
+			and SMODS.Mods["Multiplayer"].config.misprint_display
+		then
 			local temp_card = copy_card(card, nil, 0.7)
-            temp_card:set_ability(G.P_CENTERS.c_base)
-            temp_card.edition = nil
-            temp_card.seal = nil
-            temp_card.debuff = nil
-            temp_card.pinned = nil
+			temp_card:set_ability(G.P_CENTERS.c_base)
+			temp_card.edition = nil
+			temp_card.seal = nil
+			temp_card.debuff = nil
+			temp_card.pinned = nil
 			temp_card.states.drag.can = false
 			temp_card.states.hover.can = false
 			misprint_view:emplace(temp_card)
