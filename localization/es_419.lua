@@ -96,56 +96,6 @@ return {
 				},
 			},
 		},
-		Gamemode = {
-			gamemode_mp_attrition = {
-				name = "Desgaste",
-				text = {
-					"Pelea 1 a 1 contra tu {X:purple,C:white}Némesis{},",
-					"El jugador con menos puntos",
-					"pierde una vida.",
-					"{C:inactive}--", -- Lives text
-					"{C:red}4 vidas",
-					"{C:inactive}--", -- Other
-					"{C:inactive}Tu {X:purple,C:white}némesis{C:inactive} cambia cada ciega.{}",
-				},
-			},
-			gamemode_mp_battle_royale = {
-				name = "Batalla campal",
-				text = {
-					"Pelea contra todos los jugadores restantes",
-					"en cada ciega jefe. El jugador con",
-					"la menor puntuación pierde una vida.",
-					"{C:inactive}--", -- Lives text
-					"{C:red}2-4 vidas{C:inactive}, dependiendo la cantidad de jugadores",
-					"{C:inactive}--", -- Other
-					"{C:inactive}Con 5 jugadores o más, los últimos 2 pierden una vida",
-				},
-			},
-			gamemode_mp_precision = {
-				name = "Precisión",
-				text = {
-					"Pelea contra todos los jugadores restantes ",
-					"en cada ciega jefe. El jugador con la ",
-					"puntuación más lejana al blanco pierde una vida",
-					"{C:inactive}--", -- Lives text
-					"{C:red}2-4 vidas{C:inactive}, dependiendo la cantidad de jugadores",
-					"{C:inactive}--", -- Other
-					"{C:inactive}Con 5 jugadores o más, los últimos 2 pierden una vida",
-				},
-			},
-			gamemode_mp_speedrun = {
-				name = "Speedrun",
-				text = {
-					"El primer jugador en vencer la ciega 8",
-					"gana. No hay vidas ni reinicios al perder",
-					"1 a 1 con diferentes semillas",
-					"{C:inactive}--", -- Lives text
-					"{C:red}Gana o pierde{}",
-					"{C:inactive}--", -- Other
-					"{C:inactive}Misma semilla, los jugadores estarán en la misma semilla",
-				},
-			},
-		},
 		Edition = {
 			e_mp_phantom = {
 				name = "Fantasma",
