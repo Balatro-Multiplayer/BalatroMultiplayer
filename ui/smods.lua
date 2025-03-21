@@ -81,6 +81,21 @@ SMODS.Mods.Multiplayer.config_tab = function()
 				config = {
 					padding = 0.5,
 					align = "cm",
+				},
+				nodes = {
+					create_toggle({
+						id = "misprint_display_toggle",
+						label = localize("b_misprint_display"),
+						ref_table = SMODS.Mods["Multiplayer"].config,
+						ref_value = "misprint_display",
+					}),
+				},
+			},
+			{
+				n = G.UIT.R,
+				config = {
+					padding = 0.5,
+					align = "cm",
 					id = "username_input_box",
 				},
 				nodes = {
