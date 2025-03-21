@@ -30,25 +30,26 @@ return {
 			j_mp_lets_go_gambling = {
 				name = "Kōkiri te Peti!",
 				text = {
-					"Hokona atu tēnei Hako kia {X:mult,C:white} +X#3# {} Rea,",
-					"engari, he {C:green}#1#/#2#{} te tūpono ka urupatua",
-					"{C:inactive}(Ka {X:mult,C:white}+X#4#{C:inactive} nui ake te Rea, whai muri i ia {C:attention}Ārai Matua{C:inactive})",
-					"{C:inactive}(I tēnei wā he {X:mult,C:white}X#5#{C:inactive} Rea)",
+					"He {C:green}#1#/#2#{} te tūpono ka",
+					"tīkina te {X:mult,C:white}X#3#{} Rea me te {C:money}$#4#{}",
+					"He {C:green}#5#/#6#{} te tūpono ka",
+					"whiwhi tō {X:purple,C:white}Hoariri{} i te {C:money}$#7#",
 				},
 			},
 			j_mp_speedrun = {
-				name = "TĀKARO TERE",
+				name = "TĀKAROTERE",
 				text = {
-					"Ka {C:attention}tōtorutia{} tō tatau",
-					"mēnā ka pau ō {C:blue}Ringa{} katoa",
-					"i mua i tō {X:purple,C:white}Hoariri{} i rō {C:attention}whawhai{}",
+					"Mēnā ka tae atu koe ki te",
+					"{C:attention}whawhai{} i mua i tō {X:purple,C:white}Hoariri{},,",
+					"ka tīkina tētahi Kāri {C:spectral}Tūmatarau{}",
+					"{C:inactive}(Me whai wāhi)",
 				},
 			},
 			j_mp_conjoined_joker = {
 				name = "Hako Kotahi",
 				text = {
 					"Hei te wā ka {C:attention}whawhai{} ki tō",
-					"{X:purple,C:white}Hoariri{}, ka tāpirihia te{X:mult,C:white}X#1#{} Rea mō",
+					"{X:purple,C:white}Hoariri{}, ka tāpirihia te {X:mult,C:white}X#1#{} Rea mō",
 					"ia {C:blue}Ringa{} e toe ana ki tō {X:purple,C:white}Hoariri",
 					"{C:inactive}(Kāore e nui ake i te {X:mult,C:white}X#2#{C:inactive}, I tēnei wā he {X:mult,C:white}X#3#{C:inactive})",
 				},
