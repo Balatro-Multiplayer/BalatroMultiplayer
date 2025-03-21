@@ -14,9 +14,9 @@ return {
 			j_mp_defensive_joker = {
 				name = "Comodín defensivo",
 				text = {
-					"{C:chips}+#1#{} Chips for every {C:red,E:1}life{}",
-					"less than your {X:purple,C:white}Nemesis{}",
-					"{C:inactive}(Currently {C:chips}+#2#{C:inactive} Chips)",
+					"{C:chips}+#1#{} fichas por cada {C:red,E:1}vida{}",
+					"menos que tu {X:purple,C:white}némesis{}",
+					"{C:inactive}(Actualmente {C:chips}+#2#{C:inactive} fichas)",
 				},
 			},
 			j_mp_skip_off = {
