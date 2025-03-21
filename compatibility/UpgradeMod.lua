@@ -1,12 +1,4 @@
 if SMODS.Mods["upgrademod"] and SMODS.Mods["upgrademod"].can_load then
-    function action_speedrun()
-        local card = G.MULTIPLAYER.UTILS.get_joker("j_mp_speedrun")
-        if card then
-            card:juice_up()
-            G.GAME.chips = to_big(G.GAME.chips) * to_big(3 + (speedrun_factor or 0.25)*((effect_level or 1) - 1))
-        end
-    end
-
     function action_asteroid()
         local hand_type = "High Card"
         local max_level = 0

@@ -264,7 +264,7 @@ local function action_version()
 	MP.ACTIONS.version()
 end
 
-local function action_asteroid()
+local action_asteroid = action_asteroid or function()
 	local hand_type = "High Card"
 	local max_level = 0
 	for k, v in pairs(G.GAME.hands) do
