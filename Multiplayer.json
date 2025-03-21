@@ -1,23 +1,24 @@
 {
-	"id": "VirtualizedMultiplayer",
+	"id": "Multiplayer",
 	"name": "Multiplayer",
-	"display_name": "MP",
+	"display_name": "Multiplayer",
 	"author": ["virtualized", "TGMM", "CUexter"],
 	"description": "Allows players to compete with their friends!",
 	"prefix": "mp",
-	"main_file": "Core.lua",
+	"main_file": "core.lua",
 	"priority": 9007199254740990,
 	"badge_colour": "AC3232",
 	"badge_text_colour": "FFFFFF",
-	"version": "0.1.8.4",
+	"version": "0.2.0",
 	"dependencies": [
-    "Steamodded (>=1.0.0~ALPHA-1424a)",
-    "Lovely (>=0.7)",
-    "Balatro (>=1.0.1n)"
-  ],
+		"Steamodded (>=1.0.0~BETA-0315b)",
+		"Lovely (>=0.7)",
+		"Balatro (>=1.0.1o)"
+	],
 	"conflicts": [
 		"SystemClock (<<1.6.3)",
 		"Cryptid (<<0.5.4)",
-		"Talisman (<=2.0.2)"
+		"Talisman (<=2.0.2)",
+		"VirtualizedMultiplayer"
 	]
 }

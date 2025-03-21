@@ -1,0 +1,68 @@
+[manifest]
+version = "1.0.0"
+dump_lua = true
+priority = 2147483600
+
+# Deck Select
+[[patches]]
+[patches.pattern]
+target = "functions/UI_definitions.lua"
+pattern = '''local t =   create_UIBox_generic_options({no_back = from_game_over, no_esc = from_game_over, contents ={'''
+position = 'at'
+payload = '''local t = MP.LOBBY.code and create_UIBox_generic_options({contents ={
+    {n=G.UIT.R, config={padding = 0.0, align = "cm", colour = G.C.CLEAR}, nodes={
+      {n=G.UIT.R, config={align = 'cm', padding = 0.1, no_fill = true, minh = 0, minw = 0}, nodes={
+        {n=G.UIT.O, config={id = 'tab_contents', object = UIBox{definition = ((Galdur and Galdur.config.use) and G.UIDEF.run_setup_option_new_model or G.UIDEF.run_setup_option)('New Run'), config = {offset = {x=0,y=0}}}}}
+      }},
+    }},
+  }}) or create_UIBox_generic_options({no_back = from_game_over, no_esc = from_game_over, contents ={'''
+match_indent = true
+times = 1
+
+[[patches]]
+[patches.pattern]
+target = "functions/UI_definitions.lua"
+pattern = '''if type == 'New Run' then'''
+position = 'at'
+payload = '''if type == 'New Run' and not MP.LOBBY.code then'''
+match_indent = true
+times = 1
+
+[[patches]]
+[patches.pattern]
+target = "functions/UI_definitions.lua"
+pattern = '''G.FUNCS.change_stake({to_key = G.viewed_stake})
+  else'''
+position = 'after'
+payload = '''if MP.LOBBY.code then
+    G.viewed_stake = MP.LOBBY.deck.stake
+    G.FUNCS.change_stake({to_key = G.viewed_stake})
+  end'''
+match_indent = true
+times = 1
+
+[[patches]]
+[patches.pattern]
+target = "functions/button_callbacks.lua"
+pattern = '''if G.SETTINGS.current_setup == 'New Run' then'''
+position = 'at'
+payload = '''if G.SETTINGS.current_setup == 'New Run' or G.SETTINGS.current_setup == 'Multiplayer' then'''
+match_indent = true
+times = 1
+
+[[patches]]
+[patches.pattern]
+target = "functions/UI_definitions.lua"
+pattern = '''G.GAME.viewed_back = Back(get_deck_from_name(G.PROFILES[G.SETTINGS.profile].MEMORY.deck))'''
+position = 'at'
+payload = '''G.GAME.viewed_back = MP.LOBBY.code and Back(get_deck_from_name(MP.LOBBY.deck.back)) or Back(get_deck_from_name(G.PROFILES[G.SETTINGS.profile].MEMORY.deck))'''
+match_indent = true
+times = 1
+
+[[patches]]
+[patches.regex]
+target = "functions/UI_definitions.lua"
+pattern = '''function G.UIDEF.run_setup_option(?<pre>[\s\S]+?)localize\('b_play_cap'\)'''
+position = 'at'
+payload = '''function G.UIDEF.run_setup_option$pre MP.LOBBY.code and localize('b_select') or localize('b_play_cap')'''
+times = 1

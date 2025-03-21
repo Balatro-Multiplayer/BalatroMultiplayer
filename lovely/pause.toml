@@ -1,0 +1,31 @@
+[manifest]
+version = "1.0.0"
+dump_lua = true
+priority = 2147483600
+
+[[patches]]
+[patches.pattern]
+target = 'functions/UI_definitions.lua'
+pattern = '''main_menu = UIBox_button{ label = {localize('b_main_menu')}, button = "go_to_menu", minw = 5}'''
+position = 'after'
+payload = '''unstuck_button = UIBox_button{ label = {localize('b_unstuck')}, button = "mp_unstuck", minw = 5}
+return_to_lobby = UIBox_button{ label = {localize('b_return_lobby')}, button = "mp_return_to_lobby", minw = 5}
+leave_lobby = UIBox_button{ label = {localize('b_leave_lobby')}, button = "lobby_leave", minw = 5}'''
+match_indent = true
+times = 1
+
+[[patches]]
+[patches.pattern]
+target = 'functions/UI_definitions.lua'
+pattern = '''G.GAME.seeded and current_seed or nil,
+      restart,
+      main_menu,'''
+position = 'at'
+payload = '''(not MP.LOBBY.code and G.GAME.seeded) and current_seed or nil,
+not MP.LOBBY.code and restart or nil,
+not MP.LOBBY.code and main_menu or nil,
+MP.LOBBY.code and unstuck_button or nil,
+MP.LOBBY.code and return_to_lobby or nil,
+MP.LOBBY.code and leave_lobby or nil,'''
+match_indent = true
+times = 1
