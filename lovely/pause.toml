@@ -10,7 +10,7 @@ pattern = '''main_menu = UIBox_button{ label = {localize('b_main_menu')}, button
 position = 'after'
 payload = '''unstuck_button = UIBox_button{ label = {localize('b_unstuck')}, button = "mp_unstuck", minw = 5}
 return_to_lobby = UIBox_button{ label = {localize('b_return_lobby')}, button = "mp_return_to_lobby", minw = 5}
-leave_lobby = UIBox_button{ label = {localize('leave_lobby')}, button = "lobby_leave", minw = 5}'''
+leave_lobby = UIBox_button{ label = {localize('b_leave_lobby')}, button = "lobby_leave", minw = 5}'''
 match_indent = true
 times = 1
 

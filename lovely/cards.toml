@@ -8,9 +8,7 @@ priority = 2147483600
 target = "card.lua"
 pattern = '''\) then self.cost = 0 end'''
 position = 'after'
-payload = '''
-  if self.edition and self.edition.type == 'mp_phantom' then self.sell_cost = 0 end
-  if self.ability.name == 'j_mp_lets_go_gambling' then self.sell_cost = -1 end'''
+payload = '''if self.edition and self.edition.type == 'mp_phantom' then self.sell_cost = 0 end'''
 times = 1
 
 [[patches]]

@@ -1,0 +1,13 @@
+[manifest]
+version = "1.0.0"
+dump_lua = true
+priority = 2147483600
+
+[[patches]]
+[patches.pattern]
+target = '''=[SMODS _ "src/utils.lua"]'''
+pattern = '''function SMODS.in_scoring(card, scoring_hand)'''
+position = 'after'
+payload = '''   if not scoring_hand then return false end'''
+match_indent = true
+times = 1

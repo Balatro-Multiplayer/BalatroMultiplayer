@@ -151,7 +151,7 @@ function MP.UTILS.overlay_message(message)
 end
 
 function MP.UTILS.get_joker(key)
-	if not G.jokers then
+	if not G.jokers or not G.jokers.cards then
 		return nil
 	end
 	for i = 1, #G.jokers.cards do
@@ -163,7 +163,7 @@ function MP.UTILS.get_joker(key)
 end
 
 function MP.UTILS.get_phantom_joker(key)
-	if not MP.shared then
+	if not MP.shared or not MP.shared.cards then
 		return nil
 	end
 	for i = 1, #MP.shared.cards do
@@ -179,7 +179,7 @@ function MP.UTILS.get_phantom_joker(key)
 end
 
 function MP.UTILS.run_for_each_joker(key, func)
-	if not G.jokers then
+	if not G.jokers or not G.jokers.cards then
 		return
 	end
 	for i = 1, #G.jokers.cards do
@@ -190,7 +190,7 @@ function MP.UTILS.run_for_each_joker(key, func)
 end
 
 function MP.UTILS.run_for_each_phantom_joker(key, func)
-	if not MP.shared then
+	if not MP.shared or not MP.shared.cards then
 		return
 	end
 	for i = 1, #MP.shared.cards do

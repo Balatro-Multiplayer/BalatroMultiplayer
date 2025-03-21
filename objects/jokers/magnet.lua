@@ -24,7 +24,7 @@ SMODS.Joker({
 		return MP.LOBBY.code and MP.LOBBY.config.multiplayer_jokers
 	end,
 	calculate = function(self, card, context)
-		if context.end_of_round and not context.blueprint then
+		if context.end_of_round and not context.other_card and not context.blueprint and not context.debuffed then
 			card.ability.extra.current_rounds = card.ability.extra.current_rounds + 1
 			if card.ability.extra.current_rounds == card.ability.extra.rounds then
 				local eval = function(card)

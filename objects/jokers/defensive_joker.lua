@@ -25,7 +25,7 @@ SMODS.Joker({
 	update = function(self, card, dt)
 		if MP.LOBBY.code then
 			if G.STAGE == G.STAGES.RUN then
-				card.ability.t_chips = math.min((MP.GAME.enemy.lives - MP.GAME.lives) * card.ability.extra.extra, 0)
+				card.ability.t_chips = math.max((MP.GAME.enemy.lives - MP.GAME.lives) * card.ability.extra.extra, 0)
 			end
 		else
 			card.ability.t_chips = 0

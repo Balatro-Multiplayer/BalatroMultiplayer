@@ -1285,8 +1285,7 @@ function create_UIBox_game_over()
 														{
 															n = G.UIT.T,
 															config = {
-																text = G.localization.misc.dictionary["leave_lobby"]
-																	or "Leave Lobby",
+																text = localize("b_leave_lobby"),
 																scale = 0.5,
 																colour = G.C.UI.TEXT_LIGHT,
 															},
@@ -1567,8 +1566,7 @@ function create_UIBox_win()
 														{
 															n = G.UIT.T,
 															config = {
-																text = G.localization.misc.dictionary["leave_lobby"]
-																	or "Leave Lobby",
+																text = localize("b_leave_lobby"),
 																scale = 0.5,
 																colour = G.C.UI.TEXT_LIGHT,
 															},

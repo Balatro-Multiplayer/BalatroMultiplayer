@@ -88,7 +88,7 @@ times = 1
 target = "functions/common_events.lua"
 pattern = '''G.GAME.current_round.hands_left = G.GAME.current_round.hands_left + mod'''
 position = 'after'
-payload = '''if MP.LOBBY.code and MP.is_pvp_boss() then
+payload = '''if MP.LOBBY.code and MP.is_pvp_boss() and mod > 0 then
 		MP.ACTIONS.play_hand(G.GAME.chips, G.GAME.current_round.hands_left)
 	end'''
 match_indent = true
