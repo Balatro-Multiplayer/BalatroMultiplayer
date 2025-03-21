@@ -197,6 +197,7 @@ return {
 			b_unstuck = "Unstuck",
 			b_unstuck_arcana = "Stuck In Booster Pack",
 			b_unstuck_blind = "Stuck Outside PvP",
+			b_misprint_display = "Display the next card in the deck",
 			k_enemy_score = "Current Enemy score",
 			k_enemy_hands = "Enemy hands left: ",
 			k_coming_soon = "Coming Soon!",
