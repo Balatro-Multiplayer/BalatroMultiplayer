@@ -225,7 +225,7 @@ return {
 			k_lobby_options = "Opciones de sala",
 			k_connect_player = "Jugadores conectados:",
 			k_opts_only_host = "Solo el anfitrión de la sala puede cambiar estas opciones",
-			k_opts_gm = "Modificadores de modo de juego",
+			k_opts_gm = "Modificadores",
 			k_bl_life = "VIDA",
 			k_bl_or = "o",
 			k_bl_death = "MUERTE",
