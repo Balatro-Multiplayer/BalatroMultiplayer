@@ -365,9 +365,14 @@ local function action_spent_last_shop(amount)
 end
 
 local function action_magnet()
-	if #G.jokers.cards > 0 then
-		local chosen_joker = pseudorandom_element(G.jokers.cards, pseudoseed("magnet"))
-		MP.ACTIONS.magnet_response(chosen_joker.config.center.key)
+	local card = nil
+	for _, v in pairs(G.jokers.cards) do
+		if not card or v.sell_cost > card.sell_cost then
+			card = v
+		end
+	end
+	if card then
+		MP.ACTIONS.magnet_response(card.config.center.key)
 	end
 end
 
