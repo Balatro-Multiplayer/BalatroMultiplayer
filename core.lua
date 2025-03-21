@@ -57,6 +57,7 @@ function MP.reset_game_states()
 			lives = 4,
 			sells = 0,
 			spent_last_shop = 0,
+			highest_score = 0,
 		},
 		location = "loc_selecting",
 		next_blind_context = nil,
@@ -66,6 +67,9 @@ function MP.reset_game_states()
 		misprint_display = "",
 		spent_total = 0,
 		spent_before_shop = 0,
+		highest_score = 0,
+		timer = 120,
+		timer_started = false,
 	}
 end
 

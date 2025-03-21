@@ -1,0 +1,39 @@
+[manifest]
+version = "1.0.0"
+dump_lua = true
+priority = 2147483600
+
+[[patches]]
+[patches.regex]
+target = "functions/UI_definitions.lua"
+pattern = '''contents\.buttons = \{(?<pre>[\s\S]*?)minh = 1\.75(?<between>[\s\S]*?)minh = 1\.75'''
+position = 'at'
+payload = '''contents.buttons = {$pre minh = MP.LOBBY.code and 1.2 or 1.75$between minh = MP.LOBBY.code and 1.2 or 1.75'''
+times = 1
+
+[[patches]]
+[patches.pattern]
+target = "functions/UI_definitions.lua"
+pattern = '''{n=G.UIT.T, config={text = localize('b_options'), scale = scale, colour = G.C.UI.TEXT_LIGHT, shadow = true}}
+            }},
+          }}'''
+position = 'after'
+payload = ''',
+MP.LOBBY.code and {n=G.UIT.R, config={id = 'lobby_info_button', align = "cm", minh = 1.2, minw = 1.5,padding = 0.05, r = 0.1, hover = true, colour = G.C.BLUE, button = "lobby_info", shadow = true}, nodes={
+    {n=G.UIT.R, config={align = "cm", padding = 0, maxw = 1.4}, nodes={
+        {n=G.UIT.T, config={text = "Lobby", scale = 1.2*scale, colour = G.C.UI.TEXT_LIGHT, shadow = true}}
+    }},
+    {n=G.UIT.R, config={align = "cm", padding = 0, maxw = 1.4}, nodes={
+        {n=G.UIT.T, config={text = "Info", scale = 1*scale, colour = G.C.UI.TEXT_LIGHT, shadow = true, focus_args = {button = G.F_GUIDE and 'guide' or 'back', orientation = 'bm'}, func = 'set_button_pip'}}
+    }}
+}} or nil,'''
+match_indent = true
+times = 1
+
+[[patches]]
+[patches.regex]
+target = "functions/UI_definitions.lua"
+pattern = '''\{n=G\.UIT\.C, config=\{align = "cm", padding = 0\.05, minw = 1\.45, minh = 1,'''
+position = 'at'
+payload = '''MP.LOBBY.code and MP.UI.timer_hud() or {n=G.UIT.C, config={align = "cm", padding = 0.05, minw = 1.45, minh = 1,'''
+times = 1

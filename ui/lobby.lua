@@ -761,14 +761,17 @@ function G.UIDEF.create_UIBox_view_hash(type)
 						padding = 0.2,
 						align = "cm",
 					},
-					nodes = hash_str_to_view(type == "host" and MP.LOBBY.host.hash_str or MP.LOBBY.guest.hash_str),
+					nodes = MP.UI.hash_str_to_view(
+						type == "host" and MP.LOBBY.host.hash_str or MP.LOBBY.guest.hash_str,
+						G.C.UI.TEXT_LIGHT
+					),
 				},
 			},
 		})
 	)
 end
 
-function hash_str_to_view(str)
+function MP.UI.hash_str_to_view(str, text_colour)
 	local t = {}
 
 	if not str then
@@ -789,7 +792,7 @@ function hash_str_to_view(str)
 						text = s,
 						shadow = true,
 						scale = 0.45,
-						colour = G.C.UI.TEXT_LIGHT,
+						colour = text_colour,
 					},
 				},
 			},

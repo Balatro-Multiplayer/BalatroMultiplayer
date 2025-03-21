@@ -198,6 +198,8 @@ return {
 			b_unstuck_arcana = "Stuck In Booster Pack",
 			b_unstuck_blind = "Stuck Outside PvP",
 			b_misprint_display = "Display the next card in the deck",
+			b_players = "Players",
+			b_continue_singleplayer = "Continue in Singleplayer",
 			k_enemy_score = "Current Enemy score",
 			k_enemy_hands = "Enemy hands left: ",
 			k_coming_soon = "Coming Soon!",
@@ -238,6 +240,9 @@ return {
 			k_badlatro = "Badlatro",
 			k_badlatro_description = "A weekly ruleset designed by @dr_monty_the_snek on the discord server that has been added to the mod permanently.",
 			k_oops_ex = "Oops!",
+			k_timer = "Timer",
+			k_mods_list = "Mods List",
+			k_enemy_jokers = "Enemy Jokers",
 			ml_enemy_loc = { "Enemy", "location" },
 			ml_mp_kofi_message = {
 				"This mod and game server is",

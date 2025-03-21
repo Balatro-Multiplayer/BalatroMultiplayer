@@ -83,6 +83,8 @@ end
 
 local function action_start_blind()
 	MP.GAME.ready_blind = false
+	MP.GAME.timer_started = false
+	MP.GAME.timer = 120
 	if MP.GAME.next_blind_context then
 		G.FUNCS.select_blind(MP.GAME.next_blind_context)
 	else
@@ -102,6 +104,10 @@ local function action_enemy_info(score_str, hands_left_str, skips_str, lives_str
 	if score == nil or hands_left == nil then
 		sendDebugMessage("Invalid score or hands_left", "MULTIPLAYER")
 		return
+	end
+
+	if MP.GAME.enemy.highest_score < score then
+		MP.GAME.enemy.highest_score = score
 	end
 
 	G.E_MANAGER:add_event(Event({
@@ -136,6 +142,8 @@ end
 
 local function action_end_pvp()
 	MP.GAME.end_pvp = true
+	MP.GAME.timer = 120
+	MP.GAME.timer_started = false
 end
 
 ---@param lives number
@@ -382,6 +390,44 @@ local function action_magnet_response(key)
 	G.jokers:emplace(card)
 end
 
+local function action_receive_end_game_jokers(keys)
+	if not MP.end_game_jokers then
+		return
+	end
+	local split_keys = {}
+	for key in string.gmatch(keys, "([^;]+)") do
+		table.insert(split_keys, key)
+	end
+	for _, key in pairs(split_keys) do
+		local card = create_card("Joker", MP.end_game_jokers, false, nil, nil, nil, key)
+		card:set_edition()
+		card:add_to_deck()
+		MP.end_game_jokers:emplace(card)
+	end
+end
+
+local function action_get_end_game_jokers()
+	if not G.jokers or not G.jokers.cards then
+		Client.send("action:receiveEndGameJokers,keys:")
+		return
+	end
+	local jokers = G.jokers.cards
+	local keys = ""
+	for _, card in pairs(jokers) do
+		keys = keys .. card.config.center.key .. ";"
+	end
+	Client.send(string.format("action:receiveEndGameJokers,keys:%s", keys))
+end
+
+local function action_start_ante_timer(time)
+	if type(time) == "string" then
+		time = tonumber(time)
+	end
+	MP.GAME.timer = time
+	MP.GAME.timer_started = true
+	G.E_MANAGER:add_event(MP.timer_event)
+end
+
 -- #region Client to Server
 function MP.ACTIONS.create_lobby(gamemode)
 	MP.LOBBY.config.ruleset = gamemode
@@ -442,6 +488,9 @@ end
 ---@param score number
 ---@param hands_left number
 function MP.ACTIONS.play_hand(score, hands_left)
+	if score > MP.GAME.highest_score then
+		MP.GAME.highest_score = score
+	end
 	local fixed_score = tostring(to_big(score))
 	-- Credit to sidmeierscivilizationv on discord for this fix for Talisman
 	if string.match(fixed_score, "[eE]") == nil and string.match(fixed_score, "[.]") then
@@ -506,6 +555,19 @@ end
 
 function MP.ACTIONS.magnet_response(key)
 	Client.send("action:magnetResponse,key:" .. key)
+end
+
+function MP.ACTIONS.get_end_game_jokers()
+	Client.send("action:getEndGameJokers")
+end
+
+function MP.ACTIONS.start_ante_timer()
+	Client.send("action:startAnteTimer,time:" .. tostring(MP.GAME.timer))
+	action_start_ante_timer(MP.GAME.timer)
+end
+
+function MP.ACTIONS.fail_timer()
+	Client.send("action:failTimer")
 end
 
 -- #endregion Client to Server
@@ -609,6 +671,12 @@ function Game:update(dt)
 				action_magnet()
 			elseif parsedAction.action == "magnetResponse" then
 				action_magnet_response(parsedAction.key)
+			elseif parsedAction.action == "getEndGameJokers" then
+				action_get_end_game_jokers()
+			elseif parsedAction.action == "receiveEndGameJokers" then
+				action_receive_end_game_jokers(parsedAction.keys)
+			elseif parsedAction.action == "startAnteTimer" then
+				action_start_ante_timer(parsedAction.time)
 			elseif parsedAction.action == "error" then
 				action_error(parsedAction.message)
 			elseif parsedAction.action == "keepAlive" then
