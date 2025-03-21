@@ -106,7 +106,7 @@ local function action_enemy_info(score_str, hands_left_str, skips_str, lives_str
 		return
 	end
 
-	if MP.GAME.enemy.highest_score < score then
+	if to_big(MP.GAME.enemy.highest_score) < to_big(score) then
 		MP.GAME.enemy.highest_score = score
 	end
 
@@ -488,7 +488,7 @@ end
 ---@param score number
 ---@param hands_left number
 function MP.ACTIONS.play_hand(score, hands_left)
-	if score > MP.GAME.highest_score then
+	if to_big(score) > to_big(MP.GAME.highest_score) then
 		MP.GAME.highest_score = score
 	end
 	local fixed_score = tostring(to_big(score))
