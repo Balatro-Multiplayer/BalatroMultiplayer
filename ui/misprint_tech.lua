@@ -37,6 +37,9 @@ end
 
 -- Adapted from Pokermon (uifunctions)
 MP.update_misprint_cardarea = function(misprint_view)
+	if not misprint_view.cards then
+		return
+	end
 	if not misprint_view.states.visible then
 		local to_kill = #misprint_view.cards
 		for i = 1, to_kill do

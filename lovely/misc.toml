@@ -11,3 +11,12 @@ position = 'after'
 payload = '''   if not scoring_hand then return false end'''
 match_indent = true
 times = 1
+
+[[patches]]
+[patches.pattern]
+target = '''=[SMODS _ "src/utils.lua"]'''
+pattern = "for _, area in ipairs(SMODS.get_card_areas('playing_cards')) do"
+position = 'after'
+payload = "if not area.cards then goto continue end"
+match_indent = true
+times = 1

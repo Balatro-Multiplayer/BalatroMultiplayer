@@ -57,15 +57,6 @@ match_indent = true
 # Adapted from Pokermon (lovely)
 [[patches]]
 [patches.pattern]
-target = '=[SMODS _ "src/utils.lua"]'
-pattern = "-- TARGET: add your own CardAreas for playing card evaluation"
-position = "after"
-payload = "t[#t+1] = MP.misprint_view"
-match_indent = true
-
-# Adapted from Pokermon (lovely)
-[[patches]]
-[patches.pattern]
 target = "functions/common_events.lua"
 pattern = "local config = {}"
 position = "before"
