@@ -2,14 +2,18 @@
 	"id": "Multiplayer",
 	"name": "Multiplayer",
 	"display_name": "Multiplayer",
-	"author": ["virtualized", "TGMM", "CUexter"],
+	"author": [
+		"virtualized",
+		"TGMM",
+		"CUexter"
+	],
 	"description": "Allows players to compete with their friends!",
 	"prefix": "mp",
 	"main_file": "core.lua",
 	"priority": 9007199254740990,
 	"badge_colour": "AC3232",
 	"badge_text_colour": "FFFFFF",
-	"version": "0.2.0",
+	"version": "0.2.1",
 	"dependencies": [
 		"Steamodded (>=1.0.0~BETA-0315b)",
 		"Lovely (>=0.7)",
