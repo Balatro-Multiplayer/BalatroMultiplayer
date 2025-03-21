@@ -1,0 +1,17 @@
+[manifest]
+version = "1.0.0"
+dump_lua = true
+priority = 0
+
+# Make Next Ante Preview display Nemesis Blind's size as "????"
+[[patches]]
+[patches.pattern]
+target = '=[SMODS AntePreview "main.lua"]'
+pattern = "local tag = prediction[choice].tag"
+position = 'before'
+payload = '''
+if prediction[choice].blind == "bl_mp_nemesis" then
+    blind_amt = "????"
+end
+'''
+match_indent = true
