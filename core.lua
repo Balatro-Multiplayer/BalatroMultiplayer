@@ -144,7 +144,7 @@ SMODS.Atlas({
 
 MP.load_mp_dir("compatibility")
 
-MP.load_mp_file("networking/Action_Handlers.lua")
+MP.load_mp_file("networking/action_handlers.lua")
 
 MP.load_mp_dir("objects/editions")
 MP.load_mp_dir("objects/stickers")
