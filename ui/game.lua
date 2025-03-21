@@ -1896,7 +1896,7 @@ end
 function G.FUNCS.open_kofi(e)
 	love.system.openURL("https://ko-fi.com/virtualized")
 end
-
+--[[
 function MP.UI.create_UIBox_Misprint_Display()
 	return {
 		n = G.UIT.ROOT,
@@ -1966,5 +1966,5 @@ function G.FUNCS.misprint_display_set(e)
 
 	-- Yes I know this is stupid
 	MP.GAME.misprint_display = localized_card[1][2].config.text .. localized_card[1][3].config.text
-	e.config.object.colours = { G.C.SUITS[suit_full[suit]] }
-end
+	e.config.object.colours = { G.C.SUITS[suit_full[suit]] --}
+--end
