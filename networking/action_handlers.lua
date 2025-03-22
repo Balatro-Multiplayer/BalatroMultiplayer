@@ -391,7 +391,7 @@ local function action_magnet_response(key)
 end
 
 local function action_receive_end_game_jokers(keys)
-	if not MP.end_game_jokers then
+	if not MP.end_game_jokers or not keys or keys == "0" then
 		return
 	end
 	local split_keys = {}
