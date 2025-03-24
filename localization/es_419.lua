@@ -32,7 +32,7 @@ return {
 				name = "Let's Go Gambling",
 				text = {
 					"{C:green}#1# en #2#{} posibilidades para",
-					"{X:mult,C:white}X#3#{} Multi y {C:money}$#4#{}",
+					"{X:mult,C:white}X#3#{} multi y {C:money}$#4#{}",
 					"{C:green}#5# en #6#{} posibilidades para darle",
 					"{C:money}$#7# a tu {X:purple,C:white}némesis{}",
 				},
@@ -50,9 +50,9 @@ return {
 				name = "Comodín unido",
 				text = {
 					"Mientras estés en una {C:attention}ciega JcJ{}, gana",
-					"{X:mult,C:white}X#1#{} Multi por cada {C:blue}mano{}",
-					"que tu {X:purple,C:white}némesis{} se haya dejado",
-					"{C:inactive}(Máx {X:mult,C:white}X#2#{C:inactive} Multi, Actualmente {X:mult,C:white}X#3#{C:inactive} Multi)",
+					"{X:mult,C:white}X#1#{} multi por cada {C:blue}mano{}",
+					"que tu {X:purple,C:white}némesis{} haya dejado",
+					"{C:inactive}(Máx {X:mult,C:white}X#2#{C:inactive} multi, Actualmente {X:mult,C:white}X#3#{C:inactive} multi)",
 				},
 			},
 			j_mp_penny_pincher = {
@@ -60,15 +60,15 @@ return {
 				text = {
 					"Cuando alcances la tienda, gana",
 					"{C:money}$#1#{} por cada {C:money}$#2#{}",
-					"que tu {X:purple,C:white}némesis{} se haya gastado previamente",
+					"que tu {X:purple,C:white}némesis{} haya gastado previamente",
 				},
 			},
 			j_mp_taxes = {
 				name = "Impuestos",
 				text = {
 					"Cuando tu {X:purple,C:white}némesis'{} vende",
-					"una carta gana {C:mult}+#1#{} Multi",
-					"{C:inactive}(Actualmente {C:mult}+#2#{C:inactive} Multi)",
+					"una carta gana {C:mult}+#1#{} multi",
+					"{C:inactive}(Actualmente {C:mult}+#2#{C:inactive} multi)",
 				},
 			},
 			j_mp_magnet = {
@@ -94,16 +94,16 @@ return {
 			j_mp_pacifist = {
 				name = "Pacifista",
 				text = {
-					"{X:mult,C:white}X#1#{} Multi cuando",
+					"{X:mult,C:white}X#1#{} multi cuando",
 					"no estás en una {C:attention}ciega JcJ{}",
 				},
 			},
 			j_mp_hanging_chad = {
-				name = "Hanging Chad",
+				name = "Papel perforado",
 				text = {
 					"Reactiva {C:attention}primera{} y {C:attention}segunda{}",
 					"carta jugada que se usó para anotar",
-					"{C:attention}#1#{} de tiempo adicional",
+					"{C:attention}#1#{} vez adicional",
 				},
 			},
 		},
@@ -122,7 +122,7 @@ return {
 			bl_mp_nemesis = {
 				name = "Tu némesis",
 				text = {
-					"Enfréntante a otro jugador,",
+					"Enfréntate a otro jugador,",
 					"quien tenga más fichas gana",
 				},
 			},
@@ -140,7 +140,7 @@ return {
 			m_mp_glass = {
 				name = "Carta de vidrio",
 				text = {
-					"{X:mult,C:white} X#1# {} Multi",
+					"{X:mult,C:white} X#1# {} multi",
 					"{C:green}#2# en #3#{} posibilidades",
 					"de que la carta se destruya",
 				},
@@ -151,7 +151,7 @@ return {
 				name = "Némesis",
 				text = {
 					"{X:purple,C:white}#1#{}",
-					"Tu único e inigualable némsis",
+					"Tu único e inigualable némesis",
 				},
 			},
 		},
@@ -195,18 +195,18 @@ return {
 			b_opts_player_diff_deck = "Los jugadores tienen barajas diferentes",
 			b_reset = "Reiniciar",
 			b_set_custom_seed = "Ingresar semilla personalizada",
-			b_mp_kofi_button = "Apoyándome en Ko-fi",
+			b_mp_kofi_button = "Apoyar en Ko-fi",
 			b_unstuck = "Desatascar",
 			b_unstuck_arcana = "Atascado en paquete potenciador",
 			b_unstuck_blind = "Atascado fuera de JcJ",
 			b_misprint_display = "Muestra la siguiente carta en la baraja",
 			b_players = "Jugadores",
 			b_continue_singleplayer = "Continuar partida individual",
-			k_enemy_score = "Puntuación actual del enemigo",
-			k_enemy_hands = "Manos restantes del enemigo: ",
+			k_enemy_score = "Puntuación del enemigo",
+			k_enemy_hands = "Manos del enemigo: ",
 			k_coming_soon = "¡Muy pronto!",
 			k_wait_enemy = "Esperando que termine el enemigo...",
-			k_lives = "Vida",
+			k_lives = "Vidas",
 			k_lost_life = "Perdiste una vida",
 			k_total_lives_lost = " Total de vidas perdidas ($4 c/u)",
 			k_attrition_name = "Atrición",
@@ -248,10 +248,11 @@ return {
 			ml_enemy_loc = { "Enemigo", "ubicación" },
 			ml_mp_kofi_message = {
 				"Este mod y servidor de juego está",
-				"desarrollado y mantenido por",
-				"una persona, si",
-				"te gusta considera",
+				"siendo desarrollado y mantenido",
+				"por una persona, si te gusta",
+				"considera",
 			},
+			ml_lobby_info = { "Sala", "Info" },
 			loc_ready = "Listo para JcJ",
 			loc_selecting = "Seleccionando ciega",
 			loc_shop = "En la tienda",
@@ -266,7 +267,7 @@ return {
 			a_mp_skips_tied = { "empatadas" },
 		},
 		v_text = {
-			ch_c_hanging_chad_rework = { "{C:attention}Hanging Chad{} está {C:dark_edition}reelaborado" },
+			ch_c_hanging_chad_rework = { "{C:attention}Papel perforado{} está {C:dark_edition}reelaborado" },
 			ch_c_glass_cards_rework = { "{C:attention}Cartas de vidrio{} están {C:dark_edition}reelaboradas" },
 		},
 	},
