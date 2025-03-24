@@ -252,6 +252,7 @@ return {
 				"por una persona, si te gusta",
 				"considera",
 			},
+			ml_lobby_info = { "Sala", "Info" },
 			loc_ready = "Listo para JcJ",
 			loc_selecting = "Seleccionando ciega",
 			loc_shop = "En la tienda",
