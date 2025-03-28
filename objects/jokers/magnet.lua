@@ -9,7 +9,7 @@ SMODS.Joker({
 	key = "magnet",
 	atlas = "magnet",
 	rarity = 3,
-	cost = 8,
+	cost = 7,
 	unlocked = true,
 	discovered = true,
 	blueprint_compat = false,

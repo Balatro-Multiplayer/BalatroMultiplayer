@@ -1,32 +1,39 @@
 MP.DECK = {}
 
-MP.DECK.BANNED_CARDS = {
-	{ id = "j_mr_bones" },
-	{ id = "j_luchador" },
-	{ id = "j_matador" },
-	{ id = "j_chicot" },
-	{ id = "v_hieroglyph" },
-	{ id = "v_petroglyph" },
-	{ id = "v_directors_cut" },
-	{ id = "v_retcon" },
+MP.DECK.BANNED_JOKERS = {
+	["j_mr_bones"] = true,
+	["j_luchador"] = true,
+	["j_matador"] = true,
+	["j_chicot"] = true,
 }
+
+MP.DECK.BANNED_CONSUMABLES = {}
+
+MP.DECK.BANNED_VOUCHERS = {
+	["v_hieroglyph"] = true,
+	["v_petroglyph"] = true,
+	["v_directors_cut"] = true,
+	["v_retcon"] = true,
+}
+
+MP.DECK.BANNED_ENHANCEMENTS = {}
 
 MP.DECK.BANNED_TAGS = {
-	{ id = "tag_boss" },
+	["tag_boss"] = true,
 }
 
-MP.DECK.BANNED_BLINDS = {}
-
 function MP.DECK.ban_card(card_id)
-	table.insert(MP.DECK.BANNED_CARDS, { id = card_id })
+	if card_id:sub(1, 1) == "j" then
+		MP.DECK.BANNED_JOKERS[card_id] = true
+	elseif card_id:sub(1, 1) == "v" then
+		MP.DECK.BANNED_VOUCHERS[card_id] = true
+	elseif card_id:sub(1, 1) == "m" then
+		MP.DECK.BANNED_ENHANCEMENTS[card_id] = true
+	end
 end
 
 function MP.DECK.ban_tag(tag_id)
-	table.insert(MP.DECK.BANNED_TAGS, { id = tag_id })
-end
-
-function MP.DECK.ban_blind(blind_id)
-	table.insert(MP.DECK.BANNED_BLINDS, { id = blind_id, type = "blind" })
+	MP.DECK.BANNED_TAGS[tag_id] = true
 end
 
 local j_broken = {
@@ -55,8 +62,6 @@ function Card:init(X, Y, W, H, card, center, params)
 	end
 	card_init_ref(self, X, Y, W, H, card, center, params)
 end
-
-MP.DECK.TYPE = "Challenge Deck"
 
 MP.DECK.MAX_STAKE = 0
 

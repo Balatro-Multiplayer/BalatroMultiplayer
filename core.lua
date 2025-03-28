@@ -18,12 +18,14 @@ MP.LOBBY = {
 		back = "Red Deck",
 		sleeve = "sleeve_casl_none",
 		stake = 1,
+		challenge = "",
 		multiplayer_jokers = true,
 	},
 	deck = {
 		back = "Red Deck",
 		sleeve = "sleeve_casl_none",
 		stake = 1,
+		challenge = "",
 	},
 	username = "Guest",
 	host = {},
@@ -151,8 +153,10 @@ MP.load_mp_dir("objects/blinds")
 MP.load_mp_dir("objects/decks")
 MP.load_mp_dir("objects/jokers")
 MP.load_mp_dir("objects/consumables")
+MP.load_mp_dir("objects/challenges")
 MP.load_mp_dir("gamemodes")
 MP.load_mp_dir("rulesets")
+MP.apply_rulesets()
 
 MP.load_mp_dir("ui/components")
 MP.load_mp_dir("ui")

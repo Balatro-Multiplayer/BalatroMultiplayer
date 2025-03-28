@@ -857,7 +857,12 @@ function G.FUNCS.lobby_start_run(e, args)
 		G.FUNCS.copy_host_deck()
 	end
 
-	local challenge = G.CHALLENGES[get_challenge_int_from_id(MP.Rulesets[MP.LOBBY.config.ruleset].challenge_deck)]
+	local challenge = nil
+	if MP.LOBBY.deck.back == "Challenge Deck" then
+		challenge = G.CHALLENGES[get_challenge_int_from_id(MP.LOBBY.deck.challenge)]
+	else
+		G.GAME.viewed_back = G.P_CENTERS[MP.UTILS.get_deck_key_from_name(MP.LOBBY.deck.back)]
+	end
 
 	G.FUNCS.start_run(e, {
 		mp_start = true,
@@ -871,6 +876,7 @@ function G.FUNCS.copy_host_deck()
 	MP.LOBBY.deck.back = MP.LOBBY.config.back
 	MP.LOBBY.deck.sleeve = MP.LOBBY.config.sleeve
 	MP.LOBBY.deck.stake = MP.LOBBY.config.stake
+	MP.LOBBY.deck.challenge = MP.LOBBY.config.challenge
 end
 
 function G.FUNCS.lobby_start_game(e)
@@ -916,21 +922,24 @@ G.FUNCS.start_run = function(e, args)
 				chosen_stake = MP.DECK.MAX_STAKE
 			end
 			if MP.LOBBY.is_host then
-				MP.LOBBY.config.back = (args.deck and args.deck.name) or G.GAME.viewed_back.name
+				MP.LOBBY.config.back = args.challenge and "Challenge Deck"
+					or (args.deck and args.deck.name)
+					or G.GAME.viewed_back.name
 				MP.LOBBY.config.stake = chosen_stake
 				MP.LOBBY.config.sleeve = G.viewed_sleeve
+				MP.LOBBY.config.challenge = args.challenge and args.challenge.id or ""
 				send_lobby_options()
 			end
-			MP.LOBBY.deck.back = (args.deck and args.deck.name) or G.GAME.viewed_back.name
+			MP.LOBBY.deck.back = args.challenge and "Challenge Deck"
+				or (args.deck and args.deck.name)
+				or G.GAME.viewed_back.name
 			MP.LOBBY.deck.stake = chosen_stake
 			MP.LOBBY.deck.sleeve = G.viewed_sleeve
+			MP.LOBBY.deck.challenge = args.challenge and args.challenge.id or ""
 			MP.ACTIONS.update_player_usernames()
 		else
-			local back = args.challenge
-			back.deck.type = MP.LOBBY.deck.back
-			back.sleeve = MP.LOBBY.deck.sleeve
 			start_run_ref(e, {
-				challenge = back,
+				challenge = args.challenge,
 				stake = tonumber(MP.LOBBY.deck.stake),
 				seed = args.seed,
 			})

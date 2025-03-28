@@ -282,7 +282,7 @@ MP.timer_event = Event({
 		MP.GAME.timer = MP.GAME.timer - 1
 		if MP.GAME.timer <= 0 then
 			MP.GAME.timer = 0
-			if not MP.GAME.ready_blind then
+			if not MP.GAME.ready_blind and not MP.is_pvp_boss() then
 				MP.ACTIONS.fail_timer()
 			end
 			return true

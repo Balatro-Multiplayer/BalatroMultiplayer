@@ -24,6 +24,6 @@ times = 1
 target = "functions/UI_definitions.lua"
 pattern = '''not is_row and {n=G.UIT.R, config={align = "cm", minh = 0.9}, nodes={'''
 position = 'at'
-payload = '''(not MP.LOBBY.code) and (not is_row) and {n=G.UIT.R, config={align = "cm", minh = 0.9}, nodes={'''
+payload = '''(not (MP.LOBBY.code and G.STAGE == G.STAGES.RUN)) and (not is_row) and {n=G.UIT.R, config={align = "cm", minh = 0.9}, nodes={'''
 match_indent = true
 times = 1

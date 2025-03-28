@@ -264,27 +264,28 @@ local function action_version()
 	MP.ACTIONS.version()
 end
 
-local action_asteroid = action_asteroid or function()
-	local hand_type = "High Card"
-	local max_level = 0
-	for k, v in pairs(G.GAME.hands) do
-		if to_big(v.level) > to_big(max_level) then
-			hand_type = k
-			max_level = v.level
+local action_asteroid = action_asteroid
+	or function()
+		local hand_type = "High Card"
+		local max_level = 0
+		for k, v in pairs(G.GAME.hands) do
+			if to_big(v.level) > to_big(max_level) then
+				hand_type = k
+				max_level = v.level
+			end
 		end
+		update_hand_text({ sound = "button", volume = 0.7, pitch = 0.8, delay = 0.3 }, {
+			handname = localize(hand_type, "poker_hands"),
+			chips = G.GAME.hands[hand_type].chips,
+			mult = G.GAME.hands[hand_type].mult,
+			level = G.GAME.hands[hand_type].level,
+		})
+		level_up_hand(nil, hand_type, false, -1)
+		update_hand_text(
+			{ sound = "button", volume = 0.7, pitch = 1.1, delay = 0 },
+			{ mult = 0, chips = 0, handname = "", level = "" }
+		)
 	end
-	update_hand_text({ sound = "button", volume = 0.7, pitch = 0.8, delay = 0.3 }, {
-		handname = localize(hand_type, "poker_hands"),
-		chips = G.GAME.hands[hand_type].chips,
-		mult = G.GAME.hands[hand_type].mult,
-		level = G.GAME.hands[hand_type].level,
-	})
-	level_up_hand(nil, hand_type, false, -1)
-	update_hand_text(
-		{ sound = "button", volume = 0.7, pitch = 1.1, delay = 0 },
-		{ mult = 0, chips = 0, handname = "", level = "" }
-	)
-end
 
 local function action_sold_joker()
 	local function juice_taxes(card)
@@ -391,13 +392,14 @@ local function action_magnet_response(key)
 end
 
 local function action_receive_end_game_jokers(keys)
-	if not MP.end_game_jokers or not keys or keys == "0" then
+	if not MP.end_game_jokers then
 		return
 	end
 	local split_keys = {}
 	for key in string.gmatch(keys, "([^;]+)") do
 		table.insert(split_keys, key)
 	end
+	remove_all(MP.end_game_jokers.cards)
 	for _, key in pairs(split_keys) do
 		local card = create_card("Joker", MP.end_game_jokers, false, nil, nil, nil, key)
 		card:set_edition()

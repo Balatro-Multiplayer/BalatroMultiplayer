@@ -317,3 +317,19 @@ function MP.UTILS.shallow_copy(t)
 	end
 	return copy
 end
+
+function MP.UTILS.get_deck_key_from_name(_name)
+	for k, v in pairs(G.P_CENTERS) do
+		if v.name == _name then
+			return k
+		end
+	end
+end
+
+function MP.UTILS.merge_tables(t1, t2)
+	local copy = MP.UTILS.shallow_copy(t1)
+	for k, v in pairs(t2) do
+		copy[k] = v
+	end
+	return copy
+end
