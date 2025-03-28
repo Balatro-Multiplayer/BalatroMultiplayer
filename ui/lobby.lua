@@ -197,7 +197,11 @@ function G.UIDEF.create_UIBox_lobby_menu()
 										minw = 2.15,
 										minh = 1.35,
 										label = {
-											back,
+											localize({
+												type = "name_text",
+												key = MP.UTILS.get_deck_key_from_name(back),
+												set = "Back",
+											}),
 											localize({
 												type = "name_text",
 												key = SMODS.stake_from_index(
@@ -217,7 +221,11 @@ function G.UIDEF.create_UIBox_lobby_menu()
 										minw = 2.15,
 										minh = 1.35,
 										label = {
-											back,
+											localize({
+												type = "name_text",
+												key = MP.UTILS.get_deck_key_from_name(back),
+												set = "Back",
+											}),
 											localize({
 												type = "name_text",
 												key = SMODS.stake_from_index(
