@@ -9,7 +9,7 @@ SMODS.Challenge({
 	deck = {
 		type = "Challenge Deck",
 		cards = {
-			{ s = "S", r = 14, e = "m_stone" },
+			{ s = "C", r = "7", e = "m_stone" },
 		},
 	},
 	unlocked = function(self)
