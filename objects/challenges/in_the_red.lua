@@ -9,11 +9,6 @@ SMODS.Challenge({
 	jokers = {
 		{ id = "j_credit_card", eternal = true, edition = "negative", rental = true },
 	},
-	restrictions = {
-		banned_tags = {
-			{ id = "tag_investment" },
-		}
-	},
 	unlocked = function(self)
 		return true
 	end,

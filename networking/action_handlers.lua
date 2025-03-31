@@ -26,6 +26,7 @@ local function action_joinedLobby(code, type)
 	MP.LOBBY.type = type
 	MP.ACTIONS.lobby_info()
 	MP.UI.update_connection_status()
+	MP.ACTIONS.sync_client()
 end
 
 local function action_lobbyInfo(host, hostHash, guest, guestHash, is_host)
@@ -570,6 +571,10 @@ end
 
 function MP.ACTIONS.fail_timer()
 	Client.send("action:failTimer")
+end
+
+function MP.ACTIONS.sync_client()
+	Client.send("action:syncClient,isCached:" .. tostring(_RELEASE_MODE))
 end
 
 -- #endregion Client to Server

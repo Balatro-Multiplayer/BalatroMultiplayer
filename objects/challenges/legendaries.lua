@@ -1,18 +1,10 @@
 SMODS.Challenge({
 	key = "legendaries",
-	rules = {
-		modifiers = {
-			{
-				id = "joker_slots",
-				value = 6
-			}
-		}
-	},
 	jokers = {
-		{ id = "j_caino", eternal = true },
-		{ id = "j_perkeo", eternal = true },
-		{ id = "j_triboulet", eternal = true },
-		{ id = "j_yorick", eternal = true },
+		{ id = "j_caino" },
+		{ id = "j_perkeo" },
+		{ id = "j_triboulet" },
+		{ id = "j_yorick" },
 		{ id = "j_joker" },
 	},
 	restrictions = {
@@ -22,8 +14,6 @@ SMODS.Challenge({
 			{ id = "j_sock_and_buskin" },
 			{ id = "j_hanging_chad" },
 			{ id = "j_mp_hanging_chad" },
-			{ id = "j_blueprint" },
-			{ id = "j_brainstorm" },
 		},
 	},
 	unlocked = function(self)

@@ -3,7 +3,7 @@ SMODS.Challenge({
 	rules = {
 		modifiers = {
 			{ id = "hands", value = 1 },
-			{ id = "hand_size", value = 26 },
+			{ id = "hand_size", value = 52 },
 			{ id = "discards", value = 0 },
 		},
 	},

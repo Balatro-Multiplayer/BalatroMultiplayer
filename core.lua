@@ -61,6 +61,7 @@ function MP.reset_game_states()
 			spent_last_shop = 0,
 			highest_score = 0,
 		},
+		location = "loc_selecting",
 		next_blind_context = nil,
 		ante_key = tostring(math.random()),
 		antes_keyed = {},

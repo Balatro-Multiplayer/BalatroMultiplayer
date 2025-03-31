@@ -282,6 +282,7 @@ return {
 			c_mp_skip_off = "Skip-Off",
 			c_mp_lets_go_gambling = "Let's Go Gambling",
 			c_mp_high_hand = "High Hand",
+			c_mp_speed = "Speed",
 		},
 	},
 }

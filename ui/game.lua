@@ -1966,5 +1966,6 @@ function G.FUNCS.misprint_display_set(e)
 
 	-- Yes I know this is stupid
 	MP.GAME.misprint_display = localized_card[1][2].config.text .. localized_card[1][3].config.text
-	e.config.object.colours = { G.C.SUITS[suit_full[suit]] --}
+	e.config.object.colours = { G.C.SUITS[suit_full[suit]]
+--}
 --end

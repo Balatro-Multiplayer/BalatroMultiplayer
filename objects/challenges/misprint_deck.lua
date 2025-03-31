@@ -1,6 +1,6 @@
 local deck_cards = {}
 for i = 1, 52 do
-	deck_cards[i] = { s = "S", r = "T" }
+	deck_cards[i] = { s = "S", r = "10" }
 end
 
 SMODS.Challenge({

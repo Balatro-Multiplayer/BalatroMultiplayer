@@ -123,7 +123,7 @@ SMODS.Mods.Multiplayer.config_tab = function()
 						n = G.UIT.T,
 						config = {
 							scale = 0.3,
-							text = G.localization.misc.dictionary["k_enter_to_save"] or "Press enter to save",
+							text = localize("k_enter_to_save"),
 							colour = G.C.UI.TEXT_LIGHT,
 						},
 					},

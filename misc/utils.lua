@@ -333,3 +333,31 @@ function MP.UTILS.merge_tables(t1, t2)
 	end
 	return copy
 end
+
+local ease_dollars_ref = ease_dollars
+function ease_dollars(mod, instant)
+	sendTraceMessage(string.format("Client sent message: action:moneyMoved,amount:%s", tostring(mod)), "MULTIPLAYER")
+	return ease_dollars_ref(mod, instant)
+end
+
+local sell_card_ref = Card.sell_card
+function Card:sell_card()
+	if self.ability and self.ability.name then
+		sendTraceMessage(
+			string.format("Client sent message: action:soldCard,card:%s", self.ability.name),
+			"MULTIPLAYER"
+		)
+	end
+	return sell_card_ref(self)
+end
+
+local use_card_ref = G.FUNCS.use_card
+function G.FUNCS.use_card(e, mute, nosave)
+	if e.config and e.config.ref_table and e.config.ref_table.ability and e.config.ref_table.ability.name then
+		sendTraceMessage(
+			string.format("Client sent message: action:usedCard,card:%s", e.config.ref_table.ability.name),
+			"MULTIPLAYER"
+		)
+	end
+	return use_card_ref(e, mute, nosave)
+end
