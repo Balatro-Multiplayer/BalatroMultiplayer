@@ -13,8 +13,8 @@ return {
 			j_mp_defensive_joker = {
 				name = "防御ジョーカー",
 				text = {
-					"失った{C:red,E:1}ライフ{}1つにつき",
-					"チップ {C:chips}+#1#{}",
+					"相手より{C:red,E:1}ライフ{}が少ないとき、",
+					"差1つにつきチップ {C:chips}+#1#{}",
 					"{C:inactive}(現在 チップ {C:chips}+#2#{C:inactive})",
 				},
 			},
@@ -30,23 +30,22 @@ return {
 			j_mp_lets_go_gambling = {
 				name = "Let’s ギャンブル！",
 				text = {
-					"売却ボタン{C:inactive}({}{C:money}$-1{}{C:inactive}){}を押すたびに倍率 {X:mult,C:white} X#3# {} を得るが、",
-					"{C:green}#2#分の#1#{} の確率で破壊される",
-					"{C:inactive}({C:attention}ボスブラインド{}{C:inactive}が終了するたびに増加量が {X:mult,C:white}X#4#{C:inactive} 増える)",
-					"{C:inactive}(現在 倍率{X:mult,C:white}X#5#{C:inactive})",
+					"{C:green}#2#分の#1#{} の確率で",
+					"{X:mult,C:white}X#3#{}と{C:money}$#4#{}得る",
+					"{C:green}#6#分の#5#{} の確率で",
+					"{X:purple,C:white}相手{}に{C:money}$#7#{}が入る",
 				},
 			},
 			j_mp_speedrun = {
 				name = "タイムアタック",
 				text = {
-					"{C:attention}PvPブラインド{}で",
-					"すべての{C:blue}ハンド{}を",
-					"{X:purple,C:white}相手{}より早く使ったとき",
-					"最終スコア {X:mult,C:white} X3 {}",
+					"{X:purple,C:white}相手{}より先に{C:attention}PvPブラインド{}に",
+					"到達した場合、{C:spectral}スペクトル{}カードを1つ作る",
+					"{C:inactive}(空きが必要)",
 				},
 			},
 			j_mp_conjoined_joker = {
-				name = "共同ジョーカー",
+				name = "結合ジョーカー",
 				text = {
 					"{C:attention}PvPブラインド{}で",
 					"{X:purple,C:white}相手{} の残り{C:blue}ハンド{}1つにつき 倍率{X:mult,C:white}X#1#{}",
@@ -54,14 +53,14 @@ return {
 				},
 			},
 			j_mp_penny_pincher = {
-				name = "倹約家",
+				name = "ケチんぼ",
 				text = {
 					"ショップ開始時、{X:purple,C:white}相手{}が",
 					"前回のショップで消費したお金 {C:money}$#2#{} ごとに {C:money}$#1#{} 得る",
 				},
 			},
 			j_mp_taxes = {
-				name = "税金",
+				name = "税務係",
 				text = {
 					"{X:purple,C:white}相手{}がカードを売るたびに",
 					"倍率 {C:mult}+#1#{} ",
@@ -75,6 +74,7 @@ return {
 					"このジョーカーを売ると",
 					"{X:purple,C:white}相手{}の最も売値が高い{C:attention}ジョーカー{}を {C:attention}複製{} する",
 					"{C:inactive}(現在 {C:attention}#2#{C:inactive}/#3#)",
+					"{C:inactive,s:0.8}(エディションの状態は複製されません)",
 				},
 			},
 			j_mp_pizza = {
@@ -88,7 +88,7 @@ return {
 			j_mp_pacifist = {
 				name = "平和主義者",
 				text = {
-					"{C:attention}通常ブラインド{} のとき",
+					"{C:attention}PvPブラインドでない{} とき",
 					"倍率 {X:mult,C:white}X#1#{}",
 				},
 			},
@@ -227,11 +227,11 @@ return {
 			k_vanilla = "バニラ",
 			k_vanilla_description = "マルチプレイオリジナルカードやPvPブラインド無しの通常ルール",
 			k_weekly = "ウィークリー",
-			k_weekly_description = "(ほぼ)毎週変わる特別なルール 何かは見てからのお楽しみ！\n現在 ",
+			k_weekly_description = "(ほぼ)毎週変わる特別なルール 何かは見てからのお楽しみ！",
 			k_tournament = "トーナメント",
 			k_tournament_description = "スタンダードと内容は同じですが、ロビー設定の変更が出来ません",
 			k_badlatro = "Badlatro",
-			k_badlatro_description = "DiscordサーバーでDr. Monty(@dr_monty_the_snek)さんが作成したルール。",
+			k_badlatro_description = "DiscordサーバーでDr.Monty(@dr_monty_the_snek)さんが作成したルール。",
 			k_oops_ex = "しまった!",
 			ml_enemy_loc = { "相手の", "プレイ状況" },
 			ml_mp_kofi_message = {
