@@ -24,17 +24,18 @@ end
 local function action_joinedLobby(code, type)
 	MP.LOBBY.code = code
 	MP.LOBBY.type = type
+	MP.ACTIONS.sync_client()
 	MP.ACTIONS.lobby_info()
 	MP.UI.update_connection_status()
-	MP.ACTIONS.sync_client()
 end
 
-local function action_lobbyInfo(host, hostHash, guest, guestHash, is_host)
+local function action_lobbyInfo(host, hostHash, hostCached, guest, guestHash, guestCached, is_host)
 	MP.LOBBY.players = {}
 	MP.LOBBY.is_host = is_host == "true"
-	MP.LOBBY.host = { username = host, hash_str = hostHash, hash = hash(hostHash) }
+	MP.LOBBY.host = { username = host, hash_str = hostHash, hash = hash(hostHash), cached = hostCached == "true" }
 	if guest ~= nil then
-		MP.LOBBY.guest = { username = guest, hash_str = guestHash, hash = hash(guestHash) }
+		MP.LOBBY.guest =
+			{ username = guest, hash_str = guestHash, hash = hash(guestHash), cached = guestCached == "true" }
 	else
 		MP.LOBBY.guest = {}
 	end
@@ -398,7 +399,9 @@ local function action_receive_end_game_jokers(keys)
 	end
 	local split_keys = {}
 	for key in string.gmatch(keys, "([^;]+)") do
-		table.insert(split_keys, key)
+		if key ~= "" and key ~= nil and key ~= "0" then
+			table.insert(split_keys, key)
+		end
 	end
 	remove_all(MP.end_game_jokers.cards)
 	for _, key in pairs(split_keys) do
@@ -634,8 +637,10 @@ function Game:update(dt)
 				action_lobbyInfo(
 					parsedAction.host,
 					parsedAction.hostHash,
+					parsedAction.hostCached,
 					parsedAction.guest,
 					parsedAction.guestHash,
+					parsedAction.guestCached,
 					parsedAction.isHost
 				)
 			elseif parsedAction.action == "startGame" then

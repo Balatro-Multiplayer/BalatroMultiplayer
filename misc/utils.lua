@@ -361,3 +361,18 @@ function G.FUNCS.use_card(e, mute, nosave)
 	end
 	return use_card_ref(e, mute, nosave)
 end
+
+function MP.UTILS.random_message()
+	local messages = {
+		"Hold on, my mom made pizza pops",
+		"One sec, i gotta grab my slow cooker pork roast",
+		"One moment, getting a call from my mom",
+		"Brb, my cat is on fire",
+		"Wait, I think I left the stove on",
+		"Hold up, my pet rock just ran away",
+		"One sec, my plants are asking for water",
+		"Brb, my socks are plotting against me",
+		"Sorry, my WiFi is having an existential crisis",
+	}
+	return messages[math.random(1, #messages)]
+end

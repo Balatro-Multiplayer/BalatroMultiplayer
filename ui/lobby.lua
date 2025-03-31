@@ -95,10 +95,50 @@ function G.UIDEF.create_UIBox_view_code()
 	)
 end
 
+local function get_lobby_text()
+	if MP.LOBBY.is_host then
+		if MP.LOBBY.guest and MP.LOBBY.guest.cached == false then
+			return MP.UTILS.wrapText(
+				string.format(
+					"If you are seeing this, your opponent may be cheating. If this is a ranked game, please send the message '%s' and then open a support ticket in #support",
+					MP.UTILS.random_message()
+				),
+				100
+			),
+				SMODS.Gradients.warning_text
+		end
+	else
+		if MP.LOBBY.host and MP.LOBBY.host.cached == false then
+			return MP.UTILS.wrapText(
+				string.format(
+					"If you are seeing this, your opponent may be cheating. If this is a ranked game, please send the message '%s' and then open a support ticket in #support",
+					MP.UTILS.random_message()
+				),
+				100
+			),
+				SMODS.Gradients.warning_text
+		end
+	end
+
+	if MP.LOBBY.host and MP.LOBBY.host.hash and MP.LOBBY.guest and MP.LOBBY.guest.hash then
+		if MP.LOBBY.host.hash ~= MP.LOBBY.guest.hash then
+			return localize("k_mod_hash_warning"), G.C.UI.TEXT_LIGHT
+		end
+	end
+
+	if MP.LOBBY.username == "Guest" then
+		return localize("k_set_name"), G.C.UI.TEXT_LIGHT
+	end
+
+	return " ", G.C.UI.TEXT_LIGHT
+end
+
 function G.UIDEF.create_UIBox_lobby_menu()
 	local text_scale = 0.45
 	local back = MP.LOBBY.config.different_decks and MP.LOBBY.deck.back or MP.LOBBY.config.back
 	local stake = MP.LOBBY.config.different_decks and MP.LOBBY.deck.stake or MP.LOBBY.config.stake
+
+	local text, colour = get_lobby_text()
 
 	local t = {
 		n = G.UIT.ROOT,
@@ -116,7 +156,7 @@ function G.UIDEF.create_UIBox_lobby_menu()
 					{
 						n = G.UIT.R,
 						config = {
-							padding = 0.1,
+							padding = 0.5,
 							align = "cm",
 						},
 						nodes = {
@@ -125,17 +165,8 @@ function G.UIDEF.create_UIBox_lobby_menu()
 								config = {
 									scale = 0.3,
 									shadow = true,
-									text = (
-										(
-												(MP.LOBBY.host and MP.LOBBY.host.hash)
-												and (MP.LOBBY.guest and MP.LOBBY.guest.hash)
-												and (MP.LOBBY.host.hash ~= MP.LOBBY.guest.hash)
-											)
-											and (localize("k_mod_hash_warning"))
-										or ((MP.LOBBY.username == "Guest") and (localize("k_set_name")))
-										or " "
-									),
-									colour = G.C.UI.TEXT_LIGHT,
+									text = text,
+									colour = colour,
 								},
 							},
 						},
