@@ -1007,7 +1007,9 @@ local set_main_menu_UI_ref = set_main_menu_UI
 ---@diagnostic disable-next-line: lowercase-global
 function set_main_menu_UI()
 	if MP.LOBBY.code then
-		G.FUNCS.display_lobby_main_menu_UI()
+		if G.STAGE == G.STAGES.MAIN_MENU then
+			G.FUNCS.display_lobby_main_menu_UI()
+		end
 	else
 		set_main_menu_UI_ref()
 	end
@@ -1037,11 +1039,6 @@ function G.UIDEF.create_UIBox_unstuck()
 						align = "cm",
 					},
 					nodes = {
-						UIBox_button({
-							label = { localize("b_unstuck_arcana") },
-							button = "mp_unstuck_arcana",
-							minw = 5,
-						}),
 						UIBox_button({ label = { localize("b_unstuck_blind") }, button = "mp_unstuck_blind", minw = 5 }),
 					},
 				},
@@ -1099,7 +1096,8 @@ function MP.update_player_usernames()
 		if G.MAIN_MENU_UI then
 			G.MAIN_MENU_UI:remove()
 		end
-
-		G.FUNCS.display_lobby_main_menu_UI()
+		if G.STAGE == G.STAGES.MAIN_MENU then
+			G.FUNCS.display_lobby_main_menu_UI()
+		end
 	end
 end

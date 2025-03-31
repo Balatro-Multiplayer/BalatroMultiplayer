@@ -195,7 +195,6 @@ return {
 			b_set_custom_seed = "Set Custom Seed",
 			b_mp_kofi_button = "Supporting me on Ko-fi",
 			b_unstuck = "Unstuck",
-			b_unstuck_arcana = "Stuck In Booster Pack",
 			b_unstuck_blind = "Stuck Outside PvP",
 			b_misprint_display = "Display the next card in the deck",
 			b_players = "Players",
