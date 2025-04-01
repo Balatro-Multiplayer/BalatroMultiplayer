@@ -15,3 +15,17 @@ if prediction[choice].blind == "bl_mp_nemesis" then
 end
 '''
 match_indent = true
+
+[[patches]]
+[patches.pattern]
+target = '=[SMODS Cryptid "items/code.lua"]'
+pattern = '''if G.GAME.USING_CODE then
+				return
+			end'''
+position = 'before'
+payload = '''
+if MP.LOBBY.code then
+    return
+end
+'''
+match_indent = true
