@@ -115,5 +115,30 @@ if SMODS.Mods["JokerDisplay"] and SMODS.Mods["JokerDisplay"].can_load then
 				{ ref_table = "card.ability.extra", ref_value = "mult", colour = G.C.RED, retrigger_type = "mult" },
 			},
 		}
+		jd_def["j_mp_hanging_chad"] = {
+			retrigger_function = function(playing_card, scoring_hand, held_in_hand, joker_card)
+				if held_in_hand then
+					return 0
+				end
+				local sorted_cards = JokerDisplay.sort_cards(scoring_hand)
+				local first_card = sorted_cards and sorted_cards[1]
+				local second_card = sorted_cards and sorted_cards[2]
+				local retriggers = (
+					(
+						first_card
+						and playing_card == first_card
+						and joker_card.ability.extra * JokerDisplay.calculate_joker_triggers(joker_card)
+					) or 0
+				)
+					+ (
+						(
+							second_card
+							and playing_card == second_card
+							and joker_card.ability.extra * JokerDisplay.calculate_joker_triggers(joker_card)
+						) or 0
+					)
+				return retriggers
+			end,
+		}
 	end
 end
