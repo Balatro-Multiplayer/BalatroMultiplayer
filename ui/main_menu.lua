@@ -319,7 +319,7 @@ function G.UIDEF.create_UIBox_create_lobby_button()
 														UIBox_button({
 															id = "start_weekly",
 															label = {
-																localize("b_coming_soon"),
+																localize("k_coming_soon"),
 															},
 															colour = G.C.RED,
 															--button = "start_lobby",
