@@ -1623,7 +1623,7 @@ local reset_blinds_ref = reset_blinds
 function reset_blinds()
 	reset_blinds_ref()
 	if MP.LOBBY.code then
-		if G.GAME.round_resets.ante > 1 then
+		if G.GAME.round_resets.ante >= MP.LOBBY.config.pvp_start_round then
 			G.GAME.round_resets.blind_choices.Boss = "bl_mp_nemesis"
 		end
 	end

@@ -11,6 +11,7 @@ MP.LOBBY = {
 		death_on_round_loss = true,
 		different_seeds = false,
 		starting_lives = 4,
+		pvp_start_round = 2,
 		showdown_starting_antes = 3,
 		ruleset = "ruleset_mp_standard",
 		custom_seed = "random",

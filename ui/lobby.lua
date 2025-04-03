@@ -725,6 +725,36 @@ function G.UIDEF.create_UIBox_lobby_options()
 														current_option = MP.LOBBY.config.starting_lives,
 														opt_callback = "change_starting_lives",
 													}),
+													Disableable_Option_Cycle({
+														id = "pvp_round_start_option",
+														enabled_ref_table = MP.LOBBY,
+														enabled_ref_value = "is_host",
+														label = localize("k_opts_pvp_start_round"),
+														options = {
+															1,
+															2,
+															3,
+															4,
+															5,
+															6,
+															7,
+															8,
+															9,
+															10,
+															11,
+															12,
+															13,
+															14,
+															15,
+															16,
+															17,
+															18,
+															19,
+															20,
+														},
+														current_option = MP.LOBBY.config.pvp_start_round,
+														opt_callback = "change_starting_pvp_round",
+													}),
 												},
 											},
 										},
@@ -859,6 +889,11 @@ end
 
 G.FUNCS.change_starting_lives = function(args)
 	MP.LOBBY.config.starting_lives = args.to_val
+	send_lobby_options()
+end
+
+G.FUNCS.change_starting_pvp_round = function(args)
+	MP.LOBBY.config.pvp_start_round = args.to_val
 	send_lobby_options()
 end
 
