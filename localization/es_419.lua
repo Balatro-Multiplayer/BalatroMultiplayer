@@ -32,9 +32,9 @@ return {
 				name = "Let's Go Gambling", -- themike_71: La traducción sería "Vamos a apostar" pero lo dejareos así para mantener el meme
 				text = {
 					"{C:green}#1# en #2#{} probabilidades de",
-					"{X:mult,C:white}X#3#{} multi y {C:money}#4#${}", -- ElTioRata: Signo de dólar a la derecha para mantener consistencia con localización del juego base
+					"{X:mult,C:white}X#3#{} multi y {C:money}#4# ${}", -- ElTioRata: Signo de dólar a la derecha para mantener consistencia con localización del juego base
 					"{C:green}#5# en #6#{} probabilidades de dar",
-					"{C:money}#7#$ a tu {X:purple,C:white}némesis{}",
+					"{C:money}#7# $ a tu {X:purple,C:white}némesis{}",
 				},
 			},
 			j_mp_speedrun = {
@@ -59,7 +59,7 @@ return {
 				name = "Tacaño",
 				text = {
 					"Al inicio de cada tienda, gana",
-					"{C:money}#1#${} por cada {C:money}#2#${} que gastó",
+					"{C:money}#1# ${} por cada {C:money}#2# ${} que gastó",
 					"tu {X:purple,C:white}némesis{} en la última tienda",
 				},
 			},
