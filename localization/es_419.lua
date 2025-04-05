@@ -208,7 +208,7 @@ return {
 			k_wait_enemy = "Esperando que termine el enemigo...",
 			k_lives = "Vidas",
 			k_lost_life = "-1 vida", -- themike_71: Realmente es "Perdió una vida", mucho texto, -1 tambien sirve creo yo
-			k_total_lives_lost = "Vidas perdidas en total (4 $ c/u)",
+			k_total_lives_lost = " Vidas perdidas en total (4 $ c/u)",
 			k_attrition_name = "Atrición", -- ElTioRata: "Desgaste" sería más correcto pero es mejor dejar la palabra original para ser más preciso
 			k_enter_lobby_code = "Agregar código de sala",
 			k_paste = "Pegar desde portapapeles",
