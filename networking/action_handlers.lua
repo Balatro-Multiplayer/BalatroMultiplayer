@@ -385,8 +385,17 @@ local function action_magnet()
 			card = v
 		end
 	end
+
 	if card then
-		MP.ACTIONS.magnet_response(card.config.center.key)
+		local candidates = {}
+		for _, v in pairs(G.jokers.cards) do
+			if (v.sell_cost == card.sell_cost) then
+				table.insert(candidates, v)
+			end
+		end
+		-- Scale the pseudo from 0 - 1 to the number of candidates
+		local randomIndex = math.floor(pseudorandom('j_mp_magnet') * #candidates) + 1
+		MP.ACTIONS.magnet_response(candidates[randomIndex].config.center.key)
 	end
 end
 
