@@ -187,7 +187,7 @@ return {
 			b_leave = "ABANDONAR",
 			b_opts_cb_money = "Recibe $ al perder una vida",
 			b_opts_no_gold_on_loss = "No obtener recompensa al perder una ronda",
-			b_opts_death_on_loss = "Pierde una vida al perder en rondas no-JcJ"
+			b_opts_death_on_loss = "Pierde una vida al perder en rondas no-JcJ",
 			b_opts_start_antes = "Apuestas iniciales",
 			b_opts_diff_seeds = "Los jugadores estan en semillas diferentes",
 			b_opts_lives = "Vidas",
@@ -233,8 +233,8 @@ return {
 			k_random = "Al azar",
 			k_standard = "Estándar",
 			k_standard_description = "Reglas del modo estándar, agrega cartas del multijugador y algunos cambios del juego base para adaptarse al meta del mod.",
-			k_vanilla = "Vanilla",
-			k_vanilla_description = "Reglas del modo vainilla, Sin cartas del Multiplayer y no modifica nada del juego base.",
+			k_vanilla = "Vainilla",
+			k_vanilla_description = "Reglas del modo vainilla, sin cartas del multijugador y no modifica nada del juego base.",
 			k_weekly = "Semanal",
 			k_weekly_description = "Reglas especiales que cambian semanal o quincenalmente. ¡Supongo que tendrás que descubrirlo por tu cuenta! Actualmente: ",
 			k_tournament = "Torneo",
@@ -267,7 +267,7 @@ return {
 			a_mp_skips_tied = { "empatadas" },
 		},
 		v_text = {
-			ch_c_hanging_chad_rework =  "{C:attention}Papel perforado{} está {C:dark_edition}modificado" },
+			ch_c_hanging_chad_rework = { "{C:attention}Papel perforado{} está {C:dark_edition}modificado" },
 			ch_c_glass_cards_rework = { "{C:attention}Cartas de vidrio{} están {C:dark_edition}modificadas" },
 		},
 		challenge_names = {
