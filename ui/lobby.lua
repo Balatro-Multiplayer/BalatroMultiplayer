@@ -96,6 +96,15 @@ function G.UIDEF.create_UIBox_view_code()
 end
 
 local function get_lobby_text()
+	local notFullyUnlocked = false
+
+	for k, v in pairs(G.P_CENTER_POOLS.Joker) do
+		if not v.unlocked then
+			notFullyUnlocked = true
+			break -- No need to keep checking once we know it's not fully unlocked
+		end
+	end
+	
 	if MP.LOBBY.is_host then
 		if MP.LOBBY.guest and MP.LOBBY.guest.cached == false then
 			return MP.UTILS.wrapText(
@@ -118,6 +127,10 @@ local function get_lobby_text()
 			),
 				SMODS.Gradients.warning_text
 		end
+	end
+
+	if notFullyUnlocked then
+		return "The profile you are playing on is not fully unlocked. If this is a ranked/tournament game, please create a new profile and hit unlock all in the profile settings", SMODS.Gradients.warning_text
 	end
 
 	if MP.LOBBY.host and MP.LOBBY.host.hash and MP.LOBBY.guest and MP.LOBBY.guest.hash then
