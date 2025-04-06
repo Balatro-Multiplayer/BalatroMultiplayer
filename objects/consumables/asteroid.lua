@@ -1,6 +1,9 @@
 SMODS.Atlas({
 	key = "asteroid",
-	path = "c_asteroid.png",
+	path = {
+		["default"] = "c_asteroid.png",
+		["ru"] = "c_asteroid_ru.png",
+	},
 	px = 71,
 	py = 95,
 })
