@@ -37,7 +37,7 @@ MP.GAME = {}
 MP.UI = {}
 MP.ACTIONS = {}
 
-G.C.MULITPLAYER = HEX("AC3232")
+G.C.MULTIPLAYER = HEX("AC3232")
 
 function MP.reset_game_states()
 	sendDebugMessage("Resetting game states", "MULTIPLAYER")

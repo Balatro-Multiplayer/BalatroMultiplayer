@@ -11,7 +11,7 @@ SMODS.Blind({
 	key = "nemesis",
 	dollars = 5,
 	mult = 1, -- Jen's Almanac crashes the game if the mult is 0
-	boss_colour = G.C.MULITPLAYER,
+	boss_colour = G.C.MULTIPLAYER,
 	boss = { min = 1, max = 10 },
 	atlas = "player_blind_chip",
 	discovered = true,

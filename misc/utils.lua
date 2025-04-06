@@ -252,7 +252,7 @@ function SMODS.create_mod_badges(obj, badges)
 						n = G.UIT.R,
 						config = {
 							align = "cm",
-							colour = G.C.MULITPLAYER,
+							colour = G.C.MULTIPLAYER,
 							r = 0.1,
 							minw = 2 / min_scale_fac,
 							minh = 0.36,
@@ -290,7 +290,7 @@ function SMODS.create_mod_badges(obj, badges)
 				return true
 			end
 			for i = 1, #badges do
-				if eq_col(badges[i].nodes[1].config.colour, G.C.MULITPLAYER) then
+				if eq_col(badges[i].nodes[1].config.colour, G.C.MULTIPLAYER) then
 					badges[i].nodes[1].nodes[2].config.object:remove()
 					badges[i] = mp_badge
 					break
