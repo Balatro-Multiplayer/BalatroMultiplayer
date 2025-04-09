@@ -831,7 +831,7 @@ function Game:update_hand_played(dt)
 			func = function()
 				MP.ACTIONS.play_hand(G.GAME.chips, G.GAME.current_round.hands_left)
 				-- Set blind chips to enemy score
-				G.GAME.blind.chips = MP.GAME.enemy.score
+				G.GAME.blind.chip_text = MP.INSANE_INT.to_string(MP.GAME.enemy.score)
 				-- For now, never advance to next round
 				if G.GAME.current_round.hands_left < 1 then
 					attention_text({
@@ -1678,9 +1678,8 @@ function Blind:disable()
 end
 
 G.FUNCS.multiplayer_blind_chip_UI_scale = function(e)
-	local new_score_text = number_format(MP.GAME.enemy.score)
+	local new_score_text = MP.INSANE_INT.to_string(MP.GAME.enemy.score)
 	if G.GAME.blind and MP.GAME.enemy.score and MP.GAME.enemy.score_text ~= new_score_text then
-		e.config.scale = scale_number(MP.GAME.enemy.score, 0.7, 100000)
 		MP.GAME.enemy.score_text = new_score_text
 	end
 end
