@@ -1772,7 +1772,7 @@ local function hide_enemy_location()
 								{
 									n = G.UIT.T,
 									config = {
-										text = localize("k_round"),
+										text = G.SETTINGS.language == "vi" and localize("k_lower_score") or localize("k_round"),
 										scale = 0.42,
 										colour = G.C.UI.TEXT_LIGHT,
 										shadow = true,
@@ -1787,7 +1787,7 @@ local function hide_enemy_location()
 								{
 									n = G.UIT.T,
 									config = {
-										text = localize("k_lower_score"),
+										text = G.SETTINGS.language == "vi" and localize("k_round") or localize("k_lower_score"),
 										scale = 0.42,
 										colour = G.C.UI.TEXT_LIGHT,
 										shadow = true,
