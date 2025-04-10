@@ -111,6 +111,8 @@ function MP.reset_game_states()
 		highest_score = MP.INSANE_INT.empty(),
 		timer = 120,
 		timer_started = false,
+		real_money = "0",
+		ce_money_manip = false,
 	}
 end
 
