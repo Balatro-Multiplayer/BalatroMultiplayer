@@ -40,9 +40,9 @@ return {
 			j_mp_speedrun = {
 				name = "CARRERA DE VELOCIDAD", -- ElTioRata: Sé que el término queda más largo pero así suelen ponerlo en traducciones oficiales
 				text = {
-					"Si llegas a la {C:attention}Ciega PvP",
-					"antes que tu {X:purple,C:white}Némesis{},",
-					"crea una comodín {C:spectral}Espectral{}",
+					"Si llegas a la {C:attention}ciega JcJ",
+					"antes que tu {X:purple,C:white}némesis{},",
+					"crea una comodín {C:spectral}espectral{}",
 					"{C:inactive}(Debe haber espacio)",
 				},
 			},
