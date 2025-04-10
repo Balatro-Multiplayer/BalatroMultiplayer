@@ -13,8 +13,9 @@ if Handy then
 		function Handy.fake_events.execute(arg)
 			if type(arg.func) == "function" and arg.node then
 				arg.func(arg.node)
+			else
+				fake_events_execute_ref(arg)
 			end
-			return fake_events_execute_ref(arg)
 		end
 	end
 
