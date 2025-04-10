@@ -167,7 +167,7 @@ function MP.UI.create_UIBox_player_row(type)
 					{
 						n = G.UIT.T,
 						config = {
-							text = number_format(highest_score, 1000000),
+							text = MP.INSANE_INT.to_string(highest_score),
 							scale = 0.45,
 							colour = G.C.FILTER,
 							shadow = true,

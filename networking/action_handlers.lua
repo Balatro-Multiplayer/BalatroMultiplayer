@@ -98,7 +98,8 @@ end
 ---@param hands_left_str string
 ---@param skips_str string
 local function action_enemy_info(score_str, hands_left_str, skips_str, lives_str)
-	local score = tonumber(score_str)
+	local score = MP.INSANE_INT.from_string(score_str)
+	
 	local hands_left = tonumber(hands_left_str)
 	local skips = tonumber(skips_str)
 	local lives = tonumber(lives_str)
@@ -108,7 +109,7 @@ local function action_enemy_info(score_str, hands_left_str, skips_str, lives_str
 		return
 	end
 
-	if to_big(MP.GAME.enemy.highest_score) < to_big(score) then
+	if MP.INSANE_INT.greater_than(score, MP.GAME.enemy.highest_score) then
 		MP.GAME.enemy.highest_score = score
 	end
 
@@ -117,9 +118,35 @@ local function action_enemy_info(score_str, hands_left_str, skips_str, lives_str
 		blocking = false,
 		trigger = "ease",
 		delay = 3,
-		ref_table = MP.GAME.enemy,
-		ref_value = "score",
-		ease_to = score,
+		ref_table = MP.GAME.enemy.score,
+		ref_value = "e_count",
+		ease_to = score.e_count,
+		func = function(t)
+			return math.floor(t)
+		end,
+	}))
+
+	G.E_MANAGER:add_event(Event({
+		blockable = false,
+		blocking = false,
+		trigger = "ease",
+		delay = 3,
+		ref_table = MP.GAME.enemy.score,
+		ref_value = "coeffiocient",
+		ease_to = score.coeffiocient,
+		func = function(t)
+			return math.floor(t)
+		end,
+	}))
+
+	G.E_MANAGER:add_event(Event({
+		blockable = false,
+		blocking = false,
+		trigger = "ease",
+		delay = 3,
+		ref_table = MP.GAME.enemy.score,
+		ref_value = "exponent",
+		ease_to = score.exponent,
 		func = function(t)
 			return math.floor(t)
 		end,
@@ -506,9 +533,6 @@ end
 ---@param score number
 ---@param hands_left number
 function MP.ACTIONS.play_hand(score, hands_left)
-	if to_big(score) > to_big(MP.GAME.highest_score) then
-		MP.GAME.highest_score = score
-	end
 	local fixed_score = tostring(to_big(score))
 	-- Credit to sidmeierscivilizationv on discord for this fix for Talisman
 	if string.match(fixed_score, "[eE]") == nil and string.match(fixed_score, "[.]") then
@@ -516,6 +540,11 @@ function MP.ACTIONS.play_hand(score, hands_left)
 		fixed_score = string.sub(string.gsub(fixed_score, "%.", ","), 1, -3)
 	end
 	fixed_score = string.gsub(fixed_score, ",", "") -- Remove commas
+
+	local insane_int_score = MP.INSANE_INT.from_string(fixed_score)
+	if MP.INSANE_INT.greater_than(insane_int_score, MP.GAME.highest_score) then
+		MP.GAME.highest_score = insane_int_score
+	end
 	Client.send(string.format("action:playHand,score:" .. fixed_score .. ",handsLeft:%d", hands_left))
 end
 
