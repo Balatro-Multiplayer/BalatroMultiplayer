@@ -1,4 +1,24 @@
 if Handy then
+	-- Patch fake events check and execute
+	if not (Handy.meta and Handy.meta["1.4.1b_patched_select_blind_and_skip"]) then
+		local fake_events_check_ref = Handy.fake_events.check
+		function Handy.fake_events.check(arg)
+			if type(arg.func) == "function" and arg.node then
+				arg.func(arg.node)
+				return arg.node.config.button ~= nil, arg.node.config.button
+			end
+			return fake_events_check_ref(arg)
+		end
+		local fake_events_execute_ref = Handy.fake_events.execute
+		function Handy.fake_events.execute(arg)
+			if type(arg.func) == "function" and arg.node then
+				arg.func(arg.node)
+			else
+				fake_events_execute_ref(arg)
+			end
+		end
+	end
+
 	-- Disable all dangerous controls
 	if type(Handy.is_dangerous_actions_active) == "function" then
 		-- Updated version
@@ -51,6 +71,50 @@ if Handy then
 					increase = false,
 					decrease = false,
 				}
+			end
+		end
+	end
+
+	-- Patch "Select blind" keybinds to prevent softlocks
+	if Handy.regular_keybinds then
+		if not (Handy.meta and Handy.meta["1.4.1b_patched_select_blind_and_skip"]) then
+			function Handy.regular_keybinds.can_select_blind(key)
+				if
+					not (
+						Handy.controller.is_module_key(Handy.config.current.regular_keybinds.select_blind, key)
+						and G.GAME.blind_on_deck
+						and G.GAME.round_resets.blind_choices[G.GAME.blind_on_deck]
+					)
+				then
+					return false
+				end
+
+				local success, button = pcall(function()
+					return G.blind_select_opts[string.lower(G.GAME.blind_on_deck)]:get_UIE_by_ID("select_blind_button")
+				end)
+				if not success or not button then
+					return false
+				end
+				if button.config and button.config.func then
+					return Handy.fake_events.check({
+						func = G.FUNCS[button.config.func],
+						node = button,
+					})
+				else
+					return true
+				end
+			end
+			function Handy.regular_keybinds.select_blind()
+				local success, button = pcall(function()
+					return G.blind_select_opts[string.lower(G.GAME.blind_on_deck)]:get_UIE_by_ID("select_blind_button")
+				end)
+
+				if success and button and button.config and button.config.button then
+					Handy.fake_events.execute({
+						func = G.FUNCS[button.config.button],
+						node = button,
+					})
+				end
 			end
 		end
 	end
