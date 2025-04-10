@@ -24,5 +24,5 @@ function MP.is_pvp_boss()
 	if not G.GAME or not G.GAME.blind then
 		return false
 	end
-	return G.GAME.blind.config.blind.key == "bl_mp_nemesis"
+	return G.GAME.blind.config.blind.key == "bl_mp_nemesis" or G.GAME.blind.pvp
 end
