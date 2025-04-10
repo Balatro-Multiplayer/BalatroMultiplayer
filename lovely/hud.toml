@@ -21,10 +21,10 @@ position = 'after'
 payload = ''',
 MP.LOBBY.code and {n=G.UIT.R, config={id = 'lobby_info_button', align = "cm", minh = 1.2, minw = 1.5,padding = 0.05, r = 0.1, hover = true, colour = G.C.BLUE, button = "lobby_info", shadow = true}, nodes={
     {n=G.UIT.R, config={align = "cm", padding = 0, maxw = 1.4}, nodes={
-        {n=G.UIT.T, config={text = "Lobby", scale = 1.2*scale, colour = G.C.UI.TEXT_LIGHT, shadow = true}}
+        {n=G.UIT.T, config={text = localize("ml_lobby_info")[1], scale = 1.2*scale, colour = G.C.UI.TEXT_LIGHT, shadow = true}}
     }},
     {n=G.UIT.R, config={align = "cm", padding = 0, maxw = 1.4}, nodes={
-        {n=G.UIT.T, config={text = "Info", scale = 1*scale, colour = G.C.UI.TEXT_LIGHT, shadow = true, focus_args = {button = G.F_GUIDE and 'guide' or 'back', orientation = 'bm'}, func = 'set_button_pip'}}
+        {n=G.UIT.T, config={text = localize("ml_lobby_info")[2], scale = 1*scale, colour = G.C.UI.TEXT_LIGHT, shadow = true, focus_args = {button = G.F_GUIDE and 'guide' or 'back', orientation = 'bm'}, func = 'set_button_pip'}}
     }}
 }} or nil,'''
 match_indent = true
