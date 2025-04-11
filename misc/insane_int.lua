@@ -41,10 +41,10 @@ MP.INSANE_INT.to_string = function(insane_int_display)
     end
 
     if insane_int_display.exponent == 0 then
-        return e .. number_format(insane_int_display.coeffiocient, 10000)
+        return e .. number_format(insane_int_display.coeffiocient)
     end
 
-    return e .. number_format(insane_int_display.coeffiocient, 10000) .. "e" .. number_format(insane_int_display.exponent, 1000000)
+    return e .. number_format(insane_int_display.coeffiocient, 10000) .. "e" .. number_format(insane_int_display.exponent)
 end
 
 -- This doesn't really fit with the comment at the top,
