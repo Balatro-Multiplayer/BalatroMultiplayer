@@ -8,9 +8,7 @@ MP.Ruleset({
 		"c_justice",
 	},
 	banned_vouchers = {},
-	banned_enhancements = {
-		"m_glass",
-	},
+	banned_enhancements = {},
 	banned_tags = {},
 }):inject()
 

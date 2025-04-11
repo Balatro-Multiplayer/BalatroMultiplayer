@@ -47,7 +47,8 @@ function create_UIBox_blind_choice(type, run_info)
 				pseudorandom_element(_poker_hands, pseudoseed("orbital"))
 		end
 
-		if G.GAME.round_resets.blind_choices[type] == "bl_mp_nemesis" then
+		if G.GAME.round_resets.blind_choices[type] == "bl_mp_nemesis" 
+		or G.GAME.round_resets.pvp_blind_choices[type] then
 			local dt1 = DynaText({
 				string = { { string = localize("k_bl_life"), colour = G.C.FILTER } },
 				colours = { G.C.BLACK },
@@ -134,11 +135,16 @@ function create_UIBox_blind_choice(type, run_info)
 			* blind_choice.config.mult
 			* G.GAME.starting_params.ante_scaling
 
-		if G.GAME.round_resets.blind_choices[type] == "bl_mp_nemesis" then
+		if G.GAME.round_resets.blind_choices[type] == "bl_mp_nemesis" 
+		or G.GAME.round_resets.pvp_blind_choices[type] then
 			blind_amt = "????"
 		end
 
 		local text_table = loc_target
+
+		if G.GAME.round_resets.pvp_blind_choices[type] then
+			text_table[#text_table+1] = localize("k_bl_mostchips")
+		end
 
 		local blind_state = G.GAME.round_resets.blind_states[type]
 		local _reward = true
@@ -198,7 +204,8 @@ function create_UIBox_blind_choice(type, run_info)
 										shadow = true,
 										hover = true,
 										one_press = true,
-										func = G.GAME.round_resets.blind_choices[type] == "bl_mp_nemesis"
+										func = (G.GAME.round_resets.blind_choices[type] == "bl_mp_nemesis"
+											or G.GAME.round_resets.pvp_blind_choices[type])
 												and "pvp_ready_button"
 											or nil,
 										button = "select_blind",
@@ -347,6 +354,22 @@ function create_UIBox_blind_choice(type, run_info)
 																	n = G.UIT.T,
 																	config = {
 																		text = text_table[2] or "-",
+																		scale = 0.32,
+																		colour = disabled and G.C.UI.TEXT_INACTIVE
+																			or G.C.WHITE,
+																		shadow = not disabled,
+																	},
+																},
+															},
+														} or nil,
+														text_table[3] and {
+															n = G.UIT.R,
+															config = { align = "cm", maxw = 2.8 },
+															nodes = {
+																{
+																	n = G.UIT.T,
+																	config = {
+																		text = text_table[3] or "-",
 																		scale = 0.32,
 																		colour = disabled and G.C.UI.TEXT_INACTIVE
 																			or G.C.WHITE,
@@ -665,6 +688,9 @@ function Game:update_draw_to_hand(dt)
 			and G.GAME.current_round.discards_used == 0
 			and G.GAME.facing_blind
 		then
+			if G.GAME.round_resets.pvp_blind_choices[G.GAME.blind_on_deck] then
+				G.GAME.blind.pvp = true
+			end
 			if MP.is_pvp_boss() then
 				G.E_MANAGER:add_event(Event({
 					trigger = "after",
@@ -1622,9 +1648,14 @@ end
 local reset_blinds_ref = reset_blinds
 function reset_blinds()
 	reset_blinds_ref()
+	G.GAME.round_resets.pvp_blind_choices = {}
 	if MP.LOBBY.code then
 		if G.GAME.round_resets.ante >= MP.LOBBY.config.pvp_start_round then
-			G.GAME.round_resets.blind_choices.Boss = "bl_mp_nemesis"
+			if not MP.LOBBY.config.normal_bosses then
+				G.GAME.round_resets.blind_choices.Boss = "bl_mp_nemesis"
+			else
+				G.GAME.round_resets.pvp_blind_choices.Boss = true
+			end
 		end
 	end
 end
@@ -1771,7 +1802,7 @@ local function hide_enemy_location()
 								{
 									n = G.UIT.T,
 									config = {
-										text = localize("k_round"),
+										text = G.SETTINGS.language == "vi" and localize("k_lower_score") or localize("k_round"),
 										scale = 0.42,
 										colour = G.C.UI.TEXT_LIGHT,
 										shadow = true,
@@ -1786,7 +1817,7 @@ local function hide_enemy_location()
 								{
 									n = G.UIT.T,
 									config = {
-										text = localize("k_lower_score"),
+										text = G.SETTINGS.language == "vi" and localize("k_round") or localize("k_lower_score"),
 										scale = 0.42,
 										colour = G.C.UI.TEXT_LIGHT,
 										shadow = true,

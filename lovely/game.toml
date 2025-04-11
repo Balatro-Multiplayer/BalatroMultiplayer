@@ -79,7 +79,7 @@ times = 1
 target = "functions/state_events.lua"
 pattern = '''if G.GAME.current_round.hands_left > 0 and not G.GAME.modifiers.no_extra_hand_money then'''
 position = 'at'
-payload = '''if G.GAME.current_round.hands_left > 0 and not G.GAME.modifiers.no_extra_hand_money and G.GAME.blind.name ~= "bl_mp_nemesis" then'''
+payload = '''if G.GAME.current_round.hands_left > 0 and (not G.GAME.modifiers.no_extra_hand_money) and (not MP.is_pvp_boss()) then'''
 match_indent = true
 times = 1
 
@@ -124,5 +124,18 @@ position = 'after'
 payload = '''if MP.LOBBY.code and to_big(mod) < to_big(0) then
   MP.GAME.spent_total = to_big(MP.GAME.spent_total) + (to_big(mod) * to_big(-1))
 end'''
+match_indent = true
+times = 1
+
+[[patches]]
+[patches.pattern]
+target = 'functions/state_events.lua'
+pattern = '''local dollars = 0
+
+if G.GAME.chips - G.GAME.blind.chips >= 0 then'''
+position = 'at'
+payload = '''local dollars = 0
+
+if G.GAME.chips - G.GAME.blind.chips >= 0 or MP.is_pvp_boss() then'''
 match_indent = true
 times = 1

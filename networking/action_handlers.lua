@@ -661,7 +661,14 @@ function Game:update(dt)
 			if not ((parsedAction.action == "keepAlive") or (parsedAction.action == "keepAliveAck")) then
 				local log = string.format("Client got %s message: ", parsedAction.action)
 				for k, v in pairs(parsedAction) do
-					log = log .. string.format(" (%s: %s) ", k, v)
+					if parsedAction.action == "startGame" and k == "seed" then
+						last_game_seed = v
+					else
+						log = log .. string.format(" (%s: %s) ", k, v)
+					end
+				end
+				if parsedAction.action == "receiveEndGameJokers" and last_game_seed then
+					log = log .. string.format(" (seed: %s) ", last_game_seed)
 				end
 				sendTraceMessage(log, "MULTIPLAYER")
 			end

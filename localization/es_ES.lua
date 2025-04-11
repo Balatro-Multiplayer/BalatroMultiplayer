@@ -223,6 +223,7 @@ return {
 			k_connect_player = "Jugadores conectados:",
 			k_opts_only_host = "Solo el anfitrión puede cambiar estas opciones",
 			k_opts_gm = "Modificadores de juego",
+            k_opts_pvp_start_round = "JcJ Empieza en la ronda",
 			k_bl_life = "Vida",
 			k_bl_or = "o",
 			k_bl_death = "Muerte",
@@ -266,6 +267,22 @@ return {
 		v_text = {
 			ch_c_hanging_chad_rework = { "El {C:attention}Papel perforado{} está {C:dark_edition}modificado" },
 			ch_c_glass_cards_rework = { "Las {C:attention}Cartas de vidrio{} están {C:dark_edition}modificadas" },
+		},
+        challenge_names = {
+            c_mp_misprint_deck = "Mazo con errores de imprenta", 
+			c_mp_legendaries = "Legendarios",
+			c_mp_psychosis = "Psicosis",
+            c_mp_scratch = "Desde Cero",
+            c_mp_twin_towers = "Torres Gemelas",
+            c_mp_in_the_red = "En Números Rojos",
+            c_mp_paper_money = "Dinero de Papel",
+			c_mp_high_hand = "Carta alta",
+			c_mp_chore_list = "Lista de Tareas",
+            c_mp_oops_all_jokers = "Solo Comodines",
+            c_mp_divination = "Divinidad",
+			c_mp_skip_off = "Sálta-lo",
+			c_mp_lets_go_gambling = "Let's Go Gambling", -- same as joker | igual que el comodín
+			c_mp_speed = "Velocidad",
 		},
 	},
 }
