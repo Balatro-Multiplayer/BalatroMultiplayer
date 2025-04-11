@@ -127,7 +127,7 @@ function create_UIBox_blind_choice(type, run_info)
 			type = "raw_descriptions",
 			key = blind_choice.config.key,
 			set = "Blind",
-			vars = { localize(G.GAME.current_round.most_played_poker_hand, "poker_hands") },
+			vars = { blind_choice.config.key == 'bl_ox' and localize(G.GAME.current_round.most_played_poker_hand, "poker_hands") or '' },
 		})
 		local loc_name = localize({ type = "name_text", key = blind_choice.config.key, set = "Blind" })
 		local blind_col = get_blind_main_colour(type)
@@ -1713,6 +1713,7 @@ end
 G.FUNCS.multiplayer_blind_chip_UI_scale = function(e)
 	local new_score_text = MP.INSANE_INT.to_string(MP.GAME.enemy.score)
 	if G.GAME.blind and MP.GAME.enemy.score and MP.GAME.enemy.score_text ~= new_score_text then
+		e.config.scale = number_scale(MP.GAME.enemy.score, 0.7)
 		MP.GAME.enemy.score_text = new_score_text
 	end
 end
