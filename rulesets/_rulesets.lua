@@ -30,6 +30,7 @@ MP.BANNED_OBJECTS = {
 	vouchers = {},
 	enhancements = {},
 	tags = {},
+	blinds = {},
 }
 
 function MP.apply_rulesets()
@@ -50,6 +51,7 @@ function MP.apply_rulesets()
 			{ items = ruleset.banned_vouchers, table = MP.BANNED_OBJECTS.vouchers },
 			{ items = ruleset.banned_enhancements, table = MP.BANNED_OBJECTS.enhancements },
 			{ items = ruleset.banned_tags, table = MP.BANNED_OBJECTS.tags },
+			{ items = ruleset.banned_blinds, table = MP.BANNED_OBJECTS.blinds },
 		}
 
 		for _, banned_type in ipairs(banned_types) do
@@ -67,6 +69,7 @@ function MP.apply_rulesets()
 			global_banned = MP.DECK.BANNED_ENHANCEMENTS,
 		},
 		{ objects = MP.BANNED_OBJECTS.tags, mod = SMODS.Tag, global_banned = MP.DECK.BANNED_TAGS },
+		{ objects = MP.BANNED_OBJECTS.blinds, mod = SMODS.Blind, global_banned = MP.DECK.BANNED_BLINDS },
 	}
 
 	for _, type in ipairs(object_types) do
