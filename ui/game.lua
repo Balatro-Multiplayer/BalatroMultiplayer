@@ -127,7 +127,7 @@ function create_UIBox_blind_choice(type, run_info)
 			type = "raw_descriptions",
 			key = blind_choice.config.key,
 			set = "Blind",
-			vars = { localize(G.GAME.current_round.most_played_poker_hand, "poker_hands") },
+			vars = { blind_choice.config.key == 'bl_ox' and localize(G.GAME.current_round.most_played_poker_hand, "poker_hands") or '' },
 		})
 		local loc_name = localize({ type = "name_text", key = blind_choice.config.key, set = "Blind" })
 		local blind_col = get_blind_main_colour(type)
@@ -690,6 +690,8 @@ function Game:update_draw_to_hand(dt)
 		then
 			if G.GAME.round_resets.pvp_blind_choices[G.GAME.blind_on_deck] then
 				G.GAME.blind.pvp = true
+			else
+				G.GAME.blind.pvp = false
 			end
 			if MP.is_pvp_boss() then
 				G.E_MANAGER:add_event(Event({
