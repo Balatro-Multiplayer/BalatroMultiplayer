@@ -1711,6 +1711,7 @@ end
 G.FUNCS.multiplayer_blind_chip_UI_scale = function(e)
 	local new_score_text = MP.INSANE_INT.to_string(MP.GAME.enemy.score)
 	if G.GAME.blind and MP.GAME.enemy.score and MP.GAME.enemy.score_text ~= new_score_text then
+		e.config.scale = scale_number(MP.GAME.enemy.score, 0.7, 100000)
 		MP.GAME.enemy.score_text = new_score_text
 	end
 end
