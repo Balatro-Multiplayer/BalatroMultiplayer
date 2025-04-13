@@ -74,11 +74,13 @@ function MP.apply_rulesets()
 
 	for _, type in ipairs(object_types) do
 		for obj_key, rulesets in pairs(type.objects) do
-			type.mod:take_ownership(obj_key, {
-				in_pool = function(self)
-					return not (rulesets[MP.LOBBY.config.ruleset] and MP.LOBBY.code)
-				end,
-			}, true)
+			if (rulesets[MP.LOBBY.config.ruleset] and MP.LOBBY.code) then
+				type.mod:take_ownership(obj_key, {
+					in_pool = function(self)
+						return false
+					end,
+				}, true)
+			end
 		end
 		for obj_key, _ in pairs(type.global_banned) do
 			type.mod:take_ownership(obj_key, {
