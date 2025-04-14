@@ -183,6 +183,9 @@ local function action_player_info(lives)
 			MP.GAME.comeback_bonus = MP.GAME.comeback_bonus + 1
 		end
 		ease_lives(lives - MP.GAME.lives)
+		if MP.LOBBY.config.no_gold_on_round_loss and (G.GAME.blind and G.GAME.blind.dollars) then
+			G.GAME.blind.dollars = 0
+		end
 	end
 	MP.GAME.lives = lives
 end
@@ -510,7 +513,7 @@ end
 
 function MP.ACTIONS.fail_round(hands_used)
 	if MP.LOBBY.config.no_gold_on_round_loss then
-		MP.GAME.blind.dollars = 0
+		G.GAME.blind.dollars = 0
 	end
 	if hands_used == 0 then
 		return
