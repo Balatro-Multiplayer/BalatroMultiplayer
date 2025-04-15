@@ -85,7 +85,7 @@ function MP.apply_rulesets()
 					if rulesets[MP.LOBBY.config.ruleset] and MP.LOBBY.code then
 						return false
 					elseif self.orig_in_pool then
-						-- return the original in_pool function if it's not nil
+						-- behave like the original in_pool function if it's not nil
 						return self.orig_in_pool(self)
 					else
 						return true -- in_pool returning true doesn't overwrite original checks
