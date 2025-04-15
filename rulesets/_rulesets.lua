@@ -72,15 +72,22 @@ function MP.apply_rulesets()
 		{ objects = MP.BANNED_OBJECTS.blinds, mod = SMODS.Blind, global_banned = MP.DECK.BANNED_BLINDS },
 	}
 
+	local function false_function(self)
+		return false
+	end
+
 	for _, type in ipairs(object_types) do
 		for obj_key, rulesets in pairs(type.objects) do
-			if (rulesets[MP.LOBBY.config.ruleset] and MP.LOBBY.code) then
-				type.mod:take_ownership(obj_key, {
-					in_pool = function(self)
-						return false
-					end,
-				}, true)
-			end
+			-- Get the object using the object key
+			local obj = type.mod.obj_table[obj_key] or (type.mod.get_obj and type.mod:get_obj(obj_key))
+
+			-- Save the original in_pool function
+			local orig_in_pool = obj.in_pool
+
+			-- Change the in_pool function
+			type.mod:take_ownership(obj_key, {
+				in_pool = (rulesets[MP.LOBBY.config.ruleset] and MP.LOBBY.code and false_function) or orig_in_pool,
+			}, true)
 		end
 		for obj_key, _ in pairs(type.global_banned) do
 			type.mod:take_ownership(obj_key, {
