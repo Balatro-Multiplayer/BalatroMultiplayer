@@ -74,12 +74,27 @@ function MP.apply_rulesets()
 
 	for _, type in ipairs(object_types) do
 		for obj_key, rulesets in pairs(type.objects) do
-			if (rulesets[MP.LOBBY.config.ruleset] and MP.LOBBY.code) then
-				type.mod:take_ownership(obj_key, {
-					in_pool = function(self)
+			-- Find object with object key, using the same method as take_ownership
+			local obj = type.mod.obj_table[obj_key] or (type.mod.get_obj and type.mod:get_obj(obj_key))
+			
+			if obj then
+				-- Save the original in_pool function inside the object itself
+				obj.orig_in_pool = obj.in_pool
+				-- Update the in_pool function
+				obj.in_pool = function(self)
+					if rulesets[MP.LOBBY.config.ruleset] and MP.LOBBY.code then
 						return false
-					end,
-				}, true)
+					elseif self.orig_in_pool then
+						-- return the original in_pool function if it's not nil
+						return self.orig_in_pool(self)
+					else
+						return true -- in_pool returning true doesn't overwrite original checks
+					end
+				end
+			else
+				sendWarnMessage(
+					('Cannot ban %s: Does not exist.'):format(obj_key), type.mod.set
+				)
 			end
 		end
 		for obj_key, _ in pairs(type.global_banned) do
