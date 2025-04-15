@@ -86,7 +86,7 @@ function MP.apply_rulesets()
 						return false
 					elseif self.orig_in_pool then
 						-- behave like the original in_pool function if it's not nil
-						return self.orig_in_pool(self)
+						return self:orig_in_pool()
 					else
 						return true -- in_pool returning true doesn't overwrite original checks
 					end
