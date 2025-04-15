@@ -239,6 +239,18 @@ local function action_send_phantom(key)
 	new_card:set_edition("e_mp_phantom")
 	new_card:add_to_deck()
 	MP.shared:emplace(new_card)
+	
+	local cards = SMODS.find_card(key, true)
+	local total = 0
+	for i, v in ipairs(cards) do
+		if v.edition and v.edition.type == 'mp_phantom' then
+			total = total + 1
+		else break end
+	end
+	if total >= #cards then
+		G.GAME.used_jokers[key] = nil
+	end
+	print(G.GAME.used_jokers[key] and 'true' or 'false')
 end
 
 local function action_remove_phantom(key)
