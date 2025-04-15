@@ -53,9 +53,7 @@ SMODS.Joker({
 })
 
 SMODS.Enhancement:take_ownership("glass", {
-	config = {
-		Xmult = MP.LOBBY.config.ruleset == "ruleset_mp_standard" and MP.LOBBY.code and 1.5 or 2,
-		extra = 4,
-		mp_sticker_balanced = MP.LOBBY.config.ruleset == "ruleset_mp_standard" and MP.LOBBY.code,
-	},
+	set_ability = function(self, card, initial, delay_sprites)
+		card.ability.Xmult = MP.LOBBY.config.ruleset == "ruleset_mp_standard" and MP.LOBBY.code and 1.5 or 2
+	end,
 }, true)
