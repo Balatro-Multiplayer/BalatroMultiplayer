@@ -1704,7 +1704,7 @@ end
 
 local blind_disable_ref = Blind.disable
 function Blind:disable()
-	if MP.is_pvp_boss() then
+	if MP.is_pvp_boss() and not (G.GAME.blind and G.GAME.blind.name == 'Verdant Leaf') then	-- hackfix to make verdant work properly
 		return
 	end
 	blind_disable_ref(self)
