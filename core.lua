@@ -36,6 +36,9 @@ MP.LOBBY = {
 MP.GAME = {}
 MP.UI = {}
 MP.ACTIONS = {}
+MP.INTEGRATIONS = {
+	TheOrder = SMODS.Mods["Multiplayer"].config.integrations.TheOrder,
+}
 
 G.C.MULTIPLAYER = HEX("AC3232")
 

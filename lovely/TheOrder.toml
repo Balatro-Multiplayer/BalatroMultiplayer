@@ -1,0 +1,38 @@
+# Credit to @MathIsFun_ for creating TheOrder, which this integration is a copy of
+[manifest]
+version = "1.0.0"
+dump_lua = true
+priority = 0
+
+# Patches boss generation to be ante-based
+[[patches]]
+[patches.pattern]
+target = "functions/common_events.lua"
+pattern = "local _, boss = pseudorandom_element(eligible_bosses, pseudoseed('boss'))"
+position = "at"
+payload = '''local boss = nil
+if MP.INTEGRATIONS.TheOrder then
+	_, boss = pseudorandom_element(eligible_bosses, pseudoseed('boss'..G.GAME.round_resets.ante))
+else
+	_, boss = pseudorandom_element(eligible_bosses, pseudoseed('boss'))
+end'''
+match_indent = true
+
+# Adds an asterisk to the front of the seed
+# This isn't required for the mod to function, but it makes it easier to identify that seeds vary from vanilla
+[[patches]]
+[patches.pattern]
+target = "game.lua"
+pattern = "for k, v in pairs(self.GAME.pseudorandom) do if v == 0 then self.GAME.pseudorandom[k] = pseudohash(k..self.GAME.pseudorandom.seed) end end"
+position = "before"
+payload = '''if self.GAME.pseudorandom.seed:sub(1, 1) ~= "*" and MP.INTEGRATIONS.TheOrder then self.GAME.pseudorandom.seed = "*" .. self.GAME.pseudorandom.seed end'''
+match_indent = true
+
+# Ankh compat w/ previous patch
+[[patches]]
+[patches.pattern]
+target = "game.lua"
+pattern = "self.GAME.pseudorandom.seed = hash_seed(self.GAME.pseudorandom.seed)"
+position = "before"
+payload = '''if self.GAME.pseudorandom.seed:sub(1, 1) ~= "*" and MP.INTEGRATIONS.TheOrder then self.GAME.pseudorandom.seed = "*" .. self.GAME.pseudorandom.seed end'''
+match_indent = true

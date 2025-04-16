@@ -76,7 +76,7 @@ SMODS.Mods.Multiplayer.config_tab = function()
 			colour = G.C.BLACK,
 		},
 		nodes = {
-			{
+			--[[{
 				n = G.UIT.R,
 				config = {
 					padding = 0.5,
@@ -89,6 +89,55 @@ SMODS.Mods.Multiplayer.config_tab = function()
 						ref_table = SMODS.Mods["Multiplayer"].config,
 						ref_value = "misprint_display",
 					}),
+				},
+			},]]
+			{
+				n = G.UIT.R,
+				config = {
+					padding = 0,
+					align = "cm",
+				},
+				nodes = {
+					create_toggle({
+						id = "the_order_integration_toggle",
+						label = localize("b_the_order_integration"),
+						ref_table = SMODS.Mods["Multiplayer"].config.integrations,
+						ref_value = "TheOrder",
+					}),
+				},
+			},
+			{
+				n = G.UIT.R,
+				config = {
+					padding = 0,
+					align = "cm",
+				},
+				nodes = {
+					{
+						n = G.UIT.T,
+						config = {
+							text = localize("k_the_order_credit"),
+							shadow = true,
+							scale = 0.375,
+							colour = G.C.UI.TEXT_INACTIVE,
+						},
+					},
+					{
+						n = G.UIT.B,
+						config = {
+							w = 0.1,
+							h = 0.1,
+						},
+					},
+					{
+						n = G.UIT.T,
+						config = {
+							text = localize("k_requires_restart"),
+							shadow = true,
+							scale = 0.375,
+							colour = G.C.UI.TEXT_INACTIVE,
+						},
+					},
 				},
 			},
 			{

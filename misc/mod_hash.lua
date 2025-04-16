@@ -18,6 +18,11 @@ local function get_mod_data()
 			table.insert(mod_table, key .. "-" .. mod.version)
 		end
 	end
+	for key, mod in pairs(MP.INTEGRATIONS) do
+		if mod then
+			table.insert(mod_table, key .. "-MultiplayerIntegration")
+		end
+	end
 	return mod_table
 end
 
