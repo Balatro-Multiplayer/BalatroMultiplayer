@@ -96,6 +96,12 @@ SMODS.Mods.Multiplayer.config_tab = function()
 				config = {
 					padding = 0,
 					align = "cm",
+					on_demand_tooltip = {
+						text = {
+							localize('k_the_order_integration_desc'), 
+							localize("k_the_order_credit")
+						}
+					},
 				},
 				nodes = {
 					create_toggle({
