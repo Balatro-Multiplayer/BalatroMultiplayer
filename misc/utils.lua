@@ -364,15 +364,15 @@ end
 
 function MP.UTILS.random_message()
 	local messages = {
-		"Hold on, my mom made pizza pops",
-		"One sec, i gotta grab my slow cooker pork roast",
-		"One moment, getting a call from my mom",
-		"Brb, my cat is on fire",
-		"Wait, I think I left the stove on",
-		"Hold up, my pet rock just ran away",
-		"One sec, my plants are asking for water",
-		"Brb, my socks are plotting against me",
-		"Sorry, my WiFi is having an existential crisis",
+		localize("k_message1"),
+		localize("k_message2"),
+		localize("k_message3"),
+		localize("k_message4"),
+		localize("k_message5"),
+		localize("k_message6"),
+		localize("k_message7"),
+		localize("k_message8"),
+		localize("k_message9"),
 	}
 	return messages[math.random(1, #messages)]
 end
