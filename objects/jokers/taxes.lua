@@ -14,7 +14,7 @@ SMODS.Joker({
 	discovered = true,
 	blueprint_compat = true,
 	eternal_compat = true,
-	perishable_compat = true,
+	perishable_compat = false,
 	config = { extra = { mult_gain = 5, mult = 0 } },
 	loc_vars = function(self, info_queue, card)
 		add_nemesis_info(info_queue)
