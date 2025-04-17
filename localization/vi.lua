@@ -219,6 +219,7 @@ return {
 			b_misprint_display = "Hiển thị lá tiếp theo trong bộ bài",
 			b_players = "Người chơi",
 			b_continue_singleplayer = "Tiếp tục trong Chơi Đơn",
+			b_the_order_integration = "Bật Tích Hợp The Order",
 			k_enemy_score = "Điểm Đối Thủ",
 			k_enemy_hands = "Tay bài còn lại: ",
 			k_coming_soon = "Sắp ra mắt!",
@@ -264,6 +265,9 @@ return {
 			k_timer = "Đếm Ngược",
 			k_mods_list = "Danh Sách Mod",
 			k_enemy_jokers = "Joker của Đối Thủ",
+			k_the_order_credit = "*Công nhận cho @MathIsFun_",
+			k_the_order_integration_desc = "Vá quy trình tạo lá bài để không còn bị phụ thuộc vào ante và dùng một tập hợp duy nhất cho mỗi loại/độ hiếm",
+			k_requires_restart = "*Yêu cầu khởi động lại để có hiệu lực",
 			ml_enemy_loc = { "Vị trí", "Đối Thủ" },
 			ml_mp_kofi_message = {
 				"Mod và máy chủ này được",
