@@ -13,7 +13,7 @@ SMODS.Joker({
 	unlocked = true,
 	discovered = true,
 	blueprint_compat = false,
-	eternal_compat = true,
+	eternal_compat = false,
 	perishable_compat = true,
 	config = { extra = { discards = 6, discards_loss = 1 } },
 	loc_vars = function(self, info_queue, card)
