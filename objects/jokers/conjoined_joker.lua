@@ -15,7 +15,7 @@ SMODS.Joker({
 	blueprint_compat = true,
 	eternal_compat = true,
 	perishable_compat = true,
-	config = { extra = { x_mult_gain = 1, max_x_mult = 5, x_mult = 1 } },
+	config = { extra = { x_mult_gain = 0.5, max_x_mult = 3, x_mult = 1 } },
 	loc_vars = function(self, info_queue, card)
 		add_nemesis_info(info_queue)
 		return { vars = { card.ability.extra.x_mult_gain, card.ability.extra.max_x_mult, card.ability.extra.x_mult } }
@@ -23,11 +23,21 @@ SMODS.Joker({
 	in_pool = function(self)
 		return MP.LOBBY.code and MP.LOBBY.config.multiplayer_jokers
 	end,
+	add_to_deck = function(self, card, from_debuffed)
+		if not from_debuffed and (not card.edition or card.edition.type ~= "mp_phantom") then
+			MP.ACTIONS.send_phantom("j_mp_conjoined")
+		end
+	end,
+	remove_from_deck = function(self, card, from_debuff)
+		if not from_debuff and (not card.edition or card.edition.type ~= "mp_phantom") then
+			MP.ACTIONS.remove_phantom("j_mp_conjoined")
+		end
+	end,
 	update = function(self, card, dt)
 		if MP.LOBBY.code then
 			if G.STAGE == G.STAGES.RUN then
 				card.ability.extra.x_mult = math.max(
-					math.min(MP.GAME.enemy.hands * card.ability.extra.x_mult_gain, card.ability.extra.max_x_mult),
+					math.min(1 + (MP.GAME.enemy.hands * card.ability.extra.x_mult_gain), card.ability.extra.max_x_mult),
 					1
 				)
 			end
