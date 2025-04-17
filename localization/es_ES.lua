@@ -1,4 +1,5 @@
 -- Localization by @kmiras, @panbimbogd, @themike_71
+-- Traducido por @kmiras, @panbimbogd, @themike_71
 return {
 	descriptions = {
 		Joker = {
@@ -199,6 +200,8 @@ return {
             b_unstuck_blind = "Atascado fuera del PvP",
 			b_misprint_display = "Muestra la siguiente carta en la baraja",
 			b_players = "Jugadores",
+            b_continue_singleplayer = "Continuar en modo Un Jugador",
+			b_the_order_integration = "Habilitar integración The Order",
         	k_enemy_score = "Puntuación actual del enemigo",
 			k_enemy_hands = "Manos restantes del enemigo: ",
 			k_coming_soon = "¡Próximamente!",
@@ -227,6 +230,7 @@ return {
 			k_bl_life = "Vida",
 			k_bl_or = "o",
 			k_bl_death = "Muerte",
+            k_bl_mostchips = "Mayor puntuación gana",
 			k_current_seed = "Código actual: ",
 			k_random = "Aleatorio", -- It can also be left as is, "Random" | También puede dejarse como es, "Random"
 			k_standard = "Estándar",
@@ -243,6 +247,9 @@ return {
             k_timer = "Temporizador",
 			k_mods_list = "Lista de Mods",
 			k_enemy_jokers = "Comodines del enemigo",
+            k_the_order_credit = "*Crédito a @MathIsFun_",
+            k_the_order_integration_desc = "Esto parcheará la aparición de cartas para que no sea basada en las apuestas iniciales y use un solo grupo para cada tipo/rareza",
+			k_requires_restart = "*Requiere reiniciar para que tome efecto",
             ml_enemy_loc = { "Ubicación del", "enemigo" },
 			ml_mp_kofi_message = {
 				"Este mod y servidor es",
