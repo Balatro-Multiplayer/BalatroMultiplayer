@@ -109,7 +109,7 @@ local function get_lobby_text()
 		if MP.LOBBY.guest and MP.LOBBY.guest.cached == false then
 			return MP.UTILS.wrapText(
 				string.format(
-					"If you are seeing this, your opponent may be cheating. If this is a ranked game, please send the message '%s' and then open a support ticket in #support",
+					localize("k_warning_cheating"),
 					MP.UTILS.random_message()
 				),
 				100
@@ -120,7 +120,7 @@ local function get_lobby_text()
 		if MP.LOBBY.host and MP.LOBBY.host.cached == false then
 			return MP.UTILS.wrapText(
 				string.format(
-					"If you are seeing this, your opponent may be cheating. If this is a ranked game, please send the message '%s' and then open a support ticket in #support",
+					localize("k_warning_cheating"),
 					MP.UTILS.random_message()
 				),
 				100
@@ -130,7 +130,7 @@ local function get_lobby_text()
 	end
 
 	if notFullyUnlocked then
-		return "The profile you are playing on is not fully unlocked. If this is a ranked/tournament game, please create a new profile and hit unlock all in the profile settings", SMODS.Gradients.warning_text
+		return localize("k_warning_unlock_profile"), SMODS.Gradients.warning_text
 	end
 
 	if MP.LOBBY.host and MP.LOBBY.host.hash and MP.LOBBY.guest and MP.LOBBY.guest.hash then
