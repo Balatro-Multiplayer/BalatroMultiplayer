@@ -33,6 +33,18 @@ MP.BANNED_OBJECTS = {
 	blinds = {},
 }
 
+function new_in_pool_for_blind(v) -- For blinds specifically, in_pool does overwrite basic checks like minimum ante, so we need to repackage all basic checks inside the new in_pool
+	if MP.LOBBY.code then
+		return false
+	elseif not v.boss.showdown and (v.boss.min <= math.max(1, G.GAME.round_resets.ante) and ((math.max(1, G.GAME.round_resets.ante))%G.GAME.win_ante ~= 0 or G.GAME.round_resets.ante < 2)) then
+		return true
+	elseif v.boss.showdown and (G.GAME.round_resets.ante)%G.GAME.win_ante == 0 and G.GAME.round_resets.ante >= 2 then
+		return true
+	else
+		return false
+	end
+end
+
 function MP.apply_rulesets()
 	for _, ruleset in pairs(MP.Rulesets) do
 		local function process_banned_items(banned_items, banned_table)
@@ -88,7 +100,7 @@ function MP.apply_rulesets()
 						-- behave like the original in_pool function if it's not nil
 						return self:orig_in_pool()
 					else
-						return true -- in_pool returning true doesn't overwrite original checks
+						return self.set ~= 'Blind' or new_in_pool_for_blind(self) -- in_pool returning true doesn't overwrite original checks EXCEPT for blinds
 					end
 				end
 			else
@@ -100,7 +112,11 @@ function MP.apply_rulesets()
 		for obj_key, _ in pairs(type.global_banned) do
 			type.mod:take_ownership(obj_key, {
 				in_pool = function(self)
-					return not MP.LOBBY.code
+					if self.set ~= 'Blind' then
+						return not MP.LOBBY.code
+					else
+						return new_in_pool_for_blind(self)
+					end
 				end,
 			}, true)
 		end
