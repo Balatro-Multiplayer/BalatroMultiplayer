@@ -4,4 +4,7 @@ return {
 	["server_port"] = 8788,
 	["logging"] = false,
 	["misprint_display"] = true,
+	["integrations"] = {
+		["TheOrder"] = false,
+	},
 }

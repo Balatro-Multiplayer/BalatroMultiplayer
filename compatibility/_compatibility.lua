@@ -22,6 +22,11 @@ MP.DECK.BANNED_TAGS = {
 	["tag_boss"] = true,
 }
 
+MP.DECK.BANNED_BLINDS = {
+	["bl_wall"] = true,
+	["bl_final_vessel"] = true,
+}
+
 function MP.DECK.ban_card(card_id)
 	if card_id:sub(1, 1) == "j" then
 		MP.DECK.BANNED_JOKERS[card_id] = true
@@ -34,6 +39,10 @@ end
 
 function MP.DECK.ban_tag(tag_id)
 	MP.DECK.BANNED_TAGS[tag_id] = true
+end
+
+function MP.DECK.ban_blind(blind_id)
+	MP.DECK.BANNED_BLINDS[blind_id] = true
 end
 
 local j_broken = {

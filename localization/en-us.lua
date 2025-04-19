@@ -200,6 +200,7 @@ return {
 			b_misprint_display = "Display the next card in the deck",
 			b_players = "Players",
 			b_continue_singleplayer = "Continue in Singleplayer",
+			b_the_order_integration = "Enable The Order Integration",
 			k_enemy_score = "Current Enemy score",
 			k_enemy_hands = "Enemy hands left: ",
 			k_coming_soon = "Coming Soon!",
@@ -245,6 +246,9 @@ return {
 			k_timer = "Timer",
 			k_mods_list = "Mods List",
 			k_enemy_jokers = "Enemy Jokers",
+			k_the_order_credit = "*Credit to @MathIsFun_",
+			k_the_order_integration_desc = "This will patch card creation to not be ante-based and use a single pool for every type/rarity",
+			k_requires_restart = "*Requires a restart to take effect",
 			ml_enemy_loc = { "Enemy", "location" },
 			ml_mp_kofi_message = {
 				"This mod and game server is",

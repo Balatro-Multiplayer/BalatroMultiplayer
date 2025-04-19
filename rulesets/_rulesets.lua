@@ -30,6 +30,7 @@ MP.BANNED_OBJECTS = {
 	vouchers = {},
 	enhancements = {},
 	tags = {},
+	blinds = {},
 }
 
 function MP.apply_rulesets()
@@ -50,6 +51,7 @@ function MP.apply_rulesets()
 			{ items = ruleset.banned_vouchers, table = MP.BANNED_OBJECTS.vouchers },
 			{ items = ruleset.banned_enhancements, table = MP.BANNED_OBJECTS.enhancements },
 			{ items = ruleset.banned_tags, table = MP.BANNED_OBJECTS.tags },
+			{ items = ruleset.banned_blinds, table = MP.BANNED_OBJECTS.blinds },
 		}
 
 		for _, banned_type in ipairs(banned_types) do
@@ -67,15 +69,33 @@ function MP.apply_rulesets()
 			global_banned = MP.DECK.BANNED_ENHANCEMENTS,
 		},
 		{ objects = MP.BANNED_OBJECTS.tags, mod = SMODS.Tag, global_banned = MP.DECK.BANNED_TAGS },
+		{ objects = MP.BANNED_OBJECTS.blinds, mod = SMODS.Blind, global_banned = MP.DECK.BANNED_BLINDS },
 	}
 
 	for _, type in ipairs(object_types) do
 		for obj_key, rulesets in pairs(type.objects) do
-			type.mod:take_ownership(obj_key, {
-				in_pool = function(self)
-					return not (rulesets[MP.LOBBY.config.ruleset] and MP.LOBBY.code)
-				end,
-			}, true)
+			-- Find object with object key, using the same method as take_ownership
+			local obj = type.mod.obj_table[obj_key] or (type.mod.get_obj and type.mod:get_obj(obj_key))
+			
+			if obj then
+				-- Save the original in_pool function inside the object itself
+				obj.orig_in_pool = obj.in_pool
+				-- Update the in_pool function
+				obj.in_pool = function(self)
+					if rulesets[MP.LOBBY.config.ruleset] and MP.LOBBY.code then
+						return false
+					elseif self.orig_in_pool then
+						-- behave like the original in_pool function if it's not nil
+						return self:orig_in_pool()
+					else
+						return true -- in_pool returning true doesn't overwrite original checks
+					end
+				end
+			else
+				sendWarnMessage(
+					('Cannot ban %s: Does not exist.'):format(obj_key), type.mod.set
+				)
+			end
 		end
 		for obj_key, _ in pairs(type.global_banned) do
 			type.mod:take_ownership(obj_key, {
