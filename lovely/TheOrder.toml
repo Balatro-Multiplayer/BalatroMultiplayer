@@ -36,3 +36,51 @@ pattern = "self.GAME.pseudorandom.seed = hash_seed(self.GAME.pseudorandom.seed)"
 position = "before"
 payload = '''if self.GAME.pseudorandom.seed:sub(1, 1) ~= "*" and MP.INTEGRATIONS.TheOrder then self.GAME.pseudorandom.seed = "*" .. self.GAME.pseudorandom.seed end'''
 match_indent = true
+
+
+
+
+# Make hallucination coinflip queue global
+[[patches]]
+[patches.pattern]
+target = "card.lua"
+pattern = '''if pseudorandom('halu'..G.GAME.round_resets.ante) < G.GAME.probabilities.normal/self.ability.extra then'''
+position = "at"
+payload = '''if pseudorandom('halu'..MP.ante_based()) < G.GAME.probabilities.normal/self.ability.extra then'''
+match_indent = true
+
+# Make booster pack queue global
+[[patches]]
+[patches.pattern]
+target = "functions/common_events.lua"
+pattern = '''local poll = pseudorandom(pseudoseed((_key or 'pack_generic')..G.GAME.round_resets.ante))*cume'''
+position = "at"
+payload = '''local poll = pseudorandom(pseudoseed((_key or 'pack_generic')..MP.ante_based()))*cume'''
+match_indent = true
+
+# Make deck shuffles global
+# This is overkill at this point, deck shuffles become effectively random
+[[patches]]
+[patches.pattern]
+target = "functions/state_events.lua"
+pattern = '''G.deck:shuffle('nr'..G.GAME.round_resets.ante)'''
+position = "at"
+payload = '''G.deck:shuffle('nr'..MP.ante_based())'''
+match_indent = true
+
+[[patches]]
+[patches.pattern]
+target = "functions/button_callbacks.lua"
+pattern = '''G.deck:shuffle('cashout'..G.GAME.round_resets.ante)'''
+position = "at"
+payload = '''G.deck:shuffle('cashout'..MP.ante_based())'''
+match_indent = true
+
+# Patch Wraith to use same queue as Rare Tag
+[[patches]]
+[patches.pattern]
+target = "card.lua"
+pattern = '''local card = create_card('Joker', G.jokers, nil, 0.99, nil, nil, nil, 'wra')'''
+position = "at"
+payload = '''local card = create_card('Joker', G.jokers, nil, MP.INTEGRATIONS.TheOrder and 1 or 0.99, nil, nil, nil, 'wra')'''
+match_indent = true
