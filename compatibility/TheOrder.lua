@@ -23,6 +23,7 @@ function reset_idol_card()
 		G.GAME.round_resets.ante = a
 		return ret
 	end
+	return idol()
 end
 local mail = reset_mail_card
 function reset_mail_card()
@@ -33,6 +34,7 @@ function reset_mail_card()
 		G.GAME.round_resets.ante = a
 		return ret
 	end
+	return mail()
 end
 local ancient = reset_ancient_card
 function reset_ancient_card()
@@ -43,6 +45,7 @@ function reset_ancient_card()
 		G.GAME.round_resets.ante = a
 		return ret
 	end
+	return ancient()
 end
 local castle = reset_castle_card
 function reset_castle_card()
@@ -53,6 +56,7 @@ function reset_castle_card()
 		G.GAME.round_resets.ante = a
 		return ret
 	end
+	return castle()
 end
 
 
