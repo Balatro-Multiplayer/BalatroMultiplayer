@@ -1,6 +1,6 @@
 # Balatro Multiplayer Mod
 
-[![ModIcon](https://github.com/Balatro-Multiplayer/BalatroMultiplayer/blob/2cd9015963c1118e0b849f11e7c335f97b74f36c/assets/2x/modicon.png)
+![ModIcon](https://github.com/Balatro-Multiplayer/BalatroMultiplayer/blob/2cd9015963c1118e0b849f11e7c335f97b74f36c/assets/2x/modicon.png)
 
 A multiplayer mod for Balatro, allowing players to compete with each other.
 
