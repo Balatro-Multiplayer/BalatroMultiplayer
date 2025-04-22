@@ -49,6 +49,7 @@ Contributions that make content changes like modifying how the base game works, 
 ### Looking to contribute but don't have a feature in mind?
 
 Here are some features we're planning to implement in future releases that aren't being worked on yet:
+*If you plan on working on one of these features please open a draft PR to show that it is being worked on*
 
 - **Timer Config**: Add a Lobby Option to change the timer values, as well as letting players pause the timer after starting
 - **Nemesis Deck View**: Implement a button on the game over and game won screens to view the Nemesis' deck
