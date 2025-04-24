@@ -235,22 +235,13 @@ local function action_lobby_options(options)
 end
 
 local function action_send_phantom(key)
+	local menu = G.OVERLAY_MENU	-- we are spoofing a menu here, which disables duplicate protection
+	G.OVERLAY_MENU = G.OVERLAY_MENU or true
 	local new_card = create_card("Joker", MP.shared, false, nil, nil, nil, key)
 	new_card:set_edition("e_mp_phantom")
 	new_card:add_to_deck()
 	MP.shared:emplace(new_card)
-	
-	local cards = SMODS.find_card(key, true)
-	local total = 0
-	for i, v in ipairs(cards) do
-		if v.edition and v.edition.type == 'mp_phantom' then
-			total = total + 1
-		else break end
-	end
-	if total >= #cards then
-		G.GAME.used_jokers[key] = nil
-	end
-	print(G.GAME.used_jokers[key] and 'true' or 'false')
+	G.OVERLAY_MENU = menu
 end
 
 local function action_remove_phantom(key)
@@ -260,6 +251,30 @@ local function action_remove_phantom(key)
 		card:start_dissolve({ G.C.RED }, nil, 1.6)
 		MP.shared:remove_card(card)
 	end
+end
+
+-- card:remove is called in an event so we have to hook the function instead of doing normal things
+local cardremove = Card.remove
+function Card:remove()
+	local menu = G.OVERLAY_MENU
+	if self.edition and self.edition.type == 'mp_phantom' then
+		G.OVERLAY_MENU = G.OVERLAY_MENU or true
+	end
+	cardremove(self)
+	G.OVERLAY_MENU = menu
+end
+
+-- and smods find card STILL needs to be patched here
+local smodsfindcard = SMODS.find_card
+function SMODS.find_card(key, count_debuffed)
+	local ret = smodsfindcard(key, count_debuffed)
+	local new_ret = {}
+	for i, v in ipairs(ret) do
+		if not v.edition or v.edition.type ~= 'mp_phantom' then
+			new_ret[#new_ret+1] = v
+		end
+	end
+	return new_ret
 end
 
 local function action_speedrun()
