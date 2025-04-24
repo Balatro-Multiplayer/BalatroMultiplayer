@@ -13,7 +13,7 @@
 	"priority": 9007199254740990,
 	"badge_colour": "AC3232",
 	"badge_text_colour": "FFFFFF",
-	"version": "0.2.6",
+	"version": "0.2.7",
 	"dependencies": [
 		"Steamodded (>=1.0.0~BETA-0323b)",
 		"Lovely (>=0.7)",
