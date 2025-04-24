@@ -90,19 +90,20 @@ function MP.apply_rulesets()
 			local obj = type.mod.obj_table[obj_key] or (type.mod.get_obj and type.mod:get_obj(obj_key))
 			
 			if obj then
-				-- Save the original in_pool function inside the object itself
-				obj.orig_in_pool = obj.in_pool
-				-- Update the in_pool function
-				obj.in_pool = function(self)
-					if rulesets[MP.LOBBY.config.ruleset] and MP.LOBBY.code then
-						return false
-					elseif self.orig_in_pool then
-						-- behave like the original in_pool function if it's not nil
-						return self:orig_in_pool()
-					else
-						return self.set ~= 'Blind' or new_in_pool_for_blind(self) -- in_pool returning true doesn't overwrite original checks EXCEPT for blinds
-					end
-				end
+				local old_in_pool = obj.in_pool
+				type.mod:take_ownership(obj_key, {
+					orig_in_pool = old_in_pool, -- Save the original in_pool function inside the object itself
+					in_pool = function(self) -- Update the in_pool function
+						if rulesets[MP.LOBBY.config.ruleset] and MP.LOBBY.code then
+							return false
+						elseif self.orig_in_pool then
+							-- behave like the original in_pool function if it's not nil
+							return self:orig_in_pool()
+						else
+							return self.set ~= 'Blind' or new_in_pool_for_blind(self) -- in_pool returning true doesn't overwrite original checks EXCEPT for blinds
+						end
+					end,
+				}, true)
 			else
 				sendWarnMessage(
 					('Cannot ban %s: Does not exist.'):format(obj_key), type.mod.set
