@@ -33,6 +33,18 @@ MP.BANNED_OBJECTS = {
 	blinds = {},
 }
 
+function new_in_pool_for_blind(v) -- For blinds specifically, in_pool does overwrite basic checks like minimum ante, so we need to repackage all basic checks inside the new in_pool
+	if MP.LOBBY.code then
+		return false
+	elseif not v.boss.showdown and (v.boss.min <= math.max(1, G.GAME.round_resets.ante) and ((math.max(1, G.GAME.round_resets.ante))%G.GAME.win_ante ~= 0 or G.GAME.round_resets.ante < 2)) then
+		return true
+	elseif v.boss.showdown and (G.GAME.round_resets.ante)%G.GAME.win_ante == 0 and G.GAME.round_resets.ante >= 2 then
+		return true
+	else
+		return false
+	end
+end
+
 function MP.apply_rulesets()
 	for _, ruleset in pairs(MP.Rulesets) do
 		local function process_banned_items(banned_items, banned_table)
@@ -78,19 +90,20 @@ function MP.apply_rulesets()
 			local obj = type.mod.obj_table[obj_key] or (type.mod.get_obj and type.mod:get_obj(obj_key))
 			
 			if obj then
-				-- Save the original in_pool function inside the object itself
-				obj.orig_in_pool = obj.in_pool
-				-- Update the in_pool function
-				obj.in_pool = function(self)
-					if rulesets[MP.LOBBY.config.ruleset] and MP.LOBBY.code then
-						return false
-					elseif self.orig_in_pool then
-						-- behave like the original in_pool function if it's not nil
-						return self:orig_in_pool()
-					else
-						return true -- in_pool returning true doesn't overwrite original checks
-					end
-				end
+				local old_in_pool = obj.in_pool
+				type.mod:take_ownership(obj_key, {
+					orig_in_pool = old_in_pool, -- Save the original in_pool function inside the object itself
+					in_pool = function(self) -- Update the in_pool function
+						if rulesets[MP.LOBBY.config.ruleset] and MP.LOBBY.code then
+							return false
+						elseif self.orig_in_pool then
+							-- behave like the original in_pool function if it's not nil
+							return self:orig_in_pool()
+						else
+							return self.set ~= 'Blind' or new_in_pool_for_blind(self) -- in_pool returning true doesn't overwrite original checks EXCEPT for blinds
+						end
+					end,
+				}, true)
 			else
 				sendWarnMessage(
 					('Cannot ban %s: Does not exist.'):format(obj_key), type.mod.set
@@ -100,7 +113,11 @@ function MP.apply_rulesets()
 		for obj_key, _ in pairs(type.global_banned) do
 			type.mod:take_ownership(obj_key, {
 				in_pool = function(self)
-					return not MP.LOBBY.code
+					if self.set ~= 'Blind' then
+						return not MP.LOBBY.code
+					else
+						return new_in_pool_for_blind(self)
+					end
 				end,
 			}, true)
 		end
