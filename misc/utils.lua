@@ -16,7 +16,7 @@ function MP.UTILS.serialize_table(val, name, skipnewlines, depth)
 
 		for k, v in pairs(val) do
 			tmp = tmp
-				.. Utils.serialize_table(v, k, skipnewlines, depth + 1)
+				.. MP.UTILS.serialize_table(v, k, skipnewlines, depth + 1)
 				.. ","
 				.. (not skipnewlines and "\n" or "")
 		end
@@ -300,6 +300,17 @@ function SMODS.create_mod_badges(obj, badges)
 	end
 end
 
+function MP.UTILS.reverse_key_value_pairs(tbl, stringify_keys)
+	local reversed_tbl = {}
+	for k, v in pairs(tbl) do
+		if stringify_keys then
+			v = tostring(v)
+		end
+		reversed_tbl[v] = k
+	end
+	return reversed_tbl
+end
+
 function add_nemesis_info(info_queue)
 	if MP.LOBBY.code then
 		info_queue[#info_queue + 1] = {
@@ -361,6 +372,38 @@ function G.FUNCS.use_card(e, mute, nosave)
 	end
 	return use_card_ref(e, mute, nosave)
 end
+
+
+-- Pre-compile a reversed list of all the centers
+local reversed_centers = nil
+
+function MP.UTILS.card_to_string(card)
+	if not card or not card.base or not card.base.suit or not card.base.value then
+		return ""
+	end
+
+	if not reversed_centers then
+		reversed_centers = MP.UTILS.reverse_key_value_pairs(G.P_CENTERS)
+	end
+
+	local suit = string.sub(card.base.suit, 1, 1)
+	local rank = card.base.value
+	if rank == '10' then rank = 'T'
+	elseif rank == 'Jack' then rank = 'J'
+	elseif rank == 'Queen' then rank = 'Q'
+	elseif rank == 'King' then rank = 'K'
+	elseif rank == 'Ace' then rank = 'A'
+	end
+
+	local enhancement = reversed_centers[card.config.center] or "none"
+	local edition = card.edition and  MP.UTILS.reverse_key_value_pairs(card.edition, true)["true"] or "none"
+	local seal = card.seal or "none"
+
+	local card_str = suit .. "-" .. rank .. "-" .. enhancement .. "-" .. edition .. "-" .. seal
+
+	return card_str
+end
+
 
 function MP.UTILS.random_message()
 	local messages = {

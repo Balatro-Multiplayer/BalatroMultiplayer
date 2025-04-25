@@ -1081,6 +1081,10 @@ function create_UIBox_game_over()
 		{ card_limit = G.GAME.starting_params.joker_slots, type = "joker", highlight_limit = 1 }
 	)
 	MP.ACTIONS.get_end_game_jokers()
+    MP.nemesis_deck = CardArea(-100, -100, G.CARD_W, G.CARD_H, {type = 'deck'})
+	if not MP.nemesis_deck_received then
+		MP.ACTIONS.get_nemesis_deck()
+	end
 	G.SETTINGS.paused = false
 	local eased_red = copy_table(G.GAME.round_resets.ante <= G.GAME.win_ante and G.C.RED or G.C.BLUE)
 	eased_red[4] = 0
@@ -1139,6 +1143,59 @@ function create_UIBox_game_over()
 								nodes = {
 									{ n = G.UIT.O, config = { object = MP.end_game_jokers } },
 								},
+							},
+							{
+								n = G.UIT.R,
+								config = { align = "cm", padding = 0.08 },
+								nodes = {
+									{
+										n = G.UIT.C,
+										config = {
+											maxw = 1,
+											minw = 1,
+											minh = 0.5,
+											colour = G.C.CLEAR,
+											no_fill = false
+										}
+									},
+									{
+										n = G.UIT.C,
+										config = {
+											button = "view_nemesis_deck",
+											align = "cm",
+											padding = 0.12,
+											colour = G.C.BLUE,
+											emboss = 0.05,
+											minh = 0.7,
+											minw = 2,
+											maxw = 2,
+											r = 0.1,
+											shadow = true,
+											hover = true,
+										},
+										nodes = {
+											{
+												n = G.UIT.T,
+												config = {
+													text = localize("b_view_nemesis_deck"),
+													colour = G.C.UI.TEXT_LIGHT,
+													scale = 0.65,
+													col = true,
+												}
+											}
+										}
+									},
+									{
+										n = G.UIT.C,
+										config = {
+											maxw = 1,
+											minw = 1,
+											minh = 0.5,
+											colour = G.C.CLEAR,
+											no_fill = false
+										}
+									},
+								}
 							},
 							{
 								n = G.UIT.R,
@@ -1331,6 +1388,10 @@ function create_UIBox_win()
 		{ card_limit = G.GAME.starting_params.joker_slots, type = "joker", highlight_limit = 1 }
 	)
 	MP.ACTIONS.get_end_game_jokers()
+    MP.nemesis_deck = CardArea(-100, -100, G.CARD_W, G.CARD_H, {type = 'deck'})
+	if not MP.nemesis_deck_received then
+		MP.ACTIONS.get_nemesis_deck()
+	end
 	G.SETTINGS.paused = false
 	local eased_green = copy_table(G.C.GREEN)
 	eased_green[4] = 0
@@ -1394,6 +1455,59 @@ function create_UIBox_win()
 								nodes = {
 									{ n = G.UIT.O, config = { object = MP.end_game_jokers } },
 								},
+							},
+							{
+								n = G.UIT.R,
+								config = { align = "cm", padding = 0.08 },
+								nodes = {
+									{
+										n = G.UIT.C,
+										config = {
+											maxw = 0.8,
+											minw = 0.8,
+											minh = 0.7,
+											colour = G.C.CLEAR,
+											no_fill = false
+										}
+									},
+									{
+										n = G.UIT.C,
+										config = {
+											button = "view_nemesis_deck",
+											align = "cm",
+											padding = 0.12,
+											colour = G.C.BLUE,
+											emboss = 0.05,
+											minh = 0.7,
+											minw = 2,
+											maxw = 2,
+											r = 0.1,
+											shadow = true,
+											hover = true,
+										},
+										nodes = {
+											{
+												n = G.UIT.T,
+												config = {
+													text = localize("b_view_nemesis_deck"),
+													colour = G.C.UI.TEXT_LIGHT,
+													scale = 0.65,
+													col = true,
+												}
+											}
+										}
+									},
+									{
+										n = G.UIT.C,
+										config = {
+											maxw = 0.8,
+											minw = 0.8,
+											minh = 0.7,
+											colour = G.C.CLEAR,
+											no_fill = false
+										}
+									},
+								}
 							},
 							{
 								n = G.UIT.R,
@@ -1572,6 +1686,73 @@ function create_UIBox_win()
 	--t.nodes[1].config.mid = true
 	t.config.id = "you_win_UI"
 	return t
+end
+
+function G.FUNCS.overlay_endgame_menu()
+	G.FUNCS.overlay_menu({
+		definition = MP.GAME.won and create_UIBox_win() or create_UIBox_game_over(),
+		config = {no_esc = true}
+	})
+	local Jimbo = nil
+
+	G.E_MANAGER:add_event(Event({
+		trigger = 'after',
+		delay = 2.5,
+		blocking = false,
+		func = (function()
+			if G.OVERLAY_MENU and G.OVERLAY_MENU:get_UIE_by_ID('jimbo_spot') then
+				Jimbo = Card_Character({x = 0, y = 5})
+				local spot = G.OVERLAY_MENU:get_UIE_by_ID('jimbo_spot')
+				spot.config.object:remove()
+				spot.config.object = Jimbo
+				Jimbo.ui_object_updated = true
+				local jimbo_words = MP.GAME.won and 'wq_'..math.random(1,7) or 'lq_'..math.random(1,10)
+				Jimbo:add_speech_bubble(jimbo_words, nil, {quip = true})
+				Jimbo:say_stuff(5)
+			end
+			return true
+		end)
+	}))
+end
+
+function G.UIDEF.view_nemesis_deck()
+	local playing_cards_ref = G.playing_cards
+	G.playing_cards = MP.GAME.nemesis_cards
+	local t = G.UIDEF.view_deck()
+	G.playing_cards = playing_cards_ref
+	return t
+end
+
+function G.UIDEF.create_UIBox_view_nemesis_deck()
+	return create_UIBox_generic_options(
+		{
+			back_func = 'overlay_endgame_menu',
+			contents = {
+				create_tabs({
+					tabs = {
+						{
+							label = localize('k_nemesis_deck'),
+							chosen = true,
+							tab_definition_function = G.UIDEF.view_nemesis_deck,
+							tab_definition_function_args = false
+						},
+					},
+					tab_h = 8,
+					snap_to_nav = true
+				})
+			},
+		})
+end
+
+function G.FUNCS.view_nemesis_deck()
+	G.SETTINGS.paused = true
+	if G.deck_preview then
+		G.deck_preview:remove()
+		G.deck_preview = nil
+	end
+	G.FUNCS.overlay_menu({
+		definition = G.UIDEF.create_UIBox_view_nemesis_deck()
+	})
 end
 
 local ease_ante_ref = ease_ante
