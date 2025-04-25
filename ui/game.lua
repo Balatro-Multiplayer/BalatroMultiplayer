@@ -1922,7 +1922,7 @@ G.FUNCS.skip_blind = function(e)
 	skip_blind_ref(e)
 	if MP.LOBBY.code then
 		if not MP.GAME.timer_started then
-			MP.GAME.timer = MP.GAME.timer + 120
+			MP.GAME.timer = MP.GAME.timer + MP.LOBBY.config.timer_max_seconds
 		end
 		MP.ACTIONS.skip(G.GAME.skips)
 	end

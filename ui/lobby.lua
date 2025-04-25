@@ -786,6 +786,22 @@ function G.UIDEF.create_UIBox_lobby_options()
 														current_option = MP.LOBBY.config.pvp_start_round,
 														opt_callback = "change_starting_pvp_round",
 													}),
+													Disableable_Option_Cycle({
+														 id = "pvp_timer_seconds_option",
+														 enabled_ref_table = MP.LOBBY,
+														 enabled_ref_value = "is_host",
+														 label = localize("k_opts_pvp_timer"),
+														 options = {
+																"30s",
+																"60s",
+																"90s",
+																"120s",
+																"150s",
+																"180s"
+														 },
+														 current_option = (MP.LOBBY.config.timer_max_seconds)/30,
+														 opt_callback = "change_timer_max_seconds"
+													})
 												},
 											},
 										},
@@ -926,6 +942,11 @@ end
 G.FUNCS.change_starting_pvp_round = function(args)
 	MP.LOBBY.config.pvp_start_round = args.to_val
 	send_lobby_options()
+end
+
+G.FUNCS.change_timer_max_seconds = function(args)
+	 MP.LOBBY.config.timer_max_seconds = tonumber(args.to_val:sub(1, -2))
+	 send_lobby_options()
 end
 
 G.FUNCS.change_showdown_starting_antes = function(args)
