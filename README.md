@@ -11,7 +11,7 @@ Detailed installation instructions are available on our website:
 
 Quick installation steps:
 
-1. Download the latest release from the [Releases page](https://github.com/Balatro-Multiplayer/balatro-multiplayer/releases)
+1. Download the latest release from the [Releases page](https://github.com/Balatro-Multiplayer/BalatroMultiplayer/releases)
 2. Extract the files to your Balatro game directory
 3. Run the game with the mod enabled
 4. Follow the in-game instructions to connect with friends
