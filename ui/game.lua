@@ -1082,7 +1082,10 @@ function create_UIBox_game_over()
 	)
 	MP.ACTIONS.get_end_game_jokers()
 	MP.nemesis_deck = CardArea(-100, -100, G.CARD_W, G.CARD_H, {type = 'deck'})
-	MP.ACTIONS.get_nemesis_deck()
+	if not MP.nemesis_deck_received then
+		MP.nemesis_cards = {}
+		MP.ACTIONS.get_nemesis_deck()
+	end
 	G.SETTINGS.paused = false
 	local eased_red = copy_table(G.GAME.round_resets.ante <= G.GAME.win_ante and G.C.RED or G.C.BLUE)
 	eased_red[4] = 0
@@ -1387,7 +1390,10 @@ function create_UIBox_win()
 	)
 	MP.ACTIONS.get_end_game_jokers()
 	MP.nemesis_deck = CardArea(-100, -100, G.CARD_W, G.CARD_H, {type = 'deck'})
-	MP.ACTIONS.get_nemesis_deck()
+	if not MP.nemesis_deck_received then
+		MP.nemesis_cards = {}
+		MP.ACTIONS.get_nemesis_deck()
+	end
 	G.SETTINGS.paused = false
 	local eased_green = copy_table(G.C.GREEN)
 	eased_green[4] = 0
@@ -1711,7 +1717,7 @@ end
 
 function G.UIDEF.view_nemesis_deck()
 	local playing_cards_ref = G.playing_cards
-	G.playing_cards = MP.GAME.nemesis_cards
+	G.playing_cards = MP.nemesis_cards
 	local t = G.UIDEF.view_deck()
 	G.playing_cards = playing_cards_ref
 	return t

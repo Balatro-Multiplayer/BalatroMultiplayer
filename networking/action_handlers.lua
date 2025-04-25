@@ -191,11 +191,13 @@ local function action_player_info(lives)
 end
 
 local function action_win_game()
+	MP.nemesis_deck_received = false
 	win_game()
 	MP.GAME.won = true
 end
 
 local function action_lose_game()
+	MP.nemesis_deck_received = false
 	G.STATE_COMPLETE = false
 	G.STATE = G.STATES.GAME_OVER
 end
@@ -495,7 +497,9 @@ local function action_get_end_game_jokers()
 end
 
 local function action_get_nemesis_deck()
-	if MP.nemesis_deck_received then return end
+	if MP.nemesis_deck_received then
+		return
+	end
 	local deck_str = ""
 	for _, card in ipairs(G.playing_cards) do
 		deck_str = deck_str .. ";" .. MP.UTILS.card_to_string(card)
@@ -504,10 +508,8 @@ local function action_get_nemesis_deck()
 end
 
 local function action_receive_nemesis_deck(deck_str)
-	if MP.nemesis_deck_received then return end
-
-	if not MP.GAME.nemesis_cards then
-		MP.GAME.nemesis_cards = {}
+	if MP.nemesis_deck_received then
+		return
 	end
 
 	local card_strings = MP.UTILS.string_split(deck_str, ";")
@@ -545,9 +547,9 @@ local function action_receive_nemesis_deck(deck_str)
 			card:set_seal(seal, true, true)
 		end
 
-		-- remove the card from G.playing_cards and insert into MP.GAME.nemesis_cards
+		-- remove the card from G.playing_cards and insert into MP.nemesis_cards
 		table.remove(G.playing_cards, #G.playing_cards)
-		table.insert(MP.GAME.nemesis_cards, card)
+		table.insert(MP.nemesis_cards, card)
 
 		::continue::
 	end
