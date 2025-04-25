@@ -506,6 +506,14 @@ local function action_start_ante_timer(time)
 	G.E_MANAGER:add_event(MP.timer_event)
 end
 
+local function action_pause_ante_timer(time)
+	if type(time) == "string" then
+		time = tonumber(time)
+	end
+	MP.GAME.timer = time
+	MP.GAME.timer_started = false
+end
+
 -- #region Client to Server
 function MP.ACTIONS.create_lobby(gamemode)
 	MP.LOBBY.config.ruleset = gamemode
@@ -646,6 +654,11 @@ function MP.ACTIONS.start_ante_timer()
 	action_start_ante_timer(MP.GAME.timer)
 end
 
+function MP.ACTIONS.pause_ante_timer()
+	Client.send("action:pauseAnteTimer,time:" .. tostring(MP.GAME.timer))
+	action_pause_ante_timer(MP.GAME.timer) -- TODO
+end
+
 function MP.ACTIONS.fail_timer()
 	Client.send("action:failTimer")
 end
@@ -770,6 +783,8 @@ function Game:update(dt)
 				action_receive_end_game_jokers(parsedAction.keys)
 			elseif parsedAction.action == "startAnteTimer" then
 				action_start_ante_timer(parsedAction.time)
+			elseif parsedAction.action == "pauseAnteTimer" then
+				action_pause_ante_timer(parsedAction.time)
 			elseif parsedAction.action == "error" then
 				action_error(parsedAction.message)
 			elseif parsedAction.action == "keepAlive" then
