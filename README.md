@@ -49,7 +49,6 @@ Contributions that make content changes like modifying how the base game works, 
 ### Looking to contribute but don't have a feature in mind?
 
 Here are some features we're planning to implement in future releases that aren't being worked on yet:
-- **Timer Config**: Add a Lobby Option to change the timer values, as well as letting players pause the timer after starting
 - **Nemesis Deck View**: Implement a button on the game over and game won screens to view the Nemesis' deck
 - **Rulesets Selection Rework**: Change the rulesets screen to be more like the challenges screen, in order to be clear about what the rulesets affect
 - **In Pool Rework**: Update the pooling function and related multiplayer code to independently handle ruleset and gamemode bans (to prevent our card and ruleset logic from interfering with each other)
