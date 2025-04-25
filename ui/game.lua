@@ -1081,10 +1081,8 @@ function create_UIBox_game_over()
 		{ card_limit = G.GAME.starting_params.joker_slots, type = "joker", highlight_limit = 1 }
 	)
 	MP.ACTIONS.get_end_game_jokers()
-    MP.nemesis_deck = CardArea(-100, -100, G.CARD_W, G.CARD_H, {type = 'deck'})
-	if not MP.nemesis_deck_received then
-		MP.ACTIONS.get_nemesis_deck()
-	end
+	MP.nemesis_deck = CardArea(-100, -100, G.CARD_W, G.CARD_H, {type = 'deck'})
+	MP.ACTIONS.get_nemesis_deck()
 	G.SETTINGS.paused = false
 	local eased_red = copy_table(G.GAME.round_resets.ante <= G.GAME.win_ante and G.C.RED or G.C.BLUE)
 	eased_red[4] = 0
@@ -1153,7 +1151,7 @@ function create_UIBox_game_over()
 										config = {
 											maxw = 1,
 											minw = 1,
-											minh = 0.5,
+											minh = 0.7,
 											colour = G.C.CLEAR,
 											no_fill = false
 										}
@@ -1190,7 +1188,7 @@ function create_UIBox_game_over()
 										config = {
 											maxw = 1,
 											minw = 1,
-											minh = 0.5,
+											minh = 0.7,
 											colour = G.C.CLEAR,
 											no_fill = false
 										}
@@ -1388,10 +1386,8 @@ function create_UIBox_win()
 		{ card_limit = G.GAME.starting_params.joker_slots, type = "joker", highlight_limit = 1 }
 	)
 	MP.ACTIONS.get_end_game_jokers()
-    MP.nemesis_deck = CardArea(-100, -100, G.CARD_W, G.CARD_H, {type = 'deck'})
-	if not MP.nemesis_deck_received then
-		MP.ACTIONS.get_nemesis_deck()
-	end
+	MP.nemesis_deck = CardArea(-100, -100, G.CARD_W, G.CARD_H, {type = 'deck'})
+	MP.ACTIONS.get_nemesis_deck()
 	G.SETTINGS.paused = false
 	local eased_green = copy_table(G.C.GREEN)
 	eased_green[4] = 0
@@ -1693,15 +1689,13 @@ function G.FUNCS.overlay_endgame_menu()
 		definition = MP.GAME.won and create_UIBox_win() or create_UIBox_game_over(),
 		config = {no_esc = true}
 	})
-	local Jimbo = nil
-
 	G.E_MANAGER:add_event(Event({
 		trigger = 'after',
 		delay = 2.5,
 		blocking = false,
 		func = (function()
 			if G.OVERLAY_MENU and G.OVERLAY_MENU:get_UIE_by_ID('jimbo_spot') then
-				Jimbo = Card_Character({x = 0, y = 5})
+				local Jimbo = Card_Character({x = 0, y = 5})
 				local spot = G.OVERLAY_MENU:get_UIE_by_ID('jimbo_spot')
 				spot.config.object:remove()
 				spot.config.object = Jimbo
@@ -1733,8 +1727,7 @@ function G.UIDEF.create_UIBox_view_nemesis_deck()
 						{
 							label = localize('k_nemesis_deck'),
 							chosen = true,
-							tab_definition_function = G.UIDEF.view_nemesis_deck,
-							tab_definition_function_args = false
+							tab_definition_function = G.UIDEF.view_nemesis_deck
 						},
 					},
 					tab_h = 8,

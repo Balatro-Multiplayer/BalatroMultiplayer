@@ -495,6 +495,7 @@ local function action_get_end_game_jokers()
 end
 
 local function action_get_nemesis_deck()
+	if MP.nemesis_deck_received then return end
 	local deck_str = ""
 	for _, card in ipairs(G.playing_cards) do
 		deck_str = deck_str .. ";" .. MP.UTILS.card_to_string(card)

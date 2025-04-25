@@ -387,13 +387,11 @@ function MP.UTILS.card_to_string(card)
 	end
 
 	local suit = string.sub(card.base.suit, 1, 1)
-	local rank = card.base.value
-	if rank == '10' then rank = 'T'
-	elseif rank == 'Jack' then rank = 'J'
-	elseif rank == 'Queen' then rank = 'Q'
-	elseif rank == 'King' then rank = 'K'
-	elseif rank == 'Ace' then rank = 'A'
-	end
+
+	local rank_value_map = {
+		['10'] = 'T', Jack = 'J', Queen = 'Q', King = 'K', Ace = 'A'
+	}
+	local rank = rank_value_map[card.base.value] or card.base.value
 
 	local enhancement = reversed_centers[card.config.center] or "none"
 	local edition = card.edition and  MP.UTILS.reverse_key_value_pairs(card.edition, true)["true"] or "none"
