@@ -149,280 +149,153 @@ function Game:main_menu(change_context)
 	return ret
 end
 
-function G.UIDEF.create_UIBox_create_lobby_button()
-	local var_495_0 = 0.75
+function G.UIDEF.ruleset_selection_options()
+	local default_ruleset_area = UIBox({
+		definition = G.UIDEF.ruleset_info("standard"),
+		config = {align = "cm"}
+	})
 
-	return (
-		create_UIBox_generic_options({
-			back_func = "play_options",
-			contents = {
-				{
-					n = G.UIT.R,
-					config = {
-						padding = 0,
-						align = "cm",
-					},
-					nodes = {
-						create_tabs({
-							snap_to_nav = true,
-							colour = G.C.BOOSTER,
-							tabs = {
-								{
-									label = localize("k_standard"),
-									chosen = true,
-									tab_definition_function = function()
-										return {
-											n = G.UIT.ROOT,
-											config = {
-												emboss = 0.05,
-												minh = 6,
-												r = 0.1,
-												minw = 10,
-												align = "tm",
-												padding = 0.2,
-												colour = G.C.BLACK,
-											},
-											nodes = {
-												{
-													n = G.UIT.R,
-													config = {
-														align = "tm",
-														padding = 0.05,
-														w = 8,
-														h = 2,
-													},
-													nodes = {
-														UIBox_button({
-															id = "start_standard",
-															label = {
-																localize("b_start_lobby"),
-															},
-															colour = G.C.RED,
-															button = "start_lobby",
-															minw = 5,
-														}),
-													},
-												},
-												{
-													n = G.UIT.R,
-													config = {
-														align = "tm",
-														padding = 0.05,
-														minw = 8,
-														minh = 4,
-													},
-													nodes = {
-														{
-															n = G.UIT.T,
-															config = {
-																text = MP.UTILS.wrapText(
-																	localize("k_standard_description"),
-																	50
-																),
-																shadow = true,
-																scale = var_495_0 * 0.6,
-																colour = G.C.UI.TEXT_LIGHT,
-															},
-														},
-													},
-												},
-											},
-										}
-									end,
-								},
-								{
-									label = localize("k_vanilla"),
-									tab_definition_function = function()
-										return {
-											n = G.UIT.ROOT,
-											config = {
-												emboss = 0.05,
-												minh = 6,
-												r = 0.1,
-												minw = 10,
-												align = "tm",
-												padding = 0.2,
-												colour = G.C.BLACK,
-											},
-											nodes = {
-												{
-													n = G.UIT.R,
-													config = {
-														align = "tm",
-														padding = 0.05,
-														w = 8,
-														h = 2,
-													},
-													nodes = {
-														UIBox_button({
-															id = "start_vanilla",
-															label = {
-																localize("b_start_lobby"),
-															},
-															colour = G.C.RED,
-															button = "start_lobby",
-															minw = 5,
-														}),
-													},
-												},
-												{
-													n = G.UIT.R,
-													config = {
-														align = "tm",
-														padding = 0.05,
-														minw = 8,
-														minh = 4,
-													},
-													nodes = {
-														{
-															n = G.UIT.T,
-															config = {
-																text = MP.UTILS.wrapText(
-																	localize("k_vanilla_description"),
-																	50
-																),
-																shadow = true,
-																scale = var_495_0 * 0.6,
-																colour = G.C.UI.TEXT_LIGHT,
-															},
-														},
-													},
-												},
-											},
-										}
-									end,
-								},
-								{
-									label = localize("k_weekly"),
-									tab_definition_function = function()
-										return {
-											n = G.UIT.ROOT,
-											config = {
-												emboss = 0.05,
-												minh = 6,
-												r = 0.1,
-												minw = 10,
-												align = "tm",
-												padding = 0.2,
-												colour = G.C.BLACK,
-											},
-											nodes = {
-												{
-													n = G.UIT.R,
-													config = {
-														align = "tm",
-														padding = 0.05,
-														w = 8,
-														h = 2,
-													},
-													nodes = {
-														UIBox_button({
-															id = "start_weekly",
-															label = {
-																localize("k_coming_soon"),
-															},
-															colour = G.C.RED,
-															--button = "start_lobby",
-															minw = 5,
-														}),
-													},
-												},
-												{
-													n = G.UIT.R,
-													config = {
-														align = "tm",
-														padding = 0.05,
-														minw = 8,
-														minh = 4,
-													},
-													nodes = {
-														{
-															n = G.UIT.T,
-															config = {
-																text = MP.UTILS.wrapText(
-																	localize("k_weekly_description"),
-																	50
-																),
-																shadow = true,
-																scale = var_495_0 * 0.6,
-																colour = G.C.UI.TEXT_LIGHT,
-															},
-														},
-													},
-												},
-											},
-										}
-									end,
-								},
-								{
-									label = localize("k_badlatro"),
-									tab_definition_function = function()
-										return {
-											n = G.UIT.ROOT,
-											config = {
-												emboss = 0.05,
-												minh = 6,
-												r = 0.1,
-												minw = 10,
-												align = "Tm",
-												padding = 0.2,
-												colour = G.C.BLACK,
-											},
-											nodes = {
-												{
-													n = G.UIT.R,
-													config = {
-														align = "tm",
-														padding = 0.05,
-														w = 8,
-														h = 2,
-													},
-													nodes = {
-														UIBox_button({
-															id = "start_badlatro",
-															label = {
-																localize("b_start_lobby"),
-															},
-															colour = G.C.RED,
-															button = "start_lobby",
-															minw = 5,
-														}),
-													},
-												},
-												{
-													n = G.UIT.R,
-													config = {
-														align = "tm",
-														padding = 0.05,
-														minw = 8,
-														minh = 4,
-													},
-													nodes = {
-														{
-															n = G.UIT.T,
-															config = {
-																text = MP.UTILS.wrapText(
-																	localize("k_badlatro_description"),
-																	50
-																),
-																shadow = true,
-																scale = var_495_0 * 0.6,
-																colour = G.C.UI.TEXT_LIGHT,
-															},
-														},
-													},
-												},
-											},
-										}
-									end,
-								},
-							},
-						}),
-					},
-				},
-			},
-		})
-	)
+	return create_UIBox_generic_options({back_func = "play_options", contents = {
+		{n=G.UIT.C, config={align = "tm", minh = 8, minw = 4}, nodes={
+			{n=G.UIT.R, config={align = "cm", padding = 0.05}, nodes={
+				UIBox_button({id = "standard_ruleset_button", col = true, chosen = "vert", label = {localize("k_standard")}, button = "change_ruleset_selection", colour = G.C.RED, minw = 4, scale = 0.4, minh = 0.6}),
+			}},
+			{n=G.UIT.R, config={align = "cm", padding = 0.05}, nodes={
+				UIBox_button({id = "vanilla_ruleset_button", col = true, label = {localize("k_vanilla")}, button = "change_ruleset_selection", colour = G.C.RED, minw = 4, scale = 0.4, minh = 0.6}),
+			}},
+			{n=G.UIT.R, config={align = "cm", padding = 0.05}, nodes={
+				UIBox_button({id = "badlatro_ruleset_button", col = true, label = {localize("k_badlatro")}, button = "change_ruleset_selection", colour = G.C.RED, minw = 4, scale = 0.4, minh = 0.6}),
+			}}
+		}},
+		{n=G.UIT.C, config={align = "cm", minh = 8, maxh = 8, minw = 10}, nodes={
+			{n=G.UIT.O, config={id = "ruleset_area", object = default_ruleset_area}}
+		}}
+	}})
+end
+
+function G.FUNCS.change_ruleset_selection(e)
+	if not G.OVERLAY_MENU then return end
+
+	local ruleset_area = G.OVERLAY_MENU:get_UIE_by_ID("ruleset_area")
+	if not ruleset_area then return end
+
+	-- Switch 'chosen' status from the previously-chosen button to this one:
+	if ruleset_area.config.prev_chosen then
+		ruleset_area.config.prev_chosen.config.chosen = nil
+	else -- The previously-chosen button should be the default one here:
+		local default_button = G.OVERLAY_MENU:get_UIE_by_ID("standard_ruleset_button")
+		if default_button then default_button.config.chosen = nil end
+	end
+	e.config.chosen = "vert" -- Special setting to show 'chosen' indicator on the side
+
+	if ruleset_area.config.object then ruleset_area.config.object:remove() end
+	ruleset_area.config.object = UIBox({
+		 definition = G.UIDEF.ruleset_info(string.match(e.config.id, "([^_]+)")),
+		 config = {align = "cm", parent = ruleset_area}
+	})
+
+	ruleset_area.config.prev_chosen = e
+end
+
+function G.UIDEF.ruleset_info(ruleset_name)
+	 local ruleset = MP.Rulesets["ruleset_mp_" .. ruleset_name]
+	 local ruleset_desc = localize("k_" .. ruleset_name .. "_description")
+
+	 local ruleset_banned_tabs = UIBox({
+		 definition = G.UIDEF.ruleset_banned_tabs(ruleset),
+		 config = {align = "cm"}
+	 })
+
+	 return {n=G.UIT.ROOT, config={align = "tm", minh = 8, maxh = 8, minw = 10, colour = G.C.CLEAR}, nodes={
+		 {n=G.UIT.C, config={align = "tm", padding = 0.2, r = 0.1, colour = G.C.BLACK}, nodes={
+			 {n=G.UIT.R, config={align = "tm", padding = 0.05, minw = 9, maxw = 9, minh = 0.67}, nodes={
+				 {n = G.UIT.T, config = {text = MP.UTILS.wrapText(ruleset_desc, 80), colour = G.C.UI.TEXT_LIGHT, scale = 0.8}}
+			 }},
+			 {n=G.UIT.R, config={align = "cm"}, nodes={
+				 {n=G.UIT.O, config={object = ruleset_banned_tabs}}
+			 }},
+			 {n=G.UIT.R, config={align = "cm"}, nodes={
+				 {n=G.UIT.R, config={id = "start"..ruleset_name, button = "start_lobby", align = "cm", padding = 0.05, r = 0.1, minw = 8, minh = 0.8, colour = G.C.BLUE, hover = true, shadow = true}, nodes={
+					 {n=G.UIT.T, config={text = "Create Lobby", scale = 0.5, colour = G.C.UI.TEXT_LIGHT}}
+				 }}
+			 }}
+		 }}
+	 }}
+end
+
+function G.UIDEF.ruleset_banned_tabs(ruleset)
+	local banned_cards_tabs = {}
+	for k, v in ipairs({{type = "Jokers", card_ids = ruleset.banned_jokers},
+											{type = "Consumables", card_ids = ruleset.banned_consumables},
+											{type = "Vouchers", card_ids = ruleset.banned_vouchers},
+											{type = "Enhancements", card_ids = ruleset.banned_enhancements}})
+	do
+		local tab_def = {label = v.type,
+										 chosen = (k == 1),
+										 tab_definition_function = G.UIDEF.ruleset_banned_cards,
+										 tab_definition_function_args = v}
+		table.insert(banned_cards_tabs, tab_def)
+	end
+
+	return {n=G.UIT.ROOT, config={align = "cm", colour = G.C.CLEAR}, nodes={
+		create_tabs({tab_h = 4.2, padding = 0, scale = 0.85, text_scale = 0.36, no_shoulders = true, no_loop = true,
+								 tabs = banned_cards_tabs})
+	}}
+end
+
+function G.UIDEF.ruleset_banned_cards(args)
+	local card_ids = args.card_ids
+
+	local function get_ruleset_cardarea(card_ids, width, height)
+		local ret = {}
+
+		if #card_ids > 0 then
+			local card_rows = {}
+			local n_rows = math.max(1, 1 + math.floor(#card_ids/10) - math.floor(math.log(6, #card_ids)))
+			local max_width = 1
+			for k, v in ipairs(card_ids) do
+				local _row = math.ceil(n_rows * (k/(#card_ids)))
+				card_rows[_row] = card_rows[_row] or {}
+				card_rows[_row][#card_rows[_row]+1] = v
+				if #card_rows[_row] > max_width then max_width = #card_rows[_row] end
+			end
+
+			local card_size = math.max(0.3, 0.8 - 0.01*(max_width*n_rows))
+
+			for _, card_row in ipairs(card_rows) do
+				local card_area = CardArea(
+					0, 0,
+					width, height/n_rows,
+					{card_limit = nil, type = 'title_2', view_deck = true, highlight_limit = 0, card_w = G.CARD_W*card_size}
+				)
+
+				for k, v in ipairs(card_row) do -- Each card_row consists of Card IDs
+					local card = Card(0,0, G.CARD_W*card_size, G.CARD_H*card_size, nil, G.P_CENTERS[v], {bypass_discovery_center = true,bypass_discovery_ui = true})
+					card_area:emplace(card)
+				end
+
+				table.insert(ret,
+										 {n=G.UIT.R, config={align = "cm"}, nodes={
+											 {n=G.UIT.O, config={object = card_area}}
+										 }})
+			end
+		end
+
+		return ret
+	end
+
+	local cards_grid = get_ruleset_cardarea(card_ids, 8, 4)
+
+	return {n=G.UIT.ROOT, config={align = "cm", colour = G.C.CLEAR}, nodes={
+		{n=G.UIT.C, config={align = "cm", colour = G.C.L_BLACK, padding = 0.05, r = 0.1, minw = 9, minh = 4.8, maxh = 4.8}, nodes={
+			{n=G.UIT.R, config={align = "cm"}, nodes=cards_grid},
+			{n=G.UIT.R, config={align = "cm", padding = 0.05}, nodes={
+				(#card_ids > 0)
+					and {n=G.UIT.T, config={text = "Banned "..args.type, colour = lighten(G.C.L_BLACK, 0.5), scale = 0.33}}
+					or {n=G.UIT.T, config={text = "No Banned "..args.type, colour = lighten(G.C.L_BLACK, 0.5), scale = 0.33}}
+			}}
+		}}
+	}}
 end
 
 function G.UIDEF.create_UIBox_join_lobby_button()
@@ -519,7 +392,7 @@ function G.FUNCS.create_lobby(e)
 	G.SETTINGS.paused = true
 
 	G.FUNCS.overlay_menu({
-		definition = G.UIDEF.create_UIBox_create_lobby_button(),
+		definition = G.UIDEF.ruleset_selection_options(),
 	})
 end
 
