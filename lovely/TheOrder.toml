@@ -76,11 +76,12 @@ position = "at"
 payload = '''G.deck:shuffle('cashout'..MP.ante_based())'''
 match_indent = true
 
-# Patch Wraith to use same queue as Rare Tag
+# Patch polled rate
+# This determines whether shop card is tarot/joker/planet/etc
 [[patches]]
 [patches.pattern]
-target = "card.lua"
-pattern = '''local card = create_card('Joker', G.jokers, nil, 0.99, nil, nil, nil, 'wra')'''
+target = "functions/UI_definitions.lua"
+pattern = '''local polled_rate = pseudorandom(pseudoseed('cdt'..G.GAME.round_resets.ante))*total_rate'''
 position = "at"
-payload = '''local card = create_card('Joker', G.jokers, nil, MP.INTEGRATIONS.TheOrder and 1 or 0.99, nil, nil, nil, 'wra')'''
+payload = '''local polled_rate = pseudorandom(pseudoseed('cdt'..MP.ante_based()))*total_rate'''
 match_indent = true

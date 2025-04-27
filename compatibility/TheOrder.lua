@@ -1,10 +1,13 @@
--- Credit to @MathIsFun_ for creating TheOrder, which this integration is a copy of
+-- Credit to @MathIsFun_ for creating TheOrder, which this integration is a modified copy of
 -- Patches card creation to not be ante-based and use a single pool for every type/rarity
 local cc = create_card
 function create_card(_type, area, legendary, _rarity, skip_materialize, soulable, forced_key, key_append)
     if MP.INTEGRATIONS.TheOrder then
         local a = G.GAME.round_resets.ante
         G.GAME.round_resets.ante = 0
+        if _type == "Tarot" or _type == "Planet" or _type == "Spectral" then
+            key_append = _type
+        end
         local c = cc(_type, area, legendary, _rarity, skip_materialize, soulable, forced_key, key_append)
         G.GAME.round_resets.ante = a
         return c
@@ -65,7 +68,7 @@ end
 -- This is irritating
 SMODS.Booster:take_ownership_by_kind('Standard', {
 	create_card = function(self, card, i)
-		local s_append = MP.get_booster_append(card)
+		local s_append = ''	-- MP.get_booster_append(card)
 		local b_append = MP.ante_based()..s_append
 		
 		local _edition = poll_edition('standard_edition'..b_append, 2, true)
@@ -73,12 +76,12 @@ SMODS.Booster:take_ownership_by_kind('Standard', {
 		
 		return {set = (pseudorandom(pseudoseed('stdset'..b_append)) > 0.6) and "Enhanced" or "Base", edition = _edition, seal = _seal, area = G.pack_cards, skip_materialize = true, soulable = true, key_append = "sta"..s_append}
 	end,
-})
+}, true)
 
 -- Rest of the packs since we're dealing with pack queues now
 SMODS.Booster:take_ownership_by_kind('Arcana', {
 	create_card = function(self, card, i)
-		local s_append = MP.get_booster_append(card)
+		local s_append = ''	-- MP.get_booster_append(card)
 		
 		local _card
 		if G.GAME.used_vouchers.v_omen_globe and pseudorandom('omen_globe') > 0.8 then
@@ -88,10 +91,10 @@ SMODS.Booster:take_ownership_by_kind('Arcana', {
 		end
 		return _card
 	end,
-})
+}, true)
 SMODS.Booster:take_ownership_by_kind('Celestial', {
 	create_card = function(self, card, i)
-		local s_append = MP.get_booster_append(card)
+		local s_append = ''	-- MP.get_booster_append(card)
 		
 		local _card
 		if G.GAME.used_vouchers.v_telescope and i == 1 then
@@ -115,19 +118,19 @@ SMODS.Booster:take_ownership_by_kind('Celestial', {
 		end
 		return _card
 	end,
-})
+}, true)
 SMODS.Booster:take_ownership_by_kind('Spectral', {
 	create_card = function(self, card, i)
-		local s_append = MP.get_booster_append(card)
+		local s_append = ''	-- MP.get_booster_append(card)
 		return {set = "Spectral", area = G.pack_cards, skip_materialize = true, soulable = true, key_append = "spe"..s_append}
 	end,
-})
+}, true)
 SMODS.Booster:take_ownership_by_kind('Buffoon', {
 	create_card = function(self, card, i)
 		local s_append = MP.get_booster_append(card)
 		return {set = "Joker", area = G.pack_cards, skip_materialize = true, soulable = true, key_append = "buf"..s_append}
 	end,
-})
+}, true)
 
 -- Patch seal queues
 local pollseal = SMODS.poll_seal
@@ -152,9 +155,10 @@ end
 
 -- Helper function to make code more readable - deal with packs
 -- Note that soul queue is based on type and not packs, so you probably won't miss out on soul if you avoid early mega arcanas or something
+-- ^^^ above statement is unnecessary for now since functionality is only active for buffoon packs ^^^
 function MP.get_booster_append(booster)
 	if MP.INTEGRATIONS.TheOrder then
-		if booster.ability.extra > 3.5 then	-- midpoint, i don't feel like string matching
+		if booster.ability.extra > 3.5 then	-- midpoint, i don't feel like string matching and this handles vanilla cases
 			if (booster.config.center.config.choose or 1) > 1.5 then
 				return 'mega'	-- if we want jumbos to have same queue as megas, change this or 'jumb' to be the same
 			else
