@@ -1080,7 +1080,11 @@ function create_UIBox_game_over()
 		G.CARD_H,
 		{ card_limit = G.GAME.starting_params.joker_slots, type = "joker", highlight_limit = 1 }
 	)
-	MP.ACTIONS.get_end_game_jokers()
+	if not MP.end_game_jokers_received then
+		MP.ACTIONS.get_end_game_jokers()
+	else
+		G.FUNCS.load_end_game_jokers()
+	end
 	MP.nemesis_deck = CardArea(-100, -100, G.CARD_W, G.CARD_H, {type = 'deck'})
 	if not MP.nemesis_deck_received then
 		MP.nemesis_cards = {}
@@ -1388,7 +1392,11 @@ function create_UIBox_win()
 		G.CARD_H,
 		{ card_limit = G.GAME.starting_params.joker_slots, type = "joker", highlight_limit = 1 }
 	)
-	MP.ACTIONS.get_end_game_jokers()
+	if not MP.end_game_jokers_received then
+		MP.ACTIONS.get_end_game_jokers()
+	else
+		G.FUNCS.load_end_game_jokers()
+	end
 	MP.nemesis_deck = CardArea(-100, -100, G.CARD_W, G.CARD_H, {type = 'deck'})
 	if not MP.nemesis_deck_received then
 		MP.nemesis_cards = {}

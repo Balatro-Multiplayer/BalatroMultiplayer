@@ -191,12 +191,14 @@ local function action_player_info(lives)
 end
 
 local function action_win_game()
+	MP.end_game_jokers_received = false
 	MP.nemesis_deck_received = false
 	win_game()
 	MP.GAME.won = true
 end
 
 local function action_lose_game()
+	MP.end_game_jokers_received = false
 	MP.nemesis_deck_received = false
 	G.STATE_COMPLETE = false
 	G.STATE = G.STATES.GAME_OVER
@@ -464,12 +466,12 @@ local function action_magnet_response(key)
 	G.jokers:emplace(card)
 end
 
-local function action_receive_end_game_jokers(keys)
+function G.FUNCS.load_end_game_jokers()
 	if not MP.end_game_jokers then
 		return
 	end
 	local split_keys = {}
-	for key in string.gmatch(keys, "([^;]+)") do
+	for key in string.gmatch(MP.end_game_jokers_keys, "([^;]+)") do
 		if key ~= "" and key ~= nil and key ~= "0" then
 			table.insert(split_keys, key)
 		end
@@ -483,7 +485,16 @@ local function action_receive_end_game_jokers(keys)
 	end
 end
 
+local function action_receive_end_game_jokers(keys)
+	MP.end_game_jokers_keys = keys
+	G.FUNCS.load_end_game_jokers()
+	MP.end_game_jokers_received = true
+end
+
 local function action_get_end_game_jokers()
+	if MP.end_game_jokers_received then
+		return
+	end
 	if not G.jokers or not G.jokers.cards then
 		Client.send("action:receiveEndGameJokers,keys:")
 		return
