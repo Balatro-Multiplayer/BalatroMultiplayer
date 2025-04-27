@@ -167,7 +167,7 @@ function G.UIDEF.ruleset_selection_options()
 				UIBox_button({id = "badlatro_ruleset_button", col = true, label = {localize("k_badlatro")}, button = "change_ruleset_selection", colour = G.C.RED, minw = 4, scale = 0.4, minh = 0.6}),
 			}}
 		}},
-		{n=G.UIT.C, config={align = "cm", minh = 8, maxh = 8, minw = 10}, nodes={
+		{n=G.UIT.C, config={align = "cm", minh = 8, maxh = 8, minw = 11}, nodes={
 			{n=G.UIT.O, config={id = "ruleset_area", object = default_ruleset_area}}
 		}}
 	}})
@@ -203,7 +203,7 @@ end
 function G.UIDEF.ruleset_info(ruleset_name)
 	local ruleset = MP.Rulesets["ruleset_mp_" .. ruleset_name]
 
-	local ruleset_desc = MP.UTILS.wrapText(localize("k_" .. ruleset_name .. "_description"), 80)
+	local ruleset_desc = MP.UTILS.wrapText(localize("k_" .. ruleset_name .. "_description"), 100)
 	local _, ruleset_desc_lines = ruleset_desc:gsub("\n", " ")
 
 	local ruleset_banned_tabs = UIBox({
@@ -211,9 +211,9 @@ function G.UIDEF.ruleset_info(ruleset_name)
 		config = {align = "cm"}
 	})
 
-	return {n=G.UIT.ROOT, config={align = "tm", minh = 8, maxh = 8, minw = 10, colour = G.C.CLEAR}, nodes={
+	return {n=G.UIT.ROOT, config={align = "tm", minh = 8, maxh = 8, minw = 11, colour = G.C.CLEAR}, nodes={
 		{n=G.UIT.C, config={align = "tm", padding = 0.2, r = 0.1, colour = G.C.BLACK}, nodes={
-			{n=G.UIT.R, config={align = "tm", padding = 0.05, minw = 9, maxw = 9, minh = math.max(2, ruleset_desc_lines) * 0.35}, nodes={
+			{n=G.UIT.R, config={align = "tm", padding = 0.05, minw = 11, maxw = 11, minh = math.max(2, ruleset_desc_lines) * 0.35}, nodes={
 				{n=G.UIT.T, config={text = ruleset_desc, colour = G.C.UI.TEXT_LIGHT, scale = 0.8}}
 			}},
 			{n=G.UIT.R, config={align = "cm"}, nodes={
@@ -282,20 +282,23 @@ end
 function G.UIDEF.ruleset_tabs_definition(ruleset, is_banned_tab, chosen_tab_idx)
 	local banned_cards_tabs = {}
 
-	local function copy_all_banned_cards(global_bans, ruleset_bans)
+	local function copy_all_banned_ids(global_bans, ruleset_bans)
 		local ret = {}
 		for v,_ in pairs(global_bans) do ret[#ret+1] = v end
-		for _,v in ipairs(ruleset_bans) do table.insert(ret, v) end
+		if ruleset_bans then
+			for _,v in ipairs(ruleset_bans) do table.insert(ret, v) end
+		end
 		return ret
 	end
 
-	for k, v in ipairs({{type = localize("b_jokers"), card_ids = is_banned_tab and copy_all_banned_cards(MP.DECK.BANNED_JOKERS, ruleset.banned_jokers) or ruleset.reworked_jokers},
-											{type = localize("b_stat_consumables"), card_ids = is_banned_tab and copy_all_banned_cards(MP.DECK.BANNED_CONSUMABLES, ruleset.banned_consumables) or ruleset.reworked_consumables},
-											{type = localize("b_vouchers"), card_ids = is_banned_tab and copy_all_banned_cards(MP.DECK.BANNED_VOUCHERS, ruleset.banned_vouchers) or ruleset.reworked_vouchers},
-											{type = localize("b_enhanced_cards"), card_ids = is_banned_tab and copy_all_banned_cards(MP.DECK.BANNED_ENHANCEMENTS, ruleset.banned_enhancements) or ruleset.reworked_enhancements}})
+	for k, v in ipairs({{type = localize("b_jokers"), obj_ids = is_banned_tab and copy_all_banned_ids(MP.DECK.BANNED_JOKERS, ruleset.banned_jokers) or ruleset.reworked_jokers},
+											{type = localize("b_stat_consumables"), obj_ids = is_banned_tab and copy_all_banned_ids(MP.DECK.BANNED_CONSUMABLES, ruleset.banned_consumables) or ruleset.reworked_consumables},
+											{type = localize("b_vouchers"), obj_ids = is_banned_tab and copy_all_banned_ids(MP.DECK.BANNED_VOUCHERS, ruleset.banned_vouchers) or ruleset.reworked_vouchers},
+											{type = localize("b_enhanced_cards"), obj_ids = is_banned_tab and copy_all_banned_ids(MP.DECK.BANNED_ENHANCEMENTS, ruleset.banned_enhancements) or ruleset.reworked_enhancements},
+											{type = localize("k_other"), obj_ids = is_banned_tab and {tags = copy_all_banned_ids(MP.DECK.BANNED_TAGS, ruleset.banned_tags), blinds = copy_all_banned_ids(MP.DECK.BANNED_BLINDS, ruleset.banned_blinds)} or {tags = ruleset.reworked_tags or {}, blinds = ruleset.reworked_blinds or {}}}})
 	do
 		v.idx = k
-		v.is_banned_cards = is_banned_tab
+		v.is_banned_tab = is_banned_tab
 		local tab_def = {label = v.type,
 										 chosen = (k == chosen_tab_idx),
 										 tab_definition_function = G.UIDEF.ruleset_cardarea_definition,
@@ -304,21 +307,21 @@ function G.UIDEF.ruleset_tabs_definition(ruleset, is_banned_tab, chosen_tab_idx)
 	end
 
 	return {n=G.UIT.ROOT, config={align = "cm", colour = G.C.CLEAR}, nodes={
-		create_tabs({tab_h = 4.2, padding = 0, scale = 0.85, text_scale = 0.36, no_shoulders = true, no_loop = true,
+		create_tabs({tab_h = 4.2, padding = 0, scale = 0.8, text_scale = 0.36, no_shoulders = true, no_loop = true,
 								 tabs = banned_cards_tabs})
 	}}
 end
 
 function G.UIDEF.ruleset_cardarea_definition(args)
-	local function get_ruleset_cardarea(card_ids, width, height)
+	local function get_ruleset_cardarea(obj_ids, width, height)
 		local ret = {}
 
-		if #card_ids > 0 then
+		if #obj_ids > 0 then
 			local card_rows = {}
-			local n_rows = math.max(1, 1 + math.floor(#card_ids/10) - math.floor(math.log(6, #card_ids)))
+			local n_rows = math.max(1, 1 + math.floor(#obj_ids/10) - math.floor(math.log(6, #obj_ids)))
 			local max_width = 1
-			for k, v in ipairs(card_ids) do
-				local _row = math.ceil(n_rows * (k/(#card_ids)))
+			for k, v in ipairs(obj_ids) do
+				local _row = math.ceil(n_rows * (k/(#obj_ids)))
 				card_rows[_row] = card_rows[_row] or {}
 				card_rows[_row][#card_rows[_row]+1] = v
 				if #card_rows[_row] > max_width then max_width = #card_rows[_row] end
@@ -348,18 +351,93 @@ function G.UIDEF.ruleset_cardarea_definition(args)
 		return ret
 	end
 
-	local cards_grid = get_ruleset_cardarea(args.card_ids, 8, 4)
+	local function get_ruleset_obj_grid(obj_ids, obj_ref_table, objs_per_row, obj_constructor, wrap_as_object)
+		local objs = {}
+		for _,v in ipairs(obj_ids) do objs[#objs+1] = obj_ref_table[v] end
+		-- table.sort(objs, function (a, b) return a.order < b.order end)
 
-	return {n=G.UIT.ROOT, config={id = "ruleset_active_tab", tab_idx = args.idx, align = "cm", colour = G.C.CLEAR}, nodes={
-		{n=G.UIT.C, config={align = "cm", padding = 0.05, r = 0.1, minw = 9, minh = 4.8, maxh = 4.8}, nodes={
-			{n=G.UIT.R, config={align = "cm"}, nodes=cards_grid},
-			{n=G.UIT.R, config={align = "cm", padding = 0.05}, nodes={
-				(#args.card_ids > 0)
-					and {n=G.UIT.T, config={text = localize({type = "variable", key = args.is_banned_cards and "k_banned_cards" or "k_reworked_cards", vars = {args.type}}), colour = lighten(G.C.L_BLACK, 0.5), scale = 0.33}}
-					or {n=G.UIT.T, config={text = localize({type = "variable", key = args.is_banned_cards and "k_no_banned_cards" or "k_no_reworked_cards", vars = {args.type}}), colour = lighten(G.C.L_BLACK, 0.5), scale = 0.33}}
+		local obj_grid = {}
+		local obj_rows = {}
+		for k,v in ipairs(objs) do
+			local obj = obj_constructor(v)
+
+			local row_idx = math.ceil(k/objs_per_row)
+			if not obj_rows[row_idx] then obj_rows[row_idx] = {} end
+			table.insert(obj_rows[row_idx], {n=G.UIT.C, config={align = "cm", padding = 0.1}, nodes={
+				wrap_as_object
+					and {n=G.UIT.O, config={object = obj}}
+					or obj
+			}})
+		end
+		for _,v in ipairs(obj_rows) do
+			table.insert(obj_grid, {n=G.UIT.R, config={align = "cm"}, nodes=v})
+		end
+
+		return obj_grid
+	end
+
+	local function get_localised_label(objs, obj_type)
+		return (#objs > 0)
+			and {n=G.UIT.T, config={text = localize({type = "variable", key = args.is_banned_tab and "k_banned_objs" or "k_reworked_objs", vars = {obj_type}}), colour = lighten(G.C.L_BLACK, 0.5), scale = 0.33}}
+			or {n=G.UIT.T, config={text = localize({type = "variable", key = args.is_banned_tab and "k_no_banned_objs" or "k_no_reworked_objs", vars = {obj_type}}), colour = lighten(G.C.L_BLACK, 0.5), scale = 0.33}}
+	end
+
+	if args.type == localize("k_other") then
+		local function tag_constructor(tag_spec)
+			return Tag(tag_spec.key):generate_UI(1 - 0.1*(math.sqrt(#args.obj_ids.tags)))
+		end
+
+		local function blind_constructor(blind_spec)
+			local temp_blind = AnimatedSprite(0,0,1.1,1.1, G.ANIMATION_ATLAS['blind_chips'], blind_spec.pos)
+			temp_blind:define_draw_steps({
+				{shader = 'dissolve', shadow_height = 0.05},
+				{shader = 'dissolve'}
+			})
+			temp_blind.float = true
+			temp_blind.states.hover.can = true
+			temp_blind.states.drag.can = false
+			temp_blind.states.collide.can = true
+			temp_blind.config = {blind = blind_spec, force_focus = true}
+			temp_blind.hover = function()
+				if not G.CONTROLLER.dragging.target or G.CONTROLLER.using_touch then
+						if not temp_blind.hovering and temp_blind.states.visible then
+							temp_blind.hovering = true
+							temp_blind.hover_tilt = 3
+							temp_blind:juice_up(0.05, 0.02)
+							temp_blind.config.h_popup = create_UIBox_blind_popup(blind_spec, true)
+							temp_blind.config.h_popup_config ={align = 'cl', offset = {x=-0.1,y=0},parent = temp_blind}
+							Node.hover(temp_blind)
+						end
+				end
+			end
+			temp_blind.stop_hover = function() temp_blind.hovering = false; Node.stop_hover(temp_blind); temp_blind.hover_tilt = 0 end
+
+			return temp_blind
+		end
+
+		local tag_grid = get_ruleset_obj_grid(args.obj_ids.tags, G.P_TAGS, 4, tag_constructor)
+		local blind_grid = get_ruleset_obj_grid(args.obj_ids.blinds, G.P_BLINDS, 3, blind_constructor, true)
+
+		return {n=G.UIT.ROOT, config={id = "ruleset_active_tab", tab_idx = args.idx, align = "cm", colour = G.C.CLEAR}, nodes={
+			{n=G.UIT.C, config={align = "cm", padding = 0.05, r = 0.1, minw = 5.4, minh = 4.8, maxh = 4.8}, nodes={
+				{n=G.UIT.R, config={align = "cm", minh = 4}, nodes=tag_grid},
+				{n=G.UIT.R, config={align = "cm", padding = 0.05}, nodes={get_localised_label(args.obj_ids.tags, localize("b_tags"))}}
+			}},
+			{n=G.UIT.C, config={align = "cm", padding = 0.05, r = 0.1, minw = 5.4, minh = 4.8, maxh = 4.8}, nodes={
+				{n=G.UIT.R, config={align = "cm", minh = 4}, nodes=blind_grid},
+				{n=G.UIT.R, config={align = "cm", padding = 0.05}, nodes={get_localised_label(args.obj_ids.blinds, localize("b_blinds"))}}
 			}}
 		}}
-	}}
+	else
+		local cards_grid = get_ruleset_cardarea(args.obj_ids, 10, 4)
+
+		return {n=G.UIT.ROOT, config={id = "ruleset_active_tab", tab_idx = args.idx, align = "cm", colour = G.C.CLEAR}, nodes={
+			{n=G.UIT.C, config={align = "cm", padding = 0.05, r = 0.1, minw = 10.8, minh = 4.8, maxh = 4.8}, nodes={
+				{n=G.UIT.R, config={align = "cm"}, nodes=cards_grid},
+				{n=G.UIT.R, config={align = "cm", padding = 0.05}, nodes={get_localised_label(args.obj_ids, args.type)}}
+			}}
+		}}
+	end
 end
 
 function G.UIDEF.create_UIBox_join_lobby_button()

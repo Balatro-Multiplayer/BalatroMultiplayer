@@ -10,6 +10,7 @@ MP.Ruleset({
 	banned_vouchers = {},
 	banned_enhancements = {},
 	banned_tags = {},
+	banned_blinds ={},
 
 	reworked_jokers = {
 		"j_mp_hanging_chad",
@@ -24,12 +25,17 @@ MP.Ruleset({
 		"j_mp_speedrun",
 		"j_mp_taxes",
 	},
-	reworked_consumables = {},
+	reworked_consumables = {
+		"c_mp_asteroid"
+	},
 	reworked_vouchers = {},
 	reworked_enhancements = {
 		"m_glass"
 	},
 	reworked_tags = {},
+	reworked_blinds = {
+		"bl_mp_nemesis"
+	},
 }):inject()
 
 SMODS.Joker({
