@@ -198,37 +198,39 @@ function G.FUNCS.change_ruleset_selection(e)
 end
 
 function G.UIDEF.ruleset_info(ruleset_name)
-	 local ruleset = MP.Rulesets["ruleset_mp_" .. ruleset_name]
-	 local ruleset_desc = localize("k_" .. ruleset_name .. "_description")
+	local ruleset = MP.Rulesets["ruleset_mp_" .. ruleset_name]
 
-	 local ruleset_banned_tabs = UIBox({
-		 definition = G.UIDEF.ruleset_banned_tabs(ruleset),
-		 config = {align = "cm"}
-	 })
+	local ruleset_desc = MP.UTILS.wrapText(localize("k_" .. ruleset_name .. "_description"), 80)
+	local _, ruleset_desc_lines = ruleset_desc:gsub("\n", " ")
 
-	 return {n=G.UIT.ROOT, config={align = "tm", minh = 8, maxh = 8, minw = 10, colour = G.C.CLEAR}, nodes={
-		 {n=G.UIT.C, config={align = "tm", padding = 0.2, r = 0.1, colour = G.C.BLACK}, nodes={
-			 {n=G.UIT.R, config={align = "tm", padding = 0.05, minw = 9, maxw = 9, minh = 0.67}, nodes={
-				 {n = G.UIT.T, config = {text = MP.UTILS.wrapText(ruleset_desc, 80), colour = G.C.UI.TEXT_LIGHT, scale = 0.8}}
-			 }},
-			 {n=G.UIT.R, config={align = "cm"}, nodes={
-				 {n=G.UIT.O, config={object = ruleset_banned_tabs}}
-			 }},
-			 {n=G.UIT.R, config={align = "cm"}, nodes={
-				 {n=G.UIT.R, config={id = "start"..ruleset_name, button = "start_lobby", align = "cm", padding = 0.05, r = 0.1, minw = 8, minh = 0.8, colour = G.C.BLUE, hover = true, shadow = true}, nodes={
-					 {n=G.UIT.T, config={text = "Create Lobby", scale = 0.5, colour = G.C.UI.TEXT_LIGHT}}
-				 }}
-			 }}
-		 }}
-	 }}
+	local ruleset_banned_tabs = UIBox({
+		definition = G.UIDEF.ruleset_banned_tabs(ruleset),
+		config = {align = "cm"}
+	})
+
+	return {n=G.UIT.ROOT, config={align = "tm", minh = 8, maxh = 8, minw = 10, colour = G.C.CLEAR}, nodes={
+		{n=G.UIT.C, config={align = "tm", padding = 0.2, r = 0.1, colour = G.C.BLACK}, nodes={
+			{n=G.UIT.R, config={align = "tm", padding = 0.05, minw = 9, maxw = 9, minh = math.max(2, ruleset_desc_lines) * 0.35}, nodes={
+				{n=G.UIT.T, config={text = ruleset_desc, colour = G.C.UI.TEXT_LIGHT, scale = 0.8}}
+			}},
+			{n=G.UIT.R, config={align = "cm"}, nodes={
+				{n=G.UIT.O, config={object = ruleset_banned_tabs}}
+			}},
+			{n=G.UIT.R, config={align = "cm"}, nodes={
+				{n=G.UIT.R, config={id = "start"..ruleset_name, button = "start_lobby", align = "cm", padding = 0.05, r = 0.1, minw = 8, minh = 0.8, colour = G.C.BLUE, hover = true, shadow = true}, nodes={
+					{n=G.UIT.T, config={text = localize("b_create_lobby"), scale = 0.5, colour = G.C.UI.TEXT_LIGHT}}
+				}}
+			}}
+		}}
+	}}
 end
 
 function G.UIDEF.ruleset_banned_tabs(ruleset)
 	local banned_cards_tabs = {}
-	for k, v in ipairs({{type = "Jokers", card_ids = ruleset.banned_jokers},
-											{type = "Consumables", card_ids = ruleset.banned_consumables},
-											{type = "Vouchers", card_ids = ruleset.banned_vouchers},
-											{type = "Enhancements", card_ids = ruleset.banned_enhancements}})
+	for k, v in ipairs({{type = localize("b_jokers"), card_ids = ruleset.banned_jokers},
+											{type = localize("b_stat_consumables"), card_ids = ruleset.banned_consumables},
+											{type = localize("b_vouchers"), card_ids = ruleset.banned_vouchers},
+											{type = localize("b_enhanced_cards"), card_ids = ruleset.banned_enhancements}})
 	do
 		local tab_def = {label = v.type,
 										 chosen = (k == 1),
@@ -244,8 +246,6 @@ function G.UIDEF.ruleset_banned_tabs(ruleset)
 end
 
 function G.UIDEF.ruleset_banned_cards(args)
-	local card_ids = args.card_ids
-
 	local function get_ruleset_cardarea(card_ids, width, height)
 		local ret = {}
 
@@ -284,15 +284,15 @@ function G.UIDEF.ruleset_banned_cards(args)
 		return ret
 	end
 
-	local cards_grid = get_ruleset_cardarea(card_ids, 8, 4)
+	local cards_grid = get_ruleset_cardarea(args.card_ids, 8, 4)
 
 	return {n=G.UIT.ROOT, config={align = "cm", colour = G.C.CLEAR}, nodes={
 		{n=G.UIT.C, config={align = "cm", colour = G.C.L_BLACK, padding = 0.05, r = 0.1, minw = 9, minh = 4.8, maxh = 4.8}, nodes={
 			{n=G.UIT.R, config={align = "cm"}, nodes=cards_grid},
 			{n=G.UIT.R, config={align = "cm", padding = 0.05}, nodes={
-				(#card_ids > 0)
-					and {n=G.UIT.T, config={text = "Banned "..args.type, colour = lighten(G.C.L_BLACK, 0.5), scale = 0.33}}
-					or {n=G.UIT.T, config={text = "No Banned "..args.type, colour = lighten(G.C.L_BLACK, 0.5), scale = 0.33}}
+				(#args.card_ids > 0)
+					and {n=G.UIT.T, config={text = localize({type = "variable", key = "k_banned_cards", vars = {args.type}}), colour = lighten(G.C.L_BLACK, 0.5), scale = 0.33}}
+					or {n=G.UIT.T, config={text = localize({type = "variable", key = "k_no_banned_cards", vars = {args.type}}), colour = lighten(G.C.L_BLACK, 0.5), scale = 0.33}}
 			}}
 		}}
 	}}

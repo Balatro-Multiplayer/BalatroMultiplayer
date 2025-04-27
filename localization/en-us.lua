@@ -280,6 +280,8 @@ return {
 			a_mp_skips_ahead = { "#1# Skips Ahead" },
 			a_mp_skips_behind = { "#1# Skips Behind" },
 			a_mp_skips_tied = { "Tied" },
+			k_banned_cards = "Banned #1#",
+			k_no_banned_cards = "No Banned #1#",
 		},
 		v_text = {
 			ch_c_hanging_chad_rework = { "{C:attention}Hanging Chad{} is {C:dark_edition}reworked" },
