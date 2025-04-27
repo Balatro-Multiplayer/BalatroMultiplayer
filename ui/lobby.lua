@@ -799,8 +799,8 @@ function G.UIDEF.create_UIBox_lobby_options()
 																"150s",
 																"180s"
 														 },
-														 current_option = (MP.LOBBY.config.timer_max_seconds)/30,
-														 opt_callback = "change_timer_max_seconds"
+														 current_option = (MP.LOBBY.config.timer_base_seconds)/30,
+														 opt_callback = "change_timer_base_seconds"
 													})
 												},
 											},
@@ -944,8 +944,8 @@ G.FUNCS.change_starting_pvp_round = function(args)
 	send_lobby_options()
 end
 
-G.FUNCS.change_timer_max_seconds = function(args)
-	 MP.LOBBY.config.timer_max_seconds = tonumber(args.to_val:sub(1, -2))
+G.FUNCS.change_timer_base_seconds = function(args)
+	 MP.LOBBY.config.timer_base_seconds = tonumber(args.to_val:sub(1, -2))
 	 send_lobby_options()
 end
 

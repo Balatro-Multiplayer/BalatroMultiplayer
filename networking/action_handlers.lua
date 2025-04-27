@@ -86,7 +86,7 @@ end
 local function action_start_blind()
 	MP.GAME.ready_blind = false
 	MP.GAME.timer_started = false
-	MP.GAME.timer = MP.LOBBY.config.timer_max_seconds
+	MP.GAME.timer = MP.LOBBY.config.timer_base_seconds
 	if MP.GAME.next_blind_context then
 		G.FUNCS.select_blind(MP.GAME.next_blind_context)
 	else
@@ -171,7 +171,7 @@ end
 
 local function action_end_pvp()
 	MP.GAME.end_pvp = true
-	MP.GAME.timer = MP.LOBBY.config.timer_max_seconds
+	MP.GAME.timer = MP.LOBBY.config.timer_base_seconds
 	MP.GAME.timer_started = false
 end
 
@@ -219,7 +219,7 @@ local function action_lobby_options(options)
 		if k == "pvp_start_round" then
 			parsed_v = tonumber(v)
 		end
-		if k == "timer_max_seconds" then
+		if k == "timer_base_seconds" then
 			parsed_v = tonumber(v)
 		end
 		MP.LOBBY.config[k] = parsed_v
