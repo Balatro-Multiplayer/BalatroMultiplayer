@@ -59,4 +59,10 @@ MP.Ruleset({
 		"tag_top_up",
 		"tag_handy",
 	},
+
+	reworked_jokers = {},
+	reworked_consumables = {},
+	reworked_vouchers = {},
+	reworked_enhancements = {},
+	reworked_tags = {},
 }):inject()

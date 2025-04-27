@@ -195,6 +195,9 @@ function G.FUNCS.change_ruleset_selection(e)
 	})
 
 	ruleset_area.config.prev_chosen = e
+
+	MP.LOBBY.config.ruleset = nil
+	MP.LOBBY.ruleset_preview = false
 end
 
 function G.UIDEF.ruleset_info(ruleset_name)
@@ -204,7 +207,7 @@ function G.UIDEF.ruleset_info(ruleset_name)
 	local _, ruleset_desc_lines = ruleset_desc:gsub("\n", " ")
 
 	local ruleset_banned_tabs = UIBox({
-		definition = G.UIDEF.ruleset_banned_tabs(ruleset),
+		definition = G.UIDEF.ruleset_tabs(ruleset),
 		config = {align = "cm"}
 	})
 
@@ -225,16 +228,77 @@ function G.UIDEF.ruleset_info(ruleset_name)
 	}}
 end
 
-function G.UIDEF.ruleset_banned_tabs(ruleset)
+function G.UIDEF.ruleset_tabs(ruleset)
+	local default_tabs = UIBox({
+		definition = G.UIDEF.ruleset_tabs_definition(ruleset, true, 1),
+		config = {align = "cm", is_bans_tabs = true, chosen_tab = 1}
+	})
+
+	return {n=G.UIT.ROOT, config={align = "cm", colour = G.C.L_BLACK, r = 0.1}, nodes={
+		{n=G.UIT.C, config={align = "cm"}, nodes={
+			{n=G.UIT.R, config={align = "tm", colour = G.C.GREY, r = 0.1}, nodes={
+				{n=G.UIT.O, config={object = default_tabs}}
+			}},
+			{n=G.UIT.R, config={align = "bm", padding = 0.05}, nodes={
+				create_option_cycle({
+					options = {"Bans", "Additions/Reworks"},
+					current_option = 1,
+					opt_callback = "ruleset_switch_tabs",
+					opt_args = {ui = default_tabs, ruleset = ruleset},
+					w = 5, colour = G.C.RED, cycle_shoulders = false})
+			}}
+		}}
+	}}
+end
+
+function G.FUNCS.ruleset_switch_tabs(args)
+	if not args or not args.cycle_config then return end
+	local callback_args = args.cycle_config.opt_args
+
+	local tabs_object = callback_args.ui
+	local tabs_wrap = tabs_object.parent
+
+	local active_tab_idx = tabs_wrap.UIBox:get_UIE_by_ID("ruleset_active_tab").config.tab_idx
+
+	tabs_object.config.is_bans_tabs = not tabs_object.config.is_bans_tabs
+
+	if tabs_object.config.is_bans_tabs then
+		MP.LOBBY.config.ruleset = nil
+		MP.LOBBY.ruleset_preview = false
+	else
+		MP.LOBBY.config.ruleset = callback_args.ruleset.key
+		MP.LOBBY.ruleset_preview = true
+	end
+
+	tabs_wrap.config.object:remove()
+	tabs_wrap.config.object = UIBox({
+		definition = tabs_object.config.is_bans_tabs and G.UIDEF.ruleset_tabs_definition(callback_args.ruleset, true, active_tab_idx) or G.UIDEF.ruleset_tabs_definition(callback_args.ruleset, false, active_tab_idx),
+		config = {align = "cm", parent = tabs_wrap}
+	})
+
+	tabs_wrap.UIBox:recalculate()
+end
+
+function G.UIDEF.ruleset_tabs_definition(ruleset, is_banned_tab, chosen_tab_idx)
 	local banned_cards_tabs = {}
-	for k, v in ipairs({{type = localize("b_jokers"), card_ids = ruleset.banned_jokers},
-											{type = localize("b_stat_consumables"), card_ids = ruleset.banned_consumables},
-											{type = localize("b_vouchers"), card_ids = ruleset.banned_vouchers},
-											{type = localize("b_enhanced_cards"), card_ids = ruleset.banned_enhancements}})
+
+	local function copy_all_banned_cards(global_bans, ruleset_bans)
+		local ret = {}
+		for v,_ in pairs(global_bans) do ret[#ret+1] = v end
+		for _,v in ipairs(ruleset_bans) do table.insert(ret, v) end
+		return ret
+	end
+
+	for k, v in ipairs({{type = localize("b_jokers"), card_ids = is_banned_tab and copy_all_banned_cards(MP.DECK.BANNED_JOKERS, ruleset.banned_jokers) or ruleset.reworked_jokers},
+											{type = localize("b_stat_consumables"), card_ids = is_banned_tab and copy_all_banned_cards(MP.DECK.BANNED_CONSUMABLES, ruleset.banned_consumables) or ruleset.reworked_consumables},
+											{type = localize("b_vouchers"), card_ids = is_banned_tab and copy_all_banned_cards(MP.DECK.BANNED_VOUCHERS, ruleset.banned_vouchers) or ruleset.reworked_vouchers},
+											{type = localize("b_enhanced_cards"), card_ids = is_banned_tab and copy_all_banned_cards(MP.DECK.BANNED_ENHANCEMENTS, ruleset.banned_enhancements) or ruleset.reworked_enhancements}})
 	do
+		v.idx = k
+		v.is_banned_cards = is_banned_tab
 		local tab_def = {label = v.type,
-										 chosen = (k == 1),
-										 tab_definition_function = G.UIDEF.ruleset_banned_cards,
+										 chosen = (k == chosen_tab_idx),
+										 tab_definition_function = G.UIDEF.ruleset_cardarea_definition,
 										 tab_definition_function_args = v}
 		table.insert(banned_cards_tabs, tab_def)
 	end
@@ -245,7 +309,7 @@ function G.UIDEF.ruleset_banned_tabs(ruleset)
 	}}
 end
 
-function G.UIDEF.ruleset_banned_cards(args)
+function G.UIDEF.ruleset_cardarea_definition(args)
 	local function get_ruleset_cardarea(card_ids, width, height)
 		local ret = {}
 
@@ -286,13 +350,13 @@ function G.UIDEF.ruleset_banned_cards(args)
 
 	local cards_grid = get_ruleset_cardarea(args.card_ids, 8, 4)
 
-	return {n=G.UIT.ROOT, config={align = "cm", colour = G.C.CLEAR}, nodes={
-		{n=G.UIT.C, config={align = "cm", colour = G.C.L_BLACK, padding = 0.05, r = 0.1, minw = 9, minh = 4.8, maxh = 4.8}, nodes={
+	return {n=G.UIT.ROOT, config={id = "ruleset_active_tab", tab_idx = args.idx, align = "cm", colour = G.C.CLEAR}, nodes={
+		{n=G.UIT.C, config={align = "cm", padding = 0.05, r = 0.1, minw = 9, minh = 4.8, maxh = 4.8}, nodes={
 			{n=G.UIT.R, config={align = "cm"}, nodes=cards_grid},
 			{n=G.UIT.R, config={align = "cm", padding = 0.05}, nodes={
 				(#args.card_ids > 0)
-					and {n=G.UIT.T, config={text = localize({type = "variable", key = "k_banned_cards", vars = {args.type}}), colour = lighten(G.C.L_BLACK, 0.5), scale = 0.33}}
-					or {n=G.UIT.T, config={text = localize({type = "variable", key = "k_no_banned_cards", vars = {args.type}}), colour = lighten(G.C.L_BLACK, 0.5), scale = 0.33}}
+					and {n=G.UIT.T, config={text = localize({type = "variable", key = args.is_banned_cards and "k_banned_cards" or "k_reworked_cards", vars = {args.type}}), colour = lighten(G.C.L_BLACK, 0.5), scale = 0.33}}
+					or {n=G.UIT.T, config={text = localize({type = "variable", key = args.is_banned_cards and "k_no_banned_cards" or "k_no_reworked_cards", vars = {args.type}}), colour = lighten(G.C.L_BLACK, 0.5), scale = 0.33}}
 			}}
 		}}
 	}}
