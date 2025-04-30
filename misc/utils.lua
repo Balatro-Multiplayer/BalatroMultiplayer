@@ -351,6 +351,29 @@ function Card:sell_card()
 	return sell_card_ref(self)
 end
 
+local reroll_shop_ref = G.FUNCS.reroll_shop
+function G.FUNCS.reroll_shop(e)
+	sendTraceMessage(
+		string.format("Client sent message: action:rerollShop,cost:%s", G.GAME.current_round.reroll_cost),
+		"MULTIPLAYER"
+	)
+	return reroll_shop_ref(e)
+end
+
+ 
+local buy_from_shop_ref = G.FUNCS.buy_from_shop
+function G.FUNCS.buy_from_shop(e)
+	print(dump(e.config))
+	local c1 = e.config.ref_table
+    if c1 and c1:is(Card) then
+		sendTraceMessage(
+			string.format("Client sent message: action:boughtCardFromShop,card:%s,cost:%s", c1.ability.name, c1.cost),
+			"MULTIPLAYER"
+		)
+	end
+	return buy_from_shop_ref(e)
+end
+
 local use_card_ref = G.FUNCS.use_card
 function G.FUNCS.use_card(e, mute, nosave)
 	if e.config and e.config.ref_table and e.config.ref_table.ability and e.config.ref_table.ability.name then
