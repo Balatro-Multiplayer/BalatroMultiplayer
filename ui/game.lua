@@ -927,10 +927,6 @@ function Game:update_new_round(dt)
 end
 
 function MP.end_round()
-	if MP.GAME.antes_keyed[MP.GAME.ante_key] then
-		-- Prevent MP.end_round() from triggering multiple times at the end of a pvp round
-		return
-	end
 	G.GAME.blind.in_blind = false
 	local game_over = false
 	local game_won = false
