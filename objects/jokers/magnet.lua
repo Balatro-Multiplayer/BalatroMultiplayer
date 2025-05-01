@@ -23,8 +23,18 @@ SMODS.Joker({
 	in_pool = function(self)
 		return MP.LOBBY.code and MP.LOBBY.config.multiplayer_jokers
 	end,
+	add_to_deck = function(self, card, from_debuffed)
+		if not from_debuffed and (not card.edition or card.edition.type ~= "mp_phantom") then
+			MP.ACTIONS.send_phantom("j_mp_magnet")
+		end
+	end,
+	remove_from_deck = function(self, card, from_debuff)
+		if not from_debuff and (not card.edition or card.edition.type ~= "mp_phantom") then
+			MP.ACTIONS.remove_phantom("j_mp_magnet")
+		end
+	end,
 	calculate = function(self, card, context)
-		if context.end_of_round and not context.other_card and not context.blueprint and not context.debuffed then
+		if context.end_of_round and not context.other_card and not context.blueprint and not context.debuffed and (not card.edition or card.edition.type ~= "mp_phantom") then
 			card.ability.extra.current_rounds = card.ability.extra.current_rounds + 1
 			if card.ability.extra.current_rounds == card.ability.extra.rounds then
 				local eval = function(card)
