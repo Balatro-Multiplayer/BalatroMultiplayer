@@ -60,3 +60,13 @@ payload = '''if old_center ~= center then
   end'''
 match_indent = true
 times = 1
+
+# Fixes the issue with baseball card working on phantom jokers
+[[patches]]
+[patches.pattern]
+target = "card.lua"
+pattern = '''if self.ability.name == 'Baseball Card' and (context.other_joker.config.center.rarity == 2 or context.other_joker.config.center.rarity == "Uncommon") and self ~= context.other_joker then'''
+position = 'after'
+payload = '''if context.other_joker.edition and context.other_joker.edition.type == 'mp_phantom' then return end'''
+match_indent = true
+times = 1
