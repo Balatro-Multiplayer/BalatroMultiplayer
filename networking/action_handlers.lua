@@ -191,11 +191,15 @@ local function action_player_info(lives)
 end
 
 local function action_win_game()
+	MP.end_game_jokers_received = false
+	MP.nemesis_deck_received = false
 	win_game()
 	MP.GAME.won = true
 end
 
 local function action_lose_game()
+	MP.end_game_jokers_received = false
+	MP.nemesis_deck_received = false
 	G.STATE_COMPLETE = false
 	G.STATE = G.STATES.GAME_OVER
 end
@@ -462,12 +466,12 @@ local function action_magnet_response(key)
 	G.jokers:emplace(card)
 end
 
-local function action_receive_end_game_jokers(keys)
+function G.FUNCS.load_end_game_jokers()
 	if not MP.end_game_jokers then
 		return
 	end
 	local split_keys = {}
-	for key in string.gmatch(keys, "([^;]+)") do
+	for key in string.gmatch(MP.end_game_jokers_keys, "([^;]+)") do
 		if key ~= "" and key ~= nil and key ~= "0" then
 			table.insert(split_keys, key)
 		end
@@ -481,7 +485,16 @@ local function action_receive_end_game_jokers(keys)
 	end
 end
 
+local function action_receive_end_game_jokers(keys)
+	MP.end_game_jokers_keys = keys
+	G.FUNCS.load_end_game_jokers()
+	MP.end_game_jokers_received = true
+end
+
 local function action_get_end_game_jokers()
+	if MP.end_game_jokers_received then
+		return
+	end
 	if not G.jokers or not G.jokers.cards then
 		Client.send("action:receiveEndGameJokers,keys:")
 		return
@@ -492,6 +505,67 @@ local function action_get_end_game_jokers()
 		keys = keys .. card.config.center.key .. ";"
 	end
 	Client.send(string.format("action:receiveEndGameJokers,keys:%s", keys))
+end
+
+local function action_get_nemesis_deck()
+	if MP.nemesis_deck_received then
+		return
+	end
+	local deck_str = ""
+	for _, card in ipairs(G.playing_cards) do
+		deck_str = deck_str .. ";" .. MP.UTILS.card_to_string(card)
+	end
+	Client.send(string.format("action:receiveNemesisDeck,cards:%s", deck_str))
+end
+
+local function action_receive_nemesis_deck(deck_str)
+	if MP.nemesis_deck_received then
+		return
+	end
+
+	local card_strings = MP.UTILS.string_split(deck_str, ";")
+
+	for _, card_str in pairs(card_strings) do
+		if card_str == "" then
+			goto continue
+		end
+
+		local card_params = MP.UTILS.string_split(card_str, "-")
+
+		local _suit = card_params[1]
+		local _rank = card_params[2]
+		local enhancement = card_params[3]
+		local edition = card_params[4]
+		local seal = card_params[5]
+
+		local front_key = _suit .. "_" .. _rank
+		local card = create_playing_card(
+			{
+				front = G.P_CARDS[front_key],
+				center = (enhancement == "none" and nil or G.P_CENTERS[enhancement])
+			},
+			MP.nemesis_deck, true, true, nil, false
+		)
+
+		if edition and edition ~= "none" then
+			local edition_object = {}
+			edition_object[edition] = true
+
+			card:set_edition(edition_object, true, true)
+		end
+
+		if seal ~= "none" then
+			card:set_seal(seal, true, true)
+		end
+
+		-- remove the card from G.playing_cards and insert into MP.nemesis_cards
+		table.remove(G.playing_cards, #G.playing_cards)
+		table.insert(MP.nemesis_cards, card)
+
+		::continue::
+	end
+
+	MP.nemesis_deck_received = true
 end
 
 local function action_start_ante_timer(time)
@@ -638,6 +712,10 @@ function MP.ACTIONS.get_end_game_jokers()
 	Client.send("action:getEndGameJokers")
 end
 
+function MP.ACTIONS.get_nemesis_deck()
+	Client.send("action:getNemesisDeck")
+end
+
 function MP.ACTIONS.start_ante_timer()
 	Client.send("action:startAnteTimer,time:" .. tostring(MP.GAME.timer))
 	action_start_ante_timer(MP.GAME.timer)
@@ -765,6 +843,10 @@ function Game:update(dt)
 				action_get_end_game_jokers()
 			elseif parsedAction.action == "receiveEndGameJokers" then
 				action_receive_end_game_jokers(parsedAction.keys)
+			elseif parsedAction.action == "getNemesisDeck" then
+				action_get_nemesis_deck()
+			elseif parsedAction.action == "receiveNemesisDeck" then
+				action_receive_nemesis_deck(parsedAction.cards)
 			elseif parsedAction.action == "startAnteTimer" then
 				action_start_ante_timer(parsedAction.time)
 			elseif parsedAction.action == "error" then
