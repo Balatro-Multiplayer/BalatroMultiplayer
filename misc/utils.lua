@@ -363,7 +363,6 @@ end
  
 local buy_from_shop_ref = G.FUNCS.buy_from_shop
 function G.FUNCS.buy_from_shop(e)
-	print(dump(e.config))
 	local c1 = e.config.ref_table
     if c1 and c1:is(Card) then
 		sendTraceMessage(
