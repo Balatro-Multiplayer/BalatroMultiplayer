@@ -12,6 +12,7 @@ MP.LOBBY = {
 		different_seeds = false,
 		starting_lives = 4,
 		pvp_start_round = 2,
+		timer_base_seconds = 120,
 		showdown_starting_antes = 3,
 		ruleset = "ruleset_mp_standard",
 		custom_seed = "random",
@@ -112,7 +113,7 @@ function MP.reset_game_states()
 		spent_total = 0,
 		spent_before_shop = 0,
 		highest_score = MP.INSANE_INT.empty(),
-		timer = 120,
+		timer = MP.LOBBY.config.timer_base_seconds,
 		timer_started = false,
 	}
 end
