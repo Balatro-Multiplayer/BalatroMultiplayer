@@ -24,9 +24,7 @@ SMODS.Joker({
 		return MP.LOBBY.code and MP.LOBBY.config.multiplayer_jokers
 	end,
 	calc_dollar_bonus = function(self, card)
-		return {
-			dollars = math.floor(MP.GAME.enemy.spent_last_shop / card.ability.extra.nemesis_dollars),
-		}
+		return math.floor(MP.GAME.enemy.spent_last_shop / card.ability.extra.nemesis_dollars)
 	end,
 	mp_credits = {
 		idea = { "Nxkoozie" },
