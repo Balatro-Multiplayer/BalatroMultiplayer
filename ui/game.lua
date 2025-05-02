@@ -870,11 +870,11 @@ function Game:update_hand_played(dt)
 						offset = { x = 0, y = -1.5 },
 						major = G.play,
 					})
-					if G.hand.cards[1] then
+					if G.hand.cards[1] and G.STATE == G.STATES.HAND_PLAYED then
 						eval_hand_and_jokers()
 						G.FUNCS.draw_from_hand_to_discard()
 					end
-				elseif not MP.GAME.end_pvp then
+				elseif not MP.GAME.end_pvp and G.STATE == G.STATES.HAND_PLAYED then
 					G.STATE_COMPLETE = false
 					G.STATE = G.STATES.DRAW_TO_HAND
 				end
