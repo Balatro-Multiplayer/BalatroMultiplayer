@@ -101,7 +101,9 @@ match_indent = true
 target = "functions/common_events.lua"
 pattern = '''if (area == G.shop_jokers) or (area == G.pack_cards) then'''
 position = "before"
-payload = '''print(center.key)
+payload = '''
+local _etpeareakey = MP.INTEGRATIONS.TheOrder and 'etperpoll' or (area == G.pack_cards and 'packetper' or 'etperpoll')
+local _rentareakey = MP.INTEGRATIONS.TheOrder and 'ssjr' or (area == G.pack_cards and 'packssjr' or 'ssjr')
 local _order = MP.INTEGRATIONS.TheOrder and center.key or ""
 '''
 match_indent = true
@@ -111,7 +113,7 @@ match_indent = true
 target = "functions/common_events.lua"
 pattern = '''local eternal_perishable_poll = pseudorandom((area == G.pack_cards and 'packetper' or 'etperpoll')..G.GAME.round_resets.ante)'''
 position = "at"
-payload = '''local eternal_perishable_poll = pseudorandom(_order..(area == G.pack_cards and 'packetper' or 'etperpoll')..G.GAME.round_resets.ante)'''
+payload = '''local eternal_perishable_poll = pseudorandom(_order.._etpeareakey..G.GAME.round_resets.ante)'''
 match_indent = true
 
 [[patches]]
@@ -119,7 +121,7 @@ match_indent = true
 target = "functions/common_events.lua"
 pattern = '''if G.GAME.modifiers.enable_rentals_in_shop and pseudorandom((area == G.pack_cards and 'packssjr' or 'ssjr')..G.GAME.round_resets.ante) > 0.7 and not SMODS.Stickers["rental"].should_apply then'''
 position = "at"
-payload = '''if G.GAME.modifiers.enable_rentals_in_shop and pseudorandom(_order..(area == G.pack_cards and 'packssjr' or 'ssjr')..G.GAME.round_resets.ante) > 0.7 and not SMODS.Stickers["rental"].should_apply then'''
+payload = '''if G.GAME.modifiers.enable_rentals_in_shop and pseudorandom(_order.._rentareakey..G.GAME.round_resets.ante) > 0.7 and not SMODS.Stickers["rental"].should_apply then'''
 match_indent = true
 
 [[patches]]
