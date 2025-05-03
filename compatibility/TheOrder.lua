@@ -8,7 +8,7 @@ function create_card(_type, area, legendary, _rarity, skip_materialize, soulable
         if _type == "Tarot" or _type == "Planet" or _type == "Spectral" then
             key_append = _type
         end
-        local c = cc(_type, area, legendary, _rarity, skip_materialize, soulable, forced_key, key_append)
+        local c = cc(_type, area, legendary, _rarity, skip_materialize, soulable, forced_key, _rarity)	-- _rarity replacing key_append can be entirely removed to normalise skip tags and riff raff with shop rarity queues
         G.GAME.round_resets.ante = a
         return c
     end
@@ -157,6 +157,8 @@ end
 -- Note that soul queue is based on type and not packs, so you probably won't miss out on soul if you avoid early mega arcanas or something
 -- ^^^ above statement is unnecessary for now since functionality is only active for buffoon packs ^^^
 function MP.get_booster_append(booster)
+	return '' -- disabling, most of the code is useless now but whatever
+	
 	if MP.INTEGRATIONS.TheOrder then
 		if booster.ability.extra > 3.5 then	-- midpoint, i don't feel like string matching and this handles vanilla cases
 			if (booster.config.center.config.choose or 1) > 1.5 then
