@@ -131,3 +131,27 @@ pattern = '''local edition = poll_edition('edi'..(key_append or '')..G.GAME.roun
 position = "at"
 payload = '''local edition = poll_edition(_order..'edi'..(key_append or '')..G.GAME.round_resets.ante)'''
 match_indent = true
+
+# Make soul/black hole queue not dependent on type (omen globe)
+# Avoid black hole overwriting soul
+[[patches]]
+[patches.pattern]
+target = "functions/common_events.lua"
+pattern = '''if pseudorandom('soul_'.._type..G.GAME.round_resets.ante) > 0.997 then
+	forced_key = 'c_soul''''
+position = "at"
+payload = '''if pseudorandom('soul_'..(MP.INTEGRATIONS.TheOrder and 'c_soul' or _type)..G.GAME.round_resets.ante) > 0.997 then
+	forced_key = 'c_soul''''
+match_indent = true
+
+[[patches]]
+[patches.pattern]
+target = "functions/common_events.lua"
+pattern = '''if pseudorandom('soul_'.._type..G.GAME.round_resets.ante) > 0.997 then
+	forced_key = 'c_black_hole''''
+position = "at"
+payload = '''if pseudorandom('soul_'..(MP.INTEGRATIONS.TheOrder and 'c_black_hole' or _type)..G.GAME.round_resets.ante) > 0.997 then
+	if not (MP.INTEGRATIONS.TheOrder and forced_key) then
+		forced_key = 'c_black_hole'
+	end'''
+match_indent = true
