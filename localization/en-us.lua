@@ -64,7 +64,7 @@ return {
 			j_mp_taxes = {
 				name = "Taxes",
 				text = {
-					"When your {X:purple,C:white}Nemesis'{} sells",
+					"When your {X:purple,C:white}Nemesis{} sells",
 					"a card gain {C:mult}+#1#{} Mult",
 					"{C:inactive}(Currently {C:mult}+#2#{C:inactive} Mult)",
 				},
