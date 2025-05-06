@@ -11,7 +11,7 @@ Detailed installation instructions are available on our website:
 
 Quick installation steps:
 
-1. Download the latest release from the [Releases page](https://github.com/Balatro-Multiplayer/balatro-multiplayer/releases)
+1. Download the latest release from the [Releases page](https://github.com/Balatro-Multiplayer/BalatroMultiplayer/releases)
 2. Extract the files to your Balatro game directory
 3. Run the game with the mod enabled
 4. Follow the in-game instructions to connect with friends
@@ -50,7 +50,6 @@ Contributions that make content changes like modifying how the base game works, 
 
 Here are some features we're planning to implement in future releases that aren't being worked on yet:
 - **Nemesis Deck View**: Implement a button on the game over and game won screens to view the Nemesis' deck
-- **Rulesets Selection Rework**: Change the rulesets screen to be more like the challenges screen, in order to be clear about what the rulesets affect
 - **In Pool Rework**: Update the pooling function and related multiplayer code to independently handle ruleset and gamemode bans (to prevent our card and ruleset logic from interfering with each other)
 - **Return of Gamemodes**: Re-implement gamemodes and have a secondary selection screen after the rulesets to select a gamemode. Here is a list of gamemodes:
   - Attrition: This is how the Multiplayer mod works right now, ever boss blind is a Nemesis blind

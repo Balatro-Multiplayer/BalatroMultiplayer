@@ -59,4 +59,16 @@ MP.Ruleset({
 		"tag_top_up",
 		"tag_handy",
 	},
+	banned_blinds ={},
+
+	reworked_jokers = {},
+	reworked_consumables = {
+		"c_mp_asteroid"
+	},
+	reworked_vouchers = {},
+	reworked_enhancements = {},
+	reworked_tags = {},
+	reworked_blinds = {
+		"bl_mp_nemesis"
+	},
 }):inject()

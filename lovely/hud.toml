@@ -26,7 +26,7 @@ MP.LOBBY.code and {n=G.UIT.R, config={id = 'lobby_info_button', align = "cm", mi
     {n=G.UIT.R, config={align = "cm", padding = 0, maxw = 1.4}, nodes={
         {n=G.UIT.T, config={text = localize("ml_lobby_info")[2], scale = 1*scale, colour = G.C.UI.TEXT_LIGHT, shadow = true, focus_args = {button = G.F_GUIDE and 'guide' or 'back', orientation = 'bm'}, func = 'set_button_pip'}}
     }}
-}} or nil,'''
+}} or nil'''
 match_indent = true
 times = 1
 

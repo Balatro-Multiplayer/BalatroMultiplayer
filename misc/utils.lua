@@ -16,7 +16,7 @@ function MP.UTILS.serialize_table(val, name, skipnewlines, depth)
 
 		for k, v in pairs(val) do
 			tmp = tmp
-				.. Utils.serialize_table(v, k, skipnewlines, depth + 1)
+				.. MP.UTILS.serialize_table(v, k, skipnewlines, depth + 1)
 				.. ","
 				.. (not skipnewlines and "\n" or "")
 		end
@@ -300,6 +300,17 @@ function SMODS.create_mod_badges(obj, badges)
 	end
 end
 
+function MP.UTILS.reverse_key_value_pairs(tbl, stringify_keys)
+	local reversed_tbl = {}
+	for k, v in pairs(tbl) do
+		if stringify_keys then
+			v = tostring(v)
+		end
+		reversed_tbl[v] = k
+	end
+	return reversed_tbl
+end
+
 function add_nemesis_info(info_queue)
 	if MP.LOBBY.code then
 		info_queue[#info_queue + 1] = {
@@ -351,6 +362,28 @@ function Card:sell_card()
 	return sell_card_ref(self)
 end
 
+local reroll_shop_ref = G.FUNCS.reroll_shop
+function G.FUNCS.reroll_shop(e)
+	sendTraceMessage(
+		string.format("Client sent message: action:rerollShop,cost:%s", G.GAME.current_round.reroll_cost),
+		"MULTIPLAYER"
+	)
+	return reroll_shop_ref(e)
+end
+
+ 
+local buy_from_shop_ref = G.FUNCS.buy_from_shop
+function G.FUNCS.buy_from_shop(e)
+	local c1 = e.config.ref_table
+    if c1 and c1:is(Card) then
+		sendTraceMessage(
+			string.format("Client sent message: action:boughtCardFromShop,card:%s,cost:%s", c1.ability.name, c1.cost),
+			"MULTIPLAYER"
+		)
+	end
+	return buy_from_shop_ref(e)
+end
+
 local use_card_ref = G.FUNCS.use_card
 function G.FUNCS.use_card(e, mute, nosave)
 	if e.config and e.config.ref_table and e.config.ref_table.ability and e.config.ref_table.ability.name then
@@ -361,6 +394,36 @@ function G.FUNCS.use_card(e, mute, nosave)
 	end
 	return use_card_ref(e, mute, nosave)
 end
+
+
+-- Pre-compile a reversed list of all the centers
+local reversed_centers = nil
+
+function MP.UTILS.card_to_string(card)
+	if not card or not card.base or not card.base.suit or not card.base.value then
+		return ""
+	end
+
+	if not reversed_centers then
+		reversed_centers = MP.UTILS.reverse_key_value_pairs(G.P_CENTERS)
+	end
+
+	local suit = string.sub(card.base.suit, 1, 1)
+
+	local rank_value_map = {
+		['10'] = 'T', Jack = 'J', Queen = 'Q', King = 'K', Ace = 'A'
+	}
+	local rank = rank_value_map[card.base.value] or card.base.value
+
+	local enhancement = reversed_centers[card.config.center] or "none"
+	local edition = card.edition and  MP.UTILS.reverse_key_value_pairs(card.edition, true)["true"] or "none"
+	local seal = card.seal or "none"
+
+	local card_str = suit .. "-" .. rank .. "-" .. enhancement .. "-" .. edition .. "-" .. seal
+
+	return card_str
+end
+
 
 function MP.UTILS.random_message()
 	local messages = {
