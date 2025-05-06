@@ -12,7 +12,7 @@ SMODS.Joker({
 	cost = 4,
 	unlocked = true,
 	discovered = true,
-	blueprint_compat = true,
+	blueprint_compat = false,
 	eternal_compat = true,
 	perishable_compat = true,
 	config = { extra = { dollars = 1, nemesis_dollars = 3 } },
@@ -23,12 +23,8 @@ SMODS.Joker({
 	in_pool = function(self)
 		return MP.LOBBY.code and MP.LOBBY.config.multiplayer_jokers
 	end,
-	calculate = function(self, card, context)
-		if context.cardarea == G.jokers and context.starting_shop then
-			return {
-				dollars = math.floor(MP.GAME.enemy.spent_last_shop / card.ability.extra.nemesis_dollars),
-			}
-		end
+	calc_dollar_bonus = function(self, card)
+		return math.floor(MP.GAME.enemy.spent_last_shop / card.ability.extra.nemesis_dollars)
 	end,
 	mp_credits = {
 		idea = { "Nxkoozie" },
