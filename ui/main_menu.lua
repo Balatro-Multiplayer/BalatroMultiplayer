@@ -31,7 +31,8 @@ function wheel_of_fortune_the_card(card)
 	math.randomseed(os.time())
 	local chance = math.random(4)
 	if chance == 1 then
-		local edition = poll_edition("main_menu", nil, false, true)
+		local editions = {{name = 'e_foil', weight = 50}, {name = 'e_holo', weight = 35}, {name = 'e_polychrome', weight = 15}}
+		local edition = poll_edition("main_menu"..os.time(), nil, true, true, editions)
 		card:set_edition(edition, true)
 		card:juice_up(0.3, 0.5)
 	else

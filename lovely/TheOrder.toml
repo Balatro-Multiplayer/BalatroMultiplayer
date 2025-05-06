@@ -76,11 +76,82 @@ position = "at"
 payload = '''G.deck:shuffle('cashout'..MP.ante_based())'''
 match_indent = true
 
-# Patch Wraith to use same queue as Rare Tag
+# Patch polled rate
+# This determines whether shop card is tarot/joker/planet/etc
 [[patches]]
 [patches.pattern]
-target = "card.lua"
-pattern = '''local card = create_card('Joker', G.jokers, nil, 0.99, nil, nil, nil, 'wra')'''
+target = "functions/UI_definitions.lua"
+pattern = '''local polled_rate = pseudorandom(pseudoseed('cdt'..G.GAME.round_resets.ante))*total_rate'''
 position = "at"
-payload = '''local card = create_card('Joker', G.jokers, nil, MP.INTEGRATIONS.TheOrder and 1 or 0.99, nil, nil, nil, 'wra')'''
+payload = '''local polled_rate = pseudorandom(pseudoseed('cdt'..MP.ante_based()))*total_rate'''
+match_indent = true
+
+# Resample advances rarity queue
+[[patches]]
+[patches.pattern]
+target = "functions/common_events.lua"
+pattern = '''center = pseudorandom_element(_pool, pseudoseed(_pool_key..'_resample'..it))'''
+position = "at"
+payload = '''center = pseudorandom_element(_pool, pseudoseed(_pool_key..(MP.INTEGRATIONS.TheOrder and '' or ('_resample'..it)) ))'''
+match_indent = true
+
+# Patch joker editions/stickers to be dependent on individual jokers rather than queue
+[[patches]]
+[patches.pattern]
+target = "functions/common_events.lua"
+pattern = '''if (area == G.shop_jokers) or (area == G.pack_cards) then'''
+position = "before"
+payload = '''
+local _etpeareakey = MP.INTEGRATIONS.TheOrder and 'etperpoll' or (area == G.pack_cards and 'packetper' or 'etperpoll')
+local _rentareakey = MP.INTEGRATIONS.TheOrder and 'ssjr' or (area == G.pack_cards and 'packssjr' or 'ssjr')
+local _order = MP.INTEGRATIONS.TheOrder and center.key or ""
+'''
+match_indent = true
+
+[[patches]]
+[patches.pattern]
+target = "functions/common_events.lua"
+pattern = '''local eternal_perishable_poll = pseudorandom((area == G.pack_cards and 'packetper' or 'etperpoll')..G.GAME.round_resets.ante)'''
+position = "at"
+payload = '''local eternal_perishable_poll = pseudorandom(_order.._etpeareakey..G.GAME.round_resets.ante)'''
+match_indent = true
+
+[[patches]]
+[patches.pattern]
+target = "functions/common_events.lua"
+pattern = '''if G.GAME.modifiers.enable_rentals_in_shop and pseudorandom((area == G.pack_cards and 'packssjr' or 'ssjr')..G.GAME.round_resets.ante) > 0.7 and not SMODS.Stickers["rental"].should_apply then'''
+position = "at"
+payload = '''if G.GAME.modifiers.enable_rentals_in_shop and pseudorandom(_order.._rentareakey..G.GAME.round_resets.ante) > 0.7 and not SMODS.Stickers["rental"].should_apply then'''
+match_indent = true
+
+[[patches]]
+[patches.pattern]
+target = "functions/common_events.lua"
+pattern = '''local edition = poll_edition('edi'..(key_append or '')..G.GAME.round_resets.ante)'''
+position = "at"
+payload = '''local edition = poll_edition(_order..'edi'..(key_append or '')..G.GAME.round_resets.ante)'''
+match_indent = true
+
+# Make soul/black hole queue not dependent on type (omen globe)
+# Avoid black hole overwriting soul
+[[patches]]
+[patches.pattern]
+target = "functions/common_events.lua"
+pattern = '''if pseudorandom('soul_'.._type..G.GAME.round_resets.ante) > 0.997 then
+	forced_key = 'c_soul''''
+position = "at"
+payload = '''if pseudorandom('soul_'..(MP.INTEGRATIONS.TheOrder and 'c_soul' or _type)..G.GAME.round_resets.ante) > 0.997 then
+	forced_key = 'c_soul''''
+match_indent = true
+
+[[patches]]
+[patches.pattern]
+target = "functions/common_events.lua"
+pattern = '''if pseudorandom('soul_'.._type..G.GAME.round_resets.ante) > 0.997 then
+	forced_key = 'c_black_hole''''
+position = "at"
+payload = '''if pseudorandom('soul_'..(MP.INTEGRATIONS.TheOrder and 'c_black_hole' or _type)..G.GAME.round_resets.ante) > 0.997 then
+	if not (MP.INTEGRATIONS.TheOrder and forced_key) then
+		forced_key = 'c_black_hole'
+	end'''
 match_indent = true
