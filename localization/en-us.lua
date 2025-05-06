@@ -237,7 +237,7 @@ return {
 			k_connect_player = "Connected Players:",
 			k_opts_only_host = "Only the Lobby Host can change these options",
 			k_opts_gm = "Gamemode Modifiers",
-			k_opts_pvp_start_round = "PVP Starts at Round",
+			k_opts_pvp_start_round = "PVP Starts at Ante",
 			k_opts_pvp_timer = "Timer",
 			k_bl_life = "Life",
 			k_bl_or = "or",
