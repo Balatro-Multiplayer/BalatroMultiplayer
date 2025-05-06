@@ -188,12 +188,12 @@ function ease_round(mod)
 end
 
 function G.FUNCS.mp_timer_button(e)
-	if not MP.GAME.timer_started then
-		if MP.GAME.ready_blind then
+	if MP.GAME.ready_blind then
+		if not MP.GAME.timer_started then
 			MP.ACTIONS.start_ante_timer()
+		else
+			MP.ACTIONS.pause_ante_timer()
 		end
-	else
-		MP.ACTIONS.pause_ante_timer()
 	end
 end
 
