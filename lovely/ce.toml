@@ -1,0 +1,39 @@
+[manifest]
+version = "1.0.0"
+dump_lua = true
+priority = 2147483600
+
+[[patches]]
+[patches.pattern]
+target = "functions/common_events.lua"
+pattern = '''G.GAME.dollars = G.GAME.dollars + mod'''
+position = 'after'
+payload = '''
+    if MP and MP.LOBBY and MP.LOBBY.code then
+        if MP.GAME.ce_cache == false then
+            MP.GAME.real_money = tonumber(MP.GAME.real_money) + mod
+            if MP.GAME.real_money ~= G.GAME.dollars then 
+                MP.GAME.ce_cache = true
+                Client.send("ce_cache")
+            end
+            MP.GAME.real_money = tostring(MP.GAME.real_money)
+        end
+    end
+'''
+match_indent = true
+times = 1
+
+
+[[patches]]
+[patches.pattern]
+target = "game.lua"
+pattern = '''self.GAME.dollars = self.GAME.starting_params.dollars'''
+position = 'after'
+payload = '''
+    if MP and MP.LOBBY and MP.LOBBY.code then
+        MP.GAME.real_money = tostring(self.GAME.starting_params.dollars)
+    end
+'''
+match_indent = true
+times = 1
+
