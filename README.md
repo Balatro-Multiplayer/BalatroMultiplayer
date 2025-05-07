@@ -9,12 +9,13 @@ A multiplayer mod for Balatro, allowing players to compete with each other.
 Detailed installation instructions are available on our website:
 [https://balatromp.com/docs/getting-started/installation](https://balatromp.com/docs/getting-started/installation)
 
+*Requires [Steamodded](https://github.com/Steamodded/smods) (>=1.0.0~BETA-0323b) and [Lovely Injector](https://github.com/ethangreen-dev/lovely-injector) (>=0.7)
+
 Quick installation steps:
 
 1. Download the latest release from the [Releases page](https://github.com/Balatro-Multiplayer/BalatroMultiplayer/releases)
-2. Extract the files to your Balatro game directory
-3. Run the game with the mod enabled
-4. Follow the in-game instructions to connect with friends
+2. Extract the files into a new folder in your Balatro mods directory
+3. Run the game
 
 ## 🎲 Usage
 
