@@ -49,7 +49,6 @@ Contributions that make content changes like modifying how the base game works, 
 ### Looking to contribute but don't have a feature in mind?
 
 Here are some features we're planning to implement in future releases that aren't being worked on yet:
-- **Nemesis Deck View**: Implement a button on the game over and game won screens to view the Nemesis' deck
 - **In Pool Rework**: Update the pooling function and related multiplayer code to independently handle ruleset and gamemode bans (to prevent our card and ruleset logic from interfering with each other)
 - **Return of Gamemodes**: Re-implement gamemodes and have a secondary selection screen after the rulesets to select a gamemode. Here is a list of gamemodes:
   - Attrition: This is how the Multiplayer mod works right now, ever boss blind is a Nemesis blind
