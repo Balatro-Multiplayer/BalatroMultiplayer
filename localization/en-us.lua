@@ -56,9 +56,9 @@ return {
 			j_mp_penny_pincher = {
 				name = "Penny Pincher",
 				text = {
-					"Gain {C:money}$#1#{} for every {C:money}$#2#{}",
+					"At end of round, gain"
+					"{C:money}$#1#{} for every {C:money}$#2#{}",
 					"your {X:purple,C:white}Nemesis{} spent last shop",
-					"at end of round",
 				},
 			},
 			j_mp_taxes = {
