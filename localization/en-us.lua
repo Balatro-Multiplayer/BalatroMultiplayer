@@ -58,7 +58,7 @@ return {
 				text = {
 					"Gain {C:money}$#1#{} for every {C:money}$#2#{}",
 					"your {X:purple,C:white}Nemesis{} spent last shop",
-					"at the end of the round",
+					"at end of round",
 				},
 			},
 			j_mp_taxes = {
