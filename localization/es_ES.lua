@@ -58,7 +58,7 @@ return {
             j_mp_penny_pincher = {
                 name = "Tacaño",
                 text = {
-                    "Al inicio de la tienda,",
+                    "Al final de la ronda,",
                     "gana {C:money}$#1#{} por cada {C:money}$#2#{} que",
                     "gastó tu {X:purple,C:white}Némesis{} en la última tienda",
                 },
@@ -192,6 +192,7 @@ return {
 			b_opts_lives = "Vidas",
 			b_opts_multiplayer_jokers = "Habilitar cartas multijugador",
 			b_opts_player_diff_deck = "Los jugadores tienen diferentes barajas",
+            b_opts_normal_bosses = "Habilitar efectos de Ciegas Jefe",
 			b_reset = "Reiniciar",
 			b_set_custom_seed = "Establecer código personalizado",
 			b_mp_kofi_button = "Apoyarme en Ko-fi",
@@ -202,6 +203,7 @@ return {
 			b_players = "Jugadores",
             b_continue_singleplayer = "Continuar en modo Un Jugador",
 			b_the_order_integration = "Habilitar integración The Order",
+            b_view_nemesis_deck = "Ver mazo del enemigo",
         	k_enemy_score = "Puntuación actual del enemigo",
 			k_enemy_hands = "Manos restantes del enemigo: ",
 			k_coming_soon = "¡Próximamente!",
@@ -237,6 +239,7 @@ return {
 			k_connect_player = "Jugadores conectados:",
 			k_opts_only_host = "Solo el anfitrión puede cambiar estas opciones",
 			k_opts_gm = "Modificadores de juego",
+            k_opts_pvp_timer = "Temporizador",
             k_opts_pvp_start_round = "JcJ Empieza en la ronda",
 			k_bl_life = "Vida",
 			k_bl_or = "o",
@@ -258,6 +261,7 @@ return {
             k_timer = "Temporizador",
 			k_mods_list = "Lista de Mods",
 			k_enemy_jokers = "Comodines del enemigo",
+            k_nemesis_deck = "Mazo del enemigo",
             k_the_order_credit = "*Crédito a @MathIsFun_",
             k_the_order_integration_desc = "Esto parcheará la aparición de cartas para que no sea basada en las apuestas iniciales y use un solo grupo para cada tipo/rareza",
 			k_requires_restart = "*Requiere reiniciar para que tome efecto",
@@ -281,6 +285,12 @@ return {
 			a_mp_skips_ahead = { "#1# Ciegas por delante" },
 			a_mp_skips_behind = { "#1# Ciegas por detrás" },
 			a_mp_skips_tied = { "Empatado" },
+            --
+            k_banned_objs = "#1# Prohi",
+			k_no_banned_objs = "No hay #1# prohibidos",
+			k_reworked_objs = "#1# añadidos/modificados",
+			k_no_reworked_objs = "No hay #1# añadidos/modificaciones ",
+            -- 
 		},
 		v_text = {
 			ch_c_hanging_chad_rework = { "El {C:attention}Papel perforado{} está {C:dark_edition}modificado" },
