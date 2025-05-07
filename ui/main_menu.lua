@@ -221,7 +221,7 @@ function G.UIDEF.ruleset_info(ruleset_name)
 				{n=G.UIT.O, config={object = ruleset_banned_tabs}}
 			}},
 			{n=G.UIT.R, config={align = "cm"}, nodes={
-				{n=G.UIT.R, config={id = "start"..ruleset_name, button = "start_lobby", align = "cm", padding = 0.05, r = 0.1, minw = 8, minh = 0.8, colour = G.C.BLUE, hover = true, shadow = true}, nodes={
+				{n=G.UIT.R, config={id = "start_"..ruleset_name, button = "start_lobby", align = "cm", padding = 0.05, r = 0.1, minw = 8, minh = 0.8, colour = G.C.BLUE, hover = true, shadow = true}, nodes={
 					{n=G.UIT.T, config={text = localize("b_create_lobby"), scale = 0.5, colour = G.C.UI.TEXT_LIGHT}}
 				}}
 			}}

@@ -1872,7 +1872,7 @@ function Game:update_selecting_hand(dt)
 	end
 	update_selecting_hand_ref(self, dt)
 
-	if MP.GAME.end_pvp then
+	if MP.GAME.end_pvp and MP.is_pvp_boss() then
 		G.hand:unhighlight_all()
 		G.STATE_COMPLETE = false
 		G.STATE = G.STATES.NEW_ROUND
@@ -2086,6 +2086,7 @@ end
 
 local select_blind_ref = G.FUNCS.select_blind
 function G.FUNCS.select_blind(e)
+	MP.GAME.end_pvp = false
 	MP.GAME.prevent_eval = false
 	select_blind_ref(e)
 	if MP.LOBBY.code then
