@@ -2086,6 +2086,7 @@ end
 
 local select_blind_ref = G.FUNCS.select_blind
 function G.FUNCS.select_blind(e)
+	MP.GAME.end_pvp = false
 	MP.GAME.prevent_eval = false
 	select_blind_ref(e)
 	if MP.LOBBY.code then
