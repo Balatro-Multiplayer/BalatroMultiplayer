@@ -169,7 +169,7 @@ function G.UIDEF.create_UIBox_lobby_menu()
 					{
 						n = G.UIT.R,
 						config = {
-							padding = 0.5,
+							padding = 1.25,
 							align = "cm",
 						},
 						nodes = {
@@ -1094,6 +1094,9 @@ local set_main_menu_UI_ref = set_main_menu_UI
 ---@diagnostic disable-next-line: lowercase-global
 function set_main_menu_UI()
 	if MP.LOBBY.code then
+		if G.MAIN_MENU_UI then
+			G.MAIN_MENU_UI:remove()
+		end
 		if G.STAGE == G.STAGES.MAIN_MENU then
 			G.FUNCS.display_lobby_main_menu_UI()
 		end
