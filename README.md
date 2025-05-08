@@ -49,16 +49,7 @@ Contributions that make content changes like modifying how the base game works, 
 
 ### Looking to contribute but don't have a feature in mind?
 
-Here are some features we're planning to implement in future releases that aren't being worked on yet:
-- **In Pool Rework**: Update the pooling function and related multiplayer code to independently handle ruleset and gamemode bans (to prevent our card and ruleset logic from interfering with each other)
-- **Return of Gamemodes**: Re-implement gamemodes and have a secondary selection screen after the rulesets to select a gamemode. Here is a list of gamemodes:
-  - Attrition: This is how the Multiplayer mod works right now, ever boss blind is a Nemesis blind
-  - Showdown: After the first 2 antes every blind is a Nemesis blind, the amount of antes before this happens should be configurable in Lobby Options
-  - Vanilla+: The player who beats the farthest blind wins. (No lives, once your opponent dies you just need to beat the blind they lost on to win)
-- **Multiplayer Context System**: Convert cards like "SPEEDRUN" and "Let's Go Gambling" (Phantom) to use new contexts that are passed by network actions (the server)
-- **Trap Cards**: Please DM "virtualized" on discord if you are interested in working on this
-
-*If you plan on working on one of these features please open a draft PR to show that it is being worked on*
+Check the [issues](https://github.com/Balatro-Multiplayer/BalatroMultiplayer/issues), there are usually issues with the "Help Wanted" tag that are just looking for someone to work on them! I (Virtualized) try and be very clear about what the problem is and what the expected solution is in these issues so hopefully there is little confusion, but feel free to DM or ping `virtualized` on discord for clarification.
 
 ## 📜 License
 
