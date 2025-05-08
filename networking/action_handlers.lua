@@ -791,7 +791,7 @@ function Game:update(dt)
 						log = log .. string.format(" (%s: %s) ", k, v)
 					end
 				end
-				if parsedAction.action == "receiveEndGameJokers" and last_game_seed then
+				if (parsedAction.action == "receiveEndGameJokers" or parsedAction.action == "stopGame") and last_game_seed then
 					log = log .. string.format(" (seed: %s) ", last_game_seed)
 				end
 				sendTraceMessage(log, "MULTIPLAYER")
