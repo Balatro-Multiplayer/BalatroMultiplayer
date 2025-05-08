@@ -263,6 +263,8 @@ return {
 			k_the_order_credit = "*Credit to @MathIsFun_",
 			k_the_order_integration_desc = "This will patch card creation to not be ante-based and use a single pool for every type/rarity",
 			k_requires_restart = "*Requires a restart to take effect",
+			k_bans = "Bans",
+			k_reworks = "Additions/Reworks",
 			ml_enemy_loc = { "Enemy", "location" },
 			ml_mp_kofi_message = {
 				"This mod and game server is",

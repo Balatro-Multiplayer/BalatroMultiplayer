@@ -242,7 +242,7 @@ function G.UIDEF.ruleset_tabs(ruleset)
 			}},
 			{n=G.UIT.R, config={align = "bm", padding = 0.05}, nodes={
 				create_option_cycle({
-					options = {"Bans", "Additions/Reworks"},
+					options = {localize("k_bans"), localize("k_reworks")},
 					current_option = 1,
 					opt_callback = "ruleset_switch_tabs",
 					opt_args = {ui = default_tabs, ruleset = ruleset},
