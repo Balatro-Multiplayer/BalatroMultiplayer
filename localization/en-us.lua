@@ -260,6 +260,7 @@ return {
 			k_mods_list = "Mods List",
 			k_enemy_jokers = "Enemy Jokers",
 			k_nemesis_deck = "Nemesis Deck",
+			k_your_deck = "Your Deck",
 			k_the_order_credit = "*Credit to @MathIsFun_",
 			k_the_order_integration_desc = "This will patch card creation to not be ante-based and use a single pool for every type/rarity",
 			k_requires_restart = "*Requires a restart to take effect",
