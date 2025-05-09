@@ -41,24 +41,36 @@ function wheel_of_fortune_the_card(card)
 	end
 end
 
-wheel_of_fortune_the_title_card = wheel_of_fortune_the_title_card
-	or function()
-		wheel_of_fortune_the_card(G.title_top.cards[1])
+local function has_mod_manipulating_title_card()
+	-- maintain a list of all mods that affect the title card here
+	-- (must use the mod's id, not its name)
+	local modlist = { "bumod", "Cryptid" }
+	for _, modname in ipairs(modlist) do
+		if SMODS.Mods[modname] then
+			return true
+		end
+	end
+	return false
+end
+
+function make_wheel_of_fortune_a_card_func(card)
+	return function()
+		if not card then
+			return false
+		end
+		wheel_of_fortune_the_card(card)
 		return true
 	end
+end
 
 MP.title_card = nil
 
-wheel_of_fortune_the_mp_card = wheel_of_fortune_the_mp_card
-	or function()
-		if MP.title_card then
-			wheel_of_fortune_the_card(MP.title_card)
-		end
-		return true
-	end
-
 function add_custom_multiplayer_cards(change_context)
-	G.title_top.cards[1]:set_base(G.P_CARDS["S_A"], true)
+	local only_mod_affecting_title_card = not has_mod_manipulating_title_card()
+
+	if only_mod_affecting_title_card then
+		G.title_top.cards[1]:set_base(G.P_CARDS["S_A"], true)
+	end
 
 	-- Credit to the Cryptid mod for the original code to add a card to the main menu
 	local title_card = create_card("Base", G.title_top, nil, nil, nil, nil)
@@ -93,20 +105,26 @@ function add_custom_multiplayer_cards(change_context)
 
 	MP.title_card = title_card
 
-	G.E_MANAGER:add_event(Event({
-		trigger = "after",
-		delay = 2,
-		blockable = false,
-		blocking = false,
-		func = wheel_of_fortune_the_title_card,
-	}))
+	-- base delay in seconds, only increases if no other mods affect the title card
+	local wheel_delay = 2
+
+	if only_mod_affecting_title_card then
+		G.E_MANAGER:add_event(Event({
+			trigger = "after",
+			delay = wheel_delay,
+			blockable = false,
+			blocking = false,
+			func = make_wheel_of_fortune_a_card_func(G.title_top.cards[1]),
+		}))
+		wheel_delay = wheel_delay + 1
+	end
 
 	G.E_MANAGER:add_event(Event({
 		trigger = "after",
-		delay = 3,
+		delay = wheel_delay,
 		blockable = false,
 		blocking = false,
-		func = wheel_of_fortune_the_mp_card,
+		func = make_wheel_of_fortune_a_card_func(MP.title_card),
 	}))
 end
 
