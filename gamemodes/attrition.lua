@@ -1,7 +1,7 @@
 MP.Gamemode({
     key = "attrition",
     get_blinds_by_ante = function(self, ante)
-        if ante > 0 then
+        if ante > 1 then
             if not MP.LOBBY.config.normal_bosses then
                 return nil, nil, "bl_mp_nemesis"
             else
