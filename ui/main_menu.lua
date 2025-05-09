@@ -27,6 +27,17 @@ function nope_a_joker(card)
 	play_sound("tarot2", 1, 0.4)
 end
 
+local function juice_up(thing, a, b)
+	if SMODS.Mods["Talisman"] and SMODS.Mods["Talisman"].can_load then
+		local disable_anims = Talisman.config_file.disable_anims
+		Talisman.config_file.disable_anims = false
+		thing:juice_up(a, b)
+		Talisman.config_file.disable_anims = disable_anims
+	else
+		thing:juice_up(a, b)
+	end
+end
+
 function wheel_of_fortune_the_card(card)
 	math.randomseed(os.time())
 	local chance = math.random(4)
@@ -34,19 +45,19 @@ function wheel_of_fortune_the_card(card)
 		local editions = {{name = 'e_foil', weight = 50}, {name = 'e_holo', weight = 35}, {name = 'e_polychrome', weight = 15}}
 		local edition = poll_edition("main_menu"..os.time(), nil, true, true, editions)
 		card:set_edition(edition, true)
-		card:juice_up(0.3, 0.5)
+		juice_up(card, 0.3, 0.5)
 	else
 		nope_a_joker(card)
-		card:juice_up(0.3, 0.5)
+		juice_up(card, 0.3, 0.5)
 	end
 end
 
 local function has_mod_manipulating_title_card()
 	-- maintain a list of all mods that affect the title card here
 	-- (must use the mod's id, not its name)
-	local modlist = { "bumod", "Cryptid" }
+	local modlist = { "bumod", "Cryptid", "Talisman" }
 	for _, modname in ipairs(modlist) do
-		if SMODS.Mods[modname] then
+		if SMODS.Mods[modname] and SMODS.Mods[modname].can_load then
 			return true
 		end
 	end
@@ -55,10 +66,9 @@ end
 
 function make_wheel_of_fortune_a_card_func(card)
 	return function()
-		if not card then
-			return false
+		if card then
+			wheel_of_fortune_the_card(card)
 		end
-		wheel_of_fortune_the_card(card)
 		return true
 	end
 end
@@ -105,7 +115,7 @@ function add_custom_multiplayer_cards(change_context)
 
 	MP.title_card = title_card
 
-	-- base delay in seconds, only increases if no other mods affect the title card
+	-- base delay in seconds, increases as needed
 	local wheel_delay = 2
 
 	if only_mod_affecting_title_card then
@@ -422,7 +432,7 @@ function G.UIDEF.ruleset_cardarea_definition(args)
 						if not temp_blind.hovering and temp_blind.states.visible then
 							temp_blind.hovering = true
 							temp_blind.hover_tilt = 3
-							temp_blind:juice_up(0.05, 0.02)
+							juice_up(temp_blind, 0.05, 0.02)
 							temp_blind.config.h_popup = create_UIBox_blind_popup(blind_spec, true)
 							temp_blind.config.h_popup_config ={align = 'cl', offset = {x=-0.1,y=0},parent = temp_blind}
 							Node.hover(temp_blind)
