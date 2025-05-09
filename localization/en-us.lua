@@ -239,6 +239,7 @@ return {
 			k_opts_gm = "Gamemode Modifiers",
 			k_opts_pvp_start_round = "PVP Starts at Ante",
 			k_opts_pvp_timer = "Timer",
+			k_opts_pvp_timer_increment = "Timer Increment",
 			k_bl_life = "Life",
 			k_bl_or = "or",
 			k_bl_death = "Death",
