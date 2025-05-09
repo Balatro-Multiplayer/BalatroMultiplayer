@@ -1844,13 +1844,10 @@ function reset_blinds()
 	reset_blinds_ref()
 	G.GAME.round_resets.pvp_blind_choices = {}
 	if MP.LOBBY.code then
-		if G.GAME.round_resets.ante >= MP.LOBBY.config.pvp_start_round then
-			if not MP.LOBBY.config.normal_bosses then
-				G.GAME.round_resets.blind_choices.Boss = "bl_mp_nemesis"
-			else
-				G.GAME.round_resets.pvp_blind_choices.Boss = true
-			end
-		end
+		local mp_small_choice, mp_big_choice, mp_boss_choice = MP.Gamemodes[MP.LOBBY.config.gamemode]:get_blinds_by_ante(G.GAME.round_resets.ante)
+		G.GAME.round_resets.blind_choices.Small = mp_small_choice or G.GAME.round_resets.blind_choices.Small
+		G.GAME.round_resets.blind_choices.Big = mp_big_choice or G.GAME.round_resets.blind_choices.Big
+		G.GAME.round_resets.blind_choices.Boss = mp_boss_choice or G.GAME.round_resets.blind_choices.Boss
 	end
 end
 

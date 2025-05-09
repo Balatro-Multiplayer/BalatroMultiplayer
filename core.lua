@@ -15,6 +15,7 @@ MP.LOBBY = {
 		timer_base_seconds = 180,
 		showdown_starting_antes = 3,
 		ruleset = "ruleset_mp_standard",
+		gamemode = "gamemode_mp_attrition",
 		custom_seed = "random",
 		different_decks = false,
 		back = "Red Deck",
