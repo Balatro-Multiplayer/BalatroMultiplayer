@@ -211,6 +211,11 @@ local function action_lobby_options(options)
 			MP.LOBBY.config.ruleset = v
 			goto continue
 		end
+		if k == "gamemode" then
+			MP.LOBBY.config.gamemode = v
+			goto continue
+		end
+
 		local parsed_v = v
 		if v == "true" then
 			parsed_v = true
@@ -589,9 +594,9 @@ local function action_pause_ante_timer(time)
 end
 
 -- #region Client to Server
-function MP.ACTIONS.create_lobby(gamemode)
-	MP.LOBBY.config.ruleset = gamemode
-	Client.send(string.format("action:createLobby,gameMode:%s", gamemode))
+function MP.ACTIONS.create_lobby(ruleset)
+	MP.LOBBY.config.ruleset = ruleset
+	Client.send(string.format("action:createLobby,gameMode:%s", ruleset))
 end
 
 function MP.ACTIONS.join_lobby(code)
