@@ -231,6 +231,10 @@ local function action_lobby_options(options)
 		if k == "timer_base_seconds" then
 			parsed_v = tonumber(v)
 		end
+		if k == "showdown_starting_antes" then
+			parsed_v = tonumber(v)
+		end
+
 		MP.LOBBY.config[k] = parsed_v
 		if G.OVERLAY_MENU then
 			local config_uie = G.OVERLAY_MENU:get_UIE_by_ID(k .. "_toggle")
@@ -595,7 +599,6 @@ end
 
 -- #region Client to Server
 function MP.ACTIONS.create_lobby(ruleset)
-	MP.LOBBY.config.ruleset = ruleset
 	Client.send(string.format("action:createLobby,gameMode:%s", ruleset))
 end
 
