@@ -1,7 +1,7 @@
 MP.Gamemode({
     key = "showdown",
     get_blinds_by_ante = function(self, ante)
-        if ante > 2 then
+        if ante > 0 then
             return "bl_mp_nemesis", "bl_mp_nemesis", "bl_mp_nemesis"
         end
         return nil, nil, nil
