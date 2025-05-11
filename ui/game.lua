@@ -1013,21 +1013,24 @@ function MP.end_round()
 			G.STATE = G.STATES.ROUND_EVAL
 			G.STATE_COMPLETE = false
 
+			local temp_furthest_blind = 0
+
 			if G.GAME.round_resets.blind_states.Small ~= "Defeated" and G.GAME.round_resets.blind_states.Small ~= "Skipped" then
 				G.GAME.round_resets.blind_states.Small = "Defeated"
-				MP.GAME.furthest_blind = G.GAME.round_resets.ante * 10 + 1
+				temp_furthest_blind = G.GAME.round_resets.ante * 10 + 1
 			elseif G.GAME.round_resets.blind_states.Big ~= "Defeated" and G.GAME.round_resets.blind_states.Big ~= "Skipped" then
 				G.GAME.round_resets.blind_states.Big = "Defeated"
-				MP.GAME.furthest_blind = G.GAME.round_resets.ante * 10 + 2
+				temp_furthest_blind = G.GAME.round_resets.ante * 10 + 2
 			else
 				G.GAME.current_round.voucher = SMODS.get_next_vouchers()
 				G.GAME.round_resets.blind_states.Boss = "Defeated"
-				MP.GAME.furthest_blind = G.GAME.round_resets.ante * 10 + 3
+				temp_furthest_blind = G.GAME.round_resets.ante * 10 + 3
 				for k, v in ipairs(G.playing_cards) do
 					v.ability.played_this_ante = nil
 				end
 			end
 
+			MP.GAME.furthest_blind = (temp_furthest_blind > MP.GAME.furthest_blind) and temp_furthest_blind or MP.GAME.furthest_blind
 			MP.ACTIONS.set_furthest_blind(MP.GAME.furthest_blind)
 
 			if G.GAME.round_resets.temp_handsize then
