@@ -911,14 +911,45 @@ function Game:update_new_round(dt)
 		-- Prevent player from losing
 		if to_big(G.GAME.chips) < to_big(G.GAME.blind.chips) and not MP.is_pvp_boss() then
 			G.GAME.blind.chips = -1
+			MP.GAME.wait_for_enemys_furthest_blind = (MP.LOBBY.config.gamemode == "gamemode_mp_survival") and (tonumber(MP.GAME.lives) == 1) -- If this is the last live, wait for the enemy
+			print((MP.LOBBY.config.gamemode == "gamemode_mp_survival"))
+			print(MP.GAME.wait_for_enemys_furthest_blind)
 			MP.ACTIONS.fail_round(G.GAME.current_round.hands_played)
+		else
+			-- Update MP.GAME.furthest_blind
+			local current_ante_furthest = 0
+			if G.GAME.blind:get_type() == "Small" then
+				current_ante_furthest = 1
+			elseif G.GAME.blind:get_type() == "Big" then
+				current_ante_furthest = 2
+			else
+				current_ante_furthest = 3
+			end
+			local new_furthest = 10 * G.GAME.round_resets.ante + current_ante_furthest
+			MP.GAME.furthest_blind = (new_furthest > MP.GAME.furthest_blind) and new_furthest or MP.GAME.furthest_blind
+			MP.ACTIONS.set_furthest_blind(MP.GAME.furthest_blind)
 		end
+
+		print(MP.GAME.furthest_blind)
 
 		-- Prevent player from winning
 		G.GAME.win_ante = 999
 
-		update_new_round_ref(self, dt)
-
+		if MP.LOBBY.config.gamemode == "gamemode_mp_survival" and MP.GAME.wait_for_enemys_furthest_blind then
+			G.STATE_COMPLETE = true
+			G.FUNCS.draw_from_hand_to_discard()
+			attention_text({
+				scale = 0.8,
+				text = localize("k_wait_enemy_reach_this_blind"),
+				hold = 5,
+				align = "cm",
+				offset = { x = 0, y = -1.5 },
+				major = G.play,
+			})
+		else
+			update_new_round_ref(self, dt)
+		end
+		
 		-- Reset ante number
 		G.GAME.win_ante = 8
 		return

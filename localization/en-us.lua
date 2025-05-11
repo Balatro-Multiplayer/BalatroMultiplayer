@@ -206,6 +206,7 @@ return {
 			k_enemy_hands = "Enemy hands left: ",
 			k_coming_soon = "Coming Soon!",
 			k_wait_enemy = "Waiting for enemy to finish...",
+			k_wait_enemy_reach_this_blind = "Waiting for enemy to reach this blind...",
 			k_lives = "Lives",
 			k_lost_life = "Lost a life",
 			k_total_lives_lost = " Total Lives Lost ($4 each)",

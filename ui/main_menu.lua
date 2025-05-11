@@ -655,10 +655,19 @@ function G.FUNCS.start_lobby(e)
 	else
 		MP.LOBBY.config.multiplayer_jokers = true
 	end
-	--to do: check if this ruleset actually exists
-	MP.ACTIONS.create_lobby(MP.LOBBY.config.ruleset)
+
+	-- Check if the current gamemode is valid. If it's not, default to attrition.
+	local gamemode_check = false
+	for k, _ in pairs(MP.Gamemodes) do
+		if k == MP.LOBBY.config.gamemode then
+			gamemode_check = true
+		end
+	end
+	MP.LOBBY.config.gamemode = gamemode_check and MP.LOBBY.config.gamemode or "gamemode_mp_attrition"
+
+	MP.ACTIONS.create_lobby(string.sub(MP.LOBBY.config.gamemode, 13))
+	print(string.sub(MP.LOBBY.config.gamemode, 13))
 	print(MP.LOBBY.config.ruleset)
-	print(MP.LOBBY.config.gamemode)
 	G.FUNCS.exit_overlay_menu()
 end
 

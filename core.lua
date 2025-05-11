@@ -118,6 +118,8 @@ function MP.reset_game_states()
 		timer_started = false,
 		real_money = 0,
 		ce_cache = false,
+		furthest_blind = 0,
+		wait_for_enemys_furthest_blind = false,
 	}
 end
 

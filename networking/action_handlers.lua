@@ -598,8 +598,8 @@ local function action_pause_ante_timer(time)
 end
 
 -- #region Client to Server
-function MP.ACTIONS.create_lobby(ruleset)
-	Client.send(string.format("action:createLobby,gameMode:%s", ruleset))
+function MP.ACTIONS.create_lobby(gamemode)
+	Client.send(string.format("action:createLobby,gameMode:%s", gamemode))
 end
 
 function MP.ACTIONS.join_lobby(code)
@@ -685,6 +685,10 @@ end
 
 function MP.ACTIONS.new_round()
 	Client.send("action:newRound")
+end
+
+function MP.ACTIONS.set_furthest_blind(furthest_blind)
+	Client.send(string.format("action:setFurthestBlind,furthestBlind:%d", furthest_blind))
 end
 
 function MP.ACTIONS.skip(skips)
