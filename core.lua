@@ -100,7 +100,7 @@ function MP.reset_game_states()
 			hands = 4,
 			location = localize("loc_selecting"),
 			skips = 0,
-			lives = 4,
+			lives = MP.LOBBY.config.starting_lives,
 			sells = 0,
 			spent_last_shop = 0,
 			highest_score = MP.INSANE_INT.empty(),

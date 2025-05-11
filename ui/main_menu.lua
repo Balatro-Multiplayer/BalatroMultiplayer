@@ -663,7 +663,6 @@ function G.FUNCS.start_lobby(e)
 		MP.LOBBY.config.starting_lives = 4
 		MP.LOBBY.config.disable_live_and_timer_hud = false
 	end
-	MP.GAME.enemy.lives = MP.LOBBY.config.starting_lives
 
 	-- Check if the current gamemode is valid. If it's not, default to attrition.
 	local gamemode_check = false
