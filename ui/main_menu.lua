@@ -200,6 +200,8 @@ function G.FUNCS.change_ruleset_selection(e)
 		 config = {align = "cm", parent = ruleset_area}
 	})
 
+	ruleset_area.config.object:recalculate()
+
 	ruleset_area.config.prev_chosen = e
 
 	MP.LOBBY.ruleset_preview = false
@@ -216,7 +218,7 @@ function G.UIDEF.ruleset_info(ruleset_name)
 		config = {align = "cm"}
 	})
 
-	return {n=G.UIT.ROOT, config={align = "tm", minh = 8, maxh = 8, minw = 11, colour = G.C.CLEAR}, nodes={
+	return {n=G.UIT.ROOT, config={align = "tm", minh = 8, maxh = 8, minw = 11, maxw = 11, colour = G.C.CLEAR}, nodes={
 		{n=G.UIT.C, config={align = "tm", padding = 0.2, r = 0.1, colour = G.C.BLACK}, nodes={
 			{n=G.UIT.R, config={align = "tm", padding = 0.05, minw = 11, maxw = 11, minh = math.max(2, ruleset_desc_lines) * 0.35}, nodes={
 				{n=G.UIT.T, config={text = ruleset_desc, colour = G.C.UI.TEXT_LIGHT, scale = 0.8}}
@@ -393,7 +395,7 @@ function G.UIDEF.ruleset_cardarea_definition(args)
 		end
 
 		local function blind_constructor(blind_spec)
-			local temp_blind = AnimatedSprite(0,0,1.1,1.1, G.ANIMATION_ATLAS['blind_chips'], blind_spec.pos)
+			local temp_blind = AnimatedSprite(0,0,1.1,1.1, G.ANIMATION_ATLAS[blind_spec.atlas] or G.ANIMATION_ATLAS['blind_chips'], blind_spec.pos)
 			temp_blind:define_draw_steps({
 				{shader = 'dissolve', shadow_height = 0.05},
 				{shader = 'dissolve'}
@@ -503,6 +505,8 @@ function G.FUNCS.change_gamemode_selection(e)
 		 config = {align = "cm", parent = gamemode_area}
 	})
 
+	gamemode_area.config.object:recalculate()
+
 	gamemode_area.config.prev_chosen = e
 end
 
@@ -512,7 +516,7 @@ function G.UIDEF.gamemode_info(gamemode_name)
 	local gamemode_desc = MP.UTILS.wrapText(localize("k_" .. gamemode_name .. "_description"), 100)
 	local _, gamemode_desc_lines = gamemode_desc:gsub("\n", " ")
 
-	return {n=G.UIT.ROOT, config={align = "tm", minh = 8, maxh = 8, minw = 11, colour = G.C.CLEAR}, nodes={
+	return {n=G.UIT.ROOT, config={align = "tm", minh = 8, maxh = 8, minw = 11, maxw = 11, colour = G.C.CLEAR}, nodes={
 		{n=G.UIT.C, config={align = "tm", padding = 0.2, r = 0.1, colour = G.C.BLACK, minh = 8}, nodes={
 			{n=G.UIT.R, config={align = "tm", padding = 0.05, minw = 11, maxw = 11, minh = 8}, nodes={
 				{n=G.UIT.T, config={text = gamemode_desc, colour = G.C.UI.TEXT_LIGHT, scale = 0.8}}
