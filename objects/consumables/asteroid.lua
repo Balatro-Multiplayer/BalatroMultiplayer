@@ -16,7 +16,7 @@ SMODS.Consumable({
 	unlocked = true,
 	discovered = true,
 	loc_vars = function(self, info_queue, card)
-		add_nemesis_info(info_queue)
+		MP.UTILS.add_nemesis_info(info_queue)
 		return { vars = { 1 } }
 	end,
 	in_pool = function(self)
