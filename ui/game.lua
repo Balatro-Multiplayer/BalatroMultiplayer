@@ -1062,7 +1062,7 @@ local start_run_ref = Game.start_run
 function Game:start_run(args)
 	start_run_ref(self, args)
 
-	if not MP.LOBBY.connected or not MP.LOBBY.code then
+	if not MP.LOBBY.connected or not MP.LOBBY.code or MP.LOBBY.config.disable_live_and_timer_hud then
 		return
 	end
 
@@ -1787,7 +1787,7 @@ end
 
 local ease_ante_ref = ease_ante
 function ease_ante(mod)
-	if not MP.LOBBY.code then
+	if not MP.LOBBY.code or MP.LOBBY.config.disable_live_and_timer_hud then
 		return ease_ante_ref(mod)
 	end
 	-- Prevents easing multiple times at once
@@ -1813,6 +1813,11 @@ function ease_lives(mod)
 			if not G.hand_text_area then
 				return
 			end
+
+			if MP.LOBBY.config.disable_live_and_timer_hud then
+				return true -- Returning nothing hangs the game because it's a part of an event
+			end
+
 			local lives_UI = G.hand_text_area.ante
 			mod = mod or 0
 			local text = "+"
