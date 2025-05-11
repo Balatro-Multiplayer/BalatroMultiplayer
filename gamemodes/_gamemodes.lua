@@ -5,7 +5,7 @@ MP.Gamemode = SMODS.GameObject:extend({
 	obj_buffer = {},
 	required_params = {
 		"key",
-		"get_blinds_by_ante",
+		"get_blinds_by_ante", -- Define custom logic for determining Small, Big, and Boss Blind based on the ante number.
 	},
 	class_prefix = "gamemode",
 	inject = function(self)
