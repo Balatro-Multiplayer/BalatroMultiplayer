@@ -666,8 +666,6 @@ function G.FUNCS.start_lobby(e)
 	MP.LOBBY.config.gamemode = gamemode_check and MP.LOBBY.config.gamemode or "gamemode_mp_attrition"
 
 	MP.ACTIONS.create_lobby(string.sub(MP.LOBBY.config.gamemode, 13))
-	print(string.sub(MP.LOBBY.config.gamemode, 13))
-	print(MP.LOBBY.config.ruleset)
 	G.FUNCS.exit_overlay_menu()
 end
 

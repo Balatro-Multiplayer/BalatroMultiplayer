@@ -911,26 +911,9 @@ function Game:update_new_round(dt)
 		-- Prevent player from losing
 		if to_big(G.GAME.chips) < to_big(G.GAME.blind.chips) and not MP.is_pvp_boss() then
 			G.GAME.blind.chips = -1
-			MP.GAME.wait_for_enemys_furthest_blind = (MP.LOBBY.config.gamemode == "gamemode_mp_survival") and (tonumber(MP.GAME.lives) == 1) -- If this is the last live, wait for the enemy
-			print((MP.LOBBY.config.gamemode == "gamemode_mp_survival"))
-			print(MP.GAME.wait_for_enemys_furthest_blind)
+			MP.GAME.wait_for_enemys_furthest_blind = (MP.LOBBY.config.gamemode == "gamemode_mp_survival") and (tonumber(MP.GAME.lives) == 1) -- In Survival Mode, if this is the last live, wait for the enemy.
 			MP.ACTIONS.fail_round(G.GAME.current_round.hands_played)
-		else
-			-- Update MP.GAME.furthest_blind
-			local current_ante_furthest = 0
-			if G.GAME.blind:get_type() == "Small" then
-				current_ante_furthest = 1
-			elseif G.GAME.blind:get_type() == "Big" then
-				current_ante_furthest = 2
-			else
-				current_ante_furthest = 3
-			end
-			local new_furthest = 10 * G.GAME.round_resets.ante + current_ante_furthest
-			MP.GAME.furthest_blind = (new_furthest > MP.GAME.furthest_blind) and new_furthest or MP.GAME.furthest_blind
-			MP.ACTIONS.set_furthest_blind(MP.GAME.furthest_blind)
 		end
-
-		print(MP.GAME.furthest_blind)
 
 		-- Prevent player from winning
 		G.GAME.win_ante = 999
@@ -1030,17 +1013,22 @@ function MP.end_round()
 			G.STATE = G.STATES.ROUND_EVAL
 			G.STATE_COMPLETE = false
 
-			if G.GAME.round_resets.blind == G.P_BLINDS.bl_small then
+			if G.GAME.round_resets.blind_states.Small ~= "Defeated" and G.GAME.round_resets.blind_states.Small ~= "Skipped" then
 				G.GAME.round_resets.blind_states.Small = "Defeated"
-			elseif G.GAME.round_resets.blind == G.P_BLINDS.bl_big then
+				MP.GAME.furthest_blind = G.GAME.round_resets.ante * 10 + 1
+			elseif G.GAME.round_resets.blind_states.Big ~= "Defeated" and G.GAME.round_resets.blind_states.Big ~= "Skipped" then
 				G.GAME.round_resets.blind_states.Big = "Defeated"
+				MP.GAME.furthest_blind = G.GAME.round_resets.ante * 10 + 2
 			else
 				G.GAME.current_round.voucher = SMODS.get_next_vouchers()
 				G.GAME.round_resets.blind_states.Boss = "Defeated"
+				MP.GAME.furthest_blind = G.GAME.round_resets.ante * 10 + 3
 				for k, v in ipairs(G.playing_cards) do
 					v.ability.played_this_ante = nil
 				end
 			end
+
+			MP.ACTIONS.set_furthest_blind(MP.GAME.furthest_blind)
 
 			if G.GAME.round_resets.temp_handsize then
 				G.hand:change_size(-G.GAME.round_resets.temp_handsize)
