@@ -211,21 +211,22 @@ local function action_lobby_options(options)
 			MP.LOBBY.config.ruleset = v
 			goto continue
 		end
+
 		local parsed_v = v
 		if v == "true" then
 			parsed_v = true
 		elseif v == "false" then
 			parsed_v = false
 		end
-		if k == "starting_lives" then
+
+		if k == "starting_lives"
+			or k == "pvp_start_round"
+			or k == "timer_base_seconds"
+			or k == "timer_increment_seconds"
+		then
 			parsed_v = tonumber(v)
 		end
-		if k == "pvp_start_round" then
-			parsed_v = tonumber(v)
-		end
-		if k == "timer_base_seconds" then
-			parsed_v = tonumber(v)
-		end
+
 		MP.LOBBY.config[k] = parsed_v
 		if G.OVERLAY_MENU then
 			local config_uie = G.OVERLAY_MENU:get_UIE_by_ID(k .. "_toggle")

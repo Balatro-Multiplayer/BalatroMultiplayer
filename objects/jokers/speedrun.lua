@@ -16,7 +16,7 @@ SMODS.Joker({
 	eternal_compat = true,
 	perishable_compat = true,
 	loc_vars = function(self, info_queue, card)
-		add_nemesis_info(info_queue)
+		MP.UTILS.add_nemesis_info(info_queue)
 		return { vars = {} }
 	end,
 	in_pool = function(self)
