@@ -519,12 +519,12 @@ local function action_get_end_game_jokers()
 		Client.send("action:receiveEndGameJokers,keys:")
 		return
 	end
-	local jokers = G.jokers.cards
-	local keys = ""
-	for _, card in pairs(jokers) do
-		keys = keys .. card.config.center.key .. ";"
+
+	local jokers = ""
+	for _, card in pairs(G.jokers.cards) do
+		jokers = jokers .. ";" .. MP.UTILS.joker_to_string(card)
 	end
-	Client.send(string.format("action:receiveEndGameJokers,keys:%s", keys))
+	Client.send(string.format("action:receiveEndGameJokers,keys:%s", jokers))
 end
 
 local function action_get_nemesis_deck()
