@@ -17,7 +17,7 @@ SMODS.Joker({
 	perishable_compat = false,
 	config = { extra = { mult_gain = 5, mult = 0 } },
 	loc_vars = function(self, info_queue, card)
-		add_nemesis_info(info_queue)
+		MP.UTILS.add_nemesis_info(info_queue)
 		return { vars = { card.ability.extra.mult_gain, card.ability.extra.mult } }
 	end,
 	in_pool = function(self)

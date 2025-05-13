@@ -17,7 +17,7 @@ SMODS.Joker({
 	perishable_compat = true,
 	config = { extra = { hands = 0, discards = 0, extra_hands = 1, extra_discards = 1 } },
 	loc_vars = function(self, info_queue, card)
-		add_nemesis_info(info_queue)
+		MP.UTILS.add_nemesis_info(info_queue)
 		return {
 			vars = {
 				card.ability.extra.extra_hands,
