@@ -477,7 +477,7 @@ local function action_magnet_response(key)
 	local card = create_card("Joker", G.jokers, false, nil, nil, nil, key_append)
 	-- Don't copy the edition if it's negative, just like Invisible Joker
 	if edition and edition ~= "none" and edition ~= "negative" then
-		card:set_edition({[edition] = true}, true, true)
+		card:set_edition({ [edition] = true }, true, true)
 	end
 	card:add_to_deck()
 	G.jokers:emplace(card)
