@@ -496,7 +496,7 @@ function G.FUNCS.load_end_game_jokers()
 		local card = create_card("Joker", MP.end_game_jokers, false, nil, nil, nil, key)
 
 		if edition and edition ~= "none" then
-			card:set_edition({[edition] = true}, true, true)
+			card:set_edition({ [edition] = true }, true, true)
 		end
 
 		card:add_to_deck()
@@ -569,10 +569,7 @@ local function action_receive_nemesis_deck(deck_str)
 		)
 
 		if edition and edition ~= "none" then
-			local edition_object = {}
-			edition_object[edition] = true
-
-			card:set_edition(edition_object, true, true)
+			card:set_edition({ [edition] = true }, true, true)
 		end
 
 		if seal ~= "none" then
