@@ -482,6 +482,8 @@ function G.FUNCS.load_end_game_jokers()
 		end
 	end
 
+	MP.end_game_jokers.config.card_limit = G.GAME.starting_params.joker_slots
+
 	remove_all(MP.end_game_jokers.cards)
 	for _, joker_str in pairs(split_jokers) do
 		if joker_str == "" then
@@ -503,6 +505,10 @@ function G.FUNCS.load_end_game_jokers()
 
 		card:add_to_deck()
 		MP.end_game_jokers:emplace(card)
+
+		if card.edition and card.edition.negative then
+			MP.end_game_jokers.config.card_limit = MP.end_game_jokers.config.card_limit + 1
+		end
 
 		::continue::
 	end
