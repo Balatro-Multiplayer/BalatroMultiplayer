@@ -422,6 +422,18 @@ function MP.UTILS.card_to_string(card)
 	return card_str
 end
 
+function MP.UTILS.joker_to_string(card)
+	if not card or not card.config or not card.config.center or not card.config.center.key then
+		return ""
+	end
+
+	local edition = card.edition and MP.UTILS.reverse_key_value_pairs(card.edition, true)["true"] or "none"
+
+	local joker_string = card.config.center.key .. "-" .. edition
+
+	return joker_string
+end
+
 function MP.UTILS.random_message()
 	local messages = {
 		localize("k_message1"),

@@ -474,18 +474,43 @@ function G.FUNCS.load_end_game_jokers()
 	if not MP.end_game_jokers then
 		return
 	end
-	local split_keys = {}
-	for key in string.gmatch(MP.end_game_jokers_keys, "([^;]+)") do
-		if key ~= "" and key ~= nil and key ~= "0" then
-			table.insert(split_keys, key)
+
+	local split_jokers = {}
+	for joker_str in string.gmatch(MP.end_game_jokers_keys, "([^;]+)") do
+		if joker_str ~= "" and joker_str ~= nil and joker_str ~= "0" then
+			table.insert(split_jokers, joker_str)
 		end
 	end
+
+	MP.end_game_jokers.config.card_limit = G.GAME.starting_params.joker_slots
+
 	remove_all(MP.end_game_jokers.cards)
-	for _, key in pairs(split_keys) do
+	for _, joker_str in pairs(split_jokers) do
+		if joker_str == "" then
+			goto continue
+		end
+
+		local joker_params = MP.UTILS.string_split(joker_str, "-")
+
+		local key = joker_params[1]
+		local edition = joker_params[2]
+
 		local card = create_card("Joker", MP.end_game_jokers, false, nil, nil, nil, key)
-		card:set_edition()
+
+		if edition and edition ~= "none" then
+			card:set_edition({ [edition] = true }, true, true)
+		else
+			card:set_edition()
+		end
+
 		card:add_to_deck()
 		MP.end_game_jokers:emplace(card)
+
+		if card.edition and card.edition.negative then
+			MP.end_game_jokers.config.card_limit = MP.end_game_jokers.config.card_limit + 1
+		end
+
+		::continue::
 	end
 end
 
@@ -503,12 +528,12 @@ local function action_get_end_game_jokers()
 		Client.send("action:receiveEndGameJokers,keys:")
 		return
 	end
-	local jokers = G.jokers.cards
-	local keys = ""
-	for _, card in pairs(jokers) do
-		keys = keys .. card.config.center.key .. ";"
+
+	local jokers = ""
+	for _, card in pairs(G.jokers.cards) do
+		jokers = jokers .. ";" .. MP.UTILS.joker_to_string(card)
 	end
-	Client.send(string.format("action:receiveEndGameJokers,keys:%s", keys))
+	Client.send(string.format("action:receiveEndGameJokers,keys:%s", jokers))
 end
 
 local function action_get_nemesis_deck()
@@ -552,10 +577,7 @@ local function action_receive_nemesis_deck(deck_str)
 		)
 
 		if edition and edition ~= "none" then
-			local edition_object = {}
-			edition_object[edition] = true
-
-			card:set_edition(edition_object, true, true)
+			card:set_edition({ [edition] = true }, true, true)
 		end
 
 		if seal ~= "none" then
