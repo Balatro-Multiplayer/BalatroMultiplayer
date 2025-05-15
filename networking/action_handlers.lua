@@ -497,6 +497,8 @@ function G.FUNCS.load_end_game_jokers()
 
 		if edition and edition ~= "none" then
 			card:set_edition({ [edition] = true }, true, true)
+		else
+			card:set_edition()
 		end
 
 		card:add_to_deck()
