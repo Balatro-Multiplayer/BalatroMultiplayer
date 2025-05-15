@@ -472,12 +472,14 @@ end
 
 local function action_magnet_response(key)
 	local joker_params = MP.UTILS.string_split(key, "-")
-	local key_append = joker_params[1]
+	local forced_key = joker_params[1]
 	local edition = joker_params[2]
-	local card = create_card("Joker", G.jokers, false, nil, nil, nil, key_append)
+	local card = create_card("Joker", G.jokers, false, nil, nil, nil, forced_key)
 	-- Don't copy the edition if it's negative, just like Invisible Joker
 	if edition and edition ~= "none" and edition ~= "negative" then
 		card:set_edition({ [edition] = true }, true, true)
+	else
+		card:set_edition()
 	end
 	card:add_to_deck()
 	G.jokers:emplace(card)
