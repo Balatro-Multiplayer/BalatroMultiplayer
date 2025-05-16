@@ -58,14 +58,13 @@ position = "at"
 payload = '''local poll = pseudorandom(pseudoseed((_key or 'pack_generic')..MP.ante_based()))*cume'''
 match_indent = true
 
-# Make deck shuffles global
-# This is overkill at this point, deck shuffles become effectively random
+# Make deck shuffles round based
 [[patches]]
 [patches.pattern]
 target = "functions/state_events.lua"
 pattern = '''G.deck:shuffle('nr'..G.GAME.round_resets.ante)'''
 position = "at"
-payload = '''G.deck:shuffle('nr'..MP.ante_based())'''
+payload = '''G.deck:shuffle('nr'..MP.order_round_based(true))'''
 match_indent = true
 
 [[patches]]
@@ -73,7 +72,7 @@ match_indent = true
 target = "functions/button_callbacks.lua"
 pattern = '''G.deck:shuffle('cashout'..G.GAME.round_resets.ante)'''
 position = "at"
-payload = '''G.deck:shuffle('cashout'..MP.ante_based())'''
+payload = '''G.deck:shuffle('cashout'..MP.order_round_based(true))'''
 match_indent = true
 
 # Patch polled rate
