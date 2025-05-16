@@ -832,6 +832,23 @@ function G.UIDEF.create_UIBox_lobby_options()
 														 current_option = MP.LOBBY.config.showdown_starting_antes,
 														 opt_callback = "change_showdown_starting_antes",
 													}),
+													Disableable_Option_Cycle({
+														 id = "pvp_timer_increment_seconds_option",
+														 enabled_ref_table = MP.LOBBY,
+														 enabled_ref_value = "is_host",
+														 label = localize("k_opts_pvp_timer_increment"),
+														 options = {
+																"0s",
+																"30s",
+																"60s",
+																"90s",
+																"120s",
+																"150s",
+																"180s"
+														 },
+														 current_option = (MP.LOBBY.config.timer_increment_seconds)/30 + 1,
+														 opt_callback = "change_timer_increment_seconds"
+													}),
 												},
 											},
 										},
@@ -976,6 +993,11 @@ end
 
 G.FUNCS.change_timer_base_seconds = function(args)
 	 MP.LOBBY.config.timer_base_seconds = tonumber(args.to_val:sub(1, -2))
+	 send_lobby_options()
+end
+
+G.FUNCS.change_timer_increment_seconds = function(args)
+	 MP.LOBBY.config.timer_increment_seconds = tonumber(args.to_val:sub(1, -2))
 	 send_lobby_options()
 end
 

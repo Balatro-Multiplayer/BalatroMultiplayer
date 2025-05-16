@@ -13,6 +13,7 @@ MP.LOBBY = {
 		starting_lives = 4,
 		pvp_start_round = 2,
 		timer_base_seconds = 180,
+		timer_increment_seconds = 90,
 		showdown_starting_antes = 3,
 		ruleset = "ruleset_mp_standard",
 		gamemode = "gamemode_mp_attrition",

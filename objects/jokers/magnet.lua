@@ -17,7 +17,7 @@ SMODS.Joker({
 	perishable_compat = true,
 	config = { extra = { rounds = 2, current_rounds = 0 } },
 	loc_vars = function(self, info_queue, card)
-		add_nemesis_info(info_queue)
+		MP.UTILS.add_nemesis_info(info_queue)
 		return { vars = { card.ability.extra.rounds, card.ability.extra.current_rounds, card.ability.extra.rounds } }
 	end,
 	in_pool = function(self)
@@ -44,7 +44,7 @@ SMODS.Joker({
 			end
 			return {
 				message = (card.ability.extra.current_rounds < card.ability.extra.rounds)
-						and (card.ability.extra.current_rounds .. "/" .. card.ability.extra.rounds)
+					and (card.ability.extra.current_rounds .. "/" .. card.ability.extra.rounds)
 					or localize("k_active_ex"),
 				colour = G.C.FILTER,
 			}

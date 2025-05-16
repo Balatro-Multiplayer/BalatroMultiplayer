@@ -311,7 +311,7 @@ function MP.UTILS.reverse_key_value_pairs(tbl, stringify_keys)
 	return reversed_tbl
 end
 
-function add_nemesis_info(info_queue)
+function MP.UTILS.add_nemesis_info(info_queue)
 	if MP.LOBBY.code then
 		info_queue[#info_queue + 1] = {
 			set = "Other",
@@ -371,11 +371,10 @@ function G.FUNCS.reroll_shop(e)
 	return reroll_shop_ref(e)
 end
 
- 
 local buy_from_shop_ref = G.FUNCS.buy_from_shop
 function G.FUNCS.buy_from_shop(e)
 	local c1 = e.config.ref_table
-    if c1 and c1:is(Card) then
+	if c1 and c1:is(Card) then
 		sendTraceMessage(
 			string.format("Client sent message: action:boughtCardFromShop,card:%s,cost:%s", c1.ability.name, c1.cost),
 			"MULTIPLAYER"
@@ -394,7 +393,6 @@ function G.FUNCS.use_card(e, mute, nosave)
 	end
 	return use_card_ref(e, mute, nosave)
 end
-
 
 -- Pre-compile a reversed list of all the centers
 local reversed_centers = nil
@@ -416,7 +414,7 @@ function MP.UTILS.card_to_string(card)
 	local rank = rank_value_map[card.base.value] or card.base.value
 
 	local enhancement = reversed_centers[card.config.center] or "none"
-	local edition = card.edition and  MP.UTILS.reverse_key_value_pairs(card.edition, true)["true"] or "none"
+	local edition = card.edition and MP.UTILS.reverse_key_value_pairs(card.edition, true)["true"] or "none"
 	local seal = card.seal or "none"
 
 	local card_str = suit .. "-" .. rank .. "-" .. enhancement .. "-" .. edition .. "-" .. seal
@@ -424,6 +422,17 @@ function MP.UTILS.card_to_string(card)
 	return card_str
 end
 
+function MP.UTILS.joker_to_string(card)
+	if not card or not card.config or not card.config.center or not card.config.center.key then
+		return ""
+	end
+
+	local edition = card.edition and MP.UTILS.reverse_key_value_pairs(card.edition, true)["true"] or "none"
+
+	local joker_string = card.config.center.key .. "-" .. edition
+
+	return joker_string
+end
 
 function MP.UTILS.random_message()
 	local messages = {
