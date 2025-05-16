@@ -16,6 +16,7 @@ MP.LOBBY = {
 		timer_increment_seconds = 90,
 		showdown_starting_antes = 3,
 		ruleset = "ruleset_mp_standard",
+		gamemode = "gamemode_mp_attrition",
 		custom_seed = "random",
 		different_decks = false,
 		back = "Red Deck",
@@ -100,7 +101,7 @@ function MP.reset_game_states()
 			hands = 4,
 			location = localize("loc_selecting"),
 			skips = 0,
-			lives = 4,
+			lives = MP.LOBBY.config.starting_lives,
 			sells = 0,
 			spent_last_shop = 0,
 			highest_score = MP.INSANE_INT.empty(),
@@ -118,6 +119,9 @@ function MP.reset_game_states()
 		timer_started = false,
 		real_money = 0,
 		ce_cache = false,
+		furthest_blind = 0,
+		wait_for_enemys_furthest_blind = false,
+		disable_live_and_timer_hud = false,
 	}
 end
 

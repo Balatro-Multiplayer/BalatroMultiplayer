@@ -35,5 +35,5 @@ times = 1
 target = "functions/UI_definitions.lua"
 pattern = '''\{n=G\.UIT\.C, config=\{align = "cm", padding = 0\.05, minw = 1\.45, minh = 1,'''
 position = 'at'
-payload = '''MP.LOBBY.code and MP.UI.timer_hud() or {n=G.UIT.C, config={align = "cm", padding = 0.05, minw = 1.45, minh = 1,'''
+payload = '''MP.LOBBY.code and (not MP.LOBBY.config.disable_live_and_timer_hud) and MP.UI.timer_hud() or {n=G.UIT.C, config={align = "cm", padding = 0.05, minw = 1.45, minh = 1,'''
 times = 1
