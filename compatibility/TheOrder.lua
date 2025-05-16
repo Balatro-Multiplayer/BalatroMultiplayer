@@ -238,9 +238,9 @@ function CardArea:shuffle(_seed)
 			polychrome = 102,
 		}
 		-- no mod compat, but mods aren't too competitive, it won't matter much
-
+		
 		local tables = {}
-
+		
 		for i, v in ipairs(self.cards) do	-- give each card a value based on current enhancement/seal/edition
 			v.mp_stdval = 0 + (centers[v.config.center_key] or 0)
 			v.mp_stdval = v.mp_stdval + (seals[v.seal or 'nil'] or 0)
@@ -251,7 +251,7 @@ function CardArea:shuffle(_seed)
 		end
 		
 		local true_seed = pseudorandom(_seed or 'shuffle')
-
+		
 		for k, v in pairs(tables) do
 			table.sort(v, function (a, b) return a.mp_stdval > b.mp_stdval end)
 			local mega_seed = k..true_seed

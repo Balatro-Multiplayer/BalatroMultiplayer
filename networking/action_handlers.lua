@@ -285,6 +285,13 @@ function SMODS.find_card(key, count_debuffed)
 	return new_ret
 end
 
+-- don't poll edition
+local origedpoll = poll_edition
+function poll_edition(_key, _mod, _no_neg, _guaranteed)
+	if G.OVERLAY_MENU then return nil end
+	return origedpoll(_key, _mod, _no_neg, _guaranteed)
+end
+
 local function action_speedrun()
 	local function speedrun(card)
 		card:juice_up()
