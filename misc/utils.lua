@@ -355,7 +355,7 @@ local sell_card_ref = Card.sell_card
 function Card:sell_card()
 	if self.ability and self.ability.name then
 		sendTraceMessage(
-			string.format("Client sent message: action:soldCard,card:%s", self.ability.name),
+			string.format("Client sent message: action:soldCard,card:%s,key:%s", self.ability.name, MP.UTILS.joker_to_string(self)),
 			"MULTIPLAYER"
 		)
 	end
@@ -376,7 +376,7 @@ function G.FUNCS.buy_from_shop(e)
 	local c1 = e.config.ref_table
 	if c1 and c1:is(Card) then
 		sendTraceMessage(
-			string.format("Client sent message: action:boughtCardFromShop,card:%s,cost:%s", c1.ability.name, c1.cost),
+			string.format("Client sent message: action:boughtCardFromShop,card:%s,cost:%s,key:%s", c1.ability.name, c1.cost, MP.UTILS.joker_to_string(c1)),
 			"MULTIPLAYER"
 		)
 	end
@@ -387,7 +387,7 @@ local use_card_ref = G.FUNCS.use_card
 function G.FUNCS.use_card(e, mute, nosave)
 	if e.config and e.config.ref_table and e.config.ref_table.ability and e.config.ref_table.ability.name then
 		sendTraceMessage(
-			string.format("Client sent message: action:usedCard,card:%s", e.config.ref_table.ability.name),
+			string.format("Client sent message: action:usedCard,card:%s,key:%s", e.config.ref_table.ability.name, MP.UTILS.joker_to_string(e.config.ref_table)),
 			"MULTIPLAYER"
 		)
 	end
