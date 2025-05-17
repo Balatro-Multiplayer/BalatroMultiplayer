@@ -35,7 +35,7 @@ local function action_lobbyInfo(host, hostHash, hostCached, guest, guestHash, gu
 	MP.LOBBY.host = { username = host, hash_str = hostHash, hash = hash(hostHash), cached = hostCached == "true" }
 	if guest ~= nil then
 		MP.LOBBY.guest =
-			{ username = guest, hash_str = guestHash, hash = hash(guestHash), cached = guestCached == "true" }
+		{ username = guest, hash_str = guestHash, hash = hash(guestHash), cached = guestCached == "true" }
 	else
 		MP.LOBBY.guest = {}
 	end
@@ -99,7 +99,7 @@ end
 ---@param skips_str string
 local function action_enemy_info(score_str, hands_left_str, skips_str, lives_str)
 	local score = MP.INSANE_INT.from_string(score_str)
-	
+
 	local hands_left = tonumber(hands_left_str)
 	local skips = tonumber(skips_str)
 	local lives = tonumber(lives_str)
@@ -336,10 +336,28 @@ end
 
 local action_asteroid = action_asteroid
 	or function()
+		local hand_priority = {
+			["Flush Five"] = 1,
+			["Flush House"] = 2,
+			["Five of a Kind"] = 3,
+			["Straight Flush"] = 4,
+			["Four of a Kind"] = 5,
+			["Full House"] = 6,
+			["Flush"] = 7,
+			["Straight"] = 8,
+			["Three of a Kind"] = 9,
+			["Two Pair"] = 11,
+			["Pair"] = 12,
+			["High Card"] = 13
+		}
 		local hand_type = "High Card"
 		local max_level = 0
+
+
 		for k, v in pairs(G.GAME.hands) do
-			if to_big(v.level) > to_big(max_level) then
+			if to_big(v.level) > to_big(max_level) or
+				(to_big(v.level) == to_big(max_level) and
+					hand_priority[k] < hand_priority[hand_type]) then
 				hand_type = k
 				max_level = v.level
 			end
