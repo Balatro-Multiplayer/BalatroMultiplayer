@@ -99,7 +99,7 @@ end
 ---@param skips_str string
 local function action_enemy_info(score_str, hands_left_str, skips_str, lives_str)
 	local score = MP.INSANE_INT.from_string(score_str)
-	
+
 	local hands_left = tonumber(hands_left_str)
 	local skips = tonumber(skips_str)
 	local lives = tonumber(lives_str)
@@ -211,21 +211,27 @@ local function action_lobby_options(options)
 			MP.LOBBY.config.ruleset = v
 			goto continue
 		end
+		if k == "gamemode" then
+			MP.LOBBY.config.gamemode = v
+			goto continue
+		end
+
 		local parsed_v = v
 		if v == "true" then
 			parsed_v = true
 		elseif v == "false" then
 			parsed_v = false
 		end
-		if k == "starting_lives" then
+
+		if k == "starting_lives"
+			or k == "pvp_start_round"
+			or k == "timer_base_seconds"
+			or k == "timer_increment_seconds"
+			or k == "showdown_starting_antes"
+		then
 			parsed_v = tonumber(v)
 		end
-		if k == "pvp_start_round" then
-			parsed_v = tonumber(v)
-		end
-		if k == "timer_base_seconds" then
-			parsed_v = tonumber(v)
-		end
+
 		MP.LOBBY.config[k] = parsed_v
 		if G.OVERLAY_MENU then
 			local config_uie = G.OVERLAY_MENU:get_UIE_by_ID(k .. "_toggle")
@@ -473,18 +479,55 @@ function G.FUNCS.load_end_game_jokers()
 	if not MP.end_game_jokers then
 		return
 	end
-	local split_keys = {}
-	for key in string.gmatch(MP.end_game_jokers_keys, "([^;]+)") do
-		if key ~= "" and key ~= nil and key ~= "0" then
-			table.insert(split_keys, key)
+
+	local split_jokers = {}
+	for joker_str in string.gmatch(MP.end_game_jokers_keys, "([^;]+)") do
+		if joker_str ~= "" and joker_str ~= nil and joker_str ~= "0" then
+			table.insert(split_jokers, joker_str)
 		end
 	end
+
+	MP.end_game_jokers.config.card_limit = G.GAME.starting_params.joker_slots
+
 	remove_all(MP.end_game_jokers.cards)
-	for _, key in pairs(split_keys) do
+	for _, joker_str in pairs(split_jokers) do
+		if joker_str == "" then
+			goto continue
+		end
+
+		local joker_params = MP.UTILS.string_split(joker_str, "-")
+
+		local key = joker_params[1]
+		local edition = joker_params[2]
+		local eternal_or_perishable = joker_params[3]
+		local rental = joker_params[4]
+
 		local card = create_card("Joker", MP.end_game_jokers, false, nil, nil, nil, key)
-		card:set_edition()
+
+		if edition and edition ~= "none" then
+			card:set_edition({ [edition] = true }, true, true)
+		else
+			card:set_edition()
+		end
+
+		if eternal_or_perishable == "eternal" then
+			card:set_eternal(true)
+		elseif eternal_or_perishable == "perishable" then
+			card:set_perishable(true)
+		end
+
+		if rental == "rental" then
+			card:set_rental(true)
+		end
+
 		card:add_to_deck()
 		MP.end_game_jokers:emplace(card)
+
+		if card.edition and card.edition.negative then
+			MP.end_game_jokers.config.card_limit = MP.end_game_jokers.config.card_limit + 1
+		end
+
+		::continue::
 	end
 end
 
@@ -502,12 +545,12 @@ local function action_get_end_game_jokers()
 		Client.send("action:receiveEndGameJokers,keys:")
 		return
 	end
-	local jokers = G.jokers.cards
-	local keys = ""
-	for _, card in pairs(jokers) do
-		keys = keys .. card.config.center.key .. ";"
+
+	local jokers = ""
+	for _, card in pairs(G.jokers.cards) do
+		jokers = jokers .. ";" .. MP.UTILS.joker_to_string(card)
 	end
-	Client.send(string.format("action:receiveEndGameJokers,keys:%s", keys))
+	Client.send(string.format("action:receiveEndGameJokers,keys:%s", jokers))
 end
 
 local function action_get_nemesis_deck()
@@ -551,10 +594,7 @@ local function action_receive_nemesis_deck(deck_str)
 		)
 
 		if edition and edition ~= "none" then
-			local edition_object = {}
-			edition_object[edition] = true
-
-			card:set_edition(edition_object, true, true)
+			card:set_edition({ [edition] = true }, true, true)
 		end
 
 		if seal ~= "none" then
@@ -590,7 +630,6 @@ end
 
 -- #region Client to Server
 function MP.ACTIONS.create_lobby(gamemode)
-	MP.LOBBY.config.ruleset = gamemode
 	Client.send(string.format("action:createLobby,gameMode:%s", gamemode))
 end
 
@@ -677,6 +716,10 @@ end
 
 function MP.ACTIONS.new_round()
 	Client.send("action:newRound")
+end
+
+function MP.ACTIONS.set_furthest_blind(furthest_blind)
+	Client.send(string.format("action:setFurthestBlind,furthestBlind:%d", furthest_blind))
 end
 
 function MP.ACTIONS.skip(skips)

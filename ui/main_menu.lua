@@ -27,6 +27,17 @@ function nope_a_joker(card)
 	play_sound("tarot2", 1, 0.4)
 end
 
+local function juice_up(thing, a, b)
+	if SMODS.Mods["Talisman"] and SMODS.Mods["Talisman"].can_load then
+		local disable_anims = Talisman.config_file.disable_anims
+		Talisman.config_file.disable_anims = false
+		thing:juice_up(a, b)
+		Talisman.config_file.disable_anims = disable_anims
+	else
+		thing:juice_up(a, b)
+	end
+end
+
 function wheel_of_fortune_the_card(card)
 	math.randomseed(os.time())
 	local chance = math.random(4)
@@ -34,31 +45,42 @@ function wheel_of_fortune_the_card(card)
 		local editions = {{name = 'e_foil', weight = 50}, {name = 'e_holo', weight = 35}, {name = 'e_polychrome', weight = 15}}
 		local edition = poll_edition("main_menu"..os.time(), nil, true, true, editions)
 		card:set_edition(edition, true)
-		card:juice_up(0.3, 0.5)
+		juice_up(card, 0.3, 0.5)
 	else
 		nope_a_joker(card)
-		card:juice_up(0.3, 0.5)
+		juice_up(card, 0.3, 0.5)
 	end
 end
 
-wheel_of_fortune_the_title_card = wheel_of_fortune_the_title_card
-	or function()
-		wheel_of_fortune_the_card(G.title_top.cards[1])
-		return true
+local function has_mod_manipulating_title_card()
+	-- maintain a list of all mods that affect the title card here
+	-- (must use the mod's id, not its name)
+	local modlist = { "bumod", "Cryptid", "Talisman" }
+	for _, modname in ipairs(modlist) do
+		if SMODS.Mods[modname] and SMODS.Mods[modname].can_load then
+			return true
+		end
 	end
+	return false
+end
 
-MP.title_card = nil
-
-wheel_of_fortune_the_mp_card = wheel_of_fortune_the_mp_card
-	or function()
-		if MP.title_card then
-			wheel_of_fortune_the_card(MP.title_card)
+function make_wheel_of_fortune_a_card_func(card)
+	return function()
+		if card then
+			wheel_of_fortune_the_card(card)
 		end
 		return true
 	end
+end
+
+MP.title_card = nil
 
 function add_custom_multiplayer_cards(change_context)
-	G.title_top.cards[1]:set_base(G.P_CARDS["S_A"], true)
+	local only_mod_affecting_title_card = not has_mod_manipulating_title_card()
+
+	if only_mod_affecting_title_card then
+		G.title_top.cards[1]:set_base(G.P_CARDS["S_A"], true)
+	end
 
 	-- Credit to the Cryptid mod for the original code to add a card to the main menu
 	local title_card = create_card("Base", G.title_top, nil, nil, nil, nil)
@@ -93,20 +115,26 @@ function add_custom_multiplayer_cards(change_context)
 
 	MP.title_card = title_card
 
-	G.E_MANAGER:add_event(Event({
-		trigger = "after",
-		delay = 2,
-		blockable = false,
-		blocking = false,
-		func = wheel_of_fortune_the_title_card,
-	}))
+	-- base delay in seconds, increases as needed
+	local wheel_delay = 2
+
+	if only_mod_affecting_title_card then
+		G.E_MANAGER:add_event(Event({
+			trigger = "after",
+			delay = wheel_delay,
+			blockable = false,
+			blocking = false,
+			func = make_wheel_of_fortune_a_card_func(G.title_top.cards[1]),
+		}))
+		wheel_delay = wheel_delay + 1
+	end
 
 	G.E_MANAGER:add_event(Event({
 		trigger = "after",
-		delay = 3,
+		delay = wheel_delay,
 		blockable = false,
 		blocking = false,
-		func = wheel_of_fortune_the_mp_card,
+		func = make_wheel_of_fortune_a_card_func(MP.title_card),
 	}))
 end
 
@@ -151,6 +179,8 @@ function Game:main_menu(change_context)
 end
 
 function G.UIDEF.ruleset_selection_options()
+	MP.LOBBY.config.ruleset = "ruleset_mp_standard"
+
 	local default_ruleset_area = UIBox({
 		definition = G.UIDEF.ruleset_info("standard"),
 		config = {align = "cm"}
@@ -189,15 +219,19 @@ function G.FUNCS.change_ruleset_selection(e)
 	end
 	e.config.chosen = "vert" -- Special setting to show 'chosen' indicator on the side
 
+	local ruleset_name = string.match(e.config.id, "([^_]+)")
+	MP.LOBBY.config.ruleset = "ruleset_mp_" .. ruleset_name
+
 	if ruleset_area.config.object then ruleset_area.config.object:remove() end
 	ruleset_area.config.object = UIBox({
-		 definition = G.UIDEF.ruleset_info(string.match(e.config.id, "([^_]+)")),
+		 definition = G.UIDEF.ruleset_info(ruleset_name),
 		 config = {align = "cm", parent = ruleset_area}
 	})
 
+	ruleset_area.config.object:recalculate()
+
 	ruleset_area.config.prev_chosen = e
 
-	MP.LOBBY.config.ruleset = nil
 	MP.LOBBY.ruleset_preview = false
 end
 
@@ -212,7 +246,7 @@ function G.UIDEF.ruleset_info(ruleset_name)
 		config = {align = "cm"}
 	})
 
-	return {n=G.UIT.ROOT, config={align = "tm", minh = 8, maxh = 8, minw = 11, colour = G.C.CLEAR}, nodes={
+	return {n=G.UIT.ROOT, config={align = "tm", minh = 8, maxh = 8, minw = 11, maxw = 11, colour = G.C.CLEAR}, nodes={
 		{n=G.UIT.C, config={align = "tm", padding = 0.2, r = 0.1, colour = G.C.BLACK}, nodes={
 			{n=G.UIT.R, config={align = "tm", padding = 0.05, minw = 11, maxw = 11, minh = math.max(2, ruleset_desc_lines) * 0.35}, nodes={
 				{n=G.UIT.T, config={text = ruleset_desc, colour = G.C.UI.TEXT_LIGHT, scale = 0.8}}
@@ -221,8 +255,8 @@ function G.UIDEF.ruleset_info(ruleset_name)
 				{n=G.UIT.O, config={object = ruleset_banned_tabs}}
 			}},
 			{n=G.UIT.R, config={align = "cm"}, nodes={
-				{n=G.UIT.R, config={id = "start_"..ruleset_name, button = "start_lobby", align = "cm", padding = 0.05, r = 0.1, minw = 8, minh = 0.8, colour = G.C.BLUE, hover = true, shadow = true}, nodes={
-					{n=G.UIT.T, config={text = localize("b_create_lobby"), scale = 0.5, colour = G.C.UI.TEXT_LIGHT}}
+				{n=G.UIT.R, config={id = "select_gamemode_button", button = "select_gamemode", align = "cm", padding = 0.05, r = 0.1, minw = 8, minh = 0.8, colour = G.C.BLUE, hover = true, shadow = true}, nodes={
+					{n=G.UIT.T, config={text = localize("b_next"), scale = 0.5, colour = G.C.UI.TEXT_LIGHT}}
 				}}
 			}}
 		}}
@@ -389,7 +423,7 @@ function G.UIDEF.ruleset_cardarea_definition(args)
 		end
 
 		local function blind_constructor(blind_spec)
-			local temp_blind = AnimatedSprite(0,0,1.1,1.1, G.ANIMATION_ATLAS['blind_chips'], blind_spec.pos)
+			local temp_blind = AnimatedSprite(0,0,1.1,1.1, G.ANIMATION_ATLAS[blind_spec.atlas] or G.ANIMATION_ATLAS['blind_chips'], blind_spec.pos)
 			temp_blind:define_draw_steps({
 				{shader = 'dissolve', shadow_height = 0.05},
 				{shader = 'dissolve'}
@@ -404,7 +438,7 @@ function G.UIDEF.ruleset_cardarea_definition(args)
 						if not temp_blind.hovering and temp_blind.states.visible then
 							temp_blind.hovering = true
 							temp_blind.hover_tilt = 3
-							temp_blind:juice_up(0.05, 0.02)
+							juice_up(temp_blind, 0.05, 0.02)
 							temp_blind.config.h_popup = create_UIBox_blind_popup(blind_spec, true)
 							temp_blind.config.h_popup_config ={align = 'cl', offset = {x=-0.1,y=0},parent = temp_blind}
 							Node.hover(temp_blind)
@@ -439,6 +473,89 @@ function G.UIDEF.ruleset_cardarea_definition(args)
 			}}
 		}}
 	end
+end
+
+function G.FUNCS.select_gamemode(e)
+	G.SETTINGS.paused = true
+
+	G.FUNCS.overlay_menu({
+		definition = G.UIDEF.gamemode_selection_options(),
+	})
+end
+
+function G.UIDEF.gamemode_selection_options()
+	MP.LOBBY.config.gamemode = "gamemode_mp_attrition"
+	
+	local default_gamemode_area = UIBox({
+		definition = G.UIDEF.gamemode_info("attrition"),
+		config = {align = "cm"}
+	})
+
+	return create_UIBox_generic_options({back_func = "play_options", contents = {
+		{n=G.UIT.C, config={align = "tm", minh = 8, minw = 4}, nodes={
+			{n=G.UIT.R, config={align = "cm", padding = 0.05}, nodes={
+				UIBox_button({id = "attrition_gamemode_button", col = true, chosen = "vert", label = {localize("k_attrition")}, button = "change_gamemode_selection", colour = G.C.RED, minw = 4, scale = 0.4, minh = 0.6}),
+			}},
+			{n=G.UIT.R, config={align = "cm", padding = 0.05}, nodes={
+				UIBox_button({id = "showdown_gamemode_button", col = true, label = {localize("k_showdown")}, button = "change_gamemode_selection", colour = G.C.RED, minw = 4, scale = 0.4, minh = 0.6}),
+			}},
+			{n=G.UIT.R, config={align = "cm", padding = 0.05}, nodes={
+				UIBox_button({id = "survival_gamemode_button", col = true, label = {localize("k_survival")}, button = "change_gamemode_selection", colour = G.C.RED, minw = 4, scale = 0.4, minh = 0.6}),
+			}}
+		}},
+		{n=G.UIT.C, config={align = "cm", minh = 8, maxh = 8, minw = 11}, nodes={
+			{n=G.UIT.O, config={id = "gamemode_area", object = default_gamemode_area}}
+		}}
+	}})
+end
+
+function G.FUNCS.change_gamemode_selection(e)
+	if not G.OVERLAY_MENU then return end
+
+	local gamemode_area = G.OVERLAY_MENU:get_UIE_by_ID("gamemode_area")
+	if not gamemode_area then return end
+
+	-- Switch 'chosen' status from the previously-chosen button to this one:
+	if gamemode_area.config.prev_chosen then
+		gamemode_area.config.prev_chosen.config.chosen = nil
+	else -- The previously-chosen button should be the default one here:
+		local default_button = G.OVERLAY_MENU:get_UIE_by_ID("attrition_gamemode_button")
+		if default_button then default_button.config.chosen = nil end
+	end
+	e.config.chosen = "vert" -- Special setting to show 'chosen' indicator on the side
+
+	local gamemode_name = string.match(e.config.id, "([^_]+)")
+	MP.LOBBY.config.gamemode = "gamemode_mp_" .. gamemode_name
+
+	if gamemode_area.config.object then gamemode_area.config.object:remove() end
+	gamemode_area.config.object = UIBox({
+		 definition = G.UIDEF.gamemode_info(gamemode_name),
+		 config = {align = "cm", parent = gamemode_area}
+	})
+
+	gamemode_area.config.object:recalculate()
+
+	gamemode_area.config.prev_chosen = e
+end
+
+function G.UIDEF.gamemode_info(gamemode_name)
+	local gamemode = MP.Gamemodes["gamemode_mp_" .. gamemode_name]
+
+	local gamemode_desc = MP.UTILS.wrapText(localize("k_" .. gamemode_name .. "_description"), 100)
+	local _, gamemode_desc_lines = gamemode_desc:gsub("\n", " ")
+
+	return {n=G.UIT.ROOT, config={align = "tm", minh = 8, maxh = 8, minw = 11, maxw = 11, colour = G.C.CLEAR}, nodes={
+		{n=G.UIT.C, config={align = "tm", padding = 0.2, r = 0.1, colour = G.C.BLACK, minh = 8}, nodes={
+			{n=G.UIT.R, config={align = "tm", padding = 0.05, minw = 11, maxw = 11, minh = 8}, nodes={
+				{n=G.UIT.T, config={text = gamemode_desc, colour = G.C.UI.TEXT_LIGHT, scale = 0.8}}
+			}},
+			{n=G.UIT.R, config={align = "cm"}, nodes={
+				{n=G.UIT.R, config={id = "start_lobby_button", button = "start_lobby", align = "cm", padding = 0.05, r = 0.1, minw = 8, minh = 0.8, colour = G.C.BLUE, hover = true, shadow = true}, nodes={
+					{n=G.UIT.T, config={text = localize("b_create_lobby"), scale = 0.5, colour = G.C.UI.TEXT_LIGHT}}
+				}}
+			}}
+		}}
+	}}
 end
 
 function G.UIDEF.create_UIBox_join_lobby_button()
@@ -497,7 +614,7 @@ function G.UIDEF.override_main_menu_play_button()
 				UIBox_button({
 					label = { localize("b_singleplayer") },
 					colour = G.C.BLUE,
-					button = "setup_run",
+					button = "setup_run_singleplayer",
 					minw = 5,
 				}),
 				MP.LOBBY.connected and UIBox_button({
@@ -521,6 +638,13 @@ function G.UIDEF.override_main_menu_play_button()
 			},
 		})
 	)
+end
+
+function G.FUNCS.setup_run_singleplayer(e)
+	G.SETTINGS.paused = true
+	MP.LOBBY.config.ruleset = nil
+	MP.LOBBY.config.gamemode = nil
+	G.FUNCS.setup_run(e)
 end
 
 function G.FUNCS.play_options(e)
@@ -554,17 +678,30 @@ end
 
 function G.FUNCS.start_lobby(e)
 	G.SETTINGS.paused = false
-	if e.config.id == "start_vanilla" then
+	if MP.LOBBY.config.ruleset == "ruleset_mp_vanilla" then
 		MP.LOBBY.config.multiplayer_jokers = false
 	else
 		MP.LOBBY.config.multiplayer_jokers = true
 	end
-	MP.ACTIONS.create_lobby(
-		e.config.id == "start_vanilla" and "ruleset_mp_vanilla"
-			or e.config.id == "start_weekly" and "ruleset_mp_weekly"
-			or e.config.id == "start_badlatro" and "ruleset_mp_badlatro"
-			or "ruleset_mp_standard"
-	)
+
+	if MP.LOBBY.config.gamemode == "gamemode_mp_survival" then
+		MP.LOBBY.config.starting_lives = 1
+		MP.LOBBY.config.disable_live_and_timer_hud = true
+	else
+		MP.LOBBY.config.starting_lives = 4
+		MP.LOBBY.config.disable_live_and_timer_hud = false
+	end
+
+	-- Check if the current gamemode is valid. If it's not, default to attrition.
+	local gamemode_check = false
+	for k, _ in pairs(MP.Gamemodes) do
+		if k == MP.LOBBY.config.gamemode then
+			gamemode_check = true
+		end
+	end
+	MP.LOBBY.config.gamemode = gamemode_check and MP.LOBBY.config.gamemode or "gamemode_mp_attrition"
+
+	MP.ACTIONS.create_lobby(string.sub(MP.LOBBY.config.gamemode, 13))
 	G.FUNCS.exit_overlay_menu()
 end
 

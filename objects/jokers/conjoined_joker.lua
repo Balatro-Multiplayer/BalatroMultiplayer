@@ -17,7 +17,7 @@ SMODS.Joker({
 	perishable_compat = true,
 	config = { extra = { x_mult_gain = 0.5, max_x_mult = 3, x_mult = 1 } },
 	loc_vars = function(self, info_queue, card)
-		add_nemesis_info(info_queue)
+		MP.UTILS.add_nemesis_info(info_queue)
 		return { vars = { card.ability.extra.x_mult_gain, card.ability.extra.max_x_mult, card.ability.extra.x_mult } }
 	end,
 	in_pool = function(self)
@@ -46,11 +46,11 @@ SMODS.Joker({
 		end
 	end,
 	calculate = function(self, card, context)
-		if context.cardarea == G.jokers 
-		    and context.joker_main 
-	            and MP.is_pvp_boss() 
-	            and (not card.edition or card.edition.type ~= "mp_phantom")
-		      then
+		if context.cardarea == G.jokers
+			and context.joker_main
+			and MP.is_pvp_boss()
+			and (not card.edition or card.edition.type ~= "mp_phantom")
+		then
 			return {
 				x_mult = card.ability.extra.x_mult,
 			}

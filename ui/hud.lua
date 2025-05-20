@@ -181,7 +181,7 @@ end
 
 local ease_round_ref = ease_round
 function ease_round(mod)
-	if MP.LOBBY.code then
+	if MP.LOBBY.code and (not MP.LOBBY.config.disable_live_and_timer_hud) then
 		return
 	end
 	ease_round_ref(mod)
