@@ -129,7 +129,8 @@ function create_UIBox_blind_choice(type, run_info)
 			set = "Blind",
 			vars = { blind_choice.config.key == 'bl_ox' and localize(G.GAME.current_round.most_played_poker_hand, "poker_hands") or '' },
 		})
-		local loc_name = localize({ type = "name_text", key = blind_choice.config.key, set = "Blind" })
+		local loc_name = ( G.GAME.round_resets.blind_choices[type] == "bl_mp_nemesis" and (MP.LOBBY.is_host and MP.LOBBY.guest.username or MP.LOBBY.host.username) ) 
+			or localize({ type = "name_text", key = blind_choice.config.key, set = "Blind" })
 		local blind_col = get_blind_main_colour(type)
 		local blind_amt = get_blind_amount(G.GAME.round_resets.blind_ante)
 			* blind_choice.config.mult
