@@ -99,7 +99,7 @@ end
 ---@param skips_str string
 local function action_enemy_info(score_str, hands_left_str, skips_str, lives_str)
 	local score = MP.INSANE_INT.from_string(score_str)
-	
+
 	local hands_left = tonumber(hands_left_str)
 	local skips = tonumber(skips_str)
 	local lives = tonumber(lives_str)
@@ -499,6 +499,8 @@ function G.FUNCS.load_end_game_jokers()
 
 		local key = joker_params[1]
 		local edition = joker_params[2]
+		local eternal_or_perishable = joker_params[3]
+		local rental = joker_params[4]
 
 		local card = create_card("Joker", MP.end_game_jokers, false, nil, nil, nil, key)
 
@@ -506,6 +508,16 @@ function G.FUNCS.load_end_game_jokers()
 			card:set_edition({ [edition] = true }, true, true)
 		else
 			card:set_edition()
+		end
+
+		if eternal_or_perishable == "eternal" then
+			card:set_eternal(true)
+		elseif eternal_or_perishable == "perishable" then
+			card:set_perishable(true)
+		end
+
+		if rental == "rental" then
+			card:set_rental(true)
 		end
 
 		card:add_to_deck()
