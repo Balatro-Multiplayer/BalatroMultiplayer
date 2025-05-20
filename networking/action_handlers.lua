@@ -211,6 +211,10 @@ local function action_lobby_options(options)
 			MP.LOBBY.config.ruleset = v
 			goto continue
 		end
+		if k == "gamemode" then
+			MP.LOBBY.config.gamemode = v
+			goto continue
+		end
 
 		local parsed_v = v
 		if v == "true" then
@@ -223,6 +227,7 @@ local function action_lobby_options(options)
 			or k == "pvp_start_round"
 			or k == "timer_base_seconds"
 			or k == "timer_increment_seconds"
+			or k == "showdown_starting_antes"
 		then
 			parsed_v = tonumber(v)
 		end
@@ -613,7 +618,6 @@ end
 
 -- #region Client to Server
 function MP.ACTIONS.create_lobby(gamemode)
-	MP.LOBBY.config.ruleset = gamemode
 	Client.send(string.format("action:createLobby,gameMode:%s", gamemode))
 end
 
@@ -700,6 +704,10 @@ end
 
 function MP.ACTIONS.new_round()
 	Client.send("action:newRound")
+end
+
+function MP.ACTIONS.set_furthest_blind(furthest_blind)
+	Client.send(string.format("action:setFurthestBlind,furthestBlind:%d", furthest_blind))
 end
 
 function MP.ACTIONS.skip(skips)
