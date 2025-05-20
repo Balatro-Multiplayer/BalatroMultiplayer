@@ -472,15 +472,31 @@ end
 
 local function action_magnet_response(key)
 	local joker_params = MP.UTILS.string_split(key, "-")
+
 	local forced_key = joker_params[1]
 	local edition = joker_params[2]
+	local eternal_or_perishable = joker_params[3]
+	local rental = joker_params[4]
+
 	local card = create_card("Joker", G.jokers, false, nil, nil, nil, forced_key)
+
 	-- Don't copy the edition if it's negative, just like Invisible Joker
 	if edition and edition ~= "none" and edition ~= "negative" then
 		card:set_edition({ [edition] = true }, true, true)
 	else
 		card:set_edition()
 	end
+
+	if eternal_or_perishable == "eternal" then
+		card:set_eternal(true)
+	elseif eternal_or_perishable == "perishable" then
+		card:set_perishable(true)
+	end
+
+	if rental == "rental" then
+		card:set_rental(true)
+	end
+
 	card:add_to_deck()
 	G.jokers:emplace(card)
 end
