@@ -912,14 +912,28 @@ function Game:update_new_round(dt)
 		-- Prevent player from losing
 		if to_big(G.GAME.chips) < to_big(G.GAME.blind.chips) and not MP.is_pvp_boss() then
 			G.GAME.blind.chips = -1
+			MP.GAME.wait_for_enemys_furthest_blind = (MP.LOBBY.config.gamemode == "gamemode_mp_survival") and (tonumber(MP.GAME.lives) == 1) -- In Survival Mode, if this is the last live, wait for the enemy.
 			MP.ACTIONS.fail_round(G.GAME.current_round.hands_played)
 		end
 
 		-- Prevent player from winning
 		G.GAME.win_ante = 999
 
-		update_new_round_ref(self, dt)
-
+		if MP.LOBBY.config.gamemode == "gamemode_mp_survival" and MP.GAME.wait_for_enemys_furthest_blind then
+			G.STATE_COMPLETE = true
+			G.FUNCS.draw_from_hand_to_discard()
+			attention_text({
+				scale = 0.8,
+				text = localize("k_wait_enemy_reach_this_blind"),
+				hold = 5,
+				align = "cm",
+				offset = { x = 0, y = -1.5 },
+				major = G.play,
+			})
+		else
+			update_new_round_ref(self, dt)
+		end
+		
 		-- Reset ante number
 		G.GAME.win_ante = 8
 		return
@@ -1000,17 +1014,25 @@ function MP.end_round()
 			G.STATE = G.STATES.ROUND_EVAL
 			G.STATE_COMPLETE = false
 
-			if G.GAME.round_resets.blind == G.P_BLINDS.bl_small then
+			local temp_furthest_blind = 0
+
+			if G.GAME.round_resets.blind_states.Small ~= "Defeated" and G.GAME.round_resets.blind_states.Small ~= "Skipped" then
 				G.GAME.round_resets.blind_states.Small = "Defeated"
-			elseif G.GAME.round_resets.blind == G.P_BLINDS.bl_big then
+				temp_furthest_blind = G.GAME.round_resets.ante * 10 + 1
+			elseif G.GAME.round_resets.blind_states.Big ~= "Defeated" and G.GAME.round_resets.blind_states.Big ~= "Skipped" then
 				G.GAME.round_resets.blind_states.Big = "Defeated"
+				temp_furthest_blind = G.GAME.round_resets.ante * 10 + 2
 			else
 				G.GAME.current_round.voucher = SMODS.get_next_vouchers()
 				G.GAME.round_resets.blind_states.Boss = "Defeated"
+				temp_furthest_blind = G.GAME.round_resets.ante * 10 + 3
 				for k, v in ipairs(G.playing_cards) do
 					v.ability.played_this_ante = nil
 				end
 			end
+
+			MP.GAME.furthest_blind = (temp_furthest_blind > MP.GAME.furthest_blind) and temp_furthest_blind or MP.GAME.furthest_blind
+			MP.ACTIONS.set_furthest_blind(MP.GAME.furthest_blind)
 
 			if G.GAME.round_resets.temp_handsize then
 				G.hand:change_size(-G.GAME.round_resets.temp_handsize)
@@ -1044,7 +1066,7 @@ local start_run_ref = Game.start_run
 function Game:start_run(args)
 	start_run_ref(self, args)
 
-	if not MP.LOBBY.connected or not MP.LOBBY.code then
+	if not MP.LOBBY.connected or not MP.LOBBY.code or MP.LOBBY.config.disable_live_and_timer_hud then
 		return
 	end
 
@@ -1769,7 +1791,7 @@ end
 
 local ease_ante_ref = ease_ante
 function ease_ante(mod)
-	if not MP.LOBBY.code then
+	if not MP.LOBBY.code or MP.LOBBY.config.disable_live_and_timer_hud then
 		return ease_ante_ref(mod)
 	end
 	-- Prevents easing multiple times at once
@@ -1795,6 +1817,11 @@ function ease_lives(mod)
 			if not G.hand_text_area then
 				return
 			end
+
+			if MP.LOBBY.config.disable_live_and_timer_hud then
+				return true -- Returning nothing hangs the game because it's a part of an event
+			end
+
 			local lives_UI = G.hand_text_area.ante
 			mod = mod or 0
 			local text = "+"
@@ -1845,13 +1872,10 @@ function reset_blinds()
 	reset_blinds_ref()
 	G.GAME.round_resets.pvp_blind_choices = {}
 	if MP.LOBBY.code then
-		if G.GAME.round_resets.ante >= MP.LOBBY.config.pvp_start_round then
-			if not MP.LOBBY.config.normal_bosses then
-				G.GAME.round_resets.blind_choices.Boss = "bl_mp_nemesis"
-			else
-				G.GAME.round_resets.pvp_blind_choices.Boss = true
-			end
-		end
+		local mp_small_choice, mp_big_choice, mp_boss_choice = MP.Gamemodes[MP.LOBBY.config.gamemode]:get_blinds_by_ante(G.GAME.round_resets.ante)
+		G.GAME.round_resets.blind_choices.Small = mp_small_choice or G.GAME.round_resets.blind_choices.Small
+		G.GAME.round_resets.blind_choices.Big = mp_big_choice or G.GAME.round_resets.blind_choices.Big
+		G.GAME.round_resets.blind_choices.Boss = mp_boss_choice or G.GAME.round_resets.blind_choices.Boss
 	end
 end
 

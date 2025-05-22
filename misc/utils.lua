@@ -428,8 +428,17 @@ function MP.UTILS.joker_to_string(card)
 	end
 
 	local edition = card.edition and MP.UTILS.reverse_key_value_pairs(card.edition, true)["true"] or "none"
+	local eternal_or_perishable = "none"
+	if card.ability then
+		if card.ability.eternal then
+			eternal_or_perishable = "eternal"
+		elseif card.ability.perishable then
+			eternal_or_perishable = "perishable"
+		end
+	end
+	local rental = (card.ability and card.ability.rental) and "rental" or "none"
 
-	local joker_string = card.config.center.key .. "-" .. edition
+	local joker_string = card.config.center.key .. "-" .. edition .. "-" .. eternal_or_perishable .. "-" .. rental
 
 	return joker_string
 end

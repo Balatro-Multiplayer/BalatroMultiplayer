@@ -99,7 +99,7 @@ end
 ---@param skips_str string
 local function action_enemy_info(score_str, hands_left_str, skips_str, lives_str)
 	local score = MP.INSANE_INT.from_string(score_str)
-	
+
 	local hands_left = tonumber(hands_left_str)
 	local skips = tonumber(skips_str)
 	local lives = tonumber(lives_str)
@@ -211,6 +211,10 @@ local function action_lobby_options(options)
 			MP.LOBBY.config.ruleset = v
 			goto continue
 		end
+		if k == "gamemode" then
+			MP.LOBBY.config.gamemode = v
+			goto continue
+		end
 
 		local parsed_v = v
 		if v == "true" then
@@ -223,6 +227,7 @@ local function action_lobby_options(options)
 			or k == "pvp_start_round"
 			or k == "timer_base_seconds"
 			or k == "timer_increment_seconds"
+			or k == "showdown_starting_antes"
 		then
 			parsed_v = tonumber(v)
 		end
@@ -501,6 +506,8 @@ function G.FUNCS.load_end_game_jokers()
 
 		local key = joker_params[1]
 		local edition = joker_params[2]
+		local eternal_or_perishable = joker_params[3]
+		local rental = joker_params[4]
 
 		local card = create_card("Joker", MP.end_game_jokers, false, nil, nil, nil, key)
 
@@ -508,6 +515,16 @@ function G.FUNCS.load_end_game_jokers()
 			card:set_edition({ [edition] = true }, true, true)
 		else
 			card:set_edition()
+		end
+
+		if eternal_or_perishable == "eternal" then
+			card:set_eternal(true)
+		elseif eternal_or_perishable == "perishable" then
+			card:set_perishable(true)
+		end
+
+		if rental == "rental" then
+			card:set_rental(true)
 		end
 
 		card:add_to_deck()
@@ -620,7 +637,6 @@ end
 
 -- #region Client to Server
 function MP.ACTIONS.create_lobby(gamemode)
-	MP.LOBBY.config.ruleset = gamemode
 	Client.send(string.format("action:createLobby,gameMode:%s", gamemode))
 end
 
@@ -707,6 +723,10 @@ end
 
 function MP.ACTIONS.new_round()
 	Client.send("action:newRound")
+end
+
+function MP.ACTIONS.set_furthest_blind(furthest_blind)
+	Client.send(string.format("action:setFurthestBlind,furthestBlind:%d", furthest_blind))
 end
 
 function MP.ACTIONS.skip(skips)
