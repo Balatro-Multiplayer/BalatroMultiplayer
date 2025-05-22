@@ -32,6 +32,7 @@ MP.LOBBY = {
 		challenge = "",
 	},
 	username = "Guest",
+	blind_col = 1,
 	host = {},
 	guest = {},
 	is_host = false,
@@ -128,6 +129,8 @@ end
 MP.reset_game_states()
 
 MP.LOBBY.username = MP.UTILS.get_username()
+MP.LOBBY.blind_col = MP.UTILS.get_blind_col()
+
 
 if not SMODS.current_mod.lovely then
 	G.E_MANAGER:add_event(Event({

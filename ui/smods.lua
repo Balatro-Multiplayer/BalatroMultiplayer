@@ -66,7 +66,12 @@ SMODS.Mods.Multiplayer.credits_tab = function()
 end
 
 SMODS.Mods.Multiplayer.config_tab = function()
-	return {
+	local blind_anim = AnimatedSprite(0,0, 1.4, 1.4, G.ANIMATION_ATLAS['mp_player_blind_col'], G.P_BLINDS[MP.UTILS.blind_col_numtokey(MP.LOBBY.blind_col)].pos)
+	blind_anim:define_draw_steps({
+		{shader = 'dissolve', shadow_height = 0.05},
+		{shader = 'dissolve'}
+	})
+	local ret = {
 		n = G.UIT.ROOT,
 		config = {
 			r = 0.1,
@@ -184,10 +189,50 @@ SMODS.Mods.Multiplayer.config_tab = function()
 					},
 				},
 			},
+			{
+				n = G.UIT.R,
+				config = {
+					padding = 0.1,
+					align = "cm",
+					id = "blind_col_changer",
+				},
+				nodes = {
+					{n=G.UIT.C, config={align = "cm"}, nodes={
+						{n=G.UIT.O, config={id = "blind_col_changer_sprite", object = blind_anim}},
+					}},
+					{n=G.UIT.C, config={align = "cm"}, nodes={
+						create_option_cycle({
+							id = "blind_col_changer_option",
+							label = localize{type ='name_text', key = MP.UTILS.blind_col_numtokey(MP.LOBBY.blind_col), set = 'Blind'},
+							scale = 0.8, 
+							options = {1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25}, -- blind_cols are being saved as numbers because of this option cycle. if this is changed then we should probably change to keys
+							opt_callback = 'change_blind_col', 
+							current_option = MP.LOBBY.blind_col
+						}),
+					}},
+				},
+			},
 		},
 	}
+	return ret
 end
 
 function G.FUNCS.multiplayer_discord(e)
 	love.system.openURL("https://discord.gg/gEemz4ptuF")
+end
+
+function G.FUNCS.change_blind_col(args)	-- all we're doing is just saving + redefining the ui elements here
+	MP.UTILS.save_blind_col(args.to_val)
+	MP.LOBBY.blind_col = args.to_val
+	local sprite = G.OVERLAY_MENU:get_UIE_by_ID('blind_col_changer_sprite')
+	sprite.config.object:remove()
+	sprite.config.object = AnimatedSprite(0,0, 1.4, 1.4, G.ANIMATION_ATLAS['mp_player_blind_col'], G.P_BLINDS[MP.UTILS.blind_col_numtokey(MP.LOBBY.blind_col)].pos)
+	sprite.config.object:define_draw_steps({
+		{shader = 'dissolve', shadow_height = 0.05},
+		{shader = 'dissolve'}
+	})
+	sprite.UIBox:recalculate()
+	local option = G.OVERLAY_MENU:get_UIE_by_ID('blind_col_changer_option')
+	option.children[1].children[1].config.text = localize{type ='name_text', key = MP.UTILS.blind_col_numtokey(MP.LOBBY.blind_col), set = 'Blind'}
+	option.UIBox:recalculate()
 end
