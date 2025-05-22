@@ -11,20 +11,24 @@ function create_UIBox_blind_choice(type, run_info)
 
 		local disabled = false
 		type = type or "Small"
+		local nemesis = G.GAME.round_resets.blind_choices[type] == "bl_mp_nemesis" and true or false
+		local nemesis_blind_col = nemesis and MP.UTILS.get_nemesis_key()
 
 		local blind_choice = {
 			config = G.P_BLINDS[G.GAME.round_resets.blind_choices[type]],
 		}
 
 		local blind_atlas = "blind_chips"
+		local blind_pos = blind_choice.config.pos
 		if blind_choice.config and blind_choice.config.atlas then
 			blind_atlas = blind_choice.config.atlas
 		end
-		blind_choice.animation = AnimatedSprite(0, 0, 1.4, 1.4, G.ANIMATION_ATLAS[blind_atlas], blind_choice.config.pos)
-		blind_choice.animation:define_draw_steps({
-			{ shader = "dissolve", shadow_height = 0.05 },
-			{ shader = "dissolve" },
-		})
+		if nemesis then
+			blind_atlas = 'mp_player_blind_col'
+			blind_pos = G.P_BLINDS[nemesis_blind_col].pos
+		end
+		
+		blind_choice.animation = AnimatedSprite(0, 0, 1.4, 1.4, G.ANIMATION_ATLAS[blind_atlas], blind_pos)
 		blind_choice.animation:define_draw_steps({
 			{ shader = "dissolve", shadow_height = 0.05 },
 			{ shader = "dissolve" },
@@ -131,7 +135,9 @@ function create_UIBox_blind_choice(type, run_info)
 		})
 		local loc_name = ( G.GAME.round_resets.blind_choices[type] == "bl_mp_nemesis" and (MP.LOBBY.is_host and MP.LOBBY.guest.username or MP.LOBBY.host.username) ) 
 			or localize({ type = "name_text", key = blind_choice.config.key, set = "Blind" })
+		
 		local blind_col = get_blind_main_colour(type)
+		
 		local blind_amt = get_blind_amount(G.GAME.round_resets.blind_ante)
 			* blind_choice.config.mult
 			* G.GAME.starting_params.ante_scaling
@@ -487,6 +493,83 @@ function create_UIBox_blind_choice(type, run_info)
 	end
 end
 
+-- the 5 hooks below handle ui related stuff with custom blinds
+
+local get_blind_main_colourref = get_blind_main_colour
+function get_blind_main_colour(type)	-- handles ui colour stuff
+	local nemesis = G.GAME.round_resets.blind_choices[type] == "bl_mp_nemesis" or type == "bl_mp_nemesis"
+	if nemesis then
+		type = MP.UTILS.get_nemesis_key()
+	end
+	return get_blind_main_colourref(type)
+end
+
+local blind_change_colourref = Blind.change_colour
+function Blind:change_colour(blind_col)	-- ensures that small/big blinds have proper colouration
+	local small = false
+	if self.config.blind.key == 'bl_mp_nemesis' then
+		local blind_key = MP.UTILS.get_nemesis_key()
+		if blind_key == "bl_small" or blind_key == "bl_big" then
+			small = true
+		end
+	end
+	local boss = self.boss
+	if small then self.boss = false end
+	blind_change_colourref(self, blind_col)
+	self.boss = boss
+end
+
+local blind_set_blindref = Blind.set_blind
+function Blind:set_blind(blind, reset, silent)	-- hacking in proper spirals, far from good but whatever
+	blind_set_blindref(self, blind, reset, silent)
+	if blind and blind.key == 'bl_mp_nemesis' then
+		local boss = true
+		local showdown = false
+		local blind_key = MP.UTILS.get_nemesis_key()
+		if blind_key == "bl_small" or blind_key == "bl_big" then
+			boss = false
+		end
+		if blind_key == "bl_final_heart" then	-- should be made generic
+			showdown = true
+		end
+		G.ARGS.spin.real = (G.SETTINGS.reduced_motion and 0 or 1)*(boss and (showdown and 0.5 or 0.25) or 0)
+	end
+end
+
+local ease_background_colour_blindref = ease_background_colour_blind
+function ease_background_colour_blind(state, blind_override)	-- handles background
+	local blindname = ((blind_override or (G.GAME.blind and G.GAME.blind.name ~= '' and G.GAME.blind.name)) or 'Small Blind')
+	local blindname = (blindname == '' and 'Small Blind' or blindname)
+	if blindname == "bl_mp_nemesis" then
+		blind_override = MP.UTILS.get_nemesis_key()
+		for k, v in pairs(G.P_BLINDS) do
+			if blind_override == k then
+				blind_override = v.name
+			end
+		end
+	end
+	return ease_background_colour_blindref(state, blind_override)
+end
+
+local add_round_eval_rowref = add_round_eval_row
+function add_round_eval_row(config) -- if i could post a skull emoji i would, wtf is this (cashout screen)
+	if config.name == 'blind1' and G.GAME.blind.config.blind.key == "bl_mp_nemesis" then
+		G.P_BLINDS["bl_mp_nemesis"].atlas = 'mp_player_blind_col'
+		G.GAME.blind.pos = G.P_BLINDS[MP.UTILS.get_nemesis_key()].pos	-- this one is getting reset so no need to bother
+		add_round_eval_rowref(config)
+		G.E_MANAGER:add_event(Event({
+			trigger = 'before',
+			delay = 0.0,
+			func = function()
+				G.P_BLINDS["bl_mp_nemesis"].atlas = "mp_player_blind_chip"	-- lmao
+				return true
+			end,
+		}))
+	else
+		add_round_eval_rowref(config)
+	end
+end
+
 G.FUNCS.blind_choice_handler = function(e)
 	if
 		not e.config.ref_table.run_info
@@ -643,6 +726,11 @@ local function update_blind_HUD()
 					{ { ref_table = MP.GAME.enemy, ref_value = "hands" } }
 				G.HUD_blind:get_UIE_by_ID("dollars_to_be_earned").config.object:update_text()
 				G.HUD_blind.alignment.offset.y = 0
+				if G.GAME.blind.config.blind.key == "bl_mp_nemesis" then	-- this was just the first place i thought of to implement this sprite swapping, change if inappropriate
+					G.GAME.blind.children.animatedSprite.atlas = G.ANIMATION_ATLAS['mp_player_blind_col']
+					local nemesis_blind_col = MP.UTILS.get_nemesis_key()
+					G.GAME.blind.children.animatedSprite:set_sprite_pos(G.P_BLINDS[nemesis_blind_col].pos)
+				end
 				return true
 			end,
 		}))
