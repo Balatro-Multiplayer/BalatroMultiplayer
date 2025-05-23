@@ -35,7 +35,7 @@ local function action_lobbyInfo(host, hostHash, hostCached, guest, guestHash, gu
 	MP.LOBBY.host = { username = host, hash_str = hostHash, hash = hash(hostHash), cached = hostCached == "true" }
 	if guest ~= nil then
 		MP.LOBBY.guest =
-			{ username = guest, hash_str = guestHash, hash = hash(guestHash), cached = guestCached == "true" }
+		{ username = guest, hash_str = guestHash, hash = hash(guestHash), cached = guestCached == "true" }
 	else
 		MP.LOBBY.guest = {}
 	end
@@ -242,13 +242,13 @@ local function action_lobby_options(options)
 		::continue::
 	end
 	if different_decks_before ~= MP.LOBBY.config.different_decks then
-		G.FUNCS.exit_overlay_menu() -- throw out guest from any menu.
+		G.FUNCS.exit_overlay_menu()   -- throw out guest from any menu.
 	end
 	MP.ACTIONS.update_player_usernames() -- render new DECK button state
 end
 
 local function action_send_phantom(key)
-	local menu = G.OVERLAY_MENU	-- we are spoofing a menu here, which disables duplicate protection
+	local menu = G.OVERLAY_MENU -- we are spoofing a menu here, which disables duplicate protection
 	G.OVERLAY_MENU = G.OVERLAY_MENU or true
 	local new_card = create_card("Joker", MP.shared, false, nil, nil, nil, key)
 	new_card:set_edition("e_mp_phantom")
@@ -284,7 +284,7 @@ function SMODS.find_card(key, count_debuffed)
 	local new_ret = {}
 	for i, v in ipairs(ret) do
 		if not v.edition or v.edition.type ~= 'mp_phantom' then
-			new_ret[#new_ret+1] = v
+			new_ret[#new_ret + 1] = v
 		end
 	end
 	return new_ret
@@ -341,12 +341,32 @@ end
 
 local action_asteroid = action_asteroid
 	or function()
+		local hand_priority = {
+			["Flush Five"] = 1,
+			["Flush House"] = 2,
+			["Five of a Kind"] = 3,
+			["Straight Flush"] = 4,
+			["Four of a Kind"] = 5,
+			["Full House"] = 6,
+			["Flush"] = 7,
+			["Straight"] = 8,
+			["Three of a Kind"] = 9,
+			["Two Pair"] = 11,
+			["Pair"] = 12,
+			["High Card"] = 13
+		}
 		local hand_type = "High Card"
 		local max_level = 0
+
+
 		for k, v in pairs(G.GAME.hands) do
-			if to_big(v.level) > to_big(max_level) then
-				hand_type = k
-				max_level = v.level
+			if v.visible then
+				if to_big(v.level) > to_big(max_level) or
+					(to_big(v.level) == to_big(max_level) and
+						hand_priority[k] < hand_priority[hand_type]) then
+					hand_type = k
+					max_level = v.level
+				end
 			end
 		end
 		update_hand_text({ sound = "button", volume = 0.7, pitch = 0.8, delay = 0.3 }, {
