@@ -514,7 +514,7 @@ function MP.UTILS.str_pack_and_encode(data)
 	return str_encoded
 end
 
-function MP.UTILS.str_unpack_and_decode(str)
+function MP.UTILS.str_decode_and_unpack(str)
 	local success, str_decoded, str_decompressed, str_unpacked
 	success, str_decoded = pcall(love.data.decode, "string", "base64", str)
 	if not success then return nil end

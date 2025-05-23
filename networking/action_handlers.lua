@@ -526,22 +526,36 @@ function G.FUNCS.load_end_game_jokers()
 		return
 	end
 
-	local card_area_save = MP.UTILS.str_unpack_and_decode(MP.end_game_jokers_payload)
-	if card_area_save then
-		-- Avoid crashing if the load function ends up indexing a nil value
-		local success = pcall(MP.end_game_jokers.load, MP.end_game_jokers, card_area_save)
-		if not success then
-			-- Reset the card area if loading fails to avoid inconsistent state
-			MP.end_game_jokers:remove()
-			MP.end_game_jokers:init(
-				0,
-				0,
-				5 * G.CARD_W,
-				G.CARD_H,
-				{ card_limit = G.GAME.starting_params.joker_slots, type = "joker", highlight_limit = 1 }
-			)
+	local card_area_save = MP.UTILS.str_decode_and_unpack(MP.end_game_jokers_payload)
+	if not card_area_save then
+		sendDebugMessage("Failed to unpack enemy jokers", "MULTIPLAYER")
+		return
+	end
+
+	-- Avoid crashing if the load function ends up indexing a nil value
+	local success = pcall(MP.end_game_jokers.load, MP.end_game_jokers, card_area_save)
+	if not success then
+		sendDebugMessage("Failed to load enemy jokers", "MULTIPLAYER")
+		-- Reset the card area if loading fails to avoid inconsistent state
+		MP.end_game_jokers:remove()
+		MP.end_game_jokers:init(
+			0,
+			0,
+			5 * G.CARD_W,
+			G.CARD_H,
+			{ card_limit = G.GAME.starting_params.joker_slots, type = "joker", highlight_limit = 1 }
+		)
+		return
+	end
+
+	-- Log the jokers
+	local jokers_str = ""
+	if MP.end_game_jokers.cards then
+		for _, card in pairs(MP.end_game_jokers.cards) do
+			jokers_str = jokers_str .. ";" .. MP.UTILS.joker_to_string(card)
 		end
 	end
+	sendTraceMessage(string.format("Recieved enemy jokers: %s", jokers_str), "MULTIPLAYER")
 end
 
 local function action_receive_end_game_jokers(keys)
