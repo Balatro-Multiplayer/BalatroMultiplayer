@@ -18,11 +18,13 @@ if SMODS.Mods["upgrademod"] and SMODS.Mods["upgrademod"].can_load then
         local max_level = 0
 
         for k, v in pairs(G.GAME.hands) do
-            if to_big(v.level) > to_big(max_level) or
-                (to_big(v.level) == to_big(max_level) and
-                    hand_priority[k] < hand_priority[hand_type]) then
-                hand_type = k
-                max_level = v.level
+            if v.visible then
+                if to_big(v.level) > to_big(max_level) or
+                    (to_big(v.level) == to_big(max_level) and
+                        hand_priority[k] < hand_priority[hand_type]) then
+                    hand_type = k
+                    max_level = v.level
+                end
             end
         end
 
