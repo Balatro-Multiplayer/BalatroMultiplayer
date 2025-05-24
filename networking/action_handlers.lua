@@ -191,6 +191,8 @@ local function action_player_info(lives)
 end
 
 local function action_win_game()
+	MP.end_game_jokers_keys = ""
+	MP.nemesis_deck_string = ""
 	MP.end_game_jokers_received = false
 	MP.nemesis_deck_received = false
 	win_game()
@@ -198,6 +200,8 @@ local function action_win_game()
 end
 
 local function action_lose_game()
+	MP.end_game_jokers_keys = ""
+	MP.nemesis_deck_string = ""
 	MP.end_game_jokers_received = false
 	MP.nemesis_deck_received = false
 	G.STATE_COMPLETE = false
@@ -579,14 +583,11 @@ end
 
 local function action_receive_end_game_jokers(keys)
 	MP.end_game_jokers_keys = keys
-	G.FUNCS.load_end_game_jokers()
 	MP.end_game_jokers_received = true
+	G.FUNCS.load_end_game_jokers()
 end
 
 local function action_get_end_game_jokers()
-	if MP.end_game_jokers_received then
-		return
-	end
 	if not G.jokers or not G.jokers.cards then
 		Client.send("action:receiveEndGameJokers,keys:")
 		return
@@ -600,9 +601,6 @@ local function action_get_end_game_jokers()
 end
 
 local function action_get_nemesis_deck()
-	if MP.nemesis_deck_received then
-		return
-	end
 	local deck_str = ""
 	for _, card in ipairs(G.playing_cards) do
 		deck_str = deck_str .. ";" .. MP.UTILS.card_to_string(card)
@@ -610,12 +608,16 @@ local function action_get_nemesis_deck()
 	Client.send(string.format("action:receiveNemesisDeck,cards:%s", deck_str))
 end
 
-local function action_receive_nemesis_deck(deck_str)
-	if MP.nemesis_deck_received then
+function G.FUNCS.load_nemesis_deck()
+	if not MP.nemesis_deck or not MP.nemesis_cards then
 		return
 	end
 
-	local card_strings = MP.UTILS.string_split(deck_str, ";")
+	local card_strings = MP.UTILS.string_split(MP.nemesis_deck_string, ";")
+
+	for k, _ in pairs(MP.nemesis_cards) do
+		MP.nemesis_cards[k] = nil
+	end
 
 	for _, card_str in pairs(card_strings) do
 		if card_str == "" then
@@ -653,8 +655,12 @@ local function action_receive_nemesis_deck(deck_str)
 
 		::continue::
 	end
+end
 
+local function action_receive_nemesis_deck(deck_str)
+	MP.nemesis_deck_string = deck_str
 	MP.nemesis_deck_received = true
+	G.FUNCS.load_nemesis_deck()
 end
 
 local function action_start_ante_timer(time)
