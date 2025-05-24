@@ -484,41 +484,38 @@ local function action_magnet()
 			end
 		end
 		-- Scale the pseudo from 0 - 1 to the number of candidates
-		local randomIndex = math.floor(pseudorandom('j_mp_magnet') * #candidates) + 1
-		local joker_str = MP.UTILS.joker_to_string(candidates[randomIndex])
-		MP.ACTIONS.magnet_response(joker_str)
+		local random_index = math.floor(pseudorandom('j_mp_magnet') * #candidates) + 1
+		local card_save = candidates[random_index]:save()
+		local card_encoded = MP.UTILS.str_pack_and_encode(card_save)
+		MP.ACTIONS.magnet_response(card_encoded)
 	end
 end
 
 local function action_magnet_response(key)
-	local joker_params = MP.UTILS.string_split(key, "-")
-
-	local forced_key = joker_params[1]
-	local edition = joker_params[2]
-	local eternal_or_perishable = joker_params[3]
-	local rental = joker_params[4]
-
-	local card = create_card("Joker", G.jokers, false, nil, nil, nil, forced_key)
-
-	-- Don't copy the edition if it's negative, just like Invisible Joker
-	if edition and edition ~= "none" and edition ~= "negative" then
-		card:set_edition({ [edition] = true }, true, true)
-	else
-		card:set_edition()
+	local card_save = MP.UTILS.str_decode_and_unpack(key)
+	if not card_save then
+		sendDebugMessage("Failed to unpack magnet joker", "MULTIPLAYER")
+		return
 	end
 
-	if eternal_or_perishable == "eternal" then
-		card:set_eternal(true)
-	elseif eternal_or_perishable == "perishable" then
-		card:set_perishable(true)
+	local card = Card(G.jokers.T.x + G.jokers.T.w/2, G.jokers.T.y, G.CARD_W, G.CARD_H, G.P_CENTERS.j_joker, G.P_CENTERS.c_base)
+	-- Avoid crashing if the load function ends up indexing a nil value
+	local success = pcall(card.load, card, card_save)
+	if not success then
+		sendDebugMessage("Failed to load magnet joker", "MULTIPLAYER")
+		return
 	end
 
-	if rental == "rental" then
-		card:set_rental(true)
-	end
+	-- BALATRO BUG (version 1.0.1o): `card.VT.h` is mistakenly set to nil after calling `card:load()`
+	-- Without this call to `card:hard_set_VT()`, the game will crash later when the card is drawn
+	card:hard_set_VT()
+
+	-- Enforce "add to deck" effects (e.g. increase hand size effects)
+	card.added_to_deck = nil
 
 	card:add_to_deck()
 	G.jokers:emplace(card)
+	sendTraceMessage(string.format("Recieved magnet joker: %s", MP.UTILS.joker_to_string(card)), "MULTIPLAYER")
 end
 
 function G.FUNCS.load_end_game_jokers()
