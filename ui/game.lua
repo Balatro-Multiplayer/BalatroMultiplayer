@@ -1422,9 +1422,11 @@ function create_UIBox_win()
 		G.FUNCS.load_end_game_jokers()
 	end
 	MP.nemesis_deck = CardArea(-100, -100, G.CARD_W, G.CARD_H, {type = 'deck'})
+	MP.nemesis_cards = {}
 	if not MP.nemesis_deck_received then
-		MP.nemesis_cards = {}
 		MP.ACTIONS.get_nemesis_deck()
+	else
+		G.FUNCS.load_nemesis_deck()
 	end
 	G.SETTINGS.paused = false
 	local eased_green = copy_table(G.C.GREEN)
