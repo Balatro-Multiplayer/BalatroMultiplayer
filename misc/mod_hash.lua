@@ -15,7 +15,7 @@ local function get_mod_data()
 	local mod_table = {}
 	for key, mod in pairs(SMODS.Mods) do
 		if not mod.disabled and key ~= "Lovely" and key ~= "Balatro" and key ~= "Steamodded" then
-			table.insert(mod_table, key .. "-" .. mod.version)
+			table.insert(mod_table, key .. "-" .. (mod.version or "UNK"))
 		end
 	end
 	for key, mod in pairs(MP.INTEGRATIONS) do
