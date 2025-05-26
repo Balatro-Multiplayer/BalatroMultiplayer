@@ -484,101 +484,83 @@ local function action_magnet()
 			end
 		end
 		-- Scale the pseudo from 0 - 1 to the number of candidates
-		local randomIndex = math.floor(pseudorandom('j_mp_magnet') * #candidates) + 1
-		local joker_str = MP.UTILS.joker_to_string(candidates[randomIndex])
-		MP.ACTIONS.magnet_response(joker_str)
+		local random_index = math.floor(pseudorandom('j_mp_magnet') * #candidates) + 1
+		local card_save = candidates[random_index]:save()
+		local card_encoded = MP.UTILS.str_pack_and_encode(card_save)
+		MP.ACTIONS.magnet_response(card_encoded)
 	end
 end
 
 local function action_magnet_response(key)
-	local joker_params = MP.UTILS.string_split(key, "-")
+	local card_save, success, err
 
-	local forced_key = joker_params[1]
-	local edition = joker_params[2]
-	local eternal_or_perishable = joker_params[3]
-	local rental = joker_params[4]
-
-	local card = create_card("Joker", G.jokers, false, nil, nil, nil, forced_key)
-
-	-- Don't copy the edition if it's negative, just like Invisible Joker
-	if edition and edition ~= "none" and edition ~= "negative" then
-		card:set_edition({ [edition] = true }, true, true)
-	else
-		card:set_edition()
-	end
-
-	if eternal_or_perishable == "eternal" then
-		card:set_eternal(true)
-	elseif eternal_or_perishable == "perishable" then
-		card:set_perishable(true)
-	end
-
-	if rental == "rental" then
-		card:set_rental(true)
-	end
-
-	card:add_to_deck()
-	G.jokers:emplace(card)
-end
-
-function G.FUNCS.load_end_game_jokers()
-	if not MP.end_game_jokers then
+	card_save, err = MP.UTILS.str_decode_and_unpack(key)
+	if not card_save then
+		sendDebugMessage("Failed to unpack magnet joker: " .. tostring(err), "MULTIPLAYER")
 		return
 	end
 
-	local split_jokers = {}
-	for joker_str in string.gmatch(MP.end_game_jokers_keys, "([^;]+)") do
-		if joker_str ~= "" and joker_str ~= nil and joker_str ~= "0" then
-			table.insert(split_jokers, joker_str)
-		end
+	local card = Card(G.jokers.T.x + G.jokers.T.w/2, G.jokers.T.y, G.CARD_W, G.CARD_H, G.P_CENTERS.j_joker, G.P_CENTERS.c_base)
+	-- Avoid crashing if the load function ends up indexing a nil value
+	success, err = pcall(card.load, card, card_save)
+	if not success then
+		sendDebugMessage("Failed to load magnet joker: " .. tostring(err), "MULTIPLAYER")
+		return
 	end
 
-	MP.end_game_jokers.config.card_limit = G.GAME.starting_params.joker_slots
+	-- BALATRO BUG (version 1.0.1o): `card.VT.h` is mistakenly set to nil after calling `card:load()`
+	-- Without this call to `card:hard_set_VT()`, the game will crash later when the card is drawn
+	card:hard_set_VT()
 
-	remove_all(MP.end_game_jokers.cards)
-	for _, joker_str in pairs(split_jokers) do
-		if joker_str == "" then
-			goto continue
-		end
+	-- Enforce "add to deck" effects (e.g. increase hand size effects)
+	card.added_to_deck = nil
 
-		local joker_params = MP.UTILS.string_split(joker_str, "-")
+	card:add_to_deck()
+	G.jokers:emplace(card)
+	sendTraceMessage(string.format("Recieved magnet joker: %s", MP.UTILS.joker_to_string(card)), "MULTIPLAYER")
+end
 
-		local key = joker_params[1]
-		local edition = joker_params[2]
-		local eternal_or_perishable = joker_params[3]
-		local rental = joker_params[4]
+function G.FUNCS.load_end_game_jokers()
+	local card_area_save, success, err
 
-		local card = create_card("Joker", MP.end_game_jokers, false, nil, nil, nil, key)
-
-		if edition and edition ~= "none" then
-			card:set_edition({ [edition] = true }, true, true)
-		else
-			card:set_edition()
-		end
-
-		if eternal_or_perishable == "eternal" then
-			card:set_eternal(true)
-		elseif eternal_or_perishable == "perishable" then
-			card:set_perishable(true)
-		end
-
-		if rental == "rental" then
-			card:set_rental(true)
-		end
-
-		card:add_to_deck()
-		MP.end_game_jokers:emplace(card)
-
-		if card.edition and card.edition.negative then
-			MP.end_game_jokers.config.card_limit = MP.end_game_jokers.config.card_limit + 1
-		end
-
-		::continue::
+	if not MP.end_game_jokers and not MP.end_game_jokers_payload then
+		return
 	end
+
+	card_area_save, err = MP.UTILS.str_decode_and_unpack(MP.end_game_jokers_payload)
+	if not card_area_save then
+		sendDebugMessage("Failed to unpack enemy jokers: " .. tostring(err), "MULTIPLAYER")
+		return
+	end
+
+	-- Avoid crashing if the load function ends up indexing a nil value
+	success, err = pcall(MP.end_game_jokers.load, MP.end_game_jokers, card_area_save)
+	if not success then
+		sendDebugMessage("Failed to load enemy jokers: " .. tostring(err), "MULTIPLAYER")
+		-- Reset the card area if loading fails to avoid inconsistent state
+		MP.end_game_jokers:remove()
+		MP.end_game_jokers:init(
+			0,
+			0,
+			5 * G.CARD_W,
+			G.CARD_H,
+			{ card_limit = G.GAME.starting_params.joker_slots, type = "joker", highlight_limit = 1 }
+		)
+		return
+	end
+
+	-- Log the jokers
+	local jokers_str = ""
+	if MP.end_game_jokers.cards then
+		for _, card in pairs(MP.end_game_jokers.cards) do
+			jokers_str = jokers_str .. ";" .. MP.UTILS.joker_to_string(card)
+		end
+	end
+	sendTraceMessage(string.format("Recieved enemy jokers: %s", jokers_str), "MULTIPLAYER")
 end
 
 local function action_receive_end_game_jokers(keys)
-	MP.end_game_jokers_keys = keys
+	MP.end_game_jokers_payload = keys
 	G.FUNCS.load_end_game_jokers()
 	MP.end_game_jokers_received = true
 end
@@ -587,16 +569,16 @@ local function action_get_end_game_jokers()
 	if MP.end_game_jokers_received then
 		return
 	end
+
 	if not G.jokers or not G.jokers.cards then
 		Client.send("action:receiveEndGameJokers,keys:")
 		return
 	end
 
-	local jokers = ""
-	for _, card in pairs(G.jokers.cards) do
-		jokers = jokers .. ";" .. MP.UTILS.joker_to_string(card)
-	end
-	Client.send(string.format("action:receiveEndGameJokers,keys:%s", jokers))
+	local jokers_save = G.jokers:save()
+	local jokers_encoded = MP.UTILS.str_pack_and_encode(jokers_save)
+
+	Client.send(string.format("action:receiveEndGameJokers,keys:%s", jokers_encoded))
 end
 
 local function action_get_nemesis_deck()
