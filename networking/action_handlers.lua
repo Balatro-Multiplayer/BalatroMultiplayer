@@ -492,17 +492,19 @@ local function action_magnet()
 end
 
 local function action_magnet_response(key)
-	local card_save = MP.UTILS.str_decode_and_unpack(key)
+	local card_save, success, err
+
+	card_save, err = MP.UTILS.str_decode_and_unpack(key)
 	if not card_save then
-		sendDebugMessage("Failed to unpack magnet joker", "MULTIPLAYER")
+		sendDebugMessage("Failed to unpack magnet joker: " .. tostring(err), "MULTIPLAYER")
 		return
 	end
 
 	local card = Card(G.jokers.T.x + G.jokers.T.w/2, G.jokers.T.y, G.CARD_W, G.CARD_H, G.P_CENTERS.j_joker, G.P_CENTERS.c_base)
 	-- Avoid crashing if the load function ends up indexing a nil value
-	local success = pcall(card.load, card, card_save)
+	success, err = pcall(card.load, card, card_save)
 	if not success then
-		sendDebugMessage("Failed to load magnet joker", "MULTIPLAYER")
+		sendDebugMessage("Failed to load magnet joker: " .. tostring(err), "MULTIPLAYER")
 		return
 	end
 
@@ -519,20 +521,22 @@ local function action_magnet_response(key)
 end
 
 function G.FUNCS.load_end_game_jokers()
+	local card_area_save, success, err
+
 	if not MP.end_game_jokers and not MP.end_game_jokers_payload then
 		return
 	end
 
-	local card_area_save = MP.UTILS.str_decode_and_unpack(MP.end_game_jokers_payload)
+	card_area_save, err = MP.UTILS.str_decode_and_unpack(MP.end_game_jokers_payload)
 	if not card_area_save then
-		sendDebugMessage("Failed to unpack enemy jokers", "MULTIPLAYER")
+		sendDebugMessage("Failed to unpack enemy jokers: " .. tostring(err), "MULTIPLAYER")
 		return
 	end
 
 	-- Avoid crashing if the load function ends up indexing a nil value
-	local success = pcall(MP.end_game_jokers.load, MP.end_game_jokers, card_area_save)
+	success, err = pcall(MP.end_game_jokers.load, MP.end_game_jokers, card_area_save)
 	if not success then
-		sendDebugMessage("Failed to load enemy jokers", "MULTIPLAYER")
+		sendDebugMessage("Failed to load enemy jokers: " .. tostring(err), "MULTIPLAYER")
 		-- Reset the card area if loading fails to avoid inconsistent state
 		MP.end_game_jokers:remove()
 		MP.end_game_jokers:init(
