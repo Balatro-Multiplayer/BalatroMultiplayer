@@ -179,61 +179,6 @@ SMODS.Booster:take_ownership_by_kind('Standard', {
 		return {set = (pseudorandom(pseudoseed('stdset'..b_append)) > 0.6) and "Enhanced" or "Base", edition = _edition, seal = _seal, area = G.pack_cards, skip_materialize = true, soulable = true, key_append = "sta"..s_append}
 	end,
 }, true)
-
--- Rest of the packs since we're dealing with pack queues now
-SMODS.Booster:take_ownership_by_kind('Arcana', {
-	create_card = function(self, card, i)
-		local s_append = ''	-- MP.get_booster_append(card)
-		
-		local _card
-		if G.GAME.used_vouchers.v_omen_globe and pseudorandom('omen_globe') > 0.8 then
-			_card = {set = "Spectral", area = G.pack_cards, skip_materialize = true, soulable = true, key_append = "ar2"..s_append}
-		else
-			_card = {set = "Tarot", area = G.pack_cards, skip_materialize = true, soulable = true, key_append = "ar1"..s_append}
-		end
-		return _card
-	end,
-}, true)
-SMODS.Booster:take_ownership_by_kind('Celestial', {
-	create_card = function(self, card, i)
-		local s_append = ''	-- MP.get_booster_append(card)
-		
-		local _card
-		if G.GAME.used_vouchers.v_telescope and i == 1 then
-			local _planet, _hand, _tally = nil, nil, 0
-			for k, v in ipairs(G.handlist) do
-				if G.GAME.hands[v].visible and G.GAME.hands[v].played > _tally then
-					_hand = v
-					_tally = G.GAME.hands[v].played
-				end
-			end
-			if _hand then
-				for k, v in pairs(G.P_CENTER_POOLS.Planet) do
-					if v.config.hand_type == _hand then
-						_planet = v.key
-					end
-				end
-			end
-			_card = {set = "Planet", area = G.pack_cards, skip_materialize = true, soulable = true, key = _planet, key_append = "pl1"..s_append}
-		else
-			_card = {set = "Planet", area = G.pack_cards, skip_materialize = true, soulable = true, key_append = "pl1"..s_append}
-		end
-		return _card
-	end,
-}, true)
-SMODS.Booster:take_ownership_by_kind('Spectral', {
-	create_card = function(self, card, i)
-		local s_append = ''	-- MP.get_booster_append(card)
-		return {set = "Spectral", area = G.pack_cards, skip_materialize = true, soulable = true, key_append = "spe"..s_append}
-	end,
-}, true)
-SMODS.Booster:take_ownership_by_kind('Buffoon', {
-	create_card = function(self, card, i)
-		local s_append = MP.get_booster_append(card)
-		return {set = "Joker", area = G.pack_cards, skip_materialize = true, soulable = true, key_append = "buf"..s_append}
-	end,
-}, true)
-
 -- Patch seal queues
 local pollseal = SMODS.poll_seal
 function SMODS.poll_seal(args)
@@ -255,19 +200,68 @@ function MP.ante_based()
 	return G.GAME.round_resets.ante
 end
 
--- Helper function to make code more readable - deal with packs
--- Note that soul queue is based on type and not packs, so you probably won't miss out on soul if you avoid early mega arcanas or something
--- ^^^ above statement is unnecessary for now since functionality is only active for buffoon packs ^^^
-function MP.get_booster_append(booster)
-	if MP.INTEGRATIONS.TheOrder and false then
-		if booster.ability.extra > 3.5 then	-- midpoint, i don't feel like string matching and this handles vanilla cases
-			if (booster.config.center.config.choose or 1) > 1.5 then
-				return 'mega'	-- if we want jumbos to have same queue as megas, change this or 'jumb' to be the same
-			else
-				return 'jumb'
-			end
-		end
-		return 'norm'
+-- Handle round based rng with order (avoid desync with skips)
+function MP.order_round_based(ante_based)
+	if MP.INTEGRATIONS.TheOrder then
+		return G.GAME.round_resets.ante..(G.GAME.blind.config.blind.key or '')	-- fine becase no boss shenanigans... change this if that happens
+	end
+	if ante_based then
+		return MP.ante_based()
 	end
 	return ''
+end
+
+-- Rework shuffle rng to be more similar between players
+local orig_shuffle = CardArea.shuffle
+function CardArea:shuffle(_seed)
+	if MP.INTEGRATIONS.TheOrder then
+		local centers = {	-- these are roughly ordered in terms of current meta, doesn't matter toooo much? but they have to be ordered
+			c_base = 0,
+			m_stone = 50,
+			m_bonus = 51,
+			m_mult = 52,
+			m_wild = 53,
+			m_gold = 54,
+			m_lucky = 55,
+			m_steel = 56,
+			m_glass = 57,
+		}
+		local seals = {
+			Gold = 75,
+			Blue = 76,
+			Purple = 77,
+			Red = 78,
+		}
+		local editions = {
+			foil = 100,
+			holo = 101,
+			polychrome = 102,
+		}
+		-- no mod compat, but mods aren't too competitive, it won't matter much
+		
+		local tables = {}
+		
+		for i, v in ipairs(self.cards) do	-- give each card a value based on current enhancement/seal/edition
+			v.mp_stdval = 0 + (centers[v.config.center_key] or 0)
+			v.mp_stdval = v.mp_stdval + (seals[v.seal or 'nil'] or 0)
+			v.mp_stdval = v.mp_stdval + (editions[v.edition and v.edition.type or 'nil'] or 0)
+			local key = v.config.center_key == 'm_stone' and 'Stone' or v.base.suit..v.base.id
+			tables[key] = tables[key] or {}
+			tables[key][#tables[key]+1] = v
+		end
+		
+		local true_seed = pseudorandom(_seed or 'shuffle')
+		
+		for k, v in pairs(tables) do
+			table.sort(v, function (a, b) return a.mp_stdval > b.mp_stdval end)
+			local mega_seed = k..true_seed
+			for i, card in ipairs(v) do
+				card.mp_shuffleval = pseudorandom(mega_seed)
+			end
+		end
+		table.sort(self.cards, function (a, b) return a.mp_shuffleval > b.mp_shuffleval end)
+		self:set_ranks()
+	else
+		return orig_shuffle(self, _seed)
+	end
 end
