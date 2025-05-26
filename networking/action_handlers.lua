@@ -11,14 +11,19 @@ end
 function MP.ACTIONS.set_username(username)
 	MP.LOBBY.username = username or "Guest"
 	if MP.LOBBY.connected then
-		Client.send(string.format("action:username,username:%s,modHash:%s", MP.LOBBY.username, MP.MOD_STRING))
+		Client.send(string.format("action:username,username:%s,modHash:%s", MP.LOBBY.username.."~"..MP.LOBBY.blind_col, MP.MOD_STRING))
 	end
 end
+
+function MP.ACTIONS.set_blind_col(num)
+	MP.LOBBY.blind_col = num or 1
+end
+
 
 local function action_connected()
 	MP.LOBBY.connected = true
 	MP.UI.update_connection_status()
-	Client.send(string.format("action:username,username:%s,modHash:%s", MP.LOBBY.username, MP.MOD_STRING))
+	Client.send(string.format("action:username,username:%s,modHash:%s", MP.LOBBY.username.."~"..MP.LOBBY.blind_col, MP.MOD_STRING))
 end
 
 local function action_joinedLobby(code, type)
@@ -32,10 +37,16 @@ end
 local function action_lobbyInfo(host, hostHash, hostCached, guest, guestHash, guestCached, is_host)
 	MP.LOBBY.players = {}
 	MP.LOBBY.is_host = is_host == "true"
-	MP.LOBBY.host = { username = host, hash_str = hostHash, hash = hash(hostHash), cached = hostCached == "true" }
+	local function parseName(name)
+		local name, col = string.match(name, "([^~]+)~(%d+)")
+		col = math.max(1, math.min(tonumber(col), 25))
+		return name, col
+	end
+	local hostName, hostCol = parseName(host)
+	MP.LOBBY.host = { username = hostName, blind_col = hostCol, hash_str = hostHash, hash = hash(hostHash), cached = hostCached == "true" }
 	if guest ~= nil then
-		MP.LOBBY.guest =
-		{ username = guest, hash_str = guestHash, hash = hash(guestHash), cached = guestCached == "true" }
+		local guestName, guestCol = parseName(guest)
+		MP.LOBBY.guest = { username = guestName, blind_col = guestCol, hash_str = guestHash, hash = hash(guestHash), cached = guestCached == "true" }
 	else
 		MP.LOBBY.guest = {}
 	end
@@ -288,6 +299,13 @@ function SMODS.find_card(key, count_debuffed)
 		end
 	end
 	return new_ret
+end
+
+-- don't poll edition
+local origedpoll = poll_edition
+function poll_edition(_key, _mod, _no_neg, _guaranteed)
+	if G.OVERLAY_MENU then return nil end
+	return origedpoll(_key, _mod, _no_neg, _guaranteed)
 end
 
 local function action_speedrun()
