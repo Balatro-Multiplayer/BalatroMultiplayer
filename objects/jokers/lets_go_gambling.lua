@@ -15,7 +15,7 @@ SMODS.Joker({
 	blueprint_compat = true,
 	eternal_compat = true,
 	perishable_compat = true,
-	config = { extra = { odds = 4, xmult = 4, dollars = 10, nemesis_odds = 8, nemesis_dollars = 5 } },
+	config = { extra = { odds = 4, xmult = 4, dollars = 10, nemesis_odds = 4, nemesis_dollars = 10 } },
 	loc_vars = function(self, info_queue, card)
 		return {
 			vars = {
@@ -44,7 +44,7 @@ SMODS.Joker({
 				returns.x_mult = card.ability.extra.xmult
 				returns.dollars = card.ability.extra.dollars
 			end
-			if
+			if MP.is_pvp_boss() and 
 				pseudorandom("j_mp_lets_go_gambling")
 				< G.GAME.probabilities.normal / card.ability.extra.nemesis_odds
 			then
