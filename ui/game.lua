@@ -1024,7 +1024,7 @@ function MP.end_round()
 			else
 				G.GAME.current_round.voucher = SMODS.get_next_vouchers()
 				G.GAME.round_resets.blind_states.Boss = "Defeated"
-				temp_furthest_blind = G.GAME.round_resets.ante * 10 + 3
+				temp_furthest_blind = (G.GAME.round_resets.ante - 1) * 10 + 3
 				for k, v in ipairs(G.playing_cards) do
 					v.ability.played_this_ante = nil
 				end
