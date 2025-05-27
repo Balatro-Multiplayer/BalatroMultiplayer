@@ -32,7 +32,7 @@ return {
 					"{C:green}#1# in #2#{} chance for",
 					"{X:mult,C:white}X#3#{} Mult and {C:money}$#4#{}",
 					"{C:green}#5# in #6#{} chance to give",
-					"your {X:purple,C:white}Nemesis{} {C:money}$#7# in {C:attention}PvP Blind",
+					"your {X:purple,C:white}Nemesis{} {C:money}$#7#{} in {C:attention}PvP Blind",
 				},
 			},
 			j_mp_speedrun = {
