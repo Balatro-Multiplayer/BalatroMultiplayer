@@ -214,7 +214,7 @@ end
 -- Rework shuffle rng to be more similar between players
 local orig_shuffle = CardArea.shuffle
 function CardArea:shuffle(_seed)
-	if MP.INTEGRATIONS.TheOrder then
+	if MP.INTEGRATIONS.TheOrder and self == G.deck then
 		local centers = {	-- these are roughly ordered in terms of current meta, doesn't matter toooo much? but they have to be ordered
 			c_base = 0,
 			m_stone = 50,
