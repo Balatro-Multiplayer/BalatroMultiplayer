@@ -501,9 +501,13 @@ local function action_magnet()
 				table.insert(candidates, v)
 			end
 		end
+
 		-- Scale the pseudo from 0 - 1 to the number of candidates
 		local random_index = math.floor(pseudorandom('j_mp_magnet') * #candidates) + 1
-		local card_save = candidates[random_index]:save()
+		local chosen_card = candidates[random_index]
+		sendTraceMessage(string.format("Sending magnet joker: %s", MP.UTILS.joker_to_string(chosen_card)), "MULTIPLAYER")
+
+		local card_save = chosen_card:save()
 		local card_encoded = MP.UTILS.str_pack_and_encode(card_save)
 		MP.ACTIONS.magnet_response(card_encoded)
 	end
@@ -514,7 +518,7 @@ local function action_magnet_response(key)
 
 	card_save, err = MP.UTILS.str_decode_and_unpack(key)
 	if not card_save then
-		sendDebugMessage("Failed to unpack magnet joker: " .. tostring(err), "MULTIPLAYER")
+		sendDebugMessage(string.format("Failed to unpack magnet joker: %s", tostring(err)) , "MULTIPLAYER")
 		return
 	end
 
@@ -522,7 +526,7 @@ local function action_magnet_response(key)
 	-- Avoid crashing if the load function ends up indexing a nil value
 	success, err = pcall(card.load, card, card_save)
 	if not success then
-		sendDebugMessage("Failed to load magnet joker: " .. tostring(err), "MULTIPLAYER")
+		sendDebugMessage(string.format("Failed to load magnet joker: %s", tostring(err)) , "MULTIPLAYER")
 		return
 	end
 
@@ -547,14 +551,14 @@ function G.FUNCS.load_end_game_jokers()
 
 	card_area_save, err = MP.UTILS.str_decode_and_unpack(MP.end_game_jokers_payload)
 	if not card_area_save then
-		sendDebugMessage("Failed to unpack enemy jokers: " .. tostring(err), "MULTIPLAYER")
+		sendDebugMessage(string.format("Failed to unpack enemy jokers: %s", tostring(err)) , "MULTIPLAYER")
 		return
 	end
 
 	-- Avoid crashing if the load function ends up indexing a nil value
 	success, err = pcall(MP.end_game_jokers.load, MP.end_game_jokers, card_area_save)
 	if not success then
-		sendDebugMessage("Failed to load enemy jokers: " .. tostring(err), "MULTIPLAYER")
+		sendDebugMessage(string.format("Failed to load enemy jokers: %s", tostring(err)) , "MULTIPLAYER")
 		-- Reset the card area if loading fails to avoid inconsistent state
 		MP.end_game_jokers:remove()
 		MP.end_game_jokers:init(
@@ -568,13 +572,13 @@ function G.FUNCS.load_end_game_jokers()
 	end
 
 	-- Log the jokers
-	local jokers_str = ""
 	if MP.end_game_jokers.cards then
+		local jokers_str = ""
 		for _, card in pairs(MP.end_game_jokers.cards) do
 			jokers_str = jokers_str .. ";" .. MP.UTILS.joker_to_string(card)
 		end
+		sendTraceMessage(string.format("Recieved end game jokers: %s", jokers_str), "MULTIPLAYER")
 	end
-	sendTraceMessage(string.format("Recieved enemy jokers: %s", jokers_str), "MULTIPLAYER")
 end
 
 local function action_receive_end_game_jokers(keys)
@@ -592,6 +596,13 @@ local function action_get_end_game_jokers()
 		Client.send("action:receiveEndGameJokers,keys:")
 		return
 	end
+
+	-- Log the jokers
+	local jokers_str = ""
+	for _, card in pairs(G.jokers.cards) do
+		jokers_str = jokers_str .. ";" .. MP.UTILS.joker_to_string(card)
+	end
+	sendTraceMessage(string.format("Sending end game jokers: %s", jokers_str), "MULTIPLAYER")
 
 	local jokers_save = G.jokers:save()
 	local jokers_encoded = MP.UTILS.str_pack_and_encode(jokers_save)
