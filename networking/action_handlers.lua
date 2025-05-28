@@ -539,7 +539,7 @@ local function action_magnet_response(key)
 
 	card:add_to_deck()
 	G.jokers:emplace(card)
-	sendTraceMessage(string.format("Recieved magnet joker: %s", MP.UTILS.joker_to_string(card)), "MULTIPLAYER")
+	sendTraceMessage(string.format("Received magnet joker: %s", MP.UTILS.joker_to_string(card)), "MULTIPLAYER")
 end
 
 function G.FUNCS.load_end_game_jokers()
@@ -577,7 +577,7 @@ function G.FUNCS.load_end_game_jokers()
 		for _, card in pairs(MP.end_game_jokers.cards) do
 			jokers_str = jokers_str .. ";" .. MP.UTILS.joker_to_string(card)
 		end
-		sendTraceMessage(string.format("Recieved end game jokers: %s", jokers_str), "MULTIPLAYER")
+		sendTraceMessage(string.format("Received end game jokers: %s", jokers_str), "MULTIPLAYER")
 	end
 end
 
