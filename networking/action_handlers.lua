@@ -518,7 +518,7 @@ local function action_magnet_response(key)
 
 	card_save, err = MP.UTILS.str_decode_and_unpack(key)
 	if not card_save then
-		sendDebugMessage(string.format("Failed to unpack magnet joker: %s", tostring(err)) , "MULTIPLAYER")
+		sendDebugMessage(string.format("Failed to unpack magnet joker: %s", err) , "MULTIPLAYER")
 		return
 	end
 
@@ -526,7 +526,7 @@ local function action_magnet_response(key)
 	-- Avoid crashing if the load function ends up indexing a nil value
 	success, err = pcall(card.load, card, card_save)
 	if not success then
-		sendDebugMessage(string.format("Failed to load magnet joker: %s", tostring(err)) , "MULTIPLAYER")
+		sendDebugMessage(string.format("Failed to load magnet joker: %s", err) , "MULTIPLAYER")
 		return
 	end
 
@@ -551,14 +551,14 @@ function G.FUNCS.load_end_game_jokers()
 
 	card_area_save, err = MP.UTILS.str_decode_and_unpack(MP.end_game_jokers_payload)
 	if not card_area_save then
-		sendDebugMessage(string.format("Failed to unpack enemy jokers: %s", tostring(err)) , "MULTIPLAYER")
+		sendDebugMessage(string.format("Failed to unpack enemy jokers: %s", err) , "MULTIPLAYER")
 		return
 	end
 
 	-- Avoid crashing if the load function ends up indexing a nil value
 	success, err = pcall(MP.end_game_jokers.load, MP.end_game_jokers, card_area_save)
 	if not success then
-		sendDebugMessage(string.format("Failed to load enemy jokers: %s", tostring(err)) , "MULTIPLAYER")
+		sendDebugMessage(string.format("Failed to load enemy jokers: %s", err) , "MULTIPLAYER")
 		-- Reset the card area if loading fails to avoid inconsistent state
 		MP.end_game_jokers:remove()
 		MP.end_game_jokers:init(
