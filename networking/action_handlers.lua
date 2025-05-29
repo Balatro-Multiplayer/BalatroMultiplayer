@@ -624,30 +624,49 @@ local function action_receive_nemesis_deck(deck_str)
 
 		local card_params = MP.UTILS.string_split(card_str, "-")
 
-		local _suit = card_params[1]
-		local _rank = card_params[2]
+		local suit = card_params[1]
+		local rank = card_params[2]
 		local enhancement = card_params[3]
 		local edition = card_params[4]
 		local seal = card_params[5]
 
-		local front_key = _suit .. "_" .. _rank
+		-- Validate the card parameters
+		-- If invalid suit or rank, skip the card
+		-- If invalid enhancement, edition, or seal, fallback to "none"
+		local front_key = tostring(suit) .. "_" .. tostring(rank)
+		if not G.P_CARDS[front_key] then
+			sendDebugMessage(string.format("Invalid playing card key: %s", front_key), "MULTIPLAYER")
+			goto continue
+		end
+		if not enhancement or (enhancement ~= "none" and not G.P_CENTERS[enhancement]) then
+			sendDebugMessage(string.format("Invalid enhancement: %s", enhancement), "MULTIPLAYER")
+			enhancement = "none"
+		end
+		if not edition or (edition ~= "none" and not G.P_CENTERS["e_" .. edition]) then
+			sendDebugMessage(string.format("Invalid edition: %s", edition), "MULTIPLAYER")
+			edition = "none"
+		end
+		if not seal or (seal ~= "none" and not G.P_SEALS[seal]) then
+			sendDebugMessage(string.format("Invalid seal: %s", seal), "MULTIPLAYER")
+			seal = "none"
+		end
+
+		-- Create the card
 		local card = create_playing_card(
 			{
 				front = G.P_CARDS[front_key],
-				center = (enhancement == "none" and nil or G.P_CENTERS[enhancement])
+				center = enhancement ~= "none" and G.P_CENTERS[enhancement] or nil
 			},
 			MP.nemesis_deck, true, true, nil, false
 		)
-
-		if edition and edition ~= "none" then
+		if edition ~= "none" then
 			card:set_edition({ [edition] = true }, true, true)
 		end
-
 		if seal ~= "none" then
 			card:set_seal(seal, true, true)
 		end
 
-		-- remove the card from G.playing_cards and insert into MP.nemesis_cards
+		-- Remove the card from G.playing_cards and insert into MP.nemesis_cards
 		table.remove(G.playing_cards, #G.playing_cards)
 		table.insert(MP.nemesis_cards, card)
 
