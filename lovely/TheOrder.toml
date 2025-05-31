@@ -154,3 +154,43 @@ payload = '''if pseudorandom('soul_'..(MP.INTEGRATIONS.TheOrder and 'c_black_hol
 		forced_key = 'c_black_hole'
 	end'''
 match_indent = true
+
+# Patch To-Do List rng to be the same on different operating systems
+# This is a vanilla bug!
+[[patches]]
+[patches.pattern]
+target = "card.lua"
+pattern = '''while not self.ability.to_do_poker_hand do'''
+position = "before"
+payload = '''
+if MP.INTEGRATIONS.TheOrder then
+	_poker_hands = MP.sorted_hand_list(self.ability.to_do_poker_hand)
+end
+'''
+match_indent = true
+
+[[patches]]
+[patches.pattern]
+target = "card.lua"
+pattern = '''self.ability.to_do_poker_hand = pseudorandom_element(_poker_hands, pseudoseed('to_do'))'''
+position = "before"
+payload = '''
+if MP.INTEGRATIONS.TheOrder then
+	_poker_hands = MP.sorted_hand_list(self.ability.to_do_poker_hand)
+end
+'''
+match_indent = true
+
+# Do the same for orbital
+# Why tf is this in uidef?
+[[patches]]
+[patches.pattern]
+target = "functions/UI_definitions.lua"
+pattern = '''G.GAME.orbital_choices[G.GAME.round_resets.ante][type] = pseudorandom_element(_poker_hands, pseudoseed('orbital'))'''
+position = "before"
+payload = '''
+if MP.INTEGRATIONS.TheOrder then
+	_poker_hands = MP.sorted_hand_list()
+end
+'''
+match_indent = true

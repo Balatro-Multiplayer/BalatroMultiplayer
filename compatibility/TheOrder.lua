@@ -211,6 +211,27 @@ function MP.order_round_based(ante_based)
 	return ''
 end
 
+-- Helper function for a sorted hand list to fix pairs() jank
+function MP.sorted_hand_list(current_hand)
+	if not current_hand then current_hand = "NULL" end
+	local _poker_hands = {}
+	local done = false
+	local order = 1
+	while not done do	-- messy selection sort
+		done = true
+		for k, v in pairs(G.GAME.hands) do
+			if v.order == order then
+				order = order + 1
+				done = false
+				if v.visible and k ~= current_hand then
+					_poker_hands[#_poker_hands+1] = k
+				end
+			end
+		end
+	end
+	return _poker_hands
+end
+
 -- Rework shuffle rng to be more similar between players
 local orig_shuffle = CardArea.shuffle
 function CardArea:shuffle(_seed)
@@ -234,8 +255,8 @@ function CardArea:shuffle(_seed)
 		}
 		local editions = {
 			foil = 1000,
-			holo = 1067,
-			polychrome = 1134,
+			holo = 1032,
+			polychrome = 1064,
 		}
 		-- no mod compat, but mods aren't too competitive, it won't matter much
 		
