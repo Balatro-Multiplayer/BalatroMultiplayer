@@ -105,7 +105,9 @@ end
 function MP.UTILS.get_nemesis_key()	-- calling this function assumes the user is currently in a multiplayer game
 	local ret = MP.UTILS.blind_col_numtokey((MP.LOBBY.is_host and MP.LOBBY.guest.blind_col or MP.LOBBY.host.blind_col) or 1)
 	if tonumber(MP.GAME.enemy.lives) <= 1 and tonumber(MP.GAME.lives) <= 1 then
-		ret = "bl_final_heart"
+		if G.STATE ~= G.STATES.ROUND_EVAL then	-- very messy fix that mostly works. breaks in a different way... but far harder to notice
+			ret = "bl_final_heart"
+		end
 	end
 	return ret
 end
