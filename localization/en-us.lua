@@ -201,7 +201,7 @@ return {
 			b_players = "Players",
 			b_continue_singleplayer = "Continue in Singleplayer",
 			b_the_order_integration = "Enable The Order Integration",
-			b_view_nemesis_deck = "View Nemesis Deck",
+			b_view_nemesis_deck = "View Decks",
 			k_enemy_score = "Current Enemy score",
 			k_enemy_hands = "Enemy hands left: ",
 			k_coming_soon = "Coming Soon!",
