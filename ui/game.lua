@@ -1113,7 +1113,7 @@ function MP.end_round()
 			else
 				G.GAME.current_round.voucher = SMODS.get_next_vouchers()
 				G.GAME.round_resets.blind_states.Boss = "Defeated"
-				temp_furthest_blind = G.GAME.round_resets.ante * 10 + 3
+				temp_furthest_blind = (G.GAME.round_resets.ante - 1) * 10 + 3
 				for k, v in ipairs(G.playing_cards) do
 					v.ability.played_this_ante = nil
 				end
@@ -2235,6 +2235,17 @@ G.FUNCS.skip_blind = function(e)
 			MP.GAME.timer = MP.GAME.timer + MP.LOBBY.config.timer_increment_seconds
 		end
 		MP.ACTIONS.skip(G.GAME.skips)
+
+		--Update the furthest blind
+		local temp_furthest_blind = 0
+		if G.GAME.round_resets.blind_states.Big == "Skipped" then
+			temp_furthest_blind = G.GAME.round_resets.ante * 10 + 2
+		elseif G.GAME.round_resets.blind_states.Small == "Skipped" then
+			temp_furthest_blind = G.GAME.round_resets.ante * 10 + 1
+		end
+
+		MP.GAME.furthest_blind = (temp_furthest_blind > MP.GAME.furthest_blind) and temp_furthest_blind or MP.GAME.furthest_blind
+		MP.ACTIONS.set_furthest_blind(MP.GAME.furthest_blind)
 	end
 end
 
