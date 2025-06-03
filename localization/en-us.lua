@@ -32,7 +32,7 @@ return {
 					"{C:green}#1# in #2#{} chance for",
 					"{X:mult,C:white}X#3#{} Mult and {C:money}$#4#{}",
 					"{C:green}#5# in #6#{} chance to give",
-					"your {X:purple,C:white}Nemesis{} {C:money}$#7#",
+					"your {X:purple,C:white}Nemesis{} {C:money}$#7#{} in {C:attention}PvP Blind",
 				},
 			},
 			j_mp_speedrun = {
@@ -65,7 +65,7 @@ return {
 				name = "Taxes",
 				text = {
 					"When your {X:purple,C:white}Nemesis{} sells",
-					"a card gain {C:mult}+#1#{} Mult",
+					"a joker gain {C:mult}+#1#{} Mult",
 					"{C:inactive}(Currently {C:mult}+#2#{C:inactive} Mult)",
 				},
 			},
@@ -201,7 +201,7 @@ return {
 			b_players = "Players",
 			b_continue_singleplayer = "Continue in Singleplayer",
 			b_the_order_integration = "Enable The Order Integration",
-			b_view_nemesis_deck = "View Nemesis Deck",
+			b_view_nemesis_deck = "View Decks",
 			k_enemy_score = "Current Enemy score",
 			k_enemy_hands = "Enemy hands left: ",
 			k_coming_soon = "Coming Soon!",

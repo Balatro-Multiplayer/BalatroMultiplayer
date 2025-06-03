@@ -17,7 +17,7 @@ MP.Ruleset({
 		"j_mp_conjoined_joker",
 		"j_mp_defensive_joker",
 		"j_mp_lets_go_gambling",
-		"j_mp_magnet",
+		--"j_mp_magnet",
 		"j_mp_pacifist",
 		"j_mp_penny_pincher",
 		"j_mp_pizza",
