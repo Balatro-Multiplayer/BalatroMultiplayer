@@ -62,6 +62,56 @@ function MP.UTILS.get_username()
 	return SMODS.Mods["Multiplayer"].config.username
 end
 
+function MP.UTILS.save_blind_col(num)
+	MP.ACTIONS.set_blind_col(num)
+	SMODS.Mods["Multiplayer"].config.blind_col = num
+end
+
+function MP.UTILS.get_blind_col()
+	return SMODS.Mods["Multiplayer"].config.blind_col
+end
+
+function MP.UTILS.blind_col_numtokey(num)
+	local keys = {
+		"tooth",
+		"small",
+		"big",
+		"hook",
+		"ox",
+		"house",
+		"wall",
+		"wheel",
+		"arm",
+		"club",
+		"fish",
+		"psychic",
+		"goad",
+		"water",
+		"window",
+		"manacle",
+		"eye",
+		"mouth",
+		"plant",
+		"serpent",
+		"pillar",
+		"needle",
+		"head",
+		"flint",
+		"mark",
+	}
+	return "bl_"..(keys[num])
+end
+
+function MP.UTILS.get_nemesis_key()	-- calling this function assumes the user is currently in a multiplayer game
+	local ret = MP.UTILS.blind_col_numtokey((MP.LOBBY.is_host and MP.LOBBY.guest.blind_col or MP.LOBBY.host.blind_col) or 1)
+	if tonumber(MP.GAME.enemy.lives) <= 1 and tonumber(MP.GAME.lives) <= 1 then
+		if G.STATE ~= G.STATES.ROUND_EVAL then	-- very messy fix that mostly works. breaks in a different way... but far harder to notice
+			ret = "bl_final_heart"
+		end
+	end
+	return ret
+end
+
 function MP.UTILS.string_split(inputstr, sep)
 	if sep == nil then
 		sep = "%s"
@@ -456,4 +506,71 @@ function MP.UTILS.random_message()
 		localize("k_message9"),
 	}
 	return messages[math.random(1, #messages)]
+end
+
+-- From https://github.com/lunarmodules/Penlight (MIT license)
+local function save_global_env()
+	local env = {}
+	env.hook, env.mask, env.count = debug.gethook()
+
+	-- env.hook is "external hook" if is a C hook function
+	if env.hook ~= "external hook" then
+		debug.sethook()
+	end
+
+	env.string_mt = getmetatable("")
+	debug.setmetatable("", nil)
+	return env
+end
+
+-- From https://github.com/lunarmodules/Penlight (MIT license)
+local function restore_global_env(env)
+	if env then
+		debug.setmetatable("", env.string_mt)
+		if env.hook ~= "external hook" then
+			debug.sethook(env.hook, env.mask, env.count)
+		end
+	end
+end
+
+local function STR_UNPACK_CHECKED(str)
+	-- Code generated from STR_PACK should only return a table and nothing else
+	if str:sub(1, 8) ~= "return {" then
+		error("Invalid string header, expected \"return {...\"")
+	end
+
+	-- Protect against code injection by disallowing function definitions
+	-- This is a very naive check, but hopefully won't trigger false positives
+	if str:find("[^\"'%w_]function[^\"'%w_]") then
+		error("Function keyword detected")
+	end
+
+	-- Load with an empty environment, no functions or globals should be available
+	local chunk = assert(load(str, nil, "t", {}))
+	local global_env = save_global_env()
+	local success, str_unpacked = pcall(chunk)
+	restore_global_env(global_env)
+	if not success then
+		error(str_unpacked)
+	end
+
+	return str_unpacked
+end
+
+function MP.UTILS.str_pack_and_encode(data)
+	local str = STR_PACK(data)
+	local str_compressed = love.data.compress("string", "deflate", str)
+	local str_encoded = love.data.encode("string", "base64", str_compressed)
+	return str_encoded
+end
+
+function MP.UTILS.str_decode_and_unpack(str)
+	local success, str_decoded, str_decompressed, str_unpacked
+	success, str_decoded = pcall(love.data.decode, "string", "base64", str)
+	if not success then return nil, str_decoded end
+	success, str_decompressed = pcall(love.data.decompress, "string", "deflate", str_decoded)
+	if not success then return nil, str_decompressed end
+	success, str_unpacked = pcall(STR_UNPACK_CHECKED, str_decompressed)
+	if not success then return nil, str_unpacked end
+	return str_unpacked
 end

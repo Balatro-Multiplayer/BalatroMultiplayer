@@ -1,4 +1,4 @@
-SMODS.Atlas({
+--[[ SMODS.Atlas({
 	key = "magnet",
 	path = "j_magnet.png",
 	px = 71,
@@ -63,3 +63,4 @@ SMODS.Joker({
 		code = { "Virtualized" },
 	},
 })
+--]]

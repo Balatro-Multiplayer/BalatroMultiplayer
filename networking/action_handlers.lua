@@ -11,14 +11,19 @@ end
 function MP.ACTIONS.set_username(username)
 	MP.LOBBY.username = username or "Guest"
 	if MP.LOBBY.connected then
-		Client.send(string.format("action:username,username:%s,modHash:%s", MP.LOBBY.username, MP.MOD_STRING))
+		Client.send(string.format("action:username,username:%s,modHash:%s", MP.LOBBY.username.."~"..MP.LOBBY.blind_col, MP.MOD_STRING))
 	end
 end
+
+function MP.ACTIONS.set_blind_col(num)
+	MP.LOBBY.blind_col = num or 1
+end
+
 
 local function action_connected()
 	MP.LOBBY.connected = true
 	MP.UI.update_connection_status()
-	Client.send(string.format("action:username,username:%s,modHash:%s", MP.LOBBY.username, MP.MOD_STRING))
+	Client.send(string.format("action:username,username:%s,modHash:%s", MP.LOBBY.username.."~"..MP.LOBBY.blind_col, MP.MOD_STRING))
 end
 
 local function action_joinedLobby(code, type)
@@ -32,10 +37,16 @@ end
 local function action_lobbyInfo(host, hostHash, hostCached, guest, guestHash, guestCached, is_host)
 	MP.LOBBY.players = {}
 	MP.LOBBY.is_host = is_host == "true"
-	MP.LOBBY.host = { username = host, hash_str = hostHash, hash = hash(hostHash), cached = hostCached == "true" }
+	local function parseName(name)
+		local name, col = string.match(name, "([^~]+)~(%d+)")
+		col = math.max(1, math.min(tonumber(col), 25))
+		return name, col
+	end
+	local hostName, hostCol = parseName(host)
+	MP.LOBBY.host = { username = hostName, blind_col = hostCol, hash_str = hostHash, hash = hash(hostHash), cached = hostCached == "true" }
 	if guest ~= nil then
-		MP.LOBBY.guest =
-		{ username = guest, hash_str = guestHash, hash = hash(guestHash), cached = guestCached == "true" }
+		local guestName, guestCol = parseName(guest)
+		MP.LOBBY.guest = { username = guestName, blind_col = guestCol, hash_str = guestHash, hash = hash(guestHash), cached = guestCached == "true" }
 	else
 		MP.LOBBY.guest = {}
 	end
@@ -191,6 +202,8 @@ local function action_player_info(lives)
 end
 
 local function action_win_game()
+	MP.end_game_jokers_keys = ""
+	MP.nemesis_deck_string = ""
 	MP.end_game_jokers_received = false
 	MP.nemesis_deck_received = false
 	win_game()
@@ -198,6 +211,8 @@ local function action_win_game()
 end
 
 local function action_lose_game()
+	MP.end_game_jokers_keys = ""
+	MP.nemesis_deck_string = ""
 	MP.end_game_jokers_received = false
 	MP.nemesis_deck_received = false
 	G.STATE_COMPLETE = false
@@ -288,6 +303,13 @@ function SMODS.find_card(key, count_debuffed)
 		end
 	end
 	return new_ret
+end
+
+-- don't poll edition
+local origedpoll = poll_edition
+function poll_edition(_key, _mod, _no_neg, _guaranteed)
+	if G.OVERLAY_MENU then return nil end
+	return origedpoll(_key, _mod, _no_neg, _guaranteed)
 end
 
 local function action_speedrun()
@@ -483,126 +505,112 @@ local function action_magnet()
 				table.insert(candidates, v)
 			end
 		end
+
 		-- Scale the pseudo from 0 - 1 to the number of candidates
-		local randomIndex = math.floor(pseudorandom('j_mp_magnet') * #candidates) + 1
-		local joker_str = MP.UTILS.joker_to_string(candidates[randomIndex])
-		MP.ACTIONS.magnet_response(joker_str)
+		local random_index = math.floor(pseudorandom('j_mp_magnet') * #candidates) + 1
+		local chosen_card = candidates[random_index]
+		sendTraceMessage(string.format("Sending magnet joker: %s", MP.UTILS.joker_to_string(chosen_card)), "MULTIPLAYER")
+
+		local card_save = chosen_card:save()
+		local card_encoded = MP.UTILS.str_pack_and_encode(card_save)
+		MP.ACTIONS.magnet_response(card_encoded)
 	end
 end
 
 local function action_magnet_response(key)
-	local joker_params = MP.UTILS.string_split(key, "-")
+	local card_save, success, err
 
-	local forced_key = joker_params[1]
-	local edition = joker_params[2]
-	local eternal_or_perishable = joker_params[3]
-	local rental = joker_params[4]
-
-	local card = create_card("Joker", G.jokers, false, nil, nil, nil, forced_key)
-
-	-- Don't copy the edition if it's negative, just like Invisible Joker
-	if edition and edition ~= "none" and edition ~= "negative" then
-		card:set_edition({ [edition] = true }, true, true)
-	else
-		card:set_edition()
-	end
-
-	if eternal_or_perishable == "eternal" then
-		card:set_eternal(true)
-	elseif eternal_or_perishable == "perishable" then
-		card:set_perishable(true)
-	end
-
-	if rental == "rental" then
-		card:set_rental(true)
-	end
-
-	card:add_to_deck()
-	G.jokers:emplace(card)
-end
-
-function G.FUNCS.load_end_game_jokers()
-	if not MP.end_game_jokers then
+	card_save, err = MP.UTILS.str_decode_and_unpack(key)
+	if not card_save then
+		sendDebugMessage(string.format("Failed to unpack magnet joker: %s", err) , "MULTIPLAYER")
 		return
 	end
 
-	local split_jokers = {}
-	for joker_str in string.gmatch(MP.end_game_jokers_keys, "([^;]+)") do
-		if joker_str ~= "" and joker_str ~= nil and joker_str ~= "0" then
-			table.insert(split_jokers, joker_str)
-		end
+	local card = Card(G.jokers.T.x + G.jokers.T.w/2, G.jokers.T.y, G.CARD_W, G.CARD_H, G.P_CENTERS.j_joker, G.P_CENTERS.c_base)
+	-- Avoid crashing if the load function ends up indexing a nil value
+	success, err = pcall(card.load, card, card_save)
+	if not success then
+		sendDebugMessage(string.format("Failed to load magnet joker: %s", err) , "MULTIPLAYER")
+		return
 	end
 
-	MP.end_game_jokers.config.card_limit = G.GAME.starting_params.joker_slots
+	-- BALATRO BUG (version 1.0.1o): `card.VT.h` is mistakenly set to nil after calling `card:load()`
+	-- Without this call to `card:hard_set_VT()`, the game will crash later when the card is drawn
+	card:hard_set_VT()
 
-	remove_all(MP.end_game_jokers.cards)
-	for _, joker_str in pairs(split_jokers) do
-		if joker_str == "" then
-			goto continue
+	-- Enforce "add to deck" effects (e.g. increase hand size effects)
+	card.added_to_deck = nil
+
+	card:add_to_deck()
+	G.jokers:emplace(card)
+	sendTraceMessage(string.format("Received magnet joker: %s", MP.UTILS.joker_to_string(card)), "MULTIPLAYER")
+end
+
+function G.FUNCS.load_end_game_jokers()
+	local card_area_save, success, err
+
+	if not MP.end_game_jokers and not MP.end_game_jokers_payload then
+		return
+	end
+
+	card_area_save, err = MP.UTILS.str_decode_and_unpack(MP.end_game_jokers_payload)
+	if not card_area_save then
+		sendDebugMessage(string.format("Failed to unpack enemy jokers: %s", err) , "MULTIPLAYER")
+		return
+	end
+
+	-- Avoid crashing if the load function ends up indexing a nil value
+	success, err = pcall(MP.end_game_jokers.load, MP.end_game_jokers, card_area_save)
+	if not success then
+		sendDebugMessage(string.format("Failed to load enemy jokers: %s", err) , "MULTIPLAYER")
+		-- Reset the card area if loading fails to avoid inconsistent state
+		MP.end_game_jokers:remove()
+		MP.end_game_jokers:init(
+			0,
+			0,
+			5 * G.CARD_W,
+			G.CARD_H,
+			{ card_limit = G.GAME.starting_params.joker_slots, type = "joker", highlight_limit = 1 }
+		)
+		return
+	end
+
+	-- Log the jokers
+	if MP.end_game_jokers.cards then
+		local jokers_str = ""
+		for _, card in pairs(MP.end_game_jokers.cards) do
+			jokers_str = jokers_str .. ";" .. MP.UTILS.joker_to_string(card)
 		end
-
-		local joker_params = MP.UTILS.string_split(joker_str, "-")
-
-		local key = joker_params[1]
-		local edition = joker_params[2]
-		local eternal_or_perishable = joker_params[3]
-		local rental = joker_params[4]
-
-		local card = create_card("Joker", MP.end_game_jokers, false, nil, nil, nil, key)
-
-		if edition and edition ~= "none" then
-			card:set_edition({ [edition] = true }, true, true)
-		else
-			card:set_edition()
-		end
-
-		if eternal_or_perishable == "eternal" then
-			card:set_eternal(true)
-		elseif eternal_or_perishable == "perishable" then
-			card:set_perishable(true)
-		end
-
-		if rental == "rental" then
-			card:set_rental(true)
-		end
-
-		card:add_to_deck()
-		MP.end_game_jokers:emplace(card)
-
-		if card.edition and card.edition.negative then
-			MP.end_game_jokers.config.card_limit = MP.end_game_jokers.config.card_limit + 1
-		end
-
-		::continue::
+		sendTraceMessage(string.format("Received end game jokers: %s", jokers_str), "MULTIPLAYER")
 	end
 end
 
 local function action_receive_end_game_jokers(keys)
 	MP.end_game_jokers_keys = keys
-	G.FUNCS.load_end_game_jokers()
 	MP.end_game_jokers_received = true
+	G.FUNCS.load_end_game_jokers()
 end
 
 local function action_get_end_game_jokers()
-	if MP.end_game_jokers_received then
-		return
-	end
 	if not G.jokers or not G.jokers.cards then
 		Client.send("action:receiveEndGameJokers,keys:")
 		return
 	end
 
-	local jokers = ""
+	-- Log the jokers
+	local jokers_str = ""
 	for _, card in pairs(G.jokers.cards) do
-		jokers = jokers .. ";" .. MP.UTILS.joker_to_string(card)
+		jokers_str = jokers_str .. ";" .. MP.UTILS.joker_to_string(card)
 	end
-	Client.send(string.format("action:receiveEndGameJokers,keys:%s", jokers))
+	sendTraceMessage(string.format("Sending end game jokers: %s", jokers_str), "MULTIPLAYER")
+
+	local jokers_save = G.jokers:save()
+	local jokers_encoded = MP.UTILS.str_pack_and_encode(jokers_save)
+
+	Client.send(string.format("action:receiveEndGameJokers,keys:%s", jokers_encoded))
 end
 
 local function action_get_nemesis_deck()
-	if MP.nemesis_deck_received then
-		return
-	end
 	local deck_str = ""
 	for _, card in ipairs(G.playing_cards) do
 		deck_str = deck_str .. ";" .. MP.UTILS.card_to_string(card)
@@ -610,12 +618,16 @@ local function action_get_nemesis_deck()
 	Client.send(string.format("action:receiveNemesisDeck,cards:%s", deck_str))
 end
 
-local function action_receive_nemesis_deck(deck_str)
-	if MP.nemesis_deck_received then
+function G.FUNCS.load_nemesis_deck()
+	if not MP.nemesis_deck or not MP.nemesis_cards then
 		return
 	end
 
-	local card_strings = MP.UTILS.string_split(deck_str, ";")
+	local card_strings = MP.UTILS.string_split(MP.nemesis_deck_string, ";")
+
+	for k, _ in pairs(MP.nemesis_cards) do
+		MP.nemesis_cards[k] = nil
+	end
 
 	for _, card_str in pairs(card_strings) do
 		if card_str == "" then
@@ -624,37 +636,60 @@ local function action_receive_nemesis_deck(deck_str)
 
 		local card_params = MP.UTILS.string_split(card_str, "-")
 
-		local _suit = card_params[1]
-		local _rank = card_params[2]
+		local suit = card_params[1]
+		local rank = card_params[2]
 		local enhancement = card_params[3]
 		local edition = card_params[4]
 		local seal = card_params[5]
 
-		local front_key = _suit .. "_" .. _rank
+		-- Validate the card parameters
+		-- If invalid suit or rank, skip the card
+		-- If invalid enhancement, edition, or seal, fallback to "none"
+		local front_key = tostring(suit) .. "_" .. tostring(rank)
+		if not G.P_CARDS[front_key] then
+			sendDebugMessage(string.format("Invalid playing card key: %s", front_key), "MULTIPLAYER")
+			goto continue
+		end
+		if not enhancement or (enhancement ~= "none" and not G.P_CENTERS[enhancement]) then
+			sendDebugMessage(string.format("Invalid enhancement: %s", enhancement), "MULTIPLAYER")
+			enhancement = "none"
+		end
+		if not edition or (edition ~= "none" and not G.P_CENTERS["e_" .. edition]) then
+			sendDebugMessage(string.format("Invalid edition: %s", edition), "MULTIPLAYER")
+			edition = "none"
+		end
+		if not seal or (seal ~= "none" and not G.P_SEALS[seal]) then
+			sendDebugMessage(string.format("Invalid seal: %s", seal), "MULTIPLAYER")
+			seal = "none"
+		end
+
+		-- Create the card
 		local card = create_playing_card(
 			{
 				front = G.P_CARDS[front_key],
-				center = (enhancement == "none" and nil or G.P_CENTERS[enhancement])
+				center = enhancement ~= "none" and G.P_CENTERS[enhancement] or nil
 			},
 			MP.nemesis_deck, true, true, nil, false
 		)
-
-		if edition and edition ~= "none" then
+		if edition ~= "none" then
 			card:set_edition({ [edition] = true }, true, true)
 		end
-
 		if seal ~= "none" then
 			card:set_seal(seal, true, true)
 		end
 
-		-- remove the card from G.playing_cards and insert into MP.nemesis_cards
+		-- Remove the card from G.playing_cards and insert into MP.nemesis_cards
 		table.remove(G.playing_cards, #G.playing_cards)
 		table.insert(MP.nemesis_cards, card)
 
 		::continue::
 	end
+end
 
+local function action_receive_nemesis_deck(deck_str)
+	MP.nemesis_deck_string = deck_str
 	MP.nemesis_deck_received = true
+	G.FUNCS.load_nemesis_deck()
 end
 
 local function action_start_ante_timer(time)

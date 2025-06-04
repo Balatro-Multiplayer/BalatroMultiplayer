@@ -12,8 +12,8 @@ MP.LOBBY = {
 		different_seeds = false,
 		starting_lives = 4,
 		pvp_start_round = 2,
-		timer_base_seconds = 180,
-		timer_increment_seconds = 90,
+		timer_base_seconds = 150,
+		timer_increment_seconds = 60,
 		showdown_starting_antes = 3,
 		ruleset = "ruleset_mp_standard",
 		gamemode = "gamemode_mp_attrition",
@@ -32,6 +32,7 @@ MP.LOBBY = {
 		challenge = "",
 	},
 	username = "Guest",
+	blind_col = 1,
 	host = {},
 	guest = {},
 	is_host = false,
@@ -128,6 +129,8 @@ end
 MP.reset_game_states()
 
 MP.LOBBY.username = MP.UTILS.get_username()
+MP.LOBBY.blind_col = MP.UTILS.get_blind_col()
+
 
 if not SMODS.current_mod.lovely then
 	G.E_MANAGER:add_event(Event({

@@ -42,7 +42,12 @@ function wheel_of_fortune_the_card(card)
 	math.randomseed(os.time())
 	local chance = math.random(4)
 	if chance == 1 then
-		local editions = {{name = 'e_foil', weight = 50}, {name = 'e_holo', weight = 35}, {name = 'e_polychrome', weight = 15}}
+		local editions = {
+			{name = 'e_foil', weight = 499},
+			{name = 'e_holo', weight = 350},
+			{name = 'e_polychrome', weight = 150},
+			{name = 'e_negative', weight = 1}
+		}
 		local edition = poll_edition("main_menu"..os.time(), nil, true, true, editions)
 		card:set_edition(edition, true)
 		juice_up(card, 0.3, 0.5)
@@ -186,51 +191,19 @@ function G.UIDEF.ruleset_selection_options()
 		config = {align = "cm"}
 	})
 
-	return create_UIBox_generic_options({back_func = "play_options", contents = {
-		{n=G.UIT.C, config={align = "tm", minh = 8, minw = 4}, nodes={
-			{n=G.UIT.R, config={align = "cm", padding = 0.05}, nodes={
-				UIBox_button({id = "standard_ruleset_button", col = true, chosen = "vert", label = {localize("k_standard")}, button = "change_ruleset_selection", colour = G.C.RED, minw = 4, scale = 0.4, minh = 0.6}),
-			}},
-			{n=G.UIT.R, config={align = "cm", padding = 0.05}, nodes={
-				UIBox_button({id = "vanilla_ruleset_button", col = true, label = {localize("k_vanilla")}, button = "change_ruleset_selection", colour = G.C.RED, minw = 4, scale = 0.4, minh = 0.6}),
-			}},
-			{n=G.UIT.R, config={align = "cm", padding = 0.05}, nodes={
-				UIBox_button({id = "badlatro_ruleset_button", col = true, label = {localize("k_badlatro")}, button = "change_ruleset_selection", colour = G.C.RED, minw = 4, scale = 0.4, minh = 0.6}),
-			}}
-		}},
-		{n=G.UIT.C, config={align = "cm", minh = 8, maxh = 8, minw = 11}, nodes={
-			{n=G.UIT.O, config={id = "ruleset_area", object = default_ruleset_area}}
-		}}
-	}})
+	local ruleset_buttons_data = {
+		{button_id = "standard_ruleset_button", button_localize_key = "k_standard"},
+		{button_id = "vanilla_ruleset_button", button_localize_key = "k_vanilla"},
+		{button_id = "badlatro_ruleset_button", button_localize_key = "k_badlatro"},
+	}
+
+	return MP.UI.Main_Lobby_Options("ruleset_area", default_ruleset_area,
+														 "change_ruleset_selection", ruleset_buttons_data)
 end
 
 function G.FUNCS.change_ruleset_selection(e)
-	if not G.OVERLAY_MENU then return end
-
-	local ruleset_area = G.OVERLAY_MENU:get_UIE_by_ID("ruleset_area")
-	if not ruleset_area then return end
-
-	-- Switch 'chosen' status from the previously-chosen button to this one:
-	if ruleset_area.config.prev_chosen then
-		ruleset_area.config.prev_chosen.config.chosen = nil
-	else -- The previously-chosen button should be the default one here:
-		local default_button = G.OVERLAY_MENU:get_UIE_by_ID("standard_ruleset_button")
-		if default_button then default_button.config.chosen = nil end
-	end
-	e.config.chosen = "vert" -- Special setting to show 'chosen' indicator on the side
-
-	local ruleset_name = string.match(e.config.id, "([^_]+)")
-	MP.LOBBY.config.ruleset = "ruleset_mp_" .. ruleset_name
-
-	if ruleset_area.config.object then ruleset_area.config.object:remove() end
-	ruleset_area.config.object = UIBox({
-		 definition = G.UIDEF.ruleset_info(ruleset_name),
-		 config = {align = "cm", parent = ruleset_area}
-	})
-
-	ruleset_area.config.object:recalculate()
-
-	ruleset_area.config.prev_chosen = e
+	MP.UI.Change_Main_Lobby_Options(e, "ruleset_area", G.UIDEF.ruleset_info, "standard_ruleset_button",
+														 function (ruleset_name) MP.LOBBY.config.ruleset = "ruleset_mp_" .. ruleset_name end)
 
 	MP.LOBBY.ruleset_preview = false
 end
@@ -475,67 +448,27 @@ function G.UIDEF.ruleset_cardarea_definition(args)
 	end
 end
 
-function G.FUNCS.select_gamemode(e)
-	G.SETTINGS.paused = true
-
-	G.FUNCS.overlay_menu({
-		definition = G.UIDEF.gamemode_selection_options(),
-	})
-end
-
 function G.UIDEF.gamemode_selection_options()
 	MP.LOBBY.config.gamemode = "gamemode_mp_attrition"
-	
+
 	local default_gamemode_area = UIBox({
 		definition = G.UIDEF.gamemode_info("attrition"),
 		config = {align = "cm"}
 	})
 
-	return create_UIBox_generic_options({back_func = "play_options", contents = {
-		{n=G.UIT.C, config={align = "tm", minh = 8, minw = 4}, nodes={
-			{n=G.UIT.R, config={align = "cm", padding = 0.05}, nodes={
-				UIBox_button({id = "attrition_gamemode_button", col = true, chosen = "vert", label = {localize("k_attrition")}, button = "change_gamemode_selection", colour = G.C.RED, minw = 4, scale = 0.4, minh = 0.6}),
-			}},
-			{n=G.UIT.R, config={align = "cm", padding = 0.05}, nodes={
-				UIBox_button({id = "showdown_gamemode_button", col = true, label = {localize("k_showdown")}, button = "change_gamemode_selection", colour = G.C.RED, minw = 4, scale = 0.4, minh = 0.6}),
-			}},
-			{n=G.UIT.R, config={align = "cm", padding = 0.05}, nodes={
-				UIBox_button({id = "survival_gamemode_button", col = true, label = {localize("k_survival")}, button = "change_gamemode_selection", colour = G.C.RED, minw = 4, scale = 0.4, minh = 0.6}),
-			}}
-		}},
-		{n=G.UIT.C, config={align = "cm", minh = 8, maxh = 8, minw = 11}, nodes={
-			{n=G.UIT.O, config={id = "gamemode_area", object = default_gamemode_area}}
-		}}
-	}})
+	local gamemode_buttons_data = {
+		{button_id = "attrition_gamemode_button", button_localize_key = "k_attrition"},
+		{button_id = "showdown_gamemode_button", button_localize_key = "k_showdown"},
+		{button_id = "survival_gamemode_button", button_localize_key = "k_survival"},
+	}
+
+	return MP.UI.Main_Lobby_Options("gamemode_area", default_gamemode_area,
+														 "change_gamemode_selection", gamemode_buttons_data)
 end
 
 function G.FUNCS.change_gamemode_selection(e)
-	if not G.OVERLAY_MENU then return end
-
-	local gamemode_area = G.OVERLAY_MENU:get_UIE_by_ID("gamemode_area")
-	if not gamemode_area then return end
-
-	-- Switch 'chosen' status from the previously-chosen button to this one:
-	if gamemode_area.config.prev_chosen then
-		gamemode_area.config.prev_chosen.config.chosen = nil
-	else -- The previously-chosen button should be the default one here:
-		local default_button = G.OVERLAY_MENU:get_UIE_by_ID("attrition_gamemode_button")
-		if default_button then default_button.config.chosen = nil end
-	end
-	e.config.chosen = "vert" -- Special setting to show 'chosen' indicator on the side
-
-	local gamemode_name = string.match(e.config.id, "([^_]+)")
-	MP.LOBBY.config.gamemode = "gamemode_mp_" .. gamemode_name
-
-	if gamemode_area.config.object then gamemode_area.config.object:remove() end
-	gamemode_area.config.object = UIBox({
-		 definition = G.UIDEF.gamemode_info(gamemode_name),
-		 config = {align = "cm", parent = gamemode_area}
-	})
-
-	gamemode_area.config.object:recalculate()
-
-	gamemode_area.config.prev_chosen = e
+	MP.UI.Change_Main_Lobby_Options(e, "gamemode_area", G.UIDEF.gamemode_info, "attrition_gamemode_button",
+														 function (gamemode_name) MP.LOBBY.config.gamemode = "gamemode_mp_" .. gamemode_name end)
 end
 
 function G.UIDEF.gamemode_info(gamemode_name)
@@ -660,6 +593,14 @@ function G.FUNCS.create_lobby(e)
 
 	G.FUNCS.overlay_menu({
 		definition = G.UIDEF.ruleset_selection_options(),
+	})
+end
+
+function G.FUNCS.select_gamemode(e)
+	G.SETTINGS.paused = true
+
+	G.FUNCS.overlay_menu({
+		definition = G.UIDEF.gamemode_selection_options(),
 	})
 end
 
