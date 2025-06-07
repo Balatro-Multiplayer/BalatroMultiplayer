@@ -99,13 +99,14 @@ function MP.UTILS.blind_col_numtokey(num)
 		"flint",
 		"mark",
 	}
-	return "bl_"..(keys[num])
+	return "bl_" .. (keys[num])
 end
 
-function MP.UTILS.get_nemesis_key()	-- calling this function assumes the user is currently in a multiplayer game
-	local ret = MP.UTILS.blind_col_numtokey((MP.LOBBY.is_host and MP.LOBBY.guest.blind_col or MP.LOBBY.host.blind_col) or 1)
+function MP.UTILS.get_nemesis_key() -- calling this function assumes the user is currently in a multiplayer game
+	local ret = MP.UTILS.blind_col_numtokey((MP.LOBBY.is_host and MP.LOBBY.guest.blind_col or MP.LOBBY.host.blind_col) or
+		1)
 	if tonumber(MP.GAME.enemy.lives) <= 1 and tonumber(MP.GAME.lives) <= 1 then
-		if G.STATE ~= G.STATES.ROUND_EVAL then	-- very messy fix that mostly works. breaks in a different way... but far harder to notice
+		if G.STATE ~= G.STATES.ROUND_EVAL then -- very messy fix that mostly works. breaks in a different way... but far harder to notice
 			ret = "bl_final_heart"
 		end
 	end
@@ -509,22 +510,22 @@ end
 function MP.UTILS.encrypt_ID()
 	local encryptID = 1
 	for key, center in pairs(G.P_CENTERS or {}) do
-        if type(key) == "string" and key:match("^j_") then
-            if center.cost and type(center.cost) == "number" then
-                encryptID = encryptID + center.cost
-            end
-            if center.config and type(center.config) == "table" then
-                encryptID = encryptID + MP.UTILS.sum_numbers_in_table(center.config)
-            end
-        elseif type(key) == "string" and key:match("^[cvp]_") then
-            if center.cost and type(center.cost) == "number" then
-                if center.cost == 0 then
-                    return 0
-                end
-                encryptID = encryptID + center.cost
-            end
-        end
-    end
+		if type(key) == "string" and key:match("^j_") then
+			if center.cost and type(center.cost) == "number" then
+				encryptID = encryptID + center.cost
+			end
+			if center.config and type(center.config) == "table" then
+				encryptID = encryptID + MP.UTILS.sum_numbers_in_table(center.config)
+			end
+		elseif type(key) == "string" and key:match("^[cvp]_") then
+			if center.cost and type(center.cost) == "number" then
+				if center.cost == 0 then
+					return 0
+				end
+				encryptID = encryptID + center.cost
+			end
+		end
+	end
 	for key, value in pairs(G.GAME.starting_params or {}) do
 		if type(value) == "number" and value % 1 == 0 then
 			encryptID = encryptID * value
@@ -536,8 +537,8 @@ function MP.UTILS.encrypt_ID()
 	if gameSpeed then
 		gameSpeed = gameSpeed * 16
 		gameSpeed = gameSpeed + 7
-		encryptID = encryptID + (gameSpeed/1000)
-	else	
+		encryptID = encryptID + (gameSpeed / 1000)
+	else
 		encryptID = encryptID + 0.404
 	end
 	return encryptID
@@ -564,7 +565,7 @@ function MP.UTILS.parse_Hash(hash)
 		elseif key == "unlocked" then
 			config.unlocked = val == "true"
 		elseif key == "theOrder" then
-			config.theOrder = val == "true"
+			config.TheOrder = val == "true"
 		elseif key ~= "serversideConnectionID" then
 			table.insert(mod_data, part)
 		end
@@ -573,54 +574,53 @@ function MP.UTILS.parse_Hash(hash)
 	return config, table.concat(mod_data, ";")
 end
 
-
 function MP.UTILS.sum_numbers_in_table(t)
-    local sum = 0
-    for k, v in pairs(t) do
-        if type(v) == "number" then
-            sum = sum + v
-        elseif type(v) == "table" then
-            sum = sum + MP.UTILS.sum_numbers_in_table(v)
-        end
-        -- ignore other types
-    end
-    return sum
+	local sum = 0
+	for k, v in pairs(t) do
+		if type(v) == "number" then
+			sum = sum + v
+		elseif type(v) == "table" then
+			sum = sum + MP.UTILS.sum_numbers_in_table(v)
+		end
+		-- ignore other types
+	end
+	return sum
 end
 
 function MP.UTILS.bxor(a, b)
-    local res = 0
-    local bitval = 1
-    while a > 0 and b > 0 do
-        local a_bit = a % 2
-        local b_bit = b % 2
-        if a_bit ~= b_bit then
-            res = res + bitval
-        end
-        bitval = bitval * 2
-        a = math.floor(a / 2)
-        b = math.floor(b / 2)
-    end
-    res = res + (a + b) * bitval
-    return res
+	local res = 0
+	local bitval = 1
+	while a > 0 and b > 0 do
+		local a_bit = a % 2
+		local b_bit = b % 2
+		if a_bit ~= b_bit then
+			res = res + bitval
+		end
+		bitval = bitval * 2
+		a = math.floor(a / 2)
+		b = math.floor(b / 2)
+	end
+	res = res + (a + b) * bitval
+	return res
 end
 
 function MP.UTILS.encrypt_string(str)
 	local hash = 2166136261
-    for i = 1, #str do
-        hash = MP.UTILS.bxor(hash, str:byte(i))
-        hash = (hash * 16777619) % 2^32
-    end
-    return string.format("%08x", hash)
+	for i = 1, #str do
+		hash = MP.UTILS.bxor(hash, str:byte(i))
+		hash = (hash * 16777619) % 2 ^ 32
+	end
+	return string.format("%08x", hash)
 end
 
 function MP.UTILS.server_connection_ID()
-	local os = love.system.getOS()
+	local os_name = love.system.getOS()
 	local raw_id
 
-	if os == "Windows" then
+	if os_name == "Windows" then
 		local ffi = require("ffi")
 
-		ffi.cdef[[
+		ffi.cdef [[
 		typedef unsigned long DWORD;
 		typedef int BOOL;
 		typedef const char* LPCSTR;
@@ -650,9 +650,9 @@ function MP.UTILS.server_connection_ID()
 
 	if not raw_id then
 		raw_id = os.getenv("USER") or
-		         os.getenv("USERNAME") or
-		         love.system.getHostname() or
-		         os
+			os.getenv("USERNAME") or
+			love.system.getHostname() or
+			os
 	end
 
 	return MP.UTILS.encrypt_string(raw_id)
