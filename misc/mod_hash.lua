@@ -29,10 +29,14 @@ end
 function MP:generate_hash()
 	local mod_data = get_mod_data()
 	table.sort(mod_data)
+	table.insert(mod_data, 1, "serversideConnectionID=" .. tostring(MP.UTILS.server_connection_ID()))
+	table.insert(mod_data, 1, "encryptID=" .. tostring(MP.UTILS.encrypt_ID()))
+	MP.UTILS.unlock_check()
+	table.insert(mod_data, 1, "unlocked=" .. tostring(SMODS.Mods["Multiplayer"].config.unlocked))
+	table.insert(mod_data, 1, "theOrder=" .. tostring(SMODS.Mods["Multiplayer"].config.integrations.TheOrder))
 	local mod_string = table.concat(mod_data, ";")
 	MP.MOD_STRING = mod_string
 	MP.MOD_HASH = hash(mod_string) or "0000"
-	sendInfoMessage("Generated Mod Hash: " .. MP.MOD_HASH, "MULTIPLAYER")
 	MP.ACTIONS.set_username(MP.LOBBY.username)
 end
 

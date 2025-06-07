@@ -8,4 +8,5 @@ return {
 	["integrations"] = {
 		["TheOrder"] = false,
 	},
+	["unlocked"] = true,
 }

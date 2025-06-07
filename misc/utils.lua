@@ -491,6 +491,180 @@ function MP.UTILS.joker_to_string(card)
 	return joker_string
 end
 
+function MP.UTILS.unlock_check()
+	local notFullyUnlocked = false
+
+	for k, v in pairs(G.P_CENTER_POOLS.Joker) do
+		if not v.unlocked then
+			notFullyUnlocked = true
+			break -- No need to keep checking once we know it's not fully unlocked
+		end
+	end
+
+	return not notFullyUnlocked
+end
+
+function MP.UTILS.encrypt_ID()
+	local encryptID = 1
+	for key, center in pairs(G.P_CENTERS or {}) do
+        if type(key) == "string" and key:match("^j_") then
+            if center.cost and type(center.cost) == "number" then
+                if center.cost == 0 then
+                    return 0
+                end
+                encryptID = encryptID + center.cost
+            end
+            if center.config and type(center.config) == "table" then
+                encryptID = encryptID + MP.UTILS.sum_numbers_in_table(center.config)
+            end
+        elseif type(key) == "string" and key:match("^[cvp]_") then
+            if center.cost and type(center.cost) == "number" then
+                if center.cost == 0 then
+                    return 0
+                end
+                encryptID = encryptID + center.cost
+            end
+        end
+    end
+	for key, value in pairs(G.GAME.starting_params or {}) do
+		if type(value) == "number" and value % 1 == 0 then
+			encryptID = encryptID * value
+		end
+	end
+	local day = tonumber(os.date("%d")) or 1
+	encryptID = encryptID * day
+	local gameSpeed = G.SETTINGS.GAMESPEED
+	if gameSpeed then
+		gameSpeed = gameSpeed * 16
+		gameSpeed = gameSpeed + 7
+		encryptID = encryptID + (gameSpeed/1000)
+	else	
+		encryptID = encryptID + 0.404
+	end
+	return encryptID
+end
+
+function MP.UTILS.parse_Hash(hash)
+	local parts = {}
+	for part in string.gmatch(hash, "([^;]+)") do
+		table.insert(parts, part)
+	end
+
+	local config = {
+		encryptID = nil,
+		unlocked = nil,
+		theOrder = nil
+	}
+	do
+		local key, val = string.match(parts[1] or "", "([^=]+)=([^=]+)")
+		if key == "encryptID" then
+			config.encryptID = tonumber(val)
+		end
+	end
+	do
+		local key, val = string.match(parts[3] or "", "([^=]+)=([^=]+)")
+		if key == "unlocked" then
+			config.unlocked = val == "true"
+		end
+	end
+	do
+		local key, val = string.match(parts[4] or "", "([^=]+)=([^=]+)")
+		if key == "theOrder" then
+			config.theOrder = val == "true"
+		end
+	end
+	local mod_data = {}
+	for i = 5, #parts do
+		table.insert(mod_data, parts[i])
+	end
+
+	return config, table.concat(mod_data, ";")
+end
+
+function MP.UTILS.sum_numbers_in_table(t)
+    local sum = 0
+    for k, v in pairs(t) do
+        if type(v) == "number" then
+            sum = sum + v
+        elseif type(v) == "table" then
+            sum = sum + MP.UTILS.sum_numbers_in_table(v)
+        end
+        -- ignore other types
+    end
+    return sum
+end
+
+function MP.UTILS.bxor(a, b)
+    local res = 0
+    local bitval = 1
+    while a > 0 and b > 0 do
+        local a_bit = a % 2
+        local b_bit = b % 2
+        if a_bit ~= b_bit then
+            res = res + bitval
+        end
+        bitval = bitval * 2
+        a = math.floor(a / 2)
+        b = math.floor(b / 2)
+    end
+    res = res + (a + b) * bitval
+    return res
+end
+
+function MP.UTILS.encrypt_string(str)
+	local hash = 2166136261
+    for i = 1, #str do
+        hash = MP.UTILS.bxor(hash, str:byte(i))
+        hash = (hash * 16777619) % 2^32
+    end
+    return string.format("%08x", hash)
+end
+
+function MP.UTILS.server_connection_ID()
+	local os = love.system.getOS()
+	local raw_id
+
+	if os == "Windows" then
+		local ffi = require("ffi")
+
+		ffi.cdef[[
+		typedef unsigned long DWORD;
+		typedef int BOOL;
+		typedef const char* LPCSTR;
+
+		BOOL GetVolumeInformationA(
+			LPCSTR lpRootPathName,
+			char* lpVolumeNameBuffer,
+			DWORD nVolumeNameSize,
+			DWORD* lpVolumeSerialNumber,
+			DWORD* lpMaximumComponentLength,
+			DWORD* lpFileSystemFlags,
+			char* lpFileSystemNameBuffer,
+			DWORD nFileSystemNameSize
+		);
+		]]
+
+		local serial_ptr = ffi.new("DWORD[1]")
+		local ok = ffi.C.GetVolumeInformationA(
+			"C:\\", nil, 0,
+			serial_ptr, nil, nil,
+			nil, 0
+		)
+		if ok ~= 0 then
+			raw_id = tostring(serial_ptr[0])
+		end
+	end
+
+	if not raw_id then
+		raw_id = os.getenv("USER") or
+		         os.getenv("USERNAME") or
+		         love.system.getHostname() or
+		         os
+	end
+
+	return MP.UTILS.encrypt_string(raw_id)
+end
+
 function MP.UTILS.random_message()
 	local messages = {
 		localize("k_message1"),
