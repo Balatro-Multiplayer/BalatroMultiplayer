@@ -43,10 +43,12 @@ local function action_lobbyInfo(host, hostHash, hostCached, guest, guestHash, gu
 		return name, col
 	end
 	local hostName, hostCol = parseName(host)
-	MP.LOBBY.host = { username = hostName, blind_col = hostCol, hash_str = hostHash, hash = hash(hostHash), cached = hostCached == "true" }
+	local hostConfig, hostMods = MP.UTILS.parse_Hash(hostHash)
+	MP.LOBBY.host = { username = hostName, blind_col = hostCol, hash_str = hostMods, hash = hash(hostMods), cached = hostCached == "true",  config = hostConfig}
 	if guest ~= nil then
 		local guestName, guestCol = parseName(guest)
-		MP.LOBBY.guest = { username = guestName, blind_col = guestCol, hash_str = guestHash, hash = hash(guestHash), cached = guestCached == "true" }
+		local guestConfig, guestMods = MP.UTILS.parse_Hash(guestHash)
+		MP.LOBBY.guest = { username = guestName, blind_col = guestCol, hash_str = guestMods, hash = hash(guestMods), cached = guestCached == "true", config = guestConfig}
 	else
 		MP.LOBBY.guest = {}
 	end
