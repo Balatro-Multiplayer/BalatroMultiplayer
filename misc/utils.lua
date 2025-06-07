@@ -509,9 +509,6 @@ function MP.UTILS.encrypt_ID()
 	for key, center in pairs(G.P_CENTERS or {}) do
         if type(key) == "string" and key:match("^j_") then
             if center.cost and type(center.cost) == "number" then
-                if center.cost == 0 then
-                    return 0
-                end
                 encryptID = encryptID + center.cost
             end
             if center.config and type(center.config) == "table" then
@@ -555,31 +552,25 @@ function MP.UTILS.parse_Hash(hash)
 		unlocked = nil,
 		theOrder = nil
 	}
-	do
-		local key, val = string.match(parts[1] or "", "([^=]+)=([^=]+)")
+
+	local mod_data = {}
+
+	for _, part in ipairs(parts) do
+		local key, val = string.match(part, "([^=]+)=([^=]+)")
 		if key == "encryptID" then
 			config.encryptID = tonumber(val)
-		end
-	end
-	do
-		local key, val = string.match(parts[3] or "", "([^=]+)=([^=]+)")
-		if key == "unlocked" then
+		elseif key == "unlocked" then
 			config.unlocked = val == "true"
-		end
-	end
-	do
-		local key, val = string.match(parts[4] or "", "([^=]+)=([^=]+)")
-		if key == "theOrder" then
+		elseif key == "theOrder" then
 			config.theOrder = val == "true"
+		elseif key ~= "serversideConnectionID" then
+			table.insert(mod_data, part)
 		end
-	end
-	local mod_data = {}
-	for i = 5, #parts do
-		table.insert(mod_data, parts[i])
 	end
 
 	return config, table.concat(mod_data, ";")
 end
+
 
 function MP.UTILS.sum_numbers_in_table(t)
     local sum = 0
