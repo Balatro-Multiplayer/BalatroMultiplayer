@@ -38,12 +38,19 @@ if Handy then
 		end
 	end
 
-	-- Disable game speed and Nopeus interaction
+	-- Disable game speed, Animation skip and Nopeus interaction
 	if type(Handy.get_module_override) == "function" then
 		-- Updater version
 		local func_ref = Handy.get_module_override
 		function Handy.get_module_override(module)
-			if module == Handy.cc.speed_multiplier or module == Handy.cc.nopeus_interaction then
+			if
+				module
+				and (
+					module == Handy.cc.speed_multiplier
+					or module == Handy.cc.nopeus_interaction
+					or module == Handy.cc.animation_skip
+				)
+			then
 				return { enabled = false }
 			else
 				return func_ref()
@@ -143,7 +150,7 @@ if Handy then
 						{
 							n = G.UIT.T,
 							config = {
-								text = "Patched by Multiplayer mod: Speed Multiplayer, Nopeus interaction and Dangerous controls disabled.",
+								text = "Patched by Multiplayer mod: Speed Multiplayer, Animation skip, Nopeus interaction and Dangerous controls are disabled.",
 								scale = 0.3,
 								colour = G.C.MULT,
 								align = "cm",
