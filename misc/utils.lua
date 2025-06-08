@@ -724,7 +724,7 @@ end
 
 function MP.UTILS.str_pack_and_encode(data)
 	local str = STR_PACK(data)
-	local str_compressed = love.data.compress("string", "deflate", str)
+	local str_compressed = love.data.compress("string", "gzip", str)
 	local str_encoded = love.data.encode("string", "base64", str_compressed)
 	return str_encoded
 end
@@ -733,7 +733,7 @@ function MP.UTILS.str_decode_and_unpack(str)
 	local success, str_decoded, str_decompressed, str_unpacked
 	success, str_decoded = pcall(love.data.decode, "string", "base64", str)
 	if not success then return nil, str_decoded end
-	success, str_decompressed = pcall(love.data.decompress, "string", "deflate", str_decoded)
+	success, str_decompressed = pcall(love.data.decompress, "string", "gzip", str_decoded)
 	if not success then return nil, str_decompressed end
 	success, str_unpacked = pcall(STR_UNPACK_CHECKED, str_decompressed)
 	if not success then return nil, str_unpacked end
