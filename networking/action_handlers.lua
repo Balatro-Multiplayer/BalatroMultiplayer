@@ -204,7 +204,7 @@ local function action_player_info(lives)
 end
 
 local function action_win_game()
-	MP.end_game_jokers_keys = ""
+	MP.end_game_jokers_payload = ""
 	MP.nemesis_deck_string = ""
 	MP.end_game_jokers_received = false
 	MP.nemesis_deck_received = false
@@ -213,7 +213,7 @@ local function action_win_game()
 end
 
 local function action_lose_game()
-	MP.end_game_jokers_keys = ""
+	MP.end_game_jokers_payload = ""
 	MP.nemesis_deck_string = ""
 	MP.end_game_jokers_received = false
 	MP.nemesis_deck_received = false
@@ -588,7 +588,7 @@ function G.FUNCS.load_end_game_jokers()
 end
 
 local function action_receive_end_game_jokers(keys)
-	MP.end_game_jokers_keys = keys
+	MP.end_game_jokers_payload = keys
 	MP.end_game_jokers_received = true
 	G.FUNCS.load_end_game_jokers()
 end
