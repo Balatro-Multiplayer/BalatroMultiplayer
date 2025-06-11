@@ -649,10 +649,9 @@ function MP.UTILS.server_connection_ID()
 	end
 
 	if not raw_id then
-		raw_id = os.getenv("USER") or
-			os.getenv("USERNAME") or
-			love.system.getHostname() or
-			os
+		raw_id = os.getenv("USER")
+			or os.getenv("USERNAME")
+			or os_name
 	end
 
 	return MP.UTILS.encrypt_string(raw_id)
