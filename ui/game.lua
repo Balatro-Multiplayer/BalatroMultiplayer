@@ -522,7 +522,7 @@ end
 local blind_set_blindref = Blind.set_blind
 function Blind:set_blind(blind, reset, silent)	-- hacking in proper spirals, far from good but whatever
 	blind_set_blindref(self, blind, reset, silent)
-	if blind and blind.key == 'bl_mp_nemesis' then
+	if (blind and blind.key == 'bl_mp_nemesis') or (self and self.name and self.name == 'bl_mp_nemesis') then -- this shouldn't break and this fix shouldn't work
 		local boss = true
 		local showdown = false
 		local blind_key = MP.UTILS.get_nemesis_key()
