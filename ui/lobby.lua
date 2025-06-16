@@ -1073,6 +1073,7 @@ function G.FUNCS.lobby_leave(e)
 	MP.LOBBY.code = nil
 	MP.ACTIONS.leave_lobby()
 	MP.UI.update_connection_status()
+	G.STATE = G.STATES.MENU
 end
 
 function G.FUNCS.lobby_choose_deck(e)
@@ -1165,11 +1166,15 @@ local in_lobby = false
 local gameUpdateRef = Game.update
 ---@diagnostic disable-next-line: duplicate-set-field
 function Game:update(dt)
+	-- Track lobby state transitions
 	if (MP.LOBBY.code and not in_lobby) or (not MP.LOBBY.code and in_lobby) then
 		in_lobby = not in_lobby
 		G.F_NO_SAVING = in_lobby
-		self.FUNCS.go_to_menu()
-		MP.reset_game_states()
+		if G.STATE == G.STATES.MENU then
+			-- Only return to menu if we're not in a run/game
+			self.FUNCS.go_to_menu()
+			MP.reset_game_states()
+		end
 	end
 	gameUpdateRef(self, dt)
 end

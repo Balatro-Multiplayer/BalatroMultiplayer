@@ -1150,33 +1150,39 @@ function MP.end_round()
 	return true
 end
 
+function G.FUNCS.reload_hand_UI()
+	G.HUD = UIBox {
+		definition = create_UIBox_HUD(),
+		config = { align = ('cli'), offset = { x = -0.7, y = 0 }, major = G.ROOM_ATTACH }
+	}
+
+	if MP.LOBBY.connected and MP.LOBBY.code and not MP.LOBBY.config.disable_live_and_timer_hud then
+		local scale = 0.4
+		local hud_ante = G.HUD:get_UIE_by_ID("hud_ante")
+		hud_ante.children[1].children[1].config.text = localize("k_lives")
+
+		-- Set lives number
+		hud_ante.children[2].children[1].config.object = DynaText({
+			string = { { ref_table = MP.GAME, ref_value = "lives" } },
+			colours = { G.C.IMPORTANT },
+			shadow = true,
+			font = G.LANGUAGES["en-us"].font,
+			scale = 2 * scale,
+		})
+
+		-- Remove unnecessary HUD elements from ante counter
+		hud_ante.children[2].children[2] = nil
+		hud_ante.children[2].children[3] = nil
+		hud_ante.children[2].children[4] = nil
+	end
+
+	G.HUD:recalculate()
+end
+
 local start_run_ref = Game.start_run
 function Game:start_run(args)
 	start_run_ref(self, args)
-
-	if not MP.LOBBY.connected or not MP.LOBBY.code or MP.LOBBY.config.disable_live_and_timer_hud then
-		return
-	end
-
-	local scale = 0.4
-	local hud_ante = G.HUD:get_UIE_by_ID("hud_ante")
-	hud_ante.children[1].children[1].config.text = localize("k_lives")
-
-	-- Set lives number
-	hud_ante.children[2].children[1].config.object = DynaText({
-		string = { { ref_table = MP.GAME, ref_value = "lives" } },
-		colours = { G.C.IMPORTANT },
-		shadow = true,
-		font = G.LANGUAGES["en-us"].font,
-		scale = 2 * scale,
-	})
-
-	-- Remove unnecessary HUD elements
-	hud_ante.children[2].children[2] = nil
-	hud_ante.children[2].children[3] = nil
-	hud_ante.children[2].children[4] = nil
-
-	self.HUD:recalculate()
+	G.FUNCS.reload_hand_UI()
 end
 
 local create_UIBox_game_over_ref = create_UIBox_game_over
@@ -1203,7 +1209,6 @@ function create_UIBox_game_over()
 	else
 		G.FUNCS.load_nemesis_deck()
 	end
-	G.SETTINGS.paused = false
 	local eased_red = copy_table(G.GAME.round_resets.ante <= G.GAME.win_ante and G.C.RED or G.C.BLUE)
 	eased_red[4] = 0
 	ease_value(eased_red, 4, 0.8, nil, nil, true)
@@ -1517,7 +1522,6 @@ function create_UIBox_win()
 	else
 		G.FUNCS.load_nemesis_deck()
 	end
-	G.SETTINGS.paused = false
 	local eased_green = copy_table(G.C.GREEN)
 	eased_green[4] = 0
 	ease_value(eased_green, 4, 0.5, nil, nil, true)
@@ -1598,6 +1602,7 @@ function create_UIBox_win()
 									{
 										n = G.UIT.C,
 										config = {
+											id = "view_nemesis_deck_button",
 											button = "view_nemesis_deck",
 											align = "cm",
 											padding = 0.12,
@@ -1609,6 +1614,7 @@ function create_UIBox_win()
 											r = 0.1,
 											shadow = true,
 											hover = true,
+											focus_args = { nav = "wide" },
 										},
 										nodes = {
 											{
@@ -1738,6 +1744,16 @@ function create_UIBox_win()
 													},
 												},
 											},
+											UIBox_button({
+												id = "continue_singpleplayer_button",
+												align = "lm",
+												button = "continue_in_singleplayer",
+												label = { localize("b_continue_singleplayer") },
+												colour = G.C.GREEN,
+												minw = 6,
+												minh = 1,
+												focus_args = { nav = "wide" },
+											})
 										},
 									},
 									{
@@ -1748,6 +1764,7 @@ function create_UIBox_win()
 											create_UIBox_round_scores_row("furthest_round", G.C.FILTER),
 											create_UIBox_round_scores_row("seed", G.C.WHITE),
 											UIBox_button({
+												id = "copy_seed_button",
 												button = "copy_seed",
 												label = { localize("b_copy") },
 												colour = G.C.BLUE,
@@ -2252,6 +2269,16 @@ end
 function G.FUNCS.open_kofi(e)
 	love.system.openURL("https://ko-fi.com/virtualized")
 end
+
+function G.FUNCS:continue_in_singleplayer(e)
+	MP.LOBBY.code = nil
+	MP.ACTIONS.leave_lobby()
+	MP.UI.update_connection_status()
+	G.FUNCS:exit_overlay_menu()
+	G.FUNCS.reload_hand_UI()
+	G:save_progress()
+end
+
 --[[
 function MP.UI.create_UIBox_Misprint_Display()
 	return {
