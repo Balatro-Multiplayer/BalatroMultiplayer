@@ -1151,12 +1151,12 @@ function MP.end_round()
 end
 
 function G.FUNCS.reload_hand_UI()
-	G.HUD = UIBox {
-		definition = create_UIBox_HUD(),
-		config = { align = ('cli'), offset = { x = -0.7, y = 0 }, major = G.ROOM_ATTACH }
-	}
-
 	if MP.LOBBY.connected and MP.LOBBY.code and not MP.LOBBY.config.disable_live_and_timer_hud then
+		G.HUD = UIBox {
+			definition = create_UIBox_HUD(),
+			config = { align = ('cli'), offset = { x = -0.7, y = 0 }, major = G.ROOM_ATTACH }
+		}
+
 		local scale = 0.4
 		local hud_ante = G.HUD:get_UIE_by_ID("hud_ante")
 		hud_ante.children[1].children[1].config.text = localize("k_lives")
@@ -1182,7 +1182,7 @@ end
 local start_run_ref = Game.start_run
 function Game:start_run(args)
 	start_run_ref(self, args)
-	G.FUNCS.reload_hand_UI()
+	--G.FUNCS.reload_hand_UI()
 end
 
 local create_UIBox_game_over_ref = create_UIBox_game_over
