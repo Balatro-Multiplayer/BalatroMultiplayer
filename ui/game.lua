@@ -1744,9 +1744,11 @@ function create_UIBox_win()
 												button = "continue_in_singleplayer",
 												label = { localize("b_continue_singleplayer") },
 												colour = G.C.GREEN,
+												toolTip = {title = "", text = localize("k_continue_singleplayer_tooltip")},
 												minw = 6,
 												minh = 1,
-												focus_args = { nav = "wide" },
+												func = 'set_button_pip',
+												focus_args = { nav = "wide", button = "y" },
 											})
 										},
 									},
@@ -2274,6 +2276,7 @@ function G.FUNCS:continue_in_singleplayer(e)
 	-- Allow saving, save the run, and set up for continuation
 	G.F_NO_SAVING = false
 	G.SETTINGS.current_setup = 'Continue'
+	G.FUNCS.wipe_on()
 	save_run()
 	G:delete_run()
 
@@ -2292,6 +2295,7 @@ function G.FUNCS:continue_in_singleplayer(e)
 			return true
 		end
 	}))
+	G.FUNCS.wipe_off()
 end
 
 --[[
