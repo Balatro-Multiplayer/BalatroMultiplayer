@@ -1150,39 +1150,33 @@ function MP.end_round()
 	return true
 end
 
-function G.FUNCS.reload_hand_UI()
-	if MP.LOBBY.connected and MP.LOBBY.code and not MP.LOBBY.config.disable_live_and_timer_hud then
-		G.HUD = UIBox {
-			definition = create_UIBox_HUD(),
-			config = { align = ('cli'), offset = { x = -0.7, y = 0 }, major = G.ROOM_ATTACH }
-		}
-
-		local scale = 0.4
-		local hud_ante = G.HUD:get_UIE_by_ID("hud_ante")
-		hud_ante.children[1].children[1].config.text = localize("k_lives")
-
-		-- Set lives number
-		hud_ante.children[2].children[1].config.object = DynaText({
-			string = { { ref_table = MP.GAME, ref_value = "lives" } },
-			colours = { G.C.IMPORTANT },
-			shadow = true,
-			font = G.LANGUAGES["en-us"].font,
-			scale = 2 * scale,
-		})
-
-		-- Remove unnecessary HUD elements from ante counter
-		hud_ante.children[2].children[2] = nil
-		hud_ante.children[2].children[3] = nil
-		hud_ante.children[2].children[4] = nil
-	end
-
-	G.HUD:recalculate()
-end
-
 local start_run_ref = Game.start_run
 function Game:start_run(args)
 	start_run_ref(self, args)
-	--G.FUNCS.reload_hand_UI()
+
+	if not MP.LOBBY.connected or not MP.LOBBY.code or MP.LOBBY.config.disable_live_and_timer_hud then
+		return
+	end
+
+	local scale = 0.4
+	local hud_ante = G.HUD:get_UIE_by_ID("hud_ante")
+	hud_ante.children[1].children[1].config.text = localize("k_lives")
+
+	-- Set lives number
+	hud_ante.children[2].children[1].config.object = DynaText({
+		string = { { ref_table = MP.GAME, ref_value = "lives" } },
+		colours = { G.C.IMPORTANT },
+		shadow = true,
+		font = G.LANGUAGES["en-us"].font,
+		scale = 2 * scale,
+	})
+
+	-- Remove unnecessary HUD elements from ante counter
+	hud_ante.children[2].children[2] = nil
+	hud_ante.children[2].children[3] = nil
+	hud_ante.children[2].children[4] = nil
+
+	G.HUD:recalculate();
 end
 
 local create_UIBox_game_over_ref = create_UIBox_game_over
@@ -1202,7 +1196,7 @@ function create_UIBox_game_over()
 	else
 		G.FUNCS.load_end_game_jokers()
 	end
-	MP.nemesis_deck = CardArea(-100, -100, G.CARD_W, G.CARD_H, {type = 'deck'})
+	MP.nemesis_deck = CardArea(-100, -100, G.CARD_W, G.CARD_H, { type = 'deck' })
 	MP.nemesis_cards = {}
 	if not MP.nemesis_deck_received then
 		MP.ACTIONS.get_nemesis_deck()
@@ -1515,7 +1509,7 @@ function create_UIBox_win()
 	else
 		G.FUNCS.load_end_game_jokers()
 	end
-	MP.nemesis_deck = CardArea(-100, -100, G.CARD_W, G.CARD_H, {type = 'deck'})
+	MP.nemesis_deck = CardArea(-100, -100, G.CARD_W, G.CARD_H, { type = 'deck' })
 	MP.nemesis_cards = {}
 	if not MP.nemesis_deck_received then
 		MP.ACTIONS.get_nemesis_deck()
@@ -1833,7 +1827,7 @@ end
 function G.FUNCS.overlay_endgame_menu()
 	G.FUNCS.overlay_menu({
 		definition = MP.GAME.won and create_UIBox_win() or create_UIBox_game_over(),
-		config = {no_esc = true}
+		config = { no_esc = true }
 	})
 	G.E_MANAGER:add_event(Event({
 		trigger = 'after',
@@ -1841,13 +1835,13 @@ function G.FUNCS.overlay_endgame_menu()
 		blocking = false,
 		func = (function()
 			if G.OVERLAY_MENU and G.OVERLAY_MENU:get_UIE_by_ID('jimbo_spot') then
-				local Jimbo = Card_Character({x = 0, y = 5})
+				local Jimbo = Card_Character({ x = 0, y = 5 })
 				local spot = G.OVERLAY_MENU:get_UIE_by_ID('jimbo_spot')
 				spot.config.object:remove()
 				spot.config.object = Jimbo
 				Jimbo.ui_object_updated = true
-				local jimbo_words = MP.GAME.won and 'wq_'..math.random(1,7) or 'lq_'..math.random(1,10)
-				Jimbo:add_speech_bubble(jimbo_words, nil, {quip = true})
+				local jimbo_words = MP.GAME.won and 'wq_' .. math.random(1, 7) or 'lq_' .. math.random(1, 10)
+				Jimbo:add_speech_bubble(jimbo_words, nil, { quip = true })
 				Jimbo:say_stuff(5)
 			end
 			return true
@@ -2261,7 +2255,8 @@ G.FUNCS.skip_blind = function(e)
 			temp_furthest_blind = G.GAME.round_resets.ante * 10 + 1
 		end
 
-		MP.GAME.furthest_blind = (temp_furthest_blind > MP.GAME.furthest_blind) and temp_furthest_blind or MP.GAME.furthest_blind
+		MP.GAME.furthest_blind = (temp_furthest_blind > MP.GAME.furthest_blind) and temp_furthest_blind or
+		MP.GAME.furthest_blind
 		MP.ACTIONS.set_furthest_blind(MP.GAME.furthest_blind)
 	end
 end
@@ -2274,9 +2269,20 @@ function G.FUNCS:continue_in_singleplayer(e)
 	MP.LOBBY.code = nil
 	MP.ACTIONS.leave_lobby()
 	MP.UI.update_connection_status()
-	G.FUNCS:exit_overlay_menu()
-	G.FUNCS.reload_hand_UI()
-	G:save_progress()
+
+	local saveText = MP.UTILS.MP_SAVE()
+	G.SAVED_GAME = saveText
+	G.SETTINGS.current_setup = 'Continue'
+  G:delete_run()
+
+	G.E_MANAGER:add_event(Event({
+    trigger = 'immediate',
+		no_delete = true,
+    func = function()
+			G.FUNCS.start_setup_run(nil)
+      return true
+    end
+  }))
 end
 
 --[[
