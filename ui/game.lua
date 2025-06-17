@@ -2266,23 +2266,32 @@ function G.FUNCS.open_kofi(e)
 end
 
 function G.FUNCS:continue_in_singleplayer(e)
+	-- Leave multiplayer lobby and update UI
 	MP.LOBBY.code = nil
 	MP.ACTIONS.leave_lobby()
 	MP.UI.update_connection_status()
 
-	local saveText = MP.UTILS.MP_SAVE()
-	G.SAVED_GAME = saveText
+	-- Allow saving, save the run, and set up for continuation
+	G.F_NO_SAVING = false
 	G.SETTINGS.current_setup = 'Continue'
-  G:delete_run()
+	save_run()
+	G:delete_run()
 
+	-- Load the saved game and start a new run in singleplayer
 	G.E_MANAGER:add_event(Event({
-    trigger = 'immediate',
+		trigger = 'immediate',
 		no_delete = true,
-    func = function()
-			G.FUNCS.start_setup_run(nil)
-      return true
-    end
-  }))
+		func = function()
+			local profile = G.SETTINGS.profile
+			local save_path = profile .. '/save.jkr'
+			G.SAVED_GAME = get_compressed(save_path)
+			if G.SAVED_GAME ~= nil then
+				G.SAVED_GAME = STR_UNPACK(G.SAVED_GAME)
+			end
+			G:start_run({ savetext = G.SAVED_GAME })
+			return true
+		end
+	}))
 end
 
 --[[

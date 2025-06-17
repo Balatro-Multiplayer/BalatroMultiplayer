@@ -738,33 +738,3 @@ function MP.UTILS.str_decode_and_unpack(str)
 	if not success then return nil, str_unpacked end
 	return str_unpacked
 end
-
--- Save current run and return as table
-function MP.UTILS.MP_SAVE()
-	local cardAreas = {}
-	for k, v in pairs(G) do
-		if (type(v) == "table") and v.is and v:is(CardArea) then
-			local cardAreaSer = v:save()
-			if cardAreaSer then cardAreas[k] = cardAreaSer end
-		end
-	end
-
-	local tags = {}
-	for k, v in ipairs(G.GAME.tags) do
-		if (type(v) == "table") and v.is and v:is(Tag) then
-			local tagSer = v:save()
-			if tagSer then tags[k] = tagSer end
-		end
-	end
-
-	return {
-		cardAreas = cardAreas,
-		tags = tags,
-		GAME = G.GAME,
-		STATE = G.STATE,
-		ACTION = G.action,
-		BLIND = G.GAME.blind and G.GAME.blind:save() or nil,
-		BACK = G.GAME.selected_back and G.GAME.selected_back:save() or nil,
-		VERSION = G.VERSION,
-	}
-end
