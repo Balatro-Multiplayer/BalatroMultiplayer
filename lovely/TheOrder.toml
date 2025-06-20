@@ -128,7 +128,10 @@ match_indent = true
 target = "functions/common_events.lua"
 pattern = '''local edition = poll_edition('edi'..(key_append or '')..G.GAME.round_resets.ante)'''
 position = "at"
-payload = '''local edition = poll_edition(_order..'edi'..(key_append or '')..G.GAME.round_resets.ante)'''
+payload = '''
+if MP.INTEGRATIONS.TheOrder then key_append = nil end	-- why does this even use key_append again?
+local edition = poll_edition(_order..'edi'..(key_append or '')..G.GAME.round_resets.ante)
+'''
 match_indent = true
 
 # Make soul/black hole queue not dependent on type (omen globe)
