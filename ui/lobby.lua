@@ -598,6 +598,24 @@ function G.UIDEF.create_UIBox_lobby_options()
 												},
 												nodes = {
 													Disableable_Toggle({
+														id = "timer_toggle",
+														enabled_ref_table = MP.LOBBY,
+														enabled_ref_value = "is_host",
+														label = localize("b_opts_timer"),
+														ref_table = MP.LOBBY.config,
+														ref_value = "timer",
+														callback = send_lobby_options,
+													}),
+												},
+											},
+											{
+												n = G.UIT.R,
+												config = {
+													padding = 0,
+													align = "cr",
+												},
+												nodes = {
+													Disableable_Toggle({
 														id = "normal_bosses_toggle",
 														enabled_ref_table = MP.LOBBY,
 														enabled_ref_value = "is_host",

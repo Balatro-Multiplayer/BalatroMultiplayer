@@ -181,94 +181,100 @@ end
 
 local ease_round_ref = ease_round
 function ease_round(mod)
-	if MP.LOBBY.code and (not MP.LOBBY.config.disable_live_and_timer_hud) then
+	if MP.LOBBY.code and (not MP.LOBBY.config.disable_live_and_timer_hud) and MP.LOBBY.config.timer then
 		return
 	end
 	ease_round_ref(mod)
 end
 
 function G.FUNCS.mp_timer_button(e)
-	if MP.GAME.ready_blind then
-		if not MP.GAME.timer_started then
-			MP.ACTIONS.start_ante_timer()
-		else
-			MP.ACTIONS.pause_ante_timer()
+	if MP.LOBBY.config.timer then
+		if MP.GAME.ready_blind then
+			if not MP.GAME.timer_started then
+				MP.ACTIONS.start_ante_timer()
+			else
+				MP.ACTIONS.pause_ante_timer()
+			end
 		end
 	end
 end
 
 function MP.UI.timer_hud()
-	return {
-		n = G.UIT.C,
-		config = {
-			align = "cm",
-			padding = 0.05,
-			minw = 1.45,
-			minh = 1,
-			colour = G.C.DYN_UI.BOSS_MAIN,
-			emboss = 0.05,
-			r = 0.1,
-		},
-		nodes = {
-			{
-				n = G.UIT.R,
-				config = { align = "cm", maxw = 1.35 },
-				nodes = {
-					{
-						n = G.UIT.T,
-						config = {
-							text = localize("k_timer"),
-							minh = 0.33,
-							scale = 0.34,
-							colour = G.C.UI.TEXT_LIGHT,
-							shadow = true,
-						},
-					},
-				},
+	if MP.LOBBY.config.timer then
+		return {
+			n = G.UIT.C,
+			config = {
+				align = "cm",
+				padding = 0.05,
+				minw = 1.45,
+				minh = 1,
+				colour = G.C.DYN_UI.BOSS_MAIN,
+				emboss = 0.05,
+				r = 0.1,
 			},
-			{
-				n = G.UIT.R,
-				config = {
-					align = "cm",
-					r = 0.1,
-					minw = 1.2,
-					colour = G.C.DYN_UI.BOSS_DARK,
-					id = "row_round_text",
-					func = "set_timer_box",
-					button = "mp_timer_button",
-				},
-				nodes = {
-					{
-						n = G.UIT.O,
-						config = {
-							object = DynaText({
-								string = { { ref_table = MP.GAME, ref_value = "timer" } },
-								colours = { G.C.UI.TEXT_DARK },
+			nodes = {
+				{
+					n = G.UIT.R,
+					config = { align = "cm", maxw = 1.35 },
+					nodes = {
+						{
+							n = G.UIT.T,
+							config = {
+								text = localize("k_timer"),
+								minh = 0.33,
+								scale = 0.34,
+								colour = G.C.UI.TEXT_LIGHT,
 								shadow = true,
-								scale = 0.8,
-							}),
-							id = "timer_UI_count",
+							},
+						},
+					},
+				},
+				{
+					n = G.UIT.R,
+					config = {
+						align = "cm",
+						r = 0.1,
+						minw = 1.2,
+						colour = G.C.DYN_UI.BOSS_DARK,
+						id = "row_round_text",
+						func = "set_timer_box",
+						button = "mp_timer_button",
+					},
+					nodes = {
+						{
+							n = G.UIT.O,
+							config = {
+								object = DynaText({
+									string = { { ref_table = MP.GAME, ref_value = "timer" } },
+									colours = { G.C.UI.TEXT_DARK },
+									shadow = true,
+									scale = 0.8,
+								}),
+								id = "timer_UI_count",
+							},
 						},
 					},
 				},
 			},
-		},
-	}
+		}
+	end
 end
 
 function G.FUNCS.set_timer_box(e)
-	if MP.GAME.timer_started then
+	if MP.LOBBY.config.timer then
+		if MP.GAME.timer_started then
+			e.config.colour = G.C.DYN_UI.BOSS_DARK
+			e.children[1].config.object.colours = { G.C.IMPORTANT }
+			return
+		end
+		if not MP.GAME.timer_started and MP.GAME.ready_blind then
+			e.config.colour = G.C.IMPORTANT
+			e.children[1].config.object.colours = { G.C.UI.TEXT_LIGHT }
+			return
+		end
 		e.config.colour = G.C.DYN_UI.BOSS_DARK
-		e.children[1].config.object.colours = { G.C.IMPORTANT }
-		return
+		e.children[1].config.object.colours = { G.C.UI.TEXT_DARK }
 	end
-	if not MP.GAME.timer_started and MP.GAME.ready_blind then
-		e.config.colour = G.C.IMPORTANT
-		e.children[1].config.object.colours = { G.C.UI.TEXT_LIGHT }
-		return
-	end
-	e.config.colour = G.C.DYN_UI.BOSS_DARK
-	e.children[1].config.object.colours = { G.C.UI.TEXT_DARK }
 end
 
 MP.timer_event = Event({
