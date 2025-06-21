@@ -24,6 +24,7 @@ MP.LOBBY = {
 		stake = 1,
 		challenge = "",
 		multiplayer_jokers = true,
+		timer = true,
 	},
 	deck = {
 		back = "Red Deck",
