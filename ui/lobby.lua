@@ -96,15 +96,13 @@ function G.UIDEF.create_UIBox_view_code()
 end
 
 local function get_lobby_text()
-	local notFullyUnlocked = false
+	local guest_has_order = MP.LOBBY.guest and MP.LOBBY.guest.config and MP.LOBBY.guest.config.theOrder
+	local host_has_order = SMODS.Mods["Multiplayer"].config.integrations.theOrder
 
-	for k, v in pairs(G.P_CENTER_POOLS.Joker) do
-		if not v.unlocked then
-			notFullyUnlocked = true
-			break -- No need to keep checking once we know it's not fully unlocked
-		end
+	if guest_has_order ~= host_has_order then
+		return localize("k_warning_no_order"), SMODS.Gradients.warning_text
 	end
-	
+
 	if MP.LOBBY.is_host then
 		if MP.LOBBY.guest and MP.LOBBY.guest.cached == false then
 			return MP.UTILS.wrapText(
@@ -115,6 +113,9 @@ local function get_lobby_text()
 				100
 			),
 				SMODS.Gradients.warning_text
+		end
+		if MP.LOBBY.guest and MP.LOBBY.guest.config and MP.LOBBY.guest.config.unlocked == false then
+			return localize("k_warning_nemesis_unlock"), SMODS.Gradients.warning_text
 		end
 	else
 		if MP.LOBBY.host and MP.LOBBY.host.cached == false then
@@ -127,9 +128,12 @@ local function get_lobby_text()
 			),
 				SMODS.Gradients.warning_text
 		end
+		if MP.LOBBY.host and MP.LOBBY.host.config and MP.LOBBY.host.config.unlocked == false then
+			return localize("k_warning_nemesis_unlock"), SMODS.Gradients.warning_text
+		end
 	end
-
-	if notFullyUnlocked then
+	SMODS.Mods["Multiplayer"].config.unlocked = MP.UTILS.unlock_check()
+	if not SMODS.Mods["Multiplayer"].config.unlocked then
 		return localize("k_warning_unlock_profile"), SMODS.Gradients.warning_text
 	end
 

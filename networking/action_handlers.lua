@@ -38,15 +38,19 @@ local function action_lobbyInfo(host, hostHash, hostCached, guest, guestHash, gu
 	MP.LOBBY.players = {}
 	MP.LOBBY.is_host = is_host == "true"
 	local function parseName(name)
-		local name, col = string.match(name, "([^~]+)~(%d+)")
-		col = math.max(1, math.min(tonumber(col), 25))
-		return name, col
+		local username, col_str = string.match(name, "([^~]+)~(%d+)")
+		username = username or "Guest"
+		local col = tonumber(col_str) or 1
+		col = math.max(1, math.min(col, 25))
+		return username, col
 	end
 	local hostName, hostCol = parseName(host)
-	MP.LOBBY.host = { username = hostName, blind_col = hostCol, hash_str = hostHash, hash = hash(hostHash), cached = hostCached == "true" }
+	local hostConfig, hostMods = MP.UTILS.parse_Hash(hostHash)
+	MP.LOBBY.host = { username = hostName, blind_col = hostCol, hash_str = hostMods, hash = hash(hostMods), cached = hostCached == "true",  config = hostConfig}
 	if guest ~= nil then
 		local guestName, guestCol = parseName(guest)
-		MP.LOBBY.guest = { username = guestName, blind_col = guestCol, hash_str = guestHash, hash = hash(guestHash), cached = guestCached == "true" }
+		local guestConfig, guestMods = MP.UTILS.parse_Hash(guestHash)
+		MP.LOBBY.guest = { username = guestName, blind_col = guestCol, hash_str = guestMods, hash = hash(guestMods), cached = guestCached == "true", config = guestConfig}
 	else
 		MP.LOBBY.guest = {}
 	end
@@ -202,7 +206,7 @@ local function action_player_info(lives)
 end
 
 local function action_win_game()
-	MP.end_game_jokers_keys = ""
+	MP.end_game_jokers_payload = ""
 	MP.nemesis_deck_string = ""
 	MP.end_game_jokers_received = false
 	MP.nemesis_deck_received = false
@@ -211,7 +215,7 @@ local function action_win_game()
 end
 
 local function action_lose_game()
-	MP.end_game_jokers_keys = ""
+	MP.end_game_jokers_payload = ""
 	MP.nemesis_deck_string = ""
 	MP.end_game_jokers_received = false
 	MP.nemesis_deck_received = false
@@ -586,7 +590,7 @@ function G.FUNCS.load_end_game_jokers()
 end
 
 local function action_receive_end_game_jokers(keys)
-	MP.end_game_jokers_keys = keys
+	MP.end_game_jokers_payload = keys
 	MP.end_game_jokers_received = true
 	G.FUNCS.load_end_game_jokers()
 end

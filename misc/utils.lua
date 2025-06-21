@@ -99,13 +99,14 @@ function MP.UTILS.blind_col_numtokey(num)
 		"flint",
 		"mark",
 	}
-	return "bl_"..(keys[num])
+	return "bl_" .. (keys[num])
 end
 
-function MP.UTILS.get_nemesis_key()	-- calling this function assumes the user is currently in a multiplayer game
-	local ret = MP.UTILS.blind_col_numtokey((MP.LOBBY.is_host and MP.LOBBY.guest.blind_col or MP.LOBBY.host.blind_col) or 1)
+function MP.UTILS.get_nemesis_key() -- calling this function assumes the user is currently in a multiplayer game
+	local ret = MP.UTILS.blind_col_numtokey((MP.LOBBY.is_host and MP.LOBBY.guest.blind_col or MP.LOBBY.host.blind_col) or
+		1)
 	if tonumber(MP.GAME.enemy.lives) <= 1 and tonumber(MP.GAME.lives) <= 1 then
-		if G.STATE ~= G.STATES.ROUND_EVAL then	-- very messy fix that mostly works. breaks in a different way... but far harder to notice
+		if G.STATE ~= G.STATES.ROUND_EVAL then -- very messy fix that mostly works. breaks in a different way... but far harder to notice
 			ret = "bl_final_heart"
 		end
 	end
@@ -493,6 +494,169 @@ function MP.UTILS.joker_to_string(card)
 	return joker_string
 end
 
+function MP.UTILS.unlock_check()
+	local notFullyUnlocked = false
+
+	for k, v in pairs(G.P_CENTER_POOLS.Joker) do
+		if not v.unlocked then
+			notFullyUnlocked = true
+			break -- No need to keep checking once we know it's not fully unlocked
+		end
+	end
+
+	return not notFullyUnlocked
+end
+
+function MP.UTILS.encrypt_ID()
+	local encryptID = 1
+	for key, center in pairs(G.P_CENTERS or {}) do
+		if type(key) == "string" and key:match("^j_") then
+			if center.cost and type(center.cost) == "number" then
+				encryptID = encryptID + center.cost
+			end
+			if center.config and type(center.config) == "table" then
+				encryptID = encryptID + MP.UTILS.sum_numbers_in_table(center.config)
+			end
+		elseif type(key) == "string" and key:match("^[cvp]_") then
+			if center.cost and type(center.cost) == "number" then
+				if center.cost == 0 then
+					return 0
+				end
+				encryptID = encryptID + center.cost
+			end
+		end
+	end
+	for key, value in pairs(G.GAME.starting_params or {}) do
+		if type(value) == "number" and value % 1 == 0 then
+			encryptID = encryptID * value
+		end
+	end
+	local day = tonumber(os.date("%d")) or 1
+	encryptID = encryptID * day
+	local gameSpeed = G.SETTINGS.GAMESPEED
+	if gameSpeed then
+		gameSpeed = gameSpeed * 16
+		gameSpeed = gameSpeed + 7
+		encryptID = encryptID + (gameSpeed / 1000)
+	else
+		encryptID = encryptID + 0.404
+	end
+	return encryptID
+end
+
+function MP.UTILS.parse_Hash(hash)
+	local parts = {}
+	for part in string.gmatch(hash, "([^;]+)") do
+		table.insert(parts, part)
+	end
+
+	local config = {
+		encryptID = nil,
+		unlocked = nil,
+		theOrder = nil
+	}
+
+	local mod_data = {}
+
+	for _, part in ipairs(parts) do
+		local key, val = string.match(part, "([^=]+)=([^=]+)")
+		if key == "encryptID" then
+			config.encryptID = tonumber(val)
+		elseif key == "unlocked" then
+			config.unlocked = val == "true"
+		elseif key == "theOrder" then
+			config.TheOrder = val == "true"
+		elseif key ~= "serversideConnectionID" then
+			table.insert(mod_data, part)
+		end
+	end
+
+	return config, table.concat(mod_data, ";")
+end
+
+function MP.UTILS.sum_numbers_in_table(t)
+	local sum = 0
+	for k, v in pairs(t) do
+		if type(v) == "number" then
+			sum = sum + v
+		elseif type(v) == "table" then
+			sum = sum + MP.UTILS.sum_numbers_in_table(v)
+		end
+		-- ignore other types
+	end
+	return sum
+end
+
+function MP.UTILS.bxor(a, b)
+	local res = 0
+	local bitval = 1
+	while a > 0 and b > 0 do
+		local a_bit = a % 2
+		local b_bit = b % 2
+		if a_bit ~= b_bit then
+			res = res + bitval
+		end
+		bitval = bitval * 2
+		a = math.floor(a / 2)
+		b = math.floor(b / 2)
+	end
+	res = res + (a + b) * bitval
+	return res
+end
+
+function MP.UTILS.encrypt_string(str)
+	local hash = 2166136261
+	for i = 1, #str do
+		hash = MP.UTILS.bxor(hash, str:byte(i))
+		hash = (hash * 16777619) % 2 ^ 32
+	end
+	return string.format("%08x", hash)
+end
+
+function MP.UTILS.server_connection_ID()
+	local os_name = love.system.getOS()
+	local raw_id
+
+	if os_name == "Windows" then
+		local ffi = require("ffi")
+
+		ffi.cdef [[
+		typedef unsigned long DWORD;
+		typedef int BOOL;
+		typedef const char* LPCSTR;
+
+		BOOL GetVolumeInformationA(
+			LPCSTR lpRootPathName,
+			char* lpVolumeNameBuffer,
+			DWORD nVolumeNameSize,
+			DWORD* lpVolumeSerialNumber,
+			DWORD* lpMaximumComponentLength,
+			DWORD* lpFileSystemFlags,
+			char* lpFileSystemNameBuffer,
+			DWORD nFileSystemNameSize
+		);
+		]]
+
+		local serial_ptr = ffi.new("DWORD[1]")
+		local ok = ffi.C.GetVolumeInformationA(
+			"C:\\", nil, 0,
+			serial_ptr, nil, nil,
+			nil, 0
+		)
+		if ok ~= 0 then
+			raw_id = tostring(serial_ptr[0])
+		end
+	end
+
+	if not raw_id then
+		raw_id = os.getenv("USER")
+			or os.getenv("USERNAME")
+			or os_name
+	end
+
+	return MP.UTILS.encrypt_string(raw_id)
+end
+
 function MP.UTILS.random_message()
 	local messages = {
 		localize("k_message1"),
@@ -559,7 +723,7 @@ end
 
 function MP.UTILS.str_pack_and_encode(data)
 	local str = STR_PACK(data)
-	local str_compressed = love.data.compress("string", "deflate", str)
+	local str_compressed = love.data.compress("string", "gzip", str)
 	local str_encoded = love.data.encode("string", "base64", str_compressed)
 	return str_encoded
 end
@@ -568,7 +732,7 @@ function MP.UTILS.str_decode_and_unpack(str)
 	local success, str_decoded, str_decompressed, str_unpacked
 	success, str_decoded = pcall(love.data.decode, "string", "base64", str)
 	if not success then return nil, str_decoded end
-	success, str_decompressed = pcall(love.data.decompress, "string", "deflate", str_decoded)
+	success, str_decompressed = pcall(love.data.decompress, "string", "gzip", str_decoded)
 	if not success then return nil, str_decompressed end
 	success, str_unpacked = pcall(STR_UNPACK_CHECKED, str_decompressed)
 	if not success then return nil, str_unpacked end

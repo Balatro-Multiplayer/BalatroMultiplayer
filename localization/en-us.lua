@@ -224,6 +224,8 @@ return {
 			k_set_name = "Set your username in the main menu! (Mods > Multiplayer > Config)",
 			k_mod_hash_warning = "Players have different mods or mod versions! This can cause problems!",
 			k_warning_unlock_profile = "The profile you are playing on is not fully unlocked. If this is a ranked/tournament game, please create a new profile and hit unlock all in the profile settings",
+			k_warning_nemesis_unlock = "Your opponent is playing on a profile that is not fully unlocked. Please instruct them to create a new profile and hit unlock all in the profile settings",
+			k_warning_no_order = "One player has The Order integration enabled while the other does not. This will cause the seeds to differ.",
 			k_warning_cheating = "If you are seeing this, your opponent may be cheating. If this is a ranked game, please send the message '%s' and then open a support ticket in #support",
 			k_message1 = "Hold on, my mom made pizza pops",
 			k_message2 = "One sec, i gotta grab my slow cooker pork roast",
