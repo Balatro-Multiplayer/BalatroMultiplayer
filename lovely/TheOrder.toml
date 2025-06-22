@@ -52,7 +52,7 @@ match_indent = true
 # Make booster pack queue global
 [[patches]]
 [patches.pattern]
-target = "functions/common_events.lua"
+target = '''=[SMODS _ "src/overrides.lua"]'''
 pattern = '''local poll = pseudorandom(pseudoseed((_key or 'pack_generic')..G.GAME.round_resets.ante))*cume'''
 position = "at"
 payload = '''local poll = pseudorandom(pseudoseed((_key or 'pack_generic')..MP.ante_based()))*cume'''
