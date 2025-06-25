@@ -179,6 +179,7 @@ SMODS.Booster:take_ownership_by_kind('Standard', {
 		return {set = (pseudorandom(pseudoseed('stdset'..b_append)) > 0.6) and "Enhanced" or "Base", edition = _edition, seal = _seal, area = G.pack_cards, skip_materialize = true, soulable = true, key_append = "sta"..s_append}
 	end,
 }, true)
+
 -- Patch seal queues
 local pollseal = SMODS.poll_seal
 function SMODS.poll_seal(args)
@@ -191,6 +192,69 @@ function SMODS.poll_seal(args)
 	end
 	return pollseal(args)
 end
+
+-- Make voucher queue less chaotic
+-- I don't like the fact that we have to do this twice
+
+local function get_culled(_pool)
+	local culled = {}
+	for i = 1, #_pool, 2 do
+		local first = _pool[i]
+		local second = _pool[i + 1]
+
+		if second == nil then
+			-- idk if this ever triggers but just to be safe
+			culled[#culled + 1] = (first ~= 'UNAVAILABLE') and first or 'UNAVAILABLE'
+		elseif first ~= 'UNAVAILABLE' then
+			culled[#culled + 1] = first
+		elseif second ~= 'UNAVAILABLE' then
+			culled[#culled + 1] = second
+		else
+			culled[#culled + 1] = 'UNAVAILABLE'
+		end
+	end
+	return culled
+end
+
+local nextvouchers = SMODS.get_next_vouchers
+function SMODS.get_next_vouchers(vouchers)
+	if MP.INTEGRATIONS.TheOrder then
+		vouchers = vouchers or {spawn = {}}
+		local _pool = get_current_pool('Voucher')
+		local culled = get_culled(_pool)
+		for i=#vouchers+1, math.min(SMODS.size_of_pool(_pool), G.GAME.starting_params.vouchers_in_shop + (G.GAME.modifiers.extra_vouchers or 0)) do
+			local center = pseudorandom_element(culled, pseudoseed("Voucher0"))
+			local it = 1
+			while center == 'UNAVAILABLE' or vouchers.spawn[center] do
+				it = it + 1
+				center = pseudorandom_element(culled, pseudoseed("Voucher0"))
+			end
+			vouchers[#vouchers+1] = center
+			vouchers.spawn[center] = true
+		end
+		return vouchers
+	end
+	return nextvouchers(vouchers)
+end
+
+local nextvoucherkey = get_next_voucher_key
+function get_next_voucher_key(_from_tag)
+	if MP.INTEGRATIONS.TheOrder then
+		local _pool = get_current_pool('Voucher')
+		local culled = get_culled(_pool)
+		local center = pseudorandom_element(culled, pseudoseed("Voucher0"))
+		local it = 1
+		while center == 'UNAVAILABLE' do
+			it = it + 1
+			center = pseudorandom_element(culled, pseudoseed("Voucher0"))
+		end
+
+		return center
+	end
+	return nextvoucherkey(_from_tag)
+end
+
+
 
 -- Helper function to make code more readable - deal with ante
 function MP.ante_based()
