@@ -119,6 +119,12 @@ local function action_enemy_info(score_str, hands_left_str, skips_str, lives_str
 	local skips = tonumber(skips_str)
 	local lives = tonumber(lives_str)
 
+	if MP.GAME.enemy.skips ~= skips then
+		for i = 1, skips - MP.GAME.enemy.skips do
+			MP.GAME.enemy.spent_in_shop[#MP.GAME.enemy.spent_in_shop+1] = 0
+		end
+	end
+
 	if score == nil or hands_left == nil then
 		sendDebugMessage("Invalid score or hands_left", "MULTIPLAYER")
 		return
@@ -491,7 +497,7 @@ local function action_eat_pizza(whole)
 end
 
 local function action_spent_last_shop(amount)
-	MP.GAME.enemy.spent_last_shop = tonumber(amount)
+	MP.GAME.enemy.spent_in_shop[#MP.GAME.enemy.spent_in_shop+1] = tonumber(amount)
 end
 
 local function action_magnet()

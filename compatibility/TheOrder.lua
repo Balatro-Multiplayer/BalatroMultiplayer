@@ -6,9 +6,15 @@ function create_card(_type, area, legendary, _rarity, skip_materialize, soulable
         local a = G.GAME.round_resets.ante
         G.GAME.round_resets.ante = 0
         if _type == "Tarot" or _type == "Planet" or _type == "Spectral" then
-            key_append = _type
+            if area == G.pack_cards then
+                key_append = _type.."_pack"
+            else
+                key_append = _type
+            end
+        else
+	    key_append = _rarity	-- _rarity replacing key_append can be entirely removed to normalise skip tags and riff raff with shop rarity queues
         end
-        local c = cc(_type, area, legendary, _rarity, skip_materialize, soulable, forced_key, _rarity)	-- _rarity replacing key_append can be entirely removed to normalise skip tags and riff raff with shop rarity queues
+        local c = cc(_type, area, legendary, _rarity, skip_materialize, soulable, forced_key, key_append)
         G.GAME.round_resets.ante = a
         return c
     end

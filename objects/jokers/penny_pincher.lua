@@ -18,13 +18,31 @@ SMODS.Joker({
 	config = { extra = { dollars = 1, nemesis_dollars = 3 } },
 	loc_vars = function(self, info_queue, card)
 		MP.UTILS.add_nemesis_info(info_queue)
-		return { vars = { card.ability.extra.dollars, card.ability.extra.nemesis_dollars } }
+		local spent = MP.GAME.enemy.spent_in_shop[MP.GAME.pincher_index + 1]
+		for i, v in ipairs(MP.GAME.enemy.spent_in_shop) do
+			print(i);print(v)
+		end
+		local money = nil
+		if spent then
+			money = math.floor(spent / card.ability.extra.nemesis_dollars)
+		end
+		return { vars = { card.ability.extra.dollars, card.ability.extra.nemesis_dollars, money or "N/A" } }
 	end,
 	in_pool = function(self)
 		return MP.LOBBY.code and MP.LOBBY.config.multiplayer_jokers
 	end,
 	calc_dollar_bonus = function(self, card)
-		return math.floor(MP.GAME.enemy.spent_last_shop / card.ability.extra.nemesis_dollars)
+		local spent = MP.GAME.enemy.spent_in_shop[MP.GAME.pincher_index]
+		for i, v in ipairs(MP.GAME.enemy.spent_in_shop) do
+			print(i);print(v)
+		end
+		local money = 0
+		if spent then
+			money = math.floor(spent / card.ability.extra.nemesis_dollars)
+		end
+		if money > 0 then
+			return money
+		end
 	end,
 	mp_credits = {
 		idea = { "Nxkoozie" },

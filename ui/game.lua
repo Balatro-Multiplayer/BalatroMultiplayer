@@ -1122,6 +1122,8 @@ function MP.end_round()
 			MP.GAME.furthest_blind = (temp_furthest_blind > MP.GAME.furthest_blind) and temp_furthest_blind or MP.GAME.furthest_blind
 			MP.ACTIONS.set_furthest_blind(MP.GAME.furthest_blind)
 
+			MP.GAME.pincher_index = MP.GAME.pincher_index + 1
+
 			if G.GAME.round_resets.temp_handsize then
 				G.hand:change_size(-G.GAME.round_resets.temp_handsize)
 				G.GAME.round_resets.temp_handsize = nil
@@ -2243,7 +2245,9 @@ G.FUNCS.skip_blind = function(e)
 		elseif G.GAME.round_resets.blind_states.Small == "Skipped" then
 			temp_furthest_blind = G.GAME.round_resets.ante * 10 + 1
 		end
-
+		
+		MP.GAME.pincher_index = MP.GAME.pincher_index + 1
+		
 		MP.GAME.furthest_blind = (temp_furthest_blind > MP.GAME.furthest_blind) and temp_furthest_blind or MP.GAME.furthest_blind
 		MP.ACTIONS.set_furthest_blind(MP.GAME.furthest_blind)
 	end
