@@ -65,8 +65,10 @@ return {
 				name = "Taxes",
 				text = {
 					"When your {X:purple,C:white}Nemesis{} sells",
-					"a joker gain {C:mult}+#1#{} Mult",
-					"{C:inactive}(Currently {C:mult}+#2#{C:inactive} Mult)",
+					"a card, gain {C:mult}+#1#{} Mult at the",
+					"start of the next {C:attention}PvP Blind{}",
+					"{C:inactive}(Currently {C:mult}+#2#{C:inactive} Mult,",
+					"{C:inactive}will be at {C:mult}+#3#{C:inactive} Mult)",
 				},
 			},
 			j_mp_magnet = {

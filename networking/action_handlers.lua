@@ -411,7 +411,7 @@ local action_asteroid = action_asteroid
 local function action_sold_joker()
 	local function juice_taxes(card)
 		if card then
-			card.ability.extra.mult = card.ability.extra.mult_gain + card.ability.extra.mult
+			card.ability.extra.mult_next = card.ability.extra.mult_gain + card.ability.extra.mult_next
 			card:juice_up()
 		end
 	end

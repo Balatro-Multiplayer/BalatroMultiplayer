@@ -99,7 +99,7 @@ times = 1
 target = "card.lua"
 pattern = '''function Card:sell_card()'''
 position = 'after'
-payload = '''if MP.LOBBY.code and self.area == G.jokers then
+payload = '''if MP.LOBBY.code then
   MP.ACTIONS.sold_joker()
 end'''
 match_indent = true
