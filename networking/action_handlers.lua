@@ -317,9 +317,9 @@ end
 
 -- don't poll edition
 local origedpoll = poll_edition
-function poll_edition(_key, _mod, _no_neg, _guaranteed)
+function poll_edition(_key, _mod, _no_neg, _guaranteed, _options)
 	if G.OVERLAY_MENU then return nil end
-	return origedpoll(_key, _mod, _no_neg, _guaranteed)
+	return origedpoll(_key, _mod, _no_neg, _guaranteed, _options)
 end
 
 local function action_speedrun()
