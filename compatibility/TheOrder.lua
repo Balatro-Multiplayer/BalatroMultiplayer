@@ -211,6 +211,10 @@ local function get_culled(_pool)
 		if second == nil then
 			-- idk if this ever triggers but just to be safe
 			culled[#culled + 1] = (first ~= 'UNAVAILABLE') and first or 'UNAVAILABLE'
+		elseif first ~= 'UNAVAILABLE' and second ~= 'UNAVAILABLE' then
+			-- only true in the case of mods adding t3 vouchers
+			culled[#culled + 1] = first
+			culled[#culled + 1] = second
 		elseif first ~= 'UNAVAILABLE' then
 			culled[#culled + 1] = first
 		elseif second ~= 'UNAVAILABLE' then
