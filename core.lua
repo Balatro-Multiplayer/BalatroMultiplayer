@@ -124,6 +124,7 @@ function MP.reset_game_states()
 		pincher_index = -3,
 		pincher_unlock = false,
 		asteroids = 0,
+		pizza_discards = 0,
 		wait_for_enemys_furthest_blind = false,
 		disable_live_and_timer_hud = false,
 	}

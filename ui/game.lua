@@ -809,7 +809,10 @@ function Game:update_draw_to_hand(dt)
 						return true
 					end,
 				}))
+				
 				MP.GAME.pincher_unlock = true
+				G.after_pvp = true	-- i can't find a reasonable way to detect end of pvp (for pizza) so i'm doing something strange instead
+				
 				if MP.GAME.asteroids > 0 then	-- launch asteroids, messy event garbage
 					delay(0.8)
 					update_hand_text({sound = 'button', volume = 0.7, pitch = 0.8, delay = 0.3}, {handname=localize('k_asteroids'),chips = localize('k_amount_short'), mult = MP.GAME.asteroids})
@@ -1922,6 +1925,14 @@ function ease_ante(mod)
 	if MP.GAME.antes_keyed[MP.GAME.ante_key] then
 		return
 	end
+
+	-- pizza: remove discards
+	if MP.GAME.pizza_discards > 0 then
+		G.GAME.round_resets.discards = G.GAME.round_resets.discards - MP.GAME.pizza_discards
+		ease_discard(-MP.GAME.pizza_discards)
+		MP.GAME.pizza_discards = 0
+	end
+
 	MP.GAME.antes_keyed[MP.GAME.ante_key] = true
 	MP.ACTIONS.set_ante(G.GAME.round_resets.ante + mod)
 	G.E_MANAGER:add_event(Event({

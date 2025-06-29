@@ -84,10 +84,10 @@ return {
 			j_mp_pizza = {
 				name = "Pizza",
 				text = {
-					"{C:red}+#1#{} Discards for all players",
-					"{C:red}-#2#{} Discard when any player",
-					"selects a blind",
-					"Eaten when your {X:purple,C:white}Nemesis{} skips",
+					"Eaten after {C:attention}PvP Blind{},",
+					"giving {C:red}+#1#{} discards for you,",
+					"and {C:red}+#2#{} discard for {X:purple,C:white}Nemesis{},",
+					"lasts until end of Ante",
 				},
 			},
 			j_mp_pacifist = {

@@ -432,68 +432,10 @@ local function action_lets_go_gambling_nemesis()
 	ease_dollars(card and card.ability and card.ability.extra and card.ability.extra.nemesis_dollars or 5)
 end
 
-local function action_eat_pizza(whole)
-	local function eat_whole(card)
-		card:remove_from_deck()
-		G.E_MANAGER:add_event(Event({
-			trigger = "after",
-			delay = 0.2,
-			func = function()
-				attention_text({
-					text = localize("k_eaten_ex"),
-					scale = 0.6,
-					hold = 1.4,
-					major = card,
-					backdrop_colour = G.C.FILTER,
-					align = "bm",
-					offset = {
-						x = 0,
-						y = 0,
-					},
-				})
-				card:start_dissolve({ G.C.RED }, nil, 1.6)
-				return true
-			end,
-		}))
-	end
-
-	whole = whole == "true"
-	local card = MP.UTILS.get_joker("j_mp_pizza") or MP.UTILS.get_phantom_joker("j_mp_pizza")
-	if card then
-		if whole then
-			eat_whole(card)
-			return
-		end
-		card:juice_up()
-		card.ability.extra.discards = card.ability.extra.discards - card.ability.extra.discards_loss
-		if card.ability.extra.discards <= 0 then
-			eat_whole(card)
-			return
-		end
-		G.E_MANAGER:add_event(Event({
-			trigger = "after",
-			delay = 0.2,
-			func = function()
-				attention_text({
-					text = localize({
-						type = "variable",
-						key = "a_remaining",
-						vars = { card.ability.extra.discards },
-					}),
-					scale = 0.6,
-					hold = 1.4,
-					major = card,
-					backdrop_colour = G.C.RED,
-					align = "bm",
-					offset = {
-						x = 0,
-						y = 0,
-					},
-				})
-				return true
-			end,
-		}))
-	end
+local function action_eat_pizza(discards)
+	MP.GAME.pizza_discards = MP.GAME.pizza_discards + discards
+	G.GAME.round_resets.discards = G.GAME.round_resets.discards + discards
+	ease_discard(discards)
 end
 
 local function action_spent_last_shop(amount)
@@ -837,8 +779,8 @@ function MP.ACTIONS.lets_go_gambling_nemesis()
 	Client.send("action:letsGoGamblingNemesis")
 end
 
-function MP.ACTIONS.eat_pizza(whole)
-	Client.send("action:eatPizza,whole:" .. tostring(whole and true))
+function MP.ACTIONS.eat_pizza(discards)
+	Client.send("action:eatPizza,whole:" .. tostring(discards))
 end
 
 function MP.ACTIONS.spent_last_shop(amount)
@@ -982,7 +924,7 @@ function Game:update(dt)
 			elseif parsedAction.action == "letsGoGamblingNemesis" then
 				action_lets_go_gambling_nemesis()
 			elseif parsedAction.action == "eatPizza" then
-				action_eat_pizza(parsedAction.whole)
+				action_eat_pizza(parsedAction.whole)	-- rename to "discards" when possible
 			elseif parsedAction.action == "spentLastShop" then
 				action_spent_last_shop(parsedAction.amount)
 			elseif parsedAction.action == "magnet" then
