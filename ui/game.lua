@@ -809,6 +809,36 @@ function Game:update_draw_to_hand(dt)
 						return true
 					end,
 				}))
+				MP.GAME.pincher_unlock = true
+				if MP.GAME.asteroids > 0 then	-- launch asteroids, messy event garbage
+					delay(0.8)
+					update_hand_text({sound = 'button', volume = 0.7, pitch = 0.8, delay = 0.3}, {handname=localize('k_asteroids'),chips = localize('k_amount_short'), mult = MP.GAME.asteroids})
+					delay(0.6)
+					local send = 0
+					for i = 1, MP.GAME.asteroids do
+						local perc = MP.GAME.asteroids-send
+						G.E_MANAGER:add_event(Event({
+							func = function()
+								play_sound('tarot1', 0.9+(perc/10), 1)
+								return true
+							end
+						}))
+						send = send + 1
+						update_hand_text({delay = 0}, {mult = MP.GAME.asteroids - send})
+						delay(0.2)
+					end
+					G.E_MANAGER:add_event(Event({
+						func = function()
+							for i = 1, MP.GAME.asteroids do
+								MP.ACTIONS.asteroid()
+							end
+							MP.GAME.asteroids = 0
+							return true
+						end
+					}))
+					delay(0.7)
+					update_hand_text({sound = 'button', volume = 0.7, pitch = 1.1, delay = 0}, {mult = 0, chips = 0, handname = '', level = ''})
+				end
 			end
 		end
 	end

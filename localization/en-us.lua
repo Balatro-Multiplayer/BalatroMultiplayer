@@ -268,6 +268,8 @@ return {
 			k_survival = "Survival",
 			k_survival_description = "The player who beats the farthest blind wins. No Nemesis blinds. This gamemode is a test of your ability to gradually build-up to the highest scoring Vanilla hands.",
 			k_oops_ex = "Oops!",
+			k_asteroids = "Asteroids",
+			k_amount_short = "Amt.",
 			k_timer = "Timer",
 			k_mods_list = "Mods List",
 			k_enemy_jokers = "Enemy Jokers",

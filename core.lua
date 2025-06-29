@@ -122,6 +122,8 @@ function MP.reset_game_states()
 		ce_cache = false,
 		furthest_blind = 0,
 		pincher_index = -3,
+		pincher_unlock = false,
+		asteroids = 0,
 		wait_for_enemys_furthest_blind = false,
 		disable_live_and_timer_hud = false,
 	}
