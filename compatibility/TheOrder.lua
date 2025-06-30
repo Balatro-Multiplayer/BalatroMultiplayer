@@ -11,7 +11,7 @@ function create_card(_type, area, legendary, _rarity, skip_materialize, soulable
             else
                 key_append = _type
             end
-        else
+        elseif not (_type == 'Base' or _type == 'Enhanced') then
 	    key_append = _rarity	-- _rarity replacing key_append can be entirely removed to normalise skip tags and riff raff with shop rarity queues
         end
         local c = cc(_type, area, legendary, _rarity, skip_materialize, soulable, forced_key, key_append)
