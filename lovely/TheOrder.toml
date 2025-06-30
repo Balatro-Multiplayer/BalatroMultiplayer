@@ -158,6 +158,15 @@ payload = '''if pseudorandom('soul_'..(MP.INTEGRATIONS.TheOrder and 'c_black_hol
 	end'''
 match_indent = true
 
+# Patch Wraith rarity to be the same as Rare Tag (because order uses it for some reason)
+[[patches]]
+[patches.pattern]
+target = "card.lua"
+pattern = '''local card = create_card('Joker', G.jokers, nil, 0.99, nil, nil, nil, 'wra')'''
+position = "at"
+payload = '''local card = create_card('Joker', G.jokers, nil, MP.INTEGRATIONS.TheOrder and 1 or 0.99, nil, nil, nil, 'wra')'''
+match_indent = true
+
 # Patch To-Do List rng to be the same on different operating systems
 # This is a vanilla bug!
 [[patches]]

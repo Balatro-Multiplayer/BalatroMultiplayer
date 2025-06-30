@@ -348,7 +348,7 @@ function CardArea:shuffle(_seed)
 		local true_seed = pseudorandom(_seed or 'shuffle')
 		
 		for k, v in pairs(tables) do
-			table.sort(v, function (a, b) return a.mp_stdval > b.mp_stdval end)
+			table.sort(v, function (a, b) return a.mp_stdval > b.mp_stdval end) -- largest value first
 			local mega_seed = k..true_seed
 			for i, card in ipairs(v) do
 				card.mp_shuffleval = pseudorandom(mega_seed)
@@ -359,4 +359,46 @@ function CardArea:shuffle(_seed)
 	else
 		return orig_shuffle(self, _seed)
 	end
+end
+
+-- Make pseudorandom_element selecting a joker less chaotic
+local orig_pseudorandom_element = pseudorandom_element
+function pseudorandom_element(_t, seed, args)
+	if MP.INTEGRATIONS.TheOrder then
+		local is_joker = true
+		for k, v in pairs(_t) do
+			if not (type(v) == 'table' and v.ability and v.ability.set == 'Joker') then
+				is_joker = false
+				break
+			end
+		end
+		if is_joker then
+			local tables = {}
+			local keys = {}
+			for k, v in pairs(_t) do
+				local key = v.config.center.key
+				tables[key] = tables[key] or {}
+				tables[key][#tables[key]+1] = v
+			end
+			local true_seed = pseudorandom(seed or math.random())
+			for k, v in pairs(tables) do
+				table.sort(v, function (a, b) return a.sort_id < b.sort_id end) -- oldest joker (lowest sort_id) first
+				local mega_seed = k..true_seed
+				for i, card in ipairs(v) do
+					card.mp_shuffleval = pseudorandom(mega_seed)
+				end
+			end
+			for k, v in pairs(_t) do
+				print(v.mp_shuffleval)
+				print(v.config.center.key)
+				keys[#keys+1] = {k = k,v = v}
+			end
+			
+			table.sort(keys, function (a, b) return a.v.mp_shuffleval > b.v.mp_shuffleval end)
+			
+			local key = keys[1].k
+			return _t[key], key
+		end
+	end
+	return orig_pseudorandom_element(_t, seed, args)
 end
