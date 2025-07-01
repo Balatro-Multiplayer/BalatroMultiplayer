@@ -64,9 +64,11 @@ return {
 			j_mp_taxes = {
 				name = "Taxes",
 				text = {
-					"When your {X:purple,C:white}Nemesis{} sells",
-					"a joker gain {C:mult}+#1#{} Mult",
-					"{C:inactive}(Currently {C:mult}+#2#{C:inactive} Mult)",
+					"{C:mult}+#1#{} Mult for every card your",
+					"{X:purple,C:white}Nemesis{} {C:attention}sold{} this run, updates",
+					"when {C:attention}PvP Blind{} is selected",
+					"{C:inactive}(Currently {C:mult}+#2#{C:inactive} Mult,",
+					"{C:inactive}will be at {C:mult}+#3#{C:inactive} Mult)",
 				},
 			},
 			j_mp_magnet = {
@@ -267,6 +269,7 @@ return {
 			k_survival = "Survival",
 			k_survival_description = "The player who beats the farthest blind wins. No Nemesis blinds. This gamemode is a test of your ability to gradually build-up to the highest scoring Vanilla hands.",
 			k_oops_ex = "Oops!",
+			k_filed_ex = "Filed!",
 			k_timer = "Timer",
 			k_mods_list = "Mods List",
 			k_enemy_jokers = "Enemy Jokers",
