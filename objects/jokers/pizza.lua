@@ -15,10 +15,10 @@ SMODS.Joker({
 	blueprint_compat = false,
 	eternal_compat = false,
 	perishable_compat = true,
-	config = { extra = { discards = 6, discards_loss = 1 } },
+	config = { extra = { discards = 2, discards_nemesis = 1 } },
 	loc_vars = function(self, info_queue, card)
 		MP.UTILS.add_nemesis_info(info_queue)
-		return { vars = { card.ability.extra.discards, card.ability.extra.discards_loss } }
+		return { vars = { card.ability.extra.discards, card.ability.extra.discards_nemesis } }
 	end,
 	in_pool = function(self)
 		return MP.LOBBY.code and MP.LOBBY.config.multiplayer_jokers
@@ -34,34 +34,18 @@ SMODS.Joker({
 		end
 	end,
 	calculate = function(self, card, context)
-		if context.setting_blind and not context.blueprint then
-			card.ability.extra.discards = card.ability.extra.discards - card.ability.extra.discards_loss
-			if card.ability.extra.discards <= 0 and (not card.edition or card.edition.type ~= "mp_phantom") then
-				card:remove_from_deck()
-				card:start_dissolve({ G.C.RED }, nil, 1.6)
-				return {
-					message = localize("k_eaten_ex"),
-					colour = G.C.FILTER,
-				}
-			end
-			G.E_MANAGER:add_event(Event({
-				func = function()
-					ease_discard(card.ability.extra.discards, nil, true)
-					return true
-				end,
-			}))
-			MP.ACTIONS.eat_pizza(false)
+		if context.mp_end_of_pvp and (not card.edition or card.edition.type ~= "mp_phantom") and not context.blueprint then
+			-- do things
+			MP.GAME.pizza_discards = MP.GAME.pizza_discards + card.ability.extra.discards
+			G.GAME.round_resets.discards = G.GAME.round_resets.discards + card.ability.extra.discards
+			ease_discard(card.ability.extra.discards)
+			MP.ACTIONS.eat_pizza(card.ability.extra.discards_nemesis)
+			card:remove_from_deck()
+			card:start_dissolve({ G.C.RED }, nil, 1.6)
 			return {
-				message = localize({
-					type = "variable",
-					key = "a_remaining",
-					vars = { card.ability.extra.discards },
-				}),
+				message = localize("k_eaten_ex"),
 				colour = G.C.RED,
 			}
-		end
-		if context.skip_blind and card.edition and card.edition.type == "mp_phantom" and not context.blueprint then
-			MP.ACTIONS.eat_pizza(true)
 		end
 	end,
 	mp_credits = {

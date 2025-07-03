@@ -522,7 +522,7 @@ end
 local blind_set_blindref = Blind.set_blind
 function Blind:set_blind(blind, reset, silent)	-- hacking in proper spirals, far from good but whatever
 	blind_set_blindref(self, blind, reset, silent)
-	if blind and blind.key == 'bl_mp_nemesis' then
+	if (blind and blind.key == 'bl_mp_nemesis') or (self and self.name and self.name == 'bl_mp_nemesis') then -- this shouldn't break and this fix shouldn't work
 		local boss = true
 		local showdown = false
 		local blind_key = MP.UTILS.get_nemesis_key()
@@ -809,6 +809,39 @@ function Game:update_draw_to_hand(dt)
 						return true
 					end,
 				}))
+				
+				MP.GAME.pincher_unlock = true
+				G.after_pvp = true	-- i can't find a reasonable way to detect end of pvp (for pizza) so i'm doing something strange instead
+				
+				if MP.GAME.asteroids > 0 then	-- launch asteroids, messy event garbage
+					delay(0.8)
+					update_hand_text({sound = 'button', volume = 0.7, pitch = 0.8, delay = 0.3}, {handname=localize('k_asteroids'),chips = localize('k_amount_short'), mult = MP.GAME.asteroids})
+					delay(0.6)
+					local send = 0
+					for i = 1, MP.GAME.asteroids do
+						local perc = MP.GAME.asteroids-send
+						G.E_MANAGER:add_event(Event({
+							func = function()
+								play_sound('tarot1', 0.9+(perc/10), 1)
+								return true
+							end
+						}))
+						send = send + 1
+						update_hand_text({delay = 0}, {mult = MP.GAME.asteroids - send})
+						delay(0.2)
+					end
+					G.E_MANAGER:add_event(Event({
+						func = function()
+							for i = 1, MP.GAME.asteroids do
+								MP.ACTIONS.asteroid()
+							end
+							MP.GAME.asteroids = 0
+							return true
+						end
+					}))
+					delay(0.7)
+					update_hand_text({sound = 'button', volume = 0.7, pitch = 1.1, delay = 0}, {mult = 0, chips = 0, handname = '', level = ''})
+				end
 			end
 		end
 	end
@@ -1121,6 +1154,8 @@ function MP.end_round()
 
 			MP.GAME.furthest_blind = (temp_furthest_blind > MP.GAME.furthest_blind) and temp_furthest_blind or MP.GAME.furthest_blind
 			MP.ACTIONS.set_furthest_blind(MP.GAME.furthest_blind)
+
+			MP.GAME.pincher_index = MP.GAME.pincher_index + 1
 
 			if G.GAME.round_resets.temp_handsize then
 				G.hand:change_size(-G.GAME.round_resets.temp_handsize)
@@ -1977,6 +2012,14 @@ function ease_ante(mod)
 	if MP.GAME.antes_keyed[MP.GAME.ante_key] then
 		return
 	end
+
+	-- pizza: remove discards
+	if MP.GAME.pizza_discards > 0 then
+		G.GAME.round_resets.discards = G.GAME.round_resets.discards - MP.GAME.pizza_discards
+		ease_discard(-MP.GAME.pizza_discards)
+		MP.GAME.pizza_discards = 0
+	end
+
 	MP.GAME.antes_keyed[MP.GAME.ante_key] = true
 	MP.ACTIONS.set_ante(G.GAME.round_resets.ante + mod)
 	G.E_MANAGER:add_event(Event({
@@ -2330,7 +2373,9 @@ G.FUNCS.skip_blind = function(e)
 		elseif G.GAME.round_resets.blind_states.Small == "Skipped" then
 			temp_furthest_blind = G.GAME.round_resets.ante * 10 + 1
 		end
-
+		
+		MP.GAME.pincher_index = MP.GAME.pincher_index + 1
+		
 		MP.GAME.furthest_blind = (temp_furthest_blind > MP.GAME.furthest_blind) and temp_furthest_blind or MP.GAME.furthest_blind
 		MP.ACTIONS.set_furthest_blind(MP.GAME.furthest_blind)
 	end

@@ -52,7 +52,7 @@ match_indent = true
 # Make booster pack queue global
 [[patches]]
 [patches.pattern]
-target = "functions/common_events.lua"
+target = '''=[SMODS _ "src/overrides.lua"]'''
 pattern = '''local poll = pseudorandom(pseudoseed((_key or 'pack_generic')..G.GAME.round_resets.ante))*cume'''
 position = "at"
 payload = '''local poll = pseudorandom(pseudoseed((_key or 'pack_generic')..MP.ante_based()))*cume'''
@@ -128,7 +128,10 @@ match_indent = true
 target = "functions/common_events.lua"
 pattern = '''local edition = poll_edition('edi'..(key_append or '')..G.GAME.round_resets.ante)'''
 position = "at"
-payload = '''local edition = poll_edition(_order..'edi'..(key_append or '')..G.GAME.round_resets.ante)'''
+payload = '''
+if MP.INTEGRATIONS.TheOrder then key_append = nil end	-- why does this even use key_append again?
+local edition = poll_edition(_order..'edi'..(key_append or '')..G.GAME.round_resets.ante)
+'''
 match_indent = true
 
 # Make soul/black hole queue not dependent on type (omen globe)
@@ -153,6 +156,15 @@ payload = '''if pseudorandom('soul_'..(MP.INTEGRATIONS.TheOrder and 'c_black_hol
 	if not (MP.INTEGRATIONS.TheOrder and forced_key) then
 		forced_key = 'c_black_hole'
 	end'''
+match_indent = true
+
+# Patch Wraith rarity to be the same as Rare Tag (because order uses it for some reason)
+[[patches]]
+[patches.pattern]
+target = "card.lua"
+pattern = '''local card = create_card('Joker', G.jokers, nil, 0.99, nil, nil, nil, 'wra')'''
+position = "at"
+payload = '''local card = create_card('Joker', G.jokers, nil, MP.INTEGRATIONS.TheOrder and 1 or 0.99, nil, nil, nil, 'wra')'''
 match_indent = true
 
 # Patch To-Do List rng to be the same on different operating systems

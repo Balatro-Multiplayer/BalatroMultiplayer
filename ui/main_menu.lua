@@ -48,9 +48,10 @@ function wheel_of_fortune_the_card(card)
 			{name = 'e_polychrome', weight = 150},
 			{name = 'e_negative', weight = 1}
 		}
-		local edition = poll_edition("main_menu"..os.time(), nil, true, true, editions)
+		local edition = poll_edition("main_menu"..os.time(), nil, nil, true, editions)
 		card:set_edition(edition, true)
 		juice_up(card, 0.3, 0.5)
+		G.CONTROLLER.locks.edition = false	-- if this isn't done, set_edition will block inputs for 0.1s
 	else
 		nope_a_joker(card)
 		juice_up(card, 0.3, 0.5)
