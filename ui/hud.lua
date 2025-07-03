@@ -28,7 +28,7 @@ function MP.UI.lobby_info()
 	})
 end
 
-function MP.UI.create_UIBox_settings()
+function MP.UI.create_UIBox_settings() -- optimize this please
 	local ruleset = string.sub(MP.LOBBY.config.ruleset, 12, -1)
 	local gamemode = string.sub(MP.LOBBY.config.gamemode, 13, -1)
 	local gold_on_life_loss = tostring(MP.LOBBY.config.gold_on_life_loss)
@@ -37,7 +37,6 @@ function MP.UI.create_UIBox_settings()
 	local different_seeds = tostring(MP.LOBBY.config.different_seeds)
 	local different_decks = tostring(MP.LOBBY.config.different_decks)
 	local multiplayer_jokers = tostring(MP.LOBBY.config.multiplayer_jokers)
-	local timer = tostring(MP.LOBBY.config.timer)
 	return {
 		n = G.UIT.ROOT,
 		config = {
@@ -54,6 +53,16 @@ function MP.UI.create_UIBox_settings()
 				{n=G.UIT.T, config={text = (localize("k_" .. ruleset) .. " " .. localize("k_" .. gamemode)), colour = G.C.UI.TEXT_LIGHT, scale = 0.8}}}},
 			{n=G.UIT.R, config={align = "tm", padding = 0.05}, nodes={
 				{n=G.UIT.T, config={text = (localize("b_opts_cb_money") .. " = " .. gold_on_life_loss), colour = G.C.UI.TEXT_LIGHT, scale = 0.8}}}},
+			{n=G.UIT.R, config={align = "tm", padding = 0.05}, nodes={
+				{n=G.UIT.T, config={text = (localize("b_opts_no_gold_on_loss") .. " = " .. no_gold_on_round_loss), colour = G.C.UI.TEXT_LIGHT, scale = 0.8}}}},
+			{n=G.UIT.R, config={align = "tm", padding = 0.05}, nodes={
+				{n=G.UIT.T, config={text = (localize("b_opts_death_on_loss") .. " = " .. death_on_round_loss), colour = G.C.UI.TEXT_LIGHT, scale = 0.8}}}},
+			{n=G.UIT.R, config={align = "tm", padding = 0.05}, nodes={
+				{n=G.UIT.T, config={text = (localize("b_opts_diff_seeds") .. " = " .. different_seeds), colour = G.C.UI.TEXT_LIGHT, scale = 0.8}}}},
+			{n=G.UIT.R, config={align = "tm", padding = 0.05}, nodes={
+				{n=G.UIT.T, config={text = (localize("b_opts_player_diff_deck") .. " = " .. different_decks), colour = G.C.UI.TEXT_LIGHT, scale = 0.8}}}},
+			{n=G.UIT.R, config={align = "tm", padding = 0.05}, nodes={
+				{n=G.UIT.T, config={text = (localize("b_opts_multiplayer_jokers") .. " = " .. multiplayer_jokers), colour = G.C.UI.TEXT_LIGHT, scale = 0.8}}}},
 		}
 	}
 end
