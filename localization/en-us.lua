@@ -203,6 +203,7 @@ return {
 			b_unstuck_blind = "Stuck Outside PvP",
 			b_misprint_display = "Display the next card in the deck",
 			b_players = "Players",
+			b_lobby_info = "Lobby Info",
 			b_continue_singleplayer = "Continue in Singleplayer",
 			b_the_order_integration = "Enable The Order Integration",
 			b_view_nemesis_deck = "View Decks",

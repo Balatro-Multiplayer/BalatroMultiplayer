@@ -15,12 +15,35 @@ function MP.UI.lobby_info()
 						chosen = true,
 						tab_definition_function = MP.UI.create_UIBox_players,
 					},
+					{
+						label = localize("b_lobby_info"),
+						chosen = false,
+						tab_definition_function = MP.UI.create_UIBox_settings, -- saying settings because _options is used in lobby
+					},
 				},
 				tab_h = 8,
 				snap_to_nav = true,
 			}),
 		},
 	})
+end
+
+function MP.UI.create_UIBox_settings()
+	return {
+		n = G.UIT.ROOT,
+		config = {
+			emboss = 0.05,
+			minh = 6,
+			r = 0.1,
+			minw = 10,
+			align = "tm",
+			padding = 0.2,
+			colour = G.C.BLACK,
+		},
+		nodes = {
+			
+		}
+	}
 end
 
 function MP.UI.create_UIBox_players()
