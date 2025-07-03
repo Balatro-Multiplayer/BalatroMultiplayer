@@ -29,6 +29,8 @@ function MP.UI.lobby_info()
 end
 
 function MP.UI.create_UIBox_settings()
+	local ruleset = MP.LOBBY.config.ruleset
+	local gamemode = MP.LOBBY.config.gamemode
 	return {
 		n = G.UIT.ROOT,
 		config = {
@@ -41,7 +43,10 @@ function MP.UI.create_UIBox_settings()
 			colour = G.C.BLACK,
 		},
 		nodes = {
-			
+			{n=G.UIT.R, config={align = "tm", padding = 0.05}, nodes={
+				{n=G.UIT.T, config={text = ruleset, colour = G.C.UI.TEXT_LIGHT, scale = 0.8}}}},
+			{n=G.UIT.R, config={align = "tm", padding = 0.05}, nodes={
+				{n=G.UIT.T, config={text = gamemode, colour = G.C.UI.TEXT_LIGHT, scale = 0.8}}}},
 		}
 	}
 end
