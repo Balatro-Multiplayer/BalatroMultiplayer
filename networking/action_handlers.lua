@@ -278,6 +278,7 @@ local function action_lobby_options(options)
 				return
 			end
 			MP.LOBBY.config.ruleset = v
+--			MP.apply_ruleset_overrides(v)
 			goto continue
 		end
 		if k == "gamemode" then

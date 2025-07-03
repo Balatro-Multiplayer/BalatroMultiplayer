@@ -211,7 +211,8 @@ function G.FUNCS.change_ruleset_selection(e)
 	MP.UI.Change_Main_Lobby_Options(e, "ruleset_area", G.UIDEF.ruleset_info, "ranked_ruleset_button",
 		function (ruleset_name) 
 			MP.LOBBY.config.ruleset = "ruleset_mp_" .. ruleset_name 
-			MP.LoadReworks(ruleset_name) 
+			MP.LoadReworks(ruleset_name)
+-- 			MP.apply_ruleset_overrides(MP.LOBBY.config.ruleset)
 		end
 	)
 
