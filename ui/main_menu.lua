@@ -61,7 +61,7 @@ end
 local function has_mod_manipulating_title_card()
 	-- maintain a list of all mods that affect the title card here
 	-- (must use the mod's id, not its name)
-	local modlist = { "bumod", "Cryptid", "Talisman" }
+	local modlist = { "BUMod", "Cryptid", "Talisman" }
 	for _, modname in ipairs(modlist) do
 		if SMODS.Mods[modname] and SMODS.Mods[modname].can_load then
 			return true

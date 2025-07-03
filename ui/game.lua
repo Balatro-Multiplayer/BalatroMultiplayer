@@ -1231,6 +1231,7 @@ function create_UIBox_game_over()
 	else
 		G.FUNCS.load_end_game_jokers()
 	end
+	MP.end_game_jokers_text = localize("k_enemy_jokers")
 	MP.nemesis_deck = CardArea(-100, -100, G.CARD_W, G.CARD_H, {type = 'deck'})
 	MP.nemesis_cards = {}
 	if not MP.nemesis_deck_received then
@@ -1282,7 +1283,8 @@ function create_UIBox_game_over()
 									{
 										n = G.UIT.T,
 										config = {
-											text = localize("k_enemy_jokers"),
+											ref_table = MP,
+											ref_value = "end_game_jokers_text",
 											scale = 0.8,
 											maxw = 5,
 											shadow = true,
@@ -1309,6 +1311,33 @@ function create_UIBox_game_over()
 											minh = 0.7,
 											colour = G.C.CLEAR,
 											no_fill = false
+										}
+									},
+									{
+										n = G.UIT.C,
+										config = {
+											button = "toggle_players_jokers",
+											align = "cm",
+											padding = 0.12,
+											colour = G.C.BLUE,
+											emboss = 0.05,
+											minh = 0.7,
+											minw = 2,
+											maxw = 2,
+											r = 0.1,
+											shadow = true,
+											hover = true,
+										},
+										nodes = {
+											{
+												n = G.UIT.T,
+												config = {
+													text = localize("b_toggle_jokers"),
+													colour = G.C.UI.TEXT_LIGHT,
+													scale = 0.65,
+													col = true,
+												}
+											}
 										}
 									},
 									{
@@ -1545,6 +1574,7 @@ function create_UIBox_win()
 	else
 		G.FUNCS.load_end_game_jokers()
 	end
+	MP.end_game_jokers_text = localize("k_enemy_jokers")
 	MP.nemesis_deck = CardArea(-100, -100, G.CARD_W, G.CARD_H, {type = 'deck'})
 	MP.nemesis_cards = {}
 	if not MP.nemesis_deck_received then
@@ -1601,7 +1631,8 @@ function create_UIBox_win()
 									{
 										n = G.UIT.T,
 										config = {
-											text = localize("k_enemy_jokers"),
+											ref_table = MP,
+											ref_value = "end_game_jokers_text",
 											scale = 0.8,
 											maxw = 5,
 											shadow = true,
@@ -1628,6 +1659,33 @@ function create_UIBox_win()
 											minh = 0.7,
 											colour = G.C.CLEAR,
 											no_fill = false
+										}
+									},
+									{
+										n = G.UIT.C,
+										config = {
+											button = "toggle_players_jokers",
+											align = "cm",
+											padding = 0.12,
+											colour = G.C.BLUE,
+											emboss = 0.05,
+											minh = 0.7,
+											minw = 2,
+											maxw = 2,
+											r = 0.1,
+											shadow = true,
+											hover = true,
+										},
+										nodes = {
+											{
+												n = G.UIT.T,
+												config = {
+													text = localize("b_toggle_jokers"),
+													colour = G.C.UI.TEXT_LIGHT,
+													scale = 0.65,
+													col = true,
+												}
+											}
 										}
 									},
 									{
@@ -1903,6 +1961,35 @@ function G.UIDEF.create_UIBox_view_nemesis_deck()
 				})
 			},
 		})
+end
+
+function G.FUNCS.toggle_players_jokers()
+	if not G.jokers or not MP.end_game_jokers then
+		return
+	end
+
+	-- Avoid Jokers being removed from activating removal abilities (e.g. Negatives)
+	if MP.end_game_jokers.cards then
+		for _, card in pairs(MP.end_game_jokers.cards) do
+			card.added_to_deck = false
+		end
+	end
+
+	if MP.end_game_jokers_text == localize("k_enemy_jokers") then
+		local your_jokers_save = copy_table(G.jokers:save())
+		MP.end_game_jokers:load(your_jokers_save)
+		MP.end_game_jokers_text = localize("k_your_jokers")
+	else
+		if MP.end_game_jokers_received then
+			G.FUNCS.load_end_game_jokers()
+		else
+			if MP.end_game_jokers.cards then
+				remove_all(MP.end_game_jokers.cards)
+			end
+			MP.end_game_jokers.cards = {}
+		end
+		MP.end_game_jokers_text = localize("k_enemy_jokers")
+	end
 end
 
 function G.FUNCS.view_nemesis_deck()

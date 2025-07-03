@@ -415,11 +415,10 @@ local action_asteroid = action_asteroid
 	end
 
 local function action_sold_joker()
+	-- HACK: this action is being sent when any card is being sold, since Taxes is now reworked
+	MP.GAME.enemy.sells = MP.GAME.enemy.sells + 1
 	local function juice_taxes(card)
-		if card then
-			card.ability.extra.mult = card.ability.extra.mult_gain + card.ability.extra.mult
-			card:juice_up()
-		end
+		card:juice_up()
 	end
 	MP.UTILS.run_for_each_joker("j_mp_taxes", juice_taxes)
 end
