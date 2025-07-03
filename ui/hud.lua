@@ -31,6 +31,7 @@ end
 function MP.UI.create_UIBox_settings()
 	local ruleset = MP.LOBBY.config.ruleset
 	local gamemode = MP.LOBBY.config.gamemode
+	local gold_on_life_loss = tostring(MP.LOBBY.config.gold_on_life_loss)
 	return {
 		n = G.UIT.ROOT,
 		config = {
@@ -47,6 +48,8 @@ function MP.UI.create_UIBox_settings()
 				{n=G.UIT.T, config={text = ruleset, colour = G.C.UI.TEXT_LIGHT, scale = 0.8}}}},
 			{n=G.UIT.R, config={align = "tm", padding = 0.05}, nodes={
 				{n=G.UIT.T, config={text = gamemode, colour = G.C.UI.TEXT_LIGHT, scale = 0.8}}}},
+			{n=G.UIT.R, config={align = "tm", padding = 0.05}, nodes={
+				{n=G.UIT.T, config={text = (localize("b_opts_cb_money") .. " = " .. gold_on_life_loss), colour = G.C.UI.TEXT_LIGHT, scale = 0.8}}}},
 		}
 	}
 end
