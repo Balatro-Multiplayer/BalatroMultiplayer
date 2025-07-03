@@ -6,9 +6,15 @@ function create_card(_type, area, legendary, _rarity, skip_materialize, soulable
         local a = G.GAME.round_resets.ante
         G.GAME.round_resets.ante = 0
         if _type == "Tarot" or _type == "Planet" or _type == "Spectral" then
-            key_append = _type
+            if area == G.pack_cards then
+                key_append = _type.."_pack"
+            else
+                key_append = _type
+            end
+        elseif not (_type == 'Base' or _type == 'Enhanced') then
+	    key_append = _rarity	-- _rarity replacing key_append can be entirely removed to normalise skip tags and riff raff with shop rarity queues
         end
-        local c = cc(_type, area, legendary, _rarity, skip_materialize, soulable, forced_key, _rarity)	-- _rarity replacing key_append can be entirely removed to normalise skip tags and riff raff with shop rarity queues
+        local c = cc(_type, area, legendary, _rarity, skip_materialize, soulable, forced_key, key_append)
         G.GAME.round_resets.ante = a
         return c
     end
@@ -179,6 +185,7 @@ SMODS.Booster:take_ownership_by_kind('Standard', {
 		return {set = (pseudorandom(pseudoseed('stdset'..b_append)) > 0.6) and "Enhanced" or "Base", edition = _edition, seal = _seal, area = G.pack_cards, skip_materialize = true, soulable = true, key_append = "sta"..s_append}
 	end,
 }, true)
+
 -- Patch seal queues
 local pollseal = SMODS.poll_seal
 function SMODS.poll_seal(args)
@@ -191,6 +198,73 @@ function SMODS.poll_seal(args)
 	end
 	return pollseal(args)
 end
+
+-- Make voucher queue less chaotic
+-- I don't like the fact that we have to do this twice
+
+local function get_culled(_pool)
+	local culled = {}
+	for i = 1, #_pool, 2 do
+		local first = _pool[i]
+		local second = _pool[i + 1]
+
+		if second == nil then
+			-- idk if this ever triggers but just to be safe
+			culled[#culled + 1] = (first ~= 'UNAVAILABLE') and first or 'UNAVAILABLE'
+		elseif first ~= 'UNAVAILABLE' and second ~= 'UNAVAILABLE' then
+			-- only true in the case of mods adding t3 vouchers
+			culled[#culled + 1] = first
+			culled[#culled + 1] = second
+		elseif first ~= 'UNAVAILABLE' then
+			culled[#culled + 1] = first
+		elseif second ~= 'UNAVAILABLE' then
+			culled[#culled + 1] = second
+		else
+			culled[#culled + 1] = 'UNAVAILABLE'
+		end
+	end
+	return culled
+end
+
+local nextvouchers = SMODS.get_next_vouchers
+function SMODS.get_next_vouchers(vouchers)
+	if MP.INTEGRATIONS.TheOrder then
+		vouchers = vouchers or {spawn = {}}
+		local _pool = get_current_pool('Voucher')
+		local culled = get_culled(_pool)
+		for i=#vouchers+1, math.min(SMODS.size_of_pool(_pool), G.GAME.starting_params.vouchers_in_shop + (G.GAME.modifiers.extra_vouchers or 0)) do
+			local center = pseudorandom_element(culled, pseudoseed("Voucher0"))
+			local it = 1
+			while center == 'UNAVAILABLE' or vouchers.spawn[center] do
+				it = it + 1
+				center = pseudorandom_element(culled, pseudoseed("Voucher0"))
+			end
+			vouchers[#vouchers+1] = center
+			vouchers.spawn[center] = true
+		end
+		return vouchers
+	end
+	return nextvouchers(vouchers)
+end
+
+local nextvoucherkey = get_next_voucher_key
+function get_next_voucher_key(_from_tag)
+	if MP.INTEGRATIONS.TheOrder then
+		local _pool = get_current_pool('Voucher')
+		local culled = get_culled(_pool)
+		local center = pseudorandom_element(culled, pseudoseed("Voucher0"))
+		local it = 1
+		while center == 'UNAVAILABLE' do
+			it = it + 1
+			center = pseudorandom_element(culled, pseudoseed("Voucher0"))
+		end
+
+		return center
+	end
+	return nextvoucherkey(_from_tag)
+end
+
+
 
 -- Helper function to make code more readable - deal with ante
 function MP.ante_based()
@@ -274,7 +348,7 @@ function CardArea:shuffle(_seed)
 		local true_seed = pseudorandom(_seed or 'shuffle')
 		
 		for k, v in pairs(tables) do
-			table.sort(v, function (a, b) return a.mp_stdval > b.mp_stdval end)
+			table.sort(v, function (a, b) return a.mp_stdval > b.mp_stdval end) -- largest value first
 			local mega_seed = k..true_seed
 			for i, card in ipairs(v) do
 				card.mp_shuffleval = pseudorandom(mega_seed)
@@ -285,4 +359,46 @@ function CardArea:shuffle(_seed)
 	else
 		return orig_shuffle(self, _seed)
 	end
+end
+
+-- Make pseudorandom_element selecting a joker less chaotic
+local orig_pseudorandom_element = pseudorandom_element
+function pseudorandom_element(_t, seed, args)
+	if MP.INTEGRATIONS.TheOrder then
+		local is_joker = true
+		for k, v in pairs(_t) do
+			if not (type(v) == 'table' and v.ability and v.ability.set == 'Joker') then
+				is_joker = false
+				break
+			end
+		end
+		if is_joker then
+			local tables = {}
+			local keys = {}
+			for k, v in pairs(_t) do
+				local key = v.config.center.key
+				tables[key] = tables[key] or {}
+				tables[key][#tables[key]+1] = v
+			end
+			local true_seed = pseudorandom(seed or math.random())
+			for k, v in pairs(tables) do
+				table.sort(v, function (a, b) return a.sort_id < b.sort_id end) -- oldest joker (lowest sort_id) first
+				local mega_seed = k..true_seed
+				for i, card in ipairs(v) do
+					card.mp_shuffleval = pseudorandom(mega_seed)
+				end
+			end
+			for k, v in pairs(_t) do
+				print(v.mp_shuffleval)
+				print(v.config.center.key)
+				keys[#keys+1] = {k = k,v = v}
+			end
+			
+			table.sort(keys, function (a, b) return a.v.mp_shuffleval > b.v.mp_shuffleval end)
+			
+			local key = keys[1].k
+			return _t[key], key
+		end
+	end
+	return orig_pseudorandom_element(_t, seed, args)
 end

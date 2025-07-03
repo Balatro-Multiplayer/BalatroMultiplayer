@@ -56,17 +56,20 @@ return {
 			j_mp_penny_pincher = {
 				name = "Penny Pincher",
 				text = {
-					"At the end of the round, earn",
-					"{C:money}$#1#{} for every {C:money}$#2#{}",
-					"your {X:purple,C:white}Nemesis{} spent last shop",
+					"At end of round, earn {C:money}$#1#{} for",
+					"every {C:money}$#2#{} your {X:purple,C:white}Nemesis{} spent",
+					"in corresponding shop {C:attention}last ante{}",
+					"{C:inactive}(Next payout: {C:money}$#3#{C:inactive})",
 				},
 			},
 			j_mp_taxes = {
 				name = "Taxes",
 				text = {
-					"When your {X:purple,C:white}Nemesis{} sells",
-					"a joker gain {C:mult}+#1#{} Mult",
-					"{C:inactive}(Currently {C:mult}+#2#{C:inactive} Mult)",
+					"{C:mult}+#1#{} Mult for every card your",
+					"{X:purple,C:white}Nemesis{} {C:attention}sold{} this run, updates",
+					"when {C:attention}PvP Blind{} is selected",
+					"{C:inactive}(Currently {C:mult}+#2#{C:inactive} Mult,",
+					"{C:inactive}will be at {C:mult}+#3#{C:inactive} Mult)",
 				},
 			},
 			j_mp_magnet = {
@@ -83,10 +86,10 @@ return {
 			j_mp_pizza = {
 				name = "Pizza",
 				text = {
-					"{C:red}+#1#{} Discards for all players",
-					"{C:red}-#2#{} Discard when any player",
-					"selects a blind",
-					"Eaten when your {X:purple,C:white}Nemesis{} skips",
+					"Eaten after {C:attention}PvP Blind{},",
+					"giving {C:red}+#1#{} discards for you,",
+					"and {C:red}+#2#{} discard for {X:purple,C:white}Nemesis{},",
+					"lasts until end of Ante",
 				},
 			},
 			j_mp_pacifist = {
@@ -203,6 +206,7 @@ return {
 			b_continue_singleplayer = "Continue in Singleplayer",
 			b_the_order_integration = "Enable The Order Integration",
 			b_view_nemesis_deck = "View Decks",
+			b_toggle_jokers = "Toggle Jokers",
 			k_enemy_score = "Current Enemy score",
 			k_enemy_hands = "Enemy hands left: ",
 			k_coming_soon = "Coming Soon!",
@@ -268,9 +272,13 @@ return {
 			k_survival = "Survival",
 			k_survival_description = "The player who beats the farthest blind wins. No Nemesis blinds. This gamemode is a test of your ability to gradually build-up to the highest scoring Vanilla hands.",
 			k_oops_ex = "Oops!",
+			k_asteroids = "Asteroids",
+			k_amount_short = "Amt.",
+			k_filed_ex = "Filed!",
 			k_timer = "Timer",
 			k_mods_list = "Mods List",
 			k_enemy_jokers = "Enemy Jokers",
+			k_your_jokers = "Your Jokers",
 			k_nemesis_deck = "Nemesis Deck",
 			k_your_deck = "Your Deck",
 			k_the_order_credit = "*Credit to @MathIsFun_",
