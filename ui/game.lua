@@ -522,7 +522,7 @@ end
 local blind_set_blindref = Blind.set_blind
 function Blind:set_blind(blind, reset, silent)	-- hacking in proper spirals, far from good but whatever
 	blind_set_blindref(self, blind, reset, silent)
-	if blind and blind.key == 'bl_mp_nemesis' then
+	if (blind and blind.key == 'bl_mp_nemesis') or (self and self.name and self.name == 'bl_mp_nemesis') then -- this shouldn't break and this fix shouldn't work
 		local boss = true
 		local showdown = false
 		local blind_key = MP.UTILS.get_nemesis_key()
@@ -809,6 +809,39 @@ function Game:update_draw_to_hand(dt)
 						return true
 					end,
 				}))
+
+				MP.GAME.pincher_unlock = true
+				G.after_pvp = true	-- i can't find a reasonable way to detect end of pvp (for pizza) so i'm doing something strange instead
+
+				if MP.GAME.asteroids > 0 then	-- launch asteroids, messy event garbage
+					delay(0.8)
+					update_hand_text({sound = 'button', volume = 0.7, pitch = 0.8, delay = 0.3}, {handname=localize('k_asteroids'),chips = localize('k_amount_short'), mult = MP.GAME.asteroids})
+					delay(0.6)
+					local send = 0
+					for i = 1, MP.GAME.asteroids do
+						local perc = MP.GAME.asteroids-send
+						G.E_MANAGER:add_event(Event({
+							func = function()
+								play_sound('tarot1', 0.9+(perc/10), 1)
+								return true
+							end
+						}))
+						send = send + 1
+						update_hand_text({delay = 0}, {mult = MP.GAME.asteroids - send})
+						delay(0.2)
+					end
+					G.E_MANAGER:add_event(Event({
+						func = function()
+							for i = 1, MP.GAME.asteroids do
+								MP.ACTIONS.asteroid()
+							end
+							MP.GAME.asteroids = 0
+							return true
+						end
+					}))
+					delay(0.7)
+					update_hand_text({sound = 'button', volume = 0.7, pitch = 1.1, delay = 0}, {mult = 0, chips = 0, handname = '', level = ''})
+				end
 			end
 		end
 	end
@@ -1122,6 +1155,8 @@ function MP.end_round()
 			MP.GAME.furthest_blind = (temp_furthest_blind > MP.GAME.furthest_blind) and temp_furthest_blind or MP.GAME.furthest_blind
 			MP.ACTIONS.set_furthest_blind(MP.GAME.furthest_blind)
 
+			MP.GAME.pincher_index = MP.GAME.pincher_index + 1
+
 			if G.GAME.round_resets.temp_handsize then
 				G.hand:change_size(-G.GAME.round_resets.temp_handsize)
 				G.GAME.round_resets.temp_handsize = nil
@@ -1198,6 +1233,7 @@ function create_UIBox_game_over()
 	end
 
 	MP.ACTIONS.request_nemesis_stats()
+	MP.end_game_jokers_text = localize("k_enemy_jokers")
 	MP.nemesis_deck = CardArea(-100, -100, G.CARD_W, G.CARD_H, {type = 'deck'})
 	MP.nemesis_cards = {}
 	if not MP.nemesis_deck_received then
@@ -1249,7 +1285,8 @@ function create_UIBox_game_over()
 									{
 										n = G.UIT.T,
 										config = {
-											text = localize("k_enemy_jokers"),
+											ref_table = MP,
+											ref_value = "end_game_jokers_text",
 											scale = 0.8,
 											maxw = 5,
 											shadow = true,
@@ -1276,6 +1313,33 @@ function create_UIBox_game_over()
 											minh = 0.7,
 											colour = G.C.CLEAR,
 											no_fill = false
+										}
+									},
+									{
+										n = G.UIT.C,
+										config = {
+											button = "toggle_players_jokers",
+											align = "cm",
+											padding = 0.12,
+											colour = G.C.BLUE,
+											emboss = 0.05,
+											minh = 0.7,
+											minw = 2,
+											maxw = 2,
+											r = 0.1,
+											shadow = true,
+											hover = true,
+										},
+										nodes = {
+											{
+												n = G.UIT.T,
+												config = {
+													text = localize("b_toggle_jokers"),
+													colour = G.C.UI.TEXT_LIGHT,
+													scale = 0.65,
+													col = true,
+												}
+											}
 										}
 									},
 									{
@@ -1512,6 +1576,7 @@ function create_UIBox_win()
 	else
 		G.FUNCS.load_end_game_jokers()
 	end
+	MP.end_game_jokers_text = localize("k_enemy_jokers")
 	MP.ACTIONS.request_nemesis_stats()
 	MP.nemesis_deck = CardArea(-100, -100, G.CARD_W, G.CARD_H, {type = 'deck'})
 	MP.nemesis_cards = {}
@@ -1569,7 +1634,8 @@ function create_UIBox_win()
 									{
 										n = G.UIT.T,
 										config = {
-											text = localize("k_enemy_jokers"),
+											ref_table = MP,
+											ref_value = "end_game_jokers_text",
 											scale = 0.8,
 											maxw = 5,
 											shadow = true,
@@ -1596,6 +1662,33 @@ function create_UIBox_win()
 											minh = 0.7,
 											colour = G.C.CLEAR,
 											no_fill = false
+										}
+									},
+									{
+										n = G.UIT.C,
+										config = {
+											button = "toggle_players_jokers",
+											align = "cm",
+											padding = 0.12,
+											colour = G.C.BLUE,
+											emboss = 0.05,
+											minh = 0.7,
+											minw = 2,
+											maxw = 2,
+											r = 0.1,
+											shadow = true,
+											hover = true,
+										},
+										nodes = {
+											{
+												n = G.UIT.T,
+												config = {
+													text = localize("b_toggle_jokers"),
+													colour = G.C.UI.TEXT_LIGHT,
+													scale = 0.65,
+													col = true,
+												}
+											}
 										}
 									},
 									{
@@ -1873,6 +1966,35 @@ function G.UIDEF.create_UIBox_view_nemesis_deck()
 		})
 end
 
+function G.FUNCS.toggle_players_jokers()
+	if not G.jokers or not MP.end_game_jokers then
+		return
+	end
+
+	-- Avoid Jokers being removed from activating removal abilities (e.g. Negatives)
+	if MP.end_game_jokers.cards then
+		for _, card in pairs(MP.end_game_jokers.cards) do
+			card.added_to_deck = false
+		end
+	end
+
+	if MP.end_game_jokers_text == localize("k_enemy_jokers") then
+		local your_jokers_save = copy_table(G.jokers:save())
+		MP.end_game_jokers:load(your_jokers_save)
+		MP.end_game_jokers_text = localize("k_your_jokers")
+	else
+		if MP.end_game_jokers_received then
+			G.FUNCS.load_end_game_jokers()
+		else
+			if MP.end_game_jokers.cards then
+				remove_all(MP.end_game_jokers.cards)
+			end
+			MP.end_game_jokers.cards = {}
+		end
+		MP.end_game_jokers_text = localize("k_enemy_jokers")
+	end
+end
+
 function G.FUNCS.view_nemesis_deck()
 	G.SETTINGS.paused = true
 	if G.deck_preview then
@@ -1893,6 +2015,14 @@ function ease_ante(mod)
 	if MP.GAME.antes_keyed[MP.GAME.ante_key] then
 		return
 	end
+
+	-- pizza: remove discards
+	if MP.GAME.pizza_discards > 0 then
+		G.GAME.round_resets.discards = G.GAME.round_resets.discards - MP.GAME.pizza_discards
+		ease_discard(-MP.GAME.pizza_discards)
+		MP.GAME.pizza_discards = 0
+	end
+
 	MP.GAME.antes_keyed[MP.GAME.ante_key] = true
 	MP.ACTIONS.set_ante(G.GAME.round_resets.ante + mod)
 	G.E_MANAGER:add_event(Event({
@@ -2246,6 +2376,8 @@ G.FUNCS.skip_blind = function(e)
 		elseif G.GAME.round_resets.blind_states.Small == "Skipped" then
 			temp_furthest_blind = G.GAME.round_resets.ante * 10 + 1
 		end
+
+		MP.GAME.pincher_index = MP.GAME.pincher_index + 1
 
 		MP.GAME.furthest_blind = (temp_furthest_blind > MP.GAME.furthest_blind) and temp_furthest_blind or MP.GAME.furthest_blind
 		MP.ACTIONS.set_furthest_blind(MP.GAME.furthest_blind)

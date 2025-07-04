@@ -452,6 +452,17 @@ function G.FUNCS.use_card(e, mute, nosave)
 	return use_card_ref(e, mute, nosave)
 end
 
+-- Hook for end of pvp context (slightly scuffed)
+local evaluate_round_ref = G.FUNCS.evaluate_round
+G.FUNCS.evaluate_round = function()
+	if G.after_pvp then
+		G.after_pvp = nil
+		SMODS.calculate_context({mp_end_of_pvp = true})
+	end
+	evaluate_round_ref()
+end
+
+
 -- Pre-compile a reversed list of all the centers
 local reversed_centers = nil
 
