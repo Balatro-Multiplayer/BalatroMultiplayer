@@ -126,7 +126,7 @@ function MP.UI.create_UIBox_settings() -- optimize this please
 					enabled_ref_table = MP.LOBBY,
 					label = localize("b_opts_normal_bosses"),
 					ref_table = MP.LOBBY.config,
-					ref_value = "b_opts_normal_bosses",})}},
+					ref_value = "normal_bosses",})}},
 		}
 	}
 end
