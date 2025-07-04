@@ -106,12 +106,12 @@ local function get_lobby_text()
 	if MP.LOBBY.is_host then
 		if MP.LOBBY.guest and MP.LOBBY.guest.cached == false then
 			return MP.UTILS.wrapText(
-				string.format(
-					localize("k_warning_cheating"),
-					MP.UTILS.random_message()
+					string.format(
+						localize("k_warning_cheating"),
+						MP.UTILS.random_message()
+					),
+					100
 				),
-				100
-			),
 				SMODS.Gradients.warning_text
 		end
 		if MP.LOBBY.guest and MP.LOBBY.guest.config and MP.LOBBY.guest.config.unlocked == false then
@@ -120,12 +120,12 @@ local function get_lobby_text()
 	else
 		if MP.LOBBY.host and MP.LOBBY.host.cached == false then
 			return MP.UTILS.wrapText(
-				string.format(
-					localize("k_warning_cheating"),
-					MP.UTILS.random_message()
+					string.format(
+						localize("k_warning_cheating"),
+						MP.UTILS.random_message()
+					),
+					100
 				),
-				100
-			),
 				SMODS.Gradients.warning_text
 		end
 		if MP.LOBBY.host and MP.LOBBY.host.config and MP.LOBBY.host.config.unlocked == false then
@@ -791,67 +791,68 @@ function G.UIDEF.create_UIBox_lobby_options()
 														opt_callback = "change_starting_pvp_round",
 													}),
 													Disableable_Option_Cycle({
-														 id = "pvp_timer_seconds_option",
-														 enabled_ref_table = MP.LOBBY,
-														 enabled_ref_value = "is_host",
-														 label = localize("k_opts_pvp_timer"),
-														 options = {
-																"30s",
-																"60s",
-																"90s",
-																"120s",
-																"150s",
-																"180s"
-														 },
-														 current_option = (MP.LOBBY.config.timer_base_seconds)/30,
-														 opt_callback = "change_timer_base_seconds"
+														id = "pvp_timer_seconds_option",
+														enabled_ref_table = MP.LOBBY,
+														enabled_ref_value = "is_host",
+														label = localize("k_opts_pvp_timer"),
+														options = {
+															"30s",
+															"60s",
+															"90s",
+															"120s",
+															"150s",
+															"180s"
+														},
+														current_option = (MP.LOBBY.config.timer_base_seconds) / 30,
+														opt_callback = "change_timer_base_seconds"
 													}),
 													Disableable_Option_Cycle({
-														 id = "showdown_starting_antes_option",
-														 enabled_ref_table = MP.LOBBY,
-														 enabled_ref_value = "is_host",
-														 label = localize("k_opts_showdown_starting_antes"),
-														 options = {
-															  1,
-															  2,
-															  3,
-															  4,
-															  5,
-															  6,
-															  7,
-															  8,
-															  9,
-															  10,
-															  11,
-															  12,
-															  13,
-															  14,
-															  15,
-															  16,
-															  17,
-															  18,
-															  19,
-															  20,
-														 },
-														 current_option = MP.LOBBY.config.showdown_starting_antes,
-														 opt_callback = "change_showdown_starting_antes",
+														id = "showdown_starting_antes_option",
+														enabled_ref_table = MP.LOBBY,
+														enabled_ref_value = "is_host",
+														label = localize("k_opts_showdown_starting_antes"),
+														options = {
+															1,
+															2,
+															3,
+															4,
+															5,
+															6,
+															7,
+															8,
+															9,
+															10,
+															11,
+															12,
+															13,
+															14,
+															15,
+															16,
+															17,
+															18,
+															19,
+															20,
+														},
+														current_option = MP.LOBBY.config.showdown_starting_antes,
+														opt_callback = "change_showdown_starting_antes",
 													}),
 													Disableable_Option_Cycle({
-														 id = "pvp_timer_increment_seconds_option",
-														 enabled_ref_table = MP.LOBBY,
-														 enabled_ref_value = "is_host",
-														 label = localize("k_opts_pvp_timer_increment"),
-														 options = {
-																"0s",
-																"30s",
-																"60s",
-																"90s",
-																"120s",
-																"150s",
-																"180s"
-														 },
-														 current_option = (MP.LOBBY.config.timer_increment_seconds)/30 + 1,
-														 opt_callback = "change_timer_increment_seconds"
+														id = "pvp_timer_increment_seconds_option",
+														enabled_ref_table = MP.LOBBY,
+														enabled_ref_value = "is_host",
+														label = localize("k_opts_pvp_timer_increment"),
+														options = {
+															"0s",
+															"30s",
+															"60s",
+															"90s",
+															"120s",
+															"150s",
+															"180s"
+														},
+														current_option = (MP.LOBBY.config.timer_increment_seconds) / 30 +
+														1,
+														opt_callback = "change_timer_increment_seconds"
 													}),
 												},
 											},
@@ -996,13 +997,13 @@ G.FUNCS.change_starting_pvp_round = function(args)
 end
 
 G.FUNCS.change_timer_base_seconds = function(args)
-	 MP.LOBBY.config.timer_base_seconds = tonumber(args.to_val:sub(1, -2))
-	 send_lobby_options()
+	MP.LOBBY.config.timer_base_seconds = tonumber(args.to_val:sub(1, -2))
+	send_lobby_options()
 end
 
 G.FUNCS.change_timer_increment_seconds = function(args)
-	 MP.LOBBY.config.timer_increment_seconds = tonumber(args.to_val:sub(1, -2))
-	 send_lobby_options()
+	MP.LOBBY.config.timer_increment_seconds = tonumber(args.to_val:sub(1, -2))
+	send_lobby_options()
 end
 
 G.FUNCS.change_showdown_starting_antes = function(args)
@@ -1091,7 +1092,7 @@ G.FUNCS.start_run = function(e, args)
 			if MP.DECK.MAX_STAKE > 0 and chosen_stake > MP.DECK.MAX_STAKE then
 				MP.UTILS.overlay_message(
 					"Selected stake is incompatible with Multiplayer, stake set to "
-						.. SMODS.stake_from_index(MP.DECK.MAX_STAKE)
+					.. SMODS.stake_from_index(MP.DECK.MAX_STAKE)
 				)
 				chosen_stake = MP.DECK.MAX_STAKE
 			end
