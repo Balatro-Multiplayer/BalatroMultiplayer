@@ -41,9 +41,13 @@ function create_UIBox_blind_choice(type, run_info)
 
 		if not G.GAME.orbital_choices[G.GAME.round_resets.ante][type] then
 			local _poker_hands = {}
-			for k, v in pairs(G.GAME.hands) do
-				if v.visible then
-					_poker_hands[#_poker_hands + 1] = k
+			if MP.INTEGRATIONS.TheOrder then
+				_poker_hands = MP.sorted_hand_list()
+			else
+				for k, v in pairs(G.GAME.hands) do
+					if v.visible then
+						_poker_hands[#_poker_hands + 1] = k
+					end
 				end
 			end
 
