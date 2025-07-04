@@ -1,3 +1,5 @@
+local Disableable_Toggle = MP.UI.Disableable_Toggle
+
 function G.FUNCS.lobby_info(e)
 	G.SETTINGS.paused = true
 	G.FUNCS.overlay_menu({
@@ -31,15 +33,12 @@ end
 function MP.UI.create_UIBox_settings() -- optimize this please
 	local ruleset = string.sub(MP.LOBBY.config.ruleset, 12, -1)
 	local gamemode = string.sub(MP.LOBBY.config.gamemode, 13, -1)
-	local gold_on_life_loss = tostring(MP.LOBBY.config.gold_on_life_loss)
-	local no_gold_on_round_loss = tostring(MP.LOBBY.config.no_gold_on_round_loss)
-	local death_on_round_loss = tostring(MP.LOBBY.config.death_on_round_loss)
 	local different_seeds = tostring(MP.LOBBY.config.different_seeds)
 	local different_decks = tostring(MP.LOBBY.config.different_decks)
 	local multiplayer_jokers = tostring(MP.LOBBY.config.multiplayer_jokers)
 	return {
 		n = G.UIT.ROOT,
-		config = {
+			config = {
 			emboss = 0.05,
 			minh = 6,
 			r = 0.1,
@@ -50,19 +49,84 @@ function MP.UI.create_UIBox_settings() -- optimize this please
 		},
 		nodes = {
 			{n=G.UIT.R, config={align = "tm", padding = 0.05}, nodes={
-				{n=G.UIT.T, config={text = (localize("k_" .. ruleset) .. " " .. localize("k_" .. gamemode)), colour = G.C.UI.TEXT_LIGHT, scale = 0.8}}}},
-			{n=G.UIT.R, config={align = "tm", padding = 0.05}, nodes={
-				{n=G.UIT.T, config={text = (localize("b_opts_cb_money") .. " = " .. gold_on_life_loss), colour = G.C.UI.TEXT_LIGHT, scale = 0.8}}}},
-			{n=G.UIT.R, config={align = "tm", padding = 0.05}, nodes={
-				{n=G.UIT.T, config={text = (localize("b_opts_no_gold_on_loss") .. " = " .. no_gold_on_round_loss), colour = G.C.UI.TEXT_LIGHT, scale = 0.8}}}},
-			{n=G.UIT.R, config={align = "tm", padding = 0.05}, nodes={
-				{n=G.UIT.T, config={text = (localize("b_opts_death_on_loss") .. " = " .. death_on_round_loss), colour = G.C.UI.TEXT_LIGHT, scale = 0.8}}}},
-			{n=G.UIT.R, config={align = "tm", padding = 0.05}, nodes={
-				{n=G.UIT.T, config={text = (localize("b_opts_diff_seeds") .. " = " .. different_seeds), colour = G.C.UI.TEXT_LIGHT, scale = 0.8}}}},
-			{n=G.UIT.R, config={align = "tm", padding = 0.05}, nodes={
-				{n=G.UIT.T, config={text = (localize("b_opts_player_diff_deck") .. " = " .. different_decks), colour = G.C.UI.TEXT_LIGHT, scale = 0.8}}}},
-			{n=G.UIT.R, config={align = "tm", padding = 0.05}, nodes={
-				{n=G.UIT.T, config={text = (localize("b_opts_multiplayer_jokers") .. " = " .. multiplayer_jokers), colour = G.C.UI.TEXT_LIGHT, scale = 0.8}}}},
+				{n=G.UIT.T, config={text = (localize("k_" .. ruleset) .. " " .. localize("k_" .. gamemode)), colour = G.C.UI.TEXT_LIGHT, scale = 0.6}}}},
+			{n = G.UIT.R,
+				config = {
+					padding = 0,
+					align = "cr",
+					},
+				nodes = {
+				Disableable_Toggle({
+					enabled_ref_table = MP.LOBBY,
+					label = localize("b_opts_cb_money"),
+					ref_table = MP.LOBBY.config,
+					ref_value = "gold_on_life_loss",})}},
+			{n = G.UIT.R,
+				config = {
+					padding = 0,
+					align = "cr",
+					},
+				nodes = {
+				Disableable_Toggle({
+					enabled_ref_table = MP.LOBBY,
+					label = localize("b_opts_no_gold_on_loss"),
+					ref_table = MP.LOBBY.config,
+					ref_value = "no_gold_on_round_loss",})}},
+			{n = G.UIT.R,
+				config = {
+					padding = 0,
+					align = "cr",
+					},
+				nodes = {
+				Disableable_Toggle({
+					enabled_ref_table = MP.LOBBY,
+					label = localize("b_opts_death_on_loss"),
+					ref_table = MP.LOBBY.config,
+					ref_value = "death_on_round_loss",})}},
+			{n = G.UIT.R,
+				config = {
+					padding = 0,
+					align = "cr",
+					},
+				nodes = {
+				Disableable_Toggle({
+					enabled_ref_table = MP.LOBBY,
+					label = localize("b_opts_diff_seeds"),
+					ref_table = MP.LOBBY.config,
+					ref_value = "different_seeds",})}},
+			{n = G.UIT.R,
+				config = {
+					padding = 0,
+					align = "cr",
+					},
+				nodes = {
+				Disableable_Toggle({
+					enabled_ref_table = MP.LOBBY,
+					label = localize("b_opts_player_diff_deck"),
+					ref_table = MP.LOBBY.config,
+					ref_value = "different_decks",})}},
+			{n = G.UIT.R,
+				config = {
+					padding = 0,
+					align = "cr",
+					},
+				nodes = {
+				Disableable_Toggle({
+					enabled_ref_table = MP.LOBBY,
+					label = localize("b_opts_multiplayer_jokers"),
+					ref_table = MP.LOBBY.config,
+					ref_value = "multiplayer_jokers",})}},
+			{n = G.UIT.R,
+				config = {
+					padding = 0,
+					align = "cr",
+					},
+				nodes = {
+				Disableable_Toggle({
+					enabled_ref_table = MP.LOBBY,
+					label = localize("b_opts_normal_bosses"),
+					ref_table = MP.LOBBY.config,
+					ref_value = "b_opts_normal_bosses",})}},
 		}
 	}
 end
