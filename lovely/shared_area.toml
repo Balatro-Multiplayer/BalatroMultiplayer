@@ -8,13 +8,17 @@ priority = 2147483600
 target = 'game.lua'
 pattern = 'self\.jokers = CardArea'
 position = 'before'
-payload = '''if MP.LOBBY.code then 
-      MP.shared = CardArea(
-        0, CAI.consumeable_H + 0.3,
-        CAI.consumeable_W / 2,
-        CAI.consumeable_H, 
-        {card_limit = 0, type = 'joker', highlight_limit = 1})
-    end
+payload = '''
+if MP.LOBBY.code then 
+	MP.shared = CardArea(
+		0, CAI.consumeable_H + 0.3,
+		CAI.consumeable_W / 2,
+		CAI.consumeable_H, 
+		{card_limit = 0, type = 'joker', highlight_limit = 1})
+elseif MP.shared then
+	MP.shared:remove()
+	MP.shared = nil
+end
 '''
 times = 1
 

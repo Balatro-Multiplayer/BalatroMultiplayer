@@ -83,12 +83,12 @@ function reset_idol_card()
 		end
 
 		local raw_random = pseudorandom('idol'..G.GAME.round_resets.ante)
-		local rand = raw_random * 1000
+		sendDebugMessage("Idol poll: "..raw_random)
 
 		local threshold = 0
 		for _, entry in ipairs(valid_idol_cards) do
-			threshold = threshold + (entry.count / total_weight) * 1000
-			if rand <= threshold then
+			threshold = threshold + (entry.count / total_weight)
+			if raw_random < threshold then
 				local idol_card = entry.card
 				G.GAME.current_round.idol_card.rank = idol_card.base.value
 				G.GAME.current_round.idol_card.suit = idol_card.base.suit
@@ -149,14 +149,14 @@ function reset_mail_rank()
 		end
 
 		local raw_random = pseudorandom('mail'..G.GAME.round_resets.ante)
-		local rand = raw_random * 1000
+		sendDebugMessage("Mail poll: "..raw_random)
 
 		local threshold = 0
 		for i, entry in ipairs(valid_ranks) do
 			local count = count_map[entry.value].count
-			local weight = (count / total_weight) * 1000
+			local weight = (count / total_weight)
 			threshold = threshold + weight
-			if rand <= threshold then
+			if raw_random < threshold then
 				G.GAME.current_round.mail_card.rank = entry.example_card.base.value
 				G.GAME.current_round.mail_card.id = entry.example_card.base.id
 				break
@@ -376,6 +376,7 @@ function pseudorandom_element(_t, seed, args)
 			local tables = {}
 			local keys = {}
 			for k, v in pairs(_t) do
+				keys[#keys+1] = {k = k,v = v}
 				local key = v.config.center.key
 				tables[key] = tables[key] or {}
 				tables[key][#tables[key]+1] = v
@@ -387,11 +388,6 @@ function pseudorandom_element(_t, seed, args)
 				for i, card in ipairs(v) do
 					card.mp_shuffleval = pseudorandom(mega_seed)
 				end
-			end
-			for k, v in pairs(_t) do
-				print(v.mp_shuffleval)
-				print(v.config.center.key)
-				keys[#keys+1] = {k = k,v = v}
 			end
 			
 			table.sort(keys, function (a, b) return a.v.mp_shuffleval > b.v.mp_shuffleval end)
