@@ -59,7 +59,7 @@ target = "card.lua"
 pattern = 'for i = self.ability.extra.min, self.ability.extra.max do'
 position = "before"
 payload = '''
-if self.area.config.type == "title" and MP.LOBBY.code then mp_collection = true end
+local mp_collection = self.area.config.type == "title" and MP.LOBBY.code
 '''
 match_indent = true
 
