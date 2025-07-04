@@ -569,6 +569,37 @@ local function action_get_nemesis_deck()
 	Client.send(string.format("action:receiveNemesisDeck,cards:%s", deck_str))
 end
 
+local function action_send_game_stats()
+	if not MP.GAME.stats then
+		Client.send("action:nemesisEndGameStats")
+		return
+	end
+
+	local stats_str = string.format("reroll_count:%d,reroll_cost_total:%d",
+		MP.GAME.stats.reroll_count, 
+		MP.GAME.stats.reroll_cost_total)
+
+	-- Extract voucher keys where value is true and join them with a dash
+	local voucher_keys = ""
+	if G.GAME.used_vouchers then
+		local keys = {}
+		for k, v in pairs(G.GAME.used_vouchers) do
+			if v == true then
+				table.insert(keys, k)
+			end
+		end
+		voucher_keys = table.concat(keys, "-")
+	end
+
+	-- Add voucher keys to stats string
+	if voucher_keys ~= "" then
+		stats_str = stats_str .. string.format(",vouchers:%s", voucher_keys)
+	end
+
+	Client.send(string.format("action:nemesisEndGameStats,%s", stats_str))
+end
+
+
 function G.FUNCS.load_nemesis_deck()
 	if not MP.nemesis_deck or not MP.nemesis_cards then
 		return
@@ -802,6 +833,16 @@ function MP.ACTIONS.get_nemesis_deck()
 	Client.send("action:getNemesisDeck")
 end
 
+function MP.ACTIONS.send_game_stats()
+	Client.send("action:sendGameStats")
+	action_send_game_stats()
+end
+
+function MP.ACTIONS.request_nemesis_stats()
+	Client.send("action:endGameStatsRequested")
+end
+
+
 function MP.ACTIONS.start_ante_timer()
 	Client.send("action:startAnteTimer,time:" .. tostring(MP.GAME.timer))
 	action_start_ante_timer(MP.GAME.timer)
@@ -938,6 +979,10 @@ function Game:update(dt)
 				action_get_nemesis_deck()
 			elseif parsedAction.action == "receiveNemesisDeck" then
 				action_receive_nemesis_deck(parsedAction.cards)
+			elseif parsedAction.action == "endGameStatsRequested" then
+				action_send_game_stats()
+			elseif parsedAction.action == "nemesisEndGameStats" then
+				-- Handle receiving game stats (is only logged now, now shown in the ui)
 			elseif parsedAction.action == "startAnteTimer" then
 				action_start_ante_timer(parsedAction.time)
 			elseif parsedAction.action == "pauseAnteTimer" then
