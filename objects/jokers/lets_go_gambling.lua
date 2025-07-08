@@ -45,7 +45,7 @@ SMODS.Joker({
 				returns.dollars = card.ability.extra.dollars
 			end
 			if MP.is_pvp_boss() and 
-				pseudorandom("j_mp_lets_go_gambling")
+				pseudorandom("j_mp_lets_go_gambling_misfire")
 				< G.GAME.probabilities.normal / card.ability.extra.nemesis_odds
 			then
 				returns = returns or {}

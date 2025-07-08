@@ -24,6 +24,7 @@ MP.LOBBY = {
 		stake = 1,
 		challenge = "",
 		multiplayer_jokers = true,
+		timer = true,
 	},
 	deck = {
 		back = "Red Deck",
@@ -104,7 +105,7 @@ function MP.reset_game_states()
 			skips = 0,
 			lives = MP.LOBBY.config.starting_lives,
 			sells = 0,
-			spent_last_shop = 0,
+			spent_in_shop = {},
 			highest_score = MP.INSANE_INT.empty(),
 		},
 		location = "loc_selecting",
@@ -121,8 +122,17 @@ function MP.reset_game_states()
 		real_money = 0,
 		ce_cache = false,
 		furthest_blind = 0,
+		pincher_index = -3,
+		pincher_unlock = false,
+		asteroids = 0,
+		pizza_discards = 0,
 		wait_for_enemys_furthest_blind = false,
 		disable_live_and_timer_hud = false,
+		stats = {
+			reroll_count = 0,
+			reroll_cost_total = 0,
+			-- Add more stats here in the future
+		},
 	}
 end
 

@@ -119,6 +119,12 @@ local function action_enemy_info(score_str, hands_left_str, skips_str, lives_str
 	local skips = tonumber(skips_str)
 	local lives = tonumber(lives_str)
 
+	if MP.GAME.enemy.skips ~= skips then
+		for i = 1, skips - MP.GAME.enemy.skips do
+			MP.GAME.enemy.spent_in_shop[#MP.GAME.enemy.spent_in_shop+1] = 0
+		end
+	end
+
 	if score == nil or hands_left == nil then
 		sendDebugMessage("Invalid score or hands_left", "MULTIPLAYER")
 		return
@@ -311,9 +317,9 @@ end
 
 -- don't poll edition
 local origedpoll = poll_edition
-function poll_edition(_key, _mod, _no_neg, _guaranteed)
+function poll_edition(_key, _mod, _no_neg, _guaranteed, _options)
 	if G.OVERLAY_MENU then return nil end
-	return origedpoll(_key, _mod, _no_neg, _guaranteed)
+	return origedpoll(_key, _mod, _no_neg, _guaranteed, _options)
 end
 
 local function action_speedrun()
@@ -409,11 +415,10 @@ local action_asteroid = action_asteroid
 	end
 
 local function action_sold_joker()
+	-- HACK: this action is being sent when any card is being sold, since Taxes is now reworked
+	MP.GAME.enemy.sells = MP.GAME.enemy.sells + 1
 	local function juice_taxes(card)
-		if card then
-			card.ability.extra.mult = card.ability.extra.mult_gain + card.ability.extra.mult
-			card:juice_up()
-		end
+		card:juice_up()
 	end
 	MP.UTILS.run_for_each_joker("j_mp_taxes", juice_taxes)
 end
@@ -426,72 +431,14 @@ local function action_lets_go_gambling_nemesis()
 	ease_dollars(card and card.ability and card.ability.extra and card.ability.extra.nemesis_dollars or 5)
 end
 
-local function action_eat_pizza(whole)
-	local function eat_whole(card)
-		card:remove_from_deck()
-		G.E_MANAGER:add_event(Event({
-			trigger = "after",
-			delay = 0.2,
-			func = function()
-				attention_text({
-					text = localize("k_eaten_ex"),
-					scale = 0.6,
-					hold = 1.4,
-					major = card,
-					backdrop_colour = G.C.FILTER,
-					align = "bm",
-					offset = {
-						x = 0,
-						y = 0,
-					},
-				})
-				card:start_dissolve({ G.C.RED }, nil, 1.6)
-				return true
-			end,
-		}))
-	end
-
-	whole = whole == "true"
-	local card = MP.UTILS.get_joker("j_mp_pizza") or MP.UTILS.get_phantom_joker("j_mp_pizza")
-	if card then
-		if whole then
-			eat_whole(card)
-			return
-		end
-		card:juice_up()
-		card.ability.extra.discards = card.ability.extra.discards - card.ability.extra.discards_loss
-		if card.ability.extra.discards <= 0 then
-			eat_whole(card)
-			return
-		end
-		G.E_MANAGER:add_event(Event({
-			trigger = "after",
-			delay = 0.2,
-			func = function()
-				attention_text({
-					text = localize({
-						type = "variable",
-						key = "a_remaining",
-						vars = { card.ability.extra.discards },
-					}),
-					scale = 0.6,
-					hold = 1.4,
-					major = card,
-					backdrop_colour = G.C.RED,
-					align = "bm",
-					offset = {
-						x = 0,
-						y = 0,
-					},
-				})
-				return true
-			end,
-		}))
-	end
+local function action_eat_pizza(discards)
+	MP.GAME.pizza_discards = MP.GAME.pizza_discards + discards
+	G.GAME.round_resets.discards = G.GAME.round_resets.discards + discards
+	ease_discard(discards)
 end
 
 local function action_spent_last_shop(amount)
-	MP.GAME.enemy.spent_last_shop = tonumber(amount)
+	MP.GAME.enemy.spent_in_shop[#MP.GAME.enemy.spent_in_shop+1] = tonumber(amount)
 end
 
 local function action_magnet()
@@ -621,6 +568,37 @@ local function action_get_nemesis_deck()
 	end
 	Client.send(string.format("action:receiveNemesisDeck,cards:%s", deck_str))
 end
+
+local function action_send_game_stats()
+	if not MP.GAME.stats then
+		Client.send("action:nemesisEndGameStats")
+		return
+	end
+
+	local stats_str = string.format("reroll_count:%d,reroll_cost_total:%d",
+		MP.GAME.stats.reroll_count, 
+		MP.GAME.stats.reroll_cost_total)
+
+	-- Extract voucher keys where value is true and join them with a dash
+	local voucher_keys = ""
+	if G.GAME.used_vouchers then
+		local keys = {}
+		for k, v in pairs(G.GAME.used_vouchers) do
+			if v == true then
+				table.insert(keys, k)
+			end
+		end
+		voucher_keys = table.concat(keys, "-")
+	end
+
+	-- Add voucher keys to stats string
+	if voucher_keys ~= "" then
+		stats_str = stats_str .. string.format(",vouchers:%s", voucher_keys)
+	end
+
+	Client.send(string.format("action:nemesisEndGameStats,%s", stats_str))
+end
+
 
 function G.FUNCS.load_nemesis_deck()
 	if not MP.nemesis_deck or not MP.nemesis_cards or not MP.LOBBY.code then
@@ -831,8 +809,8 @@ function MP.ACTIONS.lets_go_gambling_nemesis()
 	Client.send("action:letsGoGamblingNemesis")
 end
 
-function MP.ACTIONS.eat_pizza(whole)
-	Client.send("action:eatPizza,whole:" .. tostring(whole and true))
+function MP.ACTIONS.eat_pizza(discards)
+	Client.send("action:eatPizza,whole:" .. tostring(discards))
 end
 
 function MP.ACTIONS.spent_last_shop(amount)
@@ -854,6 +832,16 @@ end
 function MP.ACTIONS.get_nemesis_deck()
 	Client.send("action:getNemesisDeck")
 end
+
+function MP.ACTIONS.send_game_stats()
+	Client.send("action:sendGameStats")
+	action_send_game_stats()
+end
+
+function MP.ACTIONS.request_nemesis_stats()
+	Client.send("action:endGameStatsRequested")
+end
+
 
 function MP.ACTIONS.start_ante_timer()
 	Client.send("action:startAnteTimer,time:" .. tostring(MP.GAME.timer))
@@ -976,7 +964,7 @@ function Game:update(dt)
 			elseif parsedAction.action == "letsGoGamblingNemesis" then
 				action_lets_go_gambling_nemesis()
 			elseif parsedAction.action == "eatPizza" then
-				action_eat_pizza(parsedAction.whole)
+				action_eat_pizza(parsedAction.whole)	-- rename to "discards" when possible
 			elseif parsedAction.action == "spentLastShop" then
 				action_spent_last_shop(parsedAction.amount)
 			elseif parsedAction.action == "magnet" then
@@ -991,6 +979,10 @@ function Game:update(dt)
 				action_get_nemesis_deck()
 			elseif parsedAction.action == "receiveNemesisDeck" then
 				action_receive_nemesis_deck(parsedAction.cards)
+			elseif parsedAction.action == "endGameStatsRequested" then
+				action_send_game_stats()
+			elseif parsedAction.action == "nemesisEndGameStats" then
+				-- Handle receiving game stats (is only logged now, now shown in the ui)
 			elseif parsedAction.action == "startAnteTimer" then
 				action_start_ante_timer(parsedAction.time)
 			elseif parsedAction.action == "pauseAnteTimer" then
