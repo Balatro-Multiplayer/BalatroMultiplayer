@@ -128,6 +128,11 @@ function MP.reset_game_states()
 		pizza_discards = 0,
 		wait_for_enemys_furthest_blind = false,
 		disable_live_and_timer_hud = false,
+		stats = {
+			reroll_count = 0,
+			reroll_cost_total = 0,
+			-- Add more stats here in the future
+		},
 	}
 end
 

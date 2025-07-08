@@ -419,6 +419,13 @@ function G.FUNCS.reroll_shop(e)
 		string.format("Client sent message: action:rerollShop,cost:%s", G.GAME.current_round.reroll_cost),
 		"MULTIPLAYER"
 	)
+
+	-- Update reroll stats if in a multiplayer game
+	if MP.LOBBY.code and MP.GAME.stats then
+		MP.GAME.stats.reroll_count = MP.GAME.stats.reroll_count + 1
+		MP.GAME.stats.reroll_cost_total = MP.GAME.stats.reroll_cost_total + G.GAME.current_round.reroll_cost
+	end
+
 	return reroll_shop_ref(e)
 end
 

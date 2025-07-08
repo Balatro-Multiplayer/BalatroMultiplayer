@@ -27,7 +27,7 @@ function create_UIBox_blind_choice(type, run_info)
 			blind_atlas = 'mp_player_blind_col'
 			blind_pos = G.P_BLINDS[nemesis_blind_col].pos
 		end
-		
+
 		blind_choice.animation = AnimatedSprite(0, 0, 1.4, 1.4, G.ANIMATION_ATLAS[blind_atlas], blind_pos)
 		blind_choice.animation:define_draw_steps({
 			{ shader = "dissolve", shadow_height = 0.05 },
@@ -139,9 +139,9 @@ function create_UIBox_blind_choice(type, run_info)
 		})
 		local loc_name = ( G.GAME.round_resets.blind_choices[type] == "bl_mp_nemesis" and (MP.LOBBY.is_host and MP.LOBBY.guest.username or MP.LOBBY.host.username) ) 
 			or localize({ type = "name_text", key = blind_choice.config.key, set = "Blind" })
-		
+
 		local blind_col = get_blind_main_colour(type)
-		
+
 		local blind_amt = get_blind_amount(G.GAME.round_resets.blind_ante)
 			* blind_choice.config.mult
 			* G.GAME.starting_params.ante_scaling
@@ -813,10 +813,10 @@ function Game:update_draw_to_hand(dt)
 						return true
 					end,
 				}))
-				
+
 				MP.GAME.pincher_unlock = true
 				G.after_pvp = true	-- i can't find a reasonable way to detect end of pvp (for pizza) so i'm doing something strange instead
-				
+
 				if MP.GAME.asteroids > 0 then	-- launch asteroids, messy event garbage
 					delay(0.8)
 					update_hand_text({sound = 'button', volume = 0.7, pitch = 0.8, delay = 0.3}, {handname=localize('k_asteroids'),chips = localize('k_amount_short'), mult = MP.GAME.asteroids})
@@ -1058,7 +1058,7 @@ function Game:update_new_round(dt)
 		else
 			update_new_round_ref(self, dt)
 		end
-		
+
 		-- Reset ante number
 		G.GAME.win_ante = 8
 		return
@@ -1235,6 +1235,8 @@ function create_UIBox_game_over()
 	else
 		G.FUNCS.load_end_game_jokers()
 	end
+
+	MP.ACTIONS.request_nemesis_stats()
 	MP.end_game_jokers_text = localize("k_enemy_jokers")
 	MP.nemesis_deck = CardArea(-100, -100, G.CARD_W, G.CARD_H, {type = 'deck'})
 	MP.nemesis_cards = {}
@@ -1579,6 +1581,7 @@ function create_UIBox_win()
 		G.FUNCS.load_end_game_jokers()
 	end
 	MP.end_game_jokers_text = localize("k_enemy_jokers")
+	MP.ACTIONS.request_nemesis_stats()
 	MP.nemesis_deck = CardArea(-100, -100, G.CARD_W, G.CARD_H, {type = 'deck'})
 	MP.nemesis_cards = {}
 	if not MP.nemesis_deck_received then
@@ -2377,9 +2380,9 @@ G.FUNCS.skip_blind = function(e)
 		elseif G.GAME.round_resets.blind_states.Small == "Skipped" then
 			temp_furthest_blind = G.GAME.round_resets.ante * 10 + 1
 		end
-		
+
 		MP.GAME.pincher_index = MP.GAME.pincher_index + 1
-		
+
 		MP.GAME.furthest_blind = (temp_furthest_blind > MP.GAME.furthest_blind) and temp_furthest_blind or MP.GAME.furthest_blind
 		MP.ACTIONS.set_furthest_blind(MP.GAME.furthest_blind)
 	end
