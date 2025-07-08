@@ -601,7 +601,7 @@ end
 
 
 function G.FUNCS.load_nemesis_deck()
-	if not MP.nemesis_deck or not MP.nemesis_cards then
+	if not MP.nemesis_deck or not MP.nemesis_cards or not MP.LOBBY.code then
 		return
 	end
 

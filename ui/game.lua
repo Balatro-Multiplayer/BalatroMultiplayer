@@ -1210,12 +1210,12 @@ function Game:start_run(args)
 		scale = 2 * scale,
 	})
 
-	-- Remove unnecessary HUD elements
+	-- Remove unnecessary HUD elements from ante counter
 	hud_ante.children[2].children[2] = nil
 	hud_ante.children[2].children[3] = nil
 	hud_ante.children[2].children[4] = nil
 
-	self.HUD:recalculate()
+	G.HUD:recalculate();
 end
 
 local create_UIBox_game_over_ref = create_UIBox_game_over
@@ -1235,7 +1235,6 @@ function create_UIBox_game_over()
 	else
 		G.FUNCS.load_end_game_jokers()
 	end
-
 	MP.ACTIONS.request_nemesis_stats()
 	MP.end_game_jokers_text = localize("k_enemy_jokers")
 	MP.nemesis_deck = CardArea(-100, -100, G.CARD_W, G.CARD_H, {type = 'deck'})
@@ -1245,7 +1244,6 @@ function create_UIBox_game_over()
 	else
 		G.FUNCS.load_nemesis_deck()
 	end
-	G.SETTINGS.paused = false
 	local eased_red = copy_table(G.GAME.round_resets.ante <= G.GAME.win_ante and G.C.RED or G.C.BLUE)
 	eased_red[4] = 0
 	ease_value(eased_red, 4, 0.8, nil, nil, true)
@@ -1589,7 +1587,6 @@ function create_UIBox_win()
 	else
 		G.FUNCS.load_nemesis_deck()
 	end
-	G.SETTINGS.paused = false
 	local eased_green = copy_table(G.C.GREEN)
 	eased_green[4] = 0
 	ease_value(eased_green, 4, 0.5, nil, nil, true)
@@ -1698,6 +1695,7 @@ function create_UIBox_win()
 									{
 										n = G.UIT.C,
 										config = {
+                      id = "view_nemesis_deck_button",
 											button = "view_nemesis_deck",
 											align = "cm",
 											padding = 0.12,
@@ -1709,6 +1707,7 @@ function create_UIBox_win()
 											r = 0.1,
 											shadow = true,
 											hover = true,
+											focus_args = { nav = "wide" },
 										},
 										nodes = {
 											{
@@ -1838,6 +1837,18 @@ function create_UIBox_win()
 													},
 												},
 											},
+											UIBox_button({
+												id = "continue_singpleplayer_button",
+												align = "lm",
+												button = "continue_in_singleplayer",
+												label = { localize("b_continue_singleplayer") },
+												colour = G.C.GREEN,
+												toolTip = {title = "", text = localize("k_continue_singleplayer_tooltip")},
+												minw = 6,
+												minh = 1,
+												func = 'set_button_pip',
+												focus_args = { nav = "wide", button = "y" },
+											})
 										},
 									},
 									{
@@ -1848,6 +1859,7 @@ function create_UIBox_win()
 											create_UIBox_round_scores_row("furthest_round", G.C.FILTER),
 											create_UIBox_round_scores_row("seed", G.C.WHITE),
 											UIBox_button({
+												id = "copy_seed_button",
 												button = "copy_seed",
 												label = { localize("b_copy") },
 												colour = G.C.BLUE,
@@ -1916,7 +1928,7 @@ end
 function G.FUNCS.overlay_endgame_menu()
 	G.FUNCS.overlay_menu({
 		definition = MP.GAME.won and create_UIBox_win() or create_UIBox_game_over(),
-		config = {no_esc = true}
+		config = { no_esc = true }
 	})
 	G.E_MANAGER:add_event(Event({
 		trigger = 'after',
@@ -1924,13 +1936,13 @@ function G.FUNCS.overlay_endgame_menu()
 		blocking = false,
 		func = (function()
 			if G.OVERLAY_MENU and G.OVERLAY_MENU:get_UIE_by_ID('jimbo_spot') then
-				local Jimbo = Card_Character({x = 0, y = 5})
+				local Jimbo = Card_Character({ x = 0, y = 5 })
 				local spot = G.OVERLAY_MENU:get_UIE_by_ID('jimbo_spot')
 				spot.config.object:remove()
 				spot.config.object = Jimbo
 				Jimbo.ui_object_updated = true
-				local jimbo_words = MP.GAME.won and 'wq_'..math.random(1,7) or 'lq_'..math.random(1,10)
-				Jimbo:add_speech_bubble(jimbo_words, nil, {quip = true})
+				local jimbo_words = MP.GAME.won and 'wq_' .. math.random(1, 7) or 'lq_' .. math.random(1, 10)
+				Jimbo:add_speech_bubble(jimbo_words, nil, { quip = true })
 				Jimbo:say_stuff(5)
 			end
 			return true
@@ -2384,6 +2396,7 @@ G.FUNCS.skip_blind = function(e)
 		MP.GAME.pincher_index = MP.GAME.pincher_index + 1
 
 		MP.GAME.furthest_blind = (temp_furthest_blind > MP.GAME.furthest_blind) and temp_furthest_blind or MP.GAME.furthest_blind
+
 		MP.ACTIONS.set_furthest_blind(MP.GAME.furthest_blind)
 	end
 end
@@ -2391,6 +2404,38 @@ end
 function G.FUNCS.open_kofi(e)
 	love.system.openURL("https://ko-fi.com/virtualized")
 end
+
+function G.FUNCS:continue_in_singleplayer(e)
+	-- Leave multiplayer lobby and update UI
+	MP.LOBBY.code = nil
+	MP.ACTIONS.leave_lobby()
+	MP.UI.update_connection_status()
+
+	-- Allow saving, save the run, and set up for continuation
+	G.F_NO_SAVING = false
+	G.SETTINGS.current_setup = 'Continue'
+	G.FUNCS.wipe_on()
+	save_run()
+	G:delete_run()
+
+	-- Load the saved game and start a new run in singleplayer
+	G.E_MANAGER:add_event(Event({
+		trigger = 'immediate',
+		no_delete = true,
+		func = function()
+			local profile = G.SETTINGS.profile
+			local save_path = profile .. '/save.jkr'
+			G.SAVED_GAME = get_compressed(save_path)
+			if G.SAVED_GAME ~= nil then
+				G.SAVED_GAME = STR_UNPACK(G.SAVED_GAME)
+			end
+			G:start_run({ savetext = G.SAVED_GAME })
+			return true
+		end
+	}))
+	G.FUNCS.wipe_off()
+end
+
 --[[
 function MP.UI.create_UIBox_Misprint_Display()
 	return {
