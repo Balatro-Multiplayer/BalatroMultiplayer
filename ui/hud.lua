@@ -33,9 +33,7 @@ end
 function MP.UI.create_UIBox_settings() -- optimize this please
 	local ruleset = string.sub(MP.LOBBY.config.ruleset, 12, -1)
 	local gamemode = string.sub(MP.LOBBY.config.gamemode, 13, -1)
-	local different_seeds = tostring(MP.LOBBY.config.different_seeds)
-	local different_decks = tostring(MP.LOBBY.config.different_decks)
-	local multiplayer_jokers = tostring(MP.LOBBY.config.multiplayer_jokers)
+	local seed = MP.LOBBY.config.custom_seed == "random" and localize("k_random") or MP.LOBBY.config.custom_seed
 	return {
 		n = G.UIT.ROOT,
 			config = {
@@ -50,6 +48,8 @@ function MP.UI.create_UIBox_settings() -- optimize this please
 		nodes = {
 			{n=G.UIT.R, config={align = "tm", padding = 0.05}, nodes={
 				{n=G.UIT.T, config={text = (localize("k_" .. ruleset) .. " " .. localize("k_" .. gamemode)), colour = G.C.UI.TEXT_LIGHT, scale = 0.6}}}},
+			{n=G.UIT.R, config={align = "tm", padding = 0.05}, nodes={
+				{n=G.UIT.T, config={text = (localize("k_current_seed") .. seed), colour = G.C.UI.TEXT_LIGHT, scale = 0.6}}}},
 			{n = G.UIT.R,
 				config = {
 					padding = 0,
