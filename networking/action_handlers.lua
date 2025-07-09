@@ -323,15 +323,7 @@ function poll_edition(_key, _mod, _no_neg, _guaranteed, _options)
 end
 
 local function action_speedrun()
-	local function speedrun(card)
-		card:juice_up()
-		if #G.consumeables.cards < G.consumeables.config.card_limit then
-			local card = create_card("Spectral", G.consumeables, nil, nil, nil, nil, nil, "speedrun")
-			card:add_to_deck()
-			G.consumeables:emplace(card)
-		end
-	end
-	MP.UTILS.run_for_each_joker("j_mp_speedrun", speedrun)
+	SMODS.calculate_context({mp_speedrun = true})
 end
 
 local function enemyLocation(options)

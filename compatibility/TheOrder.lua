@@ -83,13 +83,13 @@ function reset_idol_card()
 		end
 
 		local raw_random = pseudorandom('idol'..G.GAME.round_resets.ante)
-		sendDebugMessage("Idol poll: "..raw_random)
 
 		local threshold = 0
 		for _, entry in ipairs(valid_idol_cards) do
 			threshold = threshold + (entry.count / total_weight)
 			if raw_random < threshold then
 				local idol_card = entry.card
+				sendDebugMessage("(Idol) Selected card "..idol_card.base.value.." of "..idol_card.base.suit.." with weight "..entry.count.." of total "..total_weight)
 				G.GAME.current_round.idol_card.rank = idol_card.base.value
 				G.GAME.current_round.idol_card.suit = idol_card.base.suit
 				G.GAME.current_round.idol_card.id = idol_card.base.id
@@ -149,7 +149,6 @@ function reset_mail_rank()
 		end
 
 		local raw_random = pseudorandom('mail'..G.GAME.round_resets.ante)
-		sendDebugMessage("Mail poll: "..raw_random)
 
 		local threshold = 0
 		for i, entry in ipairs(valid_ranks) do
@@ -157,6 +156,7 @@ function reset_mail_rank()
 			local weight = (count / total_weight)
 			threshold = threshold + weight
 			if raw_random < threshold then
+				sendDebugMessage("(Mail) Selected card "..entry.example_card.base.value.." with weight "..count.." of total "..total_weight)
 				G.GAME.current_round.mail_card.rank = entry.example_card.base.value
 				G.GAME.current_round.mail_card.id = entry.example_card.base.id
 				break
