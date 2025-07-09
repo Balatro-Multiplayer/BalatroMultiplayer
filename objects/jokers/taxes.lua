@@ -28,13 +28,22 @@ SMODS.Joker({
 		return MP.LOBBY.code and MP.LOBBY.config.multiplayer_jokers
 	end,
 	calculate = function(self, card, context)
-		if context.joker_main then
+		if context.cardarea == G.jokers and context.joker_main then
 			return {
 				mult = card.ability.extra.mult,
 			}
-		elseif context.setting_blind and context.blind.key == "bl_mp_nemesis" then
+		elseif
+			context.cardarea == G.jokers
+			and context.setting_blind
+			and not context.blueprint
+			and context.blind.key == "bl_mp_nemesis"
+		then
 			card.ability.extra.mult = calculate_taxes_mult(card)
-			card_eval_status_text(card, 'extra', nil, nil, nil, { message = localize('k_filed_ex') })
+			return {
+				message = localize("k_filed_ex"),
+			}
+		elseif context.mp_sold_joker and not context.blueprint then
+			card:juice_up()
 		end
 	end,
 	mp_credits = {
