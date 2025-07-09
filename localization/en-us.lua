@@ -86,10 +86,9 @@ return {
 			j_mp_pizza = {
 				name = "Pizza",
 				text = {
-					"Eaten after {C:attention}PvP Blind{},",
-					"giving {C:red}+#1#{} discards for you,",
-					"and {C:red}+#2#{} discard for {X:purple,C:white}Nemesis{},",
-					"lasts until end of Ante",
+					"{C:red}+#1#{} discards and",
+					"{C:red}+#2#{} discard for your {X:purple,C:white}Nemesis{}",
+					"{C:inactive}(Eaten after {C:attention}PvP Blind{}{C:inactive})"
 				},
 			},
 			j_mp_pacifist = {
@@ -114,8 +113,8 @@ return {
 				text = {
 					"Remove #1# level from",
 					"your {X:purple,C:white}Nemesis'{}",
-					"highest level",
-					"{C:legendary,E:1}poker hand{}",
+					"highest level {C:legendary,E:1}poker hand{}",
+					"at start of {C:attention}PvP Blind{}"
 				},
 			},
 		},
