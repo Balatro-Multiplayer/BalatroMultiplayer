@@ -35,7 +35,7 @@ return {
 					"Chance de {C:green}#1# em #2#{} de",
 					"{X:mult,C:white}X#3#{} Multi e {C:money}$#4#{}",
 					"Chance de {C:green}#5# em #6#{} de dar",
-					"ao seu {X:purple,C:white}Rival{} {C:money}$#7# em um {C:attention}Blind de Duelo{}",
+					"ao seu {X:purple,C:white}Rival{} {C:money}$#7#{} em um {C:attention}Blind de Duelo{}",
 				},
 			},
 			j_mp_speedrun = {
