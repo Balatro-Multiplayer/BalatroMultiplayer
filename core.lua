@@ -105,6 +105,7 @@ function MP.reset_game_states()
 			skips = 0,
 			lives = MP.LOBBY.config.starting_lives,
 			sells = 0,
+			sells_per_ante = {},
 			spent_in_shop = {},
 			highest_score = MP.INSANE_INT.empty(),
 		},

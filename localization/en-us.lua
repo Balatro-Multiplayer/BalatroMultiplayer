@@ -65,11 +65,10 @@ return {
 			j_mp_taxes = {
 				name = "Taxes",
 				text = {
-					"{C:mult}+#1#{} Mult for every card your",
-					"{X:purple,C:white}Nemesis{} {C:attention}sold{} this run, updates",
-					"when {C:attention}PvP Blind{} is selected",
-					"{C:inactive}(Currently {C:mult}+#2#{C:inactive} Mult,",
-					"{C:inactive}will be at {C:mult}+#3#{C:inactive} Mult)",
+					"This Joker gains {C:mult}+#1#{} Mult for every card your",
+					"{X:purple,C:white}Nemesis{} has {C:attention}sold{} since the last {C:attention}PvP Blind{},",
+					"updates when {C:attention}PvP Blind{} is selected",
+					"{C:inactive}(Currently {C:mult}+#2#{C:inactive} Mult)",
 				},
 			},
 			j_mp_magnet = {
