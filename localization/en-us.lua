@@ -59,7 +59,6 @@ return {
 					"At end of round, earn {C:money}$#1#{} for",
 					"every {C:money}$#2#{} your {X:purple,C:white}Nemesis{} spent",
 					"in corresponding shop {C:attention}last ante{}",
-					"{C:inactive}(Next payout: {C:money}$#3#{C:inactive})",
 				},
 			},
 			j_mp_taxes = {
