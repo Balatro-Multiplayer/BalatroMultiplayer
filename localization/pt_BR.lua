@@ -68,11 +68,10 @@ return {
 			j_mp_taxes = {
 				name = "Impostos",
 				text = {
-					"{C:mult}+#1#{} Multi para cada carta seu",
-					"{X:purple,C:white}Rival{} {C:attention}vender{} nesta partida, atualizando",
-					"quando um {C:attention}Blind de Duelo{} for selecionado",
-					"{C:inactive}(Atualmente {C:mult}+#2#{C:inactive} Multi,",
-					"{C:inactive}atualizará para {C:mult}+#3#{C:inactive} Multi)",
+					"Este Curinga ganha {C:mult}+#1#{} Multi para cada carta que seu",
+					"{X:purple,C:white}Rival{} {C:attention}vender{} desde a última {C:attention}Blind de Duelo{},",
+					"atualizando quando um {C:attention}Blind de Duelo{} for selecionado",
+					"{C:inactive}(Atualmente {C:mult}+#2#{C:inactive} Multi)",
 				},
 			},
 			j_mp_magnet = {
