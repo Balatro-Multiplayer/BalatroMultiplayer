@@ -95,23 +95,19 @@ function G.UIDEF.create_UIBox_view_code()
 	)
 end
 
+-- TODO: This entire function seems to only return once
+-- ie we only get EITHER the order warning message or cheating message or nemesis unlock message
 local function get_lobby_text()
-	local guest_has_order = MP.LOBBY.guest and MP.LOBBY.guest.config and MP.LOBBY.guest.config.theOrder
-	local host_has_order = SMODS.Mods["Multiplayer"].config.integrations.theOrder
+	local guest_has_order = MP.LOBBY.guest and MP.LOBBY.guest.config and MP.LOBBY.guest.config.TheOrder
+	local host_has_order = MP.LOBBY.host and MP.LOBBY.host.config and MP.LOBBY.host.config.TheOrder
 
-	if guest_has_order ~= host_has_order then
+	if (MP.LOBBY.ready_to_start or not MP.LOBBY.is_host) and guest_has_order ~= host_has_order then
 		return localize("k_warning_no_order"), SMODS.Gradients.warning_text
 	end
 
 	if MP.LOBBY.is_host then
 		if MP.LOBBY.guest and MP.LOBBY.guest.cached == false then
-			return MP.UTILS.wrapText(
-					string.format(
-						localize("k_warning_cheating"),
-						MP.UTILS.random_message()
-					),
-					100
-				),
+			return MP.UTILS.wrapText(string.format(localize("k_warning_cheating"), MP.UTILS.random_message()), 100),
 				SMODS.Gradients.warning_text
 		end
 		if MP.LOBBY.guest and MP.LOBBY.guest.config and MP.LOBBY.guest.config.unlocked == false then
@@ -119,13 +115,7 @@ local function get_lobby_text()
 		end
 	else
 		if MP.LOBBY.host and MP.LOBBY.host.cached == false then
-			return MP.UTILS.wrapText(
-					string.format(
-						localize("k_warning_cheating"),
-						MP.UTILS.random_message()
-					),
-					100
-				),
+			return MP.UTILS.wrapText(string.format(localize("k_warning_cheating"), MP.UTILS.random_message()), 100),
 				SMODS.Gradients.warning_text
 		end
 		if MP.LOBBY.host and MP.LOBBY.host.config and MP.LOBBY.host.config.unlocked == false then
@@ -819,10 +809,10 @@ function G.UIDEF.create_UIBox_lobby_options()
 															"90s",
 															"120s",
 															"150s",
-															"180s"
+															"180s",
 														},
-														current_option = (MP.LOBBY.config.timer_base_seconds) / 30,
-														opt_callback = "change_timer_base_seconds"
+														current_option = MP.LOBBY.config.timer_base_seconds / 30,
+														opt_callback = "change_timer_base_seconds",
 													}),
 													Disableable_Option_Cycle({
 														id = "showdown_starting_antes_option",
@@ -866,11 +856,11 @@ function G.UIDEF.create_UIBox_lobby_options()
 															"90s",
 															"120s",
 															"150s",
-															"180s"
+															"180s",
 														},
-														current_option = (MP.LOBBY.config.timer_increment_seconds) / 30 +
-														1,
-														opt_callback = "change_timer_increment_seconds"
+														current_option = MP.LOBBY.config.timer_increment_seconds / 30
+															+ 1,
+														opt_callback = "change_timer_increment_seconds",
 													}),
 												},
 											},
@@ -1111,7 +1101,7 @@ G.FUNCS.start_run = function(e, args)
 			if MP.DECK.MAX_STAKE > 0 and chosen_stake > MP.DECK.MAX_STAKE then
 				MP.UTILS.overlay_message(
 					"Selected stake is incompatible with Multiplayer, stake set to "
-					.. SMODS.stake_from_index(MP.DECK.MAX_STAKE)
+						.. SMODS.stake_from_index(MP.DECK.MAX_STAKE)
 				)
 				chosen_stake = MP.DECK.MAX_STAKE
 			end
