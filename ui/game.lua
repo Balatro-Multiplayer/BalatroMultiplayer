@@ -1191,6 +1191,8 @@ end
 
 local start_run_ref = Game.start_run
 function Game:start_run(args)
+	MP.LoadReworks(MP.LOBBY.config.ruleset)
+
 	start_run_ref(self, args)
 
 	if not MP.LOBBY.connected or not MP.LOBBY.code or MP.LOBBY.config.disable_live_and_timer_hud then
