@@ -59,17 +59,15 @@ return {
 					"At end of round, earn {C:money}$#1#{} for",
 					"every {C:money}$#2#{} your {X:purple,C:white}Nemesis{} spent",
 					"in corresponding shop {C:attention}last ante{}",
-					"{C:inactive}(Next payout: {C:money}$#3#{C:inactive})",
 				},
 			},
 			j_mp_taxes = {
 				name = "Taxes",
 				text = {
-					"{C:mult}+#1#{} Mult for every card your",
-					"{X:purple,C:white}Nemesis{} {C:attention}sold{} this run, updates",
-					"when {C:attention}PvP Blind{} is selected",
-					"{C:inactive}(Currently {C:mult}+#2#{C:inactive} Mult,",
-					"{C:inactive}will be at {C:mult}+#3#{C:inactive} Mult)",
+					"Gains {C:mult}+#1#{} Mult for every card your",
+					"{X:purple,C:white}Nemesis{} {C:attention}sold{} since last {C:attention}PvP Blind{},",
+					"updates when {C:attention}PvP Blind{} is selected",
+					"{C:inactive}(Currently {C:mult}+#2#{C:inactive} Mult)",
 				},
 			},
 			j_mp_magnet = {
@@ -86,10 +84,9 @@ return {
 			j_mp_pizza = {
 				name = "Pizza",
 				text = {
-					"Eaten after {C:attention}PvP Blind{},",
-					"giving {C:red}+#1#{} discards for you,",
-					"and {C:red}+#2#{} discard for {X:purple,C:white}Nemesis{},",
-					"lasts until end of Ante",
+					"{C:red}+#1#{} discards and",
+					"{C:red}+#2#{} discard for your {X:purple,C:white}Nemesis{}",
+					"{C:inactive}(Eaten after {C:attention}PvP Blind{}{C:inactive})"
 				},
 			},
 			j_mp_pacifist = {
@@ -114,8 +111,8 @@ return {
 				text = {
 					"Remove #1# level from",
 					"your {X:purple,C:white}Nemesis'{}",
-					"highest level",
-					"{C:legendary,E:1}poker hand{}",
+					"highest level {C:legendary,E:1}poker hand{}",
+					"at start of {C:attention}PvP Blind{}"
 				},
 			},
 		},

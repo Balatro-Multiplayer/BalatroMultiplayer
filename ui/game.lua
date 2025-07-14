@@ -1839,6 +1839,7 @@ function create_UIBox_win()
 													},
 												},
 											},
+											--[[ Removed until it is fixed in a future update
 											UIBox_button({
 												id = "continue_singpleplayer_button",
 												align = "lm",
@@ -1850,7 +1851,7 @@ function create_UIBox_win()
 												minh = 1,
 												func = 'set_button_pip',
 												focus_args = { nav = "wide", button = "y" },
-											})
+											})]]
 										},
 									},
 									{

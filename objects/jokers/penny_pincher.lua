@@ -18,12 +18,7 @@ SMODS.Joker({
 	config = { extra = { dollars = 1, nemesis_dollars = 3 } },
 	loc_vars = function(self, info_queue, card)
 		MP.UTILS.add_nemesis_info(info_queue)
-		local spent = MP.GAME.enemy.spent_in_shop[MP.GAME.pincher_index + 1]
-		local money = nil
-		if spent then
-			money = math.floor(spent / card.ability.extra.nemesis_dollars)
-		end
-		return { vars = { card.ability.extra.dollars, card.ability.extra.nemesis_dollars, money or "N/A" } }
+		return { vars = { card.ability.extra.dollars, card.ability.extra.nemesis_dollars } }
 	end,
 	in_pool = function(self)
 		return (MP.LOBBY.code and MP.LOBBY.config.multiplayer_jokers) and MP.GAME.pincher_unlock -- do NOT replace this with G.GAME.round_resets.ante >= 3, order sets ante to 0

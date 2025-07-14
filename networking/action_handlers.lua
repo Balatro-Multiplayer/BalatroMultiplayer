@@ -409,10 +409,9 @@ local action_asteroid = action_asteroid
 local function action_sold_joker()
 	-- HACK: this action is being sent when any card is being sold, since Taxes is now reworked
 	MP.GAME.enemy.sells = MP.GAME.enemy.sells + 1
-	local function juice_taxes(card)
-		card:juice_up()
-	end
-	MP.UTILS.run_for_each_joker("j_mp_taxes", juice_taxes)
+	MP.GAME.enemy.sells_per_ante[G.GAME.round_resets.ante] = (
+		(MP.GAME.enemy.sells_per_ante[G.GAME.round_resets.ante] or 0) + 1
+	)
 end
 
 local function action_lets_go_gambling_nemesis()
@@ -568,7 +567,7 @@ local function action_send_game_stats()
 	end
 
 	local stats_str = string.format("reroll_count:%d,reroll_cost_total:%d",
-		MP.GAME.stats.reroll_count, 
+		MP.GAME.stats.reroll_count,
 		MP.GAME.stats.reroll_cost_total)
 
 	-- Extract voucher keys where value is true and join them with a dash
