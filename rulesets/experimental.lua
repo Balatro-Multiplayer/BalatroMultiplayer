@@ -219,7 +219,7 @@ SMODS.Joker({
 		return {
 			vars = {
 				card.ability.extra,
-				(max(nine_tally, 4) + min(nine_tally - 4, 0) * card.ability.extra) or 0,
+				(math.min(nine_tally, 4) + math.max(nine_tally - 4, 0) * card.ability.extra) or 0,
 			},
 		}
 	end,
@@ -233,7 +233,7 @@ SMODS.Joker({
 				nine_tally = nine_tally + 1
 			end
 		end
-		return (max(nine_tally, 4) + min(nine_tally - 4, 0) * card.ability.extra) or 0
+		return (math.min(nine_tally, 4) + math.max(nine_tally - 4, 0) * card.ability.extra) or 0
 	end,
 })
 --
