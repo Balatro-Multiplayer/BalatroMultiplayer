@@ -199,20 +199,30 @@ function G.UIDEF.create_UIBox_lobby_menu()
 							mid = true,
 						},
 						nodes = {
-							Disableable_Button({
-								id = "lobby_menu_start",
-								button = "lobby_start_game",
-								colour = G.C.BLUE,
-								minw = 3.65,
-								minh = 1.55,
-								label = { localize("b_start") },
-								disabled_text = MP.LOBBY.is_host and localize("b_wait_for_players")
-									or localize("b_wait_for_host_start"),
-								scale = text_scale * 2,
-								col = true,
-								enabled_ref_table = MP.LOBBY,
-								enabled_ref_value = "ready_to_start",
-							}),
+							MP.LOBBY.is_host
+								and Disableable_Button({
+									id = "lobby_menu_start",
+									button = "lobby_start_game",
+									colour = G.C.BLUE,
+									minw = 3.65,
+									minh = 1.55,
+									label = { localize("b_start") },
+									disabled_text = MP.LOBBY.guest.username and localize("b_wait_for_guest_ready") or localize("b_wait_for_players"),
+									scale = text_scale * 2,
+									col = true,
+									enabled_ref_table = MP.LOBBY,
+									enabled_ref_value = "ready_to_start",
+								})
+								or UIBox_button({
+									id = "lobby_menu_start",
+									button = "lobby_ready_up",
+									colour = MP.LOBBY.ready_to_start and G.C.GREEN or G.C.RED,
+									minw = 3.65,
+									minh = 1.55,
+									label = { MP.LOBBY.ready_to_start and localize("b_unready") or localize("b_ready") },
+									scale = text_scale * 2,
+									col = true,
+								}),
 							{
 								n = G.UIT.C,
 								config = {
@@ -1074,6 +1084,14 @@ end
 
 function G.FUNCS.lobby_start_game(e)
 	MP.ACTIONS.start_game()
+end
+
+function G.FUNCS.lobby_ready_up(e)
+	if not MP.LOBBY.ready_to_start then
+		MP.ACTIONS.ready_lobby()
+	else
+		MP.ACTIONS.unready_lobby()
+	end
 end
 
 function G.FUNCS.lobby_options(e)
