@@ -175,6 +175,7 @@ MP.load_mp_dir("compatibility")
 MP.load_mp_file("networking/action_handlers.lua")
 
 MP.load_mp_dir("objects/editions")
+MP.load_mp_dir("objects/enhancements")
 MP.load_mp_dir("objects/stickers")
 MP.load_mp_dir("objects/blinds")
 MP.load_mp_dir("objects/decks")

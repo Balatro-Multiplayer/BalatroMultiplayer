@@ -756,3 +756,7 @@ function MP.UTILS.str_decode_and_unpack(str)
 	if not success then return nil, str_unpacked end
 	return str_unpacked
 end
+
+function MP.UTILS.is_standard_ruleset()
+	return MP.LOBBY.config.ruleset == "ruleset_mp_blitz" or MP.LOBBY.config.ruleset == "ruleset_mp_ranked" or MP.LOBBY.config.ruleset == "ruleset_mp_traditional"
+end

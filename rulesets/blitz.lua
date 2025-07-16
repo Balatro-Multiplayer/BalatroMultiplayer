@@ -36,12 +36,3 @@ MP.Ruleset({
 		"bl_mp_nemesis"
 	},
 }):inject()
-
-SMODS.Enhancement:take_ownership("glass", {
-	set_ability = function(self, card, initial, delay_sprites)
-		local x = MP.LOBBY.config.ruleset == "ruleset_mp_blitz" and (MP.LOBBY.code or MP.LOBBY.ruleset_preview) and 1.5 or 2
-		-- Xmult is display, x_mult is internal. don't ask why, i don't know
-		card.ability.Xmult = x
-		card.ability.x_mult = x
-	end,
-}, true)

@@ -34,6 +34,6 @@ SMODS.Joker({
 		end
 	end,
 	in_pool = function(self)
-		return (MP.LOBBY.config.ruleset == "ruleset_mp_blitz" or MP.LOBBY.config.ruleset == "ruleset_mp_ranked" or MP.LOBBY.config.ruleset == "ruleset_mp_traditional") and MP.LOBBY.code
+		return MP.UTILS.is_standard_ruleset() and MP.LOBBY.code
 	end,
 })
