@@ -1246,6 +1246,7 @@ function create_UIBox_game_over()
 	else
 		G.FUNCS.load_nemesis_deck()
 	end
+	G.SETTINGS.paused = false
 	local eased_red = copy_table(G.GAME.round_resets.ante <= G.GAME.win_ante and G.C.RED or G.C.BLUE)
 	eased_red[4] = 0
 	ease_value(eased_red, 4, 0.8, nil, nil, true)
@@ -1589,6 +1590,7 @@ function create_UIBox_win()
 	else
 		G.FUNCS.load_nemesis_deck()
 	end
+	G.SETTINGS.paused = false
 	local eased_green = copy_table(G.C.GREEN)
 	eased_green[4] = 0
 	ease_value(eased_green, 4, 0.5, nil, nil, true)
