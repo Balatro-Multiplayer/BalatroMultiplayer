@@ -16,7 +16,7 @@
 	"version": "0.2.11~DEV",
 	"dependencies": [
 		"Steamodded (>=1.0.0~BETA-0323b)",
-		"Lovely (>=0.7)",
+		"Lovely (>=0.8)",
 		"Balatro (>=1.0.1o)"
 	],
 	"conflicts": [
