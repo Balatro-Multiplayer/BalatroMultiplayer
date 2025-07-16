@@ -22,6 +22,9 @@ MP.Ruleset = SMODS.GameObject:extend({
 	process_loc_text = function(self)
 		SMODS.process_loc_text(G.localization.descriptions["Ruleset"], self.key, self.loc_txt)
 	end,
+	is_disabled = function(self)
+		return false
+	end
 })
 
 MP.BANNED_OBJECTS = {

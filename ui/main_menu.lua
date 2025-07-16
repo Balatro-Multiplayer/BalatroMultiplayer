@@ -185,15 +185,18 @@ function Game:main_menu(change_context)
 end
 
 function G.UIDEF.ruleset_selection_options()
-	MP.LOBBY.config.ruleset = "ruleset_mp_standard"
+	MP.LOBBY.config.ruleset = "ruleset_mp_ranked"
 
 	local default_ruleset_area = UIBox({
-		definition = G.UIDEF.ruleset_info("standard"),
+		definition = G.UIDEF.ruleset_info("ranked"),
 		config = {align = "cm"}
 	})
 
 	local ruleset_buttons_data = {
-		{button_id = "standard_ruleset_button", button_localize_key = "k_standard"},
+		{button_id = "ranked_ruleset_button", button_localize_key = "k_ranked"},
+		{button_id = "majorleague_ruleset_button", button_localize_key = "k_majorleague"},
+		{button_id = "blitz_ruleset_button", button_localize_key = "k_blitz"},
+		{button_id = "traditional_ruleset_button", button_localize_key = "k_traditional"},
 		{button_id = "vanilla_ruleset_button", button_localize_key = "k_vanilla"},
 		{button_id = "badlatro_ruleset_button", button_localize_key = "k_badlatro"},
 	}
@@ -203,7 +206,7 @@ function G.UIDEF.ruleset_selection_options()
 end
 
 function G.FUNCS.change_ruleset_selection(e)
-	MP.UI.Change_Main_Lobby_Options(e, "ruleset_area", G.UIDEF.ruleset_info, "standard_ruleset_button",
+	MP.UI.Change_Main_Lobby_Options(e, "ruleset_area", G.UIDEF.ruleset_info, "ranked_ruleset_button",
 														 function (ruleset_name) MP.LOBBY.config.ruleset = "ruleset_mp_" .. ruleset_name end)
 
 	MP.LOBBY.ruleset_preview = false
@@ -220,6 +223,8 @@ function G.UIDEF.ruleset_info(ruleset_name)
 		config = {align = "cm"}
 	})
 
+	local ruleset_disabled = ruleset.is_disabled()
+
 	return {n=G.UIT.ROOT, config={align = "tm", minh = 8, maxh = 8, minw = 11, maxw = 11, colour = G.C.CLEAR}, nodes={
 		{n=G.UIT.C, config={align = "tm", padding = 0.2, r = 0.1, colour = G.C.BLACK}, nodes={
 			{n=G.UIT.R, config={align = "tm", padding = 0.05, minw = 11, maxw = 11, minh = math.max(2, ruleset_desc_lines) * 0.35}, nodes={
@@ -229,9 +234,23 @@ function G.UIDEF.ruleset_info(ruleset_name)
 				{n=G.UIT.O, config={object = ruleset_banned_tabs}}
 			}},
 			{n=G.UIT.R, config={align = "cm"}, nodes={
-				{n=G.UIT.R, config={id = "select_gamemode_button", button = "select_gamemode", align = "cm", padding = 0.05, r = 0.1, minw = 8, minh = 0.8, colour = G.C.BLUE, hover = true, shadow = true}, nodes={
-					{n=G.UIT.T, config={text = localize("b_next"), scale = 0.5, colour = G.C.UI.TEXT_LIGHT}}
-				}}
+				MP.UI.Disableable_Button({
+					id = "select_gamemode_button",
+					button = "select_gamemode",
+					align = "cm",
+					padding = 0.05,
+					r = 0.1,
+					minw = 8, 
+					minh = 0.8, 
+					colour = G.C.BLUE, 
+					hover = true, 
+					shadow = true,
+					label = { ruleset.forced_gamemode and localize("b_create_lobby") or localize("b_next") },
+					scale = 0.5,
+					enabled_ref_table = { val = not ruleset_disabled },
+					enabled_ref_value = "val",
+					disabled_text = { ruleset_disabled }
+				})
 			}}
 		}}
 	}}
