@@ -186,6 +186,7 @@ end
 
 function G.UIDEF.ruleset_selection_options()
 	MP.LOBBY.config.ruleset = "ruleset_mp_ranked"
+	MP.LoadReworks("ranked")
 
 	local default_ruleset_area = UIBox({
 		definition = G.UIDEF.ruleset_info("ranked"),
@@ -208,7 +209,11 @@ end
 
 function G.FUNCS.change_ruleset_selection(e)
 	MP.UI.Change_Main_Lobby_Options(e, "ruleset_area", G.UIDEF.ruleset_info, "ranked_ruleset_button",
-														 function (ruleset_name) MP.LOBBY.config.ruleset = "ruleset_mp_" .. ruleset_name end)
+		function (ruleset_name) 
+			MP.LOBBY.config.ruleset = "ruleset_mp_" .. ruleset_name 
+			MP.LoadReworks(ruleset_name) 
+		end
+	)
 
 	MP.LOBBY.ruleset_preview = false
 end

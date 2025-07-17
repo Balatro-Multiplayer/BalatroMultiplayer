@@ -95,23 +95,19 @@ function G.UIDEF.create_UIBox_view_code()
 	)
 end
 
+-- TODO: This entire function seems to only return once
+-- ie we only get EITHER the order warning message or cheating message or nemesis unlock message
 local function get_lobby_text()
-	local guest_has_order = MP.LOBBY.guest and MP.LOBBY.guest.config and MP.LOBBY.guest.config.theOrder
-	local host_has_order = SMODS.Mods["Multiplayer"].config.integrations.theOrder
+	local guest_has_order = MP.LOBBY.guest and MP.LOBBY.guest.config and MP.LOBBY.guest.config.TheOrder
+	local host_has_order = MP.LOBBY.host and MP.LOBBY.host.config and MP.LOBBY.host.config.TheOrder
 
-	if guest_has_order ~= host_has_order then
+	if (MP.LOBBY.ready_to_start or not MP.LOBBY.is_host) and guest_has_order ~= host_has_order then
 		return localize("k_warning_no_order"), SMODS.Gradients.warning_text
 	end
 
 	if MP.LOBBY.is_host then
 		if MP.LOBBY.guest and MP.LOBBY.guest.cached == false then
-			return MP.UTILS.wrapText(
-					string.format(
-						localize("k_warning_cheating"),
-						MP.UTILS.random_message()
-					),
-					100
-				),
+			return MP.UTILS.wrapText(string.format(localize("k_warning_cheating"), MP.UTILS.random_message()), 100),
 				SMODS.Gradients.warning_text
 		end
 		if MP.LOBBY.guest and MP.LOBBY.guest.config and MP.LOBBY.guest.config.unlocked == false then
@@ -119,13 +115,7 @@ local function get_lobby_text()
 		end
 	else
 		if MP.LOBBY.host and MP.LOBBY.host.cached == false then
-			return MP.UTILS.wrapText(
-					string.format(
-						localize("k_warning_cheating"),
-						MP.UTILS.random_message()
-					),
-					100
-				),
+			return MP.UTILS.wrapText(string.format(localize("k_warning_cheating"), MP.UTILS.random_message()), 100),
 				SMODS.Gradients.warning_text
 		end
 		if MP.LOBBY.host and MP.LOBBY.host.config and MP.LOBBY.host.config.unlocked == false then
@@ -199,20 +189,30 @@ function G.UIDEF.create_UIBox_lobby_menu()
 							mid = true,
 						},
 						nodes = {
-							Disableable_Button({
-								id = "lobby_menu_start",
-								button = "lobby_start_game",
-								colour = G.C.BLUE,
-								minw = 3.65,
-								minh = 1.55,
-								label = { localize("b_start") },
-								disabled_text = MP.LOBBY.is_host and localize("b_wait_for_players")
-									or localize("b_wait_for_host_start"),
-								scale = text_scale * 2,
-								col = true,
-								enabled_ref_table = MP.LOBBY,
-								enabled_ref_value = "ready_to_start",
-							}),
+							MP.LOBBY.is_host
+								and Disableable_Button({
+									id = "lobby_menu_start",
+									button = "lobby_start_game",
+									colour = G.C.BLUE,
+									minw = 3.65,
+									minh = 1.55,
+									label = { localize("b_start") },
+									disabled_text = MP.LOBBY.guest.username and localize("b_wait_for_guest_ready") or localize("b_wait_for_players"),
+									scale = text_scale * 2,
+									col = true,
+									enabled_ref_table = MP.LOBBY,
+									enabled_ref_value = "ready_to_start",
+								})
+								or UIBox_button({
+									id = "lobby_menu_start",
+									button = "lobby_ready_up",
+									colour = MP.LOBBY.ready_to_start and G.C.GREEN or G.C.RED,
+									minw = 3.65,
+									minh = 1.55,
+									label = { MP.LOBBY.ready_to_start and localize("b_unready") or localize("b_ready") },
+									scale = text_scale * 2,
+									col = true,
+								}),
 							{
 								n = G.UIT.C,
 								config = {
@@ -819,10 +819,10 @@ function G.UIDEF.create_UIBox_lobby_options()
 															"90s",
 															"120s",
 															"150s",
-															"180s"
+															"180s",
 														},
-														current_option = (MP.LOBBY.config.timer_base_seconds) / 30,
-														opt_callback = "change_timer_base_seconds"
+														current_option = MP.LOBBY.config.timer_base_seconds / 30,
+														opt_callback = "change_timer_base_seconds",
 													}),
 													Disableable_Option_Cycle({
 														id = "showdown_starting_antes_option",
@@ -866,11 +866,11 @@ function G.UIDEF.create_UIBox_lobby_options()
 															"90s",
 															"120s",
 															"150s",
-															"180s"
+															"180s",
 														},
-														current_option = (MP.LOBBY.config.timer_increment_seconds) / 30 +
-														1,
-														opt_callback = "change_timer_increment_seconds"
+														current_option = MP.LOBBY.config.timer_increment_seconds / 30
+															+ 1,
+														opt_callback = "change_timer_increment_seconds",
 													}),
 												},
 											},
@@ -1076,6 +1076,20 @@ function G.FUNCS.lobby_start_game(e)
 	MP.ACTIONS.start_game()
 end
 
+function G.FUNCS.lobby_ready_up(e)
+	MP.LOBBY.ready_to_start = not MP.LOBBY.ready_to_start
+
+	e.config.colour = MP.LOBBY.ready_to_start and G.C.GREEN or G.C.RED
+	e.children[1].children[1].config.text = MP.LOBBY.ready_to_start and localize("b_unready") or localize("b_ready")
+	e.UIBox:recalculate()
+
+	if MP.LOBBY.ready_to_start then
+		MP.ACTIONS.ready_lobby()
+	else
+		MP.ACTIONS.unready_lobby()
+	end
+end
+
 function G.FUNCS.lobby_options(e)
 	G.FUNCS.overlay_menu({
 		definition = G.UIDEF.create_UIBox_lobby_options(),
@@ -1111,7 +1125,7 @@ G.FUNCS.start_run = function(e, args)
 			if MP.DECK.MAX_STAKE > 0 and chosen_stake > MP.DECK.MAX_STAKE then
 				MP.UTILS.overlay_message(
 					"Selected stake is incompatible with Multiplayer, stake set to "
-					.. SMODS.stake_from_index(MP.DECK.MAX_STAKE)
+						.. SMODS.stake_from_index(MP.DECK.MAX_STAKE)
 				)
 				chosen_stake = MP.DECK.MAX_STAKE
 			end
@@ -1189,8 +1203,7 @@ function Game:update(dt)
 	if (MP.LOBBY.code and not in_lobby) or (not MP.LOBBY.code and in_lobby) then
 		in_lobby = not in_lobby
 		G.F_NO_SAVING = in_lobby
-		if G.STATE == G.STATES.MENU then
-			-- Only return to menu if we're not in a run/game
+		if true then -- G.STATE == G.STATES.MENU, revert if something breaks, but this causes disconnects to not exit the game
 			self.FUNCS.go_to_menu()
 			MP.reset_game_states()
 		end

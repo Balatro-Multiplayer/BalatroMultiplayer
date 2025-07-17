@@ -96,7 +96,7 @@ return {
 					"not in a {C:attention}PvP Blind{}",
 				},
 			},
-			j_mp_hanging_chad = {
+			j_hanging_chad_mp_standard = {
 				name = "Hanging Chad",
 				text = {
 					"Retrigger {C:attention}first{} and {C:attention}second{}",
@@ -179,6 +179,7 @@ return {
 			b_start = "START",
 			b_wait_for_host_start = { "WAITING FOR", "HOST TO START" },
 			b_wait_for_players = { "WAITING FOR", "PLAYERS" },
+			b_wait_for_guest_ready = { "WAITING FOR", "GUEST TO READY UP" },
 			b_lobby_options = "LOBBY OPTIONS",
 			b_copy_clipboard = "Copy to clipboard",
 			b_view_code = "VIEW CODE",
