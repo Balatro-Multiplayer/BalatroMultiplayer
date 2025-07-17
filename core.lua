@@ -15,7 +15,7 @@ MP.LOBBY = {
 		timer_base_seconds = 150,
 		timer_increment_seconds = 60,
 		showdown_starting_antes = 3,
-		ruleset = "ruleset_mp_standard",
+		ruleset = nil,
 		gamemode = "gamemode_mp_attrition",
 		custom_seed = "random",
 		different_decks = false,
@@ -37,6 +37,7 @@ MP.LOBBY = {
 	host = {},
 	guest = {},
 	is_host = false,
+	ready_to_start = false,
 }
 MP.GAME = {}
 MP.UI = {}
@@ -175,15 +176,16 @@ MP.load_mp_dir("compatibility")
 
 MP.load_mp_file("networking/action_handlers.lua")
 
+MP.load_mp_dir("rulesets")
+MP.load_mp_dir("gamemodes")
 MP.load_mp_dir("objects/editions")
+MP.load_mp_dir("objects/enhancements")
 MP.load_mp_dir("objects/stickers")
 MP.load_mp_dir("objects/blinds")
 MP.load_mp_dir("objects/decks")
 MP.load_mp_dir("objects/jokers")
 MP.load_mp_dir("objects/consumables")
 MP.load_mp_dir("objects/challenges")
-MP.load_mp_dir("gamemodes")
-MP.load_mp_dir("rulesets")
 MP.apply_rulesets()
 
 MP.load_mp_dir("ui/components")

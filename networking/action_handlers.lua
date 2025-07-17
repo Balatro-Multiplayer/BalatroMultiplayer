@@ -40,12 +40,13 @@ end
 local function action_joinedLobby(code, type)
 	MP.LOBBY.code = code
 	MP.LOBBY.type = type
+	MP.LOBBY.ready_to_start = false
 	MP.ACTIONS.sync_client()
 	MP.ACTIONS.lobby_info()
 	MP.UI.update_connection_status()
 end
 
-local function action_lobbyInfo(host, hostHash, hostCached, guest, guestHash, guestCached, is_host)
+local function action_lobbyInfo(host, hostHash, hostCached, guest, guestHash, guestCached, guestReady, is_host)
 	MP.LOBBY.players = {}
 	MP.LOBBY.is_host = is_host == "true"
 	local function parseName(name)
@@ -65,7 +66,7 @@ local function action_lobbyInfo(host, hostHash, hostCached, guest, guestHash, gu
 		cached = hostCached == "true",
 		config = hostConfig,
 	}
-
+  
 	if guest ~= nil then
 		local guestName, guestCol = parseName(guest)
 		local guestConfig, guestMods = MP.UTILS.parse_Hash(guestHash)
@@ -80,9 +81,14 @@ local function action_lobbyInfo(host, hostHash, hostCached, guest, guestHash, gu
 	else
 		MP.LOBBY.guest = {}
 	end
+
+	-- Backwards compatibility for old server, assume guest is ready
+	-- TODO: Remove this once new server gets released
+	guestReady = guestReady or "true"
+
 	-- TODO: This should check for player count instead
 	-- once we enable more than 2 players
-	MP.LOBBY.ready_to_start = MP.LOBBY.is_host and guest ~= nil
+	MP.LOBBY.ready_to_start = guest ~= nil and guestReady == "true"
 
 	if MP.LOBBY.is_host then
 		MP.ACTIONS.lobby_options()
@@ -122,6 +128,7 @@ local function action_start_game(seed, stake_str)
 		seed = MP.LOBBY.config.custom_seed
 	end
 	G.FUNCS.lobby_start_run(nil, { seed = seed, stake = stake })
+	MP.LOBBY.ready_to_start = false
 end
 
 local function action_start_blind()
@@ -259,6 +266,17 @@ local function action_lobby_options(options)
 	local different_decks_before = MP.LOBBY.config.different_decks
 	for k, v in pairs(options) do
 		if k == "ruleset" then
+			if not MP.Rulesets[v] then
+				G.FUNCS.lobby_leave(nil)
+				MP.UTILS.overlay_message(localize({ type = "variable", key = "k_failed_to_join_lobby", vars = { localize("k_ruleset_not_found") } }))
+				return
+			end
+			local disabled = MP.Rulesets[v].is_disabled()
+			if disabled then
+				G.FUNCS.lobby_leave(nil)
+				MP.UTILS.overlay_message(localize({ type = "variable", key = "k_failed_to_join_lobby", vars = { disabled } }))
+				return
+			end
 			MP.LOBBY.config.ruleset = v
 			goto continue
 		end
@@ -722,6 +740,14 @@ function MP.ACTIONS.join_lobby(code)
 	Client.send(string.format("action:joinLobby,code:%s", code))
 end
 
+function MP.ACTIONS.ready_lobby()
+	Client.send("action:readyLobby")
+end
+
+function MP.ACTIONS.unready_lobby()
+	Client.send("action:unreadyLobby")
+end
+
 function MP.ACTIONS.lobby_info()
 	Client.send("action:lobbyInfo")
 end
@@ -909,6 +935,8 @@ local function string_to_table(str)
 	return tbl
 end
 
+local last_game_seed = nil
+
 local game_update_ref = Game.update
 ---@diagnostic disable-next-line: duplicate-set-field
 function Game:update(dt)
@@ -953,6 +981,7 @@ function Game:update(dt)
 					parsedAction.guest,
 					parsedAction.guestHash,
 					parsedAction.guestCached,
+					parsedAction.guestReady,
 					parsedAction.isHost
 				)
 			elseif parsedAction.action == "startGame" then

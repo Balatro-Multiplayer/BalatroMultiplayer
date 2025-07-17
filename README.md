@@ -9,7 +9,7 @@ A multiplayer mod for Balatro, allowing players to compete with each other.
 Detailed installation instructions are available on our website:
 [https://balatromp.com/docs/getting-started/installation](https://balatromp.com/docs/getting-started/installation)
 
-*Requires [Steamodded](https://github.com/Steamodded/smods) (>=1.0.0~BETA-0323b) and [Lovely Injector](https://github.com/ethangreen-dev/lovely-injector) (>=0.7)
+*Requires [Steamodded](https://github.com/Steamodded/smods) (>=1.0.0~BETA-0323b) and [Lovely Injector](https://github.com/ethangreen-dev/lovely-injector) (>=0.8)
 
 Quick installation steps:
 

@@ -3,9 +3,8 @@
 	"name": "Multiplayer",
 	"display_name": "Multiplayer",
 	"author": [
-		"virtualized",
-		"TGMM",
-		"CUexter"
+		"Virtualized",
+		"see credits"
 	],
 	"description": "Allows players to compete with their friends!",
 	"prefix": "mp",
@@ -13,10 +12,10 @@
 	"priority": 9007199254740990,
 	"badge_colour": "AC3232",
 	"badge_text_colour": "FFFFFF",
-	"version": "0.2.11~DEV",
+	"version": "0.2.12~DEV",
 	"dependencies": [
 		"Steamodded (>=1.0.0~BETA-0323b)",
-		"Lovely (>=0.7)",
+		"Lovely (>=0.8)",
 		"Balatro (>=1.0.1o)"
 	],
 	"conflicts": [
@@ -26,3 +25,4 @@
 		"VirtualizedMultiplayer"
 	]
 }
+e
