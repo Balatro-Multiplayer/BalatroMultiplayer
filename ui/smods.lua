@@ -1,14 +1,80 @@
 SMODS.Mods.Multiplayer.credits_tab = function()
+    local scale = 0.75
 	return {
 		n = G.UIT.ROOT,
 		config = {
+			emboss = 0.05,
+			minh = 6,
 			r = 0.1,
-			minw = 5,
+			minw = 6,
 			align = "cm",
 			padding = 0.2,
-			colour = G.C.BLACK,
+			colour = G.C.BLACK
 		},
 		nodes = {
+			{
+				n = G.UIT.R,
+				config = {
+					padding = 0.2,
+					align = "cm"
+				},
+				nodes = {
+					{
+						n = G.UIT.T,
+						config = {
+							text = localize('k_created_by'),
+							shadow = true,
+							scale = scale * 0.8,
+							colour = G.C.UI.TEXT_LIGHT
+						}
+					},
+					{
+						n = G.UIT.T,
+						config = {
+							text = "Virtualized",
+							shadow = true,
+							scale = scale * 0.8,
+							colour = G.C.DARK_EDITION
+						}
+					}
+				}
+			},
+			{
+				n = G.UIT.R,
+				config = {
+					padding = 0,
+					align = "cm"
+				},
+				nodes = {
+					{
+						n = G.UIT.T,
+						config = {
+							text = localize('k_major_contributors'),
+							shadow = true,
+							scale = scale * 0.8,
+							colour = G.C.UI.TEXT_LIGHT
+						}
+					},
+				}
+			},
+			{
+				n = G.UIT.R,
+				config = {
+					padding = 0.2,
+					align = "cm"
+				},
+				nodes = {
+					{
+						n = G.UIT.T,
+						config = {
+							text = "TGMM, Senfinbrare, CUexter, Brawmario, Divvy, Andy, and many more!",
+							shadow = true,
+							scale = scale * 0.8,
+							colour = G.C.RED
+						}
+					}
+				}
+			},
 			{
 				n = G.UIT.R,
 				config = {
@@ -16,52 +82,28 @@ SMODS.Mods.Multiplayer.credits_tab = function()
 					align = "cm",
 				},
 				nodes = {
-					{
-						n = G.UIT.T,
-						config = {
-							text = localize("k_join_discord"),
-							shadow = true,
-							scale = 0.6,
-							colour = G.C.UI.TEXT_LIGHT,
-						},
-					},
-				},
+					UIBox_button({
+						minw = 3.85,
+						button = "bmp_github",
+						label = {localize('b_github_project')}
+					})
+				}
 			},
 			{
 				n = G.UIT.R,
 				config = {
-					padding = 0.2,
+					padding = 0,
 					align = "cm",
 				},
 				nodes = {
 					UIBox_button({
-						minw = 6,
-						button = "multiplayer_discord",
-						label = {
-							localize("b_mp_discord"),
-						},
-					}),
-				},
+						minw = 3.85 * 2,
+						button = "bmp_github",
+						label = {localize('b_mp_discord')}
+					})
+				}
 			},
-			{
-				n = G.UIT.R,
-				config = {
-					padding = 0.2,
-					align = "cm",
-				},
-				nodes = {
-					{
-						n = G.UIT.T,
-						config = {
-							text = localize("k_discord_msg"),
-							shadow = true,
-							scale = 0.375,
-							colour = G.C.UI.TEXT_LIGHT,
-						},
-					},
-				},
-			},
-		},
+		}
 	}
 end
 
@@ -217,8 +259,12 @@ SMODS.Mods.Multiplayer.config_tab = function()
 	return ret
 end
 
-function G.FUNCS.multiplayer_discord(e)
+function G.FUNCS.bmp_discord(e)
 	love.system.openURL("https://discord.gg/gEemz4ptuF")
+end
+
+function G.FUNCS.bmp_github(e)
+	love.system.openURL("https://github.com/Balatro-Multiplayer/BalatroMultiplayer/")
 end
 
 function G.FUNCS.change_blind_col(args)	-- all we're doing is just saving + redefining the ui elements here

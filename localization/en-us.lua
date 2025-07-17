@@ -299,6 +299,8 @@ return {
 			k_ruleset_disabled_the_order_banned = "The Order is Banned",
 			k_ruleset_not_found = "Unknown ruleset",
 			k_tutorial_not_complete = "You must complete the tutorial before you can play Multiplayer",
+			k_created_by = "Created by",
+			k_major_contributors = "Major contributions by",
 			ml_enemy_loc = { "Enemy", "location" },
 			ml_mp_kofi_message = {
 				"This mod and game server is",

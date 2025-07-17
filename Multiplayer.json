@@ -3,9 +3,8 @@
 	"name": "Multiplayer",
 	"display_name": "Multiplayer",
 	"author": [
-		"virtualized",
-		"TGMM",
-		"CUexter"
+		"Virtualized",
+		"see credits"
 	],
 	"description": "Allows players to compete with their friends!",
 	"prefix": "mp",
@@ -26,3 +25,4 @@
 		"VirtualizedMultiplayer"
 	]
 }
+e
