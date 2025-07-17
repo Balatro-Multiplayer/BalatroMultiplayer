@@ -35,7 +35,7 @@ MP.Ruleset({
 	reworked_blinds = {
 		"bl_mp_nemesis"
 	},
-	forced_gamemode = "attrition",
+	forced_gamemode = "gamemode_mp_attrition",
 	forced_lobby_options = true,
 	is_disabled = function(self)
 		local required_version = "1.0.0~BETA-0506a"

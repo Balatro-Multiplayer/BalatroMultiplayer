@@ -14,7 +14,7 @@ MP.Ruleset({
 	reworked_enhancements = {},
 	reworked_tags = {},
 	reworked_blinds = {},
-    forced_gamemode = "attrition",
+    forced_gamemode = "gamemode_mp_attrition",
     forced_lobby_options = true,
 	is_disabled = function(self)
 		if not MP.INTEGRATIONS.TheOrder then

@@ -242,7 +242,7 @@ function G.UIDEF.ruleset_info(ruleset_name)
 			{n=G.UIT.R, config={align = "cm"}, nodes={
 				MP.UI.Disableable_Button({
 					id = "select_gamemode_button",
-					button = "select_gamemode",
+					button = ruleset.forced_gamemode and "force_" .. ruleset.forced_gamemode or "select_gamemode",
 					align = "cm",
 					padding = 0.05,
 					r = 0.1,
@@ -781,4 +781,12 @@ function G.FUNCS.join_game_paste(e)
 	MP.LOBBY.temp_code = MP.UTILS.get_from_clipboard()
 	MP.ACTIONS.join_lobby(MP.LOBBY.temp_code)
 	G.FUNCS.exit_overlay_menu()
+end
+
+-- Creating forced gamemode buttons for each gamemode, since I am not sure how to pass variables through button presses
+for gamemode, _ in pairs(MP.Gamemodes) do
+	G.FUNCS["force_" .. gamemode] = function(e)
+		MP.LOBBY.config.gamemode = gamemode
+		G.FUNCS.start_lobby(e)
+	end
 end

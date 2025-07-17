@@ -2,7 +2,6 @@ MP.Ruleset({
 	key = "traditional",
 	multiplayer_content = true,
 	banned_jokers = {
-		"j_hanging_chad",
 		"j_mp_speedrun",
 		"j_mp_conjoined_joker",
 	},
@@ -14,7 +13,7 @@ MP.Ruleset({
 	banned_tags = {},
 	banned_blinds ={},
 	reworked_jokers = {
-		"j_mp_hanging_chad",
+		"j_hanging_chad",
 		"j_mp_defensive_joker",
 		"j_mp_lets_go_gambling",
 		--"j_mp_magnet",
