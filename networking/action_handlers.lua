@@ -254,6 +254,17 @@ local function action_lobby_options(options)
 	local different_decks_before = MP.LOBBY.config.different_decks
 	for k, v in pairs(options) do
 		if k == "ruleset" then
+			if not MP.Rulesets[v] then
+				G.FUNCS.lobby_leave(nil)
+				MP.UTILS.overlay_message(localize({ type = "variable", key = "k_failed_to_join_lobby", vars = { localize("k_ruleset_not_found") } }))
+				return
+			end
+			local disabled = MP.Rulesets[v].is_disabled()
+			if disabled then
+				G.FUNCS.lobby_leave(nil)
+				MP.UTILS.overlay_message(localize({ type = "variable", key = "k_failed_to_join_lobby", vars = { disabled } }))
+				return
+			end
 			MP.LOBBY.config.ruleset = v
 			goto continue
 		end

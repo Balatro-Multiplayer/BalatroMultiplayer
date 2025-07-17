@@ -296,6 +296,7 @@ return {
 			k_reworks = "Additions/Reworks",
 			k_ruleset_disabled_the_order_required = "The Order is Required",
 			k_ruleset_disabled_the_order_banned = "The Order is Banned",
+			k_ruleset_not_found = "Unknown ruleset",
 			ml_enemy_loc = { "Enemy", "location" },
 			ml_mp_kofi_message = {
 				"This mod and game server is",
@@ -321,6 +322,7 @@ return {
 			k_reworked_objs = "Added/Reworked #1#",
 			k_no_reworked_objs = "No Added/Reworked #1#",
 			k_ruleset_disabled_smods_version = "SMODS Version #1# Required",
+			k_failed_to_join_lobby = "Failed to join lobby: #1#",
 		},
 		v_text = {
 			ch_c_hanging_chad_rework = { "{C:attention}Hanging Chad{} is {C:dark_edition}reworked" },
