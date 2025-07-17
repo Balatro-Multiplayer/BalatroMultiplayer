@@ -757,6 +757,18 @@ function MP.UTILS.str_decode_and_unpack(str)
 	return str_unpacked
 end
 
+function MP.UTILS.get_standard_rulesets()
+	return {"ranked", "blitz", "traditional"}
+end
+
 function MP.UTILS.is_standard_ruleset()
-	return MP.LOBBY.config.ruleset == "ruleset_mp_blitz" or MP.LOBBY.config.ruleset == "ruleset_mp_ranked" or MP.LOBBY.config.ruleset == "ruleset_mp_traditional"
+	if MP.LOBBY.config.ruleset == nil then
+		return false
+	end
+	for _, ruleset in ipairs(MP.UTILS.get_standard_rulesets()) do
+		if MP.LOBBY.config.ruleset == "ruleset_mp_" .. ruleset then
+			return true
+		end
+	end
+	return false
 end

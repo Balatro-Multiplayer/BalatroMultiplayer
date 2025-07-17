@@ -1,9 +1,7 @@
 MP.Ruleset({
 	key = "blitz",
 	multiplayer_content = true,
-	banned_jokers = {
-		"j_hanging_chad",
-	},
+	banned_jokers = {},
 	banned_consumables = {
 		"c_justice",
 	},
@@ -11,8 +9,9 @@ MP.Ruleset({
 	banned_enhancements = {},
 	banned_tags = {},
 	banned_blinds ={},
+
 	reworked_jokers = {
-		"j_mp_hanging_chad",
+		"j_hanging_chad",
 		"j_mp_conjoined_joker",
 		"j_mp_defensive_joker",
 		"j_mp_lets_go_gambling",
