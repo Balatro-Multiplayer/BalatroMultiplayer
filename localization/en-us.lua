@@ -285,6 +285,8 @@ return {
 			k_requires_restart = "*Requires a restart to take effect",
 			k_bans = "Bans",
 			k_reworks = "Additions/Reworks",
+			k_created_by = "Created by",
+			k_major_contributors = "Major contributions by",
 			ml_enemy_loc = { "Enemy", "location" },
 			ml_mp_kofi_message = {
 				"This mod and game server is",
