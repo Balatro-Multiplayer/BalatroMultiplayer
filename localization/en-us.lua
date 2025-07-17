@@ -205,7 +205,8 @@ return {
 			b_continue_singleplayer = "Continue in Singleplayer",
 			b_the_order_integration = "Enable The Order Integration",
 			b_view_nemesis_deck = "View Decks",
-      b_toggle_jokers = "Toggle Jokers",
+			b_toggle_jokers = "Toggle Jokers",
+			b_skip_tutorial = "Skip Tutorial",
 			k_continue_singleplayer_tooltip = "This will overwrite your current singleplayer run",
 			k_enemy_score = "Current Enemy score",
 			k_enemy_hands = "Enemy hands left: ",
@@ -297,6 +298,7 @@ return {
 			k_ruleset_disabled_the_order_required = "The Order is Required",
 			k_ruleset_disabled_the_order_banned = "The Order is Banned",
 			k_ruleset_not_found = "Unknown ruleset",
+			k_tutorial_not_complete = "You must complete the tutorial before you can play Multiplayer",
 			ml_enemy_loc = { "Enemy", "location" },
 			ml_mp_kofi_message = {
 				"This mod and game server is",

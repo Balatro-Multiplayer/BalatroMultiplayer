@@ -567,6 +567,44 @@ function G.UIDEF.create_UIBox_join_lobby_button()
 end
 
 function G.UIDEF.override_main_menu_play_button()
+	if not G.SETTINGS.tutorial_complete or G.SETTINGS.tutorial_progress ~= nil then
+		return (
+			create_UIBox_generic_options({
+				contents = {
+					UIBox_button({
+						label = { localize("b_singleplayer") },
+						colour = G.C.BLUE,
+						button = "setup_run_singleplayer",
+						minw = 5,
+					}),
+					{
+						n = G.UIT.R,
+						config = {
+							align = "cm",
+							padding = 0.5,
+						},
+						nodes = {
+							{
+								n = G.UIT.T,
+								config = {
+									text = localize("k_tutorial_not_complete"),
+									colour = G.C.UI.TEXT_LIGHT,
+									scale = 0.45,
+								},
+							}
+						}
+					},
+					UIBox_button({
+						label = { localize("b_skip_tutorial") },
+						colour = G.C.RED,
+						button = "skip_tutorial",
+						minw = 5,
+					})
+				},
+			})
+		)
+	end
+
 	return (
 		create_UIBox_generic_options({
 			contents = {
@@ -636,6 +674,12 @@ function G.FUNCS.join_lobby(e)
 	G.FUNCS.overlay_menu({
 		definition = G.UIDEF.create_UIBox_join_lobby_button(),
 	})
+end
+
+function G.FUNCS.skip_tutorial(e)
+	G.SETTINGS.tutorial_complete = true
+	G.SETTINGS.tutorial_progress = nil
+	G.FUNCS.play_options(e)
 end
 
 function G.FUNCS.join_from_clipboard(e)
