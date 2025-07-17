@@ -1087,7 +1087,13 @@ function G.FUNCS.lobby_start_game(e)
 end
 
 function G.FUNCS.lobby_ready_up(e)
-	if not MP.LOBBY.ready_to_start then
+	MP.LOBBY.ready_to_start = not MP.LOBBY.ready_to_start
+
+	e.config.colour = MP.LOBBY.ready_to_start and G.C.GREEN or G.C.RED
+	e.children[1].children[1].config.text = MP.LOBBY.ready_to_start and localize("b_unready") or localize("b_ready")
+	e.UIBox:recalculate()
+
+	if MP.LOBBY.ready_to_start then
 		MP.ACTIONS.ready_lobby()
 	else
 		MP.ACTIONS.unready_lobby()
