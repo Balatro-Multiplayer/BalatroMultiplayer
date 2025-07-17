@@ -98,25 +98,6 @@ end
 -- TODO: This entire function seems to only return once
 -- ie we only get EITHER the order warning message or cheating message or nemesis unlock message
 local function get_lobby_text()
-	local guest_has_order = MP.LOBBY.guest and MP.LOBBY.guest.config and MP.LOBBY.guest.config.TheOrder
-	local host_has_order = MP.LOBBY.host and MP.LOBBY.host.config and MP.LOBBY.host.config.TheOrder
-
-	-- TODO we could probably do a mod list parse check
-	if (MP.LOBBY.ready_to_start or not MP.LOBBY.is_host) and guest_has_order ~= host_has_order then
-		return localize("k_warning_no_order"), SMODS.Gradients.warning_text
-	end
-
-	if MP.LOBBY.ready_to_start or not MP.LOBBY.is_host then
-		local hostSteamoddedVersion = MP.LOBBY.host and MP.LOBBY.host.config and MP.LOBBY.host.config.Mods["Steamodded"]
-		local guestSteamoddedVersion = MP.LOBBY.guest
-			and MP.LOBBY.guest.config
-			and MP.LOBBY.guest.config.Mods["Steamodded"]
-
-		if hostSteamoddedVersion ~= guestSteamoddedVersion then
-			return localize("k_steamodded_warning"), SMODS.Gradients.warning_text
-		end
-	end
-
 	if MP.LOBBY.is_host then
 		if MP.LOBBY.guest and MP.LOBBY.guest.cached == false then
 			return MP.UTILS.wrapText(string.format(localize("k_warning_cheating"), MP.UTILS.random_message()), 100),
@@ -134,18 +115,44 @@ local function get_lobby_text()
 			return localize("k_warning_nemesis_unlock"), SMODS.Gradients.warning_text
 		end
 	end
+
+	local guest_has_order = MP.LOBBY.guest and MP.LOBBY.guest.config and MP.LOBBY.guest.config.TheOrder
+	local host_has_order = MP.LOBBY.host and MP.LOBBY.host.config and MP.LOBBY.host.config.TheOrder
+
+	if (MP.LOBBY.ready_to_start or not MP.LOBBY.is_host) and guest_has_order ~= host_has_order then
+		return localize("k_warning_no_order"), SMODS.Gradients.warning_text
+	end
+
+	if MP.LOBBY.ready_to_start or not MP.LOBBY.is_host then
+		local hostSteamoddedVersion = MP.LOBBY.host and MP.LOBBY.host.config and MP.LOBBY.host.config.Mods["Steamodded"]
+		local guestSteamoddedVersion = MP.LOBBY.guest
+			and MP.LOBBY.guest.config
+			and MP.LOBBY.guest.config.Mods["Steamodded"]
+
+		if hostSteamoddedVersion ~= guestSteamoddedVersion then
+			return localize("k_steamodded_warning"), SMODS.Gradients.warning_text
+		end
+	end
+
 	SMODS.Mods["Multiplayer"].config.unlocked = MP.UTILS.unlock_check()
 	if not SMODS.Mods["Multiplayer"].config.unlocked then
 		return localize("k_warning_unlock_profile"), SMODS.Gradients.warning_text
 	end
 
-	-- TODO since we do individual checks for the order and steamodded then we could probably cut this out
+	-- Remove the mod hash warning from main warning display area since it's shown
+	-- alongside critical warnings (cheating, compatibility issues). This makes users
+	-- learn to ignore all warnings. Instead, we should indicate hash differences
+	-- through other UI elements like colored usernames or separate indicators.
+	-- The hash check itself remains useful for debugging but shouldn't be presented
+	-- as a blocking warning alongside serious compatibility issues.
+	-- steph
 	if MP.LOBBY.host and MP.LOBBY.host.hash and MP.LOBBY.guest and MP.LOBBY.guest.hash then
 		if MP.LOBBY.host.hash ~= MP.LOBBY.guest.hash then
 			return localize("k_mod_hash_warning"), G.C.UI.TEXT_LIGHT
 		end
 	end
 
+	-- ???: What is this supposed to accomplish?
 	if MP.LOBBY.username == "Guest" then
 		return localize("k_set_name"), G.C.UI.TEXT_LIGHT
 	end
