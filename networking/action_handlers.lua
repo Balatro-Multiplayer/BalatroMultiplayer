@@ -908,6 +908,8 @@ local function string_to_table(str)
 	return tbl
 end
 
+local last_game_seed = nil
+
 local game_update_ref = Game.update
 ---@diagnostic disable-next-line: duplicate-set-field
 function Game:update(dt)
