@@ -37,6 +37,7 @@ MP.LOBBY = {
 	host = {},
 	guest = {},
 	is_host = false,
+	ready_to_start = false,
 }
 MP.GAME = {}
 MP.UI = {}
