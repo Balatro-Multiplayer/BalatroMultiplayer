@@ -98,28 +98,23 @@ end
 -- TODO: This entire function seems to only return once
 -- ie we only get EITHER the order warning message or cheating message or nemesis unlock message
 local function get_lobby_text()
-	if MP.LOBBY.is_host then
-		if MP.LOBBY.guest and MP.LOBBY.guest.cached == false then
-			return MP.UTILS.wrapText(string.format(localize("k_warning_cheating"), MP.UTILS.random_message()), 100),
-				SMODS.Gradients.warning_text
-		end
-		if MP.LOBBY.guest and MP.LOBBY.guest.config and MP.LOBBY.guest.config.unlocked == false then
-			return localize("k_warning_nemesis_unlock"), SMODS.Gradients.warning_text
-		end
-	else
-		if MP.LOBBY.host and MP.LOBBY.host.cached == false then
-			return MP.UTILS.wrapText(string.format(localize("k_warning_cheating"), MP.UTILS.random_message()), 100),
-				SMODS.Gradients.warning_text
-		end
-		if MP.LOBBY.host and MP.LOBBY.host.config and MP.LOBBY.host.config.unlocked == false then
-			return localize("k_warning_nemesis_unlock"), SMODS.Gradients.warning_text
-		end
+	-- Check the other player (guest if we're host, host if we're guest)
+	local other_player = MP.LOBBY.is_host and MP.LOBBY.guest or MP.LOBBY.host
+
+	if other_player and other_player.cached == false then
+		return MP.UTILS.wrapText(string.format(localize("k_warning_cheating"), MP.UTILS.random_message()), 100),
+			SMODS.Gradients.warning_text
 	end
 
-	local guest_has_order = MP.LOBBY.guest and MP.LOBBY.guest.config and MP.LOBBY.guest.config.TheOrder
-	local host_has_order = MP.LOBBY.host and MP.LOBBY.host.config and MP.LOBBY.host.config.TheOrder
+	if other_player and other_player.config and other_player.config.unlocked == false then
+		return localize("k_warning_nemesis_unlock"), SMODS.Gradients.warning_text
+	end
 
-	if (MP.LOBBY.ready_to_start or not MP.LOBBY.is_host) and guest_has_order ~= host_has_order then
+	local current_player = MP.LOBBY.is_host and MP.LOBBY.host or MP.LOBBY.guest
+	local current_has_order = current_player and current_player.config and current_player.config.TheOrder
+	local other_has_order = other_player and other_player.config and other_player.config.TheOrder
+
+	if (MP.LOBBY.ready_to_start or not MP.LOBBY.is_host) and current_has_order ~= other_has_order then
 		return localize("k_warning_no_order"), SMODS.Gradients.warning_text
 	end
 
