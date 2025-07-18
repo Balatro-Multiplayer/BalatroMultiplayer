@@ -523,7 +523,7 @@ end
 function G.FUNCS.load_end_game_jokers()
 	local card_area_save, success, err
 
-	if not MP.end_game_jokers and not MP.end_game_jokers_payload then
+	if not MP.end_game_jokers or not MP.end_game_jokers_payload then
 		return
 	end
 
@@ -624,7 +624,7 @@ end
 
 
 function G.FUNCS.load_nemesis_deck()
-	if not MP.nemesis_deck or not MP.nemesis_cards or not MP.LOBBY.code then
+	if not MP.nemesis_deck_string or not MP.nemesis_deck or not MP.nemesis_cards or not MP.LOBBY.code then
 		return
 	end
 
