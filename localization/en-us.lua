@@ -84,9 +84,10 @@ return {
 			j_mp_pizza = {
 				name = "Pizza",
 				text = {
-					"After {C:attention}PvP Blind{}, {C:inactive}eaten for:",
-					"{C:red}+#2#{} discards and {C:red}+#1#{} discard",
-					"for your {X:purple,C:white}Nemesis{} {C:inactive}next ante{}",
+					"At the end of the next {C:attention}PvP Blind{},",
+					"consume this Joker and grant",
+					"{C:red}+#1#{} discards to you and",
+					"{C:red}+#2#{} discards to your {X:purple,C:white}Nemesis{} for the ante",
 				},
 			},
 			j_mp_pacifist = {
