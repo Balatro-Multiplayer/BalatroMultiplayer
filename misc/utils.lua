@@ -99,12 +99,12 @@ function MP.UTILS.blind_col_numtokey(num)
 		"flint",
 		"mark",
 	}
-	return "bl_" .. (keys[num])
+	return "bl_" .. keys[num]
 end
 
 function MP.UTILS.get_nemesis_key() -- calling this function assumes the user is currently in a multiplayer game
-	local ret = MP.UTILS.blind_col_numtokey((MP.LOBBY.is_host and MP.LOBBY.guest.blind_col or MP.LOBBY.host.blind_col) or
-		1)
+	local ret =
+		MP.UTILS.blind_col_numtokey((MP.LOBBY.is_host and MP.LOBBY.guest.blind_col or MP.LOBBY.host.blind_col) or 1)
 	if tonumber(MP.GAME.enemy.lives) <= 1 and tonumber(MP.GAME.lives) <= 1 then
 		if G.STATE ~= G.STATES.ROUND_EVAL then -- very messy fix that mostly works. breaks in a different way... but far harder to notice
 			ret = "bl_final_heart"
@@ -457,11 +457,10 @@ local evaluate_round_ref = G.FUNCS.evaluate_round
 G.FUNCS.evaluate_round = function()
 	if G.after_pvp then
 		G.after_pvp = nil
-		SMODS.calculate_context({mp_end_of_pvp = true})
+		SMODS.calculate_context({ mp_end_of_pvp = true })
 	end
 	evaluate_round_ref()
 end
-
 
 -- Pre-compile a reversed list of all the centers
 local reversed_centers = nil
@@ -478,7 +477,11 @@ function MP.UTILS.card_to_string(card)
 	local suit = string.sub(card.base.suit, 1, 1)
 
 	local rank_value_map = {
-		['10'] = 'T', Jack = 'J', Queen = 'Q', King = 'K', Ace = 'A'
+		["10"] = "T",
+		Jack = "J",
+		Queen = "Q",
+		King = "K",
+		Ace = "A",
 	}
 	local rank = rank_value_map[card.base.value] or card.base.value
 
@@ -571,7 +574,8 @@ function MP.UTILS.parse_Hash(hash)
 	local config = {
 		encryptID = nil,
 		unlocked = nil,
-		theOrder = nil
+		theOrder = nil,
+		Mods = {},
 	}
 
 	local mod_data = {}
@@ -589,7 +593,38 @@ function MP.UTILS.parse_Hash(hash)
 		end
 	end
 
-	return config, table.concat(mod_data, ";")
+	-- TODO Can be simplified by parsing the `mod_data` instead of the concatenated mod_string
+	-- TODO: We prob don't need to return mod_string anymore; can use config.Mods as a cleaner interface for the host/guest's mods
+	local mod_string = table.concat(mod_data, ";")
+	config.Mods = MP.UTILS.parse_modlist(mod_string)
+
+	return config, mod_string
+end
+
+function MP.UTILS.parse_modlist(mod_string)
+	if not mod_string or mod_string == "" then
+		return {}
+	end
+
+	local mods = {}
+
+	for mod_entry in string.gmatch(mod_string, "([^;]+)") do
+		if mod_entry ~= "" and not string.find(mod_entry, "=") then
+			local mod_name, mod_version
+
+			local dash_pos = string.find(mod_entry, "-")
+			if dash_pos then
+				mod_name = string.sub(mod_entry, 1, dash_pos - 1)
+				mod_version = string.sub(mod_entry, dash_pos + 1)
+			else
+				mod_name = mod_entry
+			end
+
+			mods[mod_name] = mod_version
+		end
+	end
+
+	return mods
 end
 
 function MP.UTILS.sum_numbers_in_table(t)
@@ -638,7 +673,7 @@ function MP.UTILS.server_connection_ID()
 	if os_name == "Windows" then
 		local ffi = require("ffi")
 
-		ffi.cdef [[
+		ffi.cdef([[
 		typedef unsigned long DWORD;
 		typedef int BOOL;
 		typedef const char* LPCSTR;
@@ -653,23 +688,17 @@ function MP.UTILS.server_connection_ID()
 			char* lpFileSystemNameBuffer,
 			DWORD nFileSystemNameSize
 		);
-		]]
+		]])
 
 		local serial_ptr = ffi.new("DWORD[1]")
-		local ok = ffi.C.GetVolumeInformationA(
-			"C:\\", nil, 0,
-			serial_ptr, nil, nil,
-			nil, 0
-		)
+		local ok = ffi.C.GetVolumeInformationA("C:\\", nil, 0, serial_ptr, nil, nil, nil, 0)
 		if ok ~= 0 then
 			raw_id = tostring(serial_ptr[0])
 		end
 	end
 
 	if not raw_id then
-		raw_id = os.getenv("USER")
-			or os.getenv("USERNAME")
-			or os_name
+		raw_id = os.getenv("USER") or os.getenv("USERNAME") or os_name
 	end
 
 	return MP.UTILS.encrypt_string(raw_id)
@@ -718,7 +747,7 @@ end
 local function STR_UNPACK_CHECKED(str)
 	-- Code generated from STR_PACK should only return a table and nothing else
 	if str:sub(1, 8) ~= "return {" then
-		error("Invalid string header, expected \"return {...\"")
+		error('Invalid string header, expected "return {..."')
 	end
 
 	-- Protect against code injection by disallowing function definitions
@@ -749,11 +778,17 @@ end
 function MP.UTILS.str_decode_and_unpack(str)
 	local success, str_decoded, str_decompressed, str_unpacked
 	success, str_decoded = pcall(love.data.decode, "string", "base64", str)
-	if not success then return nil, str_decoded end
+	if not success then
+		return nil, str_decoded
+	end
 	success, str_decompressed = pcall(love.data.decompress, "string", "gzip", str_decoded)
-	if not success then return nil, str_decompressed end
+	if not success then
+		return nil, str_decompressed
+	end
 	success, str_unpacked = pcall(STR_UNPACK_CHECKED, str_decompressed)
-	if not success then return nil, str_unpacked end
+	if not success then
+		return nil, str_unpacked
+	end
 	return str_unpacked
 end
 
