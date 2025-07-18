@@ -51,26 +51,22 @@ function reset_idol_card()
 			["6"] = 6, ["7"] = 7, ["8"] = 8, ["9"] = 9, ["10"] = 10,
 			["Jack"] = 11, ["Queen"] = 12, ["King"] = 13
 		}
-		
-		
-		local suit_order = {
-			Spades = 1,
-			Hearts = 2,
-			Clubs = 3,
-			Diamonds = 4
-		}
-		
-		-- Dynamically source extra suits from SMODS
-		local current_index = 5
-		
-		for _, suit in ipairs(SMODS.Suit.obj_buffer) do
-			-- If suit isn't one of the original four and not already in suit_order
-			if not suit_order[suit] then
-				suit_order[suit] = current_index
-				current_index = current_index + 1
-			end
-		end
+-- prevents crashes when idol logic compares cards with modded suits
+-- base suits get fixed indices, unknown suits assigned sequentially from 5+
+local suit_order = {
+    Spades = 1,
+    Hearts = 2,
+    Clubs = 3,
+    Diamonds = 4
+}
 
+local current_index = 5
+for _, suit in ipairs(SMODS.Suit.obj_buffer) do
+    if not suit_order[suit] then
+        suit_order[suit] = current_index
+        current_index = current_index + 1
+    end
+end
 
 		table.sort(valid_idol_cards, function(a, b)
 			-- Sort by count descending first
