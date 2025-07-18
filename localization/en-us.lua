@@ -84,10 +84,9 @@ return {
 			j_mp_pizza = {
 				name = "Pizza",
 				text = {
-					"{C:inactive}After {C:attention}PvP Blind{}{C:inactive}:",
-					"{C:red}+#1#{} discards and",
-					"{C:red}+#2#{} discard for your {X:purple,C:white}Nemesis{}",
-					"{C:inactive}(Eaten after PvP Blind)",
+					"After {C:attention}PvP Blind{}, {C:inactive}eaten for:",
+					"{C:red}+#2#{} discards and {C:red}+#1#{} discard",
+					"for your {X:purple,C:white}Nemesis{} {C:inactive}next ante{}",
 				},
 			},
 			j_mp_pacifist = {
