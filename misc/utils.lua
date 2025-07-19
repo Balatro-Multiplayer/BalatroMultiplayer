@@ -758,7 +758,16 @@ function MP.UTILS.str_decode_and_unpack(str)
 end
 
 function MP.UTILS.get_standard_rulesets()
-	return {"ranked", "blitz", "traditional"}
+	local ret = {}
+	for k, v in pairs(MP.Rulesets) do
+		if v.standard then
+			ret[#ret+1] = string.sub(v.key, 12, #v.key)
+		end
+	end
+	for i = 1, 100 do
+		print(ret)
+	end
+	return ret
 end
 
 function MP.UTILS.is_standard_ruleset()
@@ -771,4 +780,12 @@ function MP.UTILS.is_standard_ruleset()
 		end
 	end
 	return false
+end
+
+function MP.UTILS.get_weekly()
+	return SMODS.Mods["Multiplayer"].config.weekly
+end
+
+function MP.UTILS.is_weekly(arg)
+	return MP.UTILS.get_weekly() == arg and MP.LOBBY.config.ruleset == 'ruleset_mp_weekly'
 end

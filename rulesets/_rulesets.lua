@@ -36,93 +36,26 @@ MP.BANNED_OBJECTS = {
 	blinds = {},
 }
 
-function new_in_pool_for_blind(v) -- For blinds specifically, in_pool does overwrite basic checks like minimum ante, so we need to repackage all basic checks inside the new in_pool
-	if MP.LOBBY.code then
-		return false
-	elseif not v.boss.showdown and (v.boss.min <= math.max(1, G.GAME.round_resets.ante) and ((math.max(1, G.GAME.round_resets.ante))%G.GAME.win_ante ~= 0 or G.GAME.round_resets.ante < 2)) then
-		return true
-	elseif v.boss.showdown and (G.GAME.round_resets.ante)%G.GAME.win_ante == 0 and G.GAME.round_resets.ante >= 2 then
-		return true
-	else
-		return false
-	end
-end
-
-function MP.apply_rulesets()
-	for _, ruleset in pairs(MP.Rulesets) do
-		local function process_banned_items(banned_items, banned_table)
-			if not banned_items then
-				return
-			end
-			for _, item_key in ipairs(banned_items) do
-				banned_table[item_key] = banned_table[item_key] or {}
-				banned_table[item_key][ruleset.key] = true
-			end
-		end
-
-		local banned_types = {
-			{ items = ruleset.banned_jokers, table = MP.BANNED_OBJECTS.jokers },
-			{ items = ruleset.banned_consumables, table = MP.BANNED_OBJECTS.consumables },
-			{ items = ruleset.banned_vouchers, table = MP.BANNED_OBJECTS.vouchers },
-			{ items = ruleset.banned_enhancements, table = MP.BANNED_OBJECTS.enhancements },
-			{ items = ruleset.banned_tags, table = MP.BANNED_OBJECTS.tags },
-			{ items = ruleset.banned_blinds, table = MP.BANNED_OBJECTS.blinds },
+function MP.ApplyBans()
+	if MP.LOBBY.code and MP.LOBBY.config.ruleset then
+		local ruleset = MP.Rulesets[MP.LOBBY.config.ruleset]
+		local banned_tables = {
+			"jokers",
+			"consumables",
+			"vouchers",
+			"enhancements",
+			"tags",
+			"blinds",
 		}
-
-		for _, banned_type in ipairs(banned_types) do
-			process_banned_items(banned_type.items, banned_type.table)
-		end
-	end
-
-	local object_types = {
-		{ objects = MP.BANNED_OBJECTS.jokers, mod = SMODS.Joker, global_banned = MP.DECK.BANNED_JOKERS },
-		{ objects = MP.BANNED_OBJECTS.consumables, mod = SMODS.Consumable, global_banned = MP.DECK.BANNED_CONSUMABLES },
-		{ objects = MP.BANNED_OBJECTS.vouchers, mod = SMODS.Voucher, global_banned = MP.DECK.BANNED_VOUCHERS },
-		{
-			objects = MP.BANNED_OBJECTS.enhancements,
-			mod = SMODS.Enhancement,
-			global_banned = MP.DECK.BANNED_ENHANCEMENTS,
-		},
-		{ objects = MP.BANNED_OBJECTS.tags, mod = SMODS.Tag, global_banned = MP.DECK.BANNED_TAGS },
-		{ objects = MP.BANNED_OBJECTS.blinds, mod = SMODS.Blind, global_banned = MP.DECK.BANNED_BLINDS },
-	}
-
-	for _, type in ipairs(object_types) do
-		for obj_key, rulesets in pairs(type.objects) do
-			-- Find object with object key, using the same method as take_ownership
-			local obj = type.mod.obj_table[obj_key] or (type.mod.get_obj and type.mod:get_obj(obj_key))
-			
-			if obj then
-				local old_in_pool = obj.in_pool
-				type.mod:take_ownership(obj_key, {
-					orig_in_pool = old_in_pool, -- Save the original in_pool function inside the object itself
-					in_pool = function(self) -- Update the in_pool function
-						if rulesets[MP.LOBBY.config.ruleset] and MP.LOBBY.code then
-							return false
-						elseif self.orig_in_pool then
-							-- behave like the original in_pool function if it's not nil
-							return self:orig_in_pool()
-						else
-							return self.set ~= 'Blind' or new_in_pool_for_blind(self) -- in_pool returning true doesn't overwrite original checks EXCEPT for blinds
-						end
-					end,
-				}, true)
-			else
-				sendWarnMessage(
-					('Cannot ban %s: Does not exist.'):format(obj_key), type.mod.set
-				)
+		for _, table in ipairs(banned_tables) do -- i'm keeping the print, because it didn't work once and i am paranoid
+			for _, v in ipairs(ruleset['banned_'..table]) do
+				print(v.." banned")
+				G.GAME.banned_keys[v] = true
 			end
-		end
-		for obj_key, _ in pairs(type.global_banned) do
-			type.mod:take_ownership(obj_key, {
-				in_pool = function(self)
-					if self.set ~= 'Blind' then
-						return not MP.LOBBY.code
-					else
-						return new_in_pool_for_blind(self)
-					end
-				end,
-			}, true)
+			for k, v in pairs(MP.DECK['BANNED_'..string.upper(table)]) do
+				print(k.." BANNED")
+				G.GAME.banned_keys[k] = true
+			end
 		end
 	end
 end

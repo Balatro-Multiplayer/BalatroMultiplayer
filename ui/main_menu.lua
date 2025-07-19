@@ -201,6 +201,7 @@ function G.UIDEF.ruleset_selection_options()
 		{button_id = "traditional_ruleset_button", button_localize_key = "k_traditional"},
 		{button_id = "vanilla_ruleset_button", button_localize_key = "k_vanilla"},
 		{button_id = "badlatro_ruleset_button", button_localize_key = "k_badlatro"},
+		{button_id = "weekly_ruleset_button", button_localize_key = "k_weekly"},
 	}
 
 	return MP.UI.Main_Lobby_Options("ruleset_area", default_ruleset_area,
@@ -208,6 +209,11 @@ function G.UIDEF.ruleset_selection_options()
 end
 
 function G.FUNCS.change_ruleset_selection(e)
+	if e.config.id == 'weekly_ruleset_button' then -- wtf
+		if G.FUNCS.weekly_interrupt(e) then
+			return
+		end
+	end
 	MP.UI.Change_Main_Lobby_Options(e, "ruleset_area", G.UIDEF.ruleset_info, "ranked_ruleset_button",
 		function (ruleset_name) 
 			MP.LOBBY.config.ruleset = "ruleset_mp_" .. ruleset_name 
@@ -637,6 +643,57 @@ function G.UIDEF.override_main_menu_play_button()
 	)
 end
 
+function G.UIDEF.weekly_interrupt(loaded)
+
+	return (
+		create_UIBox_generic_options({
+			back_func = 'create_lobby',
+			contents = {
+				{
+					n = G.UIT.R,
+					config = {
+						align = "cm",
+						padding = 0.1,
+					},
+					nodes = {
+						{
+							n = G.UIT.T,
+							config = {
+								text = "A new weekly ruleset is available!",
+								colour = G.C.UI.TEXT_LIGHT,
+								scale = 0.45,
+							},
+						}
+					}
+				},
+				{
+					n = G.UIT.R,
+					config = {
+						align = "cm",
+						padding = 0.2,
+					},
+					nodes = {
+						{
+							n = G.UIT.T,
+							config = {
+								text = "Current: ?????????? ?????",
+								colour = darken(G.C.UI.TEXT_LIGHT, 0.2),
+								scale = 0.35,
+							},
+						}
+					}
+				},
+				UIBox_button({
+					label = { "Sync locally (Restarts game)" },
+					colour = G.C.RED,
+					button = "set_weekly",
+					minw = 5,
+				})
+			},
+		})
+	)
+end
+
 function G.FUNCS.setup_run_singleplayer(e)
 	G.SETTINGS.paused = true
 	MP.LOBBY.config.ruleset = nil
@@ -674,6 +731,25 @@ function G.FUNCS.join_lobby(e)
 	G.FUNCS.overlay_menu({
 		definition = G.UIDEF.create_UIBox_join_lobby_button(),
 	})
+end
+
+function G.FUNCS.weekly_interrupt(e)
+	MP.LOBBY.fetched_weekly = 'smallworld' -- temp
+	if (not MP.LOBBY.config.weekly) or (MP.LOBBY.config.weekly ~= MP.LOBBY.fetched_weekly) then
+		G.SETTINGS.paused = true
+	
+		G.FUNCS.overlay_menu({
+			definition = G.UIDEF.weekly_interrupt(not not MP.LOBBY.config.weekly),
+		})
+		return true
+	end
+	return false
+end
+
+function G.FUNCS.set_weekly(e)
+	SMODS.Mods["Multiplayer"].config.weekly = MP.LOBBY.fetched_weekly
+	SMODS.save_mod_config(SMODS.Mods["Multiplayer"])
+	SMODS.restart_game() -- idk if this works well...
 end
 
 function G.FUNCS.skip_tutorial(e)

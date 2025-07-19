@@ -139,3 +139,14 @@ payload = '''local dollars = 0
 if G.GAME.chips - G.GAME.blind.chips >= 0 or MP.is_pvp_boss() then'''
 match_indent = true
 times = 1
+
+# ban here
+[[patches]]
+[patches.pattern]
+target = "game.lua"
+pattern = '''self.GAME.selected_back:apply_to_run()'''
+position = "after"
+payload = '''print('b')
+MP.ApplyBans()'''
+match_indent = true
+times = 1
