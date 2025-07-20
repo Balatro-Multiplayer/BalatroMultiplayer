@@ -45,19 +45,16 @@ function reset_idol_card()
 		if #valid_idol_cards == 0 then
 			return
 		end
+		
+		local value_order = {}
+		for i, rank in ipairs(SMODS.Rank.obj_buffer) do
+    			value_order[rank] = i
+		end
 
-		local value_order = {
-			["Ace"] = 1, ["2"] = 2, ["3"] = 3, ["4"] = 4, ["5"] = 5,
-			["6"] = 6, ["7"] = 7, ["8"] = 8, ["9"] = 9, ["10"] = 10,
-			["Jack"] = 11, ["Queen"] = 12, ["King"] = 13
-		}
-
-		local suit_order = {
-			Spades = 1,
-			Hearts = 2,
-			Clubs = 3,
-			Diamonds = 4
-		}
+		local suit_order = {}
+		for i, suit in ipairs(SMODS.Suit.obj_buffer) do
+    			suit_order[suit] = i
+		end
 
 		table.sort(valid_idol_cards, function(a, b)
 			-- Sort by count descending first
@@ -111,11 +108,10 @@ function reset_mail_rank()
 
 		local count_map = {}
 		local total_weight = 0
-		local value_order = {
-			["Ace"] = 1, ["2"] = 2, ["3"] = 3, ["4"] = 4, ["5"] = 5,
-			["6"] = 6, ["7"] = 7, ["8"] = 8, ["9"] = 9, ["10"] = 10,
-			["Jack"] = 11, ["Queen"] = 12, ["King"] = 13
-		}
+		local value_order = {}
+		for i, rank in ipairs(SMODS.Rank.obj_buffer) do
+    			value_order[rank] = i
+		end
 
 		local valid_ranks = {}
 
