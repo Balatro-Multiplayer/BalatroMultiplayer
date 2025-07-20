@@ -185,6 +185,7 @@ function Game:main_menu(change_context)
 end
 
 function G.UIDEF.ruleset_selection_options()
+	MP.LOBBY.fetched_weekly = 'smallworld' -- temp
 	MP.LOBBY.config.ruleset = "ruleset_mp_ranked"
 	MP.LoadReworks("ranked")
 
@@ -209,7 +210,7 @@ function G.UIDEF.ruleset_selection_options()
 end
 
 function G.FUNCS.change_ruleset_selection(e)
-	if e.config.id == 'weekly_ruleset_button' then -- wtf
+	if e.config.id == 'weekly_ruleset_button' then
 		if G.FUNCS.weekly_interrupt(e) then
 			return
 		end
@@ -226,8 +227,11 @@ end
 
 function G.UIDEF.ruleset_info(ruleset_name)
 	local ruleset = MP.Rulesets["ruleset_mp_" .. ruleset_name]
-
-	local ruleset_desc = MP.UTILS.wrapText(localize("k_" .. ruleset_name .. "_description"), 100)
+	local ruleset_desc = localize("k_" .. ruleset_name .. "_description")
+	if ruleset_name == 'weekly' then
+		ruleset_desc = ruleset_desc.." "..localize("k_weekly_"..MP.LOBBY.config.weekly)
+	end
+	ruleset_desc = MP.UTILS.wrapText(ruleset_desc, 100)
 	local _, ruleset_desc_lines = ruleset_desc:gsub("\n", " ")
 
 	local ruleset_banned_tabs = UIBox({
@@ -676,7 +680,7 @@ function G.UIDEF.weekly_interrupt(loaded)
 						{
 							n = G.UIT.T,
 							config = {
-								text = "Current: ?????????? ?????",
+								text = localize('k_currently_colon')..localize('k_weekly_'..MP.LOBBY.fetched_weekly), -- bad loc but ok
 								colour = darken(G.C.UI.TEXT_LIGHT, 0.2),
 								scale = 0.35,
 							},
@@ -684,8 +688,8 @@ function G.UIDEF.weekly_interrupt(loaded)
 					}
 				},
 				UIBox_button({
-					label = { "Sync locally (Restarts game)" },
-					colour = G.C.RED,
+					label = { localize('k_sync_locally') },
+					colour = G.C.DARK_EDITION,
 					button = "set_weekly",
 					minw = 5,
 				})
@@ -734,7 +738,6 @@ function G.FUNCS.join_lobby(e)
 end
 
 function G.FUNCS.weekly_interrupt(e)
-	MP.LOBBY.fetched_weekly = 'smallworld' -- temp
 	if (not MP.LOBBY.config.weekly) or (MP.LOBBY.config.weekly ~= MP.LOBBY.fetched_weekly) then
 		G.SETTINGS.paused = true
 	

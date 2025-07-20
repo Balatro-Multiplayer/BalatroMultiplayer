@@ -764,9 +764,6 @@ function MP.UTILS.get_standard_rulesets()
 			ret[#ret+1] = string.sub(v.key, 12, #v.key)
 		end
 	end
-	for i = 1, 100 do
-		print(ret)
-	end
 	return ret
 end
 
