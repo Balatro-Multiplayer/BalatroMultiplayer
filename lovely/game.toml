@@ -140,13 +140,17 @@ if G.GAME.chips - G.GAME.blind.chips >= 0 or MP.is_pvp_boss() then'''
 match_indent = true
 times = 1
 
-# ban here
+# apply bans here
+# hmm...
 [[patches]]
 [patches.pattern]
 target = "game.lua"
-pattern = '''self.GAME.selected_back:apply_to_run()'''
-position = "after"
-payload = '''print('b')
-MP.ApplyBans()'''
+pattern = '''G:save_settings()'''
+position = "before"
+payload = '''
+if not saveTable then -- i am 99% sure this is unnecessary but i'm checking it anyway
+	MP.ApplyBans()
+end
+'''
 match_indent = true
 times = 1

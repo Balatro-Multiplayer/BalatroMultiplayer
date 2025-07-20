@@ -37,6 +37,8 @@ MP.BANNED_OBJECTS = {
 }
 
 function MP.ApplyBans()
+	print(MP.LOBBY.code or 'nil')
+	print(MP.LOBBY.config.ruleset or 'nil')
 	if MP.LOBBY.code and MP.LOBBY.config.ruleset then
 		local ruleset = MP.Rulesets[MP.LOBBY.config.ruleset]
 		local banned_tables = {

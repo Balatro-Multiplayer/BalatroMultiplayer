@@ -51,10 +51,11 @@ MP.Ruleset({ -- just a copy of ranked... and every weekly ruleset in vault is in
 
 local apply_bans_ref = MP.ApplyBans
 function MP.ApplyBans()
+	local ret = apply_bans_ref()
 	if MP.LOBBY.code and MP.UTILS.is_weekly('smallworld') then
 		local tables = {}
 		for k, v in pairs(G.P_CENTERS) do
-			if v.set and (not G.GAME.banned_keys[k]) and (not v.requires) then
+			if v.set and (not G.GAME.banned_keys[k]) and not (v.requires or v.hidden) then
 				local index = v.set..(v.rarity or '')
 				tables[index] = tables[index] or {}
 				local t = tables[index]
@@ -87,7 +88,7 @@ function MP.ApplyBans()
 			end
 		end
 	end
-	return apply_bans_ref()
+	return ret
 end
 
 local find_joker_ref = find_joker
