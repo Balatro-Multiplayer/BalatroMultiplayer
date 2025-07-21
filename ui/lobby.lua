@@ -134,7 +134,7 @@ local function get_lobby_text()
 		return localize("k_warning_unlock_profile"), SMODS.Gradients.warning_text
 	end
 
-	-- Remove the mod hash warning from main warning display area since it's shown
+	-- TODO:  Remove this mod hash warning from main warning display area since it's shown
 	-- alongside critical warnings (cheating, compatibility issues). This makes users
 	-- learn to ignore all warnings. Instead, we should indicate hash differences
 	-- through other UI elements like colored usernames or separate indicators.
@@ -459,19 +459,20 @@ function G.UIDEF.create_UIBox_lobby_menu()
 						},
 						nodes = {
 							MP.LOBBY.is_host
-								and Disableable_Button({
-									id = "lobby_menu_start",
-									button = "lobby_start_game",
-									colour = G.C.BLUE,
-									minw = 3.65,
-									minh = 1.55,
-									label = { localize("b_start") },
-									disabled_text = MP.LOBBY.guest.username and localize("b_wait_for_guest_ready") or localize("b_wait_for_players"),
-									scale = text_scale * 2,
-									col = true,
-									enabled_ref_table = MP.LOBBY,
-									enabled_ref_value = "ready_to_start",
-								})
+									and Disableable_Button({
+										id = "lobby_menu_start",
+										button = "lobby_start_game",
+										colour = G.C.BLUE,
+										minw = 3.65,
+										minh = 1.55,
+										label = { localize("b_start") },
+										disabled_text = MP.LOBBY.guest.username and localize("b_wait_for_guest_ready")
+											or localize("b_wait_for_players"),
+										scale = text_scale * 2,
+										col = true,
+										enabled_ref_table = MP.LOBBY,
+										enabled_ref_value = "ready_to_start",
+									})
 								or UIBox_button({
 									id = "lobby_menu_start",
 									button = "lobby_ready_up",
