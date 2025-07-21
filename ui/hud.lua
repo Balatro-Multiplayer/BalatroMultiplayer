@@ -391,6 +391,8 @@ function MP.UI.start_pvp_countdown(callback)
 			backdrop_colour = G.C.MULT,
         })
 
+		play_sound("tarot2", 1, 0.4)
+
         MP.GAME.pvp_countdown = MP.GAME.pvp_countdown - 1
 
         G.E_MANAGER:add_event(Event({
