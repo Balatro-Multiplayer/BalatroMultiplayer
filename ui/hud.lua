@@ -370,7 +370,7 @@ end
 
 function MP.UI.start_pvp_countdown(callback)
     local seconds = countdown_seconds
-	local tick_delay = 1.2
+	local tick_delay = 2
     if MP.LOBBY and MP.LOBBY.config and MP.LOBBY.config.pvp_countdown_seconds then
         seconds = MP.LOBBY.config.pvp_countdown_seconds
     end
@@ -384,11 +384,11 @@ function MP.UI.start_pvp_countdown(callback)
 
         attention_text({
             text = tostring(MP.GAME.pvp_countdown),
-            scale = 1,
+            scale = 5,
             hold = 0.9,
             align = "cm",
             major = G.play,
-			background_colour = G.C.MULT,
+			backdrop_colour = G.C.MULT,
         })
 
         MP.GAME.pvp_countdown = MP.GAME.pvp_countdown - 1
