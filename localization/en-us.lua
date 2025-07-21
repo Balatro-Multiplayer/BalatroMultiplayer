@@ -84,9 +84,10 @@ return {
 			j_mp_pizza = {
 				name = "Pizza",
 				text = {
-					"{C:red}+#1#{} discards and",
-					"{C:red}+#2#{} discard for your {X:purple,C:white}Nemesis{}",
-					"{C:inactive}(Eaten after {C:attention}PvP Blind{}{C:inactive})"
+					"At the end of the next {C:attention}PvP Blind{},",
+					"consume this Joker and grant",
+					"{C:red}+#1#{} discards to you and",
+					"{C:red}+#2#{} discards to your {X:purple,C:white}Nemesis{} for the ante",
 				},
 			},
 			j_mp_pacifist = {
@@ -112,7 +113,7 @@ return {
 					"Remove #1# level from",
 					"your {X:purple,C:white}Nemesis'{}",
 					"highest level {C:legendary,E:1}poker hand{}",
-					"at start of {C:attention}PvP Blind{}"
+					"at start of {C:attention}PvP Blind{}",
 				},
 			},
 		},
@@ -229,6 +230,7 @@ return {
 			k_warn_service = "WARN: Cannot Find Multiplayer Service",
 			k_set_name = "Set your username in the main menu! (Mods > Multiplayer > Config)",
 			k_mod_hash_warning = "Players have different mods or mod versions! This can cause problems!",
+			k_steamodded_warning = "Players have different versions of Steamodded installed. This may cause the seeds to differ.",
 			k_warning_unlock_profile = "The profile you are playing on is not fully unlocked. If this is a ranked/tournament game, please create a new profile and hit unlock all in the profile settings",
 			k_warning_nemesis_unlock = "Your opponent is playing on a profile that is not fully unlocked. Please instruct them to create a new profile and hit unlock all in the profile settings",
 			k_warning_no_order = "One player has The Order integration enabled while the other does not. This will cause the seeds to differ.",

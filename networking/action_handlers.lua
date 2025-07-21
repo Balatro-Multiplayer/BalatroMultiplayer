@@ -11,7 +11,13 @@ end
 function MP.ACTIONS.set_username(username)
 	MP.LOBBY.username = username or "Guest"
 	if MP.LOBBY.connected then
-		Client.send(string.format("action:username,username:%s,modHash:%s", MP.LOBBY.username.."~"..MP.LOBBY.blind_col, MP.MOD_STRING))
+		Client.send(
+			string.format(
+				"action:username,username:%s,modHash:%s",
+				MP.LOBBY.username .. "~" .. MP.LOBBY.blind_col,
+				MP.MOD_STRING
+			)
+		)
 	end
 end
 
@@ -19,11 +25,16 @@ function MP.ACTIONS.set_blind_col(num)
 	MP.LOBBY.blind_col = num or 1
 end
 
-
 local function action_connected()
 	MP.LOBBY.connected = true
 	MP.UI.update_connection_status()
-	Client.send(string.format("action:username,username:%s,modHash:%s", MP.LOBBY.username.."~"..MP.LOBBY.blind_col, MP.MOD_STRING))
+	Client.send(
+		string.format(
+			"action:username,username:%s,modHash:%s",
+			MP.LOBBY.username .. "~" .. MP.LOBBY.blind_col,
+			MP.MOD_STRING
+		)
+	)
 end
 
 local function action_joinedLobby(code, type)
@@ -55,6 +66,7 @@ local function action_lobbyInfo(host, hostHash, hostCached, guest, guestHash, gu
 		cached = hostCached == "true",
 		config = hostConfig,
 	}
+  
 	if guest ~= nil then
 		local guestName, guestCol = parseName(guest)
 		local guestConfig, guestMods = MP.UTILS.parse_Hash(guestHash)
@@ -142,7 +154,7 @@ local function action_enemy_info(score_str, hands_left_str, skips_str, lives_str
 
 	if MP.GAME.enemy.skips ~= skips then
 		for i = 1, skips - MP.GAME.enemy.skips do
-			MP.GAME.enemy.spent_in_shop[#MP.GAME.enemy.spent_in_shop+1] = 0
+			MP.GAME.enemy.spent_in_shop[#MP.GAME.enemy.spent_in_shop + 1] = 0
 		end
 	end
 
@@ -280,7 +292,8 @@ local function action_lobby_options(options)
 			parsed_v = false
 		end
 
-		if k == "starting_lives"
+		if
+			k == "starting_lives"
 			or k == "pvp_start_round"
 			or k == "timer_base_seconds"
 			or k == "timer_increment_seconds"
@@ -299,7 +312,7 @@ local function action_lobby_options(options)
 		::continue::
 	end
 	if different_decks_before ~= MP.LOBBY.config.different_decks then
-		G.FUNCS.exit_overlay_menu()   -- throw out guest from any menu.
+		G.FUNCS.exit_overlay_menu() -- throw out guest from any menu.
 	end
 	MP.ACTIONS.update_player_usernames() -- render new DECK button state
 end
@@ -327,7 +340,7 @@ end
 local cardremove = Card.remove
 function Card:remove()
 	local menu = G.OVERLAY_MENU
-	if self.edition and self.edition.type == 'mp_phantom' then
+	if self.edition and self.edition.type == "mp_phantom" then
 		G.OVERLAY_MENU = G.OVERLAY_MENU or true
 	end
 	cardremove(self)
@@ -340,7 +353,7 @@ function SMODS.find_card(key, count_debuffed)
 	local ret = smodsfindcard(key, count_debuffed)
 	local new_ret = {}
 	for i, v in ipairs(ret) do
-		if not v.edition or v.edition.type ~= 'mp_phantom' then
+		if not v.edition or v.edition.type ~= "mp_phantom" then
 			new_ret[#new_ret + 1] = v
 		end
 	end
@@ -350,12 +363,14 @@ end
 -- don't poll edition
 local origedpoll = poll_edition
 function poll_edition(_key, _mod, _no_neg, _guaranteed, _options)
-	if G.OVERLAY_MENU then return nil end
+	if G.OVERLAY_MENU then
+		return nil
+	end
 	return origedpoll(_key, _mod, _no_neg, _guaranteed, _options)
 end
 
 local function action_speedrun()
-	SMODS.calculate_context({mp_speedrun = true})
+	SMODS.calculate_context({ mp_speedrun = true })
 end
 
 local function enemyLocation(options)
@@ -409,17 +424,17 @@ local action_asteroid = action_asteroid
 			["Three of a Kind"] = 9,
 			["Two Pair"] = 11,
 			["Pair"] = 12,
-			["High Card"] = 13
+			["High Card"] = 13,
 		}
 		local hand_type = "High Card"
 		local max_level = 0
 
-
 		for k, v in pairs(G.GAME.hands) do
 			if v.visible then
-				if to_big(v.level) > to_big(max_level) or
-					(to_big(v.level) == to_big(max_level) and
-						hand_priority[k] < hand_priority[hand_type]) then
+				if
+					to_big(v.level) > to_big(max_level)
+					or (to_big(v.level) == to_big(max_level) and hand_priority[k] < hand_priority[hand_type])
+				then
 					hand_type = k
 					max_level = v.level
 				end
@@ -461,7 +476,7 @@ local function action_eat_pizza(discards)
 end
 
 local function action_spent_last_shop(amount)
-	MP.GAME.enemy.spent_in_shop[#MP.GAME.enemy.spent_in_shop+1] = tonumber(amount)
+	MP.GAME.enemy.spent_in_shop[#MP.GAME.enemy.spent_in_shop + 1] = tonumber(amount)
 end
 
 local function action_magnet()
@@ -475,15 +490,18 @@ local function action_magnet()
 	if card then
 		local candidates = {}
 		for _, v in pairs(G.jokers.cards) do
-			if (v.sell_cost == card.sell_cost) then
+			if v.sell_cost == card.sell_cost then
 				table.insert(candidates, v)
 			end
 		end
 
 		-- Scale the pseudo from 0 - 1 to the number of candidates
-		local random_index = math.floor(pseudorandom('j_mp_magnet') * #candidates) + 1
+		local random_index = math.floor(pseudorandom("j_mp_magnet") * #candidates) + 1
 		local chosen_card = candidates[random_index]
-		sendTraceMessage(string.format("Sending magnet joker: %s", MP.UTILS.joker_to_string(chosen_card)), "MULTIPLAYER")
+		sendTraceMessage(
+			string.format("Sending magnet joker: %s", MP.UTILS.joker_to_string(chosen_card)),
+			"MULTIPLAYER"
+		)
 
 		local card_save = chosen_card:save()
 		local card_encoded = MP.UTILS.str_pack_and_encode(card_save)
@@ -496,15 +514,16 @@ local function action_magnet_response(key)
 
 	card_save, err = MP.UTILS.str_decode_and_unpack(key)
 	if not card_save then
-		sendDebugMessage(string.format("Failed to unpack magnet joker: %s", err) , "MULTIPLAYER")
+		sendDebugMessage(string.format("Failed to unpack magnet joker: %s", err), "MULTIPLAYER")
 		return
 	end
 
-	local card = Card(G.jokers.T.x + G.jokers.T.w/2, G.jokers.T.y, G.CARD_W, G.CARD_H, G.P_CENTERS.j_joker, G.P_CENTERS.c_base)
+	local card =
+		Card(G.jokers.T.x + G.jokers.T.w / 2, G.jokers.T.y, G.CARD_W, G.CARD_H, G.P_CENTERS.j_joker, G.P_CENTERS.c_base)
 	-- Avoid crashing if the load function ends up indexing a nil value
 	success, err = pcall(card.load, card, card_save)
 	if not success then
-		sendDebugMessage(string.format("Failed to load magnet joker: %s", err) , "MULTIPLAYER")
+		sendDebugMessage(string.format("Failed to load magnet joker: %s", err), "MULTIPLAYER")
 		return
 	end
 
@@ -523,20 +542,20 @@ end
 function G.FUNCS.load_end_game_jokers()
 	local card_area_save, success, err
 
-	if not MP.end_game_jokers and not MP.end_game_jokers_payload then
+	if not MP.end_game_jokers or not MP.end_game_jokers_payload then
 		return
 	end
 
 	card_area_save, err = MP.UTILS.str_decode_and_unpack(MP.end_game_jokers_payload)
 	if not card_area_save then
-		sendDebugMessage(string.format("Failed to unpack enemy jokers: %s", err) , "MULTIPLAYER")
+		sendDebugMessage(string.format("Failed to unpack enemy jokers: %s", err), "MULTIPLAYER")
 		return
 	end
 
 	-- Avoid crashing if the load function ends up indexing a nil value
 	success, err = pcall(MP.end_game_jokers.load, MP.end_game_jokers, card_area_save)
 	if not success then
-		sendDebugMessage(string.format("Failed to load enemy jokers: %s", err) , "MULTIPLAYER")
+		sendDebugMessage(string.format("Failed to load enemy jokers: %s", err), "MULTIPLAYER")
 		-- Reset the card area if loading fails to avoid inconsistent state
 		MP.end_game_jokers:remove()
 		MP.end_game_jokers:init(
@@ -598,9 +617,11 @@ local function action_send_game_stats()
 		return
 	end
 
-	local stats_str = string.format("reroll_count:%d,reroll_cost_total:%d",
+	local stats_str = string.format(
+		"reroll_count:%d,reroll_cost_total:%d",
 		MP.GAME.stats.reroll_count,
-		MP.GAME.stats.reroll_cost_total)
+		MP.GAME.stats.reroll_cost_total
+	)
 
 	-- Extract voucher keys where value is true and join them with a dash
 	local voucher_keys = ""
@@ -622,9 +643,8 @@ local function action_send_game_stats()
 	Client.send(string.format("action:nemesisEndGameStats,%s", stats_str))
 end
 
-
 function G.FUNCS.load_nemesis_deck()
-	if not MP.nemesis_deck or not MP.nemesis_cards or not MP.LOBBY.code then
+	if not MP.nemesis_deck_string or not MP.nemesis_deck or not MP.nemesis_cards or not MP.LOBBY.code then
 		return
 	end
 
@@ -669,13 +689,10 @@ function G.FUNCS.load_nemesis_deck()
 		end
 
 		-- Create the card
-		local card = create_playing_card(
-			{
-				front = G.P_CARDS[front_key],
-				center = enhancement ~= "none" and G.P_CENTERS[enhancement] or nil
-			},
-			MP.nemesis_deck, true, true, nil, false
-		)
+		local card = create_playing_card({
+			front = G.P_CARDS[front_key],
+			center = enhancement ~= "none" and G.P_CENTERS[enhancement] or nil,
+		}, MP.nemesis_deck, true, true, nil, false)
 		if edition ~= "none" then
 			card:set_edition({ [edition] = true }, true, true)
 		end
@@ -873,7 +890,6 @@ function MP.ACTIONS.request_nemesis_stats()
 	Client.send("action:endGameStatsRequested")
 end
 
-
 function MP.ACTIONS.start_ante_timer()
 	Client.send("action:startAnteTimer,time:" .. tostring(MP.GAME.timer))
 	action_start_ante_timer(MP.GAME.timer)
@@ -940,7 +956,10 @@ function Game:update(dt)
 						log = log .. string.format(" (%s: %s) ", k, v)
 					end
 				end
-				if (parsedAction.action == "receiveEndGameJokers" or parsedAction.action == "stopGame") and last_game_seed then
+				if
+					(parsedAction.action == "receiveEndGameJokers" or parsedAction.action == "stopGame")
+					and last_game_seed
+				then
 					log = log .. string.format(" (seed: %s) ", last_game_seed)
 				end
 				sendTraceMessage(log, "MULTIPLAYER")
@@ -998,7 +1017,7 @@ function Game:update(dt)
 			elseif parsedAction.action == "letsGoGamblingNemesis" then
 				action_lets_go_gambling_nemesis()
 			elseif parsedAction.action == "eatPizza" then
-				action_eat_pizza(parsedAction.whole)	-- rename to "discards" when possible
+				action_eat_pizza(parsedAction.whole) -- rename to "discards" when possible
 			elseif parsedAction.action == "spentLastShop" then
 				action_spent_last_shop(parsedAction.amount)
 			elseif parsedAction.action == "magnet" then
