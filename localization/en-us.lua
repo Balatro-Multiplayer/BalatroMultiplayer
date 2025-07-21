@@ -252,6 +252,7 @@ return {
 			k_opts_pvp_timer = "Timer",
 			k_opts_showdown_starting_antes = "Showdown Starts at Ante",
 			k_opts_pvp_timer_increment = "Timer Increment",
+			k_opts_pvp_countdown_seconds = "PvP Countdown Seconds",
 			k_bl_life = "Life",
 			k_bl_or = "or",
 			k_bl_death = "Death",
