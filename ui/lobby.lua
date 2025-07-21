@@ -679,10 +679,22 @@ local function create_gamemode_modifiers_tab()
 						"150s",
 						"180s",
 					}, MP.LOBBY.config.timer_increment_seconds / 30, "change_timer_increment_seconds"),
-				},
-			},
-		},
-	}
+				    create_lobby_option_cycle("pvp_countdown_seconds_option", "k_opts_pvp_countdown_seconds", {
+                         0,
+                         1,
+                         2,
+                         3,
+                         4,
+                         5,
+                         6,
+                         7,
+                         8,
+                         9,
+                    }, MP.LOBBY.config.pvp_countdown_seconds + 1, "change_pvp_countdown_seconds"),
+                                },
+                        },
+                },
+        }
 end
 
 function G.UIDEF.create_UIBox_lobby_options()
@@ -879,6 +891,11 @@ end
 G.FUNCS.change_showdown_starting_antes = function(args)
 	MP.LOBBY.config.showdown_starting_antes = args.to_val
 	send_lobby_options()
+end
+
+G.FUNCS.change_pvp_countdown_seconds = function(args)
+        MP.LOBBY.config.pvp_countdown_seconds = args.to_val
+        send_lobby_options()
 end
 
 function G.FUNCS.get_lobby_main_menu_UI(e)

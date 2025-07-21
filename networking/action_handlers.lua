@@ -302,6 +302,7 @@ local function action_lobby_options(options)
 			or k == "timer_base_seconds"
 			or k == "timer_increment_seconds"
 			or k == "showdown_starting_antes"
+			or k == "pvp_countdown_seconds"
 		then
 			parsed_v = tonumber(v)
 		end
