@@ -131,15 +131,19 @@ local function action_start_game(seed, stake_str)
 	MP.LOBBY.ready_to_start = false
 end
 
+local function begin_pvp_blind()
+        if MP.GAME.next_blind_context then
+                G.FUNCS.select_blind(MP.GAME.next_blind_context)
+        else
+                sendErrorMessage("No next blind context", "MULTIPLAYER")
+        end
+end
+
 local function action_start_blind()
-	MP.GAME.ready_blind = false
-	MP.GAME.timer_started = false
-	MP.GAME.timer = MP.LOBBY.config.timer_base_seconds
-	if MP.GAME.next_blind_context then
-		G.FUNCS.select_blind(MP.GAME.next_blind_context)
-	else
-		sendErrorMessage("No next blind context", "MULTIPLAYER")
-	end
+        MP.GAME.ready_blind = false
+        MP.GAME.timer_started = false
+        MP.GAME.timer = MP.LOBBY.config.timer_base_seconds
+        MP.UI.start_pvp_countdown(begin_pvp_blind)
 end
 
 ---@param score_str string

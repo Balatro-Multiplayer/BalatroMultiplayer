@@ -368,6 +368,48 @@ function MP.UI.timer_hud()
 	end
 end
 
+function MP.UI.start_pvp_countdown(callback)
+    local seconds = countdown_seconds
+	local tick_delay = 1.2
+    if MP.LOBBY and MP.LOBBY.config and MP.LOBBY.config.pvp_countdown_seconds then
+        seconds = MP.LOBBY.config.pvp_countdown_seconds
+    end
+    MP.GAME.pvp_countdown = seconds
+
+    local function show_next()
+        if MP.GAME.pvp_countdown <= 0 then
+            if callback then callback() end
+            return true
+        end
+
+        attention_text({
+            text = tostring(MP.GAME.pvp_countdown),
+            scale = 1,
+            hold = 0.9,
+            align = "cm",
+            major = G.play,
+			background_colour = G.C.MULT,
+        })
+
+        MP.GAME.pvp_countdown = MP.GAME.pvp_countdown - 1
+
+        G.E_MANAGER:add_event(Event({
+            trigger = "after",
+            delay = tick_delay,
+            blockable = false,
+            func = show_next,
+        }))
+        return true
+    end
+
+    G.E_MANAGER:add_event(Event({
+        trigger = "after",
+        delay = 0,
+        blockable = false,
+        func = show_next,
+    }))
+end
+
 function G.FUNCS.set_timer_box(e)
 	if MP.LOBBY.config.timer then
 		if MP.GAME.timer_started then
