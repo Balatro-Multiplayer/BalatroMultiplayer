@@ -154,3 +154,18 @@ end
 '''
 match_indent = true
 times = 1
+
+# effectively ban enhancements from grim/familiar/incantation
+# this MIGHT break stuff but my bet is that it doesn't
+# because that would be convenient
+[[patches]]
+[patches.pattern]
+target = '''=[SMODS _ "src/game_object.lua"]'''
+pattern = '''for k, v in pairs(G.P_CENTER_POOLS["Enhanced"]) do'''
+position = "at"
+payload = '''
+for i, v in ipairs(MP.UTILS.get_culled_pool("Enhanced")) do
+	local v = G.P_CENTERS[v]
+'''
+match_indent = true
+times = 3

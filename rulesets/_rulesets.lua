@@ -27,15 +27,6 @@ MP.Ruleset = SMODS.GameObject:extend({
 	end
 })
 
-MP.BANNED_OBJECTS = {
-	jokers = {},
-	consumables = {},
-	vouchers = {},
-	enhancements = {},
-	tags = {},
-	blinds = {},
-}
-
 function MP.ApplyBans()
 	print(MP.LOBBY.code or 'nil')
 	print(MP.LOBBY.config.ruleset or 'nil')
@@ -49,13 +40,11 @@ function MP.ApplyBans()
 			"tags",
 			"blinds",
 		}
-		for _, table in ipairs(banned_tables) do -- i'm keeping the print, because it didn't work once and i am paranoid
+		for _, table in ipairs(banned_tables) do
 			for _, v in ipairs(ruleset['banned_'..table]) do
-				print(v.." banned")
 				G.GAME.banned_keys[v] = true
 			end
 			for k, v in pairs(MP.DECK['BANNED_'..string.upper(table)]) do
-				print(k.." BANNED")
 				G.GAME.banned_keys[k] = true
 			end
 		end
@@ -77,7 +66,7 @@ function MP.ReworkCenter(args)
 	for _, ruleset in ipairs(rulesets) do
 		local ruleset_ = "mp_"..ruleset.."_"
 		for k, v in pairs(args) do
-			if k ~= "key" and k ~= ruleset then
+			if k ~= "key" and k ~= "ruleset" then
 				center[ruleset_..k] = v
 				if not center["mp_vanilla_"..k] then
 					center["mp_vanilla_"..k] = center[k]

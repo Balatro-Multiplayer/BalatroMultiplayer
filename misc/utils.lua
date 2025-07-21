@@ -640,6 +640,17 @@ function MP.UTILS.sum_numbers_in_table(t)
 	return sum
 end
 
+function MP.UTILS.get_culled_pool(_type, _rarity, _legendary, _append)
+	local pool = get_current_pool(_type, _rarity, _legendary, _append)
+	local ret = {}
+	for i, v in ipairs(pool) do
+		if v ~= 'UNAVAILABLE' then
+			ret[#ret+1] = v
+		end
+	end
+	return ret
+end
+
 function MP.UTILS.bxor(a, b)
 	local res = 0
 	local bitval = 1

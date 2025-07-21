@@ -307,7 +307,7 @@ function G.FUNCS.ruleset_switch_tabs(args)
 	tabs_object.config.is_bans_tabs = not tabs_object.config.is_bans_tabs
 
 	if tabs_object.config.is_bans_tabs then
-		MP.LOBBY.config.ruleset = nil
+		MP.LOBBY.config.ruleset = callback_args.ruleset.key
 		MP.LOBBY.ruleset_preview = false
 	else
 		MP.LOBBY.config.ruleset = callback_args.ruleset.key
