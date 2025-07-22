@@ -95,66 +95,6 @@ function G.UIDEF.create_UIBox_view_code()
 	)
 end
 
--- TODO: This entire function seems to only return once
--- ie we only get EITHER the order warning message or cheating message or nemesis unlock message
-local function get_lobby_text()
-	-- Check the other player (guest if we're host, host if we're guest)
-	local other_player = MP.LOBBY.is_host and MP.LOBBY.guest or MP.LOBBY.host
-
-	if other_player and other_player.cached == false then
-		return MP.UTILS.wrapText(string.format(localize("k_warning_cheating"), MP.UTILS.random_message()), 100),
-			SMODS.Gradients.warning_text
-	end
-
-	if other_player and other_player.config and other_player.config.unlocked == false then
-		return localize("k_warning_nemesis_unlock"), SMODS.Gradients.warning_text
-	end
-
-	local current_player = MP.LOBBY.is_host and MP.LOBBY.host or MP.LOBBY.guest
-	local current_has_order = current_player and current_player.config and current_player.config.TheOrder
-	local other_has_order = other_player and other_player.config and other_player.config.TheOrder
-
-	if (MP.LOBBY.ready_to_start or not MP.LOBBY.is_host) and current_has_order ~= other_has_order then
-		return localize("k_warning_no_order"), SMODS.Gradients.warning_text
-	end
-
-	if MP.LOBBY.ready_to_start or not MP.LOBBY.is_host then
-		local hostSteamoddedVersion = MP.LOBBY.host and MP.LOBBY.host.config and MP.LOBBY.host.config.Mods["Steamodded"]
-		local guestSteamoddedVersion = MP.LOBBY.guest
-			and MP.LOBBY.guest.config
-			and MP.LOBBY.guest.config.Mods["Steamodded"]
-
-		if hostSteamoddedVersion ~= guestSteamoddedVersion then
-			return localize("k_steamodded_warning"), SMODS.Gradients.warning_text
-		end
-	end
-
-	SMODS.Mods["Multiplayer"].config.unlocked = MP.UTILS.unlock_check()
-	if not SMODS.Mods["Multiplayer"].config.unlocked then
-		return localize("k_warning_unlock_profile"), SMODS.Gradients.warning_text
-	end
-
-	-- Remove the mod hash warning from main warning display area since it's shown
-	-- alongside critical warnings (cheating, compatibility issues). This makes users
-	-- learn to ignore all warnings. Instead, we should indicate hash differences
-	-- through other UI elements like colored usernames or separate indicators.
-	-- The hash check itself remains useful for debugging but shouldn't be presented
-	-- as a blocking warning alongside serious compatibility issues.
-	-- steph
-	if MP.LOBBY.host and MP.LOBBY.host.hash and MP.LOBBY.guest and MP.LOBBY.guest.hash then
-		if MP.LOBBY.host.hash ~= MP.LOBBY.guest.hash then
-			return localize("k_mod_hash_warning"), G.C.UI.TEXT_LIGHT
-		end
-	end
-
-	-- ???: What is this supposed to accomplish?
-	if MP.LOBBY.username == "Guest" then
-		return localize("k_set_name"), G.C.UI.TEXT_LIGHT
-	end
-
-	return " ", G.C.UI.TEXT_LIGHT
-end
-
 local function create_player_info_row(player, player_type, text_scale)
 	if not player or not player.username then
 		return nil
@@ -262,7 +202,6 @@ local function create_custom_seed_section()
 		config = { padding = 0, align = "cr" },
 		nodes = {
 			{
-				-- TODO: Extract this into a component so we can pretend it's clean code
 				n = G.UIT.R,
 				config = {
 					padding = 0,
@@ -375,7 +314,6 @@ local function create_lobby_options_tab()
 			colour = G.C.BLACK,
 		},
 		nodes = {
-			-- Much cleaner
 			create_lobby_option_toggle("gold_on_life_loss_toggle", "b_opts_cb_money", "gold_on_life_loss"),
 			create_lobby_option_toggle(
 				"no_gold_on_round_loss_toggle",
@@ -409,44 +347,263 @@ local function create_spacer(width)
 	}
 end
 
+local function get_warnings()
+	local warnings = {}
+
+	-- Check the other player (guest if we're host, host if we're guest)
+	local other_player = MP.LOBBY.is_host and MP.LOBBY.guest or MP.LOBBY.host
+
+	if other_player and other_player.cached == false then
+		table.insert(warnings, { localize("k_warning_cheating1"), SMODS.Gradients.warning_text, 0.4 })
+		table.insert(
+			warnings,
+			{ string.format(localize("k_warning_cheating2"), MP.UTILS.random_message()), SMODS.Gradients.warning_text }
+		)
+	end
+
+	if other_player and other_player.config and other_player.config.unlocked == false then
+		table.insert(warnings, {
+			localize("k_warning_nemesis_unlock"),
+			SMODS.Gradients.warning_text,
+			0.25,
+		})
+	end
+
+	local current_player = MP.LOBBY.is_host and MP.LOBBY.host or MP.LOBBY.guest
+	local current_has_order = current_player and current_player.config and current_player.config.TheOrder
+	local other_has_order = other_player and other_player.config and other_player.config.TheOrder
+
+	if (MP.LOBBY.ready_to_start or not MP.LOBBY.is_host) and current_has_order ~= other_has_order then
+		table.insert(warnings, {
+			localize("k_warning_no_order"),
+			SMODS.Gradients.warning_text,
+		})
+	end
+
+	if MP.LOBBY.ready_to_start or not MP.LOBBY.is_host then
+		local hostSteamoddedVersion = MP.LOBBY.host and MP.LOBBY.host.config and MP.LOBBY.host.config.Mods["Steamodded"]
+		local guestSteamoddedVersion = MP.LOBBY.guest
+			and MP.LOBBY.guest.config
+			and MP.LOBBY.guest.config.Mods["Steamodded"]
+
+		if hostSteamoddedVersion ~= guestSteamoddedVersion then
+			table.insert(warnings, {
+				localize("k_steamodded_warning"),
+				SMODS.Gradients.warning_text,
+			})
+		end
+	end
+
+	SMODS.Mods["Multiplayer"].config.unlocked = MP.UTILS.unlock_check()
+	if not SMODS.Mods["Multiplayer"].config.unlocked then
+		table.insert(warnings, {
+			localize("k_warning_unlock_profile"),
+			SMODS.Gradients.warning_text,
+			0.25,
+		})
+	end
+
+	-- TODO: Remove this mod hash warning from main warning display area since it's shown
+	-- alongside critical warnings (cheating, compatibility issues). This makes users
+	-- learn to ignore all warnings. Instead, we should indicate hash differences
+	-- through other UI elements like colored usernames or separate indicators.
+	-- The hash check itself remains useful for debugging but shouldn't be presented
+	-- as a blocking warning alongside serious compatibility issues.
+	if MP.LOBBY.host and MP.LOBBY.host.hash and MP.LOBBY.guest and MP.LOBBY.guest.hash then
+		if MP.LOBBY.host.hash ~= MP.LOBBY.guest.hash then
+			table.insert(warnings, {
+				localize("k_mod_hash_warning"),
+				G.C.UI.TEXT_LIGHT,
+			})
+		end
+	end
+
+	-- ???: What is this supposed to accomplish?
+	if MP.LOBBY.username == "Guest" then
+		table.insert(warnings, {
+			localize("k_set_name"),
+			G.C.UI.TEXT_LIGHT,
+		})
+	end
+
+	-- If no warnings, add a default empty warning
+	if #warnings == 0 then
+		table.insert(warnings, {
+			" ",
+			G.C.UI.TEXT_LIGHT,
+		})
+	end
+
+	return warnings
+end
+
+local function create_warning_section()
+	local warnings = get_warnings()
+
+	local warning_texts = {}
+	for k, v in pairs(warnings) do
+		table.insert(warning_texts, {
+			n = G.UIT.R,
+			config = {
+				padding = -0.25,
+				align = "cm",
+			},
+			nodes = {
+				{
+					n = G.UIT.T,
+					config = {
+						text = v[1],
+						colour = v[2],
+						shadow = true,
+						scale = v[3] or 0.25,
+					},
+				},
+			},
+		})
+	end
+
+	return {
+		n = G.UIT.R,
+		config = {
+			padding = 0.35,
+			align = "cm",
+		},
+		nodes = warning_texts,
+	}
+end
+
+local function create_start_ready_button(text_scale)
+	if MP.LOBBY.is_host then
+		return Disableable_Button({
+			id = "lobby_menu_start",
+			button = "lobby_start_game",
+			colour = G.C.BLUE,
+			minw = 3.65,
+			minh = 1.55,
+			label = { localize("b_start") },
+			disabled_text = MP.LOBBY.guest.username and localize("b_wait_for_guest_ready")
+				or localize("b_wait_for_players"),
+			scale = text_scale * 2,
+			col = true,
+			enabled_ref_table = MP.LOBBY,
+			enabled_ref_value = "ready_to_start",
+		})
+	else
+		return UIBox_button({
+			id = "lobby_menu_start",
+			button = "lobby_ready_up",
+			colour = MP.LOBBY.ready_to_start and G.C.GREEN or G.C.RED,
+			minw = 3.65,
+			minh = 1.55,
+			label = { MP.LOBBY.ready_to_start and localize("b_unready") or localize("b_ready") },
+			scale = text_scale * 2,
+			col = true,
+		})
+	end
+end
+
+local function create_deck_selection_button(text_scale, back, stake)
+	local base_config = {
+		id = "lobby_choose_deck",
+		button = "lobby_choose_deck",
+		colour = G.C.PURPLE,
+		minw = 2.15,
+		minh = 1.35,
+		label = {
+			localize({
+				type = "name_text",
+				key = MP.UTILS.get_deck_key_from_name(back),
+				set = "Back",
+			}),
+			localize({
+				type = "name_text",
+				key = SMODS.stake_from_index(type(stake) == "string" and tonumber(stake) or stake),
+				set = "Stake",
+			}),
+		},
+		scale = text_scale * 1.2,
+		col = true,
+	}
+
+	if MP.LOBBY.is_host then
+		base_config.enabled_ref_table = MP.LOBBY
+		base_config.enabled_ref_value = "is_host"
+	else
+		base_config.enabled_ref_table = MP.LOBBY.config
+		base_config.enabled_ref_value = "different_decks"
+	end
+
+	return Disableable_Button(base_config)
+end
+
+local function create_lobby_button(config)
+	return UIBox_button({
+		id = config.id or nil,
+		button = config.button,
+		colour = config.colour,
+		minw = config.minw or 3.15,
+		minh = config.minh or 1.35,
+		label = config.label,
+		scale = config.scale,
+		col = true,
+	})
+end
+
+local function create_leave_button(text_scale)
+	return create_lobby_button({
+		id = "lobby_menu_leave",
+		button = "lobby_leave",
+		colour = G.C.RED,
+		minw = 3.65,
+		minh = 1.55,
+		label = { localize("b_leave") },
+		scale = text_scale * 1.5,
+		col = true,
+	})
+end
+
+-- That section at the bottom with most of the actions
+local function create_action_buttons_section(text_scale, back, stake)
+	return {
+		n = G.UIT.C,
+		config = { align = "cm" },
+		nodes = {
+			create_lobby_button({
+				button = "lobby_options",
+				colour = G.C.ORANGE,
+				label = { localize("b_lobby_options") },
+				scale = text_scale * 1.2,
+			}),
+			create_spacer(),
+			create_deck_selection_button(text_scale, back, stake),
+			create_spacer(),
+			create_players_section(text_scale),
+			create_spacer(),
+			create_lobby_button({
+				button = "view_code",
+				colour = G.C.PALE_GREEN,
+				label = { localize("b_view_code") },
+				scale = text_scale * 1.2,
+			}),
+		},
+	}
+end
+
+-- Main Multiplayer lobby UI
 function G.UIDEF.create_UIBox_lobby_menu()
 	local text_scale = 0.45
 	local back = MP.LOBBY.config.different_decks and MP.LOBBY.deck.back or MP.LOBBY.config.back
 	local stake = MP.LOBBY.config.different_decks and MP.LOBBY.deck.stake or MP.LOBBY.config.stake
 
-	local text, colour = get_lobby_text()
-
-	local t = {
+	return {
 		n = G.UIT.ROOT,
-		config = {
-			align = "cm",
-			colour = G.C.CLEAR,
-		},
+		config = { align = "cm", colour = G.C.CLEAR },
 		nodes = {
 			{
 				n = G.UIT.C,
-				config = {
-					align = "bm",
-				},
+				config = { align = "bm" },
 				nodes = {
-					{
-						n = G.UIT.R,
-						config = {
-							padding = 1.25,
-							align = "cm",
-						},
-						nodes = {
-							{
-								n = G.UIT.T,
-								config = {
-									scale = 0.3,
-									shadow = true,
-									text = text,
-									colour = colour,
-								},
-							},
-						},
-					} or nil,
+					create_warning_section(),
 					{
 						n = G.UIT.R,
 						config = {
@@ -458,128 +615,15 @@ function G.UIDEF.create_UIBox_lobby_menu()
 							mid = true,
 						},
 						nodes = {
-							MP.LOBBY.is_host
-								and Disableable_Button({
-									id = "lobby_menu_start",
-									button = "lobby_start_game",
-									colour = G.C.BLUE,
-									minw = 3.65,
-									minh = 1.55,
-									label = { localize("b_start") },
-									disabled_text = MP.LOBBY.guest.username and localize("b_wait_for_guest_ready") or localize("b_wait_for_players"),
-									scale = text_scale * 2,
-									col = true,
-									enabled_ref_table = MP.LOBBY,
-									enabled_ref_value = "ready_to_start",
-								})
-								or UIBox_button({
-									id = "lobby_menu_start",
-									button = "lobby_ready_up",
-									colour = MP.LOBBY.ready_to_start and G.C.GREEN or G.C.RED,
-									minw = 3.65,
-									minh = 1.55,
-									label = { MP.LOBBY.ready_to_start and localize("b_unready") or localize("b_ready") },
-									scale = text_scale * 2,
-									col = true,
-								}),
-							{
-								n = G.UIT.C,
-								config = {
-									align = "cm",
-								},
-								nodes = {
-									UIBox_button({
-										button = "lobby_options",
-										colour = G.C.ORANGE,
-										minw = 3.15,
-										minh = 1.35,
-										label = {
-											localize("b_lobby_options"),
-										},
-										scale = text_scale * 1.2,
-										col = true,
-									}),
-									create_spacer(),
-									MP.LOBBY.is_host and Disableable_Button({
-										id = "lobby_choose_deck",
-										button = "lobby_choose_deck",
-										colour = G.C.PURPLE,
-										minw = 2.15,
-										minh = 1.35,
-										label = {
-											localize({
-												type = "name_text",
-												key = MP.UTILS.get_deck_key_from_name(back),
-												set = "Back",
-											}),
-											localize({
-												type = "name_text",
-												key = SMODS.stake_from_index(
-													type(stake) == "string" and tonumber(stake) or stake
-												),
-												set = "Stake",
-											}),
-										},
-										scale = text_scale * 1.2,
-										col = true,
-										enabled_ref_table = MP.LOBBY,
-										enabled_ref_value = "is_host",
-									}) or Disableable_Button({
-										id = "lobby_choose_deck",
-										button = "lobby_choose_deck",
-										colour = G.C.PURPLE,
-										minw = 2.15,
-										minh = 1.35,
-										label = {
-											localize({
-												type = "name_text",
-												key = MP.UTILS.get_deck_key_from_name(back),
-												set = "Back",
-											}),
-											localize({
-												type = "name_text",
-												key = SMODS.stake_from_index(
-													type(stake) == "string" and tonumber(stake) or stake
-												),
-												set = "Stake",
-											}),
-										},
-										scale = text_scale * 1.2,
-										col = true,
-										enabled_ref_table = MP.LOBBY.config,
-										enabled_ref_value = "different_decks",
-									}),
-									create_spacer(),
-									create_players_section(text_scale),
-									create_spacer(),
-									UIBox_button({
-										button = "view_code",
-										colour = G.C.PALE_GREEN,
-										minw = 3.15,
-										minh = 1.35,
-										label = { localize("b_view_code") },
-										scale = text_scale * 1.2,
-										col = true,
-									}),
-								},
-							},
-							UIBox_button({
-								id = "lobby_menu_leave",
-								button = "lobby_leave",
-								colour = G.C.RED,
-								minw = 3.65,
-								minh = 1.55,
-								label = { localize("b_leave") },
-								scale = text_scale * 1.5,
-								col = true,
-							}),
+							create_start_ready_button(text_scale),
+							create_action_buttons_section(text_scale, back, stake),
+							create_leave_button(text_scale),
 						},
 					},
 				},
 			},
 		},
 	}
-	return t
 end
 
 local function create_lobby_option_cycle(id, label_key, options, current_option, callback)
