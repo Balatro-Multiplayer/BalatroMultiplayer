@@ -156,7 +156,6 @@ end
 
 SMODS.Joker({
 	key = "bloodstone",
-	no_collection = true,
 	unlocked = true,
 	discovered = true,
 	blueprint_compat = true,
@@ -165,6 +164,10 @@ SMODS.Joker({
 	rarity = 2,
 	cost = 7,
 	pos = { x = 0, y = 8 },
+	-- no_collection = true,
+	-- in_pool = function(self)
+	-- 	return MP.LOBBY.config.ruleset == "ruleset_mp_experimental" and MP.LOBBY.code
+	-- end,
 	config = { extra = { odds = 2, Xmult = 1.5 }, mp_sticker_balanced = true },
 	loc_vars = function(self, info_queue, card)
 		return {
@@ -175,9 +178,6 @@ SMODS.Joker({
 			},
 		}
 	end,
-	in_pool = function(self)
-		return MP.LOBBY.config.ruleset == "ruleset_mp_experimental" and MP.LOBBY.code
-	end,
 	calculate = function(self, card, context)
 		if context.cardarea == G.play and context.individual then
 			if context.other_card:is_suit("Hearts") then
@@ -186,6 +186,7 @@ SMODS.Joker({
 					return {
 						extra = { x_mult = card.ability.extra.Xmult },
 						message = "Cope!",
+						card = card,
 					}
 				end
 			end
@@ -237,10 +238,19 @@ SMODS.Joker({
 	end,
 })
 
+SMODS.Atlas({
+	key = "sandbox_rare",
+	path = "tag_rare.png",
+	px = 32,
+	py = 32,
+})
+
 -- Tag: 1 in 2 chance to generate a rare joker in shop
 -- Only triggers if player doesn't already own all available rares
 SMODS.Tag({
 	key = "sandbox_rare",
+	atlas = "sandbox_rare",
+	-- pos = { x = 1, y = 0 },
 	object_type = "Tag",
 	dependencies = {
 		items = {},
@@ -248,11 +258,10 @@ SMODS.Tag({
 	-- in_pool = function(self)
 	-- 	return MP.LOBBY.config.ruleset == "ruleset_mp_experimental" and MP.LOBBY.code
 	-- end,
-	pos = { x = 1, y = 0 },
 	name = "Rare Tag",
 	discovered = true,
 	order = 2,
-	min_ante = nil,
+	min_ante = 2, -- less degeneracy
 	config = {
 		type = "store_joker_create",
 		odds = 2,
@@ -264,7 +273,7 @@ SMODS.Tag({
 	apply = function(self, tag, context)
 		if context.type == "store_joker_create" then
 			local card = nil
-			-- 50% chance to proc
+			-- 1 in 2 chance to proc
 			if pseudorandom("tagroll") < G.GAME.probabilities.normal / tag.config.odds then
 				-- count owned rare jokers to prevent duplicates
 				local rares_owned = { 0 }
