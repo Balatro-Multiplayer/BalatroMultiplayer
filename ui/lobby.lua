@@ -655,7 +655,7 @@ local function create_gamemode_modifiers_tab()
 						"pvp_countdown_seconds_option", 
 						"k_opts_pvp_countdown_seconds",
 						0.85,
-						{ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 }, 
+						{ 0, 3, 5, 10 }, 
 						MP.LOBBY.config.pvp_countdown_seconds + 1, 
 						"change_pvp_countdown_seconds"
 					),
