@@ -236,6 +236,63 @@ SMODS.Joker({
 		return (math.min(nine_tally, 4) + math.max(nine_tally - 4, 0) * card.ability.extra) or 0
 	end,
 })
+
+-- Tag: 1 in 2 chance to generate a rare joker in shop
+-- Only triggers if player doesn't already own all available rares
+-- TODO: SOMEHOW IT BROKE AGAIN? AAAAAAAAAAA?
+SMODS.Tag({
+	key = "sandbox_rare",
+	object_type = "Tag",
+	dependencies = {
+		items = {},
+	},
+	-- in_pool = function(self)
+	-- 	return MP.LOBBY.config.ruleset == "ruleset_mp_experimental" and MP.LOBBY.code
+	-- end,
+	pos = { x = 1, y = 0 },
+	name = "Rare? Tag",
+	discovered = true,
+	order = 1,
+	min_ante = 2,
+	config = { type = "store_joker_create", odds = 2, mp_sticker_balanced = true },
+	requires = "j_blueprint",
+	loc_vars = function(self)
+		return { vars = { G.GAME.probabilities.normal or 1, self.config.odds } }
+	end,
+	apply = function(self, tag, context)
+		if context.type == "store_joker_create" then
+			if pseudorandom("tagroll") < G.GAME.probabilities.normal / tag.config.odds then
+				local rares_in_posession = { 0 }
+				for k, v in ipairs(G.jokers.cards) do
+					if v.config.center.rarity == 3 and not rares_in_posession[v.config.center.key] then
+						rares_in_posession[1] = rares_in_posession[1] + 1
+						rares_in_posession[v.config.center.key] = true
+					end
+				end
+
+				-- Blaaa whyu did it break again
+				if #G.P_JOKER_RARITY_POOLS[3] > rares_in_posession[1] then
+					card = create_card("Joker", context.area, nil, 1, nil, nil, nil, "rta")
+					create_shop_card_ui(card, "Joker", context.area)
+					card.states.visible = false
+					tag:yep("+", G.C.RED, function()
+						card:start_materialize()
+						card.ability.couponed = true
+						card:set_cost()
+						return true
+					end)
+				else
+					tag:nope()
+				end
+				tag.triggered = true
+			else
+				tag:nope()
+				tag.triggered = true
+			end
+		end
+	end,
+})
+
 --
 -- SMODS.Joker({
 -- 	key = "delayed_grat",

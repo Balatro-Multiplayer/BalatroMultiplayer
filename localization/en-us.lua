@@ -1,5 +1,15 @@
 return {
 	descriptions = {
+		Tag = {
+			tag_mp_sandbox_rare = {
+				name = "Gambling Tag",
+				text = {
+					"{C:green}#1# in #2#{} chance",
+					"Shop has a free",
+					"{C:red}Rare Joker{}",
+				},
+			},
+		},
 		Joker = {
 			j_broken = {
 				name = "BROKEN",
