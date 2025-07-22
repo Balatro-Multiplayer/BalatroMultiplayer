@@ -249,7 +249,8 @@ return {
 			k_warning_unlock_profile = "Hồ sơ bạn đang chơi chưa được mở khoá toàn bộ. Nếu đây là trận xếp hạng/giải đấu, hãy tạo hồ sơ mới và nhấn mở khoá toàn bộ trong cài đặt hồ sơ",
 			k_warning_nemesis_unlock = "Đối thủ của bạn đang chơi trên hồ sơ chưa được mở khoá toàn bộ. Hãy hướng dẫn họ tạo hồ sơ mới và nhấn mở khoá toàn bộ trong cài đặt hồ sơ",
 			k_warning_no_order = "Một người chơi đang bật tích hợo The Order trong khi người kia thì không. Điều nãy sẽ khiến cùng một giống bị khác nhau.",
-			k_warning_cheating = "Nếu bạn thấy cái này, đối thủ có thể đang gian lận. Nếu đây là trận xếp hạng, hãy gửi tin nhắn '%s' rồi mở một vé hỗ trợ trong #support",
+			k_warning_cheating1 = "Nếu bạn thấy cái này, đối thủ có thể đang gian lận.",
+			k_warning_cheating2 = "Nếu đây là trận xếp hạng, hãy gửi tin nhắn '%s' rồi mở một vé hỗ trợ trong #support",
 			k_message1 = "Hold on, my mom made pizza pops", 				--These are suuposed to be "fake excuses" to stall\
 			k_message2 = "One sec, i gotta grab my slow cooker pork roast", --opponents while you're working your way out.\
 			k_message3 = "One moment, getting a call from my mom", 			--The majority of players use English anyway\

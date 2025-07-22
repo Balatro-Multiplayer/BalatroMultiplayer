@@ -202,7 +202,6 @@ local function create_custom_seed_section()
 		config = { padding = 0, align = "cr" },
 		nodes = {
 			{
-				-- TODO: Extract this into a component so we can pretend it's clean code
 				n = G.UIT.R,
 				config = {
 					padding = 0,
@@ -355,25 +354,11 @@ local function get_warnings()
 	local other_player = MP.LOBBY.is_host and MP.LOBBY.guest or MP.LOBBY.host
 
 	if other_player and other_player.cached == false then
-		-- split the cheating warning message into two lines.
-		-- i apologize in advance for this despicably ugly hack. we currently do this because:
-		-- 1. this is a super long line that would go off the screen if we didn't add newlines; but
-		-- 2. mp.utils.wrapText adds newlines that breaks the auto-layouting that supports multiple warnings
-		-- 3. allows us to make the cheating warning more readable.
-		-- better alternative might be to split out the warning into multiple messages (k_warning_cheating1 and 2)
-		local warn = string.format(localize("k_warning_cheating"), MP.UTILS.random_message())
-		local split_pos = string.find(warn, "%.%s")
-		local line1 = split_pos and warn:sub(1, split_pos) or warn
-		local line2 = split_pos and warn:sub(split_pos + 2) or ""
-		table.insert(warnings, {
-			line1,
-			SMODS.Gradients.warning_text,
-			0.4,
-		})
-		table.insert(warnings, {
-			line2,
-			SMODS.Gradients.warning_text,
-		})
+		table.insert(warnings, { localize("k_warning_cheating1"), SMODS.Gradients.warning_text, 0.4 })
+		table.insert(
+			warnings,
+			{ string.format(localize("k_warning_cheating2"), MP.UTILS.random_message()), SMODS.Gradients.warning_text }
+		)
 	end
 
 	if other_player and other_player.config and other_player.config.unlocked == false then
