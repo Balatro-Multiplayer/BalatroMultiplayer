@@ -656,13 +656,13 @@ local function create_gamemode_modifiers_tab()
 						"k_opts_pvp_countdown_seconds",
 						0.85,
 						{ 0, 3, 5, 10 }, 
-						1, 
+						MP.UTILS.get_array_index_by_value({ 0, 3, 5, 10 }, MP.LOBBY.config.pvp_countdown_seconds), 
 						"change_pvp_countdown_seconds"
 					),
-                                },
-                        },
-                },
-        }
+				},
+			},
+		},
+	}
 end
 
 function G.UIDEF.create_UIBox_lobby_options()
