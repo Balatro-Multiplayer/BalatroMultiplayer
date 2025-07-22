@@ -239,7 +239,6 @@ SMODS.Joker({
 
 -- Tag: 1 in 2 chance to generate a rare joker in shop
 -- Only triggers if player doesn't already own all available rares
--- TODO: SOMEHOW IT BROKE AGAIN? AAAAAAAAAAA?
 SMODS.Tag({
 	key = "sandbox_rare",
 	object_type = "Tag",
@@ -250,45 +249,52 @@ SMODS.Tag({
 	-- 	return MP.LOBBY.config.ruleset == "ruleset_mp_experimental" and MP.LOBBY.code
 	-- end,
 	pos = { x = 1, y = 0 },
-	name = "Rare? Tag",
+	name = "Rare Tag",
 	discovered = true,
-	order = 1,
-	min_ante = 2,
-	config = { type = "store_joker_create", odds = 2, mp_sticker_balanced = true },
+	order = 2,
+	min_ante = nil,
+	config = {
+		type = "store_joker_create",
+		odds = 2,
+	},
 	requires = "j_blueprint",
 	loc_vars = function(self)
 		return { vars = { G.GAME.probabilities.normal or 1, self.config.odds } }
 	end,
 	apply = function(self, tag, context)
 		if context.type == "store_joker_create" then
+			local card = nil
+			-- 50% chance to proc
 			if pseudorandom("tagroll") < G.GAME.probabilities.normal / tag.config.odds then
-				local rares_in_posession = { 0 }
+				-- count owned rare jokers to prevent duplicates
+				local rares_owned = { 0 }
 				for k, v in ipairs(G.jokers.cards) do
-					if v.config.center.rarity == 3 and not rares_in_posession[v.config.center.key] then
-						rares_in_posession[1] = rares_in_posession[1] + 1
-						rares_in_posession[v.config.center.key] = true
+					if v.config.center.rarity == 3 and not rares_owned[v.config.center.key] then
+						rares_owned[1] = rares_owned[1] + 1
+						rares_owned[v.config.center.key] = true
 					end
 				end
 
-				-- Blaaa whyu did it break again
-				if #G.P_JOKER_RARITY_POOLS[3] > rares_in_posession[1] then
+				-- only proc if unowned rares exist
+				-- funny edge case that i've never seen happen, but if localthunk saw it i will obey
+				if #G.P_JOKER_RARITY_POOLS[3] > rares_owned[1] then
 					card = create_card("Joker", context.area, nil, 1, nil, nil, nil, "rta")
 					create_shop_card_ui(card, "Joker", context.area)
 					card.states.visible = false
 					tag:yep("+", G.C.RED, function()
 						card:start_materialize()
-						card.ability.couponed = true
+						card.ability.couponed = true -- free card
 						card:set_cost()
 						return true
 					end)
 				else
-					tag:nope()
+					tag:nope() -- all rares owned
 				end
-				tag.triggered = true
 			else
-				tag:nope()
-				tag.triggered = true
+				tag:nope() -- failed roll
 			end
+			tag.triggered = true
+			return card
 		end
 	end,
 })
