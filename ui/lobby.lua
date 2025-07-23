@@ -648,7 +648,7 @@ local function create_gamemode_modifiers_tab()
 						"k_opts_pvp_timer_increment",
 						0.85,
 						{ "0s", "30s", "60s", "90s", "120s", "150s", "180s" }, 
-						MP.LOBBY.config.timer_increment_seconds / 30, 
+						MP.UTILS.get_array_index_by_value({ 0, 30, 60, 90, 120, 150, 180 },MP.LOBBY.config.timer_increment_seconds), 
 						"change_timer_increment_seconds"
 					),
 				    create_lobby_option_cycle(
