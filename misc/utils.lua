@@ -53,6 +53,15 @@ function MP.UTILS.wrapText(text, maxChars)
 	return wrappedText
 end
 
+function MP.UTILS.get_array_index_by_value(options, value)
+    for i, v in ipairs(options) do
+        if v == value then
+            return i 
+        end
+    end
+    return nil
+end
+
 function MP.UTILS.save_username(text)
 	MP.ACTIONS.set_username(text)
 	SMODS.Mods["Multiplayer"].config.username = text
