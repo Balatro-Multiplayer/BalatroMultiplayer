@@ -2530,7 +2530,6 @@ function G.FUNCS.attention_text_realtime(args)
             args.start_time = G.TIMERS.TOTAL
             args.text:pop_out(3)
           else
-            --args.AT:align_to_attach()
             args.fade = math.max(0, 1 - 3*(G.TIMERS.TOTAL - args.start_time))
             if args.cover_colour then args.cover_colour[4] = math.min(args.cover_colour[4], 2*args.fade) end
             if args.cover_colour_l then args.cover_colour_l[4] = math.min(args.cover_colour_l[4], args.fade) end
