@@ -185,7 +185,9 @@ SMODS.Joker({
 				if bloodstone_hit then
 					return {
 						extra = { x_mult = card.ability.extra.Xmult },
-						message = "Cope!",
+						message = G.GAME.probabilities.normal < 2 and "Cope!" or nil,
+						sound = "voice2",
+						volume = 0.3,
 						card = card,
 					}
 				end
