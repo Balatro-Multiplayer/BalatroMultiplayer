@@ -184,6 +184,7 @@ return {
 			b_lobby_options = "LOBBY OPTIONS",
 			b_copy_clipboard = "Copy to clipboard",
 			b_view_code = "VIEW CODE",
+			b_copy_code = { "COPY CODE", "TO CLIPBOARD" },
 			b_leave = "LEAVE",
 			b_opts_cb_money = "Give comeback $ on life loss",
 			b_opts_no_gold_on_loss = "Don't get blind rewards on round loss",
