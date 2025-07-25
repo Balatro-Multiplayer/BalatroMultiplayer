@@ -24,10 +24,8 @@ SMODS.Joker({
 	end,
 	calculate = function(self, card, context)
 		if
-			context.cardarea == G.jokers
-			and context.joker_main
+			context.mp_speedrun 
 			and (not card.edition or card.edition.type ~= "mp_phantom") 
-			and context.mp_speedrun 
 			and #G.consumeables.cards + G.GAME.consumeable_buffer < G.consumeables.config.card_limit
 		then
 			G.GAME.consumeable_buffer = G.GAME.consumeable_buffer + 1
