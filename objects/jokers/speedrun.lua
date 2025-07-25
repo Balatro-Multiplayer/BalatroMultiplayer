@@ -23,7 +23,11 @@ SMODS.Joker({
 		return MP.LOBBY.code and MP.LOBBY.config.multiplayer_jokers
 	end,
 	calculate = function(self, card, context)
-		if context.mp_speedrun and #G.consumeables.cards + G.GAME.consumeable_buffer < G.consumeables.config.card_limit then
+		if
+			context.mp_speedrun 
+			and (not card.edition or card.edition.type ~= "mp_phantom") 
+			and #G.consumeables.cards + G.GAME.consumeable_buffer < G.consumeables.config.card_limit
+		then
 			G.GAME.consumeable_buffer = G.GAME.consumeable_buffer + 1
 			G.E_MANAGER:add_event(Event({
 				trigger = 'before',
@@ -41,6 +45,16 @@ SMODS.Joker({
 				colour = G.C.SECONDARY_SET.Spectral,
 				card = card
 			}
+		end
+	end,
+	add_to_deck = function(self, card, from_debuffed)
+		if not from_debuffed and (not card.edition or card.edition.type ~= "mp_phantom") then
+			MP.ACTIONS.send_phantom("j_mp_speedrun")
+		end
+	end,
+	remove_from_deck = function(self, card, from_debuff)
+		if not from_debuff and (not card.edition or card.edition.type ~= "mp_phantom") then
+			MP.ACTIONS.remove_phantom("j_mp_speedrun")
 		end
 	end,
 	mp_credits = {
