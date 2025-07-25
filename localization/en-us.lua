@@ -115,15 +115,6 @@ return {
 					"{C:attention}#1#{} additional time",
 				},
 			},
-			j_square_mp = {
-				name = "Square Joker",
-				text = {
-					"This Joker gains {C:chips}+#2#{} Chips",
-					"if played hand has",
-					"exactly {C:attention}4{} cards",
-					"{C:inactive}(Currently {C:chips}#1#{C:inactive} Chips)",
-				},
-			},
 			j_mp_cloud_9 = {
 				name = "Cloud 9",
 				text = {
