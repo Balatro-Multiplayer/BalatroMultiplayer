@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 G.P_CENTER_POOLS.Ruleset = {}
 MP.Rulesets = {}
 MP.Ruleset = SMODS.GameObject:extend({
@@ -25,7 +24,7 @@ MP.Ruleset = SMODS.GameObject:extend({
 	end,
 	is_disabled = function(self)
 		return false
-	end
+	end,
 })
 
 MP.BANNED_OBJECTS = {
@@ -40,9 +39,15 @@ MP.BANNED_OBJECTS = {
 function new_in_pool_for_blind(v) -- For blinds specifically, in_pool does overwrite basic checks like minimum ante, so we need to repackage all basic checks inside the new in_pool
 	if MP.LOBBY.code then
 		return false
-	elseif not v.boss.showdown and (v.boss.min <= math.max(1, G.GAME.round_resets.ante) and ((math.max(1, G.GAME.round_resets.ante))%G.GAME.win_ante ~= 0 or G.GAME.round_resets.ante < 2)) then
+	elseif
+		not v.boss.showdown
+		and (
+			v.boss.min <= math.max(1, G.GAME.round_resets.ante)
+			and ((math.max(1, G.GAME.round_resets.ante)) % G.GAME.win_ante ~= 0 or G.GAME.round_resets.ante < 2)
+		)
+	then
 		return true
-	elseif v.boss.showdown and (G.GAME.round_resets.ante)%G.GAME.win_ante == 0 and G.GAME.round_resets.ante >= 2 then
+	elseif v.boss.showdown and G.GAME.round_resets.ante % G.GAME.win_ante == 0 and G.GAME.round_resets.ante >= 2 then
 		return true
 	else
 		return false
@@ -92,7 +97,7 @@ function MP.apply_rulesets()
 		for obj_key, rulesets in pairs(type.objects) do
 			-- Find object with object key, using the same method as take_ownership
 			local obj = type.mod.obj_table[obj_key] or (type.mod.get_obj and type.mod:get_obj(obj_key))
-			
+
 			if obj then
 				local old_in_pool = obj.in_pool
 				type.mod:take_ownership(obj_key, {
@@ -104,20 +109,18 @@ function MP.apply_rulesets()
 							-- behave like the original in_pool function if it's not nil
 							return self:orig_in_pool()
 						else
-							return self.set ~= 'Blind' or new_in_pool_for_blind(self) -- in_pool returning true doesn't overwrite original checks EXCEPT for blinds
+							return self.set ~= "Blind" or new_in_pool_for_blind(self) -- in_pool returning true doesn't overwrite original checks EXCEPT for blinds
 						end
 					end,
 				}, true)
 			else
-				sendWarnMessage(
-					('Cannot ban %s: Does not exist.'):format(obj_key), type.mod.set
-				)
+				sendWarnMessage(("Cannot ban %s: Does not exist."):format(obj_key), type.mod.set)
 			end
 		end
 		for obj_key, _ in pairs(type.global_banned) do
 			type.mod:take_ownership(obj_key, {
 				in_pool = function(self)
-					if self.set ~= 'Blind' then
+					if self.set ~= "Blind" then
 						return not MP.LOBBY.code
 					else
 						return new_in_pool_for_blind(self)
@@ -132,21 +135,21 @@ end
 -- Example usage in rulesets/standard.lua
 function MP.ReworkCenter(args)
 	local center = G.P_CENTERS[args.key]
-	
+
 	-- Convert single ruleset to list for backward compatibility
 	local rulesets = args.ruleset
 	if type(rulesets) == "string" then
-		rulesets = {rulesets}
+		rulesets = { rulesets }
 	end
-	
+
 	-- Apply changes to all specified rulesets
 	for _, ruleset in ipairs(rulesets) do
-		local ruleset_ = "mp_"..ruleset.."_"
+		local ruleset_ = "mp_" .. ruleset .. "_"
 		for k, v in pairs(args) do
 			if k ~= "key" and k ~= ruleset then
-				center[ruleset_..k] = v
-				if not center["mp_vanilla_"..k] then
-					center["mp_vanilla_"..k] = center[k]
+				center[ruleset_ .. k] = v
+				if not center["mp_vanilla_" .. k] then
+					center["mp_vanilla_" .. k] = center[k]
 				end
 			end
 		end
@@ -176,11 +179,13 @@ function MP.LoadReworks(ruleset, key)
 			end
 		end
 	end
-	if key then process(key, "mp_"..ruleset.."_") else
+	if key then
+		process(key, "mp_" .. ruleset .. "_")
+	else
 		for k, v in pairs(G.P_CENTERS) do
 			if v.mp_reworks then
 				if v.mp_reworks[ruleset] then
-					process(k, "mp_"..ruleset.."_")
+					process(k, "mp_" .. ruleset .. "_")
 				elseif v.mp_reworks["vanilla"] then -- Check vanilla separately to reset reworked jokers
 					process(k, "mp_vanilla_")
 				end
@@ -188,7 +193,7 @@ function MP.LoadReworks(ruleset, key)
 		end
 	end
 end
-=======
+
 G.P_CENTER_POOLS.Ruleset = {}
 MP.Rulesets = {}
 MP.Ruleset = SMODS.GameObject:extend({
@@ -329,8 +334,8 @@ function MP.apply_ruleset_overrides(ruleset_key)
 
 	if ruleset_key == "ruleset_mp_standard" then
 		MP.apply_standard_overrides()
-	elseif ruleset_key == "ruleset_mp_experimental" then
-		MP.apply_experimental_overrides()
+	elseif ruleset_key == "ruleset_mp_sandbox" then
+		MP.apply_sandbox_overrides()
 	end
 
 	print("Ruleset applied: " .. ruleset_key)
@@ -397,7 +402,7 @@ function MP.apply_standard_overrides()
 	}, true)
 end
 
-function MP.apply_experimental_overrides()
+function MP.apply_sandbox_overrides()
 	MP.ACTIVE_RULESET_OVERRIDES.glass = {
 		type = "enhancement",
 		key = "m_glass",
@@ -444,4 +449,3 @@ function MP.apply_experimental_overrides()
 		end,
 	}, true)
 end
->>>>>>> 6d493ce (add experimental implementation)

@@ -2,7 +2,7 @@
 -- TODO maybe function in MP.Ruleset that defines the functions we call afterwards etc
 
 MP.Ruleset({
-	key = "experimental",
+	key = "sandbox",
 	multiplayer_content = true,
 	banned_jokers = {
 		"j_hanging_chad",
@@ -84,7 +84,7 @@ SMODS.Joker({
 		end
 	end,
 	in_pool = function(self)
-		return MP.LOBBY.config.ruleset == "ruleset_mp_experimental" and MP.LOBBY.code
+		return MP.LOBBY.config.ruleset == "ruleset_mp_sandbox" and MP.LOBBY.code
 	end,
 })
 
@@ -112,7 +112,7 @@ SMODS.Joker({
 		}
 	end,
 	in_pool = function(self)
-		return MP.LOBBY.config.ruleset == "ruleset_mp_experimental" and MP.LOBBY.code
+		return MP.LOBBY.config.ruleset == "ruleset_mp_sandbox" and MP.LOBBY.code
 	end,
 	calculate = function(self, card, context)
 		if context.cardarea == G.play and context.individual then
@@ -166,7 +166,7 @@ SMODS.Joker({
 	pos = { x = 0, y = 8 },
 	-- no_collection = true,
 	-- in_pool = function(self)
-	-- 	return MP.LOBBY.config.ruleset == "ruleset_mp_experimental" and MP.LOBBY.code
+	-- 	return MP.LOBBY.config.ruleset == "ruleset_mp_sandbox" and MP.LOBBY.code
 	-- end,
 	config = { extra = { odds = 2, Xmult = 1.5 }, mp_sticker_balanced = true },
 	loc_vars = function(self, info_queue, card)
@@ -227,7 +227,7 @@ SMODS.Joker({
 		}
 	end,
 	in_pool = function(self)
-		return MP.LOBBY.config.ruleset == "ruleset_mp_experimental" and MP.LOBBY.code
+		return MP.LOBBY.config.ruleset == "ruleset_mp_sandbox" and MP.LOBBY.code
 	end,
 	calc_dollar_bonus = function(self, card)
 		local nine_tally = 0
@@ -258,7 +258,7 @@ SMODS.Tag({
 		items = {},
 	},
 	-- in_pool = function(self)
-	-- 	return MP.LOBBY.config.ruleset == "ruleset_mp_experimental" and MP.LOBBY.code
+	-- 	return MP.LOBBY.config.ruleset == "ruleset_mp_sandbox" and MP.LOBBY.code
 	-- end,
 	name = "Rare Tag",
 	discovered = true,
@@ -329,7 +329,7 @@ SMODS.Tag({
 -- 		} }
 -- 	end,
 -- 	in_pool = function(self)
--- 		return MP.LOBBY.config.ruleset == "ruleset_mp_experimental" and MP.LOBBY.code
+-- 		return MP.LOBBY.config.ruleset == "ruleset_mp_sandbox" and MP.LOBBY.code
 -- 	end,
 
 -- 	calc_dollar_bonus = function(self, card)
