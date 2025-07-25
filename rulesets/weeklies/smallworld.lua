@@ -80,7 +80,6 @@ function MP.ApplyBans()
 				local ii = 1
 				for i, vv in ipairs(v) do
 					if ii <= threshold then
-						print('banned: '..vv)
 						G.GAME.banned_keys[vv] = true
 						ii = ii + 1
 					else break end

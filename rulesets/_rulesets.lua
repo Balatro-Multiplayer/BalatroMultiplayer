@@ -28,8 +28,6 @@ MP.Ruleset = SMODS.GameObject:extend({
 })
 
 function MP.ApplyBans()
-	print(MP.LOBBY.code or 'nil')
-	print(MP.LOBBY.config.ruleset or 'nil')
 	if MP.LOBBY.code and MP.LOBBY.config.ruleset then
 		local ruleset = MP.Rulesets[MP.LOBBY.config.ruleset]
 		local banned_tables = {
@@ -66,7 +64,7 @@ function MP.ReworkCenter(args)
 	for _, ruleset in ipairs(rulesets) do
 		local ruleset_ = "mp_"..ruleset.."_"
 		for k, v in pairs(args) do
-			if k ~= "key" and k ~= "ruleset" then
+			if k ~= "key" and k ~= "ruleset" and k ~= "silent" then
 				center[ruleset_..k] = v
 				if not center["mp_vanilla_"..k] then
 					center["mp_vanilla_"..k] = center[k]
@@ -76,6 +74,8 @@ function MP.ReworkCenter(args)
 		center.mp_reworks = center.mp_reworks or {}
 		center.mp_reworks[ruleset] = true -- Caching this for better load times since we're gonna be inefficiently looping through all centers probably
 		center.mp_reworks["vanilla"] = true
+		
+		center.mp_silent[ruleset] = args.silent
 	end
 end
 
