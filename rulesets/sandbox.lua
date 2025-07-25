@@ -1,14 +1,8 @@
--- TODO fix weird crash in ruleset overview
--- TODO maybe function in MP.Ruleset that defines the functions we call afterwards etc
-
 MP.Ruleset({
 	key = "sandbox",
 	multiplayer_content = true,
 	banned_jokers = {
-		"j_hanging_chad",
-		"j_idol",
 		"j_cloud_9",
-		-- "j_delayed_grat",
 		"j_bloodstone",
 	},
 	banned_consumables = {
@@ -20,13 +14,14 @@ MP.Ruleset({
 	banned_blinds = {},
 
 	reworked_jokers = {
-		"j_hanging_chad",
-		"j_mp_idol",
 		"j_mp_cloud_9",
 		"j_mp_bloodstone",
-		-- "j_mp_delayed_grat",
+		"j_hanging_chad",
+		"j_idol",
+		"j_square",
 		"j_mp_conjoined_joker",
 		"j_mp_defensive_joker",
+		-- "j_mp_magnet", -- can't decide if we want this or not
 		"j_mp_lets_go_gambling",
 		"j_mp_pacifist",
 		"j_mp_penny_pincher",
@@ -42,7 +37,6 @@ MP.Ruleset({
 	reworked_enhancements = {
 		"m_glass",
 	},
-	reworked_tags = {},
 	reworked_blinds = {
 		"bl_mp_nemesis",
 	},
@@ -55,6 +49,7 @@ MP.Ruleset({
 		return false
 	end,
 
+	-- TODO now we just need this and maybe square joker rework and we're ready to ship
 	-- overrides = function()
 	--     print("Override for SANDBOX called")
 	-- 	SMODS.Booster:take_ownership_by_kind("Standard", {
@@ -86,86 +81,20 @@ MP.Ruleset({
 	-- end,
 }):inject()
 
--- todo replace w updating hanging chad joker
--- SMODS.Joker({
--- 	key = "hanging_chad",
--- 	no_collection = true,
--- 	unlocked = true,
--- 	discovered = true,
--- 	blueprint_compat = true,
--- 	perishable_compat = true,
--- 	eternal_compat = true,
--- 	rarity = 1,
--- 	cost = 4,
--- 	pos = { x = 9, y = 6 },
--- 	config = { extra = 1, mp_sticker_balanced = true },
--- 	loc_vars = function(self, info_queue, card)
--- 		return { vars = {
--- 			card.ability.extra,
--- 		} }
--- 	end,
--- 	calculate = function(self, card, context)
--- 		if context.cardarea == G.play and context.repetition then
--- 			if context.other_card == context.scoring_hand[1] then
--- 				return {
--- 					message = localize("k_again_ex"),
--- 					repetitions = card.ability.extra,
--- 					card = card,
--- 				}
--- 			end
--- 			if context.other_card == context.scoring_hand[2] then
--- 				return {
--- 					message = localize("k_again_ex"),
--- 					repetitions = card.ability.extra,
--- 					card = card,
--- 				}
--- 			end
--- 		end
--- 	end,
--- 	in_pool = function(self)
--- 		return MP.LOBBY.config.ruleset == "ruleset_mp_sandbox" and MP.LOBBY.code
--- 	end,
--- })
+-- TODO replace everything below with ReworkCenter stuff
+--
 
--- j_idol=             {order = 127,  unlocked = false, discovered = false, blueprint_compat = true, perishable_compat = true, eternal_compat = true, rarity = 2, cost = 6, name = "The Idol", pos = {x=6,y=7}, set = "Joker", effect = "", config = {extra = 2}, unlock_condition = {type = 'chip_score', chips = 1000000}},
-SMODS.Joker({
-	key = "idol",
-	no_collection = true,
-	unlocked = true,
-	discovered = true,
-	blueprint_compat = true,
-	perishable_compat = true,
-	eternal_compat = true,
+MP.ReworkCenter({
+	key = "j_square",
+	ruleset = "sandbox",
+	config = { extra = { chips = 64, chip_mod = 4 } },
+})
+
+MP.ReworkCenter({
+	key = "j_idol",
+	ruleset = "sandbox",
 	rarity = 3,
 	cost = 8,
-	pos = { x = 6, y = 7 },
-	config = { extra = 2, mp_sticker_balanced = true },
-	loc_vars = function(self, info_queue, card)
-		return {
-			vars = {
-				card.ability.extra,
-				localize(G.GAME.current_round.idol_card.rank, "ranks"),
-				localize(G.GAME.current_round.idol_card.suit, "suits_plural"),
-				colours = { G.C.SUITS[G.GAME.current_round.idol_card.suit] },
-			},
-		}
-	end,
-	in_pool = function(self)
-		return MP.LOBBY.config.ruleset == "ruleset_mp_sandbox" and MP.LOBBY.code
-	end,
-	calculate = function(self, card, context)
-		if context.cardarea == G.play and context.individual then
-			if
-				context.other_card:get_id() == G.GAME.current_round.idol_card.id
-				and context.other_card:is_suit(G.GAME.current_round.idol_card.suit)
-			then
-				return {
-					x_mult = card.ability.extra,
-					colour = G.C.RED,
-				}
-			end
-		end
-	end,
 })
 
 -- Global state for persistent bias across bloodstone calls
@@ -192,6 +121,28 @@ function cope_and_seethe_check(actual_odds)
 		return false
 	end
 end
+
+-- TODO I don't want to do this right now as I don't want to do loc_vars magic to get it to work
+-- MP.ReworkCenter({
+-- 	key = "j_bloodstone",
+-- 	rarity = 3,
+-- 	calculate = function(self, card, context)
+-- 		if context.cardarea == G.play and context.individual then
+-- 			if context.other_card:is_suit("Hearts") then
+-- 				local bloodstone_hit = cope_and_seethe_check(G.GAME.probabilities.normal / card.ability.extra.odds)
+-- 				if bloodstone_hit then
+-- 					return {
+-- 						extra = { x_mult = card.ability.extra.Xmult },
+-- 						message = G.GAME.probabilities.normal < 2 and "Cope!" or nil,
+-- 						sound = "voice2",
+-- 						volume = 0.3,
+-- 						card = card,
+-- 					}
+-- 				end
+-- 			end
+-- 		end
+-- 	end,
+-- })
 
 SMODS.Joker({
 	key = "bloodstone",
@@ -247,7 +198,7 @@ SMODS.Joker({
 	cost = 7,
 	pos = { x = 7, y = 12 },
 	config = { extra = 2, mp_sticker_balanced = true },
-	-- todo not sure if we actually should need to tally nines twice
+	-- NOTE: Shouldn't need to tally this twice but here we are!
 	loc_vars = function(self, info_queue, card)
 		local nine_tally = 0
 		if G.playing_cards ~= nil then
@@ -287,7 +238,6 @@ SMODS.Atlas({
 })
 
 -- Tag: 1 in 2 chance to generate a rare joker in shop
--- Only triggers if player doesn't already own all available rares
 SMODS.Tag({
 	key = "sandbox_rare",
 	atlas = "sandbox_rare",
@@ -348,32 +298,3 @@ SMODS.Tag({
 		end
 	end,
 })
-
---
--- SMODS.Joker({
--- 	key = "delayed_grat",
--- 	no_collection = true,
--- 	unlocked = true,
--- 	discovered = true,
--- 	blueprint_compat = false,
--- 	perishable_compat = true,
--- 	eternal_compat = true,
--- 	rarity = 1,
--- 	cost = 4,
--- 	pos = { x = 4, y = 3 },
--- 	config = { extra = 3, mp_sticker_balanced = true },
--- 	loc_vars = function(self, info_queue, card)
--- 		return { vars = {
--- 			card.ability.extra,
--- 		} }
--- 	end,
--- 	in_pool = function(self)
--- 		return MP.LOBBY.config.ruleset == "ruleset_mp_sandbox" and MP.LOBBY.code
--- 	end,
-
--- 	calc_dollar_bonus = function(self, card)
--- 		if G.GAME.current_round.discards_used == 0 and G.GAME.current_round.discards_left > 0 then
--- 			return G.GAME.current_round.discards_left * card.ability.extra
--- 		end
--- 	end,
--- })

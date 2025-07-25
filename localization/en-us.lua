@@ -115,21 +115,21 @@ return {
 					"{C:attention}#1#{} additional time",
 				},
 			},
-			j_mp_idol = {
-				name = "The Idol",
+			j_square_mp = {
+				name = "Square Joker",
 				text = {
-					"Each played {C:attention}#2#",
-					"of {V:1}#3#{} gives",
-					"{X:mult,C:white} X#1# {} Mult when scored",
-					"{s:0.8}Card changes every round",
+					"This Joker gains {C:chips}+#2#{} Chips",
+					"if played hand has",
+					"exactly {C:attention}4{} cards",
+					"{C:inactive}(Currently {C:chips}#1#{C:inactive} Chips)",
 				},
 			},
 			j_mp_cloud_9 = {
 				name = "Cloud 9",
 				text = {
-					"Earn {C:money}$#1#{} for each",
-					"{C:attention}9{} in your {C:attention}full deck",
-					"at end of round",
+					"Earn {C:money}$1{} for each {C:attention}9{} in deck",
+					"(max {C:money}$4{}), then {C:money}$#1#{} for each",
+					"additional {C:attention}9{} at end of round",
 					"{C:inactive}(Currently {C:money}$#2#{}{C:inactive})",
 				},
 			},
