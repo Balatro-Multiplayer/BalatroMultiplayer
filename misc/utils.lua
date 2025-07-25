@@ -793,7 +793,7 @@ function MP.UTILS.str_decode_and_unpack(str)
 end
 
 function MP.UTILS.get_standard_rulesets()
-	return {"ranked", "blitz", "traditional"}
+	return { "ranked", "blitz", "traditional", "sandbox" }
 end
 
 function MP.UTILS.is_standard_ruleset()

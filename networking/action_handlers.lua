@@ -66,7 +66,7 @@ local function action_lobbyInfo(host, hostHash, hostCached, guest, guestHash, gu
 		cached = hostCached == "true",
 		config = hostConfig,
 	}
-  
+
 	if guest ~= nil then
 		local guestName, guestCol = parseName(guest)
 		local guestConfig, guestMods = MP.UTILS.parse_Hash(guestHash)
@@ -268,17 +268,24 @@ local function action_lobby_options(options)
 		if k == "ruleset" then
 			if not MP.Rulesets[v] then
 				G.FUNCS.lobby_leave(nil)
-				MP.UTILS.overlay_message(localize({ type = "variable", key = "k_failed_to_join_lobby", vars = { localize("k_ruleset_not_found") } }))
+				MP.UTILS.overlay_message(
+					localize({
+						type = "variable",
+						key = "k_failed_to_join_lobby",
+						vars = { localize("k_ruleset_not_found") },
+					})
+				)
 				return
 			end
 			local disabled = MP.Rulesets[v].is_disabled()
 			if disabled then
 				G.FUNCS.lobby_leave(nil)
-				MP.UTILS.overlay_message(localize({ type = "variable", key = "k_failed_to_join_lobby", vars = { disabled } }))
+				MP.UTILS.overlay_message(
+					localize({ type = "variable", key = "k_failed_to_join_lobby", vars = { disabled } })
+				)
 				return
 			end
 			MP.LOBBY.config.ruleset = v
---			MP.apply_ruleset_overrides(v)
 			goto continue
 		end
 		if k == "gamemode" then
