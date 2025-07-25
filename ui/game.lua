@@ -558,6 +558,8 @@ end
 local add_round_eval_rowref = add_round_eval_row
 function add_round_eval_row(config) -- if i could post a skull emoji i would, wtf is this (cashout screen)
 	if config.name == 'blind1' and G.GAME.blind.config.blind.key == "bl_mp_nemesis" then
+		G.GAME.blind.chip_text = MP.INSANE_INT.to_string(MP.GAME.enemy.score)
+		
 		G.P_BLINDS["bl_mp_nemesis"].atlas = 'mp_player_blind_col'
 		G.GAME.blind.pos = G.P_BLINDS[MP.UTILS.get_nemesis_key()].pos	-- this one is getting reset so no need to bother
 		add_round_eval_rowref(config)
@@ -984,8 +986,6 @@ function Game:update_hand_played(dt)
 			trigger = "immediate",
 			func = function()
 				MP.ACTIONS.play_hand(G.GAME.chips, G.GAME.current_round.hands_left)
-				-- Set blind chips to enemy score
-				G.GAME.blind.chip_text = MP.INSANE_INT.to_string(MP.GAME.enemy.score)
 				-- For now, never advance to next round
 				if G.GAME.current_round.hands_left < 1 then
 					attention_text({
