@@ -20,7 +20,7 @@ MP.Ruleset({
 	banned_blinds = {},
 
 	reworked_jokers = {
-		"j_mp_hanging_chad",
+		"j_hanging_chad",
 		"j_mp_idol",
 		"j_mp_cloud_9",
 		"j_mp_bloodstone",
@@ -46,47 +46,86 @@ MP.Ruleset({
 	reworked_blinds = {
 		"bl_mp_nemesis",
 	},
+	reworked_tags = { "tag_mp_sandbox_rare" },
+
+	is_disabled = function(self)
+		if not MP.INTEGRATIONS.TheOrder then
+			return localize("k_ruleset_disabled_the_order_required")
+		end
+		return false
+	end,
+
+	-- overrides = function()
+	--     print("Override for SANDBOX called")
+	-- 	SMODS.Booster:take_ownership_by_kind("Standard", {
+	-- 		create_card = function(self, card, i)
+	-- 			local enchantment_pool = {}
+
+	-- 			-- Skip glass
+	-- 			for k, v in pairs(G.P_CENTER_POOLS["Enhanced"]) do
+	-- 				if v.key ~= "m_glass" then
+	-- 					enchantment_pool[#enchantment_pool + 1] = v
+	-- 				end
+	-- 			end
+
+	-- 			local ante_rng = MP.ante_based()
+	-- 			local _edition = poll_edition("standard_edition" .. ante_rng, 2, true)
+	-- 			local _seal = SMODS.poll_seal({ mod = 10, key = "stdseal" .. ante_rng })
+
+	-- 			local newCard = create_playing_card({
+	-- 				front = pseudorandom_element(G.P_CARDS, pseudoseed("stdset" .. ante_rng)),
+	-- 				center = pseudorandom_element(enchantment_pool, pseudoseed("stdset" .. ante_rng)),
+	-- 			}, G.pack_cards, true, i ~= 1, { G.C.SECONDARY_SET.Default })
+
+	-- 			newCard:set_edition(_edition)
+	-- 			newCard:set_seal(_seal)
+
+	-- 			return newCard
+	-- 		end,
+	-- 	}, true)
+	-- end,
 }):inject()
 
-SMODS.Joker({
-	key = "hanging_chad",
-	no_collection = true,
-	unlocked = true,
-	discovered = true,
-	blueprint_compat = true,
-	perishable_compat = true,
-	eternal_compat = true,
-	rarity = 1,
-	cost = 4,
-	pos = { x = 9, y = 6 },
-	config = { extra = 1, mp_sticker_balanced = true },
-	loc_vars = function(self, info_queue, card)
-		return { vars = {
-			card.ability.extra,
-		} }
-	end,
-	calculate = function(self, card, context)
-		if context.cardarea == G.play and context.repetition then
-			if context.other_card == context.scoring_hand[1] then
-				return {
-					message = localize("k_again_ex"),
-					repetitions = card.ability.extra,
-					card = card,
-				}
-			end
-			if context.other_card == context.scoring_hand[2] then
-				return {
-					message = localize("k_again_ex"),
-					repetitions = card.ability.extra,
-					card = card,
-				}
-			end
-		end
-	end,
-	in_pool = function(self)
-		return MP.LOBBY.config.ruleset == "ruleset_mp_sandbox" and MP.LOBBY.code
-	end,
-})
+-- todo replace w updating hanging chad joker
+-- SMODS.Joker({
+-- 	key = "hanging_chad",
+-- 	no_collection = true,
+-- 	unlocked = true,
+-- 	discovered = true,
+-- 	blueprint_compat = true,
+-- 	perishable_compat = true,
+-- 	eternal_compat = true,
+-- 	rarity = 1,
+-- 	cost = 4,
+-- 	pos = { x = 9, y = 6 },
+-- 	config = { extra = 1, mp_sticker_balanced = true },
+-- 	loc_vars = function(self, info_queue, card)
+-- 		return { vars = {
+-- 			card.ability.extra,
+-- 		} }
+-- 	end,
+-- 	calculate = function(self, card, context)
+-- 		if context.cardarea == G.play and context.repetition then
+-- 			if context.other_card == context.scoring_hand[1] then
+-- 				return {
+-- 					message = localize("k_again_ex"),
+-- 					repetitions = card.ability.extra,
+-- 					card = card,
+-- 				}
+-- 			end
+-- 			if context.other_card == context.scoring_hand[2] then
+-- 				return {
+-- 					message = localize("k_again_ex"),
+-- 					repetitions = card.ability.extra,
+-- 					card = card,
+-- 				}
+-- 			end
+-- 		end
+-- 	end,
+-- 	in_pool = function(self)
+-- 		return MP.LOBBY.config.ruleset == "ruleset_mp_sandbox" and MP.LOBBY.code
+-- 	end,
+-- })
 
 -- j_idol=             {order = 127,  unlocked = false, discovered = false, blueprint_compat = true, perishable_compat = true, eternal_compat = true, rarity = 2, cost = 6, name = "The Idol", pos = {x=6,y=7}, set = "Joker", effect = "", config = {extra = 2}, unlock_condition = {type = 'chip_score', chips = 1000000}},
 SMODS.Joker({
@@ -161,7 +200,7 @@ SMODS.Joker({
 	blueprint_compat = true,
 	perishable_compat = true,
 	eternal_compat = true,
-	rarity = 2,
+	rarity = 3,
 	cost = 7,
 	pos = { x = 0, y = 8 },
 	-- no_collection = true,
@@ -338,7 +377,3 @@ SMODS.Tag({
 -- 		end
 -- 	end,
 -- })
-
--- Overrides are now handled dynamically in _rulesets.lua via MP.apply_ruleset_overrides()
--- This ensures they are evaluated when the ruleset is selected, not at file load time
--- But they should probably be moved here if required

@@ -18,6 +18,7 @@ MP.Ruleset = SMODS.GameObject:extend({
 			G.P_CENTER_POOLS.Ruleset = {}
 		end
 		table.insert(G.P_CENTER_POOLS.Ruleset, self)
+		-- self.overrides()
 	end,
 	process_loc_text = function(self)
 		SMODS.process_loc_text(G.localization.descriptions["Ruleset"], self.key, self.loc_txt)
@@ -25,6 +26,11 @@ MP.Ruleset = SMODS.GameObject:extend({
 	is_disabled = function(self)
 		return false
 	end,
+
+	-- overrides = function(self)
+	-- 	print("Generic override called")
+	-- 	return
+	-- end,
 })
 
 MP.BANNED_OBJECTS = {
@@ -322,130 +328,4 @@ function MP.apply_rulesets()
 			}, true)
 		end
 	end
-end
-
-MP.ACTIVE_RULESET_OVERRIDES = {}
-
--- TODO: Make sure overrides are clearly defined in each ruleset
--- And have a "fallback" ruleset to reset to
--- (either game default or The Order, depending on what is configured)
-function MP.apply_ruleset_overrides(ruleset_key)
-	MP.clear_ruleset_overrides()
-
-	if ruleset_key == "ruleset_mp_standard" then
-		MP.apply_standard_overrides()
-	elseif ruleset_key == "ruleset_mp_sandbox" then
-		MP.apply_sandbox_overrides()
-	end
-
-	print("Ruleset applied: " .. ruleset_key)
-	sendDebugMessage("Ruleset applied: " .. ruleset_key)
-
-	MP.ACTIVE_RULESET_OVERRIDES.current_ruleset = ruleset_key
-end
-
--- TODO not fully implemented
-function MP.clear_ruleset_overrides()
-	-- copypaste from smods
-	-- TODO copypaste from 506a instead
-	-- SMODS.Enhancement:take_ownership("glass", {
-	-- 	calculate = function(self, card, context)
-	-- 		if
-	-- 			context.destroy_card
-	-- 			and context.cardarea == G.play
-	-- 			and context.destroy_card == card
-	-- 			and SMODS.pseudorandom_probability(card, "glass", 1, card.ability.extra)
-	-- 		then
-	-- 			card.glass_trigger = true
-	-- 			return { remove = true }
-	-- 		end
-	-- 	end,
-	-- })
-
-	-- copypaste from the order stuff
-	SMODS.Booster:take_ownership_by_kind("Standard", {
-		create_card = function(self, card, i)
-			local s_append = "" -- MP.get_booster_append(card)
-			local b_append = MP.ante_based() .. s_append
-
-			local _edition = poll_edition("standard_edition" .. b_append, 2, true)
-			local _seal = SMODS.poll_seal({ mod = 10, key = "stdseal" .. b_append })
-
-			return {
-				set = (pseudorandom(pseudoseed("stdset" .. b_append)) > 0.6) and "Enhanced" or "Base",
-				edition = _edition,
-				seal = _seal,
-				area = G.pack_cards,
-				skip_materialize = true,
-				soulable = true,
-				key_append = "sta" .. s_append,
-			}
-		end,
-	}, true)
-	MP.ACTIVE_RULESET_OVERRIDES = {}
-end
-
--- TODO: Should probably be defined in each ruleset itself
--- and called from here
-function MP.apply_standard_overrides()
-	MP.ACTIVE_RULESET_OVERRIDES.glass = {
-		type = "enhancement",
-		key = "m_glass",
-	}
-
-	-- Apply standard ruleset glass override (1.5x instead of 2x)
-	SMODS.Enhancement:take_ownership("glass", {
-		set_ability = function(self, card, initial, delay_sprites)
-			card.ability.Xmult = 1.5
-			card.ability.x_mult = 1.5
-		end,
-	}, true)
-end
-
-function MP.apply_sandbox_overrides()
-	MP.ACTIVE_RULESET_OVERRIDES.glass = {
-		type = "enhancement",
-		key = "m_glass",
-	}
-
-	SMODS.Enhancement:take_ownership("glass", {
-		set_ability = function(self, card, initial, delay_sprites)
-			card.ability.Xmult = 2
-			card.ability.x_mult = 2
-			card.ability.extra = 3 -- 1/3 chance to break
-		end,
-	}, true)
-
-	MP.ACTIVE_RULESET_OVERRIDES.standard_pack = {
-		type = "booster",
-		kind = "Standard",
-	}
-
-	-- Apply experimental standard pack override (no glass cards)
-	SMODS.Booster:take_ownership_by_kind("Standard", {
-		create_card = function(self, card, i)
-			local enchantment_pool = {}
-
-			-- Skip glass
-			for k, v in pairs(G.P_CENTER_POOLS["Enhanced"]) do
-				if v.key ~= "m_glass" then
-					enchantment_pool[#enchantment_pool + 1] = v
-				end
-			end
-
-			local ante_rng = MP.ante_based()
-			local _edition = poll_edition("standard_edition" .. ante_rng, 2, true)
-			local _seal = SMODS.poll_seal({ mod = 10, key = "stdseal" .. ante_rng })
-
-			local newCard = create_playing_card({
-				front = pseudorandom_element(G.P_CARDS, pseudoseed("stdset" .. ante_rng)),
-				center = pseudorandom_element(enchantment_pool, pseudoseed("stdset" .. ante_rng)),
-			}, G.pack_cards, true, i ~= 1, { G.C.SECONDARY_SET.Default })
-
-			newCard:set_edition(_edition)
-			newCard:set_seal(_seal)
-
-			return newCard
-		end,
-	}, true)
 end
