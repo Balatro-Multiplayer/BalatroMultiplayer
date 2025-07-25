@@ -26,11 +26,6 @@ MP.Ruleset = SMODS.GameObject:extend({
 	is_disabled = function(self)
 		return false
 	end,
-
-	-- overrides = function(self)
-	-- 	print("Generic override called")
-	-- 	return
-	-- end,
 })
 
 MP.BANNED_OBJECTS = {
@@ -57,83 +52,6 @@ function new_in_pool_for_blind(v) -- For blinds specifically, in_pool does overw
 		return true
 	else
 		return false
-	end
-end
-
-function MP.apply_rulesets()
-	for _, ruleset in pairs(MP.Rulesets) do
-		local function process_banned_items(banned_items, banned_table)
-			if not banned_items then
-				return
-			end
-			for _, item_key in ipairs(banned_items) do
-				banned_table[item_key] = banned_table[item_key] or {}
-				banned_table[item_key][ruleset.key] = true
-			end
-		end
-
-		local banned_types = {
-			{ items = ruleset.banned_jokers, table = MP.BANNED_OBJECTS.jokers },
-			{ items = ruleset.banned_consumables, table = MP.BANNED_OBJECTS.consumables },
-			{ items = ruleset.banned_vouchers, table = MP.BANNED_OBJECTS.vouchers },
-			{ items = ruleset.banned_enhancements, table = MP.BANNED_OBJECTS.enhancements },
-			{ items = ruleset.banned_tags, table = MP.BANNED_OBJECTS.tags },
-			{ items = ruleset.banned_blinds, table = MP.BANNED_OBJECTS.blinds },
-		}
-
-		for _, banned_type in ipairs(banned_types) do
-			process_banned_items(banned_type.items, banned_type.table)
-		end
-	end
-
-	local object_types = {
-		{ objects = MP.BANNED_OBJECTS.jokers, mod = SMODS.Joker, global_banned = MP.DECK.BANNED_JOKERS },
-		{ objects = MP.BANNED_OBJECTS.consumables, mod = SMODS.Consumable, global_banned = MP.DECK.BANNED_CONSUMABLES },
-		{ objects = MP.BANNED_OBJECTS.vouchers, mod = SMODS.Voucher, global_banned = MP.DECK.BANNED_VOUCHERS },
-		{
-			objects = MP.BANNED_OBJECTS.enhancements,
-			mod = SMODS.Enhancement,
-			global_banned = MP.DECK.BANNED_ENHANCEMENTS,
-		},
-		{ objects = MP.BANNED_OBJECTS.tags, mod = SMODS.Tag, global_banned = MP.DECK.BANNED_TAGS },
-		{ objects = MP.BANNED_OBJECTS.blinds, mod = SMODS.Blind, global_banned = MP.DECK.BANNED_BLINDS },
-	}
-
-	for _, type in ipairs(object_types) do
-		for obj_key, rulesets in pairs(type.objects) do
-			-- Find object with object key, using the same method as take_ownership
-			local obj = type.mod.obj_table[obj_key] or (type.mod.get_obj and type.mod:get_obj(obj_key))
-
-			if obj then
-				local old_in_pool = obj.in_pool
-				type.mod:take_ownership(obj_key, {
-					orig_in_pool = old_in_pool, -- Save the original in_pool function inside the object itself
-					in_pool = function(self) -- Update the in_pool function
-						if rulesets[MP.LOBBY.config.ruleset] and MP.LOBBY.code then
-							return false
-						elseif self.orig_in_pool then
-							-- behave like the original in_pool function if it's not nil
-							return self:orig_in_pool()
-						else
-							return self.set ~= "Blind" or new_in_pool_for_blind(self) -- in_pool returning true doesn't overwrite original checks EXCEPT for blinds
-						end
-					end,
-				}, true)
-			else
-				sendWarnMessage(("Cannot ban %s: Does not exist."):format(obj_key), type.mod.set)
-			end
-		end
-		for obj_key, _ in pairs(type.global_banned) do
-			type.mod:take_ownership(obj_key, {
-				in_pool = function(self)
-					if self.set ~= "Blind" then
-						return not MP.LOBBY.code
-					else
-						return new_in_pool_for_blind(self)
-					end
-				end,
-			}, true)
-		end
 	end
 end
 
@@ -197,6 +115,48 @@ function MP.LoadReworks(ruleset, key)
 				end
 			end
 		end
+	end
+	MP.AddOverrides(ruleset)
+end
+
+function MP.AddOverrides(rulesetName)
+	local ruleset = MP.Rulesets[rulesetName]
+
+	-- truck ugly and disgusting - but here we are!
+	-- pref i'd like a field 'overrides' that we call dynamically
+	if rulesetName == "sandbox" then
+		SMODS.Booster:take_ownership_by_kind("Standard", {
+			create_card = function(self, card, i)
+				local enchantment_pool = {}
+
+				-- Skip glass
+				for k, v in pairs(G.P_CENTER_POOLS["Enhanced"]) do
+					if v.key ~= "m_glass" then
+						enchantment_pool[#enchantment_pool + 1] = v
+					end
+				end
+
+				local ante_rng = MP.ante_based()
+				local _edition = poll_edition("standard_edition" .. ante_rng, 2, true)
+				local _seal = SMODS.poll_seal({ mod = 10, key = "stdseal" .. ante_rng })
+
+				local newCard = create_playing_card({
+					front = pseudorandom_element(G.P_CARDS, pseudoseed("stdset" .. ante_rng)),
+					center = pseudorandom_element(enchantment_pool, pseudoseed("stdset" .. ante_rng)),
+				}, G.pack_cards, true, i ~= 1, { G.C.SECONDARY_SET.Default })
+
+				newCard:set_edition(_edition)
+				newCard:set_seal(_seal)
+
+				return newCard
+			end,
+		}, true)
+	elseif MP.INTEGRATIONS.TheOrder then
+		-- not optimal and not ideal but _luckily_ the standard pack override for The Order is right here in the code,
+		-- so we can just wrap it in a functiona and call it!
+		the_order_standard_pack_ownership()
+	else -- i have no idea how we restore old standard pack behaviour ;___;
+		print("Oops - we can't actually restore standard pack behaviour - restart the game oopsie")
 	end
 end
 

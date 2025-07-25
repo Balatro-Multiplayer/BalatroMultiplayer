@@ -49,40 +49,11 @@ MP.Ruleset({
 		return false
 	end,
 
-	-- TODO now we just need this and maybe square joker rework and we're ready to ship
-	-- overrides = function()
-	--     print("Override for SANDBOX called")
-	-- 	SMODS.Booster:take_ownership_by_kind("Standard", {
-	-- 		create_card = function(self, card, i)
-	-- 			local enchantment_pool = {}
-
-	-- 			-- Skip glass
-	-- 			for k, v in pairs(G.P_CENTER_POOLS["Enhanced"]) do
-	-- 				if v.key ~= "m_glass" then
-	-- 					enchantment_pool[#enchantment_pool + 1] = v
-	-- 				end
-	-- 			end
-
-	-- 			local ante_rng = MP.ante_based()
-	-- 			local _edition = poll_edition("standard_edition" .. ante_rng, 2, true)
-	-- 			local _seal = SMODS.poll_seal({ mod = 10, key = "stdseal" .. ante_rng })
-
-	-- 			local newCard = create_playing_card({
-	-- 				front = pseudorandom_element(G.P_CARDS, pseudoseed("stdset" .. ante_rng)),
-	-- 				center = pseudorandom_element(enchantment_pool, pseudoseed("stdset" .. ante_rng)),
-	-- 			}, G.pack_cards, true, i ~= 1, { G.C.SECONDARY_SET.Default })
-
-	-- 			newCard:set_edition(_edition)
-	-- 			newCard:set_seal(_seal)
-
-	-- 			return newCard
-	-- 		end,
-	-- 	}, true)
-	-- end,
+	-- todo this would be sick
+	overrides = function()
+		print("Override for sandbox called")
+	end,
 }):inject()
-
--- TODO replace everything below with ReworkCenter stuff
---
 
 MP.ReworkCenter({
 	key = "j_square",
@@ -154,10 +125,10 @@ SMODS.Joker({
 	rarity = 3,
 	cost = 7,
 	pos = { x = 0, y = 8 },
-	-- no_collection = true,
-	-- in_pool = function(self)
-	-- 	return MP.LOBBY.config.ruleset == "ruleset_mp_sandbox" and MP.LOBBY.code
-	-- end,
+	no_collection = true,
+	in_pool = function(self)
+		return MP.LOBBY.config.ruleset == "ruleset_mp_sandbox" and MP.LOBBY.code
+	end,
 	config = { extra = { odds = 2, Xmult = 1.5 }, mp_sticker_balanced = true },
 	loc_vars = function(self, info_queue, card)
 		return {
