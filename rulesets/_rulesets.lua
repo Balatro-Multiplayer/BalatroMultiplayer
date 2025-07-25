@@ -122,8 +122,12 @@ end
 function MP.AddOverrides(rulesetName)
 	local ruleset = MP.Rulesets[rulesetName]
 
-	-- truck ugly and disgusting - but here we are!
-	-- pref i'd like a field 'overrides' that we call dynamically
+	-- no standard pack behaviour ever overriden =
+	-- no standard pack behaviour to restore!
+	if not MP.INTEGRATIONS.TheOrder then
+		return
+	end
+
 	if rulesetName == "sandbox" then
 		SMODS.Booster:take_ownership_by_kind("Standard", {
 			create_card = function(self, card, i)
@@ -151,12 +155,10 @@ function MP.AddOverrides(rulesetName)
 				return newCard
 			end,
 		}, true)
-	elseif MP.INTEGRATIONS.TheOrder then
+	else
 		-- not optimal and not ideal but _luckily_ the standard pack override for The Order is right here in the code,
 		-- so we can just wrap it in a functiona and call it!
 		the_order_standard_pack_ownership()
-	else -- i have no idea how we restore old standard pack behaviour ;___;
-		print("Oops - we can't actually restore standard pack behaviour - restart the game oopsie")
 	end
 end
 
