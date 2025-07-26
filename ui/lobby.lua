@@ -567,7 +567,7 @@ function G.UIDEF.create_UIBox_lobby_menu()
 										colour = G.C.PALE_GREEN,
 										minw = 1.35,
 										minh = 1.35,
-										label = { localize("b_copy_code"), localize("b_clipboard") },
+										label = localize("b_copy_code_clipboard"),
 										scale = text_scale,
 										col = true,
 									}),
