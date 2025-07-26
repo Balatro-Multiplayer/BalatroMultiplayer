@@ -62,8 +62,9 @@ MP.ReworkCenter({
 			end
 
 
-
+			G.MP_JUDGEMENT_OVERRIDE = true
 			local joker = create_card('Joker', G.jokers, nil, nil, nil, nil, nil, 'jud') -- just call create card since override will kick in
+			G.MP_JUDGEMENT_OVERRIDE = nil
 			joker:add_to_deck()
 			G.jokers:emplace(joker)
 			_card:juice_up(0.3, 0.5)
