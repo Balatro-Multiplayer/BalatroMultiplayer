@@ -25,8 +25,14 @@ target = "functions/common_events.lua"
 pattern = "function create_card(_type, area, legendary, _rarity, skip_materialize, soulable, forced_key, key_append)"
 position = "after"
 payload = '''
-if G.GAME.MP_joker_overrides[1] then
+local sticker_override = false
+if _type == 'Joker' 
+and G.GAME.MP_joker_overrides[1] 
+and not (forced_key or key_append or _rarity)
+and (area == G.shop_jokers or area == G.pack_cards)
+then
 	forced_key = G.GAME.MP_joker_overrides[1].key
+	sticker_override = true
 end
 '''
 match_indent = true
@@ -38,7 +44,6 @@ target = "functions/common_events.lua"
 pattern = "if (area == G.shop_jokers) or (area == G.pack_cards) then"
 position = "at"
 payload = '''
-local sticker_override = G.GAME.MP_joker_overrides[1] and true or false
 if sticker_override then
 	for k, v in pairs(G.GAME.MP_joker_overrides[1].stickers) do -- dumb loop
 		if k == 'eternal' then card:set_eternal(v) end

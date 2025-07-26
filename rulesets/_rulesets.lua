@@ -75,6 +75,7 @@ function MP.ReworkCenter(args)
 		center.mp_reworks[ruleset] = true -- Caching this for better load times since we're gonna be inefficiently looping through all centers probably
 		center.mp_reworks["vanilla"] = true
 		
+		center.mp_silent = center.mp_silent or {}
 		center.mp_silent[ruleset] = args.silent
 	end
 end

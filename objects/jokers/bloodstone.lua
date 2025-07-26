@@ -9,15 +9,15 @@ MP.ReworkCenter({
 				if context.before then
 					G.GAME.round_resets.mp_bloodstone = G.GAME.round_resets.mp_bloodstone or {}
 					G.GAME.round_resets.mp_bloodstone[MP.order_round_based(true)] = G.GAME.round_resets.mp_bloodstone[MP.order_round_based(true)] or {}
-					card.mp_bsindex = 0
+					G.GAME.round_resets.mp_bsindex = 0
 				end
 			end
 			if context.individual and context.cardarea == G.play then
 				if context.other_card:is_suit("Hearts") then
 					local stored_queue = G.GAME.round_resets.mp_bloodstone[MP.order_round_based(true)]
-					card.mp_bsindex = card.mp_bsindex + 1 -- increment before indexing
-					stored_queue[card.mp_bsindex] = stored_queue[card.mp_bsindex] or pseudorandom('bloodstone'..MP.order_round_based(true))
-					if stored_queue[card.mp_bsindex] < G.GAME.probabilities.normal/card.ability.extra.odds then
+					G.GAME.round_resets.mp_bsindex = G.GAME.round_resets.mp_bsindex + 1 -- increment before indexing
+					stored_queue[G.GAME.round_resets.mp_bsindex] = stored_queue[G.GAME.round_resets.mp_bsindex] or pseudorandom('bloodstone'..MP.order_round_based(true))
+					if stored_queue[G.GAME.round_resets.mp_bsindex] < G.GAME.probabilities.normal/card.ability.extra.odds then
 						return {
 							x_mult = card.ability.extra.Xmult,
 							card = card
