@@ -1,0 +1,57 @@
+[manifest]
+version = "1.0.0"
+dump_lua = true
+priority = 1
+
+# This file is for various patches required by the Judgement changes in Standard
+
+# define list as game variable
+[[patches]]
+[patches.pattern]
+target = "game.lua"
+pattern = "joker_usage = {},"
+position = "before"
+payload = '''
+MP_joker_overrides = {},
+'''
+match_indent = true
+
+# keeeey
+# thank goodness we can just do this
+# not easy for the stickers though
+[[patches]]
+[patches.pattern]
+target = "functions/common_events.lua"
+pattern = "function create_card(_type, area, legendary, _rarity, skip_materialize, soulable, forced_key, key_append)"
+position = "after"
+payload = '''
+local sticker_override = false
+if _type == 'Joker' 
+and G.GAME.MP_joker_overrides[1] 
+and not (forced_key or key_append or _rarity)
+and (area == G.shop_jokers or area == G.pack_cards or G.MP_JUDGEMENT_OVERRIDE)
+then
+	forced_key = G.GAME.MP_joker_overrides[1].key
+	sticker_override = true
+end
+'''
+match_indent = true
+
+# well it's kinda easy
+[[patches]]
+[patches.pattern]
+target = "functions/common_events.lua"
+pattern = "if (area == G.shop_jokers) or (area == G.pack_cards) then"
+position = "at"
+payload = '''
+if sticker_override then
+	for k, v in pairs(G.GAME.MP_joker_overrides[1].stickers) do -- dumb loop
+		if k == 'eternal' then card:set_eternal(v) end
+		if k == 'perishable' and v == true then card:set_perishable(true) end -- bruh
+		if k == 'rental' then card:set_rental(v) end
+	end
+	table.remove(G.GAME.MP_joker_overrides, 1)
+end
+if ( (area == G.shop_jokers) or (area == G.pack_cards) ) and not sticker_override then
+'''
+match_indent = true

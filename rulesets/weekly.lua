@@ -1,3 +1,0 @@
---[[MP.Ruleset({
-	key = "weekly",
-})]]

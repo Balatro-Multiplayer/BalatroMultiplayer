@@ -57,7 +57,9 @@ if old_center ~= center or initial then
 		local ruleset = string.sub(MP.LOBBY.config.ruleset, 12, #MP.LOBBY.config.ruleset)
 		
 		if center.mp_reworks and center.mp_reworks[ruleset] and ruleset ~= 'vanilla' then
-			self.ability.mp_sticker_balanced = true
+			if not center.mp_silent[ruleset] then
+				self.ability.mp_sticker_balanced = true
+			end
 		end
 	end
 end'''

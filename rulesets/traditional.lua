@@ -1,6 +1,8 @@
 MP.Ruleset({
 	key = "traditional",
 	multiplayer_content = true,
+	standard = true,
+
 	banned_jokers = {
 		"j_mp_speedrun",
 		"j_mp_conjoined_joker",

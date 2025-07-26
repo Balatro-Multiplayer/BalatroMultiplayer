@@ -185,6 +185,7 @@ function Game:main_menu(change_context)
 end
 
 function G.UIDEF.ruleset_selection_options()
+	MP.LOBBY.fetched_weekly = 'smallworld' -- temp
 	MP.LOBBY.config.ruleset = "ruleset_mp_ranked"
 	MP.LoadReworks("ranked")
 
@@ -201,6 +202,7 @@ function G.UIDEF.ruleset_selection_options()
 		{button_id = "traditional_ruleset_button", button_localize_key = "k_traditional"},
 		{button_id = "vanilla_ruleset_button", button_localize_key = "k_vanilla"},
 		{button_id = "badlatro_ruleset_button", button_localize_key = "k_badlatro"},
+		{button_id = "weekly_ruleset_button", button_localize_key = "k_weekly"},
 	}
 
 	return MP.UI.Main_Lobby_Options("ruleset_area", default_ruleset_area,
@@ -208,6 +210,11 @@ function G.UIDEF.ruleset_selection_options()
 end
 
 function G.FUNCS.change_ruleset_selection(e)
+	if e.config.id == 'weekly_ruleset_button' then
+		if G.FUNCS.weekly_interrupt(e) then
+			return
+		end
+	end
 	MP.UI.Change_Main_Lobby_Options(e, "ruleset_area", G.UIDEF.ruleset_info, "ranked_ruleset_button",
 		function (ruleset_name) 
 			MP.LOBBY.config.ruleset = "ruleset_mp_" .. ruleset_name 
@@ -220,8 +227,11 @@ end
 
 function G.UIDEF.ruleset_info(ruleset_name)
 	local ruleset = MP.Rulesets["ruleset_mp_" .. ruleset_name]
-
-	local ruleset_desc = MP.UTILS.wrapText(localize("k_" .. ruleset_name .. "_description"), 100)
+	local ruleset_desc = localize("k_" .. ruleset_name .. "_description")
+	if ruleset_name == 'weekly' then
+		ruleset_desc = ruleset_desc.." "..localize("k_weekly_"..MP.LOBBY.config.weekly)
+	end
+	ruleset_desc = MP.UTILS.wrapText(ruleset_desc, 100)
 	local _, ruleset_desc_lines = ruleset_desc:gsub("\n", " ")
 
 	local ruleset_banned_tabs = UIBox({
@@ -297,7 +307,7 @@ function G.FUNCS.ruleset_switch_tabs(args)
 	tabs_object.config.is_bans_tabs = not tabs_object.config.is_bans_tabs
 
 	if tabs_object.config.is_bans_tabs then
-		MP.LOBBY.config.ruleset = nil
+		MP.LOBBY.config.ruleset = callback_args.ruleset.key
 		MP.LOBBY.ruleset_preview = false
 	else
 		MP.LOBBY.config.ruleset = callback_args.ruleset.key
@@ -637,6 +647,57 @@ function G.UIDEF.override_main_menu_play_button()
 	)
 end
 
+function G.UIDEF.weekly_interrupt(loaded)
+
+	return (
+		create_UIBox_generic_options({
+			back_func = 'create_lobby',
+			contents = {
+				{
+					n = G.UIT.R,
+					config = {
+						align = "cm",
+						padding = 0.1,
+					},
+					nodes = {
+						{
+							n = G.UIT.T,
+							config = {
+								text = "A new weekly ruleset is available!",
+								colour = G.C.UI.TEXT_LIGHT,
+								scale = 0.45,
+							},
+						}
+					}
+				},
+				{
+					n = G.UIT.R,
+					config = {
+						align = "cm",
+						padding = 0.2,
+					},
+					nodes = {
+						{
+							n = G.UIT.T,
+							config = {
+								text = localize('k_currently_colon')..localize('k_weekly_'..MP.LOBBY.fetched_weekly), -- bad loc but ok
+								colour = darken(G.C.UI.TEXT_LIGHT, 0.2),
+								scale = 0.35,
+							},
+						}
+					}
+				},
+				UIBox_button({
+					label = { localize('k_sync_locally') },
+					colour = G.C.DARK_EDITION,
+					button = "set_weekly",
+					minw = 5,
+				})
+			},
+		})
+	)
+end
+
 function G.FUNCS.setup_run_singleplayer(e)
 	G.SETTINGS.paused = true
 	MP.LOBBY.config.ruleset = nil
@@ -674,6 +735,24 @@ function G.FUNCS.join_lobby(e)
 	G.FUNCS.overlay_menu({
 		definition = G.UIDEF.create_UIBox_join_lobby_button(),
 	})
+end
+
+function G.FUNCS.weekly_interrupt(e)
+	if (not MP.LOBBY.config.weekly) or (MP.LOBBY.config.weekly ~= MP.LOBBY.fetched_weekly) then
+		G.SETTINGS.paused = true
+	
+		G.FUNCS.overlay_menu({
+			definition = G.UIDEF.weekly_interrupt(not not MP.LOBBY.config.weekly),
+		})
+		return true
+	end
+	return false
+end
+
+function G.FUNCS.set_weekly(e)
+	SMODS.Mods["Multiplayer"].config.weekly = MP.LOBBY.fetched_weekly
+	SMODS.save_mod_config(SMODS.Mods["Multiplayer"])
+	SMODS.restart_game() -- idk if this works well...
 end
 
 function G.FUNCS.skip_tutorial(e)
