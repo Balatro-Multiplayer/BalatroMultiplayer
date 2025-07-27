@@ -556,6 +556,7 @@ function G.UIDEF.create_UIBox_join_lobby_button()
 									ref_value = "temp_code",
 									extended_corpus = false,
 									keyboard_offset = 1,
+									keyboard_offset = 4,
 									minw = 5,
 									callback = function(val)
 										MP.ACTIONS.join_lobby(MP.LOBBY.temp_code)
