@@ -134,56 +134,56 @@ function MP.AddOverrides(rulesetName)
 		return
 	end
 
-	if rulesetName == "sandbox" then
-		print("Processing sandbox ruleset")
-		SMODS.Booster:take_ownership_by_kind("Standard", {
-			create_card = function(self, card, i)
-				print("Creating card for sandbox ruleset, card index:", i)
-				local enchantment_pool = {}
+	print("Processing sandbox ruleset")
+	-- TODO: Should we do this also for uhhhh whatever that voucher is called?
+	SMODS.Booster:take_ownership_by_kind("Standard", {
+		create_card = function(self, card, i)
+			print("Creating card for sandbox ruleset, card index:", i)
+			local enhancement_pool = {}
 
-				-- Skip glass
-				for k, v in pairs(G.P_CENTER_POOLS["Enhanced"]) do
-					if v.key ~= "m_glass" then
-						enchantment_pool[#enchantment_pool + 1] = v
-					end
+			-- Skip glass
+			for k, v in pairs(G.P_CENTER_POOLS["Enhanced"]) do
+				if v.key ~= "m_glass" then
+					enhancement_pool[#enhancement_pool + 1] = v
 				end
+			end
 
-				print("Built enchantment pool with", #enchantment_pool, "items (excluding glass)")
+			print("Built enchantment pool with", #enhancement_pool, "items (excluding glass)")
 
-				local ante_rng = MP.ante_based()
-				print("Generated ante_rng:", ante_rng)
+			local ante_rng = MP.ante_based()
+			print("Generated ante_rng:", ante_rng)
 
-				local default_center = G.P_CENTERS.c_base
-				local roll = pseudorandom(pseudoseed("stdc1" .. ante_rng)) > 0.6
+			local default_center = G.P_CENTERS.c_base
+			local roll = pseudorandom(pseudoseed("stdc1" .. ante_rng))
 
-				print("Rolled ", roll)
+			print("Rolled ", roll)
 
-				local center = roll
-						and pseudorandom_element(enhancement_pool, pseudoseed("stdc2" .. ante_rng))
-					or default_center
+			local center = roll > 0.6 and pseudorandom_element(enhancement_pool, pseudoseed("stdc2" .. ante_rng))
+				or default_center
 
-				print("Center gotten:", center.name)
+			print("Center gotten:", center.name)
 
-				local _edition = poll_edition("standard_edition" .. ante_rng, 2, true)
-				print("Generated edition:", _edition and _edition.key or "nil")
+			local _edition = poll_edition("standard_edition" .. ante_rng, 2, true)
+			print("Generated edition:", _edition and _edition.key or "nil")
 
-				local _seal = SMODS.poll_seal({ mod = 10, key = "stdseal" .. ante_rng })
-				print("Generated seal:", _seal and _seal.key or "nil")
+			local _seal = SMODS.poll_seal({ mod = 10, key = "stdseal" .. ante_rng })
+			print("Generated seal:", _seal and _seal.key or "nil")
 
-				local newCard = create_playing_card({
-					front = pseudorandom_element(G.P_CARDS, pseudoseed("stdset" .. ante_rng)),
-					center = center,
-				}, G.pack_cards, true, i ~= 1, { G.C.SECONDARY_SET.Default })
+			-- TOOD: Not actually added to someones inventory?
+			local newCard = create_playing_card({
+				front = pseudorandom_element(G.P_CARDS, pseudoseed("stdset" .. ante_rng)),
+				center = center,
+			}, G.pack_cards, true, i ~= 1, { G.C.SECONDARY_SET.Default })
 
-				newCard:set_edition(_edition)
-				newCard:set_seal(_seal)
+			newCard:set_edition(_edition)
+			newCard:set_seal(_seal)
 
-				print("Created new card with key:", newCard.config.center.key)
+			print("Created new card with key:", newCard.config.center.key)
 
-				return newCard
-			end,
-		}, true)
-		print("Finished setting up sandbox standard pack override")
+			return newCard
+		end,
+	}, true)
+	print("Finished setting up sandbox standard pack override")
 
 	print("MP.AddOverrides completed")
 end
