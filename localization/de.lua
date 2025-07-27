@@ -175,7 +175,7 @@ return {
 			b_start_lobby = "Lobby Starten",
 			b_ready = "Bereit",
 			b_unready = "Nicht Bereit",
-			b_leave_lobby = "Lobby Verlassen",
+			b_leave_lobby = "Lobby Verlassen",KOPIER
 			b_mp_discord = "Balatro Mehrspieler Discord Server",
 			b_start = "START",
 			b_wait_for_host_start = { "WARTEN AUF DEN", "HOST ZUM STARTEN" },
@@ -183,6 +183,7 @@ return {
 			b_lobby_options = "LOBBY OPTIONEN",
 			b_copy_clipboard = "Kopier zur Zwischenablage",
 			b_view_code = "CODE ZEIGEN",
+			b_copy_code = "KOPIER CODE"
 			b_leave = "VERLASSEN",
 			b_opts_cb_money = "Gebe comeback $ wenn Leben verloren werden",
 			b_opts_no_gold_on_loss = "Kriege keine Blind Belohnung für verlieren",
