@@ -1,6 +1,8 @@
 MP.Ruleset({
 	key = "blitz",
 	multiplayer_content = true,
+	standard = true,
+
 	banned_jokers = {},
 	banned_consumables = {
 		"c_justice",
