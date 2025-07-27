@@ -815,7 +815,7 @@ function G.UIDEF.create_UIBox_view_hash(type)
 				{
 					n = G.UIT.C,
 					config = {
-						padding = 0.2,
+						padding = 0.07,
 						align = "cm",
 					},
 					nodes = MP.UI.hash_str_to_view(
@@ -839,7 +839,7 @@ function MP.UI.hash_str_to_view(str, text_colour)
 		table.insert(t, {
 			n = G.UIT.R,
 			config = {
-				padding = 0.05,
+				padding = 0.02,
 				align = "cm",
 			},
 			nodes = {
@@ -848,7 +848,7 @@ function MP.UI.hash_str_to_view(str, text_colour)
 					config = {
 						text = s,
 						shadow = true,
-						scale = 0.45,
+						scale = 0.4,
 						colour = text_colour,
 					},
 				},
