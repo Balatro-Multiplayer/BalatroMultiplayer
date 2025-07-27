@@ -764,6 +764,7 @@ function G.UIDEF.create_UIBox_custom_seed_overlay()
 								ref_table = MP.LOBBY,
 								ref_value = "temp_seed",
 								prompt_text = localize("k_enter_seed"),
+								keyboard_offset = 4,
 								callback = function(val)
 									MP.LOBBY.config.custom_seed = MP.LOBBY.temp_seed
 									send_lobby_options()
