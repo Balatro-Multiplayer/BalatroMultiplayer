@@ -120,17 +120,25 @@ function MP.LoadReworks(ruleset, key)
 end
 
 function MP.AddOverrides(rulesetName)
-	local ruleset = MP.Rulesets[rulesetName]
+	print("MP.AddOverrides called with rulesetName:", rulesetName)
 
-	-- no standard pack behaviour ever overriden =
-	-- no standard pack behaviour to restore!
 	if not MP.INTEGRATIONS.TheOrder then
+		print("MP.INTEGRATIONS.TheOrder is false/nil, returning early")
+		return
+	end
+
+	print("MP.INTEGRATIONS.TheOrder is available")
+
+	if rulesetName ~= "sandbox" then
+		the_order_standard_pack_ownership()
 		return
 	end
 
 	if rulesetName == "sandbox" then
+		print("Processing sandbox ruleset")
 		SMODS.Booster:take_ownership_by_kind("Standard", {
 			create_card = function(self, card, i)
+				print("Creating card for sandbox ruleset, card index:", i)
 				local enchantment_pool = {}
 
 				-- Skip glass
@@ -140,26 +148,44 @@ function MP.AddOverrides(rulesetName)
 					end
 				end
 
+				print("Built enchantment pool with", #enchantment_pool, "items (excluding glass)")
+
 				local ante_rng = MP.ante_based()
+				print("Generated ante_rng:", ante_rng)
+
+				local default_center = G.P_CENTERS.c_base
+				local roll = pseudorandom(pseudoseed("stdc1" .. ante_rng)) > 0.6
+
+				print("Rolled ", roll)
+
+				local center = roll
+						and pseudorandom_element(enhancement_pool, pseudoseed("stdc2" .. ante_rng))
+					or default_center
+
+				print("Center gotten:", center.name)
+
 				local _edition = poll_edition("standard_edition" .. ante_rng, 2, true)
+				print("Generated edition:", _edition and _edition.key or "nil")
+
 				local _seal = SMODS.poll_seal({ mod = 10, key = "stdseal" .. ante_rng })
+				print("Generated seal:", _seal and _seal.key or "nil")
 
 				local newCard = create_playing_card({
 					front = pseudorandom_element(G.P_CARDS, pseudoseed("stdset" .. ante_rng)),
-					center = pseudorandom_element(enchantment_pool, pseudoseed("stdset" .. ante_rng)),
+					center = center,
 				}, G.pack_cards, true, i ~= 1, { G.C.SECONDARY_SET.Default })
 
 				newCard:set_edition(_edition)
 				newCard:set_seal(_seal)
 
+				print("Created new card with key:", newCard.config.center.key)
+
 				return newCard
 			end,
 		}, true)
-	else
-		-- not optimal and not ideal but _luckily_ the standard pack override for The Order is right here in the code,
-		-- so we can just wrap it in a functiona and call it!
-		the_order_standard_pack_ownership()
-	end
+		print("Finished setting up sandbox standard pack override")
+
+	print("MP.AddOverrides completed")
 end
 
 G.P_CENTER_POOLS.Ruleset = {}
