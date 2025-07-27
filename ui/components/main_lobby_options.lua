@@ -32,25 +32,46 @@ local function create_main_lobby_options_title(info_area_id)
 end
 
 function MP.UI.Main_Lobby_Options(info_area_id, default_info_area, button_func, buttons_data)
-	local buttons = {
+	local categories = {
 		create_main_lobby_options_title(info_area_id)
 	}
-	for idx, data in ipairs(buttons_data) do
-		local col = data.button_col or G.C.RED
-		if data.button_id == "weekly_ruleset_button" then -- putting the logic here because whatever
-			if (not MP.LOBBY.config.weekly) or (MP.LOBBY.config.weekly ~= MP.LOBBY.fetched_weekly) then
-				col = G.C.DARK_EDITION
+	for cat_idx, category in ipairs(buttons_data) do
+		local buttons = {}
+		for btn_idx, data in ipairs(category.buttons) do
+			local col = data.button_col or G.C.RED
+			if data.button_id == "weekly_ruleset_button" then -- putting the logic here because whatever
+				if (not MP.LOBBY.config.weekly) or (MP.LOBBY.config.weekly ~= MP.LOBBY.fetched_weekly) then
+					col = G.C.DARK_EDITION
+				end
 			end
+			local button = UIBox_button({
+				id = data.button_id,
+				col = true,
+				chosen = (cat_idx == 1 and btn_idx == 1 and "vert" or false),
+				label = { localize(data.button_localize_key) },
+				button =
+					button_func,
+				colour = col,
+				minw = 4,
+				scale = 0.4,
+				minh = 0.6
+			})
+			buttons[#buttons + 1] = { n = G.UIT.R, config = { align = "cm", padding = 0.05 }, nodes = { button } }
 		end
-		local button = UIBox_button({ id = data.button_id, col = true, chosen = (idx == 1 and "vert" or false), label = { localize(data.button_localize_key) }, button =
-		button_func, colour = col, minw = 4, scale = 0.4, minh = 0.6 })
-		buttons[#buttons + 1] = { n = G.UIT.R, config = { align = "cm", padding = 0.05 }, nodes = { button } }
+		categories[#categories + 1] = {
+			n = G.UIT.R,
+			config = { align = "cm", padding = 0.05, r = 0.1, minw = 4.2, minh = 0.8, colour = G.C.UI.TRANSPARENT_DARK },
+			nodes = {
+				{ n = G.UIT.R, config = { align = "cm" }, nodes = buttons },
+				{ n = G.UIT.R, config = { align = "cm", padding = 0.05 }, nodes = { { n = G.UIT.T, config = { text = localize(category.name), colour = lighten(G.C.L_BLACK, 0.5), scale = 0.33 } } } }
+			}
+		}
 	end
 
 	return create_UIBox_generic_options({
 		back_func = "play_options",
 		contents = {
-			{ n = G.UIT.C, config = { align = "tm", minh = 8, minw = 4 }, nodes = buttons },
+			{ n = G.UIT.C, config = { align = "tm", minh = 8, minw = 4, padding = 0.1 }, nodes = categories },
 			{
 				n = G.UIT.C,
 				config = { align = "cm", minh = 8, maxh = 8, minw = 11 },

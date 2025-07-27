@@ -195,14 +195,29 @@ function G.UIDEF.ruleset_selection_options()
 	})
 
 	local ruleset_buttons_data = {
-		{button_id = "ranked_ruleset_button", button_localize_key = "k_ranked"},
-		{button_id = "majorleague_ruleset_button", button_localize_key = "k_majorleague"},
-		{button_id = "minorleague_ruleset_button", button_localize_key = "k_minorleague"},
-		{button_id = "blitz_ruleset_button", button_localize_key = "k_blitz"},
-		{button_id = "traditional_ruleset_button", button_localize_key = "k_traditional"},
-		{button_id = "vanilla_ruleset_button", button_localize_key = "k_vanilla"},
-		{button_id = "badlatro_ruleset_button", button_localize_key = "k_badlatro"},
-		{button_id = "weekly_ruleset_button", button_localize_key = "k_weekly"},
+		{
+			name = "k_competitive",
+			buttons = {
+				{button_id = "ranked_ruleset_button", button_localize_key = "k_ranked"},
+				{button_id = "majorleague_ruleset_button", button_localize_key = "k_majorleague"},
+				{button_id = "minorleague_ruleset_button", button_localize_key = "k_minorleague"},
+			}
+		},
+		{
+			name = "k_standard",
+			buttons = {
+				{button_id = "blitz_ruleset_button", button_localize_key = "k_blitz"},
+				{button_id = "traditional_ruleset_button", button_localize_key = "k_traditional"},
+				{button_id = "vanilla_ruleset_button", button_localize_key = "k_vanilla"},
+			}
+		},
+		{
+			name = "k_other",
+			buttons = {
+				{button_id = "badlatro_ruleset_button", button_localize_key = "k_badlatro"},
+				{button_id = "weekly_ruleset_button", button_localize_key = "k_weekly"},
+			}
+		}
 	}
 
 	return MP.UI.Main_Lobby_Options("ruleset_area", default_ruleset_area,
@@ -216,9 +231,9 @@ function G.FUNCS.change_ruleset_selection(e)
 		end
 	end
 	MP.UI.Change_Main_Lobby_Options(e, "ruleset_area", G.UIDEF.ruleset_info, "ranked_ruleset_button",
-		function (ruleset_name) 
-			MP.LOBBY.config.ruleset = "ruleset_mp_" .. ruleset_name 
-			MP.LoadReworks(ruleset_name) 
+		function (ruleset_name)
+			MP.LOBBY.config.ruleset = "ruleset_mp_" .. ruleset_name
+			MP.LoadReworks(ruleset_name)
 		end
 	)
 
@@ -256,10 +271,10 @@ function G.UIDEF.ruleset_info(ruleset_name)
 					align = "cm",
 					padding = 0.05,
 					r = 0.1,
-					minw = 8, 
-					minh = 0.8, 
-					colour = G.C.BLUE, 
-					hover = true, 
+					minw = 8,
+					minh = 0.8,
+					colour = G.C.BLUE,
+					hover = true,
 					shadow = true,
 					label = { ruleset.forced_gamemode and localize("b_create_lobby") or localize("b_next") },
 					scale = 0.5,
@@ -493,9 +508,19 @@ function G.UIDEF.gamemode_selection_options()
 	})
 
 	local gamemode_buttons_data = {
-		{button_id = "attrition_gamemode_button", button_localize_key = "k_attrition"},
-		{button_id = "showdown_gamemode_button", button_localize_key = "k_showdown"},
-		{button_id = "survival_gamemode_button", button_localize_key = "k_survival"},
+		{
+			name = "k_battle",
+			buttons = {
+				{button_id = "attrition_gamemode_button", button_localize_key = "k_attrition"},
+				{button_id = "showdown_gamemode_button", button_localize_key = "k_showdown"},
+			}
+		},
+		{
+			name = "k_challenge",
+			buttons = {
+				{button_id = "survival_gamemode_button", button_localize_key = "k_survival"},
+			}
+		}
 	}
 
 	return MP.UI.Main_Lobby_Options("gamemode_area", default_gamemode_area,
@@ -741,7 +766,7 @@ end
 function G.FUNCS.weekly_interrupt(e)
 	if (not MP.LOBBY.config.weekly) or (MP.LOBBY.config.weekly ~= MP.LOBBY.fetched_weekly) then
 		G.SETTINGS.paused = true
-	
+
 		G.FUNCS.overlay_menu({
 			definition = G.UIDEF.weekly_interrupt(not not MP.LOBBY.config.weekly),
 		})
