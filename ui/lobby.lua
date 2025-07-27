@@ -398,12 +398,21 @@ local function create_lobby_options_tab()
 	}
 end
 
-local function create_spacer(width)
-	return {
-		n = G.UIT.C,
+local function create_spacer(size, row)
+	size = size or 0.2
+
+	return row and {
+		n = G.UIT.R,
 		config = {
 			align = "cm",
-			minw = width or 0.2,
+			minh = size,
+		},
+		nodes = {},
+	} or {
+		n = row and G.UIT.R or G.UIT.C,
+		config = {
+			align = "cm",
+			minw = size,
 		},
 		nodes = {},
 	}
