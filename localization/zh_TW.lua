@@ -60,7 +60,7 @@ return {
 			host_start = "大廳主開始",
 			players = "其他玩家",
 			lobby_options = "大廳設置",
-			lobby_options_cap = "大廳設置",複製程式碼
+			lobby_options_cap = "大廳設置",
 			copy_clipboard = "複製到剪貼簿",
 			connect_player = "已連接玩家：",
 			view_code = "查看代碼",
