@@ -175,7 +175,7 @@ return {
 			b_start_lobby = "Lobby Starten",
 			b_ready = "Bereit",
 			b_unready = "Nicht Bereit",
-			b_leave_lobby = "Lobby Verlassen",KOPIER
+			b_leave_lobby = "Lobby Verlassen",
 			b_mp_discord = "Balatro Mehrspieler Discord Server",
 			b_start = "START",
 			b_wait_for_host_start = { "WARTEN AUF DEN", "HOST ZUM STARTEN" },
