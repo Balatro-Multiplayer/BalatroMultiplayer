@@ -145,7 +145,7 @@ SMODS.Mods.Multiplayer.config_tab = function()
 					align = "cm",
 					on_demand_tooltip = {
 						text = {
-							localize('k_the_order_integration_desc'), 
+							localize('k_the_order_integration_desc'),
 							localize("k_the_order_credit")
 						}
 					},
@@ -246,9 +246,9 @@ SMODS.Mods.Multiplayer.config_tab = function()
 						create_option_cycle({
 							id = "blind_col_changer_option",
 							label = localize{type ='name_text', key = MP.UTILS.blind_col_numtokey(MP.LOBBY.blind_col), set = 'Blind'},
-							scale = 0.8, 
+							scale = 0.8,
 							options = {1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25}, -- blind_cols are being saved as numbers because of this option cycle. if this is changed then we should probably change to keys
-							opt_callback = 'change_blind_col', 
+							opt_callback = 'change_blind_col',
 							current_option = MP.LOBBY.blind_col
 						}),
 					}},

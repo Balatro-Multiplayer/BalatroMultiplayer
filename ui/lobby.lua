@@ -468,29 +468,30 @@ function G.UIDEF.create_UIBox_lobby_menu()
 						},
 						nodes = {
 							MP.LOBBY.is_host
-								and Disableable_Button({
-									id = "lobby_menu_start",
-									button = "lobby_start_game",
-									colour = G.C.BLUE,
-									minw = 3.65,
-									minh = 1.55,
-									label = { localize("b_start") },
-									disabled_text = MP.LOBBY.guest.username and localize("b_wait_for_guest_ready") or localize("b_wait_for_players"),
-									scale = text_scale * 2,
-									col = true,
-									enabled_ref_table = MP.LOBBY,
-									enabled_ref_value = "ready_to_start",
-								})
-								or UIBox_button({
-									id = "lobby_menu_start",
-									button = "lobby_ready_up",
-									colour = MP.LOBBY.ready_to_start and G.C.GREEN or G.C.RED,
-									minw = 3.65,
-									minh = 1.55,
-									label = { MP.LOBBY.ready_to_start and localize("b_unready") or localize("b_ready") },
-									scale = text_scale * 2,
-									col = true,
-								}),
+							and Disableable_Button({
+								id = "lobby_menu_start",
+								button = "lobby_start_game",
+								colour = G.C.BLUE,
+								minw = 3.65,
+								minh = 1.55,
+								label = { localize("b_start") },
+								disabled_text = MP.LOBBY.guest.username and localize("b_wait_for_guest_ready") or
+								localize("b_wait_for_players"),
+								scale = text_scale * 2,
+								col = true,
+								enabled_ref_table = MP.LOBBY,
+								enabled_ref_value = "ready_to_start",
+							})
+							or UIBox_button({
+								id = "lobby_menu_start",
+								button = "lobby_ready_up",
+								colour = MP.LOBBY.ready_to_start and G.C.GREEN or G.C.RED,
+								minw = 3.65,
+								minh = 1.55,
+								label = { MP.LOBBY.ready_to_start and localize("b_unready") or localize("b_ready") },
+								scale = text_scale * 2,
+								col = true,
+							}),
 							{
 								n = G.UIT.C,
 								config = {
@@ -646,11 +647,11 @@ local function create_gamemode_modifiers_tab()
 						"change_starting_lives"
 					),
 					create_lobby_option_cycle(
-						"pvp_round_start_option", 
-						"k_opts_pvp_start_round", 
+						"pvp_round_start_option",
+						"k_opts_pvp_start_round",
 						0.85,
-						{ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20 }, 
-						MP.LOBBY.config.pvp_start_round, 
+						{ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20 },
+						MP.LOBBY.config.pvp_start_round,
 						"change_starting_pvp_round"),
 					create_lobby_option_cycle(
 						"pvp_timer_seconds_option",
@@ -661,27 +662,28 @@ local function create_gamemode_modifiers_tab()
 						"change_timer_base_seconds"
 					),
 					create_lobby_option_cycle(
-						"showdown_starting_antes_option", 
-						"k_opts_showdown_starting_antes", 
+						"showdown_starting_antes_option",
+						"k_opts_showdown_starting_antes",
 						0.85,
-						{ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20 }, 
-						MP.LOBBY.config.showdown_starting_antes, 
+						{ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20 },
+						MP.LOBBY.config.showdown_starting_antes,
 						"change_showdown_starting_antes"
 					),
 					create_lobby_option_cycle(
-						"pvp_timer_increment_seconds_option", 
+						"pvp_timer_increment_seconds_option",
 						"k_opts_pvp_timer_increment",
 						0.85,
-						{ "0s", "30s", "60s", "90s", "120s", "150s", "180s" }, 
-						MP.UTILS.get_array_index_by_value({ 0, 30, 60, 90, 120, 150, 180 },MP.LOBBY.config.timer_increment_seconds), 
+						{ "0s", "30s", "60s", "90s", "120s", "150s", "180s" },
+						MP.UTILS.get_array_index_by_value({ 0, 30, 60, 90, 120, 150, 180 },
+							MP.LOBBY.config.timer_increment_seconds),
 						"change_timer_increment_seconds"
 					),
-				    create_lobby_option_cycle(
-						"pvp_countdown_seconds_option", 
+					create_lobby_option_cycle(
+						"pvp_countdown_seconds_option",
 						"k_opts_pvp_countdown_seconds",
 						0.85,
-						{ 0, 3, 5, 10 }, 
-						MP.UTILS.get_array_index_by_value({ 0, 3, 5, 10 }, MP.LOBBY.config.pvp_countdown_seconds), 
+						{ 0, 3, 5, 10 },
+						MP.UTILS.get_array_index_by_value({ 0, 3, 5, 10 }, MP.LOBBY.config.pvp_countdown_seconds),
 						"change_pvp_countdown_seconds"
 					),
 				},
@@ -888,8 +890,8 @@ G.FUNCS.change_showdown_starting_antes = function(args)
 end
 
 G.FUNCS.change_pvp_countdown_seconds = function(args)
-        MP.LOBBY.config.pvp_countdown_seconds = args.to_val
-        send_lobby_options()
+	MP.LOBBY.config.pvp_countdown_seconds = args.to_val
+	send_lobby_options()
 end
 
 function G.FUNCS.get_lobby_main_menu_UI(e)
@@ -988,7 +990,7 @@ G.FUNCS.start_run = function(e, args)
 			if MP.DECK.MAX_STAKE > 0 and chosen_stake > MP.DECK.MAX_STAKE then
 				MP.UTILS.overlay_message(
 					"Selected stake is incompatible with Multiplayer, stake set to "
-						.. SMODS.stake_from_index(MP.DECK.MAX_STAKE)
+					.. SMODS.stake_from_index(MP.DECK.MAX_STAKE)
 				)
 				chosen_stake = MP.DECK.MAX_STAKE
 			end

@@ -36,7 +36,7 @@ function MP.UI.create_UIBox_settings() -- optimize this please
 	local seed = MP.LOBBY.config.custom_seed == "random" and localize("k_random") or MP.LOBBY.config.custom_seed
 	return {
 		n = G.UIT.ROOT,
-			config = {
+		config = {
 			emboss = 0.05,
 			minh = 6,
 			r = 0.1,
@@ -46,87 +46,116 @@ function MP.UI.create_UIBox_settings() -- optimize this please
 			colour = G.C.BLACK,
 		},
 		nodes = {
-			{n=G.UIT.R, config={align = "tm", padding = 0.05}, nodes={
-				{n=G.UIT.T, config={text = (localize("k_" .. ruleset) .. " " .. localize("k_" .. gamemode)), colour = G.C.UI.TEXT_LIGHT, scale = 0.6}}}},
-			{n=G.UIT.R, config={align = "tm", padding = 0.05}, nodes={
-				{n=G.UIT.T, config={text = (localize("k_current_seed") .. seed), colour = G.C.UI.TEXT_LIGHT, scale = 0.6}}}},
-			{n = G.UIT.R,
+			{
+				n = G.UIT.R,
+				config = { align = "tm", padding = 0.05 },
+				nodes = {
+					{ n = G.UIT.T, config = { text = (localize("k_" .. ruleset) .. " " .. localize("k_" .. gamemode)), colour = G.C.UI.TEXT_LIGHT, scale = 0.6 } } }
+			},
+			{
+				n = G.UIT.R,
+				config = { align = "tm", padding = 0.05 },
+				nodes = {
+					{ n = G.UIT.T, config = { text = (localize("k_current_seed") .. seed), colour = G.C.UI.TEXT_LIGHT, scale = 0.6 } } }
+			},
+			{
+				n = G.UIT.R,
 				config = {
 					padding = 0,
 					align = "cr",
-					},
+				},
 				nodes = {
-				Disableable_Toggle({
-					enabled_ref_table = MP.LOBBY,
-					label = localize("b_opts_cb_money"),
-					ref_table = MP.LOBBY.config,
-					ref_value = "gold_on_life_loss",})}},
-			{n = G.UIT.R,
+					Disableable_Toggle({
+						enabled_ref_table = MP.LOBBY,
+						label = localize("b_opts_cb_money"),
+						ref_table = MP.LOBBY.config,
+						ref_value = "gold_on_life_loss",
+					}) }
+			},
+			{
+				n = G.UIT.R,
 				config = {
 					padding = 0,
 					align = "cr",
-					},
+				},
 				nodes = {
-				Disableable_Toggle({
-					enabled_ref_table = MP.LOBBY,
-					label = localize("b_opts_no_gold_on_loss"),
-					ref_table = MP.LOBBY.config,
-					ref_value = "no_gold_on_round_loss",})}},
-			{n = G.UIT.R,
+					Disableable_Toggle({
+						enabled_ref_table = MP.LOBBY,
+						label = localize("b_opts_no_gold_on_loss"),
+						ref_table = MP.LOBBY.config,
+						ref_value = "no_gold_on_round_loss",
+					}) }
+			},
+			{
+				n = G.UIT.R,
 				config = {
 					padding = 0,
 					align = "cr",
-					},
+				},
 				nodes = {
-				Disableable_Toggle({
-					enabled_ref_table = MP.LOBBY,
-					label = localize("b_opts_death_on_loss"),
-					ref_table = MP.LOBBY.config,
-					ref_value = "death_on_round_loss",})}},
-			{n = G.UIT.R,
+					Disableable_Toggle({
+						enabled_ref_table = MP.LOBBY,
+						label = localize("b_opts_death_on_loss"),
+						ref_table = MP.LOBBY.config,
+						ref_value = "death_on_round_loss",
+					}) }
+			},
+			{
+				n = G.UIT.R,
 				config = {
 					padding = 0,
 					align = "cr",
-					},
+				},
 				nodes = {
-				Disableable_Toggle({
-					enabled_ref_table = MP.LOBBY,
-					label = localize("b_opts_diff_seeds"),
-					ref_table = MP.LOBBY.config,
-					ref_value = "different_seeds",})}},
-			{n = G.UIT.R,
+					Disableable_Toggle({
+						enabled_ref_table = MP.LOBBY,
+						label = localize("b_opts_diff_seeds"),
+						ref_table = MP.LOBBY.config,
+						ref_value = "different_seeds",
+					}) }
+			},
+			{
+				n = G.UIT.R,
 				config = {
 					padding = 0,
 					align = "cr",
-					},
+				},
 				nodes = {
-				Disableable_Toggle({
-					enabled_ref_table = MP.LOBBY,
-					label = localize("b_opts_player_diff_deck"),
-					ref_table = MP.LOBBY.config,
-					ref_value = "different_decks",})}},
-			{n = G.UIT.R,
+					Disableable_Toggle({
+						enabled_ref_table = MP.LOBBY,
+						label = localize("b_opts_player_diff_deck"),
+						ref_table = MP.LOBBY.config,
+						ref_value = "different_decks",
+					}) }
+			},
+			{
+				n = G.UIT.R,
 				config = {
 					padding = 0,
 					align = "cr",
-					},
+				},
 				nodes = {
-				Disableable_Toggle({
-					enabled_ref_table = MP.LOBBY,
-					label = localize("b_opts_multiplayer_jokers"),
-					ref_table = MP.LOBBY.config,
-					ref_value = "multiplayer_jokers",})}},
-			{n = G.UIT.R,
+					Disableable_Toggle({
+						enabled_ref_table = MP.LOBBY,
+						label = localize("b_opts_multiplayer_jokers"),
+						ref_table = MP.LOBBY.config,
+						ref_value = "multiplayer_jokers",
+					}) }
+			},
+			{
+				n = G.UIT.R,
 				config = {
 					padding = 0,
 					align = "cr",
-					},
+				},
 				nodes = {
-				Disableable_Toggle({
-					enabled_ref_table = MP.LOBBY,
-					label = localize("b_opts_normal_bosses"),
-					ref_table = MP.LOBBY.config,
-					ref_value = "normal_bosses",})}},
+					Disableable_Toggle({
+						enabled_ref_table = MP.LOBBY,
+						label = localize("b_opts_normal_bosses"),
+						ref_table = MP.LOBBY.config,
+						ref_value = "normal_bosses",
+					}) }
+			},
 		}
 	}
 end
@@ -369,49 +398,49 @@ function MP.UI.timer_hud()
 end
 
 function MP.UI.start_pvp_countdown(callback)
-    local seconds = countdown_seconds
+	local seconds = countdown_seconds
 	local tick_delay = 1
-    if MP.LOBBY and MP.LOBBY.config and MP.LOBBY.config.pvp_countdown_seconds then
-        seconds = MP.LOBBY.config.pvp_countdown_seconds
-    end
-    MP.GAME.pvp_countdown = seconds
+	if MP.LOBBY and MP.LOBBY.config and MP.LOBBY.config.pvp_countdown_seconds then
+		seconds = MP.LOBBY.config.pvp_countdown_seconds
+	end
+	MP.GAME.pvp_countdown = seconds
 
-    local function show_next()
-        if MP.GAME.pvp_countdown <= 0 then
-            if callback then callback() end
-            return true
-        end
+	local function show_next()
+		if MP.GAME.pvp_countdown <= 0 then
+			if callback then callback() end
+			return true
+		end
 
-        G.FUNCS.attention_text_realtime({
-            text = tostring(MP.GAME.pvp_countdown),
-            scale = 5,
-            hold = 0.85,
-            align = "cm",
-            major = G.play,
+		G.FUNCS.attention_text_realtime({
+			text = tostring(MP.GAME.pvp_countdown),
+			scale = 5,
+			hold = 0.85,
+			align = "cm",
+			major = G.play,
 			backdrop_colour = G.C.MULT,
-        })
+		})
 
 		play_sound("tarot2", 1, 0.4)
 
-        MP.GAME.pvp_countdown = MP.GAME.pvp_countdown - 1
+		MP.GAME.pvp_countdown = MP.GAME.pvp_countdown - 1
 
-        G.E_MANAGER:add_event(Event({
-            trigger = "after",
+		G.E_MANAGER:add_event(Event({
+			trigger = "after",
 			timer = "REAL",
-            delay = tick_delay,
-            blockable = false,
-            func = show_next,
-        }))
-        return true
-    end
+			delay = tick_delay,
+			blockable = false,
+			func = show_next,
+		}))
+		return true
+	end
 
-    G.E_MANAGER:add_event(Event({
-        trigger = "after",
+	G.E_MANAGER:add_event(Event({
+		trigger = "after",
 		timer = "REAL",
-        delay = 0,
-        blockable = false,
-        func = show_next,
-    }))
+		delay = 0,
+		blockable = false,
+		func = show_next,
+	}))
 end
 
 function G.FUNCS.set_timer_box(e)
