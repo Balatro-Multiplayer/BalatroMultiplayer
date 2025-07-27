@@ -561,25 +561,31 @@ function G.UIDEF.create_UIBox_lobby_menu()
 									create_spacer(),
 									create_players_section(text_scale),
 									create_spacer(),
-									UIBox_button({
-										button = "view_code",
-										colour = G.C.PALE_GREEN,
-										minw = 2.15,
-										minh = 1.35,
-										label = { localize("b_view_code") },
-										scale = text_scale * 1.2,
-										col = true,
-									}),
-									create_spacer(),
-									UIBox_button({
-										button = "copy_to_clipboard",
-										colour = G.C.PALE_GREEN,
-										minw = 1.35,
-										minh = 1.35,
-										label = localize("b_copy_code_clipboard"),
-										scale = text_scale,
-										col = true,
-									}),
+									{
+										n = G.UIT.C,
+										config = {
+											align = "cm",
+										},
+										nodes = {
+											UIBox_button({
+												button = "view_code",
+												colour = G.C.PALE_GREEN,
+												minw = 2.15,
+												minh = 0.65,
+												label = { localize("b_view_code") },
+												scale = text_scale * 1.2,
+											}),
+											create_spacer(0.1, true),
+											UIBox_button({
+												button = "copy_to_clipboard",
+												colour = G.C.PERISHABLE,
+												minw = 2.15,
+												minh = 0.65,
+												label = { localize("b_copy_code") },
+												scale = text_scale,
+											}),
+										}
+									}
 								},
 							},
 							UIBox_button({
