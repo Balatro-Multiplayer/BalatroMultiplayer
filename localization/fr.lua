@@ -187,6 +187,7 @@ return {
 			b_lobby_options = "OPTIONS DE LOBBY",
 			b_copy_clipboard = "Copier vers le presse-papiers",
 			b_view_code = "VOIR LE CODE",
+			b_copy_code = "COPIER LE CODE",
 			b_leave = "PARTIR",
 			b_opts_cb_money = "Gagner des $ lors de la perte d'une vie",
 			b_opts_no_gold_on_loss = "Ne pas obtenir les récompenses de la Blinde lors d'une défaite",

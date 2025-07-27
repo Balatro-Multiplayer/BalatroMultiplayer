@@ -183,6 +183,7 @@ return {
 			b_lobby_options = "ПАРАМЕТРЫ ЛОББИ",
 			b_copy_clipboard = "Скопировать",
 			b_view_code = "УВИДЕТЬ КОД",
+			b_copy_code = "КОПИРОВАТЬ КОД",
 			b_leave = "ВЫЙТИ",
 			b_opts_cb_money = "Давать доп. золото при потере жизни",
 			b_opts_no_gold_on_loss = "Не давать золото при поражении в раунде",

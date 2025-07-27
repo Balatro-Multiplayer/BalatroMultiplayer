@@ -183,6 +183,7 @@ return {
 			b_lobby_options = "LOBBY OPTIONEN",
 			b_copy_clipboard = "Kopier zur Zwischenablage",
 			b_view_code = "CODE ZEIGEN",
+			b_copy_code = "KOPIER CODE"
 			b_leave = "VERLASSEN",
 			b_opts_cb_money = "Gebe comeback $ wenn Leben verloren werden",
 			b_opts_no_gold_on_loss = "Kriege keine Blind Belohnung für verlieren",
