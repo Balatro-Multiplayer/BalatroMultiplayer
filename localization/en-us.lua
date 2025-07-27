@@ -209,6 +209,8 @@ return {
 			b_view_nemesis_deck = "View Decks",
 			b_toggle_jokers = "Toggle Jokers",
 			b_skip_tutorial = "Skip Tutorial",
+			k_rulesets = "Rulesets",
+			k_gamemodes = "Gamemodes",
 			k_continue_singleplayer_tooltip = "This will overwrite your current singleplayer run",
 			k_enemy_score = "Current Enemy score",
 			k_enemy_hands = "Enemy hands left: ",
@@ -284,9 +286,7 @@ return {
 			k_survival_description = "The player who beats the farthest blind wins. No Nemesis blinds. This gamemode is a test of your ability to gradually build-up to the highest scoring Vanilla hands.",
 			k_weekly = "Weekly",
 			k_weekly_description = "A special ruleset that changes weekly or bi-weekly. I guess you'll have to find out what it is! Currently: ",
-
 			k_weekly_smallworld = "Small World",
-
 			k_oops_ex = "Oops!",
 			k_asteroids = "Asteroids",
 			k_amount_short = "Amt.",
