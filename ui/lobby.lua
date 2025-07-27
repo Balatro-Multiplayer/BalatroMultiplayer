@@ -398,12 +398,21 @@ local function create_lobby_options_tab()
 	}
 end
 
-local function create_spacer(width)
-	return {
-		n = G.UIT.C,
+local function create_spacer(size, row)
+	size = size or 0.2
+
+	return row and {
+		n = G.UIT.R,
 		config = {
 			align = "cm",
-			minw = width or 0.2,
+			minh = size,
+		},
+		nodes = {},
+	} or {
+		n = row and G.UIT.R or G.UIT.C,
+		config = {
+			align = "cm",
+			minw = size,
 		},
 		nodes = {},
 	}
@@ -552,15 +561,31 @@ function G.UIDEF.create_UIBox_lobby_menu()
 									create_spacer(),
 									create_players_section(text_scale),
 									create_spacer(),
-									UIBox_button({
-										button = "view_code",
-										colour = G.C.PALE_GREEN,
-										minw = 3.15,
-										minh = 1.35,
-										label = { localize("b_view_code") },
-										scale = text_scale * 1.2,
-										col = true,
-									}),
+									{
+										n = G.UIT.C,
+										config = {
+											align = "cm",
+										},
+										nodes = {
+											UIBox_button({
+												button = "view_code",
+												colour = G.C.PALE_GREEN,
+												minw = 2.15,
+												minh = 0.65,
+												label = { localize("b_view_code") },
+												scale = text_scale * 1.2,
+											}),
+											create_spacer(0.1, true),
+											UIBox_button({
+												button = "copy_to_clipboard",
+												colour = G.C.PERISHABLE,
+												minw = 2.15,
+												minh = 0.65,
+												label = { localize("b_copy_code") },
+												scale = text_scale,
+											}),
+										}
+									}
 								},
 							},
 							UIBox_button({
