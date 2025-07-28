@@ -1201,8 +1201,6 @@ function MP.end_round()
 			return true
 		end,
 	}))
-	
-
 	return true
 end
 
