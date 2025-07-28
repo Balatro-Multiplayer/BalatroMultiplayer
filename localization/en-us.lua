@@ -216,6 +216,7 @@ return {
 			k_other = "Other",
 			k_battle = "Battle",
 			k_challenge = "Challenge",
+			k_info = "Info",
 			k_continue_singleplayer_tooltip = "This will overwrite your current singleplayer run",
 			k_enemy_score = "Current Enemy score",
 			k_enemy_hands = "Enemy hands left: ",

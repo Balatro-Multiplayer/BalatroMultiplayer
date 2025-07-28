@@ -242,14 +242,8 @@ end
 
 function G.UIDEF.ruleset_info(ruleset_name)
 	local ruleset = MP.Rulesets["ruleset_mp_" .. ruleset_name]
-	local ruleset_desc = localize("k_" .. ruleset_name .. "_description")
-	if ruleset_name == 'weekly' then
-		ruleset_desc = ruleset_desc .. " " .. localize("k_weekly_" .. MP.LOBBY.config.weekly)
-	end
-	ruleset_desc = MP.UTILS.wrapText(ruleset_desc, 100)
-	local _, ruleset_desc_lines = ruleset_desc:gsub("\n", " ")
 
-	local ruleset_banned_tabs = UIBox({
+	local ruleset_info_banned_rework_tabs = UIBox({
 		definition = G.UIDEF.ruleset_tabs(ruleset),
 		config = { align = "cm" }
 	})
@@ -266,16 +260,9 @@ function G.UIDEF.ruleset_info(ruleset_name)
 				nodes = {
 					{
 						n = G.UIT.R,
-						config = { align = "tm", padding = 0.05, minw = 11, maxw = 11, minh = math.max(2, ruleset_desc_lines) * 0.35 },
-						nodes = {
-							{ n = G.UIT.T, config = { text = ruleset_desc, colour = G.C.UI.TEXT_LIGHT, scale = 0.8 } }
-						}
-					},
-					{
-						n = G.UIT.R,
 						config = { align = "cm" },
 						nodes = {
-							{ n = G.UIT.O, config = { object = ruleset_banned_tabs } }
+							{ n = G.UIT.O, config = { object = ruleset_info_banned_rework_tabs } }
 						}
 					},
 					{
@@ -285,7 +272,7 @@ function G.UIDEF.ruleset_info(ruleset_name)
 							MP.UI.Disableable_Button({
 								id = "select_gamemode_button",
 								button = ruleset.forced_gamemode and "force_" .. ruleset.forced_gamemode or
-								"select_gamemode",
+									"select_gamemode",
 								align = "cm",
 								padding = 0.05,
 								r = 0.1,
@@ -310,8 +297,8 @@ end
 
 function G.UIDEF.ruleset_tabs(ruleset)
 	local default_tabs = UIBox({
-		definition = G.UIDEF.ruleset_tabs_definition(ruleset, true, 1),
-		config = { align = "cm", is_bans_tabs = true, chosen_tab = 1 }
+		definition = G.UIDEF.ruleset_tabs_definition(ruleset, "info", 1),
+		config = { align = "cm", tab_type = "info", chosen_tab = 1 }
 	})
 
 	return {
@@ -334,7 +321,7 @@ function G.UIDEF.ruleset_tabs(ruleset)
 						config = { align = "bm", padding = 0.05 },
 						nodes = {
 							create_option_cycle({
-								options = { localize("k_bans"), localize("k_reworks") },
+								options = { localize("k_info"), localize("k_bans"), localize("k_reworks") },
 								current_option = 1,
 								opt_callback = "ruleset_switch_tabs",
 								opt_args = { ui = default_tabs, ruleset = ruleset },
@@ -357,30 +344,39 @@ function G.FUNCS.ruleset_switch_tabs(args)
 	local tabs_object = callback_args.ui
 	local tabs_wrap = tabs_object.parent
 
-	local active_tab_idx = tabs_wrap.UIBox:get_UIE_by_ID("ruleset_active_tab").config.tab_idx
+	local active_tab = tabs_wrap.UIBox:get_UIE_by_ID("ruleset_active_tab")
+	local active_tab_idx = active_tab and active_tab.config.tab_idx or 1
 
-	tabs_object.config.is_bans_tabs = not tabs_object.config.is_bans_tabs
+	local tab_type = (args.to_key == 2 and "banned") or (args.to_key == 3 and "rework") or "info"
+	local def = nil
 
-	if tabs_object.config.is_bans_tabs then
+	if tab_type == "banned" then
+		def = G.UIDEF.ruleset_tabs_definition(callback_args.ruleset, "banned", active_tab_idx)
+		tabs_object.config.tab_type = "banned"
 		MP.LOBBY.config.ruleset = callback_args.ruleset.key
 		MP.LOBBY.ruleset_preview = false
-	else
+	elseif tab_type == "rework" then
+		def = G.UIDEF.ruleset_tabs_definition(callback_args.ruleset, "rework", active_tab_idx)
+		tabs_object.config.tab_type = "rework"
 		MP.LOBBY.config.ruleset = callback_args.ruleset.key
 		MP.LOBBY.ruleset_preview = true
+	else
+		def = G.UIDEF.ruleset_tabs_definition(callback_args.ruleset, "info", active_tab_idx)
+		tabs_object.config.tab_type = "info"
+		MP.LOBBY.config.ruleset = callback_args.ruleset.key
+		MP.LOBBY.ruleset_preview = false
 	end
 
 	tabs_wrap.config.object:remove()
 	tabs_wrap.config.object = UIBox({
-		definition = tabs_object.config.is_bans_tabs and
-		G.UIDEF.ruleset_tabs_definition(callback_args.ruleset, true, active_tab_idx) or
-		G.UIDEF.ruleset_tabs_definition(callback_args.ruleset, false, active_tab_idx),
+		definition = def,
 		config = { align = "cm", parent = tabs_wrap }
 	})
 
 	tabs_wrap.UIBox:recalculate()
 end
 
-function G.UIDEF.ruleset_tabs_definition(ruleset, is_banned_tab, chosen_tab_idx)
+local function create_bans_and_reworks_tabs(ruleset, is_banned_tab, chosen_tab_idx)
 	local banned_cards_tabs = {}
 
 	local function copy_all_banned_ids(global_bans, ruleset_bans)
@@ -426,6 +422,52 @@ function G.UIDEF.ruleset_tabs_definition(ruleset, is_banned_tab, chosen_tab_idx)
 	}
 end
 
+local function create_info_tab(ruleset)
+	local ruleset_name = string.match(ruleset.key, "[^_]+$") or ""
+	local ruleset_desc = localize("k_" .. ruleset_name .. "_description")
+	if ruleset_name == 'weekly' then
+		ruleset_desc = ruleset_desc .. " " .. localize("k_weekly_" .. MP.LOBBY.config.weekly)
+	end
+	ruleset_desc = MP.UTILS.wrapText(ruleset_desc, 100)
+
+	return {
+		n = G.UIT.ROOT,
+		config = { id = "ruleset_active_tab", align = "cm", colour = G.C.CLEAR },
+		nodes = {
+			{
+				n = G.UIT.C,
+				config = { align = "tm", padding = 0.2, r = 0.1, minw = 10.7, maxw = 10.7, minh = 5.75, maxh = 5.75 },
+				nodes = {
+					{
+						n = G.UIT.R,
+						config = {
+							align = "tm"
+						},
+						nodes = {
+							{
+								n = G.UIT.T,
+								config = {
+									text = ruleset_desc,
+									scale = 0.4,
+									colour = G.C.UI.TEXT_LIGHT,
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+end
+
+function G.UIDEF.ruleset_tabs_definition(ruleset, tab_type, chosen_tab_idx)
+	if tab_type == "banned" or tab_type == "rework" then
+		return create_bans_and_reworks_tabs(ruleset, tab_type == "banned", chosen_tab_idx)
+	end
+
+	return create_info_tab(ruleset)
+end
+
 function G.UIDEF.ruleset_cardarea_definition(args)
 	local function get_ruleset_cardarea(obj_ids, width, height)
 		local ret = {}
@@ -447,8 +489,14 @@ function G.UIDEF.ruleset_cardarea_definition(args)
 				local card_area = CardArea(
 					0, 0,
 					width, height / n_rows,
-					{ card_limit = nil, type = 'title_2', view_deck = true, highlight_limit = 0, card_w = G.CARD_W *
-					card_size }
+					{
+						card_limit = nil,
+						type = 'title_2',
+						view_deck = true,
+						highlight_limit = 0,
+						card_w = G.CARD_W *
+							card_size
+					}
 				)
 
 				for k, v in ipairs(card_row) do -- Each card_row consists of Card IDs
@@ -532,8 +580,12 @@ function G.UIDEF.ruleset_cardarea_definition(args)
 						temp_blind.hover_tilt = 3
 						juice_up(temp_blind, 0.05, 0.02)
 						temp_blind.config.h_popup = create_UIBox_blind_popup(blind_spec, true)
-						temp_blind.config.h_popup_config = { align = 'cl', offset = { x = -0.1, y = 0 }, parent =
-						temp_blind }
+						temp_blind.config.h_popup_config = {
+							align = 'cl',
+							offset = { x = -0.1, y = 0 },
+							parent =
+								temp_blind
+						}
 						Node.hover(temp_blind)
 					end
 				end
@@ -556,7 +608,7 @@ function G.UIDEF.ruleset_cardarea_definition(args)
 					n = G.UIT.C,
 					config = { align = "cm", padding = 0.05, r = 0.1, minw = 5.4, minh = 4.8, maxh = 4.8 },
 					nodes = {
-						{ n = G.UIT.R, config = { align = "cm", minh = 4 }, nodes = tag_grid },
+						{ n = G.UIT.R, config = { align = "cm", minh = 4 },       nodes = tag_grid },
 						{ n = G.UIT.R, config = { align = "cm", padding = 0.05 }, nodes = { get_localised_label(args.obj_ids.tags, localize("b_tags")) } }
 					}
 				},
@@ -564,7 +616,7 @@ function G.UIDEF.ruleset_cardarea_definition(args)
 					n = G.UIT.C,
 					config = { align = "cm", padding = 0.05, r = 0.1, minw = 5.4, minh = 4.8, maxh = 4.8 },
 					nodes = {
-						{ n = G.UIT.R, config = { align = "cm", minh = 4 }, nodes = blind_grid },
+						{ n = G.UIT.R, config = { align = "cm", minh = 4 },       nodes = blind_grid },
 						{ n = G.UIT.R, config = { align = "cm", padding = 0.05 }, nodes = { get_localised_label(args.obj_ids.blinds, localize("b_blinds")) } }
 					}
 				}
@@ -581,7 +633,7 @@ function G.UIDEF.ruleset_cardarea_definition(args)
 					n = G.UIT.C,
 					config = { align = "cm", padding = 0.05, r = 0.1, minw = 10.8, minh = 4.8, maxh = 4.8 },
 					nodes = {
-						{ n = G.UIT.R, config = { align = "cm" },           nodes = cards_grid },
+						{ n = G.UIT.R, config = { align = "cm" },                 nodes = cards_grid },
 						{ n = G.UIT.R, config = { align = "cm", padding = 0.05 }, nodes = { get_localised_label(args.obj_ids, args.type) } }
 					}
 				}
@@ -626,9 +678,6 @@ end
 function G.UIDEF.gamemode_info(gamemode_name)
 	local gamemode = MP.Gamemodes["gamemode_mp_" .. gamemode_name]
 
-	local gamemode_desc = MP.UTILS.wrapText(localize("k_" .. gamemode_name .. "_description"), 100)
-	local _, gamemode_desc_lines = gamemode_desc:gsub("\n", " ")
-
 	return {
 		n = G.UIT.ROOT,
 		config = { align = "tm", minh = 8, maxh = 8, minw = 11, maxw = 11, colour = G.C.CLEAR },
@@ -637,13 +686,6 @@ function G.UIDEF.gamemode_info(gamemode_name)
 				n = G.UIT.C,
 				config = { align = "tm", padding = 0.2, r = 0.1, colour = G.C.BLACK, minh = 8 },
 				nodes = {
-					{
-						n = G.UIT.R,
-						config = { align = "tm", padding = 0.05, minw = 11, maxw = 11, minh = 8 },
-						nodes = {
-							{ n = G.UIT.T, config = { text = gamemode_desc, colour = G.C.UI.TEXT_LIGHT, scale = 0.8 } }
-						}
-					},
 					{
 						n = G.UIT.R,
 						config = { align = "cm" },

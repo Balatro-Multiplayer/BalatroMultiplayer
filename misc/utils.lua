@@ -56,7 +56,7 @@ end
 function MP.UTILS.get_array_index_by_value(options, value)
     for i, v in ipairs(options) do
         if v == value then
-            return i 
+            return i
         end
     end
     return nil
