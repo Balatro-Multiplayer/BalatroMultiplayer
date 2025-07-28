@@ -1148,7 +1148,7 @@ function MP.end_round()
 	-- Allows opponent to advance after playing anything, and eases a life from the person who discarded their deck.
 	if G.GAME.current_round.hands_played == 0 
 	   and G.GAME.current_round.discards_used > 0
-	   and MP.LOBBY.config.gamemode != "gamemode_mp_survival" then
+	   and MP.LOBBY.config.gamemode ~= "gamemode_mp_survival" then
 			if MP.is_pvp_boss() then
 				MP.ACTIONS.play_hand(0, 0)
 			end
