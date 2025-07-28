@@ -1067,7 +1067,7 @@ function Game:update_new_round(dt)
 end
 
 function MP.end_round()
-	if MP.GAME.round_ended then sendDebugMessage('Double-end prevented'); return true end -- quick fix to prevent double ends?
+	if MP.GAME.round_ended then sendDebugMessage('Double-end prevented'); return true end -- Certain MP cases trigger the Mr. Bones glitch, this prevents duplicate execution
 	MP.GAME.round_ended  = true
 	
 	G.GAME.blind.in_blind = false
@@ -2368,7 +2368,6 @@ function G.FUNCS.select_blind(e)
 	MP.GAME.prevent_eval = false
 	select_blind_ref(e)
 	if MP.LOBBY.code then
-		MP.GAME.round_ended = false -- wrapping blind so ends don't happen twice, referenced at start of MP.end_round
 		MP.GAME.ante_key = tostring(math.random())
 		MP.ACTIONS.play_hand(0, G.GAME.round_resets.hands)
 		MP.ACTIONS.new_round()
