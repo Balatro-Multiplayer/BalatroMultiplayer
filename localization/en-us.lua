@@ -298,7 +298,7 @@ return {
 			k_random = "Random",
 			k_standard = "Standard",
 			k_standard_description = "The standard ruleset, includes Multiplayer cards and changes to the base game to fit the Multiplayer meta.",
-			k_sandbox = "steph's silly sandbox",
+			k_sandbox = "steph's sandbox",
 			k_sandbox_description = "Like normal mode but someone gave the cards coffee and they're feeling chatty.",
 			k_vanilla = "Vanilla",
 			k_vanilla_description = "The vanilla ruleset, no Multiplayer cards, no modifications to base game content. This ruleset includes Multiplayer features like the timer",
