@@ -19,6 +19,7 @@ MP.Ruleset({
 		"j_hanging_chad",
 		"j_idol",
 		"j_square",
+		"j_even_steven",
 		"j_mp_conjoined_joker",
 		"j_mp_defensive_joker",
 		-- "j_mp_magnet", -- can't decide if we want this or not
@@ -66,6 +67,12 @@ MP.ReworkCenter({
 	ruleset = "sandbox",
 	rarity = 3,
 	cost = 8,
+})
+
+MP.ReworkCenter({
+	key = "j_even_steven",
+	ruleset = "sandbox",
+	config = { extra = 6 },
 })
 
 -- Global state for persistent bias across bloodstone calls

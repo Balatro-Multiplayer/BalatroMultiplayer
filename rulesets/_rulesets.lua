@@ -120,25 +120,26 @@ function MP.LoadReworks(ruleset, key)
 end
 
 function MP.AddOverrides(rulesetName)
-	print("MP.AddOverrides called with rulesetName:", rulesetName)
+	sendDebugMessage("MP.AddOverrides called with rulesetName:" .. rulesetName, "MULTIPLAYER")
 
 	if not MP.INTEGRATIONS.TheOrder then
-		print("MP.INTEGRATIONS.TheOrder is false/nil, returning early")
+		sendDebugMessage("MP.INTEGRATIONS.TheOrder is false/nil, returning early", "MULTIPLAYER")
 		return
 	end
 
-	print("MP.INTEGRATIONS.TheOrder is available")
+	sendDebugMessage("MP.INTEGRATIONS.TheOrder is available", "MULTIPLAYER")
 
 	if rulesetName ~= "sandbox" then
 		the_order_standard_pack_ownership()
 		return
 	end
 
-	print("Processing sandbox ruleset")
+	sendDebugMessage("Processing sandbox ruleset")
 	-- TODO: Should we do this also for uhhhh whatever that voucher is called?
+	-- or keep that in for fun?
 	SMODS.Booster:take_ownership_by_kind("Standard", {
 		create_card = function(self, card, i)
-			print("Creating card for sandbox ruleset, card index:", i)
+			sendDebugMessage("Creating card for sandbox ruleset, card index:" .. tostring(i), "MULTIPLAYER")
 			local enhancement_pool = {}
 
 			-- Skip glass
@@ -148,15 +149,18 @@ function MP.AddOverrides(rulesetName)
 				end
 			end
 
-			print("Built enhancement pool with", #enhancement_pool, "items (excluding glass)")
-			print(MP.UTILS.serialize_table(enhancement_pool))
+			sendDebugMessage(
+				"Built enhancement pool with" .. tostring(#enhancement_pool) .. "items (excluding glass)",
+				"MULTIPLAYER"
+			)
+			sendDebugMessage(MP.UTILS.serialize_table(enhancement_pool), "MULTIPLAYER")
 
 			local ante_rng = MP.ante_based()
 			local roll = pseudorandom(pseudoseed("stdc1" .. ante_rng))
 			local enhancement = roll > 0.6 and pseudorandom_element(enhancement_pool, pseudoseed("stdc2" .. ante_rng))
 				or nil
 
-			print("Enhancement:", enhancement)
+			sendDebugMessage("Enhancement: " .. enhancement, "MULTIPLAYER")
 
 			local s_append = ""
 			local b_append = ante_rng .. s_append
@@ -178,9 +182,9 @@ function MP.AddOverrides(rulesetName)
 			}
 		end,
 	}, true)
-	print("Finished setting up sandbox standard pack override")
+	sendDebugMessage("Finished setting up sandbox standard pack override", "MULTIPLAYER")
 
-	print("MP.AddOverrides completed")
+	sendDebugMessage("MP.AddOverrides completed", "MULTIPLAYER")
 end
 
 -- todo replace with this kinda creation instead!
