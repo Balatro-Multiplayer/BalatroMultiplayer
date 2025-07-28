@@ -1,31 +1,16 @@
 MP.DECK = {}
 
-MP.DECK.BANNED_JOKERS = {
-	["j_mr_bones"] = true,
-	["j_luchador"] = true,
-	["j_matador"] = true,
-	["j_chicot"] = true,
-}
+MP.DECK.BANNED_JOKERS = {}
 
 MP.DECK.BANNED_CONSUMABLES = {}
 
-MP.DECK.BANNED_VOUCHERS = {
-	["v_hieroglyph"] = true,
-	["v_petroglyph"] = true,
-	["v_directors_cut"] = true,
-	["v_retcon"] = true,
-}
+MP.DECK.BANNED_VOUCHERS = {}
 
 MP.DECK.BANNED_ENHANCEMENTS = {}
 
-MP.DECK.BANNED_TAGS = {
-	["tag_boss"] = true,
-}
+MP.DECK.BANNED_TAGS = {}
 
-MP.DECK.BANNED_BLINDS = {
-	["bl_wall"] = true,
-	["bl_final_vessel"] = true,
-}
+MP.DECK.BANNED_BLINDS = {}
 
 function MP.DECK.ban_card(card_id)
 	if card_id:sub(1, 1) == "j" then

@@ -379,20 +379,67 @@ end
 local function create_bans_and_reworks_tabs(ruleset, is_banned_tab, chosen_tab_idx)
 	local banned_cards_tabs = {}
 
-	local function copy_all_banned_ids(global_bans, ruleset_bans)
+	local function copy_all_banned_ids(global_bans, ruleset_bans, gamemode_bans)
+		local seen = {}
 		local ret = {}
-		for v, _ in pairs(global_bans) do ret[#ret + 1] = v end
+		for v, _ in pairs(global_bans) do
+			if not seen[v] then
+				seen[v] = true
+				ret[#ret + 1] = v
+			end
+		end
 		if ruleset_bans then
-			for _, v in ipairs(ruleset_bans) do table.insert(ret, v) end
+			for _, v in ipairs(ruleset_bans) do
+				if not seen[v] then
+					seen[v] = true
+					table.insert(ret, v)
+				end
+			end
+		end
+		if gamemode_bans then
+			for _, v in ipairs(gamemode_bans) do
+				if not seen[v] then
+					seen[v] = true
+					table.insert(ret, v)
+				end
+			end
 		end
 		return ret
 	end
 
-	for k, v in ipairs({ { type = localize("b_jokers"), obj_ids = is_banned_tab and copy_all_banned_ids(MP.DECK.BANNED_JOKERS, ruleset.banned_jokers) or ruleset.reworked_jokers },
-		{ type = localize("b_stat_consumables"), obj_ids = is_banned_tab and copy_all_banned_ids(MP.DECK.BANNED_CONSUMABLES, ruleset.banned_consumables) or ruleset.reworked_consumables },
-		{ type = localize("b_vouchers"),         obj_ids = is_banned_tab and copy_all_banned_ids(MP.DECK.BANNED_VOUCHERS, ruleset.banned_vouchers) or ruleset.reworked_vouchers },
-		{ type = localize("b_enhanced_cards"),   obj_ids = is_banned_tab and copy_all_banned_ids(MP.DECK.BANNED_ENHANCEMENTS, ruleset.banned_enhancements) or ruleset.reworked_enhancements },
-		{ type = localize("k_other"),            obj_ids = is_banned_tab and { tags = copy_all_banned_ids(MP.DECK.BANNED_TAGS, ruleset.banned_tags), blinds = copy_all_banned_ids(MP.DECK.BANNED_BLINDS, ruleset.banned_blinds) } or { tags = ruleset.reworked_tags or {}, blinds = ruleset.reworked_blinds or {} } } })
+	local function merge_lists(list1, list2)
+		local seen = {}
+		local ret = {}
+		if list1 then
+			for _, v in ipairs(list1) do
+				if not seen[v] then
+					seen[v] = true
+					table.insert(ret, v)
+				end
+			end
+		end
+		if list2 then
+			for _, v in ipairs(list2) do
+				if not seen[v] then
+					seen[v] = true
+					table.insert(ret, v)
+				end
+			end
+		end
+		return ret
+	end
+
+	local forced_gamemode = nil
+	if ruleset.forced_gamemode then
+		forced_gamemode = MP.Gamemodes[ruleset.forced_gamemode]
+	end
+
+	for k, v in ipairs({
+		{ type = localize("b_jokers"), obj_ids = is_banned_tab and copy_all_banned_ids(MP.DECK.BANNED_JOKERS, ruleset.banned_jokers, forced_gamemode and forced_gamemode.banned_jokers) or merge_lists(ruleset.reworked_jokers, forced_gamemode and forced_gamemode.reworked_jokers) },
+		{ type = localize("b_stat_consumables"), obj_ids = is_banned_tab and copy_all_banned_ids(MP.DECK.BANNED_CONSUMABLES, ruleset.banned_consumables, forced_gamemode and forced_gamemode.banned_consumables) or merge_lists(ruleset.reworked_consumables, forced_gamemode and forced_gamemode.reworked_consumables) },
+		{ type = localize("b_vouchers"), obj_ids = is_banned_tab and copy_all_banned_ids(MP.DECK.BANNED_VOUCHERS, ruleset.banned_vouchers, forced_gamemode and forced_gamemode.banned_vouchers) or merge_lists(ruleset.reworked_vouchers, forced_gamemode and forced_gamemode.reworked_vouchers) },
+		{ type = localize("b_enhanced_cards"), obj_ids = is_banned_tab and copy_all_banned_ids(MP.DECK.BANNED_ENHANCEMENTS, ruleset.banned_enhancements, forced_gamemode and forced_gamemode.banned_enhancements) or merge_lists(ruleset.reworked_enhancements, forced_gamemode and forced_gamemode.reworked_enhancements) },
+		{ type = localize("k_other"), obj_ids = is_banned_tab and { tags = copy_all_banned_ids(MP.DECK.BANNED_TAGS, ruleset.banned_tags, forced_gamemode and forced_gamemode.banned_tags), blinds = copy_all_banned_ids(MP.DECK.BANNED_BLINDS, ruleset.banned_blinds, forced_gamemode and forced_gamemode.banned_blinds) } or { tags = merge_lists(ruleset.reworked_tags or {}, forced_gamemode and forced_gamemode.reworked_tags), blinds = merge_lists(ruleset.reworked_blinds or {}, forced_gamemode and forced_gamemode.reworked_blinds) } } })
 	do
 		v.idx = k
 		v.is_banned_tab = is_banned_tab
@@ -422,17 +469,19 @@ local function create_bans_and_reworks_tabs(ruleset, is_banned_tab, chosen_tab_i
 	}
 end
 
-local function create_info_tab(ruleset)
-	local ruleset_name = string.match(ruleset.key, "[^_]+$") or ""
-	local ruleset_desc = localize("k_" .. ruleset_name .. "_description")
-	if ruleset_name == 'weekly' then
-		ruleset_desc = ruleset_desc .. " " .. localize("k_weekly_" .. MP.LOBBY.config.weekly)
+local function create_info_tab(obj)
+	local obj_name = string.match(obj.key, "[^_]+$") or ""
+	local obj_desc = localize("k_" .. obj_name .. "_description")
+	if obj_name == 'weekly' then
+		obj_desc = obj_desc .. " " .. localize("k_weekly_" .. MP.LOBBY.config.weekly)
 	end
-	ruleset_desc = MP.UTILS.wrapText(ruleset_desc, 100)
+	obj_desc = MP.UTILS.wrapText(obj_desc, 100)
+
+	local tab_id = obj.key:find("ruleset") and "ruleset_active_tab" or "gamemode_active_tab"
 
 	return {
 		n = G.UIT.ROOT,
-		config = { id = "ruleset_active_tab", align = "cm", colour = G.C.CLEAR },
+		config = { id = tab_id, align = "cm", colour = G.C.CLEAR },
 		nodes = {
 			{
 				n = G.UIT.C,
@@ -447,7 +496,7 @@ local function create_info_tab(ruleset)
 							{
 								n = G.UIT.T,
 								config = {
-									text = ruleset_desc,
+									text = obj_desc,
 									scale = 0.4,
 									colour = G.C.UI.TEXT_LIGHT,
 								}
@@ -678,14 +727,26 @@ end
 function G.UIDEF.gamemode_info(gamemode_name)
 	local gamemode = MP.Gamemodes["gamemode_mp_" .. gamemode_name]
 
+	local gamemode_info_tabs = UIBox({
+		definition = G.UIDEF.gamemode_tabs(gamemode),
+		config = { align = "cm" }
+	})
+
 	return {
 		n = G.UIT.ROOT,
 		config = { align = "tm", minh = 8, maxh = 8, minw = 11, maxw = 11, colour = G.C.CLEAR },
 		nodes = {
 			{
 				n = G.UIT.C,
-				config = { align = "tm", padding = 0.2, r = 0.1, colour = G.C.BLACK, minh = 8 },
+				config = { align = "tm", padding = 0.2, r = 0.1, colour = G.C.BLACK },
 				nodes = {
+					{
+						n = G.UIT.R,
+						config = { align = "cm" },
+						nodes = {
+							{ n = G.UIT.O, config = { object = gamemode_info_tabs } }
+						}
+					},
 					{
 						n = G.UIT.R,
 						config = { align = "cm" },
@@ -703,6 +764,81 @@ function G.UIDEF.gamemode_info(gamemode_name)
 			}
 		}
 	}
+end
+
+function G.UIDEF.gamemode_tabs(gamemode)
+	local default_tabs = UIBox({
+		definition = G.UIDEF.gamemode_tabs_definition(gamemode, "info", 1),
+		config = { align = "cm", tab_type = "info", chosen_tab = 1 }
+	})
+
+	return {
+		n = G.UIT.ROOT,
+		config = { align = "cm", colour = G.C.L_BLACK, r = 0.1 },
+		nodes = {
+			{
+				n = G.UIT.C,
+				config = { align = "cm" },
+				nodes = {
+					{
+						n = G.UIT.R,
+						config = { align = "tm", colour = G.C.GREY, r = 0.1 },
+						nodes = {
+							{ n = G.UIT.O, config = { object = default_tabs } }
+						}
+					},
+					{
+						n = G.UIT.R,
+						config = { align = "bm", padding = 0.05 },
+						nodes = {
+							create_option_cycle({
+								options = { localize("k_info"), localize("k_bans"), localize("k_reworks") },
+								current_option = 1,
+								opt_callback = "gamemode_switch_tabs",
+								opt_args = { ui = default_tabs, gamemode = gamemode },
+								w = 5,
+								colour = G.C.ORANGE,
+								cycle_shoulders = false
+							})
+						}
+					}
+				}
+			}
+		}
+	}
+end
+
+function G.FUNCS.gamemode_switch_tabs(args)
+	if not args or not args.cycle_config then return end
+	local callback_args = args.cycle_config.opt_args
+
+	local tabs_object = callback_args.ui
+	local tabs_wrap = tabs_object.parent
+
+	local active_tab = tabs_wrap.UIBox:get_UIE_by_ID("gamemode_active_tab")
+	local active_tab_idx = active_tab and active_tab.config.tab_idx or 1
+
+	local tab_type = (args.to_key == 2 and "banned") or (args.to_key == 3 and "rework") or "info"
+	local def = G.UIDEF.gamemode_tabs_definition(callback_args.gamemode, tab_type, active_tab_idx)
+
+	tabs_object.config.tab_type = tab_type
+	MP.LOBBY.config.gamemode = callback_args.gamemode.key
+	MP.LOBBY.gamemode_preview = (tab_type == "rework")
+
+	tabs_wrap.config.object:remove()
+	tabs_wrap.config.object = UIBox({
+		definition = def,
+		config = { align = "cm", parent = tabs_wrap }
+	})
+
+	tabs_wrap.UIBox:recalculate()
+end
+
+function G.UIDEF.gamemode_tabs_definition(gamemode, tab_type, chosen_tab_idx)
+	if tab_type == "banned" or tab_type == "rework" then
+		return create_bans_and_reworks_tabs(gamemode, tab_type == "banned", chosen_tab_idx)
+	end
+	return create_info_tab(gamemode)
 end
 
 function G.UIDEF.create_UIBox_join_lobby_button()

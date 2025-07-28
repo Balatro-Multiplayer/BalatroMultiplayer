@@ -10,6 +10,14 @@ MP.Ruleset = SMODS.GameObject:extend({
 		"banned_consumables",
 		"banned_vouchers",
 		"banned_enhancements",
+		"banned_tags",
+		"banned_blinds",
+		"reworked_jokers",
+		"reworked_consumables",
+		"reworked_vouchers",
+		"reworked_enhancements",
+		"reworked_tags",
+		"reworked_blinds"
 	},
 	class_prefix = "ruleset",
 	inject = function(self)
@@ -53,13 +61,13 @@ end
 -- Example usage in rulesets/standard.lua
 function MP.ReworkCenter(args)
 	local center = G.P_CENTERS[args.key]
-	
+
 	-- Convert single ruleset to list for backward compatibility
 	local rulesets = args.ruleset
 	if type(rulesets) == "string" then
 		rulesets = {rulesets}
 	end
-	
+
 	-- Apply changes to all specified rulesets
 	for _, ruleset in ipairs(rulesets) do
 		local ruleset_ = "mp_"..ruleset.."_"
@@ -74,7 +82,7 @@ function MP.ReworkCenter(args)
 		center.mp_reworks = center.mp_reworks or {}
 		center.mp_reworks[ruleset] = true -- Caching this for better load times since we're gonna be inefficiently looping through all centers probably
 		center.mp_reworks["vanilla"] = true
-		
+
 		center.mp_silent = center.mp_silent or {}
 		center.mp_silent[ruleset] = args.silent
 	end

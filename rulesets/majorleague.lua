@@ -7,7 +7,6 @@ MP.Ruleset({
 	banned_enhancements = {},
 	banned_tags = {},
 	banned_blinds = {},
-
 	reworked_jokers = {},
 	reworked_consumables = {},
 	reworked_vouchers = {},

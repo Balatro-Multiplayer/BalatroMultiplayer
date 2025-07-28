@@ -6,6 +6,18 @@ MP.Gamemode = SMODS.GameObject:extend({
 	required_params = {
 		"key",
 		"get_blinds_by_ante", -- Define custom logic for determining Small, Big, and Boss Blind based on the ante number.
+		"banned_jokers",
+		"banned_consumables",
+		"banned_vouchers",
+		"banned_enhancements",
+		"banned_tags",
+		"banned_blinds",
+		"reworked_jokers",
+		"reworked_consumables",
+		"reworked_vouchers",
+		"reworked_enhancements",
+		"reworked_tags",
+		"reworked_blinds"
 	},
 	class_prefix = "gamemode",
 	inject = function(self)
