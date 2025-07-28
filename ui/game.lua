@@ -1067,7 +1067,15 @@ function Game:update_new_round(dt)
 end
 
 function MP.end_round()
-	if MP.GAME.round_ended then sendDebugMessage('Double-end prevented'); return true end -- Certain MP cases trigger the Mr. Bones glitch, this prevents duplicate execution
+	-- This prevents duplicate execution during certain cases. e.g. Full deck discard before playing any hands.
+	if MP.GAME.round_ended then 
+		if not MP.GAME.duplicate_end then
+			MP.GAME.duplicate_end = true
+			sendDebugMessage('Duplicate end_round calls prevented.'); 
+		end
+		return true 
+	end 
+
 	MP.GAME.round_ended  = true	
 	
 	G.GAME.blind.in_blind = false

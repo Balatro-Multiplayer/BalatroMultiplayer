@@ -831,7 +831,9 @@ function MP.ACTIONS.set_ante(ante)
 end
 
 function MP.ACTIONS.new_round()
-	MP.GAME.round_ended = false -- Used to prevent recursive round ending, referenced at the beginning of MP.end_round
+	
+	MP.GAME.duplicate_end = false
+	MP.GAME.round_ended = false
 	Client.send("action:newRound")
 end
 
