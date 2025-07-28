@@ -1068,7 +1068,7 @@ end
 
 function MP.end_round()
 	if MP.GAME.round_ended then sendDebugMessage('Double-end prevented'); return true end -- Certain MP cases trigger the Mr. Bones glitch, this prevents duplicate execution
-	MP.GAME.round_ended  = true
+	MP.GAME.round_ended  = true	
 	
 	G.GAME.blind.in_blind = false
 	local game_over = false
@@ -1135,6 +1135,18 @@ function MP.end_round()
 		check_for_unlock({ type = "ante_up", ante = G.GAME.round_resets.ante + 1 })
 	end
 	G.FUNCS.draw_from_discard_to_deck()
+	
+	-- This handles an edge case where a player plays no hands, and discards the only cards in their deck.
+	-- Allows opponent to advance after playing anything, and eases a life from the person who discarded their deck.
+	if G.GAME.current_round.hands_played == 0 
+	   and G.GAME.current_round.discards_used > 0 then
+			if MP.is_pvp_boss() then
+				MP.ACTIONS.play_hand(0, 0)
+			end
+			
+			MP.ACTIONS.fail_round(1)
+	end	
+
 	G.E_MANAGER:add_event(Event({
 		trigger = "after",
 		delay = 0.3,
@@ -1189,6 +1201,8 @@ function MP.end_round()
 			return true
 		end,
 	}))
+	
+
 	return true
 end
 
