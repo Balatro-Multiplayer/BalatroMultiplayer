@@ -134,82 +134,13 @@ function MP.AddOverrides(rulesetName)
 		return
 	end
 
-	sendDebugMessage("Processing sandbox ruleset")
-	-- TODO: Should we do this also for uhhhh whatever that voucher is called?
-	-- or keep that in for fun?
-	SMODS.Booster:take_ownership_by_kind("Standard", {
-		create_card = function(self, card, i)
-			sendDebugMessage("Creating card for sandbox ruleset, card index:" .. tostring(i), "MULTIPLAYER")
-			local enhancement_pool = {}
-
-			-- Skip glass
-			for k, v in pairs(G.P_CENTER_POOLS["Enhanced"]) do
-				if v.key ~= "m_glass" then
-					enhancement_pool[#enhancement_pool + 1] = v.key
-				end
-			end
-
-			sendDebugMessage(
-				"Built enhancement pool with" .. tostring(#enhancement_pool) .. "items (excluding glass)",
-				"MULTIPLAYER"
-			)
-			sendDebugMessage(MP.UTILS.serialize_table(enhancement_pool), "MULTIPLAYER")
-
-			local ante_rng = MP.ante_based()
-			local roll = pseudorandom(pseudoseed("stdc1" .. ante_rng))
-			local enhancement = roll > 0.6 and pseudorandom_element(enhancement_pool, pseudoseed("stdc2" .. ante_rng))
-				or nil
-
-			sendDebugMessage("Enhancement: " .. enhancement, "MULTIPLAYER")
-
-			local s_append = ""
-			local b_append = ante_rng .. s_append
-
-			local _edition = poll_edition("standard_edition" .. b_append, 2, true)
-			local _seal = SMODS.poll_seal({ mod = 10, key = "stdseal" .. ante_rng })
-
-			return {
-				-- todo is set needed? or do we use Base + pass in the enhancement?
-				-- set = (pseudorandom(pseudoseed("stdset" .. b_append)) > 0.6) and "Enhanced" or "Base",
-				set = "Base",
-				edition = _edition,
-				seal = _seal,
-				enhancement = enhancement,
-				area = G.pack_cards,
-				skip_materialize = true,
-				soulable = true,
-				key_append = "sta" .. s_append,
-			}
-		end,
-	}, true)
-	sendDebugMessage("Finished setting up sandbox standard pack override", "MULTIPLAYER")
-
+	if rulesetName == "sandbox" then
+		sendDebugMessage("Processing sandbox ruleset")
+		MP.SANDBOX.standard_pack_ownership()
+		sendDebugMessage("Finished setting up sandbox standard pack override", "MULTIPLAYER")
+	end
 	sendDebugMessage("MP.AddOverrides completed", "MULTIPLAYER")
 end
-
--- todo replace with this kinda creation instead!
--- function the_order_standard_pack_ownership()
--- 	SMODS.Booster:take_ownership_by_kind("Standard", {
--- 		create_card = function(self, card, i)
--- 			local s_append = "" -- MP.get_booster_append(card)
--- 			local b_append = MP.ante_based() .. s_append
-
--- 			local _edition = poll_edition("standard_edition" .. b_append, 2, true)
--- 			local _seal = SMODS.poll_seal({ mod = 10, key = "stdseal" .. b_append })
-
--- 			return {
--- 				set = (pseudorandom(pseudoseed("stdset" .. b_append)) > 0.6) and "Enhanced" or "Base",
--- 				edition = _edition,
--- 				seal = _seal,
--- 				enhancement = "m_glass",
--- 				area = G.pack_cards,
--- 				skip_materialize = true,
--- 				soulable = true,
--- 				key_append = "sta" .. s_append,
--- 			}
--- 		end,
--- 	}, true)
--- end
 
 G.P_CENTER_POOLS.Ruleset = {}
 MP.Rulesets = {}
