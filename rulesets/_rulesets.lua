@@ -144,49 +144,68 @@ function MP.AddOverrides(rulesetName)
 			-- Skip glass
 			for k, v in pairs(G.P_CENTER_POOLS["Enhanced"]) do
 				if v.key ~= "m_glass" then
-					enhancement_pool[#enhancement_pool + 1] = v
+					enhancement_pool[#enhancement_pool + 1] = v.key
 				end
 			end
 
-			print("Built enchantment pool with", #enhancement_pool, "items (excluding glass)")
+			print("Built enhancement pool with", #enhancement_pool, "items (excluding glass)")
+			print(MP.UTILS.serialize_table(enhancement_pool))
 
 			local ante_rng = MP.ante_based()
-			print("Generated ante_rng:", ante_rng)
-
-			local default_center = G.P_CENTERS.c_base
 			local roll = pseudorandom(pseudoseed("stdc1" .. ante_rng))
+			local enhancement = roll > 0.6 and pseudorandom_element(enhancement_pool, pseudoseed("stdc2" .. ante_rng))
+				or nil
 
-			print("Rolled ", roll)
+			print("Enhancement:", enhancement)
 
-			local center = roll > 0.6 and pseudorandom_element(enhancement_pool, pseudoseed("stdc2" .. ante_rng))
-				or default_center
+			local s_append = ""
+			local b_append = ante_rng .. s_append
 
-			print("Center gotten:", center.name)
-
-			local _edition = poll_edition("standard_edition" .. ante_rng, 2, true)
-			print("Generated edition:", _edition and _edition.key or "nil")
-
+			local _edition = poll_edition("standard_edition" .. b_append, 2, true)
 			local _seal = SMODS.poll_seal({ mod = 10, key = "stdseal" .. ante_rng })
-			print("Generated seal:", _seal and _seal.key or "nil")
 
-			-- TOOD: Not actually added to someones inventory?
-			local newCard = create_playing_card({
-				front = pseudorandom_element(G.P_CARDS, pseudoseed("stdset" .. ante_rng)),
-				center = center,
-			}, G.pack_cards, true, i ~= 1, { G.C.SECONDARY_SET.Default })
-
-			newCard:set_edition(_edition)
-			newCard:set_seal(_seal)
-
-			print("Created new card with key:", newCard.config.center.key)
-
-			return newCard
+			return {
+				-- todo is set needed? or do we use Base + pass in the enhancement?
+				-- set = (pseudorandom(pseudoseed("stdset" .. b_append)) > 0.6) and "Enhanced" or "Base",
+				set = "Base",
+				edition = _edition,
+				seal = _seal,
+				enhancement = enhancement,
+				area = G.pack_cards,
+				skip_materialize = true,
+				soulable = true,
+				key_append = "sta" .. s_append,
+			}
 		end,
 	}, true)
 	print("Finished setting up sandbox standard pack override")
 
 	print("MP.AddOverrides completed")
 end
+
+-- todo replace with this kinda creation instead!
+-- function the_order_standard_pack_ownership()
+-- 	SMODS.Booster:take_ownership_by_kind("Standard", {
+-- 		create_card = function(self, card, i)
+-- 			local s_append = "" -- MP.get_booster_append(card)
+-- 			local b_append = MP.ante_based() .. s_append
+
+-- 			local _edition = poll_edition("standard_edition" .. b_append, 2, true)
+-- 			local _seal = SMODS.poll_seal({ mod = 10, key = "stdseal" .. b_append })
+
+-- 			return {
+-- 				set = (pseudorandom(pseudoseed("stdset" .. b_append)) > 0.6) and "Enhanced" or "Base",
+-- 				edition = _edition,
+-- 				seal = _seal,
+-- 				enhancement = "m_glass",
+-- 				area = G.pack_cards,
+-- 				skip_materialize = true,
+-- 				soulable = true,
+-- 				key_append = "sta" .. s_append,
+-- 			}
+-- 		end,
+-- 	}, true)
+-- end
 
 G.P_CENTER_POOLS.Ruleset = {}
 MP.Rulesets = {}
