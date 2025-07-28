@@ -24,7 +24,7 @@ MP.Ruleset({
 		"j_even_steven",
 		"j_mp_conjoined_joker",
 		"j_mp_defensive_joker",
-		-- "j_mp_magnet", -- can't decide if we want this or not
+		"j_mp_magnet",
 		"j_mp_lets_go_gambling",
 		"j_mp_pacifist",
 		"j_mp_penny_pincher",
@@ -102,28 +102,6 @@ function cope_and_seethe_check(actual_odds)
 	end
 end
 
--- TODO I don't want to do this right now as I don't want to do loc_vars magic to get it to work
--- MP.ReworkCenter({
--- 	key = "j_bloodstone",
--- 	rarity = 3,
--- 	calculate = function(self, card, context)
--- 		if context.cardarea == G.play and context.individual then
--- 			if context.other_card:is_suit("Hearts") then
--- 				local bloodstone_hit = cope_and_seethe_check(G.GAME.probabilities.normal / card.ability.extra.odds)
--- 				if bloodstone_hit then
--- 					return {
--- 						extra = { x_mult = card.ability.extra.Xmult },
--- 						message = G.GAME.probabilities.normal < 2 and "Cope!" or nil,
--- 						sound = "voice2",
--- 						volume = 0.3,
--- 						card = card,
--- 					}
--- 				end
--- 			end
--- 		end
--- 	end,
--- })
-
 SMODS.Joker({
 	key = "bloodstone",
 	unlocked = true,
@@ -178,7 +156,6 @@ SMODS.Joker({
 	cost = 7,
 	pos = { x = 7, y = 12 },
 	config = { extra = 2, mp_sticker_balanced = true },
-	-- NOTE: Shouldn't need to tally this twice but here we are!
 	loc_vars = function(self, info_queue, card)
 		local nine_tally = 0
 		if G.playing_cards ~= nil then
@@ -226,9 +203,9 @@ SMODS.Tag({
 	dependencies = {
 		items = {},
 	},
-	-- in_pool = function(self)
-	-- 	return MP.LOBBY.config.ruleset == "ruleset_mp_sandbox" and MP.LOBBY.code
-	-- end,
+	in_pool = function(self)
+		return MP.LOBBY.config.ruleset == "ruleset_mp_sandbox" and MP.LOBBY.code
+	end,
 	name = "Rare Tag",
 	discovered = true,
 	order = 2,
