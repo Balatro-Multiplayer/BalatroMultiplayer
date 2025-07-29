@@ -89,7 +89,6 @@ return {
 					"{C:attention}Joker{} có giá bán",
 					"cao nhất của {X:purple,C:white}Đối_Thủ{}",
 					"{C:inactive}(Hiện tại là {C:attention}#2#{C:inactive}/#3# ván)",
-					"{C:inactive,s:0.8}(Không sao chép trạng thái Joker)",
 				},
 			},
 			j_mp_pizza = {

@@ -82,7 +82,6 @@ return {
 					"{C:attention}Joker{} met hoogste verkoopwaarde",
 					"te {C:attention}kopiëren{}",
 					"{C:inactive}(Momenteel {C:attention}#2#{C:inactive}/#3# rondes)",
-					"{C:inactive,s:0.8}(Kan Joker status niet kopiëren)",
 				},
 			},
 			j_mp_pizza = {
