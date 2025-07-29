@@ -14,14 +14,7 @@ function MP.UI.create_lobby_code_buttons(text_scale)
 				label = { localize("b_view_code") },
 				scale = text_scale * 1.2,
 			}),
-			{
-				n = G.UIT.R,
-				config = {
-					align = "cm",
-					minh = 0.1,
-				},
-				nodes = {},
-			},
+			MP.UI.create_spacer(0.1, true),
 			UIBox_button({
 				button = "copy_to_clipboard",
 				colour = G.C.PERISHABLE,
