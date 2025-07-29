@@ -95,66 +95,6 @@ function G.UIDEF.create_UIBox_view_code()
 	)
 end
 
--- TODO: This entire function seems to only return once
--- ie we only get EITHER the order warning message or cheating message or nemesis unlock message
-local function get_lobby_text()
-	-- Check the other player (guest if we're host, host if we're guest)
-	local other_player = MP.LOBBY.is_host and MP.LOBBY.guest or MP.LOBBY.host
-
-	if other_player and other_player.cached == false then
-		return MP.UTILS.wrapText(string.format(localize("k_warning_cheating"), MP.UTILS.random_message()), 100),
-			SMODS.Gradients.warning_text
-	end
-
-	if other_player and other_player.config and other_player.config.unlocked == false then
-		return localize("k_warning_nemesis_unlock"), SMODS.Gradients.warning_text
-	end
-
-	local current_player = MP.LOBBY.is_host and MP.LOBBY.host or MP.LOBBY.guest
-	local current_has_order = current_player and current_player.config and current_player.config.TheOrder
-	local other_has_order = other_player and other_player.config and other_player.config.TheOrder
-
-	if (MP.LOBBY.ready_to_start or not MP.LOBBY.is_host) and current_has_order ~= other_has_order then
-		return localize("k_warning_no_order"), SMODS.Gradients.warning_text
-	end
-
-	if MP.LOBBY.ready_to_start or not MP.LOBBY.is_host then
-		local hostSteamoddedVersion = MP.LOBBY.host and MP.LOBBY.host.config and MP.LOBBY.host.config.Mods["Steamodded"]
-		local guestSteamoddedVersion = MP.LOBBY.guest
-			and MP.LOBBY.guest.config
-			and MP.LOBBY.guest.config.Mods["Steamodded"]
-
-		if hostSteamoddedVersion ~= guestSteamoddedVersion then
-			return localize("k_steamodded_warning"), SMODS.Gradients.warning_text
-		end
-	end
-
-	SMODS.Mods["Multiplayer"].config.unlocked = MP.UTILS.unlock_check()
-	if not SMODS.Mods["Multiplayer"].config.unlocked then
-		return localize("k_warning_unlock_profile"), SMODS.Gradients.warning_text
-	end
-
-	-- Remove the mod hash warning from main warning display area since it's shown
-	-- alongside critical warnings (cheating, compatibility issues). This makes users
-	-- learn to ignore all warnings. Instead, we should indicate hash differences
-	-- through other UI elements like colored usernames or separate indicators.
-	-- The hash check itself remains useful for debugging but shouldn't be presented
-	-- as a blocking warning alongside serious compatibility issues.
-	-- steph
-	if MP.LOBBY.host and MP.LOBBY.host.hash and MP.LOBBY.guest and MP.LOBBY.guest.hash then
-		if MP.LOBBY.host.hash ~= MP.LOBBY.guest.hash then
-			return localize("k_mod_hash_warning"), G.C.UI.TEXT_LIGHT
-		end
-	end
-
-	-- ???: What is this supposed to accomplish?
-	if MP.LOBBY.username == "Guest" then
-		return localize("k_set_name"), G.C.UI.TEXT_LIGHT
-	end
-
-	return " ", G.C.UI.TEXT_LIGHT
-end
-
 local function create_player_info_row(player, player_type, text_scale)
 	if not player or not player.username then
 		return nil
@@ -422,8 +362,6 @@ function G.UIDEF.create_UIBox_lobby_menu()
 	local back = MP.LOBBY.config.different_decks and MP.LOBBY.deck.back or MP.LOBBY.config.back
 	local stake = MP.LOBBY.config.different_decks and MP.LOBBY.deck.stake or MP.LOBBY.config.stake
 
-	local text, colour = get_lobby_text()
-
 	local t = {
 		n = G.UIT.ROOT,
 		config = {
@@ -437,7 +375,7 @@ function G.UIDEF.create_UIBox_lobby_menu()
 					align = "bm",
 				},
 				nodes = {
-					MP.UI.create_lobby_status_display(text, colour),
+					MP.UI.lobby_status_display(),
 					{
 						n = G.UIT.R,
 						config = {
