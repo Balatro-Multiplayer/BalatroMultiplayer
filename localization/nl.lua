@@ -236,7 +236,8 @@ return {
 			k_warning_unlock_profile = "Het profiel waarmee je aan het spelen bent is niet volledig vrijgespeeld. Als dit een geklasseerd spel of een spel in een toernooi is, maak een nieuw profiel aan en druk op alles vrijspelen in profiel instellingen."
 			k_warning_nemesis_unlock = "Je tegenstander is aan het spelen op een profiel dat niet volledig vrijgespeeld is. Help ze aub met een nieuw profiel aan te maken en op alles vrijspelen te drukken in profiel instellingen.",
 			k_warning_no_order = "Eén speler heeft De Orde Integratie ingeschakelt terwijl de andere niet. Dit zal er voor zorgen dat de seeds verschillend zullen zijn.",
-			k_warning_cheating = "Als je dit ziet, kan het zijn dat je tegenstander aan het valsspelen is. Als dit een geklasseerd spel is, zend aub het bericht '%s' en open een support ticket in #support.",
+			k_warning_cheating1 = "Als je dit ziet, kan het zijn dat je tegenstander aan het valsspelen is.",
+			k_warning_cheating2 = "Als dit een geklasseerd spel is, zend aub het bericht '%s' en open een support ticket in #support.",
 			-- Idk if this has to be translated, because ranked games are in English
 			k_message1 = "Hold on, my mom made pizza pops",
 			k_message2 = "One sec, i gotta grab my slow cooker pork roast",
