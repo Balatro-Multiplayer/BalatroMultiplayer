@@ -82,7 +82,6 @@ return {
 					"このジョーカーを売ると",
 					"{X:purple,C:white}相手{} の最も売値が高い {C:attention}ジョーカー{}を {C:attention}複製{} する",
 					"{C:inactive}(現在 {C:attention}#2#{C:inactive}/#3#)",
-					"{C:inactive,s:0.8}(エディションはコピーされない)",
 				},
 			},
 			j_mp_pizza = {

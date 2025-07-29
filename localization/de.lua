@@ -78,7 +78,6 @@ return {
 					"deines {X:purple,C:white} Erzfeinds'{}",
 					"{C:attention}Joker{} mit dem größten verkaufs wert",
 					"{C:inactive}(Zurzeit {C:attention}#2#{C:inactive}/#3# Runden)",
-					"{C:inactive,s:0.8}(Kopiert nicht denn Zustand des jokers)",
 				},
 			},
 			j_mp_pizza = {

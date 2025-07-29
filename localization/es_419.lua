@@ -79,7 +79,6 @@ return {
 					"el {C:attention}comodín{} con mayor valor de venta",
 					"que tenga tu {X:purple,C:white}némesis{}",
 					"{C:inactive}(Actualmente {C:attention}#2#{C:inactive}/#3# rondas)",
-					"{C:inactive,s:0.8}(No copia estado del comodín)",
 				},
 			},
 			j_mp_pizza = {

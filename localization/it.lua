@@ -79,7 +79,6 @@ return {
 					"il {C:attention}Jolly{} più costoso",
 					"della tua {X:purple,C:white}Nemesi",
 					"{C:inactive}(Attualmente {C:attention}#2#{C:inactive}/#3# round)",
-					"{C:inactive,s:0.8}(Non copia lo stato del {C:attention}Jolly{})",
 				},
 			},
 			j_mp_pizza = {

@@ -77,7 +77,6 @@ return {
 					"{C:attention}Jokera{} z największą wartością sprzedaży",
 					"twoiego {X:purple,C:white}Nemesis",
 					"{C:inactive}(Obecnie {C:attention}#2#{C:inactive}/#3# rund)",
-					"{C:inactive,s:0.8}(Nie kopiuje stanu Jokera)",
 				},
 			},
 			j_mp_pizza = {

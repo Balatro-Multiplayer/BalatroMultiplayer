@@ -82,7 +82,6 @@ return {
 					"le {C:attention}Joker{} à la plus haute ",
 					"valeur de vente de votre {X:purple,C:white}Némésis{}",
 					"{C:inactive}(Actuellement {C:attention}#2#{C:inactive}/#3# manches)",
-					"{C:inactive,s:0.8}(Ne copie pas l'état du Joker)",
 				},
 			},
 			j_mp_pizza = {

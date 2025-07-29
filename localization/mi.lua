@@ -78,7 +78,6 @@ return {
                     "ka {C:attention}tōruatia{} te {C:attention}Hako{} utu",
 					"nui rawa atu o tō {X:purple,C:white}Hoariri{}",
 					"{C:inactive}(I tēnei wā he {C:attention}#2#{C:inactive}/#3# rauna)",
-					"{C:inactive,s:0.8}(Kāore e kape i te āhua o taua Hako)",
 				},
 			},
 			j_mp_pizza = {
