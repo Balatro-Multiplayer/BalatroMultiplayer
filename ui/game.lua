@@ -1071,7 +1071,7 @@ function MP.end_round()
 	if MP.GAME.round_ended then 
 		if not MP.GAME.duplicate_end then
 			MP.GAME.duplicate_end = true
-			sendDebugMessage('Duplicate end_round calls prevented.'); 
+			sendDebugMessage('Duplicate end_round calls prevented.', 'MULTIPLAYER'); 
 		end
 		return true 
 	end 
