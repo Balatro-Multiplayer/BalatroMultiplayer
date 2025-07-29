@@ -141,7 +141,6 @@ local function create_custom_seed_section()
 		config = { padding = 0, align = "cr" },
 		nodes = {
 			{
-				-- TODO: Extract this into a component so we can pretend it's clean code
 				n = G.UIT.R,
 				config = {
 					padding = 0,
