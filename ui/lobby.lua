@@ -95,135 +95,6 @@ function G.UIDEF.create_UIBox_view_code()
 	)
 end
 
-local function create_lobby_option_toggle(id, label_key, ref_value, callback)
-	return {
-		n = G.UIT.R,
-		config = {
-			padding = 0,
-			align = "cr",
-		},
-		nodes = {
-			Disableable_Toggle({
-				id = id,
-				enabled_ref_table = MP.LOBBY,
-				enabled_ref_value = "is_host",
-				label = localize(label_key),
-				ref_table = MP.LOBBY.config,
-				ref_value = ref_value,
-				callback = callback or send_lobby_options,
-			}),
-		},
-	}
-end
-
-local function create_custom_seed_section()
-	if MP.LOBBY.config.different_seeds then
-		return { n = G.UIT.B, config = { w = 0.1, h = 0.1 } }
-	end
-
-	return {
-		n = G.UIT.R,
-		config = { padding = 0, align = "cr" },
-		nodes = {
-			{
-				-- TODO: Extract this into a component so we can pretend it's clean code
-				n = G.UIT.R,
-				config = {
-					padding = 0,
-					align = "cr",
-				},
-				nodes = {
-					{
-						n = G.UIT.C,
-						config = {
-							padding = 0,
-							align = "cm",
-						},
-						nodes = {
-							{
-								n = G.UIT.R,
-								config = {
-									padding = 0.2,
-									align = "cr",
-									func = "display_custom_seed",
-								},
-								nodes = {
-									{
-										n = G.UIT.T,
-										config = {
-											scale = 0.45,
-											text = localize("k_current_seed"),
-											colour = G.C.UI.TEXT_LIGHT,
-										},
-									},
-									{
-										n = G.UIT.T,
-										config = {
-											scale = 0.45,
-											text = MP.LOBBY.config.custom_seed,
-											colour = G.C.UI.TEXT_LIGHT,
-										},
-									},
-								},
-							},
-							{
-								n = G.UIT.R,
-								config = {
-									padding = 0.2,
-									align = "cr",
-								},
-								nodes = {
-									Disableable_Button({
-										id = "custom_seed_overlay",
-										button = "custom_seed_overlay",
-										colour = G.C.BLUE,
-										minw = 3.65,
-										minh = 0.6,
-										label = {
-											localize("b_set_custom_seed"),
-										},
-										disabled_text = {
-											localize("b_set_custom_seed"),
-										},
-										scale = 0.45,
-										col = true,
-										enabled_ref_table = MP.LOBBY,
-										enabled_ref_value = "is_host",
-									}),
-									{
-										n = G.UIT.B,
-										config = {
-											w = 0.1,
-											h = 0.1,
-										},
-									},
-									Disableable_Button({
-										id = "custom_seed_reset",
-										button = "custom_seed_reset",
-										colour = G.C.RED,
-										minw = 1.65,
-										minh = 0.6,
-										label = {
-											localize("b_reset"),
-										},
-										disabled_text = {
-											localize("b_reset"),
-										},
-										scale = 0.45,
-										col = true,
-										enabled_ref_table = MP.LOBBY,
-										enabled_ref_value = "is_host",
-									}),
-								},
-							},
-						},
-					},
-				},
-			},
-		},
-	}
-end
-
 function G.UIDEF.create_UIBox_lobby_menu()
 	local text_scale = 0.45
 	local back = MP.LOBBY.config.different_decks and MP.LOBBY.deck.back or MP.LOBBY.config.back
@@ -352,14 +223,6 @@ function G.UIDEF.create_UIBox_lobby_options()
 	})
 end
 
-function G.FUNCS.display_custom_seed(e)
-	local display = MP.LOBBY.config.custom_seed == "random" and localize("k_random") or MP.LOBBY.config.custom_seed
-	if display ~= e.children[1].config.text then
-		e.children[2].config.text = display
-		e.UIBox:recalculate(true)
-	end
-end
-
 function G.UIDEF.create_UIBox_custom_seed_overlay()
 	return create_UIBox_generic_options({
 		back_func = "lobby_options",
@@ -464,41 +327,6 @@ G.FUNCS.view_guest_hash = function(e)
 	G.FUNCS.overlay_menu({
 		definition = G.UIDEF.create_UIBox_view_hash("guest"),
 	})
-end
-
-function toggle_different_seeds()
-	G.FUNCS.lobby_options()
-	send_lobby_options()
-end
-
-G.FUNCS.change_starting_lives = function(args)
-	MP.LOBBY.config.starting_lives = args.to_val
-	send_lobby_options()
-end
-
-G.FUNCS.change_starting_pvp_round = function(args)
-	MP.LOBBY.config.pvp_start_round = args.to_val
-	send_lobby_options()
-end
-
-G.FUNCS.change_timer_base_seconds = function(args)
-	MP.LOBBY.config.timer_base_seconds = tonumber(args.to_val:sub(1, -2))
-	send_lobby_options()
-end
-
-G.FUNCS.change_timer_increment_seconds = function(args)
-	MP.LOBBY.config.timer_increment_seconds = tonumber(args.to_val:sub(1, -2))
-	send_lobby_options()
-end
-
-G.FUNCS.change_showdown_starting_antes = function(args)
-	MP.LOBBY.config.showdown_starting_antes = args.to_val
-	send_lobby_options()
-end
-
-G.FUNCS.change_pvp_countdown_seconds = function(args)
-	MP.LOBBY.config.pvp_countdown_seconds = args.to_val
-	send_lobby_options()
 end
 
 function G.FUNCS.get_lobby_main_menu_UI(e)

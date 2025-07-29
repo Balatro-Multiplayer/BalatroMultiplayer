@@ -1,13 +1,115 @@
--- Component for lobby options tab containing toggles and custom seed section
-
 local Disableable_Toggle = MP.UI.Disableable_Toggle
 local Disableable_Button = MP.UI.Disableable_Button
+
+-- TODO repetition but w/e...
+local function send_lobby_options(value)
+	MP.ACTIONS.lobby_options()
+end
+
+function G.FUNCS.custom_seed_overlay(e)
+	G.FUNCS.overlay_menu({
+		definition = G.UIDEF.create_UIBox_custom_seed_overlay(),
+	})
+end
+
+function G.FUNCS.custom_seed_reset(e)
+	MP.LOBBY.config.custom_seed = "random"
+	send_lobby_options()
+end
+
+function G.UIDEF.create_UIBox_custom_seed_overlay()
+	return create_UIBox_generic_options({
+		back_func = "lobby_options",
+		contents = {
+			{
+				n = G.UIT.R,
+				config = { align = "cm", colour = G.C.CLEAR },
+				nodes = {
+					{
+						n = G.UIT.C,
+						config = { align = "cm", minw = 0.1 },
+						nodes = {
+							create_text_input({
+								max_length = 8,
+								all_caps = true,
+								ref_table = MP.LOBBY,
+								ref_value = "temp_seed",
+								prompt_text = localize("k_enter_seed"),
+								keyboard_offset = 4,
+								callback = function(val)
+									MP.LOBBY.config.custom_seed = MP.LOBBY.temp_seed
+									send_lobby_options()
+								end,
+							}),
+							{
+								n = G.UIT.B,
+								config = { w = 0.1, h = 0.1 },
+							},
+							{
+								n = G.UIT.T,
+								config = {
+									scale = 0.3,
+									text = localize("k_enter_to_save"),
+									colour = G.C.UI.TEXT_LIGHT,
+								},
+							},
+						},
+					},
+				},
+			},
+		},
+	})
+end
+
+function toggle_different_seeds()
+	G.FUNCS.lobby_options()
+	send_lobby_options()
+end
+
+G.FUNCS.change_starting_lives = function(args)
+	MP.LOBBY.config.starting_lives = args.to_val
+	send_lobby_options()
+end
+
+G.FUNCS.change_starting_pvp_round = function(args)
+	MP.LOBBY.config.pvp_start_round = args.to_val
+	send_lobby_options()
+end
+
+G.FUNCS.change_timer_base_seconds = function(args)
+	MP.LOBBY.config.timer_base_seconds = tonumber(args.to_val:sub(1, -2))
+	send_lobby_options()
+end
+
+G.FUNCS.change_timer_increment_seconds = function(args)
+	MP.LOBBY.config.timer_increment_seconds = tonumber(args.to_val:sub(1, -2))
+	send_lobby_options()
+end
+
+G.FUNCS.change_showdown_starting_antes = function(args)
+	MP.LOBBY.config.showdown_starting_antes = args.to_val
+	send_lobby_options()
+end
+
+G.FUNCS.change_pvp_countdown_seconds = function(args)
+	MP.LOBBY.config.pvp_countdown_seconds = args.to_val
+	send_lobby_options()
+end
 
 -- This needs to have a parameter because its a callback for inputs
 local function send_lobby_options(value)
 	MP.ACTIONS.lobby_options()
 end
 
+function G.FUNCS.display_custom_seed(e)
+	local display = MP.LOBBY.config.custom_seed == "random" and localize("k_random") or MP.LOBBY.config.custom_seed
+	if display ~= e.children[1].config.text then
+		e.children[2].config.text = display
+		e.UIBox:recalculate(true)
+	end
+end
+
+-- Component for lobby options tab containing toggles and custom seed section
 local function create_lobby_option_toggle(id, label_key, ref_value, callback)
 	return {
 		n = G.UIT.R,
