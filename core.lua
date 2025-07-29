@@ -14,9 +14,11 @@ MP.LOBBY = {
 		pvp_start_round = 2,
 		timer_base_seconds = 150,
 		timer_increment_seconds = 60,
+		pvp_countdown_seconds = 3,
 		showdown_starting_antes = 3,
 		ruleset = nil,
 		gamemode = "gamemode_mp_attrition",
+		weekly = nil,
 		custom_seed = "random",
 		different_decks = false,
 		back = "Red Deck",
@@ -121,6 +123,7 @@ function MP.reset_game_states()
 		highest_score = MP.INSANE_INT.empty(),
 		timer = MP.LOBBY.config.timer_base_seconds,
 		timer_started = false,
+		pvp_countdown = 0,
 		real_money = 0,
 		ce_cache = false,
 		furthest_blind = 0,
@@ -142,6 +145,8 @@ MP.reset_game_states()
 
 MP.LOBBY.username = MP.UTILS.get_username()
 MP.LOBBY.blind_col = MP.UTILS.get_blind_col()
+
+MP.LOBBY.config.weekly = MP.UTILS.get_weekly()
 
 
 if not SMODS.current_mod.lovely then
@@ -177,6 +182,10 @@ MP.load_mp_dir("compatibility")
 MP.load_mp_file("networking/action_handlers.lua")
 
 MP.load_mp_dir("rulesets")
+if MP.LOBBY.config.weekly then -- this could be a function but why bother
+	MP.load_mp_file("rulesets/weeklies/"..MP.LOBBY.config.weekly..".lua")
+end
+
 MP.load_mp_dir("gamemodes")
 MP.load_mp_dir("objects/editions")
 MP.load_mp_dir("objects/enhancements")
@@ -186,7 +195,6 @@ MP.load_mp_dir("objects/decks")
 MP.load_mp_dir("objects/jokers")
 MP.load_mp_dir("objects/consumables")
 MP.load_mp_dir("objects/challenges")
-MP.apply_rulesets()
 
 MP.load_mp_dir("ui/components")
 MP.load_mp_dir("ui")

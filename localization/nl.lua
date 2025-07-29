@@ -186,6 +186,7 @@ return {
 			b_lobby_options = "LOBBY OPTIES",
 			b_copy_clipboard = "Kopieer naar klembord",
 			b_view_code = "BEKIJK CODE",
+			b_copy_code = "KOPIEER CODE",
 			b_leave = "VERLAAT",
 			b_opts_cb_money = "Geef comeback $ bij levensverlies",
 			b_opts_no_gold_on_loss = "Krijg geen blind beloning na verlies van ronde",

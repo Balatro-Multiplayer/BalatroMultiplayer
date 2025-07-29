@@ -201,6 +201,7 @@ return {
 			b_lobby_options = "TUỲ CHỈNH PHÒNG",
 			b_copy_clipboard = "Sao chép vào bộ nhớ đệm",
 			b_view_code = "XEM MÃ",
+			b_copy_code = "SAO CHÉP MÃ",
 			b_leave = "THOÁT",
 			b_opts_cb_money = "Bù $ cho người chơi mất mạng",
 			b_opts_no_gold_on_loss = "Không nhận thưởng blind khi thua ván",

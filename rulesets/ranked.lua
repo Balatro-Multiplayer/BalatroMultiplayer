@@ -1,7 +1,8 @@
 MP.Ruleset({
 	key = "ranked",
 	multiplayer_content = true,
-	multiplayer_content = true,
+	standard = true,
+
 	banned_jokers = {},
 	banned_consumables = {
 		"c_justice",

@@ -182,6 +182,7 @@ return {
 			b_lobby_options = "KŌWHIRINGA",
 			b_copy_clipboard = "Kape",
 			b_view_code = "KUPU HUNA",
+			b_copy_code = "KAPE HUNA",
 			b_leave = "WEHE",
 			b_opts_cb_money = "Ka riro pūtea i ia hinganga",
 			b_opts_no_gold_on_loss = "Ki te hinga, kāore e whai Whiwhinga",

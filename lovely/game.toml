@@ -139,3 +139,33 @@ payload = '''local dollars = 0
 if G.GAME.chips - G.GAME.blind.chips >= 0 or MP.is_pvp_boss() then'''
 match_indent = true
 times = 1
+
+# apply bans here
+# hmm...
+[[patches]]
+[patches.pattern]
+target = "game.lua"
+pattern = '''G:save_settings()'''
+position = "before"
+payload = '''
+if not saveTable then -- i am 99% sure this is unnecessary but i'm checking it anyway
+	MP.ApplyBans()
+end
+'''
+match_indent = true
+times = 1
+
+# effectively ban enhancements from grim/familiar/incantation
+# this MIGHT break stuff but my bet is that it doesn't
+# because that would be convenient
+[[patches]]
+[patches.pattern]
+target = '''=[SMODS _ "src/game_object.lua"]'''
+pattern = '''for k, v in pairs(G.P_CENTER_POOLS["Enhanced"]) do'''
+position = "at"
+payload = '''
+for i, v in ipairs(MP.UTILS.get_culled_pool("Enhanced")) do
+	local v = G.P_CENTERS[v]
+'''
+match_indent = true
+times = 3

@@ -187,6 +187,7 @@ return {
 			b_lobby_options = "OPÇÕES DA SALA",
 			b_copy_clipboard = "Copiar para a área de transferência",
 			b_view_code = "VER CÓDIGO",
+			b_copy_code = "COPIAR CÓDIGO",
 			b_leave = "SAIR",
 			b_opts_cb_money = "Dar $ a cada vida perdida",
 			b_opts_no_gold_on_loss = "Não ganhar recompensas de blind se perder uma rodada",

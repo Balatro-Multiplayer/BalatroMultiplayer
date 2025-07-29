@@ -184,6 +184,7 @@ return {
 			b_lobby_options = "OPZIONI LOBBY",
 			b_copy_clipboard = "Copia negli Appunti",
 			b_view_code = "RIVELA IL CODICE",
+			b_copy_code = "COPIA IL CODICE",
 			b_leave = "ESCI",
 			b_opts_cb_money = "Rimborsa 4$ per vita persa alla fine di ogni round",
 			b_opts_no_gold_on_loss = "Non dare i $ del buio se perdi il round",

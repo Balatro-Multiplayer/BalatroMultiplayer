@@ -185,6 +185,7 @@ return {
 			b_lobby_options = "ロビー設定",
 			b_copy_clipboard = "クリップボードにコピー",
 			b_view_code = "ロビーID",
+			b_copy_code = "ロビーIDコピー",
 			b_leave = "タイトルへ戻る",
 			b_opts_cb_money = "ライフ減少時に$を受け取る",
 			b_opts_no_gold_on_loss = "通常ラウンドでノルマ未達の場合にブラインド報酬を受け取らない",

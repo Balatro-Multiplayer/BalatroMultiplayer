@@ -308,25 +308,25 @@ function CardArea:shuffle(_seed)
 	if MP.INTEGRATIONS.TheOrder and self == G.deck then
 		local centers = {	-- these are roughly ordered in terms of current meta, doesn't matter toooo much? but they have to be ordered
 			c_base = 0,
-			m_stone = 500,
-			m_bonus = 507,
-			m_mult = 514,
-			m_wild = 521,
-			m_gold = 528,
-			m_lucky = 535,
-			m_steel = 542,
-			m_glass = 549,
+			m_stone = 106,
+			m_bonus = 107,
+			m_mult = 108,
+			m_wild = 109,
+			m_gold = 110,
+			m_lucky = 111,
+			m_steel = 112,
+			m_glass = 113,
 		}
 		local seals = {
-			Gold = 750,
-			Blue = 758,
-			Purple = 766,
-			Red = 774,
+			Gold = 122,
+			Blue = 131,
+			Purple = 140,
+			Red = 149,
 		}
 		local editions = {
-			foil = 1000,
-			holo = 1032,
-			polychrome = 1064,
+			foil = 157,
+			holo = 192,
+			polychrome = 227,
 		}
 		-- no mod compat, but mods aren't too competitive, it won't matter much
 		

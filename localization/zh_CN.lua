@@ -64,6 +64,7 @@ return {
 			copy_clipboard = "复制到剪贴版",
 			connect_player = "已连接玩家：",
 			view_code = "查看代碼",
+			copy_code = "複製程式碼",
 			leave = "离开",
 			opts_only_host = "只有大厅主能改这些设置",
 			opts_cb_money = "死后会给钱重新开始",
