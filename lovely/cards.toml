@@ -75,3 +75,13 @@ position = 'after'
 payload = '''if context.other_joker.edition and context.other_joker.edition.type == 'mp_phantom' then return end'''
 match_indent = true
 times = 1
+
+# align sixth sense trigger behaviour with vanilla - STEAMODDED BUG
+[[patches]]
+[patches.pattern]
+target = "card.lua"
+pattern = '''if self.ability.name == 'Sixth Sense' and #context.full_hand == 1 and context.full_hand[1]:get_id() == 6 and G.GAME.current_round.hands_played == 0 then'''
+position = 'after'
+payload = '''if ( SMODS.find_card('j_sixth_sense') )[1] ~= self then return end'''
+match_indent = true
+times = 1
