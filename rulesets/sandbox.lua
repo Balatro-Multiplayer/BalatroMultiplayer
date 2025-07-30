@@ -58,6 +58,22 @@ MP.Ruleset({
 	end,
 }):inject()
 
+-- Oops artwork - no functional changes but visual identity for sandbox
+SMODS.Atlas({
+	key = "sandbox_oops",
+	path = "j_sandbox_oops.png",
+	px = 71,
+	py = 95,
+})
+
+MP.ReworkCenter({
+	key = "j_oops",
+	atlas = "mp_sandbox_oops",
+	pos = { x = 0, y = 0 },
+	ruleset = "sandbox",
+	silent = true,
+})
+
 MP.ReworkCenter({
 	key = "j_square",
 	ruleset = "sandbox",
@@ -192,7 +208,6 @@ SMODS.Atlas({
 SMODS.Tag({
 	key = "sandbox_rare",
 	atlas = "sandbox_rare",
-	-- pos = { x = 1, y = 0 },
 	object_type = "Tag",
 	dependencies = {
 		items = {},
