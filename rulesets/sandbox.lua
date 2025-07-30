@@ -2,6 +2,7 @@ MP.SANDBOX = {}
 
 MP.Ruleset({
 	key = "sandbox",
+	standard = true,
 	multiplayer_content = true,
 	banned_jokers = {
 		"j_cloud_9",
