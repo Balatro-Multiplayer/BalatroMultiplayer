@@ -1,7 +1,13 @@
 function MP.UI.Main_Lobby_Options(info_area_id, default_info_area, button_func, buttons_data)
 	local buttons = {}
 	for idx, data in ipairs(buttons_data) do
-		local button = UIBox_button({id = data.button_id, col = true, chosen = (idx == 1 and "vert" or false), label = {localize(data.button_localize_key)}, button = button_func, colour = G.C.RED, minw = 4, scale = 0.4, minh = 0.6})
+		local col = data.button_col or G.C.RED
+		if data.button_id == "weekly_ruleset_button" then -- putting the logic here because whatever
+			if (not MP.LOBBY.config.weekly) or (MP.LOBBY.config.weekly ~= MP.LOBBY.fetched_weekly) then
+				col = G.C.DARK_EDITION
+			end
+		end
+		local button = UIBox_button({id = data.button_id, col = true, chosen = (idx == 1 and "vert" or false), label = {localize(data.button_localize_key)}, button = button_func, colour = col, minw = 4, scale = 0.4, minh = 0.6})
 		buttons[#buttons+1] = {n=G.UIT.R, config={align = "cm", padding = 0.05}, nodes={button}}
 	end
 

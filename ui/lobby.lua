@@ -398,12 +398,21 @@ local function create_lobby_options_tab()
 	}
 end
 
-local function create_spacer(width)
-	return {
-		n = G.UIT.C,
+local function create_spacer(size, row)
+	size = size or 0.2
+
+	return row and {
+		n = G.UIT.R,
 		config = {
 			align = "cm",
-			minw = width or 0.2,
+			minh = size,
+		},
+		nodes = {},
+	} or {
+		n = row and G.UIT.R or G.UIT.C,
+		config = {
+			align = "cm",
+			minw = size,
 		},
 		nodes = {},
 	}
@@ -552,15 +561,31 @@ function G.UIDEF.create_UIBox_lobby_menu()
 									create_spacer(),
 									create_players_section(text_scale),
 									create_spacer(),
-									UIBox_button({
-										button = "view_code",
-										colour = G.C.PALE_GREEN,
-										minw = 3.15,
-										minh = 1.35,
-										label = { localize("b_view_code") },
-										scale = text_scale * 1.2,
-										col = true,
-									}),
+									{
+										n = G.UIT.C,
+										config = {
+											align = "cm",
+										},
+										nodes = {
+											UIBox_button({
+												button = "view_code",
+												colour = G.C.PALE_GREEN,
+												minw = 2.15,
+												minh = 0.65,
+												label = { localize("b_view_code") },
+												scale = text_scale * 1.2,
+											}),
+											create_spacer(0.1, true),
+											UIBox_button({
+												button = "copy_to_clipboard",
+												colour = G.C.PERISHABLE,
+												minw = 2.15,
+												minh = 0.65,
+												label = { localize("b_copy_code") },
+												scale = text_scale,
+											}),
+										}
+									}
 								},
 							},
 							UIBox_button({
@@ -582,12 +607,13 @@ function G.UIDEF.create_UIBox_lobby_menu()
 	return t
 end
 
-local function create_lobby_option_cycle(id, label_key, options, current_option, callback)
+local function create_lobby_option_cycle(id, label_key, scale, options, current_option, callback)
 	return Disableable_Option_Cycle({
 		id = id,
 		enabled_ref_table = MP.LOBBY,
 		enabled_ref_value = "is_host",
 		label = localize(label_key),
+		scale = scale,
 		options = options,
 		current_option = current_option,
 		opt_callback = callback,
@@ -609,76 +635,55 @@ local function create_gamemode_modifiers_tab()
 		nodes = {
 			{
 				n = G.UIT.R,
-				config = { padding = 0, align = "cm" },
+				config = { padding = 0, align = "cm", },
 				nodes = {
 					create_lobby_option_cycle(
 						"starting_lives_option",
 						"b_opts_lives",
+						0.85,
 						{ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16 },
 						MP.LOBBY.config.starting_lives,
 						"change_starting_lives"
 					),
-					create_lobby_option_cycle("pvp_round_start_option", "k_opts_pvp_start_round", {
-						1,
-						2,
-						3,
-						4,
-						5,
-						6,
-						7,
-						8,
-						9,
-						10,
-						11,
-						12,
-						13,
-						14,
-						15,
-						16,
-						17,
-						18,
-						19,
-						20,
-					}, MP.LOBBY.config.pvp_start_round, "change_starting_pvp_round"),
+					create_lobby_option_cycle(
+						"pvp_round_start_option", 
+						"k_opts_pvp_start_round", 
+						0.85,
+						{ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20 }, 
+						MP.LOBBY.config.pvp_start_round, 
+						"change_starting_pvp_round"),
 					create_lobby_option_cycle(
 						"pvp_timer_seconds_option",
 						"k_opts_pvp_timer",
+						0.85,
 						{ "30s", "60s", "90s", "120s", "150s", "180s" },
 						MP.LOBBY.config.timer_base_seconds / 30,
 						"change_timer_base_seconds"
 					),
-					create_lobby_option_cycle("showdown_starting_antes_option", "k_opts_showdown_starting_antes", {
-						1,
-						2,
-						3,
-						4,
-						5,
-						6,
-						7,
-						8,
-						9,
-						10,
-						11,
-						12,
-						13,
-						14,
-						15,
-						16,
-						17,
-						18,
-						19,
-						20,
-					}, MP.LOBBY.config.showdown_starting_antes, "change_showdown_starting_antes"),
-
-					create_lobby_option_cycle("pvp_timer_increment_seconds_option", "k_opts_pvp_timer_increment", {
-						"0s",
-						"30s",
-						"60s",
-						"90s",
-						"120s",
-						"150s",
-						"180s",
-					}, MP.LOBBY.config.timer_increment_seconds / 30, "change_timer_increment_seconds"),
+					create_lobby_option_cycle(
+						"showdown_starting_antes_option", 
+						"k_opts_showdown_starting_antes", 
+						0.85,
+						{ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20 }, 
+						MP.LOBBY.config.showdown_starting_antes, 
+						"change_showdown_starting_antes"
+					),
+					create_lobby_option_cycle(
+						"pvp_timer_increment_seconds_option", 
+						"k_opts_pvp_timer_increment",
+						0.85,
+						{ "0s", "30s", "60s", "90s", "120s", "150s", "180s" }, 
+						MP.UTILS.get_array_index_by_value({ 0, 30, 60, 90, 120, 150, 180 },MP.LOBBY.config.timer_increment_seconds), 
+						"change_timer_increment_seconds"
+					),
+				    create_lobby_option_cycle(
+						"pvp_countdown_seconds_option", 
+						"k_opts_pvp_countdown_seconds",
+						0.85,
+						{ 0, 3, 5, 10 }, 
+						MP.UTILS.get_array_index_by_value({ 0, 3, 5, 10 }, MP.LOBBY.config.pvp_countdown_seconds), 
+						"change_pvp_countdown_seconds"
+					),
 				},
 			},
 		},
@@ -764,6 +769,7 @@ function G.UIDEF.create_UIBox_custom_seed_overlay()
 								ref_table = MP.LOBBY,
 								ref_value = "temp_seed",
 								prompt_text = localize("k_enter_seed"),
+								keyboard_offset = 4,
 								callback = function(val)
 									MP.LOBBY.config.custom_seed = MP.LOBBY.temp_seed
 									send_lobby_options()
@@ -796,7 +802,7 @@ function G.UIDEF.create_UIBox_view_hash(type)
 				{
 					n = G.UIT.C,
 					config = {
-						padding = 0.2,
+						padding = 0.07,
 						align = "cm",
 					},
 					nodes = MP.UI.hash_str_to_view(
@@ -820,7 +826,7 @@ function MP.UI.hash_str_to_view(str, text_colour)
 		table.insert(t, {
 			n = G.UIT.R,
 			config = {
-				padding = 0.05,
+				padding = 0.02,
 				align = "cm",
 			},
 			nodes = {
@@ -829,7 +835,7 @@ function MP.UI.hash_str_to_view(str, text_colour)
 					config = {
 						text = s,
 						shadow = true,
-						scale = 0.45,
+						scale = 0.4,
 						colour = text_colour,
 					},
 				},
@@ -879,6 +885,11 @@ end
 G.FUNCS.change_showdown_starting_antes = function(args)
 	MP.LOBBY.config.showdown_starting_antes = args.to_val
 	send_lobby_options()
+end
+
+G.FUNCS.change_pvp_countdown_seconds = function(args)
+        MP.LOBBY.config.pvp_countdown_seconds = args.to_val
+        send_lobby_options()
 end
 
 function G.FUNCS.get_lobby_main_menu_UI(e)

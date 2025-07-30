@@ -216,7 +216,7 @@ SMODS.Mods.Multiplayer.config_tab = function()
 						ref_table = MP.LOBBY,
 						ref_value = "username",
 						extended_corpus = true,
-						keyboard_offset = 1,
+						keyboard_offset = -3,
 						callback = function(val)
 							MP.UTILS.save_username(MP.LOBBY.username)
 						end,

@@ -186,6 +186,7 @@ return {
 			b_lobby_options = "OPCJE GRY",
 			b_copy_clipboard = "Skopiuj do schowka",
 			b_view_code = "POKAŻ KOD",
+			b_copy_code = "SKOPIUJ KOD",
 			b_leave = "OPUŚĆ LOBBY",
 			b_opts_cb_money = "Dostawanie $ po straconym życiu",
 			b_opts_no_gold_on_loss = " Brak nagrody od przeszkadzajki jeśli życie zostało stracone",
