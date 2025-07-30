@@ -125,14 +125,6 @@ return {
 					"{C:inactive}(Currently {C:money}$#2#{}{C:inactive})",
 				},
 			},
-			j_mp_delayed_grat = {
-				name = "Delayed Gratification",
-				text = {
-					"Earn {C:money}$#1#{} per {C:attention}discard{} if",
-					"no discards are used",
-					"by end of the round",
-				},
-			},
 			j_mp_bloodstone = {
 				name = "Bloodstone",
 				text = {
