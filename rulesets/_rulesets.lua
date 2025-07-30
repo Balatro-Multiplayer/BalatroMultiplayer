@@ -127,14 +127,15 @@ function MP.AddOverrides(rulesetName)
 	sendDebugMessage("MP.INTEGRATIONS.TheOrder is available", "MULTIPLAYER")
 
 	if rulesetName ~= "sandbox" then
+		sendDebugMessage("Processing ruleset " .. rulesetName .. " with the order", "MULTIPLAYER")
 		the_order_standard_pack_ownership()
-		return
-	end
-
-	if rulesetName == "sandbox" then
-		sendDebugMessage("Processing sandbox ruleset")
-		MP.SANDBOX.standard_pack_ownership()
-		sendDebugMessage("Finished setting up sandbox standard pack override", "MULTIPLAYER")
+		sendDebugMessage("Finished setting up The Order pack override", "MULTIPLAYER")
+	else
+		if rulesetName == "sandbox" then
+			sendDebugMessage("Processing sandbox ruleset")
+			MP.SANDBOX.standard_pack_ownership()
+			sendDebugMessage("Finished setting up sandbox standard pack override", "MULTIPLAYER")
+		end
 	end
 	sendDebugMessage("MP.AddOverrides completed", "MULTIPLAYER")
 end
