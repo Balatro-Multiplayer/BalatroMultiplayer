@@ -113,29 +113,4 @@ function MP.LoadReworks(ruleset, key)
 			end
 		end
 	end
-	MP.AddOverrides(ruleset)
-end
-
-function MP.AddOverrides(rulesetName)
-	sendDebugMessage("MP.AddOverrides called with rulesetName:" .. rulesetName, "MULTIPLAYER")
-
-	if not MP.INTEGRATIONS.TheOrder then
-		sendDebugMessage("MP.INTEGRATIONS.TheOrder is false/nil, returning early", "MULTIPLAYER")
-		return
-	end
-
-	sendDebugMessage("MP.INTEGRATIONS.TheOrder is available", "MULTIPLAYER")
-
-	if rulesetName ~= "sandbox" then
-		sendDebugMessage("Processing ruleset " .. rulesetName .. " with the order", "MULTIPLAYER")
-		the_order_standard_pack_ownership()
-		sendDebugMessage("Finished setting up The Order pack override", "MULTIPLAYER")
-	else
-		if rulesetName == "sandbox" then
-			sendDebugMessage("Processing sandbox ruleset")
-			MP.SANDBOX.standard_pack_ownership()
-			sendDebugMessage("Finished setting up sandbox standard pack override", "MULTIPLAYER")
-		end
-	end
-	sendDebugMessage("MP.AddOverrides completed", "MULTIPLAYER")
 end

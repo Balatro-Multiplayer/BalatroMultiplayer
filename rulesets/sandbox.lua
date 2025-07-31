@@ -265,49 +265,48 @@ SMODS.Tag({
 	end,
 })
 
-function MP.SANDBOX.standard_pack_ownership()
-	sendDebugMessage("Standard pack ownership enabled", "MULTIPLAYER")
-	SMODS.Booster:take_ownership_by_kind("Standard", {
-		create_card = function(self, card, i)
-			sendDebugMessage("Creating card for sandbox ruleset, card index:" .. tostring(i), "MULTIPLAYER")
-			local enhancement_pool = {}
+-- Standard pack card creation for sandbox ruleset
+-- Skips glass enhancement (excluded from enhancement pool)
+-- 40% chance (0.6 threshold) for any enhancement to be applied (like vanilla)
+function sandbox_create_card(self, card, i)
+	local enhancement_pool = {}
 
-			-- Skip glass
-			for k, v in pairs(G.P_CENTER_POOLS["Enhanced"]) do
-				if v.key ~= "m_glass" then
-					enhancement_pool[#enhancement_pool + 1] = v.key
-				end
-			end
+	-- Skip glass
+	for k, v in pairs(G.P_CENTER_POOLS["Enhanced"]) do
+		if v.key ~= "m_glass" then
+			enhancement_pool[#enhancement_pool + 1] = v.key
+		end
+	end
 
-			sendDebugMessage(
-				"Built enhancement pool with" .. tostring(#enhancement_pool) .. "items (excluding glass)",
-				"MULTIPLAYER"
-			)
-			sendDebugMessage(MP.UTILS.serialize_table(enhancement_pool), "MULTIPLAYER")
+	local ante_rng = MP.ante_based()
+	local roll = pseudorandom(pseudoseed("stdc1" .. ante_rng))
+	local enhancement = roll > 0.6 and pseudorandom_element(enhancement_pool, pseudoseed("stdc2" .. ante_rng)) or nil
 
-			local ante_rng = MP.ante_based()
-			local roll = pseudorandom(pseudoseed("stdc1" .. ante_rng))
-			local enhancement = roll > 0.6 and pseudorandom_element(enhancement_pool, pseudoseed("stdc2" .. ante_rng))
-				or nil
+	local s_append = ""
+	local b_append = ante_rng .. s_append
 
-			sendDebugMessage("Enhancement: " .. tostring(enhancement), "MULTIPLAYER")
+	local _edition = poll_edition("standard_edition" .. b_append, 2, true)
+	local _seal = SMODS.poll_seal({ mod = 10, key = "stdseal" .. ante_rng })
 
-			local s_append = ""
-			local b_append = ante_rng .. s_append
+	return {
+		set = "Base",
+		edition = _edition,
+		seal = _seal,
+		enhancement = enhancement,
+		area = G.pack_cards,
+		skip_materialize = true,
+		soulable = true,
+		key_append = "sta" .. s_append,
+	}
+end
 
-			local _edition = poll_edition("standard_edition" .. b_append, 2, true)
-			local _seal = SMODS.poll_seal({ mod = 10, key = "stdseal" .. ante_rng })
-
-			return {
-				set = "Base",
-				edition = _edition,
-				seal = _seal,
-				enhancement = enhancement,
-				area = G.pack_cards,
-				skip_materialize = true,
-				soulable = true,
-				key_append = "sta" .. s_append,
-			}
-		end,
-	}, true)
+for k, v in ipairs(G.P_CENTER_POOLS.Booster) do
+	if v.kind and v.kind == "Standard" then
+		MP.ReworkCenter({
+			key = v.key,
+			ruleset = "sandbox",
+			silent = true,
+			create_card = sandbox_create_card,
+		})
+	end
 end
