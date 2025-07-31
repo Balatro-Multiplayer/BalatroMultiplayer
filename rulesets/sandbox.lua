@@ -61,7 +61,7 @@ MP.Ruleset({
 -- Oops artwork - no functional changes but visual identity for sandbox
 SMODS.Atlas({
 	key = "sandbox_oops",
-	path = "j_sandbox_oops.png",
+	path = "j_sandbox_oops2.png",
 	px = 71,
 	py = 95,
 })
