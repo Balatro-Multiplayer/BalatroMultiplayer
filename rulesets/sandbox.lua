@@ -22,7 +22,6 @@ MP.Ruleset({
 		"j_hanging_chad",
 		"j_idol",
 		"j_square",
-		"j_mp_conjoined_joker",
 		"j_mp_defensive_joker",
 		"j_mp_magnet",
 		"j_mp_lets_go_gambling",
