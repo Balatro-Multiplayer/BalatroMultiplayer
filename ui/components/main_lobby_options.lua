@@ -58,14 +58,7 @@ function MP.UI.Main_Lobby_Options(info_area_id, default_info_area, button_func, 
 			})
 			buttons[#buttons + 1] = { n = G.UIT.R, config = { align = "cm", padding = 0.05 }, nodes = { button } }
 		end
-		categories[#categories + 1] = {
-			n = G.UIT.R,
-			config = { align = "cm", padding = 0.05, r = 0.1, minw = 4.2, minh = 0.8, colour = G.C.UI.TRANSPARENT_DARK },
-			nodes = {
-				{ n = G.UIT.R, config = { align = "cm" }, nodes = buttons },
-				{ n = G.UIT.R, config = { align = "cm", padding = 0.05 }, nodes = { { n = G.UIT.T, config = { text = localize(category.name), colour = lighten(G.C.L_BLACK, 0.5), scale = 0.33 } } } }
-			}
-		}
+		categories[#categories + 1] = MP.UI.BackgroundGrouping(localize(category.name), buttons)
 	end
 
 	return create_UIBox_generic_options({
