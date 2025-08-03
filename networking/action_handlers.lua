@@ -311,6 +311,7 @@ local function action_lobby_options(options)
 			or k == "timer_increment_seconds"
 			or k == "showdown_starting_antes"
 			or k == "pvp_countdown_seconds"
+			or k == "timer_forgiveness"
 		then
 			parsed_v = tonumber(v)
 		end
@@ -839,7 +840,7 @@ function MP.ACTIONS.set_ante(ante)
 end
 
 function MP.ACTIONS.new_round()
-	
+
 	MP.GAME.duplicate_end = false
 	MP.GAME.round_ended = false
 	Client.send("action:newRound")

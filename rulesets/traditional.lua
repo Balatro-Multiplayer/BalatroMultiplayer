@@ -42,4 +42,8 @@ MP.Ruleset({
 			}
 		}}
 	end,
+	force_lobby_options = function(self)
+		MP.LOBBY.config.timer = false
+		return false
+	end
 }):inject()

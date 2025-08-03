@@ -49,5 +49,8 @@ MP.Ruleset({
 			return localize("k_ruleset_disabled_the_order_required")
 		end
 		return false
+	end,
+	force_lobby_options = function(self)
+		return true
 	end
 }):inject()

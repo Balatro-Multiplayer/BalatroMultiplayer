@@ -33,6 +33,9 @@ MP.Ruleset = SMODS.GameObject:extend({
 	end,
 	is_disabled = function(self)
 		return false
+	end,
+	force_lobby_options = function(self)
+		return false
 	end
 })
 
