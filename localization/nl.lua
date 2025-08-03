@@ -204,7 +204,7 @@ return {
 			b_unstuck_blind = "Vast buiten PvP",
 			b_misprint_display = "Toon de volgende kaart van je Kaartspel",
 			b_players = "Spelers",
-			b_lobby_info = "Lobby Informatie"
+			b_lobby_info = "Lobby Informatie",
 			b_continue_singleplayer = "Speel verder in Singleplayer",
 			b_the_order_integration = "Schakel De Orde Integratie in",
 			b_view_nemesis_deck = "Toon Aartsvijands Kaartspel",
@@ -231,8 +231,8 @@ return {
 			k_connected = "Verbonden met Service",
 			k_warn_service = "WAARSCHUWING: Kan de multiplayer service niet vinden",
 			k_set_name = "Verander je gebruikersnaam in het hoofdmenu! (Mods > Multiplayer > Config)",
-			k_mod_hash_warning = "Spelers hebben verschillende mods of mod versies! Dit kan problemen veroorzaken!
-			k_warning_unlock_profile = "Het profiel waarmee je aan het spelen bent is niet volledig vrijgespeeld. Als dit een geklasseerd spel of een spel in een toernooi is, maak een nieuw profiel aan en druk op alles vrijspelen in profiel instellingen."
+			k_mod_hash_warning = "Spelers hebben verschillende mods of mod versies! Dit kan problemen veroorzaken!",
+			k_warning_unlock_profile = "Het profiel waarmee je aan het spelen bent is niet volledig vrijgespeeld. Als dit een geklasseerd spel of een spel in een toernooi is, maak een nieuw profiel aan en druk op alles vrijspelen in profiel instellingen.",
 			k_warning_nemesis_unlock = "Je tegenstander is aan het spelen op een profiel dat niet volledig vrijgespeeld is. Help ze aub met een nieuw profiel aan te maken en op alles vrijspelen te drukken in profiel instellingen.",
 			k_warning_no_order = "Eén speler heeft De Orde Integratie ingeschakelt terwijl de andere niet. Dit zal er voor zorgen dat de seeds verschillend zullen zijn.",
 			k_warning_cheating = "Als je dit ziet, kan het zijn dat je tegenstander aan het valsspelen is. Als dit een geklasseerd spel is, zend aub het bericht '%s' en open een support ticket in #support.",
