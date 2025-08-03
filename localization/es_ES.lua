@@ -79,7 +79,6 @@ return {
                     "el {C:attention}Comodín{} de mayor",
                     "valor de venta de tu {X:purple,C:white}Némesis{}",
                     "{C:inactive}(Actualmente {C:attention}#2#{C:inactive}/#3# rondas)",
-                    "{C:inactive,s:0.8}(No copia el estado del Comodín)",
                 },
             },
             j_mp_pizza = {
@@ -226,7 +225,8 @@ return {
 			k_set_name = "¡Especifica tu nombre de usuario en el menú principal! (Mods > Multiplayer > Configuración)",
 			k_mod_hash_warning = "¡Los jugadores tienen diferentes mods o diferentes versiones de mods! ¡Esto puede causar problemas!",
             k_warning_unlock_profile = "El perfil en el que estás jugando no está completamente desbloqueado. Si es un juego de ranked/torneo, crea un nuevo perfil y presiona desbloquear todo en la configuración del perfil",
-			k_warning_cheating = "Si ves esto, tu oponente puede estar haciendo trampa. Si es un juego de ranked, por favor envía el mensaje '%s' y luego abre un ticket de soporte en #support",
+			k_warning_cheating1 = "Si ves esto, tu oponente puede estar haciendo trampa.",
+			k_warning_cheating2 = "Si es un juego de ranked, por favor envía el mensaje '%s' y luego abre un ticket de soporte en #support",
             k_message1 = "Un momento, mi mamá hizo pizza",
             k_message2 = "Un segundo, tengo que ir a buscar mi cerdo asado",
             k_message3 = "Un momento, tengo una llamada de mi mamá",
@@ -291,14 +291,14 @@ return {
 			k_no_banned_objs = "No hay #1# prohibidos",
 			k_reworked_objs = "#1# añadidos/modificados",
 			k_no_reworked_objs = "No hay #1# añadidos/modificaciones ",
-            -- 
+            --
 		},
 		v_text = {
 			ch_c_hanging_chad_rework = { "El {C:attention}Papel perforado{} está {C:dark_edition}modificado" },
 			ch_c_glass_cards_rework = { "Las {C:attention}Cartas de vidrio{} están {C:dark_edition}modificadas" },
 		},
         challenge_names = {
-            c_mp_misprint_deck = "Mazo con errores de imprenta", 
+            c_mp_misprint_deck = "Mazo con errores de imprenta",
 			c_mp_legendaries = "Legendarios",
 			c_mp_psychosis = "Psicosis",
             c_mp_scratch = "Desde Cero",
