@@ -114,7 +114,7 @@ MP.Gamemode({
 												object = MP.UI.BlindChip.random()
 											}
 										},
-									}, 0.6),
+									}, {text_scale = 0.6}),
 								}
 							},
 							{
@@ -163,7 +163,7 @@ MP.Gamemode({
 												object = MP.UI.BlindChip.nemesis()
 											}
 										},
-									}, 0.6),
+									}, {text_scale = 0.6}),
 								}
 							},
 						},
@@ -189,7 +189,7 @@ MP.Gamemode({
 												colour = G.C.UI.TEXT_LIGHT,
 											}
 										},
-									}, 0.6),
+									}, {text_scale = 0.6}),
 								}
 							},
 						}
