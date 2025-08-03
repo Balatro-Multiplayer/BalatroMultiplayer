@@ -1,5 +1,15 @@
 return {
 	descriptions = {
+		Tag = {
+			tag_mp_sandbox_rare = {
+				name = "Gambling Tag",
+				text = {
+					"{C:green}#1# in #2#{} chance",
+					"Shop has a free",
+					"{C:red}Rare Joker{}",
+				},
+			},
+		},
 		Joker = {
 			j_broken = {
 				name = "BROKEN",
@@ -106,6 +116,25 @@ return {
 					"{C:attention}#1#{} additional time",
 				},
 			},
+			j_mp_cloud_9 = {
+				name = "Cloud 9",
+				text = {
+					"Earn {C:money}$1{} for each {C:attention}9{} in deck",
+					"(max {C:money}$4{}), then {C:money}$#1#{} for each",
+					"additional {C:attention}9{} at end of round",
+					"{C:inactive}(Currently {C:money}$#2#{}{C:inactive})",
+				},
+			},
+			j_mp_bloodstone = {
+				name = "Bloodstone",
+				text = {
+					"{C:green}#1# in #2#{} chance for",
+					"played cards with",
+					"{C:hearts}Heart{} suit to give",
+					"{X:mult,C:white} X#3# {} Mult when scored",
+					"{C:inactive}(Includes experimental variance){}",
+				},
+			},
 		},
 		Planet = {
 			c_mp_asteroid = {
@@ -162,6 +191,7 @@ return {
 		},
 		challenge_names = {
 			c_mp_standard = "Standard",
+			c_mp_sandbox = "Sandbox",
 			c_mp_badlatro = "Badlatro",
 			c_mp_tournament = "Tournament",
 			c_mp_weekly = "Weekly",
@@ -262,6 +292,10 @@ return {
 			k_bl_mostchips = "Most chips wins",
 			k_current_seed = "Current seed: ",
 			k_random = "Random",
+			k_standard = "Standard",
+			k_standard_description = "The standard ruleset, includes Multiplayer cards and changes to the base game to fit the Multiplayer meta.",
+			k_sandbox = "steph's sandbox",
+			k_sandbox_description = "Like normal mode but someone gave the cards coffee and they're feeling chatty.",
 			k_vanilla = "Vanilla",
 			k_vanilla_description = "The vanilla ruleset, no Multiplayer cards, no modifications to base game content. This ruleset includes Multiplayer features like the timer",
 			k_blitz = "Blitz",
