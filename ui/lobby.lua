@@ -42,59 +42,6 @@ function G.UIDEF.get_connection_status_ui()
 	})
 end
 
-function G.UIDEF.create_UIBox_view_code()
-	local var_495_0 = 0.75
-
-	return (
-		create_UIBox_generic_options({
-			contents = {
-				{
-					n = G.UIT.R,
-					config = {
-						padding = 0,
-						align = "cm",
-					},
-					nodes = {
-						{
-							n = G.UIT.R,
-							config = {
-								padding = 0.5,
-								align = "cm",
-							},
-							nodes = {
-								{
-									n = G.UIT.T,
-									config = {
-										text = MP.LOBBY.code,
-										shadow = true,
-										scale = var_495_0 * 0.6,
-										colour = G.C.UI.TEXT_LIGHT,
-									},
-								},
-							},
-						},
-						{
-							n = G.UIT.R,
-							config = {
-								padding = 0,
-								align = "cm",
-							},
-							nodes = {
-								UIBox_button({
-									label = { localize("b_copy_clipboard") },
-									colour = G.C.BLUE,
-									button = "copy_to_clipboard",
-									minw = 5,
-								}),
-							},
-						},
-					},
-				},
-			},
-		})
-	)
-end
-
 function G.UIDEF.create_UIBox_lobby_menu()
 	local text_scale = 0.45
 	local back = MP.LOBBY.config.different_decks and MP.LOBBY.deck.back or MP.LOBBY.config.back
@@ -397,9 +344,15 @@ function G.FUNCS.lobby_options(e)
 end
 
 function G.FUNCS.view_code(e)
-	G.FUNCS.overlay_menu({
-		definition = G.UIDEF.create_UIBox_view_code(),
-	})
+	local text_config = e.children[1].children[1].config
+	if text_config.text ~= MP.LOBBY.code then
+		e.config.colour = G.C.ETERNAL
+		text_config.text = MP.LOBBY.code
+	else
+		e.config.colour = G.C.GREEN
+		text_config.text = localize("b_view_code")
+	end
+	e.UIBox:recalculate()
 end
 
 function G.FUNCS.lobby_leave(e)
