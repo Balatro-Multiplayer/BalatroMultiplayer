@@ -44,6 +44,25 @@ MP.Ruleset({
 	},
 	reworked_tags = { "tag_mp_sandbox_rare" },
 
+	create_info_menu = function ()
+		return {{
+			n = G.UIT.R,
+			config = {
+				align = "tm"
+			},
+			nodes = {
+				{
+					n = G.UIT.T,
+					config = {
+						text = MP.UTILS.wrapText(localize("k_sandbox_description"), 100),
+						scale = 0.4,
+						colour = G.C.UI.TEXT_LIGHT,
+					}
+				}
+			}
+		}}
+	end,
+
 	is_disabled = function(self)
 		if not MP.INTEGRATIONS.TheOrder then
 			return localize("k_ruleset_disabled_the_order_required")
