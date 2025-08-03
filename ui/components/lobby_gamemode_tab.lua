@@ -49,7 +49,7 @@ function MP.UI.create_gamemode_modifiers_tab()
 						"pvp_timer_seconds_option",
 						"k_opts_pvp_timer",
 						0.85,
-						{ "30s", "60s", "90s", "120s", "150s", "180s" },
+						{ "30s", "60s", "90s", "120s", "150s", "180s", "210s", "240s" },
 						MP.LOBBY.config.timer_base_seconds / 30,
 						"change_timer_base_seconds"
 					),
