@@ -22,26 +22,13 @@ MP.Ruleset({
 		"j_hanging_chad",
 		"j_idol",
 		"j_square",
-		"j_mp_defensive_joker",
-		-- "j_mp_magnet",
-		"j_mp_lets_go_gambling",
-		"j_mp_pacifist",
-		"j_mp_penny_pincher",
-		"j_mp_pizza",
-		"j_mp_skip_off",
-		"j_mp_speedrun",
-		"j_mp_taxes",
 	},
-	reworked_consumables = {
-		"c_mp_asteroid",
-	},
+	reworked_consumables = {},
 	reworked_vouchers = {},
 	reworked_enhancements = {
 		"m_glass",
 	},
-	reworked_blinds = {
-		"bl_mp_nemesis",
-	},
+	reworked_blinds = {},
 	reworked_tags = { "tag_mp_sandbox_rare" },
 
 	create_info_menu = function ()
@@ -237,6 +224,7 @@ SMODS.Tag({
 	discovered = true,
 	order = 2,
 	min_ante = 2, -- less degeneracy
+	no_collection = true,
 	config = {
 		type = "store_joker_create",
 		odds = 2,
