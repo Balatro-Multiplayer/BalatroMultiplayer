@@ -95,335 +95,10 @@ function G.UIDEF.create_UIBox_view_code()
 	)
 end
 
--- TODO: This entire function seems to only return once
--- ie we only get EITHER the order warning message or cheating message or nemesis unlock message
-local function get_lobby_text()
-	-- Check the other player (guest if we're host, host if we're guest)
-	local other_player = MP.LOBBY.is_host and MP.LOBBY.guest or MP.LOBBY.host
-
-	if other_player and other_player.cached == false then
-		return MP.UTILS.wrapText(string.format(localize("k_warning_cheating"), MP.UTILS.random_message()), 100),
-			SMODS.Gradients.warning_text
-	end
-
-	if other_player and other_player.config and other_player.config.unlocked == false then
-		return localize("k_warning_nemesis_unlock"), SMODS.Gradients.warning_text
-	end
-
-	local current_player = MP.LOBBY.is_host and MP.LOBBY.host or MP.LOBBY.guest
-	local current_has_order = current_player and current_player.config and current_player.config.TheOrder
-	local other_has_order = other_player and other_player.config and other_player.config.TheOrder
-
-	if (MP.LOBBY.ready_to_start or not MP.LOBBY.is_host) and current_has_order ~= other_has_order then
-		return localize("k_warning_no_order"), SMODS.Gradients.warning_text
-	end
-
-	if MP.LOBBY.ready_to_start or not MP.LOBBY.is_host then
-		local hostSteamoddedVersion = MP.LOBBY.host and MP.LOBBY.host.config and MP.LOBBY.host.config.Mods["Steamodded"]
-		local guestSteamoddedVersion = MP.LOBBY.guest
-			and MP.LOBBY.guest.config
-			and MP.LOBBY.guest.config.Mods["Steamodded"]
-
-		if hostSteamoddedVersion ~= guestSteamoddedVersion then
-			return localize("k_steamodded_warning"), SMODS.Gradients.warning_text
-		end
-	end
-
-	SMODS.Mods["Multiplayer"].config.unlocked = MP.UTILS.unlock_check()
-	if not SMODS.Mods["Multiplayer"].config.unlocked then
-		return localize("k_warning_unlock_profile"), SMODS.Gradients.warning_text
-	end
-
-	-- Remove the mod hash warning from main warning display area since it's shown
-	-- alongside critical warnings (cheating, compatibility issues). This makes users
-	-- learn to ignore all warnings. Instead, we should indicate hash differences
-	-- through other UI elements like colored usernames or separate indicators.
-	-- The hash check itself remains useful for debugging but shouldn't be presented
-	-- as a blocking warning alongside serious compatibility issues.
-	-- steph
-	if MP.LOBBY.host and MP.LOBBY.host.hash and MP.LOBBY.guest and MP.LOBBY.guest.hash then
-		if MP.LOBBY.host.hash ~= MP.LOBBY.guest.hash then
-			return localize("k_mod_hash_warning"), G.C.UI.TEXT_LIGHT
-		end
-	end
-
-	-- ???: What is this supposed to accomplish?
-	if MP.LOBBY.username == "Guest" then
-		return localize("k_set_name"), G.C.UI.TEXT_LIGHT
-	end
-
-	return " ", G.C.UI.TEXT_LIGHT
-end
-
-local function create_player_info_row(player, player_type, text_scale)
-	if not player or not player.username then
-		return nil
-	end
-
-	return {
-		n = G.UIT.R,
-		config = {
-			padding = 0.1,
-			align = "cm",
-		},
-		nodes = {
-			{
-				n = G.UIT.T,
-				config = {
-					ref_table = player,
-					ref_value = "username",
-					shadow = true,
-					scale = text_scale * 0.8,
-					colour = G.C.UI.TEXT_LIGHT,
-				},
-			},
-			{
-				n = G.UIT.B,
-				config = {
-					w = 0.1,
-					h = 0.1,
-				},
-			},
-			player.hash and UIBox_button({
-				id = player_type .. "_hash",
-				button = "view_" .. player_type .. "_hash",
-				label = { player.hash },
-				minw = 0.75,
-				minh = 0.3,
-				scale = 0.25,
-				shadow = false,
-				colour = G.C.PURPLE,
-				col = true,
-			}) or nil,
-		},
-	}
-end
-
-local function create_players_section(text_scale)
-	return {
-		n = G.UIT.C,
-		config = {
-			align = "tm",
-			minw = 2.65,
-		},
-		nodes = {
-			{
-				n = G.UIT.R,
-				config = {
-					padding = 0.15,
-					align = "cm",
-				},
-				nodes = {
-					{
-						n = G.UIT.T,
-						config = {
-							text = localize("k_connect_player"),
-							shadow = true,
-							scale = text_scale * 0.8,
-							colour = G.C.UI.TEXT_LIGHT,
-						},
-					},
-				},
-			},
-			create_player_info_row(MP.LOBBY.host, "host", text_scale),
-			create_player_info_row(MP.LOBBY.guest, "guest", text_scale),
-		},
-	}
-end
-
-local function create_lobby_option_toggle(id, label_key, ref_value, callback)
-	return {
-		n = G.UIT.R,
-		config = {
-			padding = 0,
-			align = "cr",
-		},
-		nodes = {
-			Disableable_Toggle({
-				id = id,
-				enabled_ref_table = MP.LOBBY,
-				enabled_ref_value = "is_host",
-				label = localize(label_key),
-				ref_table = MP.LOBBY.config,
-				ref_value = ref_value,
-				callback = callback or send_lobby_options,
-			}),
-		},
-	}
-end
-
-local function create_custom_seed_section()
-	if MP.LOBBY.config.different_seeds then
-		return { n = G.UIT.B, config = { w = 0.1, h = 0.1 } }
-	end
-
-	return {
-		n = G.UIT.R,
-		config = { padding = 0, align = "cr" },
-		nodes = {
-			{
-				-- TODO: Extract this into a component so we can pretend it's clean code
-				n = G.UIT.R,
-				config = {
-					padding = 0,
-					align = "cr",
-				},
-				nodes = {
-					{
-						n = G.UIT.C,
-						config = {
-							padding = 0,
-							align = "cm",
-						},
-						nodes = {
-							{
-								n = G.UIT.R,
-								config = {
-									padding = 0.2,
-									align = "cr",
-									func = "display_custom_seed",
-								},
-								nodes = {
-									{
-										n = G.UIT.T,
-										config = {
-											scale = 0.45,
-											text = localize("k_current_seed"),
-											colour = G.C.UI.TEXT_LIGHT,
-										},
-									},
-									{
-										n = G.UIT.T,
-										config = {
-											scale = 0.45,
-											text = MP.LOBBY.config.custom_seed,
-											colour = G.C.UI.TEXT_LIGHT,
-										},
-									},
-								},
-							},
-							{
-								n = G.UIT.R,
-								config = {
-									padding = 0.2,
-									align = "cr",
-								},
-								nodes = {
-									Disableable_Button({
-										id = "custom_seed_overlay",
-										button = "custom_seed_overlay",
-										colour = G.C.BLUE,
-										minw = 3.65,
-										minh = 0.6,
-										label = {
-											localize("b_set_custom_seed"),
-										},
-										disabled_text = {
-											localize("b_set_custom_seed"),
-										},
-										scale = 0.45,
-										col = true,
-										enabled_ref_table = MP.LOBBY,
-										enabled_ref_value = "is_host",
-									}),
-									{
-										n = G.UIT.B,
-										config = {
-											w = 0.1,
-											h = 0.1,
-										},
-									},
-									Disableable_Button({
-										id = "custom_seed_reset",
-										button = "custom_seed_reset",
-										colour = G.C.RED,
-										minw = 1.65,
-										minh = 0.6,
-										label = {
-											localize("b_reset"),
-										},
-										disabled_text = {
-											localize("b_reset"),
-										},
-										scale = 0.45,
-										col = true,
-										enabled_ref_table = MP.LOBBY,
-										enabled_ref_value = "is_host",
-									}),
-								},
-							},
-						},
-					},
-				},
-			},
-		},
-	}
-end
-
--- Creates the lobby options tab UI containing toggles for various multiplayer settings
--- Returns a UI table with lobby configuration options like gold on life loss, different seeds, etc.
-local function create_lobby_options_tab()
-	return {
-		n = G.UIT.ROOT,
-		config = {
-			emboss = 0.05,
-			minh = 6,
-			r = 0.1,
-			minw = 10,
-			align = "tm",
-			padding = 0.2,
-			colour = G.C.BLACK,
-		},
-		nodes = {
-			-- Much cleaner
-			create_lobby_option_toggle("gold_on_life_loss_toggle", "b_opts_cb_money", "gold_on_life_loss"),
-			create_lobby_option_toggle(
-				"no_gold_on_round_loss_toggle",
-				"b_opts_no_gold_on_loss",
-				"no_gold_on_round_loss"
-			),
-			create_lobby_option_toggle("death_on_round_loss_toggle", "b_opts_death_on_loss", "death_on_round_loss"),
-			create_lobby_option_toggle(
-				"different_seeds_toggle",
-				"b_opts_diff_seeds",
-				"different_seeds",
-				toggle_different_seeds
-			),
-			create_lobby_option_toggle("different_decks_toggle", "b_opts_player_diff_deck", "different_decks"),
-			create_lobby_option_toggle("multiplayer_jokers_toggle", "b_opts_multiplayer_jokers", "multiplayer_jokers"),
-			create_lobby_option_toggle("timer_toggle", "b_opts_timer", "timer"),
-			create_lobby_option_toggle("normal_bosses_toggle", "b_opts_normal_bosses", "normal_bosses"),
-			create_custom_seed_section(),
-		},
-	}
-end
-
-local function create_spacer(size, row)
-	size = size or 0.2
-
-	return row and {
-		n = G.UIT.R,
-		config = {
-			align = "cm",
-			minh = size,
-		},
-		nodes = {},
-	} or {
-		n = row and G.UIT.R or G.UIT.C,
-		config = {
-			align = "cm",
-			minw = size,
-		},
-		nodes = {},
-	}
-end
-
 function G.UIDEF.create_UIBox_lobby_menu()
 	local text_scale = 0.45
 	local back = MP.LOBBY.config.different_decks and MP.LOBBY.deck.back or MP.LOBBY.config.back
 	local stake = MP.LOBBY.config.different_decks and MP.LOBBY.deck.stake or MP.LOBBY.config.stake
-
-	local text, colour = get_lobby_text()
 
 	local t = {
 		n = G.UIT.ROOT,
@@ -438,24 +113,7 @@ function G.UIDEF.create_UIBox_lobby_menu()
 					align = "bm",
 				},
 				nodes = {
-					{
-						n = G.UIT.R,
-						config = {
-							padding = 1.25,
-							align = "cm",
-						},
-						nodes = {
-							{
-								n = G.UIT.T,
-								config = {
-									scale = 0.3,
-									shadow = true,
-									text = text,
-									colour = colour,
-								},
-							},
-						},
-					} or nil,
+					MP.UI.lobby_status_display(),
 					{
 						n = G.UIT.R,
 						config = {
@@ -467,30 +125,7 @@ function G.UIDEF.create_UIBox_lobby_menu()
 							mid = true,
 						},
 						nodes = {
-							MP.LOBBY.is_host
-								and Disableable_Button({
-									id = "lobby_menu_start",
-									button = "lobby_start_game",
-									colour = G.C.BLUE,
-									minw = 3.65,
-									minh = 1.55,
-									label = { localize("b_start") },
-									disabled_text = MP.LOBBY.guest.username and localize("b_wait_for_guest_ready") or localize("b_wait_for_players"),
-									scale = text_scale * 2,
-									col = true,
-									enabled_ref_table = MP.LOBBY,
-									enabled_ref_value = "ready_to_start",
-								})
-								or UIBox_button({
-									id = "lobby_menu_start",
-									button = "lobby_ready_up",
-									colour = MP.LOBBY.ready_to_start and G.C.GREEN or G.C.RED,
-									minw = 3.65,
-									minh = 1.55,
-									label = { MP.LOBBY.ready_to_start and localize("b_unready") or localize("b_ready") },
-									scale = text_scale * 2,
-									col = true,
-								}),
+							MP.UI.create_lobby_main_button(text_scale),
 							{
 								n = G.UIT.C,
 								config = {
@@ -508,84 +143,12 @@ function G.UIDEF.create_UIBox_lobby_menu()
 										scale = text_scale * 1.2,
 										col = true,
 									}),
-									create_spacer(),
-									MP.LOBBY.is_host and Disableable_Button({
-										id = "lobby_choose_deck",
-										button = "lobby_choose_deck",
-										colour = G.C.PURPLE,
-										minw = 2.15,
-										minh = 1.35,
-										label = {
-											localize({
-												type = "name_text",
-												key = MP.UTILS.get_deck_key_from_name(back),
-												set = "Back",
-											}),
-											localize({
-												type = "name_text",
-												key = SMODS.stake_from_index(
-													type(stake) == "string" and tonumber(stake) or stake
-												),
-												set = "Stake",
-											}),
-										},
-										scale = text_scale * 1.2,
-										col = true,
-										enabled_ref_table = MP.LOBBY,
-										enabled_ref_value = "is_host",
-									}) or Disableable_Button({
-										id = "lobby_choose_deck",
-										button = "lobby_choose_deck",
-										colour = G.C.PURPLE,
-										minw = 2.15,
-										minh = 1.35,
-										label = {
-											localize({
-												type = "name_text",
-												key = MP.UTILS.get_deck_key_from_name(back),
-												set = "Back",
-											}),
-											localize({
-												type = "name_text",
-												key = SMODS.stake_from_index(
-													type(stake) == "string" and tonumber(stake) or stake
-												),
-												set = "Stake",
-											}),
-										},
-										scale = text_scale * 1.2,
-										col = true,
-										enabled_ref_table = MP.LOBBY.config,
-										enabled_ref_value = "different_decks",
-									}),
-									create_spacer(),
-									create_players_section(text_scale),
-									create_spacer(),
-									{
-										n = G.UIT.C,
-										config = {
-											align = "cm",
-										},
-										nodes = {
-											UIBox_button({
-												button = "view_code",
-												colour = G.C.PALE_GREEN,
-												minw = 2.15,
-												minh = 0.65,
-												label = { localize("b_view_code") },
-												scale = text_scale * 1.2,
-											}),
-											create_spacer(0.1, true),
-											UIBox_button({
-												button = "copy_to_clipboard",
-												colour = G.C.PERISHABLE,
-												minw = 2.15,
-												minh = 0.65,
-												label = { localize("b_copy_code") },
-												scale = text_scale,
-											}),
-										}
-									}
+									MP.UI.create_spacer(),
+									MP.UI.create_lobby_deck_button(text_scale, back, stake),
+									MP.UI.create_spacer(),
+									MP.UI.create_players_section(text_scale),
+									MP.UI.create_spacer(),
+									MP.UI.create_lobby_code_buttons(text_scale),
 								},
 							},
 							UIBox_button({
@@ -605,89 +168,6 @@ function G.UIDEF.create_UIBox_lobby_menu()
 		},
 	}
 	return t
-end
-
-local function create_lobby_option_cycle(id, label_key, scale, options, current_option, callback)
-	return Disableable_Option_Cycle({
-		id = id,
-		enabled_ref_table = MP.LOBBY,
-		enabled_ref_value = "is_host",
-		label = localize(label_key),
-		scale = scale,
-		options = options,
-		current_option = current_option,
-		opt_callback = callback,
-	})
-end
-
-local function create_gamemode_modifiers_tab()
-	return {
-		n = G.UIT.ROOT,
-		config = {
-			emboss = 0.05,
-			minh = 6,
-			r = 0.1,
-			minw = 10,
-			align = "tm",
-			padding = 0.2,
-			colour = G.C.BLACK,
-		},
-		nodes = {
-			{
-				n = G.UIT.R,
-				config = { padding = 0, align = "cm", },
-				nodes = {
-					create_lobby_option_cycle(
-						"starting_lives_option",
-						"b_opts_lives",
-						0.85,
-						{ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16 },
-						MP.LOBBY.config.starting_lives,
-						"change_starting_lives"
-					),
-					create_lobby_option_cycle(
-						"pvp_round_start_option", 
-						"k_opts_pvp_start_round", 
-						0.85,
-						{ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20 }, 
-						MP.LOBBY.config.pvp_start_round, 
-						"change_starting_pvp_round"),
-					create_lobby_option_cycle(
-						"pvp_timer_seconds_option",
-						"k_opts_pvp_timer",
-						0.85,
-						{ "30s", "60s", "90s", "120s", "150s", "180s" },
-						MP.LOBBY.config.timer_base_seconds / 30,
-						"change_timer_base_seconds"
-					),
-					create_lobby_option_cycle(
-						"showdown_starting_antes_option", 
-						"k_opts_showdown_starting_antes", 
-						0.85,
-						{ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20 }, 
-						MP.LOBBY.config.showdown_starting_antes, 
-						"change_showdown_starting_antes"
-					),
-					create_lobby_option_cycle(
-						"pvp_timer_increment_seconds_option", 
-						"k_opts_pvp_timer_increment",
-						0.85,
-						{ "0s", "30s", "60s", "90s", "120s", "150s", "180s" }, 
-						MP.UTILS.get_array_index_by_value({ 0, 30, 60, 90, 120, 150, 180 },MP.LOBBY.config.timer_increment_seconds), 
-						"change_timer_increment_seconds"
-					),
-				    create_lobby_option_cycle(
-						"pvp_countdown_seconds_option", 
-						"k_opts_pvp_countdown_seconds",
-						0.85,
-						{ 0, 3, 5, 10 }, 
-						MP.UTILS.get_array_index_by_value({ 0, 3, 5, 10 }, MP.LOBBY.config.pvp_countdown_seconds), 
-						"change_pvp_countdown_seconds"
-					),
-				},
-			},
-		},
-	}
 end
 
 function G.UIDEF.create_UIBox_lobby_options()
@@ -726,13 +206,13 @@ function G.UIDEF.create_UIBox_lobby_options()
 								label = localize("k_lobby_options"),
 								chosen = true,
 								tab_definition_function = function()
-									return create_lobby_options_tab()
+									return MP.UI.create_lobby_options_tab()
 								end,
 							},
 							{
 								label = localize("k_opts_gm"),
 								tab_definition_function = function()
-									return create_gamemode_modifiers_tab()
+									return MP.UI.create_gamemode_modifiers_tab()
 								end,
 							},
 						},
@@ -741,14 +221,6 @@ function G.UIDEF.create_UIBox_lobby_options()
 			},
 		},
 	})
-end
-
-function G.FUNCS.display_custom_seed(e)
-	local display = MP.LOBBY.config.custom_seed == "random" and localize("k_random") or MP.LOBBY.config.custom_seed
-	if display ~= e.children[1].config.text then
-		e.children[2].config.text = display
-		e.UIBox:recalculate(true)
-	end
 end
 
 function G.UIDEF.create_UIBox_custom_seed_overlay()
@@ -855,41 +327,6 @@ G.FUNCS.view_guest_hash = function(e)
 	G.FUNCS.overlay_menu({
 		definition = G.UIDEF.create_UIBox_view_hash("guest"),
 	})
-end
-
-function toggle_different_seeds()
-	G.FUNCS.lobby_options()
-	send_lobby_options()
-end
-
-G.FUNCS.change_starting_lives = function(args)
-	MP.LOBBY.config.starting_lives = args.to_val
-	send_lobby_options()
-end
-
-G.FUNCS.change_starting_pvp_round = function(args)
-	MP.LOBBY.config.pvp_start_round = args.to_val
-	send_lobby_options()
-end
-
-G.FUNCS.change_timer_base_seconds = function(args)
-	MP.LOBBY.config.timer_base_seconds = tonumber(args.to_val:sub(1, -2))
-	send_lobby_options()
-end
-
-G.FUNCS.change_timer_increment_seconds = function(args)
-	MP.LOBBY.config.timer_increment_seconds = tonumber(args.to_val:sub(1, -2))
-	send_lobby_options()
-end
-
-G.FUNCS.change_showdown_starting_antes = function(args)
-	MP.LOBBY.config.showdown_starting_antes = args.to_val
-	send_lobby_options()
-end
-
-G.FUNCS.change_pvp_countdown_seconds = function(args)
-        MP.LOBBY.config.pvp_countdown_seconds = args.to_val
-        send_lobby_options()
 end
 
 function G.FUNCS.get_lobby_main_menu_UI(e)
