@@ -21,22 +21,84 @@ MP.Ruleset({
 	reworked_tags = {},
 	reworked_blinds = {},
 	create_info_menu = function ()
-		return {{
-			n = G.UIT.R,
-			config = {
-				align = "tm"
+		return {
+			{
+				n = G.UIT.R,
+				config = {
+					align = "tm"
+				},
+				nodes = {
+					MP.UI.BackgroundGrouping(localize("k_has_multiplayer_content"), {
+						{
+							n = G.UIT.T,
+							config = {
+								text = localize("k_yes"),
+								scale = 0.8,
+								colour = G.C.GREEN,
+							}
+						}
+					}, {col = true, text_scale = 0.6}),
+					{
+						n = G.UIT.C,
+						config = {
+							minw = 0.1,
+							minh = 0.1
+						}
+					},
+					MP.UI.BackgroundGrouping(localize("k_forces_lobby_options"), {
+						{
+							n = G.UIT.T,
+							config = {
+								text = localize("k_yes"),
+								scale = 0.8,
+								colour = G.C.GREEN,
+							}
+						}
+					}, {col = true, text_scale = 0.6}),
+					{
+						n = G.UIT.C,
+						config = {
+							minw = 0.1,
+							minh = 0.1
+						}
+					},
+					MP.UI.BackgroundGrouping(localize("k_forces_gamemode"), {
+						{
+							n = G.UIT.T,
+							config = {
+								text = localize("k_attrition"),
+								scale = 0.8,
+								colour = G.C.GREEN,
+							}
+						}
+					}, {col = true, text_scale = 0.6})
+				},
 			},
-			nodes = {
-				{
-					n = G.UIT.T,
-					config = {
-						text = MP.UTILS.wrapText(localize("k_ranked_description"), 100),
-						scale = 0.4,
-						colour = G.C.UI.TEXT_LIGHT,
-					}
+			{
+				n = G.UIT.R,
+				config = {
+					minw = 0.05,
+					minh = 0.05
 				}
-			}
-		}}
+			},
+			{
+				n = G.UIT.R,
+				config = {
+					align = "cl",
+					padding = 0.1
+				},
+				nodes = {
+					{
+						n = G.UIT.T,
+						config = {
+							text = localize("k_ranked_description"),
+							scale = 0.6,
+							colour = G.C.UI.TEXT_LIGHT,
+						}
+					},
+				},
+			},
+		}
 	end,
 	forced_gamemode = "gamemode_mp_attrition",
 	forced_lobby_options = true,
@@ -49,5 +111,8 @@ MP.Ruleset({
 			return localize("k_ruleset_disabled_the_order_required")
 		end
 		return false
+	end,
+	force_lobby_options = function(self)
+		return true
 	end
 }):inject()

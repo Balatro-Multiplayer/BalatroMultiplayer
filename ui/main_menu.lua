@@ -1048,11 +1048,12 @@ end
 
 function G.FUNCS.start_lobby(e)
 	G.SETTINGS.paused = false
-	if MP.LOBBY.config.ruleset == "ruleset_mp_vanilla" then
-		MP.LOBBY.config.multiplayer_jokers = false
-	else
-		MP.LOBBY.config.multiplayer_jokers = true
-	end
+
+	MP.reset_lobby_config(true)
+
+	MP.LOBBY.config.multiplayer_jokers = MP.Rulesets[MP.LOBBY.config.ruleset].multiplayer_content
+
+	MP.LOBBY.config.forced_config = MP.Rulesets[MP.LOBBY.config.ruleset].force_lobby_options()
 
 	if MP.LOBBY.config.gamemode == "gamemode_mp_survival" then
 		MP.LOBBY.config.starting_lives = 1

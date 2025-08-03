@@ -22,45 +22,94 @@ MP.Ruleset({
 		"j_hanging_chad",
 		"j_idol",
 		"j_square",
-		"j_mp_defensive_joker",
-		-- "j_mp_magnet",
-		"j_mp_lets_go_gambling",
-		"j_mp_pacifist",
-		"j_mp_penny_pincher",
-		"j_mp_pizza",
-		"j_mp_skip_off",
-		"j_mp_speedrun",
-		"j_mp_taxes",
 	},
-	reworked_consumables = {
-		"c_mp_asteroid",
-	},
+	reworked_consumables = {},
 	reworked_vouchers = {},
 	reworked_enhancements = {
 		"m_glass",
 	},
-	reworked_blinds = {
-		"bl_mp_nemesis",
-	},
+	reworked_blinds = {},
 	reworked_tags = { "tag_mp_sandbox_rare" },
 
 	create_info_menu = function ()
-		return {{
-			n = G.UIT.R,
-			config = {
-				align = "tm"
+		return {
+			{
+				n = G.UIT.R,
+				config = {
+					align = "tm"
+				},
+				nodes = {
+					MP.UI.BackgroundGrouping(localize("k_has_multiplayer_content"), {
+						{
+							n = G.UIT.T,
+							config = {
+								text = localize("k_yes"),
+								scale = 0.8,
+								colour = G.C.GREEN,
+							}
+						}
+					}, {col = true, text_scale = 0.6}),
+					{
+						n = G.UIT.C,
+						config = {
+							minw = 0.1,
+							minh = 0.1
+						}
+					},
+					MP.UI.BackgroundGrouping(localize("k_forces_lobby_options"), {
+						{
+							n = G.UIT.T,
+							config = {
+								text = localize("k_no"),
+								scale = 0.8,
+								colour = G.C.RED,
+							}
+						}
+					}, {col = true, text_scale = 0.6}),
+					{
+						n = G.UIT.C,
+						config = {
+							minw = 0.1,
+							minh = 0.1
+						}
+					},
+					MP.UI.BackgroundGrouping(localize("k_forces_gamemode"), {
+						{
+							n = G.UIT.T,
+							config = {
+								text = localize("k_no"),
+								scale = 0.8,
+								colour = G.C.RED,
+							}
+						}
+					}, {col = true, text_scale = 0.6})
+				},
 			},
-			nodes = {
-				{
-					n = G.UIT.T,
-					config = {
-						text = MP.UTILS.wrapText(localize("k_sandbox_description"), 100),
-						scale = 0.4,
-						colour = G.C.UI.TEXT_LIGHT,
-					}
+			{
+				n = G.UIT.R,
+				config = {
+					minw = 0.05,
+					minh = 0.05
 				}
-			}
-		}}
+			},
+			{
+				n = G.UIT.R,
+				config = {
+					align = "cl",
+					padding = 0.1
+				},
+				nodes = {
+					{
+						n = G.UIT.T,
+						config = {
+							text = localize("k_sandbox_description"),
+							scale = 0.6,
+							colour = G.C.UI.TEXT_LIGHT,
+						}
+					},
+				},
+			},
+		}
 	end,
 
 	is_disabled = function(self)
@@ -237,6 +286,7 @@ SMODS.Tag({
 	discovered = true,
 	order = 2,
 	min_ante = 2, -- less degeneracy
+	no_collection = true,
 	config = {
 		type = "store_joker_create",
 		odds = 2,

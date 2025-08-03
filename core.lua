@@ -5,29 +5,7 @@ MP.LOBBY = {
 	temp_seed = "",
 	code = nil,
 	type = "",
-	config = {
-		gold_on_life_loss = true,
-		no_gold_on_round_loss = false,
-		death_on_round_loss = true,
-		different_seeds = false,
-		starting_lives = 4,
-		pvp_start_round = 2,
-		timer_base_seconds = 150,
-		timer_increment_seconds = 60,
-		pvp_countdown_seconds = 3,
-		showdown_starting_antes = 3,
-		ruleset = nil,
-		gamemode = "gamemode_mp_attrition",
-		weekly = nil,
-		custom_seed = "random",
-		different_decks = false,
-		back = "Red Deck",
-		sleeve = "sleeve_casl_none",
-		stake = 1,
-		challenge = "",
-		multiplayer_jokers = true,
-		timer = true,
-	},
+	config = {}, -- Now set in MP.reset_lobby_config
 	deck = {
 		back = "Red Deck",
 		sleeve = "sleeve_casl_none",
@@ -88,6 +66,36 @@ end
 MP.load_mp_file("misc/utils.lua")
 MP.load_mp_file("misc/insane_int.lua")
 
+function MP.reset_lobby_config(persist_ruleset_and_gamemode)
+	sendDebugMessage("Resetting lobby options", "MULTIPLAYER")
+	MP.LOBBY.config = {
+		gold_on_life_loss = true,
+		no_gold_on_round_loss = false,
+		death_on_round_loss = true,
+		different_seeds = false,
+		starting_lives = 4,
+		pvp_start_round = 2,
+		timer_base_seconds = 150,
+		timer_increment_seconds = 60,
+		pvp_countdown_seconds = 3,
+		showdown_starting_antes = 3,
+		ruleset = persist_ruleset_and_gamemode and MP.LOBBY.config.ruleset or "ruleset_mp_blitz",
+		gamemode = persist_ruleset_and_gamemode and MP.LOBBY.config.gamemode or "gamemode_mp_attrition",
+		weekly = nil,
+		custom_seed = "random",
+		different_decks = false,
+		back = "Red Deck",
+		sleeve = "sleeve_casl_none",
+		stake = 1,
+		challenge = "",
+		multiplayer_jokers = true,
+		timer = true,
+		timer_forgiveness = 0,
+		forced_config = false,
+	}
+end
+MP.reset_lobby_config()
+
 function MP.reset_game_states()
 	sendDebugMessage("Resetting game states", "MULTIPLAYER")
 	MP.GAME = {
@@ -135,6 +143,7 @@ function MP.reset_game_states()
 		pizza_discards = 0,
 		wait_for_enemys_furthest_blind = false,
 		disable_live_and_timer_hud = false,
+		timers_forgiven = 0,
 		stats = {
 			reroll_count = 0,
 			reroll_cost_total = 0,
@@ -142,7 +151,6 @@ function MP.reset_game_states()
 		},
 	}
 end
-
 MP.reset_game_states()
 
 MP.LOBBY.username = MP.UTILS.get_username()

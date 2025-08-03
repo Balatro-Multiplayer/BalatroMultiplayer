@@ -79,7 +79,7 @@ function G.UIDEF.create_UIBox_lobby_menu()
 									align = "cm",
 								},
 								nodes = {
-									UIBox_button({
+									not MP.LOBBY.config.forced_config and UIBox_button({
 										button = "lobby_options",
 										colour = G.C.ORANGE,
 										minw = 3.15,
@@ -89,7 +89,7 @@ function G.UIDEF.create_UIBox_lobby_menu()
 										},
 										scale = text_scale * 1.2,
 										col = true,
-									}),
+									}) or nil,
 									MP.UI.create_spacer(),
 									MP.UI.create_lobby_deck_button(text_scale, back, stake),
 									MP.UI.create_spacer(),

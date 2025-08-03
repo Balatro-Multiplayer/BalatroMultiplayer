@@ -476,6 +476,10 @@ MP.timer_event = Event({
 		if MP.GAME.timer <= 0 then
 			MP.GAME.timer = 0
 			if not MP.GAME.ready_blind and not MP.is_pvp_boss() then
+				if MP.GAME.timers_forgiven < MP.LOBBY.config.timer_forgiveness then
+					MP.GAME.timers_forgiven = MP.GAME.timers_forgiven + 1
+					return true
+				end
 				MP.ACTIONS.fail_timer()
 			end
 			return true
