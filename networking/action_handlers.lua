@@ -839,6 +839,9 @@ function MP.ACTIONS.set_ante(ante)
 end
 
 function MP.ACTIONS.new_round()
+	
+	MP.GAME.duplicate_end = false
+	MP.GAME.round_ended = false
 	Client.send("action:newRound")
 end
 
