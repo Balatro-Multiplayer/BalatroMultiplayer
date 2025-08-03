@@ -380,8 +380,9 @@ return {
 			k_ruleset_disabled_smods_version = "SMODS Version #1# Required",
 			k_failed_to_join_lobby = "Failed to join lobby: #1#",
 			k_ante_number = "Ante #1#",
-			k_ante_range = "Ante #1#-#2#",
-			k_ante_min = "Ante #1#+",
+			k_ante_range = "Ante #1#-#2#", -- For example, "Ante 1-2"
+			k_ante_min = "Ante #1#+", -- For example, "Ante 2+"
+			k_credits_list = "#1# and many more!" -- #1# gets replaced with a list of names
 		},
 		v_text = {
 			ch_c_hanging_chad_rework = { "{C:attention}Hanging Chad{} is {C:dark_edition}reworked" },

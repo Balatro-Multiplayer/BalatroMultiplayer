@@ -67,7 +67,7 @@ SMODS.Mods.Multiplayer.credits_tab = function()
 					{
 						n = G.UIT.T,
 						config = {
-							text = "TGMM, Senfinbrare, CUexter, Brawmario, Divvy, Andy, and many more!",
+							text = localize({ type = "variable", key = "k_credits_list", vars = { "TGMM, Senfinbrare, CUexter, Brawmario, Divvy, Andy, Steph,"}}),
 							shadow = true,
 							scale = scale * 0.8,
 							colour = G.C.RED
