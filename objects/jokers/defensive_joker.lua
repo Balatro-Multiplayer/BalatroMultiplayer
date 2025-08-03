@@ -15,21 +15,26 @@ SMODS.Joker({
 	blueprint_compat = true,
 	eternal_compat = true,
 	perishable_compat = true,
-	config = { t_chips = 0, extra = { extra = 125 } },
+	config = { t_chips = 0, extra = { extra = 125, highstake = 75 } },
 	loc_vars = function(self, info_queue, card)
-		return { vars = { card.ability.extra.extra, card.ability.t_chips } }
+		local chips = G.GAME.stake >= 6 and card.ability.extra.highstake or card.ability.extra.extra
+		return { vars = { chips, card.ability.t_chips } }
 	end,
 	in_pool = function(self)
 		return MP.LOBBY.code and MP.LOBBY.config.multiplayer_jokers
 	end,
 	update = function(self, card, dt)
-		if MP.LOBBY.code then
-			if G.STAGE == G.STAGES.RUN then
-				card.ability.t_chips = math.max((MP.GAME.enemy.lives - MP.GAME.lives) * card.ability.extra.extra, 0)
-			end
-		else
+		if not MP.LOBBY.code then
 			card.ability.t_chips = 0
+			return
 		end
+
+		if G.STAGE ~= G.STAGES.RUN then
+			return
+		end
+
+		local chips = G.GAME.stake >= 6 and card.ability.extra.highstake or card.ability.extra.extra
+		card.ability.t_chips = math.max((MP.GAME.enemy.lives - MP.GAME.lives) * chips, 0)
 	end,
 	calculate = function(self, card, context)
 		if context.cardarea == G.jokers and context.joker_main then

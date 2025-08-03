@@ -117,6 +117,8 @@ function MP.reset_game_states()
 		ante_key = tostring(math.random()),
 		antes_keyed = {},
 		prevent_eval = false,
+		round_ended = false,
+		duplicate_end = false,
 		misprint_display = "",
 		spent_total = 0,
 		spent_before_shop = 0,

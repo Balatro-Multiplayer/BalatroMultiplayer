@@ -1,5 +1,15 @@
 return {
 	descriptions = {
+		Tag = {
+			tag_mp_sandbox_rare = {
+				name = "Gambling Tag",
+				text = {
+					"{C:green}#1# in #2#{} chance",
+					"Shop has a free",
+					"{C:red}Rare Joker{}",
+				},
+			},
+		},
 		Joker = {
 			j_broken = {
 				name = "BROKEN",
@@ -15,6 +25,7 @@ return {
 					"{C:chips}+#1#{} Chips for every {C:red,E:1}life{}",
 					"less than your {X:purple,C:white}Nemesis{}",
 					"{C:inactive}(Currently {C:chips}+#2#{C:inactive} Chips)",
+					"{C:inactive}(Stake-dependent)",
 				},
 			},
 			j_mp_skip_off = {
@@ -78,7 +89,6 @@ return {
 					"your {X:purple,C:white}Nemesis'{} highest ",
 					"sell cost {C:attention}Joker{}",
 					"{C:inactive}(Currently {C:attention}#2#{C:inactive}/#3# rounds)",
-					"{C:inactive,s:0.8}(Does not copy Joker state)",
 				},
 			},
 			j_mp_pizza = {
@@ -103,6 +113,25 @@ return {
 					"Retrigger {C:attention}first{} and {C:attention}second{}",
 					"played card used in scoring",
 					"{C:attention}#1#{} additional time",
+				},
+			},
+			j_mp_cloud_9 = {
+				name = "Cloud 9",
+				text = {
+					"Earn {C:money}$1{} for each {C:attention}9{} in deck",
+					"(max {C:money}$4{}), then {C:money}$#1#{} for each",
+					"additional {C:attention}9{} at end of round",
+					"{C:inactive}(Currently {C:money}$#2#{}{C:inactive})",
+				},
+			},
+			j_mp_bloodstone = {
+				name = "Bloodstone",
+				text = {
+					"{C:green}#1# in #2#{} chance for",
+					"played cards with",
+					"{C:hearts}Heart{} suit to give",
+					"{X:mult,C:white} X#3# {} Mult when scored",
+					"{C:inactive}(Includes experimental variance){}",
 				},
 			},
 		},
@@ -161,6 +190,7 @@ return {
 		},
 		challenge_names = {
 			c_mp_standard = "Standard",
+			c_mp_sandbox = "Sandbox",
 			c_mp_badlatro = "Badlatro",
 			c_mp_tournament = "Tournament",
 			c_mp_weekly = "Weekly",
@@ -244,7 +274,8 @@ return {
 			k_warning_unlock_profile = "The profile you are playing on is not fully unlocked. If this is a ranked/tournament game, please create a new profile and hit unlock all in the profile settings",
 			k_warning_nemesis_unlock = "Your opponent is playing on a profile that is not fully unlocked. Please instruct them to create a new profile and hit unlock all in the profile settings",
 			k_warning_no_order = "One player has The Order integration enabled while the other does not. This will cause the seeds to differ.",
-			k_warning_cheating = "If you are seeing this, your opponent may be cheating. If this is a ranked game, please send the message '%s' and then open a support ticket in #support",
+			k_warning_cheating1 = "If you are seeing this, your opponent may be cheating.",
+			k_warning_cheating2 = "If this is a ranked game, please send the message '%s' and then open a support ticket in #support",
 			k_message1 = "Hold on, my mom made pizza pops",
 			k_message2 = "One sec, i gotta grab my slow cooker pork roast",
 			k_message3 = "One moment, getting a call from my mom",
@@ -269,6 +300,10 @@ return {
 			k_bl_mostchips = "Most chips wins",
 			k_current_seed = "Current seed: ",
 			k_random = "Random",
+			k_standard = "Standard",
+			k_standard_description = "The standard ruleset, includes Multiplayer cards and changes to the base game to fit the Multiplayer meta.",
+			k_sandbox = "steph's sandbox",
+			k_sandbox_description = "Like normal mode but someone gave the cards coffee and they're feeling chatty.",
 			k_vanilla = "Vanilla",
 			k_vanilla_description = "The vanilla ruleset, no Multiplayer cards, no modifications to base game content. This ruleset includes Multiplayer features like the timer",
 			k_blitz = "Blitz",

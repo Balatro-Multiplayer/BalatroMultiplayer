@@ -80,7 +80,6 @@ return {
 					"у вашего {X:purple,C:white}противника{} при продаже",
 					"спустя #1#{} раунд(-а)",
 					"{C:inactive}(сейчас: {C:attention}#2#{C:inactive}/#3# раундов)",
-					"{C:inactive,s:0.8}(Не копирует состояние джокера)",
 				},
 			},
 			j_mp_pizza = {
@@ -183,6 +182,7 @@ return {
 			b_lobby_options = "ПАРАМЕТРЫ ЛОББИ",
 			b_copy_clipboard = "Скопировать",
 			b_view_code = "УВИДЕТЬ КОД",
+			b_copy_code = "КОПИРОВАТЬ КОД",
 			b_leave = "ВЫЙТИ",
 			b_opts_cb_money = "Давать доп. золото при потере жизни",
 			b_opts_no_gold_on_loss = "Не давать золото при поражении в раунде",
@@ -200,7 +200,7 @@ return {
 			b_unstuck_blind = "Выбраться из сражения",
 			b_misprint_display = "Показывать следующую карту в колоде",
 			b_players = "Игроки",
-			b_continue_singleplayer = "Продолжить в одиночной игре",			
+			b_continue_singleplayer = "Продолжить в одиночной игре",
 			k_enemy_score = "Счёт противника",
 			k_enemy_hands = "Кол-во оставшихся рук у противника: ",
 			k_coming_soon = "Скоро!",
@@ -243,7 +243,7 @@ return {
 			k_oops_ex = "Упс!",
 			k_timer = "Таймер",
 			k_mods_list = "Список модов",
-			k_enemy_jokers = "Джокеры противника",			
+			k_enemy_jokers = "Джокеры противника",
 			ml_enemy_loc = { "Статус", "противника" },
 			ml_mp_kofi_message = {
 				"Данный мод и сервер для него",

@@ -79,7 +79,6 @@ return {
 					"el {C:attention}comodín{} con mayor valor de venta",
 					"que tenga tu {X:purple,C:white}némesis{}",
 					"{C:inactive}(Actualmente {C:attention}#2#{C:inactive}/#3# rondas)",
-					"{C:inactive,s:0.8}(No copia estado del comodín)",
 				},
 			},
 			j_mp_pizza = {
@@ -184,6 +183,7 @@ return {
 			b_lobby_options = "OPCIONES DE SALA",
 			b_copy_clipboard = "Copiar al portapapeles",
 			b_view_code = "VER CÓDIGO",
+			b_copy_code = "COPIAR CÓDIGO",
 			b_leave = "ABANDONAR",
 			b_opts_cb_money = "Recibe $ al perder una vida",
 			b_opts_no_gold_on_loss = "No obtener recompensa al perder una ronda",

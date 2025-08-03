@@ -48,10 +48,10 @@ function MP.ApplyBans()
 			"blinds",
 		}
 		for _, table in ipairs(banned_tables) do
-			for _, v in ipairs(ruleset['banned_'..table]) do
+			for _, v in ipairs(ruleset["banned_" .. table]) do
 				G.GAME.banned_keys[v] = true
 			end
-			for k, v in pairs(MP.DECK['BANNED_'..string.upper(table)]) do
+			for k, v in pairs(MP.DECK["BANNED_" .. string.upper(table)]) do
 				G.GAME.banned_keys[k] = true
 			end
 		end
@@ -66,17 +66,17 @@ function MP.ReworkCenter(args)
 	-- Convert single ruleset to list for backward compatibility
 	local rulesets = args.ruleset
 	if type(rulesets) == "string" then
-		rulesets = {rulesets}
+		rulesets = { rulesets }
 	end
 
 	-- Apply changes to all specified rulesets
 	for _, ruleset in ipairs(rulesets) do
-		local ruleset_ = "mp_"..ruleset.."_"
+		local ruleset_ = "mp_" .. ruleset .. "_"
 		for k, v in pairs(args) do
 			if k ~= "key" and k ~= "ruleset" and k ~= "silent" then
-				center[ruleset_..k] = v
-				if not center["mp_vanilla_"..k] then
-					center["mp_vanilla_"..k] = center[k]
+				center[ruleset_ .. k] = v
+				if not center["mp_vanilla_" .. k] then
+					center["mp_vanilla_" .. k] = center[k]
 				end
 			end
 		end
@@ -109,11 +109,13 @@ function MP.LoadReworks(ruleset, key)
 			end
 		end
 	end
-	if key then process(key, "mp_"..ruleset.."_") else
+	if key then
+		process(key, "mp_" .. ruleset .. "_")
+	else
 		for k, v in pairs(G.P_CENTERS) do
 			if v.mp_reworks then
 				if v.mp_reworks[ruleset] then
-					process(k, "mp_"..ruleset.."_")
+					process(k, "mp_" .. ruleset .. "_")
 				elseif v.mp_reworks["vanilla"] then -- Check vanilla separately to reset reworked jokers
 					process(k, "mp_vanilla_")
 				end
