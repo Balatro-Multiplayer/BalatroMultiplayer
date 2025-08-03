@@ -82,7 +82,6 @@ return {
 					"o {C:attention}Curinga{} do seu {X:purple,C:white}Rival{}",
 					"com o maior valor de venda",
 					"{C:inactive}(No momento {C:attention}#2#{C:inactive}/#3# rodadas)",
-					"{C:inactive,s:0.8}(Não copia o estado do Curinga)",
 				},
 			},
 			j_mp_pizza = {

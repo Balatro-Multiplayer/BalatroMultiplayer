@@ -79,7 +79,6 @@ return {
                     "el {C:attention}Comodín{} de mayor",
                     "valor de venta de tu {X:purple,C:white}Némesis{}",
                     "{C:inactive}(Actualmente {C:attention}#2#{C:inactive}/#3# rondas)",
-                    "{C:inactive,s:0.8}(No copia el estado del Comodín)",
                 },
             },
             j_mp_pizza = {
@@ -292,14 +291,14 @@ return {
 			k_no_banned_objs = "No hay #1# prohibidos",
 			k_reworked_objs = "#1# añadidos/modificados",
 			k_no_reworked_objs = "No hay #1# añadidos/modificaciones ",
-            -- 
+            --
 		},
 		v_text = {
 			ch_c_hanging_chad_rework = { "El {C:attention}Papel perforado{} está {C:dark_edition}modificado" },
 			ch_c_glass_cards_rework = { "Las {C:attention}Cartas de vidrio{} están {C:dark_edition}modificadas" },
 		},
         challenge_names = {
-            c_mp_misprint_deck = "Mazo con errores de imprenta", 
+            c_mp_misprint_deck = "Mazo con errores de imprenta",
 			c_mp_legendaries = "Legendarios",
 			c_mp_psychosis = "Psicosis",
             c_mp_scratch = "Desde Cero",

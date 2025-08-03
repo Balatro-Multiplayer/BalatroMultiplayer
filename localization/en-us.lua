@@ -89,7 +89,6 @@ return {
 					"your {X:purple,C:white}Nemesis'{} highest ",
 					"sell cost {C:attention}Joker{}",
 					"{C:inactive}(Currently {C:attention}#2#{C:inactive}/#3# rounds)",
-					"{C:inactive,s:0.8}(Does not copy Joker state)",
 				},
 			},
 			j_mp_pizza = {
