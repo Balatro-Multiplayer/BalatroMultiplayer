@@ -764,6 +764,60 @@ local function reset_blind_HUD()
 	end
 end
 
+function G.UIDEF.confirmation_dialog()
+       return create_UIBox_generic_options({
+               contents = {
+                       {
+                               n = G.UIT.R,
+                               config = {
+                                       padding = 0,
+                                       align = "cm",
+                               },
+                               nodes = {
+                                       {
+                                               n = G.UIT.R,
+                                               config = {
+                                                       padding = 0.5,
+                                                       align = "cm",
+                                               },
+                                               nodes = {
+                                                       {
+                                                               n = G.UIT.T,
+                                                               config = {
+                                                                       text = localize("k_are_you_sure"),
+                                                                       scale = 0.6,
+                                                                       shadow = true,
+                                                                       colour = G.C.UI.TEXT_LIGHT,
+                                                               },
+                                                       },
+                                               },
+                                       },
+                                       UIBox_button({
+                                               label = { localize("k_yes") },
+                                               button = "confirmation_dialog_yes",
+                                               minw = 5,
+                                       }),
+                               },
+                       },
+               },
+       })
+end
+
+function G.FUNCS.confirm_selection(callback)
+       G._confirm_callback = callback
+       G.FUNCS.overlay_menu({
+               definition = G.UIDEF.confirmation_dialog(),
+       })
+end
+
+function G.FUNCS.confirmation_dialog_yes()
+        G.FUNCS.exit_overlay_menu()
+        if G._confirm_callback then
+                G._confirm_callback()
+                G._confirm_callback = nil
+        end
+end
+
 function G.FUNCS.mp_toggle_ready(e)
 	sendTraceMessage("Toggling Ready", "MULTIPLAYER")
 	MP.GAME.ready_blind = not MP.GAME.ready_blind
