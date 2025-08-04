@@ -216,7 +216,6 @@ function G.UIDEF.ruleset_selection_options()
 			buttons = {
 				{ button_id = "badlatro_ruleset_button", button_localize_key = "k_badlatro" },
 				{ button_id = "sandbox_ruleset_button", button_localize_key = "k_sandbox" },
-				{ button_id = "weekly_ruleset_button",   button_localize_key = "k_weekly" },
 			}
 		}
 	}
