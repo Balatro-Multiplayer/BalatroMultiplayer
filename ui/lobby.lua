@@ -419,7 +419,7 @@ function G.FUNCS.display_lobby_main_menu_UI(e)
 end
 
 function G.FUNCS.mp_return_to_lobby()
-        MP.UI.confirmation_dialog(function()
+        G.FUNCS.confirm_selection(function()
                 MP.ACTIONS.stop_game()
         end)
 end
