@@ -40,25 +40,29 @@ MP.Ruleset = SMODS.GameObject:extend({
 })
 
 function MP.ApplyBans()
-	if MP.LOBBY.code and MP.LOBBY.config.ruleset then
-		local ruleset = MP.Rulesets[MP.LOBBY.config.ruleset]
-		local banned_tables = {
-			"jokers",
-			"consumables",
-			"vouchers",
-			"enhancements",
-			"tags",
-			"blinds",
-		}
-		for _, table in ipairs(banned_tables) do
-			for _, v in ipairs(ruleset["banned_" .. table]) do
-				G.GAME.banned_keys[v] = true
-			end
-			for k, v in pairs(MP.DECK["BANNED_" .. string.upper(table)]) do
-				G.GAME.banned_keys[k] = true
-			end
-		end
-	end
+    if MP.LOBBY.code and MP.LOBBY.config.ruleset then
+        local ruleset = MP.Rulesets[MP.LOBBY.config.ruleset]
+        local gamemode = MP.Gamemodes["gamemode_mp_"..MP.LOBBY.type]
+        local banned_tables = {
+            "jokers",
+            "consumables",
+            "vouchers",
+            "enhancements",
+            "tags",
+            "blinds",
+        }
+        for _, table in ipairs(banned_tables) do
+            for _, v in ipairs(ruleset["banned_" .. table]) do
+                G.GAME.banned_keys[v] = true
+            end
+            for _, v in ipairs(gamemode["banned_" .. table]) do
+                G.GAME.banned_keys[v] = true
+            end
+            for k, v in pairs(MP.DECK["BANNED_" .. string.upper(table)]) do
+                G.GAME.banned_keys[k] = true
+            end
+        end
+    end
 end
 
 -- This function writes any center rework data to G.P_CENTERS, where they will be used later in its specified ruleset
