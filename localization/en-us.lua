@@ -96,7 +96,7 @@ return {
 				text = {
 					"At the end of the next {C:attention}PvP Blind{},",
 					"consume this Joker and grant",
-					"{C:red}+#1#{} discards to you and",
+					"{C:red}+#1#{} discard to you and",
 					"{C:red}+#2#{} discards to your {X:purple,C:white}Nemesis{} for the ante",
 				},
 			},
