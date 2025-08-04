@@ -766,6 +766,7 @@ end
 
 function G.UIDEF.confirmation_dialog()
        return create_UIBox_generic_options({
+		       back_func = "options",
                contents = {
                        {
                                n = G.UIT.R,
