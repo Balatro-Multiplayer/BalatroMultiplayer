@@ -110,6 +110,11 @@ MP.Ruleset({
 		if not MP.INTEGRATIONS.TheOrder then
 			return localize("k_ruleset_disabled_the_order_required")
 		end
+		for _, mod in ipairs(SMODS.mods) do
+			if banned_mods[mod.name] then
+				return localize({type = "variable", key="k_ruleset_disabled_banned_mod", vars = {mod.name}})
+			end
+		end
 		return false
 	end,
 	force_lobby_options = function(self)
