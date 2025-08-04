@@ -169,16 +169,23 @@ end
 
 
 -- Take ownership of standard pack card creation
--- This is irritating
-SMODS.Booster:take_ownership_by_kind('Standard', {
+SMODS.Booster:take_ownership_by_kind("Standard", {
 	create_card = function(self, card, i)
-		local s_append = ''	-- MP.get_booster_append(card)
-		local b_append = MP.ante_based()..s_append
-		
-		local _edition = poll_edition('standard_edition'..b_append, 2, true)
-		local _seal = SMODS.poll_seal({mod = 10, key = 'stdseal'..b_append})
-		
-		return {set = (pseudorandom(pseudoseed('stdset'..b_append)) > 0.6) and "Enhanced" or "Base", edition = _edition, seal = _seal, area = G.pack_cards, skip_materialize = true, soulable = true, key_append = "sta"..s_append}
+		local s_append = "" -- MP.get_booster_append(card)
+		local b_append = MP.ante_based() .. s_append
+
+		local _edition = poll_edition("standard_edition" .. b_append, 2, true)
+		local _seal = SMODS.poll_seal({ mod = 10, key = "stdseal" .. b_append })
+
+		return {
+			set = (pseudorandom(pseudoseed("stdset" .. b_append)) > 0.6) and "Enhanced" or "Base",
+			edition = _edition,
+			seal = _seal,
+			area = G.pack_cards,
+			skip_materialize = true,
+			soulable = true,
+			key_append = "sta" .. s_append,
+		}
 	end,
 }, true)
 

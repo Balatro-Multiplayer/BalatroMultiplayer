@@ -1,4 +1,4 @@
---[[ SMODS.Atlas({
+SMODS.Atlas({
 	key = "magnet",
 	path = "j_magnet.png",
 	px = 71,
@@ -21,7 +21,8 @@ SMODS.Joker({
 		return { vars = { card.ability.extra.rounds, card.ability.extra.current_rounds, card.ability.extra.rounds } }
 	end,
 	in_pool = function(self)
-		return MP.LOBBY.code and MP.LOBBY.config.multiplayer_jokers
+		return false
+		-- return MP.LOBBY.code and MP.LOBBY.config.multiplayer_jokers and MP.LOBBY.config.ruleset == "ruleset_mp_sandbox"
 	end,
 	add_to_deck = function(self, card, from_debuffed)
 		if not from_debuffed and (not card.edition or card.edition.type ~= "mp_phantom") then
@@ -34,7 +35,13 @@ SMODS.Joker({
 		end
 	end,
 	calculate = function(self, card, context)
-		if context.end_of_round and not context.other_card and not context.blueprint and not context.debuffed and (not card.edition or card.edition.type ~= "mp_phantom") then
+		if
+			context.end_of_round
+			and not context.other_card
+			and not context.blueprint
+			and not context.debuffed
+			and (not card.edition or card.edition.type ~= "mp_phantom")
+		then
 			card.ability.extra.current_rounds = card.ability.extra.current_rounds + 1
 			if card.ability.extra.current_rounds == card.ability.extra.rounds then
 				local eval = function(card)
@@ -44,7 +51,7 @@ SMODS.Joker({
 			end
 			return {
 				message = (card.ability.extra.current_rounds < card.ability.extra.rounds)
-					and (card.ability.extra.current_rounds .. "/" .. card.ability.extra.rounds)
+						and (card.ability.extra.current_rounds .. "/" .. card.ability.extra.rounds)
 					or localize("k_active_ex"),
 				colour = G.C.FILTER,
 			}
@@ -63,4 +70,3 @@ SMODS.Joker({
 		code = { "Virtualized" },
 	},
 })
---]]

@@ -11,7 +11,6 @@ MP.Ruleset({ -- just a copy of ranked... and every weekly ruleset in vault is in
 	banned_enhancements = {},
 	banned_tags = {},
 	banned_blinds ={},
-
 	reworked_jokers = {
 		"j_hanging_chad",
 		"j_mp_conjoined_joker",
@@ -35,6 +34,24 @@ MP.Ruleset({ -- just a copy of ranked... and every weekly ruleset in vault is in
 	reworked_blinds = {
 		"bl_mp_nemesis"
 	},
+	create_info_menu = function ()
+		return {{
+			n = G.UIT.R,
+			config = {
+				align = "tm"
+			},
+			nodes = {
+				{
+					n = G.UIT.T,
+					config = {
+						text = MP.UTILS.wrapText(localize("k_weekly_description") .. localize("k_weekly_smallworld"), 100),
+						scale = 0.4,
+						colour = G.C.UI.TEXT_LIGHT,
+					}
+				}
+			}
+		}}
+	end,
 	forced_gamemode = "gamemode_mp_attrition",
 	forced_lobby_options = true,
 	is_disabled = function(self)
@@ -73,7 +90,7 @@ function MP.ApplyBans()
 			if k ~= "Back"
 			and k ~= "Edition"
 			and k ~= "Enhanced"
-			and k ~= "Default" then			
+			and k ~= "Default" then
 				table.sort(v)
 				pseudoshuffle(v, pseudoseed(k..'_mp_smallworld'))
 				local threshold = math.floor( 0.5 + (#v*0.75) )
