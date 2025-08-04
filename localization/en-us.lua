@@ -31,7 +31,7 @@ return {
 			j_mp_skip_off = {
 				name = "Skip-Off",
 				text = {
-					"{C:blue}+#1#{} Hands and {C:red}+#2#{} Discards",
+					"{C:blue}+#1#{} hand and {C:red}+#2#{} discard",
 					"per additional {C:attention}Blind{} skipped",
 					"compared to your {X:purple,C:white}Nemesis{}",
 					"{C:inactive}(Currently {C:blue}+#3#{C:inactive}/{C:red}+#4#{C:inactive}, #5#)",
