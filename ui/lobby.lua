@@ -479,6 +479,7 @@ end
 function G.UIDEF.create_UIBox_unstuck()
 	return (
 		create_UIBox_generic_options({
+			back_func = "options",
 			contents = {
 				{
 					n = G.UIT.C,
