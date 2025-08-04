@@ -356,10 +356,20 @@ function G.FUNCS.view_code(e)
 end
 
 function G.FUNCS.lobby_leave(e)
-	MP.LOBBY.code = nil
-	MP.ACTIONS.leave_lobby()
-	MP.UI.update_connection_status()
-	G.STATE = G.STATES.MENU
+	if G.STAGE ~= G.STAGES.MAIN_MENU then
+		G.FUNCS.confirm_selection(function()
+                MP.LOBBY.code = nil
+				MP.ACTIONS.leave_lobby()
+				MP.UI.update_connection_status()
+				G.STATE = G.STATES.MENU
+        end)
+	else
+		MP.LOBBY.code = nil
+		MP.ACTIONS.leave_lobby()
+		MP.UI.update_connection_status()
+		G.STATE = G.STATES.MENU
+	end 
+		
 end
 
 function G.FUNCS.lobby_choose_deck(e)
