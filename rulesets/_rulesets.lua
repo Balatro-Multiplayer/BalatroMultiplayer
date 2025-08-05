@@ -83,7 +83,7 @@ function MP.ReworkCenter(args)
 			if k ~= "key" and k ~= "ruleset" and k ~= "silent" then
 				center[ruleset_ .. k] = v
 				if not center["mp_vanilla_" .. k] then
-					center["mp_vanilla_" .. k] = center[k]
+					center["mp_vanilla_" .. k] = center[k] or 'NULL'
 				end
 			end
 		end
@@ -112,7 +112,11 @@ function MP.LoadReworks(ruleset, key)
 					SMODS.remove_pool(G.P_JOKER_RARITY_POOLS[center[orig]], center.key)
 					SMODS.insert_pool(G.P_JOKER_RARITY_POOLS[center[k]], center, true)
 				end
-				center[orig] = center[k]
+				if center[k] == 'NULL' then
+					center[orig] = nil
+				else
+					center[orig] = center[k] 
+				end
 			end
 		end
 	end
