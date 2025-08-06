@@ -841,21 +841,3 @@ end
 function MP.UTILS.is_weekly(arg)
 	return MP.UTILS.get_weekly() == arg and MP.LOBBY.config.ruleset == 'ruleset_mp_weekly'
 end
-
-function MP.UTILS.get_banned_mods()
-	return {
-		"Cryptid",
-		"GameSpeed",
-		"Talisman",
-		"Nopeus",
-		"Incantation",
-		"Brainstorm",
-		"Aura",
-		"NotJustYet",
-		"Showman",
-		"TagPreview",
-		"Saturn",
-		"TopDeckPreview",
-		"DVPreview"
-	},
-end

@@ -104,15 +104,33 @@ MP.Ruleset({
 	forced_lobby_options = true,
 	is_disabled = function(self)
 		local required_version = "1.0.0~BETA-0506a"
+		local banned_mods = {
+			"Cryptid",
+			"GameSpeed",
+			"Talisman",
+			"Nopeus",
+			"Incantation",
+			"Brainstorm",
+			"Aura",
+			"NotJustYet",
+			"Showman",
+			"TagPreview",
+			"Saturn",
+			"TopDeckPreview",
+			"DVPreview"
+		}
+		
 		if SMODS.version ~= required_version then
 			return localize({type = "variable", key="k_ruleset_disabled_smods_version", vars = {required_version}})
 		end
 		if not MP.INTEGRATIONS.TheOrder then
 			return localize("k_ruleset_disabled_the_order_required")
 		end
-		for _, mod in ipairs(SMODS.mods) do
-			if banned_mods[mod.name] then
-				return localize({type = "variable", key="k_ruleset_disabled_banned_mod", vars = {mod.name}})
+		for id, mod in pairs(SMODS.Mods) do
+			for _, v in ipairs(banned_mods) do
+				if mod.can_load and v == id then 
+					return localize({type = "variable", key = "k_ruleset_disabled_banned_mod", vars = {id}})
+				end
 			end
 		end
 		return false
