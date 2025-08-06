@@ -12,7 +12,7 @@ SMODS.Joker({
 	cost = 4,
 	unlocked = true,
 	discovered = true,
-	blueprint_compat = true,
+	blueprint_compat = false,
 	eternal_compat = false,
 	perishable_compat = true,
 	config = { extra = { discards = 2, discards_nemesis = 1 } },
@@ -55,3 +55,4 @@ SMODS.Joker({
 		code = { "Virtualized" },
 	},
 })
+
