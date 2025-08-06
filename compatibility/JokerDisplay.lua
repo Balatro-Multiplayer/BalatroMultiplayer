@@ -115,10 +115,20 @@ if SMODS.Mods["JokerDisplay"] and SMODS.Mods["JokerDisplay"].can_load then
 				{ ref_table = "card.ability.extra", ref_value = "mult", colour = G.C.RED, retrigger_type = "mult" },
 			},
 		}
-		jd_def["j_mp_hanging_chad"] = {
+		jd_def["j_hanging_chad"] = {
 			retrigger_function = function(playing_card, scoring_hand, held_in_hand, joker_card)
 				if held_in_hand then
 					return 0
+				end
+				local standard = false
+				if MP.LOBBY.config.ruleset then -- util function for this is probably needed but fine for now
+					local rulesets = MP.UTILS.get_standard_rulesets()
+					for i, v in ipairs(rulesets) do
+						if string.sub(MP.LOBBY.config.ruleset, 12, #MP.LOBBY.config.ruleset) == v then
+							standard = true
+							break
+						end
+					end
 				end
 				local sorted_cards = JokerDisplay.sort_cards(scoring_hand)
 				local first_card = sorted_cards and sorted_cards[1]
@@ -134,6 +144,7 @@ if SMODS.Mods["JokerDisplay"] and SMODS.Mods["JokerDisplay"].can_load then
 						(
 							second_card
 							and playing_card == second_card
+							and standard
 							and joker_card.ability.extra * JokerDisplay.calculate_joker_triggers(joker_card)
 						) or 0
 					)
