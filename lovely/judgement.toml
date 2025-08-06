@@ -26,6 +26,7 @@ pattern = "function create_card(_type, area, legendary, _rarity, skip_materializ
 position = "after"
 payload = '''
 local sticker_override = false
+G.GAME.MP_joker_overrides = G.GAME.MP_joker_overrides or {}
 if _type == 'Joker' 
 and G.GAME.MP_joker_overrides[1] 
 and not (forced_key or key_append or _rarity)

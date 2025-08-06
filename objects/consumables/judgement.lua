@@ -1,9 +1,10 @@
 -- gotta redefine the logic
 MP.ReworkCenter({
 	key = "c_judgement",
-	ruleset = MP.UTILS.get_standard_rulesets(),
+	ruleset = MP.UTILS.get_standard_rulesets({'minorleague'}),
 	silent = true,
 	use = function(self, card, area, copier)
+		print('true')
 		local _card = copier or card
 		G.E_MANAGER:add_event(Event({trigger = 'after', delay = 0.4, func = function()
 			play_sound('timpani')
