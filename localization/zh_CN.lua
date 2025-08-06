@@ -109,7 +109,7 @@ return {
 			j_hanging_chad_mp_standard = {
 				name = "未断选票",
 				text = {
-					"打出的拍中{C:attention}第一张{}和{C:attention}第二张{}",
+					"打出的牌中{C:attention}第一张{}和{C:attention}第二张{}",
 					"记分牌额外触发{C:attention}#1#{}次",
 				},
 			},
