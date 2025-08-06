@@ -1020,6 +1020,7 @@ function Game:update_hand_played(dt)
 		G.STATE_COMPLETE = false
 		G.STATE = G.STATES.NEW_ROUND
 		MP.GAME.end_pvp = false
+		MP.UI.disable_timer_button = false
 	end
 end
 
