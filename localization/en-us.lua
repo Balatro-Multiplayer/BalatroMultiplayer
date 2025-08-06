@@ -379,6 +379,7 @@ return {
 			k_reworked_objs = "Reworked #1#",
 			k_no_reworked_objs = "No Reworked #1#",
 			k_ruleset_disabled_smods_version = "SMODS Version #1# Required",
+			k_ruleset_disabled_banned_mod = "#1# is banned for use in this ruleset",
 			k_failed_to_join_lobby = "Failed to join lobby: #1#",
 			k_ante_number = "Ante #1#",
 			k_ante_range = "Ante #1#-#2#", -- For example, "Ante 1-2"
