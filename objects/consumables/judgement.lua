@@ -1,7 +1,7 @@
 -- gotta redefine the logic
 MP.ReworkCenter({
 	key = "c_judgement",
-	ruleset = MP.UTILS.get_standard_rulesets(),
+	ruleset = MP.UTILS.get_standard_rulesets({'minorleague'}),
 	silent = true,
 	use = function(self, card, area, copier)
 		local _card = copier or card

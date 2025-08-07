@@ -1,10 +1,10 @@
 -- this is kinda strange but we can just override the logic for pvp only rather than re-implementing it again, bc if we don't return anything, it'll run the normal logic
 MP.ReworkCenter({
 	key = "j_bloodstone",
-	ruleset = MP.UTILS.get_standard_rulesets(),
+	ruleset = MP.UTILS.get_standard_rulesets({'minorleague'}),
 	silent = true,
 	calculate = function(self, card, context)
-		if MP.is_pvp_boss() then
+		if MP.is_pvp_boss() and MP.INTEGRATIONS.TheOrder then
 			if not context.blueprint then
 				if context.before then
 					G.GAME.round_resets.mp_bloodstone = G.GAME.round_resets.mp_bloodstone or {}
