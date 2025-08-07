@@ -49,7 +49,7 @@ return {
 			j_mp_speedrun = {
 				name = "速通",
 				text = {
-					"若你领先你的{X:purple,C:white}Nemesis{}到达{C:attention}PVP盲注",
+					"若你领先你的{X:purple,C:white}宿敌{}到达{C:attention}PVP盲注",
 					"随机生成一张{C:spectral}幽灵牌{}",
 					"{C:inactive}（必须有空位）",
 				},
@@ -314,7 +314,7 @@ return {
 			k_majorleague_description = "这是Major League Balatro的官方规则集。\n\n本规则集与原味香草规则集基本相同，但有以下几点例外：\n- 必须禁用 The Order 集成 功能\n- 计时器设置为180秒\n- 计时器首次归零时，不会失去生命",
 			k_minorleague = "Minor League",
 			k_minorleague_description = "这是Major League Balatro的官方规则集。\n\n本规则集与原味香草规则集基本相同，但有以下几点例外：\n- 必须启用 The Order 集成 功能\n- 计时器设置为180秒\n- 计时器首次归零时，不会失去生命",
-			k_ranked = "Ranked",
+			k_ranked = "排名赛",
 			k_ranked_description = "这是 Balatro Multiplayer 模组 排名赛的官方规则集。\n\n本规则集与闪电赛规则集基本相同，但有以下几点例外：\n- 必须启用 The Order 集成 功能\n- 必须使用推荐的Steamodded版本",
 			k_badlatro = "Badlatro",
 			k_badlatro_description = "由@dr_monty_the_snek在Discord服务器上设计的每周规则集，现已永久添加到模组中。\n\n该规则集禁止使用48张小丑牌、消耗牌、标签等。",
