@@ -321,7 +321,7 @@ return {
 			k_attrition = "消耗战",
 			k_attrition_description = "第一底注后，每个Boss盲注都是宿敌盲注。你没有任何时间准备。此玩法迫使你从开局就开始备战",
 			k_showdown = "决战",
-			k_showdown_description = "前两个底注之后，每个底注都是宿敌底注。次玩法会给你充足备战的时间",
+			k_showdown_description = "前两个底注之后，每个盲注都是宿敌盲注。次玩法会给你充足备战的时间",
 			k_survival = "生存",
 			k_survival_description = "击败最远的盲注的玩家获胜。 无宿敌盲注. 此玩法会考研你逐步构建出最高分经典牌型的能力",
 			k_weekly = "Weekly",
