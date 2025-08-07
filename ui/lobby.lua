@@ -356,10 +356,20 @@ function G.FUNCS.view_code(e)
 end
 
 function G.FUNCS.lobby_leave(e)
-	MP.LOBBY.code = nil
-	MP.ACTIONS.leave_lobby()
-	MP.UI.update_connection_status()
-	G.STATE = G.STATES.MENU
+	if G.STAGE ~= G.STAGES.MAIN_MENU then
+		G.FUNCS.confirm_selection(function()
+                MP.LOBBY.code = nil
+				MP.ACTIONS.leave_lobby()
+				MP.UI.update_connection_status()
+				G.STATE = G.STATES.MENU
+        end)
+	else
+		MP.LOBBY.code = nil
+		MP.ACTIONS.leave_lobby()
+		MP.UI.update_connection_status()
+		G.STATE = G.STATES.MENU
+	end 
+		
 end
 
 function G.FUNCS.lobby_choose_deck(e)
@@ -419,7 +429,9 @@ function G.FUNCS.display_lobby_main_menu_UI(e)
 end
 
 function G.FUNCS.mp_return_to_lobby()
-	MP.ACTIONS.stop_game()
+        G.FUNCS.confirm_selection(function()
+                MP.ACTIONS.stop_game()
+        end)
 end
 
 function G.FUNCS.custom_seed_overlay(e)
@@ -467,6 +479,7 @@ end
 function G.UIDEF.create_UIBox_unstuck()
 	return (
 		create_UIBox_generic_options({
+			back_func = "options",
 			contents = {
 				{
 					n = G.UIT.C,

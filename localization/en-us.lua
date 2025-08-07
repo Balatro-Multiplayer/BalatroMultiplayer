@@ -241,6 +241,7 @@ return {
 			b_skip_tutorial = "Skip Tutorial",
 			k_yes = "Yes",
 			k_no = "No",
+			k_are_you_sure = "Are you sure?",
 			k_has_multiplayer_content = "Has Multiplayer Content",
 			k_forces_lobby_options = "Forces Lobby Options",
 			k_forces_gamemode = "Forces Gamemode",

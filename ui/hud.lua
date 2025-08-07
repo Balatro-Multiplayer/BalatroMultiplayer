@@ -443,6 +443,7 @@ function MP.UI.start_pvp_countdown(callback)
 	}))
 end
 
+
 function G.FUNCS.set_timer_box(e)
 	if MP.LOBBY.config.timer then
 		if MP.GAME.timer_started then
@@ -459,6 +460,7 @@ function G.FUNCS.set_timer_box(e)
 		e.children[1].config.object.colours = { G.C.UI.TEXT_DARK }
 	end
 end
+
 
 MP.timer_event = Event({
 	blockable = false,
