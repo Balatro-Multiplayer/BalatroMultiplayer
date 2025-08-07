@@ -32,8 +32,12 @@ and G.GAME.MP_joker_overrides[1]
 and not (forced_key or key_append or _rarity)
 and (area == G.shop_jokers or area == G.pack_cards or G.MP_JUDGEMENT_OVERRIDE)
 then
-	forced_key = G.GAME.MP_joker_overrides[1].key
-	sticker_override = true
+	if not (G.GAME.used_jokers[G.GAME.MP_joker_overrides[1].key] and not next(find_joker("Showman"))) then
+		forced_key = G.GAME.MP_joker_overrides[1].key
+		sticker_override = true
+	else
+		table.remove(G.GAME.MP_joker_overrides, 1)
+	end
 end
 '''
 match_indent = true
