@@ -199,6 +199,7 @@ return {
 		dictionary = {
 			b_singleplayer = "Singleplayer",
 			b_join_lobby = "Join Lobby",
+			b_join_lobby_clipboard = "Join From Clipboard",
 			b_return_lobby = "Return to Lobby",
 			b_reconnect = "Reconnect",
 			b_create_lobby = "Create Lobby",
