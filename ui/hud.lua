@@ -325,7 +325,7 @@ function ease_round(mod)
 end
 
 function G.FUNCS.mp_timer_button(e)
-	if MP.LOBBY.config.timer then
+	if MP.LOBBY.config.timer and not MP.UI.disable_timer_button then
 		if MP.GAME.ready_blind then
 			if not MP.GAME.timer_started then
 				MP.ACTIONS.start_ante_timer()
@@ -398,6 +398,7 @@ function MP.UI.timer_hud()
 end
 
 function MP.UI.start_pvp_countdown(callback)
+	MP.UI.disable_timer_button = true
 	local seconds = countdown_seconds
 	local tick_delay = 1
 	if MP.LOBBY and MP.LOBBY.config and MP.LOBBY.config.pvp_countdown_seconds then
