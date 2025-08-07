@@ -804,19 +804,23 @@ function G.UIDEF.confirmation_dialog()
        })
 end
 
-function G.FUNCS.confirm_selection(callback)
-       G._confirm_callback = callback
-       G.FUNCS.overlay_menu({
-               definition = G.UIDEF.confirmation_dialog(),
-       })
-end
+do
+	local confirm_selection_callback = nil
 
-function G.FUNCS.confirmation_dialog_yes()
-        G.FUNCS.exit_overlay_menu()
-        if G._confirm_callback then
-                G._confirm_callback()
-                G._confirm_callback = nil
-        end
+	function G.FUNCS.confirm_selection(callback)
+		confirm_selection_callback = callback
+		G.FUNCS.overlay_menu({
+			definition = G.UIDEF.confirmation_dialog(),
+		})
+	end
+
+	function G.FUNCS.confirmation_dialog_yes()
+		G.FUNCS.exit_overlay_menu()
+		if confirm_selection_callback then
+			confirm_selection_callback()
+			confirm_selection_callback = nil
+		end
+	end
 end
 
 function G.FUNCS.mp_toggle_ready(e)
