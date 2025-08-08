@@ -253,8 +253,8 @@ local function action_win_game()
 	MP.nemesis_deck_string = ""
 	MP.end_game_jokers_received = false
 	MP.nemesis_deck_received = false
-	win_game()
 	MP.GAME.won = true
+	win_game()
 end
 
 local function action_lose_game()
