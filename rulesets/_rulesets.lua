@@ -110,7 +110,8 @@ function MP.LoadReworks(ruleset, key)
 				local orig = string.sub(k, #ruleset_ + 1)
 				if orig == "rarity" then
 					SMODS.remove_pool(G.P_JOKER_RARITY_POOLS[center[orig]], center.key)
-					SMODS.insert_pool(G.P_JOKER_RARITY_POOLS[center[k]], center, true)
+					table.insert(G.P_JOKER_RARITY_POOLS[center[k]], center)
+					table.sort(G.P_JOKER_RARITY_POOLS[center[k]], function (a, b) return a.order < b.order end)
 				end
 				if center[k] == 'NULL' then
 					center[orig] = nil
