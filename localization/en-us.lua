@@ -133,7 +133,7 @@ return {
 					"{X:mult,C:white} X#3# {} Mult when scored",
 				},
 			},
-			j_mp_bloodston2 = {
+			j_mp_bloodstone2 = {
 				name = "Bloodstone",
 				text = {
 					"{C:green}#1# in #2#{} chance for",
