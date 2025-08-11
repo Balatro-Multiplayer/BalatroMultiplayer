@@ -26,17 +26,17 @@ MP.Ruleset({
 	reworked_consumables = {},
 	reworked_vouchers = {},
 	reworked_enhancements = {
-		"m_glass",
+		-- "m_glass",
 	},
 	reworked_blinds = {},
 	reworked_tags = { "tag_mp_sandbox_rare" },
 
-	create_info_menu = function ()
+	create_info_menu = function()
 		return {
 			{
 				n = G.UIT.R,
 				config = {
-					align = "tm"
+					align = "tm",
 				},
 				nodes = {
 					MP.UI.BackgroundGrouping(localize("k_has_multiplayer_content"), {
@@ -46,15 +46,15 @@ MP.Ruleset({
 								text = localize("k_yes"),
 								scale = 0.8,
 								colour = G.C.GREEN,
-							}
-						}
-					}, {col = true, text_scale = 0.6}),
+							},
+						},
+					}, { col = true, text_scale = 0.6 }),
 					{
 						n = G.UIT.C,
 						config = {
 							minw = 0.1,
-							minh = 0.1
-						}
+							minh = 0.1,
+						},
 					},
 					MP.UI.BackgroundGrouping(localize("k_forces_lobby_options"), {
 						{
@@ -63,15 +63,15 @@ MP.Ruleset({
 								text = localize("k_no"),
 								scale = 0.8,
 								colour = G.C.RED,
-							}
-						}
-					}, {col = true, text_scale = 0.6}),
+							},
+						},
+					}, { col = true, text_scale = 0.6 }),
 					{
 						n = G.UIT.C,
 						config = {
 							minw = 0.1,
-							minh = 0.1
-						}
+							minh = 0.1,
+						},
 					},
 					MP.UI.BackgroundGrouping(localize("k_forces_gamemode"), {
 						{
@@ -80,23 +80,23 @@ MP.Ruleset({
 								text = localize("k_no"),
 								scale = 0.8,
 								colour = G.C.RED,
-							}
-						}
-					}, {col = true, text_scale = 0.6})
+							},
+						},
+					}, { col = true, text_scale = 0.6 }),
 				},
 			},
 			{
 				n = G.UIT.R,
 				config = {
 					minw = 0.05,
-					minh = 0.05
-				}
+					minh = 0.05,
+				},
 			},
 			{
 				n = G.UIT.R,
 				config = {
 					align = "cl",
-					padding = 0.1
+					padding = 0.1,
 				},
 				nodes = {
 					{
@@ -105,7 +105,7 @@ MP.Ruleset({
 							text = localize("k_sandbox_description"),
 							scale = 0.6,
 							colour = G.C.UI.TEXT_LIGHT,
-						}
+						},
 					},
 				},
 			},
@@ -118,41 +118,36 @@ MP.Ruleset({
 		end
 		return false
 	end,
-
-	-- todo this would be sick
-	overrides = function()
-		print("Override for sandbox called")
-	end,
 }):inject()
 
 -- Oops artwork - no functional changes but visual identity for sandbox
-SMODS.Atlas({
-	key = "sandbox_oops",
-	path = "j_sandbox_oops2.png",
-	px = 71,
-	py = 95,
-})
+-- SMODS.Atlas({
+-- 	key = "sandbox_oops",
+-- 	path = "j_sandbox_oops2.png",
+-- 	px = 71,
+-- 	py = 95,
+-- })
 
-MP.ReworkCenter({
-	key = "j_oops",
-	atlas = "mp_sandbox_oops",
-	pos = { x = 0, y = 0 },
-	ruleset = "sandbox",
-	silent = true,
-})
+-- MP.ReworkCenter({
+-- 	key = "j_oops",
+-- 	atlas = "mp_sandbox_oops",
+-- 	pos = { x = 0, y = 0 },
+-- 	ruleset = "sandbox",
+-- 	silent = true,
+-- })
 
-MP.ReworkCenter({
-	key = "j_square",
-	ruleset = "sandbox",
-	config = { extra = { chips = 64, chip_mod = 4 } },
-})
+-- MP.ReworkCenter({
+-- 	key = "j_square",
+-- 	ruleset = "sandbox",
+-- 	config = { extra = { chips = 64, chip_mod = 4 } },
+-- })
 
-MP.ReworkCenter({
-	key = "j_idol",
-	ruleset = "sandbox",
-	rarity = 3,
-	cost = 8,
-})
+-- MP.ReworkCenter({
+-- 	key = "j_idol",
+-- 	ruleset = "sandbox",
+-- 	rarity = 3,
+-- 	cost = 8,
+-- })
 
 -- Global state for persistent bias across bloodstone calls
 if not MP.bloodstone_bias then
@@ -180,7 +175,7 @@ function cope_and_seethe_check(actual_odds)
 end
 
 SMODS.Joker({
-	key = "bloodstone",
+	key = "bloodstone2",
 	unlocked = true,
 	discovered = true,
 	blueprint_compat = true,
@@ -336,45 +331,45 @@ SMODS.Tag({
 -- Standard pack card creation for sandbox ruleset
 -- Skips glass enhancement (excluded from enhancement pool)
 -- 40% chance (0.6 threshold) for any enhancement to be applied (like vanilla)
-function sandbox_create_card(self, card, i)
-	local enhancement_pool = {}
+-- function sandbox_create_card(self, card, i)
+-- 	local enhancement_pool = {}
 
-	-- Skip glass
-	for k, v in pairs(G.P_CENTER_POOLS["Enhanced"]) do
-		if v.key ~= "m_glass" then
-			enhancement_pool[#enhancement_pool + 1] = v.key
-		end
-	end
+-- 	-- Skip glass
+-- 	for k, v in pairs(G.P_CENTER_POOLS["Enhanced"]) do
+-- 		if v.key ~= "m_glass" then
+-- 			enhancement_pool[#enhancement_pool + 1] = v.key
+-- 		end
+-- 	end
 
-	local ante_rng = MP.ante_based()
-	local roll = pseudorandom(pseudoseed("stdc1" .. ante_rng))
-	local enhancement = roll > 0.6 and pseudorandom_element(enhancement_pool, pseudoseed("stdc2" .. ante_rng)) or nil
+-- 	local ante_rng = MP.ante_based()
+-- 	local roll = pseudorandom(pseudoseed("stdc1" .. ante_rng))
+-- 	local enhancement = roll > 0.6 and pseudorandom_element(enhancement_pool, pseudoseed("stdc2" .. ante_rng)) or nil
 
-	local s_append = ""
-	local b_append = ante_rng .. s_append
+-- 	local s_append = ""
+-- 	local b_append = ante_rng .. s_append
 
-	local _edition = poll_edition("standard_edition" .. b_append, 2, true)
-	local _seal = SMODS.poll_seal({ mod = 10, key = "stdseal" .. ante_rng })
+-- 	local _edition = poll_edition("standard_edition" .. b_append, 2, true)
+-- 	local _seal = SMODS.poll_seal({ mod = 10, key = "stdseal" .. ante_rng })
 
-	return {
-		set = "Base",
-		edition = _edition,
-		seal = _seal,
-		enhancement = enhancement,
-		area = G.pack_cards,
-		skip_materialize = true,
-		soulable = true,
-		key_append = "sta" .. s_append,
-	}
-end
+-- 	return {
+-- 		set = "Base",
+-- 		edition = _edition,
+-- 		seal = _seal,
+-- 		enhancement = enhancement,
+-- 		area = G.pack_cards,
+-- 		skip_materialize = true,
+-- 		soulable = true,
+-- 		key_append = "sta" .. s_append,
+-- 	}
+-- end
 
-for k, v in ipairs(G.P_CENTER_POOLS.Booster) do
-	if v.kind and v.kind == "Standard" then
-		MP.ReworkCenter({
-			key = v.key,
-			ruleset = "sandbox",
-			silent = true,
-			create_card = sandbox_create_card,
-		})
-	end
-end
+-- for k, v in ipairs(G.P_CENTER_POOLS.Booster) do
+-- 	if v.kind and v.kind == "Standard" then
+-- 		MP.ReworkCenter({
+-- 			key = v.key,
+-- 			ruleset = "sandbox",
+-- 			silent = true,
+-- 			create_card = sandbox_create_card,
+-- 		})
+-- 	end
+-- end

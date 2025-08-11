@@ -1,27 +1,24 @@
 {
-	"id": "Multiplayer",
-	"name": "Multiplayer",
-	"display_name": "Multiplayer",
-	"author": [
-		"Virtualized",
-		"see credits"
-	],
-	"description": "Allows players to compete with their friends!",
-	"prefix": "mp",
-	"main_file": "core.lua",
-	"priority": 9007199254740990,
-	"badge_colour": "AC3232",
-	"badge_text_colour": "FFFFFF",
-	"version": "0.2.13",
-	"dependencies": [
-		"Steamodded (>=1.0.0~BETA-0323b)",
-		"Lovely (>=0.8)",
-		"Balatro (>=1.0.1o)"
-	],
-	"conflicts": [
-		"SystemClock (<<1.6.3)",
-		"Cryptid (<<0.5.4)",
-		"Talisman (<=2.0.2)",
-		"VirtualizedMultiplayer"
-	]
+  "id": "Multiplayer",
+  "name": "Multiplayer",
+  "display_name": "Multiplayer",
+  "author": ["Virtualized", "see credits"],
+  "description": "Allows players to compete with their friends!",
+  "prefix": "mp",
+  "main_file": "core.lua",
+  "priority": 9007199254740990,
+  "badge_colour": "AC3232",
+  "badge_text_colour": "FFFFFF",
+  "version": "0.2.13b",
+  "dependencies": [
+    "Steamodded (>=1.0.0~BETA-0323b)",
+    "Lovely (>=0.8)",
+    "Balatro (>=1.0.1o)"
+  ],
+  "conflicts": [
+    "SystemClock (<<1.6.3)",
+    "Cryptid (<<0.5.4)",
+    "Talisman (<=2.0.2)",
+    "VirtualizedMultiplayer"
+  ]
 }

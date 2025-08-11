@@ -107,7 +107,7 @@ return {
 					"not in a {C:attention}PvP Blind{}",
 				},
 			},
-			j_hanging_chad_mp_standard = {
+			j_mp_hanging_chad = {
 				name = "Hanging Chad",
 				text = {
 					"Retrigger {C:attention}first{} and {C:attention}second{}",
@@ -131,7 +131,16 @@ return {
 					"played cards with",
 					"{C:hearts}Heart{} suit to give",
 					"{X:mult,C:white} X#3# {} Mult when scored",
-					"{C:inactive}(Includes experimental variance){}",
+				},
+			},
+			j_mp_bloodston2 = {
+				name = "Bloodstone",
+				text = {
+					"{C:green}#1# in #2#{} chance for",
+					"played cards with",
+					"{C:hearts}Heart{} suit to give",
+					"{X:mult,C:white} X#3# {} Mult when scored",
+					"(Includes experimental variance)",
 				},
 			},
 		},
@@ -306,7 +315,7 @@ return {
 			k_random = "Random",
 			k_standard = "Standard",
 			k_sandbox = "Steph's Sandbox",
-			k_sandbox_description = "Like normal mode but someone gave the cards coffee and they're\nfeeling chatty.",
+			k_sandbox_description = "Like normal mode but someone gave the cards coffee and they're\nfeeling chatty.\n A bit broken until 0.2.15 ships - sorry :).",
 			k_vanilla = "Vanilla",
 			k_vanilla_description = "This ruleset removes all Multiplayer content,\nallowing you to play the game as originally designed.\n\nThis ruleset still includes Multiplayer features like the timer.\n\n(Disableable in Lobby Options)",
 			k_blitz = "Blitz",
@@ -383,7 +392,7 @@ return {
 			k_ante_number = "Ante #1#",
 			k_ante_range = "Ante #1#-#2#", -- For example, "Ante 1-2"
 			k_ante_min = "Ante #1#+", -- For example, "Ante 2+"
-			k_credits_list = "#1# and many more!" -- #1# gets replaced with a list of names
+			k_credits_list = "#1# and many more!", -- #1# gets replaced with a list of names
 		},
 		v_text = {
 			ch_c_hanging_chad_rework = { "{C:attention}Hanging Chad{} is {C:dark_edition}reworked" },
