@@ -12,7 +12,7 @@ SMODS.Joker({
 	pos = { x = 0, y = 8 },
 	-- no_collection = true,
 	in_pool = function(self)
-		return MP.LOBBY.config.ruleset == "ruleset_mp_standard" and MP.LOBBY.code
+		return MP.UTILS.is_standard_ruleset() and MP.LOBBY.code
 	end,
 	config = { extra = { odds = 2, Xmult = 1.5 }, mp_sticker_balanced = true },
 	loc_vars = function(self, info_queue, card)
