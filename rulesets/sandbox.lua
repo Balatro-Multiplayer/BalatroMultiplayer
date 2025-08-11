@@ -6,6 +6,7 @@ MP.Ruleset({
 	multiplayer_content = true,
 	banned_jokers = {
 		"j_cloud_9",
+		"j_hanging_chad",
 		"j_bloodstone",
 	},
 	banned_consumables = {
@@ -18,10 +19,10 @@ MP.Ruleset({
 
 	reworked_jokers = {
 		"j_mp_cloud_9",
-		"j_mp_bloodstone",
-		"j_hanging_chad",
-		"j_idol",
-		"j_square",
+		"j_mp_bloodstone2",
+		"j_mp_hanging_chad",
+		-- "j_idol",
+		-- "j_square",
 	},
 	reworked_consumables = {},
 	reworked_vouchers = {},
