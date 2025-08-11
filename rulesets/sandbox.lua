@@ -114,10 +114,11 @@ MP.Ruleset({
 	end,
 
 	is_disabled = function(self)
-		if not MP.INTEGRATIONS.TheOrder then
-			return localize("k_ruleset_disabled_the_order_required")
-		end
-		return false
+		return "temporarily offline while the mothership sorts itself out"
+		-- if not MP.INTEGRATIONS.TheOrder then
+		-- 	return localize("k_ruleset_disabled_the_order_required")
+		-- end
+		-- return false
 	end,
 }):inject()
 
