@@ -44,9 +44,9 @@ match_indent = true
 [[patches]]
 [patches.pattern]
 target = "card.lua"
-pattern = '''if pseudorandom('halu'..G.GAME.round_resets.ante) < G.GAME.probabilities.normal/self.ability.extra then'''
+pattern = '''if SMODS.pseudorandom_probability(self, 'halu'..G.GAME.round_resets.ante, 1, self.ability.extra) then'''
 position = "at"
-payload = '''if pseudorandom('halu'..MP.ante_based()) < G.GAME.probabilities.normal/self.ability.extra then'''
+payload = '''if SMODS.pseudorandom_probability(self, 'halu'..MP.ante_based(), 1, self.ability.extra) then'''
 match_indent = true
 
 # Make booster pack queue global

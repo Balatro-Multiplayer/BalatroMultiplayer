@@ -28,6 +28,8 @@ MP.INTEGRATIONS = {
 
 G.C.MULTIPLAYER = HEX("AC3232")
 
+MP.SMODS_VERSION = "1.0.0~BETA-0711a"
+
 function MP.load_mp_file(file)
 	local chunk, err = SMODS.load_file(file, "Multiplayer")
 	if chunk then

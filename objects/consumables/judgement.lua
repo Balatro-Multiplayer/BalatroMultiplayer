@@ -1,4 +1,4 @@
--- gotta redefine the logic
+--[[ gotta redefine the logic
 MP.ReworkCenter({
 	key = "c_judgement",
 	ruleset = MP.UTILS.get_standard_rulesets({'minorleague'}),
@@ -74,3 +74,4 @@ MP.ReworkCenter({
 		delay(0.6)
 	end,
 })
+]]

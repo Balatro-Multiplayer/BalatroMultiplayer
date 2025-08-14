@@ -1,5 +1,5 @@
 MP.Ruleset({ -- just a copy of ranked... and every weekly ruleset in vault is intended to copy paste like this....... maybe this could be more efficient?
-	key = "weekly",
+	key = "smallworld",
 	multiplayer_content = true,
 	standard = true,
 
@@ -13,19 +13,8 @@ MP.Ruleset({ -- just a copy of ranked... and every weekly ruleset in vault is in
 	banned_blinds ={},
 	reworked_jokers = {
 		"j_hanging_chad",
-		"j_mp_conjoined_joker",
-		"j_mp_defensive_joker",
-		"j_mp_lets_go_gambling",
-		"j_mp_pacifist",
-		"j_mp_penny_pincher",
-		"j_mp_pizza",
-		"j_mp_skip_off",
-		"j_mp_speedrun",
-		"j_mp_taxes",
 	},
-	reworked_consumables = {
-		"c_mp_asteroid"
-	},
+	reworked_consumables = {},
 	reworked_vouchers = {},
 	reworked_enhancements = {
 		"m_glass"
@@ -35,40 +24,92 @@ MP.Ruleset({ -- just a copy of ranked... and every weekly ruleset in vault is in
 		"bl_mp_nemesis"
 	},
 	create_info_menu = function ()
-		return {{
-			n = G.UIT.R,
-			config = {
-				align = "tm"
+		return {
+			{
+				n = G.UIT.R,
+				config = {
+					align = "tm"
+				},
+				nodes = {
+					MP.UI.BackgroundGrouping(localize("k_has_multiplayer_content"), {
+						{
+							n = G.UIT.T,
+							config = {
+								text = localize("k_yes"),
+								scale = 0.8,
+								colour = G.C.GREEN,
+							}
+						}
+					}, {col = true, text_scale = 0.6}),
+					{
+						n = G.UIT.C,
+						config = {
+							minw = 0.1,
+							minh = 0.1
+						}
+					},
+					MP.UI.BackgroundGrouping(localize("k_forces_lobby_options"), {
+						{
+							n = G.UIT.T,
+							config = {
+								text = localize("k_no"),
+								scale = 0.8,
+								colour = G.C.RED,
+							}
+						}
+					}, {col = true, text_scale = 0.6}),
+					{
+						n = G.UIT.C,
+						config = {
+							minw = 0.1,
+							minh = 0.1
+						}
+					},
+					MP.UI.BackgroundGrouping(localize("k_forces_gamemode"), {
+						{
+							n = G.UIT.T,
+							config = {
+								text = localize("k_no"),
+								scale = 0.8,
+								colour = G.C.RED,
+							}
+						}
+					}, {col = true, text_scale = 0.6})
+				},
 			},
-			nodes = {
-				{
-					n = G.UIT.T,
-					config = {
-						text = MP.UTILS.wrapText(localize("k_weekly_description") .. localize("k_weekly_smallworld"), 100),
-						scale = 0.4,
-						colour = G.C.UI.TEXT_LIGHT,
-					}
+			{
+				n = G.UIT.R,
+				config = {
+					minw = 0.05,
+					minh = 0.05
 				}
-			}
-		}}
+			},
+			{
+				n = G.UIT.R,
+				config = {
+					align = "cl",
+					padding = 0.1
+				},
+				nodes = {
+					{
+						n = G.UIT.T,
+						config = {
+							text = localize("k_smallworld_description"),
+							scale = 0.6,
+							colour = G.C.UI.TEXT_LIGHT,
+						}
+					},
+				},
+			},
+		}
 	end,
-	forced_gamemode = "gamemode_mp_attrition",
 	forced_lobby_options = true,
-	is_disabled = function(self)
-		if SMODS.version ~= MP.SMODS_VERSION then
-			return localize({type = "variable", key="k_ruleset_disabled_smods_version", vars = {MP.SMODS_VERSION}})
-		end
-		if not MP.INTEGRATIONS.TheOrder then
-			return localize("k_ruleset_disabled_the_order_required")
-		end
-		return false
-	end
 }):inject()
 
 local apply_bans_ref = MP.ApplyBans
 function MP.ApplyBans()
 	local ret = apply_bans_ref()
-	if MP.LOBBY.code and MP.UTILS.is_weekly('smallworld') then
+	if MP.LOBBY.code and MP.LOBBY.config.ruleset == 'ruleset_mp_smallworld' then
 		local tables = {}
 		for k, v in pairs(G.P_CENTERS) do
 			if v.set and (not G.GAME.banned_keys[k]) and not (v.requires or v.hidden) then
@@ -108,7 +149,7 @@ end
 
 local find_joker_ref = find_joker
 function find_joker(name, non_debuff)
-	if MP.LOBBY.code and MP.UTILS.is_weekly('smallworld') then
+	if MP.LOBBY.code and MP.LOBBY.config.ruleset == 'ruleset_mp_smallworld' then
 		if name == 'Showman' and not next(find_joker_ref('Showman', non_debuff)) then
 			return {{}} -- surely this doesn't break
 		end

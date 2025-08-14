@@ -103,9 +103,8 @@ MP.Ruleset({
 	forced_gamemode = "gamemode_mp_attrition",
 	forced_lobby_options = true,
 	is_disabled = function(self)
-		local required_version = "1.0.0~BETA-0506a"
-		if SMODS.version ~= required_version then
-			return localize({type = "variable", key="k_ruleset_disabled_smods_version", vars = {required_version}})
+		if SMODS.version ~= MP.SMODS_VERSION then
+			return localize({type = "variable", key="k_ruleset_disabled_smods_version", vars = {MP.SMODS_VERSION}})
 		end
 		if not MP.INTEGRATIONS.TheOrder then
 			return localize("k_ruleset_disabled_the_order_required")

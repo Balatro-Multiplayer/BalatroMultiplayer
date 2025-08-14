@@ -34,9 +34,9 @@ do
 		end
 	end
 	if area.config.type == 'discard' or area.config.type == 'deck' then
-		card = card or _cards[#_cards]
+		card = _cards[#_cards]
 	else
-		card = card or _cards[1]
+		card = _cards[1]
 	end
 	for k, v in pairs(self.cards) do
 		if v == card then prevent = true; break end

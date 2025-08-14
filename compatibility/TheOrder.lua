@@ -2,23 +2,25 @@
 -- Patches card creation to not be ante-based and use a single pool for every type/rarity
 local cc = create_card
 function create_card(_type, area, legendary, _rarity, skip_materialize, soulable, forced_key, key_append)
-    if MP.INTEGRATIONS.TheOrder then
-        local a = G.GAME.round_resets.ante
-        G.GAME.round_resets.ante = 0
-        if _type == "Tarot" or _type == "Planet" or _type == "Spectral" then
-            if area == G.pack_cards then
-                key_append = _type.."_pack"
-            else
-                key_append = _type
-            end
-        elseif not (_type == 'Base' or _type == 'Enhanced') then
-	    key_append = _rarity	-- _rarity replacing key_append can be entirely removed to normalise skip tags and riff raff with shop rarity queues
-        end
-        local c = cc(_type, area, legendary, _rarity, skip_materialize, soulable, forced_key, key_append)
-        G.GAME.round_resets.ante = a
-        return c
-    end
-    return cc(_type, area, legendary, _rarity, skip_materialize, soulable, forced_key, key_append)
+	if MP.INTEGRATIONS.TheOrder then
+		local a = G.GAME.round_resets.ante
+		G.GAME.round_resets.ante = 0
+		if _type == "Tarot" or _type == "Planet" or _type == "Spectral" then
+			if area == G.pack_cards then
+				key_append = _type.."_pack"
+			else
+				key_append = _type
+			end
+		elseif not (_type == 'Base' or _type == 'Enhanced') then
+			if not (key_append == 'jud' and G.GAME.stake >= 7) then -- judgement queue for higher stakes
+				key_append = _rarity -- _rarity replacing key_append can be entirely removed to normalise skip tags and riff raff with shop rarity queues
+			end
+		end
+		local c = cc(_type, area, legendary, _rarity, skip_materialize, soulable, forced_key, key_append)
+		G.GAME.round_resets.ante = a
+		return c
+	end
+	return cc(_type, area, legendary, _rarity, skip_materialize, soulable, forced_key, key_append)
 end
 
 -- Patches idol RNG when using the order to sort deck based on count of identical cards instead of default deck order
@@ -280,7 +282,7 @@ end
 -- Handle round based rng with order (avoid desync with skips)
 function MP.order_round_based(ante_based)
 	if MP.INTEGRATIONS.TheOrder then
-		return G.GAME.round_resets.ante..(G.GAME.blind.config.blind.key or '')	-- fine becase no boss shenanigans... change this if that happens
+		return G.GAME.round_resets.ante..(G.GAME.blind.config.blind.key or '') -- fine becase no boss shenanigans... change this if that happens
 	end
 	if ante_based then
 		return MP.ante_based()
@@ -294,13 +296,13 @@ function MP.sorted_hand_list(current_hand)
 	local _poker_hands = {}
 	local done = false
 	local order = 1
-	while not done do	-- messy selection sort
+	while not done do -- messy selection sort
 		done = true
 		for k, v in pairs(G.GAME.hands) do
 			if v.order == order then
 				order = order + 1
 				done = false
-				if v.visible and k ~= current_hand then
+				if SMODS.is_poker_hand_visible(k) and k ~= current_hand then
 					_poker_hands[#_poker_hands+1] = k
 				end
 			end
@@ -313,7 +315,7 @@ end
 local orig_shuffle = CardArea.shuffle
 function CardArea:shuffle(_seed)
 	if MP.INTEGRATIONS.TheOrder and self == G.deck then
-		local centers = {	-- these are roughly ordered in terms of current meta, doesn't matter toooo much? but they have to be ordered
+		local centers = { -- these are roughly ordered in terms of current meta, doesn't matter toooo much? but they have to be ordered
 			c_base = 0,
 			m_stone = 106,
 			m_bonus = 107,
@@ -339,7 +341,7 @@ function CardArea:shuffle(_seed)
 		
 		local tables = {}
 		
-		for i, v in ipairs(self.cards) do	-- give each card a value based on current enhancement/seal/edition
+		for i, v in ipairs(self.cards) do -- give each card a value based on current enhancement/seal/edition
 			v.mp_stdval = 0 + (centers[v.config.center_key] or 0)
 			v.mp_stdval = v.mp_stdval + (seals[v.seal or 'nil'] or 0)
 			v.mp_stdval = v.mp_stdval + (editions[v.edition and v.edition.type or 'nil'] or 0)

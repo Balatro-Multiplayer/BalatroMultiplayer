@@ -444,7 +444,7 @@ local action_asteroid = action_asteroid
 		local max_level = 0
 
 		for k, v in pairs(G.GAME.hands) do
-			if v.visible then
+			if SMODS.is_poker_hand_visible(k) then
 				if
 					to_big(v.level) > to_big(max_level)
 					or (to_big(v.level) == to_big(max_level) and hand_priority[k] < hand_priority[hand_type])

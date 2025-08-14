@@ -3,8 +3,21 @@ MP.Gamemode({
     get_blinds_by_ante = function(self, ante)
         return nil, nil, nil
     end,
-    banned_jokers = {},
-	banned_consumables = {},
+	banned_jokers = {
+		"j_mp_conjoined_joker",
+		"j_mp_defensive_joker",
+		"j_mp_lets_go_gambling",
+		"j_mp_magnet",
+		"j_mp_pacifist",
+		"j_mp_penny_pincher",
+		"j_mp_pizza",
+		"j_mp_skip_off",
+		"j_mp_speedrun",
+		"j_mp_taxes",
+	},
+	banned_consumables = {
+		"c_mp_asteroid",
+	},
 	banned_vouchers = {},
 	banned_enhancements = {},
 	banned_tags = {},

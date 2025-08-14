@@ -17,7 +17,8 @@ MP.ReworkCenter({
 					local stored_queue = G.GAME.round_resets.mp_bloodstone[MP.order_round_based(true)]
 					G.GAME.round_resets.mp_bsindex = G.GAME.round_resets.mp_bsindex + 1 -- increment before indexing
 					stored_queue[G.GAME.round_resets.mp_bsindex] = stored_queue[G.GAME.round_resets.mp_bsindex] or pseudorandom('bloodstone'..MP.order_round_based(true))
-					if stored_queue[G.GAME.round_resets.mp_bsindex] < G.GAME.probabilities.normal/card.ability.extra.odds then
+					local numerator, denominator = SMODS.get_probability_vars(card, 1, card.ability.extra.odds, 'bloodstone') -- no hook for you
+					if stored_queue[G.GAME.round_resets.mp_bsindex] < numerator/denominator then
 						return {
 							x_mult = card.ability.extra.Xmult,
 							card = card
