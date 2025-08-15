@@ -3,10 +3,6 @@ version = "1.0"
 dump_lua = true
 priority = 0
 
-# This manifest assumes the following release structure:
-#
-# Fantoms-Preview
-
 [[patches]]
 [patches.copy]
 target = "globals.lua"
