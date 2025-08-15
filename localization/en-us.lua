@@ -236,7 +236,7 @@ return {
 			b_opts_player_diff_deck = "Players have different decks",
 			b_opts_normal_bosses = "Enable Boss Blind effects",
 			b_opts_timer = "Enable Timer",
-			b_opts_disable_preview = "Disable Score Preview (Coming Soon)",
+			b_opts_disable_preview = "Disable Score Preview",
 			b_opts_disable_the_order = "Disable The Order (Coming Soon)",
 			b_reset = "Reset",
 			b_set_custom_seed = "Set Custom Seed",
