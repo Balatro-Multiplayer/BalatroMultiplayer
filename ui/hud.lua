@@ -185,8 +185,8 @@ function MP.UI.create_UIBox_mods_list(type)
 			{
 				n = G.UIT.C,
 				config = { align = "cm" },
-				nodes = MP.UI.hash_str_to_view(
-					type == "host" and MP.LOBBY.host.hash_str or MP.LOBBY.guest.hash_str,
+				nodes = MP.UI.modlist_to_view(
+					type == "host" and MP.LOBBY.host.config.Mods or MP.LOBBY.guest.config.Mods,
 					G.C.UI.TEXT_DARK
 				),
 			},
