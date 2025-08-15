@@ -54,7 +54,7 @@ FN.PRE._start_up = Game.start_up
 function Game:start_up()
 	FN.PRE._start_up(self)
 
-	if not MP.INTEGRATIONS.FantomsPreview then
+	if not MP.INTEGRATIONS.Preview then
 		return
 	end
 

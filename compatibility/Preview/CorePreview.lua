@@ -50,7 +50,7 @@ end
 local orig_use = Card.use_consumeable
 function Card:use_consumeable(area, copier)
 	orig_use(self, area, copier)
-	if not MP.INTEGRATIONS.FantomsPreview then
+	if not MP.INTEGRATIONS.Preview then
 		return
 	end
 	FN.PRE.add_update_event("immediate")
@@ -60,7 +60,7 @@ end
 local orig_hl = CardArea.parse_highlighted
 function CardArea:parse_highlighted()
 	orig_hl(self)
-	if not MP.INTEGRATIONS.FantomsPreview then
+	if not MP.INTEGRATIONS.Preview then
 		return
 	end
 
@@ -74,7 +74,7 @@ end
 local orig_card_remove = Card.remove_from_area
 function Card:remove_from_area()
 	orig_card_remove(self)
-	if not MP.INTEGRATIONS.FantomsPreview then
+	if not MP.INTEGRATIONS.Preview then
 		return
 	end
 
@@ -87,7 +87,7 @@ end
 local orig_update = CardArea.update
 function CardArea:update(dt)
 	orig_update(self, dt)
-	if not MP.INTEGRATIONS.FantomsPreview then
+	if not MP.INTEGRATIONS.Preview then
 		return
 	end
 
@@ -168,7 +168,7 @@ local orig_eval = G.FUNCS.evaluate_play
 function G.FUNCS.evaluate_play(e)
 	orig_eval(e)
 
-	if not MP.INTEGRATIONS.FantomsPreview then
+	if not MP.INTEGRATIONS.Preview then
 		return
 	end
 	FN.PRE.add_reset_event("after")
@@ -178,8 +178,7 @@ local orig_discard = G.FUNCS.discard_cards_from_highlighted
 function G.FUNCS.discard_cards_from_highlighted(e, is_hook_blind)
 	orig_discard(e, is_hook_blind)
 
-	-- TODO: Could also do this depending on gamemode!
-	if not MP.INTEGRATIONS.FantomsPreview then
+	if not MP.INTEGRATIONS.Preview then
 		return
 	end
 	if not is_hook_blind then

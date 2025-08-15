@@ -643,7 +643,28 @@ function MP.UTILS.get_banned_mods(mods)
 	end
 	
 	for mod_name, mod_version in pairs(mods) do
-		if MP.BANNED_MODS[mod_name] then
+		local ban_info = MP.BANNED_MODS[mod_name]
+		local is_banned = false
+		
+		if ban_info then
+			if type(ban_info) == "boolean" then
+				-- Old format: ban all versions
+				is_banned = ban_info
+			elseif type(ban_info) == "string" then
+				-- New format: ban specific version
+				is_banned = (mod_version == ban_info)
+			elseif type(ban_info) == "table" then
+				-- Table format: ban multiple specific versions
+				for _, banned_version in ipairs(ban_info) do
+					if mod_version == banned_version then
+						is_banned = true
+						break
+					end
+				end
+			end
+		end
+		
+		if is_banned then
 			table.insert(banned_mods, mod_name)
 		end
 	end

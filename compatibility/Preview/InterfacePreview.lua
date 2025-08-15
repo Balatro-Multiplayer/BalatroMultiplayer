@@ -7,7 +7,7 @@ local orig_hud = create_UIBox_HUD
 function create_UIBox_HUD()
 	local contents = orig_hud()
 
-	if not MP.INTEGRATIONS.FantomsPreview then
+	if not MP.INTEGRATIONS.Preview then
 		return contents
 	end
 

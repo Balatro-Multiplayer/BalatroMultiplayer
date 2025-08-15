@@ -45,10 +45,15 @@ local function get_warnings()
 		end
 	end
 
-	-- Check for banned mods
-	local host_banned_mods = MP.LOBBY.host and MP.LOBBY.host.config and MP.UTILS.get_banned_mods(MP.LOBBY.host.config.Mods) or {}
-	local guest_banned_mods = MP.LOBBY.guest and MP.LOBBY.guest.config and MP.UTILS.get_banned_mods(MP.LOBBY.guest.config.Mods) or {}
-	
+	local host_banned_mods = MP.LOBBY.host
+			and MP.LOBBY.host.config
+			and MP.UTILS.get_banned_mods(MP.LOBBY.host.config.Mods)
+		or {}
+	local guest_banned_mods = MP.LOBBY.guest
+			and MP.LOBBY.guest.config
+			and MP.UTILS.get_banned_mods(MP.LOBBY.guest.config.Mods)
+		or {}
+
 	if #host_banned_mods > 0 or #guest_banned_mods > 0 then
 		table.insert(warnings, {
 			localize("k_warning_banned_mods"),

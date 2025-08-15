@@ -1,5 +1,5 @@
--- FantomsPreview integration wrapper for BalatroMultiplayer
-if not MP.INTEGRATIONS.FantomsPreview then
+-- Score Preview integration wrapper for BalatroMultiplayer
+if not MP.INTEGRATIONS.Preview then
 	return
 end
 

@@ -8,7 +8,8 @@ MP.BANNED_MODS = {
 	["NotJustYet"] = true,
 	["Showman"] = true,
 	["TagPreview"] = true,
-	["FantomsPreview"] = true, -- todo replace our preview w a diff name
+	["FantomsPreview"] = true,
+	["lovely"] = "0.7.1",
 }
 
 MP.LOBBY = {
@@ -36,7 +37,7 @@ MP.UI = {}
 MP.ACTIONS = {}
 MP.INTEGRATIONS = {
 	TheOrder = SMODS.Mods["Multiplayer"].config.integrations.TheOrder,
-	FantomsPreview = SMODS.Mods["Multiplayer"].config.integrations.FantomsPreview,
+	Preview = SMODS.Mods["Multiplayer"].config.integrations.Preview,
 }
 
 G.C.MULTIPLAYER = HEX("AC3232")
