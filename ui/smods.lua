@@ -196,6 +196,61 @@ SMODS.Mods.Multiplayer.config_tab = function()
 			{
 				n = G.UIT.R,
 				config = {
+					padding = 0,
+					align = "cm",
+					on_demand_tooltip = {
+						text = {
+							localize('k_fantoms_preview_integration_desc'),
+							localize("k_fantoms_preview_credit")
+						}
+					},
+				},
+				nodes = {
+					create_toggle({
+						id = "fantoms_preview_integration_toggle",
+						label = localize("b_fantoms_preview_integration"),
+						ref_table = SMODS.Mods["Multiplayer"].config.integrations,
+						ref_value = "FantomsPreview",
+					}),
+				},
+			},
+			{
+				n = G.UIT.R,
+				config = {
+					padding = 0,
+					align = "cm",
+				},
+				nodes = {
+					{
+						n = G.UIT.T,
+						config = {
+							text = localize("k_fantoms_preview_credit"),
+							shadow = true,
+							scale = 0.375,
+							colour = G.C.UI.TEXT_INACTIVE,
+						},
+					},
+					{
+						n = G.UIT.B,
+						config = {
+							w = 0.1,
+							h = 0.1,
+						},
+					},
+					{
+						n = G.UIT.T,
+						config = {
+							text = localize("k_requires_restart"),
+							shadow = true,
+							scale = 0.375,
+							colour = G.C.UI.TEXT_INACTIVE,
+						},
+					},
+				},
+			},
+			{
+				n = G.UIT.R,
+				config = {
 					padding = 0.5,
 					align = "cm",
 					id = "username_input_box",

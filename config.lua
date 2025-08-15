@@ -7,6 +7,7 @@ return {
 	["misprint_display"] = true,
 	["integrations"] = {
 		["TheOrder"] = false,
+		["FantomsPreview"] = false,
 	},
 	["unlocked"] = true,
 }

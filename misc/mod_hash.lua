@@ -34,6 +34,7 @@ function MP:generate_hash()
 	SMODS.Mods["Multiplayer"].config.unlocked = MP.UTILS.unlock_check()
 	table.insert(mod_data, 1, "unlocked=" .. tostring(SMODS.Mods["Multiplayer"].config.unlocked))
 	table.insert(mod_data, 1, "theOrder=" .. tostring(SMODS.Mods["Multiplayer"].config.integrations.TheOrder))
+	table.insert(mod_data, 1, "fantomsPreview=" .. tostring(SMODS.Mods["Multiplayer"].config.integrations.FantomsPreview))
 	local mod_string = table.concat(mod_data, ";")
 	MP.MOD_STRING = mod_string
 	MP.MOD_HASH = hash(mod_string) or "0000"

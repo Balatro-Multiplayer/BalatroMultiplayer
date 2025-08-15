@@ -24,6 +24,7 @@ MP.UI = {}
 MP.ACTIONS = {}
 MP.INTEGRATIONS = {
 	TheOrder = SMODS.Mods["Multiplayer"].config.integrations.TheOrder,
+	FantomsPreview = SMODS.Mods["Multiplayer"].config.integrations.FantomsPreview,
 }
 
 G.C.MULTIPLAYER = HEX("AC3232")
