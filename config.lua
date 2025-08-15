@@ -6,7 +6,7 @@ return {
 	["logging"] = false,
 	["misprint_display"] = true,
 	["integrations"] = {
-		["TheOrder"] = false,
+		["TheOrder"] = true,
 		["Preview"] = false,
 	},
 	["unlocked"] = true,

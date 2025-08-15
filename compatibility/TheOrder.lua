@@ -2,7 +2,7 @@
 -- Patches card creation to not be ante-based and use a single pool for every type/rarity
 local cc = create_card
 function create_card(_type, area, legendary, _rarity, skip_materialize, soulable, forced_key, key_append)
-	if MP.INTEGRATIONS.TheOrder and not (MP.LOBBY.config and MP.LOBBY.config.disable_the_order) then
+	if MP.INTEGRATIONS.TheOrder and (MP.LOBBY.config and MP.LOBBY.config.the_order) then
 		local a = G.GAME.round_resets.ante
 		G.GAME.round_resets.ante = 0
 		if _type == "Tarot" or _type == "Planet" or _type == "Spectral" then
@@ -24,7 +24,7 @@ end
 -- Patches idol RNG when using the order to sort deck based on count of identical cards instead of default deck order
 local original_reset_idol_card = reset_idol_card
 function reset_idol_card()
-	if MP.INTEGRATIONS.TheOrder and not (MP.LOBBY.config and MP.LOBBY.config.disable_the_order) then
+	if MP.INTEGRATIONS.TheOrder and (MP.LOBBY.config and MP.LOBBY.config.the_order) then
 		G.GAME.current_round.idol_card.rank = "Ace"
 		G.GAME.current_round.idol_card.suit = "Spades"
 
@@ -111,7 +111,7 @@ end
 local original_reset_mail_rank = reset_mail_rank
 
 function reset_mail_rank()
-	if MP.INTEGRATIONS.TheOrder and not (MP.LOBBY.config and MP.LOBBY.config.disable_the_order) then
+	if MP.INTEGRATIONS.TheOrder and (MP.LOBBY.config and MP.LOBBY.config.the_order) then
 		G.GAME.current_round.mail_card.rank = "Ace"
 
 		local count_map = {}
@@ -204,7 +204,7 @@ SMODS.Booster:take_ownership_by_kind("Standard", {
 -- Patch seal queues
 local pollseal = SMODS.poll_seal
 function SMODS.poll_seal(args)
-	if MP.INTEGRATIONS.TheOrder and not (MP.LOBBY.config and MP.LOBBY.config.disable_the_order) then
+	if MP.INTEGRATIONS.TheOrder and (MP.LOBBY.config and MP.LOBBY.config.the_order) then
 		local a = G.GAME.round_resets.ante
 		G.GAME.round_resets.ante = 0
 		local ret = pollseal(args)
@@ -243,7 +243,7 @@ end
 
 local nextvouchers = SMODS.get_next_vouchers
 function SMODS.get_next_vouchers(vouchers)
-	if MP.INTEGRATIONS.TheOrder and not (MP.LOBBY.config and MP.LOBBY.config.disable_the_order) then
+	if MP.INTEGRATIONS.TheOrder and (MP.LOBBY.config and MP.LOBBY.config.the_order) then
 		vouchers = vouchers or { spawn = {} }
 		local _pool = get_current_pool("Voucher")
 		local culled = get_culled(_pool)
@@ -267,7 +267,7 @@ end
 
 local nextvoucherkey = get_next_voucher_key
 function get_next_voucher_key(_from_tag)
-	if MP.INTEGRATIONS.TheOrder and not (MP.LOBBY.config and MP.LOBBY.config.disable_the_order) then
+	if MP.INTEGRATIONS.TheOrder and (MP.LOBBY.config and MP.LOBBY.config.the_order) then
 		local _pool = get_current_pool("Voucher")
 		local culled = get_culled(_pool)
 		local center = pseudorandom_element(culled, pseudoseed("Voucher0"))
@@ -284,7 +284,7 @@ end
 
 -- Helper function to make code more readable - deal with ante
 function MP.ante_based()
-	if MP.INTEGRATIONS.TheOrder and not (MP.LOBBY.config and MP.LOBBY.config.disable_the_order) then
+	if MP.INTEGRATIONS.TheOrder and (MP.LOBBY.config and MP.LOBBY.config.the_order) then
 		return 0
 	end
 	return G.GAME.round_resets.ante
@@ -292,7 +292,7 @@ end
 
 -- Handle round based rng with order (avoid desync with skips)
 function MP.order_round_based(ante_based)
-	if MP.INTEGRATIONS.TheOrder and not (MP.LOBBY.config and MP.LOBBY.config.disable_the_order) then
+	if MP.INTEGRATIONS.TheOrder and (MP.LOBBY.config and MP.LOBBY.config.the_order) then
 		return G.GAME.round_resets.ante .. (G.GAME.blind.config.blind.key or "") -- fine becase no boss shenanigans... change this if that happens
 	end
 	if ante_based then
@@ -387,7 +387,7 @@ end
 -- Make pseudorandom_element selecting a joker less chaotic
 local orig_pseudorandom_element = pseudorandom_element
 function pseudorandom_element(_t, seed, args)
-	if MP.INTEGRATIONS.TheOrder and not (MP.LOBBY.config and MP.LOBBY.config.disable_the_order) then
+	if MP.INTEGRATIONS.TheOrder and (MP.LOBBY.config and MP.LOBBY.config.the_order) then
 		local is_joker = true
 		for k, v in pairs(_t) do
 			if not (type(v) == "table" and v.ability and v.ability.set == "Joker") then
