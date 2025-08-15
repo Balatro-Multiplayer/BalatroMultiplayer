@@ -31,7 +31,7 @@ return {
 			j_mp_skip_off = {
 				name = "Skip-Off",
 				text = {
-					"{C:blue}+#1#{} hand and {C:red}+#2#{} discard",
+					"{C:blue}+#1#{} Hands and {C:red}+#2#{} Discards",
 					"per additional {C:attention}Blind{} skipped",
 					"compared to your {X:purple,C:white}Nemesis{}",
 					"{C:inactive}(Currently {C:blue}+#3#{C:inactive}/{C:red}+#4#{C:inactive}, #5#)",
@@ -96,7 +96,7 @@ return {
 				text = {
 					"At the end of the next {C:attention}PvP Blind{},",
 					"consume this Joker and grant",
-					"{C:red}+#1#{} discard to you and",
+					"{C:red}+#1#{} discards to you and",
 					"{C:red}+#2#{} discards to your {X:purple,C:white}Nemesis{} for the ante",
 				},
 			},
@@ -107,7 +107,7 @@ return {
 					"not in a {C:attention}PvP Blind{}",
 				},
 			},
-			j_mp_hanging_chad = {
+			j_hanging_chad_mp_standard = {
 				name = "Hanging Chad",
 				text = {
 					"Retrigger {C:attention}first{} and {C:attention}second{}",
@@ -131,16 +131,7 @@ return {
 					"played cards with",
 					"{C:hearts}Heart{} suit to give",
 					"{X:mult,C:white} X#3# {} Mult when scored",
-				},
-			},
-			j_mp_bloodstone2 = {
-				name = "Bloodstone",
-				text = {
-					"{C:green}#1# in #2#{} chance for",
-					"played cards with",
-					"{C:hearts}Heart{} suit to give",
-					"{X:mult,C:white} X#3# {} Mult when scored",
-					"(Includes experimental variance)",
+					"{C:inactive}(Includes experimental variance){}",
 				},
 			},
 		},
@@ -208,7 +199,6 @@ return {
 		dictionary = {
 			b_singleplayer = "Singleplayer",
 			b_join_lobby = "Join Lobby",
-			b_join_lobby_clipboard = "Join From Clipboard",
 			b_return_lobby = "Return to Lobby",
 			b_reconnect = "Reconnect",
 			b_create_lobby = "Create Lobby",
@@ -237,7 +227,7 @@ return {
 			b_opts_normal_bosses = "Enable Boss Blind effects",
 			b_opts_timer = "Enable Timer",
 			b_opts_disable_preview = "Disable Score Preview",
-			b_opts_disable_the_order = "Disable The Order (Coming Soon)",
+			b_opts_disable_the_order = "Disable The Order",
 			b_reset = "Reset",
 			b_set_custom_seed = "Set Custom Seed",
 			b_mp_kofi_button = "Supporting me on Ko-fi",
@@ -254,7 +244,6 @@ return {
 			b_skip_tutorial = "Skip Tutorial",
 			k_yes = "Yes",
 			k_no = "No",
-			k_are_you_sure = "Are you sure?",
 			k_has_multiplayer_content = "Has Multiplayer Content",
 			k_forces_lobby_options = "Forces Lobby Options",
 			k_forces_gamemode = "Forces Gamemode",
@@ -307,10 +296,7 @@ return {
 			k_lobby_options = "Lobby Options",
 			k_connect_player = "Connected Players:",
 			k_opts_only_host = "Only the Lobby Host can change these options",
-			k_lobby_general = "General",
-			k_lobby_gameplay = "Gameplay",
-			k_lobby_modifiers = "Modifiers",
-			k_lobby_advanced = "Advanced",
+			k_opts_gm = "Gamemode Modifiers",
 			k_opts_pvp_start_round = "PVP Starts at Ante",
 			k_opts_pvp_timer = "Timer",
 			k_opts_showdown_starting_antes = "Showdown Starts at Ante",
@@ -347,8 +333,7 @@ return {
 			k_survival_description = "The player who beats the farthest blind wins. No Nemesis blinds. This gamemode is a test of your ability to gradually build-up to the highest scoring Vanilla hands.",
 			k_weekly = "Weekly",
 			k_weekly_description = "A special ruleset that changes weekly or bi-weekly. I guess you'll have to find out what it is! Currently: ",
-			k_smallworld = "Small World",
-			k_smallworld_description = "A heavily experimental ruleset, where 3/4 of everything in the game\nis randomly banned for some reason",
+			k_weekly_smallworld = "Small World",
 			k_oops_ex = "Oops!",
 			k_asteroids = "Asteroids",
 			k_amount_short = "Amt.",
