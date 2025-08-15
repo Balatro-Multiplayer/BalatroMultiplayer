@@ -124,7 +124,7 @@ MP.Ruleset({
 	forced_lobby_options = true,
 
 	force_lobby_options = function(self)
-		MP.LOBBY.config.disable_preview = true
+		MP.LOBBY.config.preview_disabled = true
 		MP.LOBBY.config.different_seeds = true
 		return true
 	end,
