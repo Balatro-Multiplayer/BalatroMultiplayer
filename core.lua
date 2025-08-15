@@ -87,6 +87,7 @@ function MP.reset_lobby_config(persist_ruleset_and_gamemode)
 		no_gold_on_round_loss = false,
 		death_on_round_loss = true,
 		different_seeds = false,
+		the_order = true,
 		starting_lives = 4,
 		pvp_start_round = 2,
 		timer_base_seconds = 150,
