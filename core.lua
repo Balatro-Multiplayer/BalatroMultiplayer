@@ -42,6 +42,10 @@ MP.INTEGRATIONS = {
 
 G.C.MULTIPLAYER = HEX("AC3232")
 
+function MP.should_use_the_order()
+	return MP.LOBBY and MP.LOBBY.config and MP.LOBBY.config.the_order
+end
+
 function MP.load_mp_file(file)
 	local chunk, err = SMODS.load_file(file, "Multiplayer")
 	if chunk then
