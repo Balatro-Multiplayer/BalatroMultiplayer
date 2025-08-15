@@ -294,6 +294,7 @@ return {
 			k_warning_no_order = "One player has The Order integration enabled while the other does not. This will cause the seeds to differ.",
 			k_warning_cheating1 = "If you are seeing this, your opponent may be cheating.",
 			k_warning_cheating2 = "If this is a ranked game, please send the message '%s' and then open a support ticket in #support",
+			k_warning_banned_mods = "One or more players have banned mods installed. These mods are not allowed in ranked games.",
 			k_message1 = "Hold on, my mom made pizza pops",
 			k_message2 = "One sec, i gotta grab my slow cooker pork roast",
 			k_message3 = "One moment, getting a call from my mom",

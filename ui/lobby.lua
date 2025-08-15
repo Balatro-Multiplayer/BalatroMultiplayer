@@ -255,6 +255,7 @@ function MP.UI.modlist_to_view(mods, text_colour)
 
 	for mod_name, mod_version in pairs(mods) do
 		local display_text = mod_version and (mod_name .. "-" .. mod_version) or mod_name
+		local color = MP.BANNED_MODS[mod_name] and G.C.RED or text_colour
 		table.insert(t, {
 			n = G.UIT.R,
 			config = {
@@ -268,7 +269,7 @@ function MP.UI.modlist_to_view(mods, text_colour)
 						text = display_text,
 						shadow = true,
 						scale = 0.4,
-						colour = text_colour,
+						colour = color,
 					},
 				},
 			},

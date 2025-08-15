@@ -1,4 +1,16 @@
 MP = SMODS.current_mod
+
+MP.BANNED_MODS = {
+	["Incantation"] = true,
+	["Brainstorm"] = true,
+	["DVPreview"] = true,
+	["Aura"] = true,
+	["NotJustYet"] = true,
+	["Showman"] = true,
+	["TagPreview"] = true,
+	["FantomsPreview"] = true, -- todo replace our preview w a diff name
+}
+
 MP.LOBBY = {
 	connected = false,
 	temp_code = "",
@@ -160,7 +172,6 @@ MP.LOBBY.blind_col = MP.UTILS.get_blind_col()
 
 MP.LOBBY.config.weekly = MP.UTILS.get_weekly()
 
-
 if not SMODS.current_mod.lovely then
 	G.E_MANAGER:add_event(Event({
 		no_delete = true,
@@ -197,7 +208,7 @@ MP.load_mp_dir("ui/components") -- Gamemodes and rulesets need these
 
 MP.load_mp_dir("rulesets")
 if MP.LOBBY.config.weekly then -- this could be a function but why bother
-	MP.load_mp_file("rulesets/weeklies/"..MP.LOBBY.config.weekly..".lua")
+	MP.load_mp_file("rulesets/weeklies/" .. MP.LOBBY.config.weekly .. ".lua")
 end
 MP.load_mp_dir("gamemodes")
 

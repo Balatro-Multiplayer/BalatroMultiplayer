@@ -636,6 +636,21 @@ function MP.UTILS.parse_modlist(mod_string)
 	return mods
 end
 
+function MP.UTILS.get_banned_mods(mods)
+	local banned_mods = {}
+	if not mods then
+		return banned_mods
+	end
+	
+	for mod_name, mod_version in pairs(mods) do
+		if MP.BANNED_MODS[mod_name] then
+			table.insert(banned_mods, mod_name)
+		end
+	end
+	
+	return banned_mods
+end
+
 function MP.UTILS.sum_numbers_in_table(t)
 	local sum = 0
 	for k, v in pairs(t) do
