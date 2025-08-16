@@ -332,6 +332,7 @@ return {
 			k_showdown_description = "After the first 2 antes, every blind is a Nemesis blind. This gamemode gives you time to prepare before battle.",
 			k_survival = "Survival",
 			k_survival_description = "The player who beats the farthest blind wins. No Nemesis blinds. This gamemode is a test of your ability to gradually build-up to the highest scoring Vanilla hands.",
+			k_destabilized = "Destabilized",
 			k_oops_ex = "Oops!",
 			k_asteroids = "Asteroids",
 			k_amount_short = "Amt.",
@@ -390,6 +391,10 @@ return {
 		v_text = {
 			ch_c_hanging_chad_rework = { "{C:attention}Hanging Chad{} is {C:dark_edition}reworked" },
 			ch_c_glass_cards_rework = { "{C:attention}Glass Cards{} are {C:dark_edition}reworked" },
+			ch_c_mp_score_instability = { "Unbalanced score is {C:purple}destabilized{} further:" },
+			ch_c_mp_score_instability_LOC1 = { "  {C:inactive}Minimum of {C:attention}1 {C:mult}Mult" },
+			ch_c_mp_score_instability_LOC2 = { "  {C:inactive}Minimum of {C:attention}0 {C:chips}Chips" },
+			ch_c_mp_ante_scaling = { "{C:red}X#1#{} base Blind size" },
 		},
 		challenge_names = {
 			c_mp_misprint_deck = "Misprint Deck",
@@ -406,6 +411,7 @@ return {
 			c_mp_skip_off = "Skip-Off",
 			c_mp_lets_go_gambling = "Let's Go Gambling",
 			c_mp_speed = "Speed",
+			c_mp_balancing_act = "Balancing Act",
 		},
 	},
 }

@@ -70,3 +70,14 @@ pattern = '''{string = 'rand()', colour = G.C.JOKER_GREY},{string = "#@"..(G.dec
 position = "at"
 payload = '''{string = 'rand()', colour = G.C.JOKER_GREY},{string = "#@"..(mp_collection and 'NOPE' or G.deck and G.deck.cards[1] and G.deck.cards[#G.deck.cards].base.id or 11)..(mp_collection and '' or G.deck and G.deck.cards[1] and G.deck.cards[#G.deck.cards].base.suit:sub(1,1) or 'D'), colour = G.C.RED},'''
 match_indent = true
+
+# there's no other way to do ante scaling in challenges other than patching lol
+[[patches]]
+[patches.pattern]
+target = "game.lua"
+pattern = '''elseif v.value then'''
+position = "before"
+payload = '''
+elseif v.id == 'mp_ante_scaling' then
+	self.GAME.starting_params.ante_scaling = v.value'''
+match_indent = true
