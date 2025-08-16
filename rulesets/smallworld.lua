@@ -20,9 +20,7 @@ MP.Ruleset({ -- just a copy of ranked... and every weekly ruleset in vault is in
 		"m_glass"
 	},
 	reworked_tags = {},
-	reworked_blinds = {
-		"bl_mp_nemesis"
-	},
+	reworked_blinds = {},
 	create_info_menu = function ()
 		return {
 			{
@@ -103,7 +101,6 @@ MP.Ruleset({ -- just a copy of ranked... and every weekly ruleset in vault is in
 			},
 		}
 	end,
-	forced_lobby_options = true,
 }):inject()
 
 local apply_bans_ref = MP.ApplyBans
