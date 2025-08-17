@@ -1,6 +1,3 @@
-local Disableable_Toggle = MP.UI.Disableable_Toggle
-local Disableable_Button = MP.UI.Disableable_Button
-
 local function send_lobby_options(value)
 	MP.ACTIONS.lobby_options()
 end
@@ -129,7 +126,7 @@ local function create_custom_seed_section()
 									align = "cr",
 								},
 								nodes = {
-									Disableable_Button({
+									MP.UI.Disableable_Button({
 										id = "custom_seed_overlay",
 										button = "custom_seed_overlay",
 										colour = G.C.BLUE,
@@ -153,7 +150,7 @@ local function create_custom_seed_section()
 											h = 0.1,
 										},
 									},
-									Disableable_Button({
+									MP.UI.Disableable_Button({
 										id = "custom_seed_reset",
 										button = "custom_seed_reset",
 										colour = G.C.RED,

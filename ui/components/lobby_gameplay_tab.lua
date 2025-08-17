@@ -1,6 +1,3 @@
-local Disableable_Toggle = MP.UI.Disableable_Toggle
-local Disableable_Button = MP.UI.Disableable_Button
-
 function MP.UI.create_gameplay_options_tab()
 	return {
 		n = G.UIT.ROOT,
