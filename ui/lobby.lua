@@ -150,16 +150,28 @@ function G.UIDEF.create_UIBox_lobby_options()
 						colour = G.C.BOOSTER,
 						tabs = {
 							{
-								label = localize("k_lobby_options"),
+								label = localize("k_lobby_general"),
 								chosen = true,
 								tab_definition_function = function()
 									return MP.UI.create_lobby_options_tab()
 								end,
 							},
 							{
-								label = localize("k_opts_gm"),
+								label = localize("k_lobby_gameplay"),
+								tab_definition_function = function()
+									return MP.UI.create_gameplay_options_tab()
+								end,
+							},
+							{
+								label = localize("k_lobby_modifiers"),
 								tab_definition_function = function()
 									return MP.UI.create_gamemode_modifiers_tab()
+								end,
+							},
+							{
+								label = localize("k_lobby_advanced"),
+								tab_definition_function = function()
+									return MP.UI.create_advanced_options_tab()
 								end,
 							},
 						},
