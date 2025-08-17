@@ -186,29 +186,29 @@ end
 
 function G.UIDEF.ruleset_selection_options()
 	MP.LOBBY.fetched_weekly = 'smallworld' -- temp
-	MP.LOBBY.config.ruleset = "ruleset_mp_ranked"
-	MP.LoadReworks("ranked")
+	MP.LOBBY.config.ruleset = "ruleset_mp_blitz"
+	MP.LoadReworks("blitz")
 
 	local default_ruleset_area = UIBox({
-		definition = G.UIDEF.ruleset_info("ranked"),
+		definition = G.UIDEF.ruleset_info("blitz"),
 		config = { align = "cm" }
 	})
 
 	local ruleset_buttons_data = {
-		{
-			name = "k_competitive",
-			buttons = {
-				{ button_id = "ranked_ruleset_button",      button_localize_key = "k_ranked" },
-				{ button_id = "majorleague_ruleset_button", button_localize_key = "k_majorleague" },
-				{ button_id = "minorleague_ruleset_button", button_localize_key = "k_minorleague" },
-			}
-		},
 		{
 			name = "k_standard",
 			buttons = {
 				{ button_id = "blitz_ruleset_button",       button_localize_key = "k_blitz" },
 				{ button_id = "traditional_ruleset_button", button_localize_key = "k_traditional" },
 				{ button_id = "vanilla_ruleset_button",     button_localize_key = "k_vanilla" },
+			}
+		},
+		{
+			name = "k_competitive",
+			buttons = {
+				{ button_id = "ranked_ruleset_button",      button_localize_key = "k_ranked" },
+				{ button_id = "majorleague_ruleset_button", button_localize_key = "k_majorleague" },
+				{ button_id = "minorleague_ruleset_button", button_localize_key = "k_minorleague" },
 			}
 		},
 		{
