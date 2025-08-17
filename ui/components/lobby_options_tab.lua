@@ -1,116 +1,25 @@
 local Disableable_Toggle = MP.UI.Disableable_Toggle
-local Disableable_Button = MP.UI.Disableable_Button
 
 -- TODO repetition but w/e...
-local function send_lobby_options(value)
+function send_lobby_options(value)
 	MP.ACTIONS.lobby_options()
 end
 
-function G.FUNCS.custom_seed_overlay(e)
-	G.FUNCS.overlay_menu({
-		definition = G.UIDEF.create_UIBox_custom_seed_overlay(),
+function create_lobby_option_cycle(id, label_key, scale, options, current_option, callback)
+	return MP.UI.Disableable_Option_Cycle({
+		id = id,
+		enabled_ref_table = MP.LOBBY,
+		enabled_ref_value = "is_host",
+		label = localize(label_key),
+		scale = scale,
+		options = options,
+		current_option = current_option,
+		opt_callback = callback,
 	})
-end
-
-function G.FUNCS.custom_seed_reset(e)
-	MP.LOBBY.config.custom_seed = "random"
-	send_lobby_options()
-end
-
-function G.UIDEF.create_UIBox_custom_seed_overlay()
-	return create_UIBox_generic_options({
-		back_func = "lobby_options",
-		contents = {
-			{
-				n = G.UIT.R,
-				config = { align = "cm", colour = G.C.CLEAR },
-				nodes = {
-					{
-						n = G.UIT.C,
-						config = { align = "cm", minw = 0.1 },
-						nodes = {
-							create_text_input({
-								max_length = 8,
-								all_caps = true,
-								ref_table = MP.LOBBY,
-								ref_value = "temp_seed",
-								prompt_text = localize("k_enter_seed"),
-								keyboard_offset = 4,
-								callback = function(val)
-									MP.LOBBY.config.custom_seed = MP.LOBBY.temp_seed
-									send_lobby_options()
-								end,
-							}),
-							{
-								n = G.UIT.B,
-								config = { w = 0.1, h = 0.1 },
-							},
-							{
-								n = G.UIT.T,
-								config = {
-									scale = 0.3,
-									text = localize("k_enter_to_save"),
-									colour = G.C.UI.TEXT_LIGHT,
-								},
-							},
-						},
-					},
-				},
-			},
-		},
-	})
-end
-
-function toggle_different_seeds()
-	G.FUNCS.lobby_options()
-	send_lobby_options()
-end
-
-G.FUNCS.change_starting_lives = function(args)
-	MP.LOBBY.config.starting_lives = args.to_val
-	send_lobby_options()
-end
-
-G.FUNCS.change_starting_pvp_round = function(args)
-	MP.LOBBY.config.pvp_start_round = args.to_val
-	send_lobby_options()
-end
-
-G.FUNCS.change_timer_base_seconds = function(args)
-	MP.LOBBY.config.timer_base_seconds = tonumber(args.to_val:sub(1, -2))
-	send_lobby_options()
-end
-
-G.FUNCS.change_timer_increment_seconds = function(args)
-	MP.LOBBY.config.timer_increment_seconds = tonumber(args.to_val:sub(1, -2))
-	send_lobby_options()
-end
-
-G.FUNCS.change_showdown_starting_antes = function(args)
-	MP.LOBBY.config.showdown_starting_antes = args.to_val
-	send_lobby_options()
-end
-
-G.FUNCS.change_pvp_countdown_seconds = function(args)
-	MP.LOBBY.config.pvp_countdown_seconds = args.to_val
-	send_lobby_options()
-end
-
--- This needs to have a parameter because its a callback for inputs
-local function send_lobby_options(value)
-	MP.ACTIONS.lobby_options()
-end
-
-function G.FUNCS.display_custom_seed(e)
-	local display = MP.LOBBY.config.custom_seed == "random" and localize("k_random") or MP.LOBBY.config.custom_seed
-	if display ~= e.children[1].config.text then
-		e.children[2].config.text = display
-		e.UIBox:recalculate(true)
-	end
 end
 
 -- Component for lobby options tab containing toggles and custom seed section
-local function create_lobby_option_toggle(id, label_key, ref_value, callback)
+function create_lobby_option_toggle(id, label_key, ref_value, callback)
 	return {
 		n = G.UIT.R,
 		config = {
@@ -131,111 +40,14 @@ local function create_lobby_option_toggle(id, label_key, ref_value, callback)
 	}
 end
 
-local function create_custom_seed_section()
-	if MP.LOBBY.config.different_seeds then
-		return { n = G.UIT.B, config = { w = 0.1, h = 0.1 } }
-	end
+G.FUNCS.change_starting_lives = function(args)
+	MP.LOBBY.config.starting_lives = args.to_val
+	send_lobby_options()
+end
 
-	return {
-		n = G.UIT.R,
-		config = { padding = 0, align = "cr" },
-		nodes = {
-			{
-				n = G.UIT.R,
-				config = {
-					padding = 0,
-					align = "cr",
-				},
-				nodes = {
-					{
-						n = G.UIT.C,
-						config = {
-							padding = 0,
-							align = "cm",
-						},
-						nodes = {
-							{
-								n = G.UIT.R,
-								config = {
-									padding = 0.2,
-									align = "cr",
-									func = "display_custom_seed",
-								},
-								nodes = {
-									{
-										n = G.UIT.T,
-										config = {
-											scale = 0.45,
-											text = localize("k_current_seed"),
-											colour = G.C.UI.TEXT_LIGHT,
-										},
-									},
-									{
-										n = G.UIT.T,
-										config = {
-											scale = 0.45,
-											text = MP.LOBBY.config.custom_seed,
-											colour = G.C.UI.TEXT_LIGHT,
-										},
-									},
-								},
-							},
-							{
-								n = G.UIT.R,
-								config = {
-									padding = 0.2,
-									align = "cr",
-								},
-								nodes = {
-									Disableable_Button({
-										id = "custom_seed_overlay",
-										button = "custom_seed_overlay",
-										colour = G.C.BLUE,
-										minw = 3.65,
-										minh = 0.6,
-										label = {
-											localize("b_set_custom_seed"),
-										},
-										disabled_text = {
-											localize("b_set_custom_seed"),
-										},
-										scale = 0.45,
-										col = true,
-										enabled_ref_table = MP.LOBBY,
-										enabled_ref_value = "is_host",
-									}),
-									{
-										n = G.UIT.B,
-										config = {
-											w = 0.1,
-											h = 0.1,
-										},
-									},
-									Disableable_Button({
-										id = "custom_seed_reset",
-										button = "custom_seed_reset",
-										colour = G.C.RED,
-										minw = 1.65,
-										minh = 0.6,
-										label = {
-											localize("b_reset"),
-										},
-										disabled_text = {
-											localize("b_reset"),
-										},
-										scale = 0.45,
-										col = true,
-										enabled_ref_table = MP.LOBBY,
-										enabled_ref_value = "is_host",
-									}),
-								},
-							},
-						},
-					},
-				},
-			},
-		},
-	}
+-- This needs to have a parameter because its a callback for inputs
+local function send_lobby_options(value)
+	MP.ACTIONS.lobby_options()
 end
 
 -- Creates the lobby options tab UI containing toggles for various multiplayer settings
@@ -245,7 +57,7 @@ function MP.UI.create_lobby_options_tab()
 		n = G.UIT.ROOT,
 		config = {
 			emboss = 0.05,
-			minh = 6,
+			minh = 4,
 			r = 0.1,
 			minw = 10,
 			align = "tm",
@@ -253,24 +65,17 @@ function MP.UI.create_lobby_options_tab()
 			colour = G.C.BLACK,
 		},
 		nodes = {
-			create_lobby_option_toggle("gold_on_life_loss_toggle", "b_opts_cb_money", "gold_on_life_loss"),
-			create_lobby_option_toggle(
-				"no_gold_on_round_loss_toggle",
-				"b_opts_no_gold_on_loss",
-				"no_gold_on_round_loss"
-			),
-			create_lobby_option_toggle("death_on_round_loss_toggle", "b_opts_death_on_loss", "death_on_round_loss"),
-			create_lobby_option_toggle(
-				"different_seeds_toggle",
-				"b_opts_diff_seeds",
-				"different_seeds",
-				toggle_different_seeds
+			create_lobby_option_cycle(
+				"starting_lives_option",
+				"b_opts_lives",
+				0.85,
+				{ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16 },
+				MP.LOBBY.config.starting_lives,
+				"change_starting_lives"
 			),
 			create_lobby_option_toggle("different_decks_toggle", "b_opts_player_diff_deck", "different_decks"),
 			create_lobby_option_toggle("multiplayer_jokers_toggle", "b_opts_multiplayer_jokers", "multiplayer_jokers"),
-			create_lobby_option_toggle("timer_toggle", "b_opts_timer", "timer"),
-			create_lobby_option_toggle("normal_bosses_toggle", "b_opts_normal_bosses", "normal_bosses"),
-			create_custom_seed_section(),
+			create_lobby_option_toggle("normal_bosses_toggle", "b_opts_normal_bosses", "normal_bosses")
 		},
 	}
 end
