@@ -5,6 +5,7 @@ MP.Ruleset({
 	banned_jokers = {
 		"j_mp_speedrun",
 		"j_mp_conjoined_joker",
+		"j_hanging_chad",
 	},
 	banned_consumables = {
 		"c_justice",
@@ -12,24 +13,24 @@ MP.Ruleset({
 	banned_vouchers = {},
 	banned_enhancements = {},
 	banned_tags = {},
-	banned_blinds ={},
+	banned_blinds = {},
 
 	reworked_jokers = {
-		"j_hanging_chad",
+		"j_mp_hanging_chad",
 	},
 	reworked_consumables = {},
 	reworked_vouchers = {},
 	reworked_enhancements = {
-		"m_glass"
+		"m_glass",
 	},
 	reworked_tags = {},
 	reworked_blinds = {},
-	create_info_menu = function ()
+	create_info_menu = function()
 		return {
 			{
 				n = G.UIT.R,
 				config = {
-					align = "tm"
+					align = "tm",
 				},
 				nodes = {
 					MP.UI.BackgroundGrouping(localize("k_has_multiplayer_content"), {
@@ -39,15 +40,15 @@ MP.Ruleset({
 								text = localize("k_yes"),
 								scale = 0.8,
 								colour = G.C.GREEN,
-							}
-						}
-					}, {col = true, text_scale = 0.6}),
+							},
+						},
+					}, { col = true, text_scale = 0.6 }),
 					{
 						n = G.UIT.C,
 						config = {
 							minw = 0.1,
-							minh = 0.1
-						}
+							minh = 0.1,
+						},
 					},
 					MP.UI.BackgroundGrouping(localize("k_forces_lobby_options"), {
 						{
@@ -56,15 +57,15 @@ MP.Ruleset({
 								text = localize("k_no"),
 								scale = 0.8,
 								colour = G.C.RED,
-							}
-						}
-					}, {col = true, text_scale = 0.6}),
+							},
+						},
+					}, { col = true, text_scale = 0.6 }),
 					{
 						n = G.UIT.C,
 						config = {
 							minw = 0.1,
-							minh = 0.1
-						}
+							minh = 0.1,
+						},
 					},
 					MP.UI.BackgroundGrouping(localize("k_forces_gamemode"), {
 						{
@@ -73,23 +74,23 @@ MP.Ruleset({
 								text = localize("k_no"),
 								scale = 0.8,
 								colour = G.C.RED,
-							}
-						}
-					}, {col = true, text_scale = 0.6})
+							},
+						},
+					}, { col = true, text_scale = 0.6 }),
 				},
 			},
 			{
 				n = G.UIT.R,
 				config = {
 					minw = 0.05,
-					minh = 0.05
-				}
+					minh = 0.05,
+				},
 			},
 			{
 				n = G.UIT.R,
 				config = {
 					align = "cl",
-					padding = 0.1
+					padding = 0.1,
 				},
 				nodes = {
 					{
@@ -98,7 +99,7 @@ MP.Ruleset({
 							text = localize("k_traditional_description"),
 							scale = 0.6,
 							colour = G.C.UI.TEXT_LIGHT,
-						}
+						},
 					},
 				},
 			},
@@ -107,5 +108,5 @@ MP.Ruleset({
 	force_lobby_options = function(self)
 		MP.LOBBY.config.timer = false
 		return false
-	end
+	end,
 }):inject()
