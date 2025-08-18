@@ -844,6 +844,12 @@ function G.UIDEF.create_UIBox_join_lobby_button()
 								}),
 							},
 						},
+						MP.LOBBY.connected and UIBox_button({
+							label = { localize("b_join_lobby") },
+							colour = G.C.RED,
+							button = "join_lobby",
+							minw = 5,
+						}) or nil,
 					},
 				},
 			},
@@ -913,7 +919,7 @@ function G.UIDEF.override_main_menu_play_button()
 				}) or nil,
 				MP.LOBBY.connected and UIBox_button({
 					label = { localize("b_join_lobby_clipboard") },
-					colour = G.C.BLUE,
+					colour = G.C.GOLD,
 					button = "join_from_clipboard",
 					minw = 5,
 				}) or nil,
@@ -1015,6 +1021,8 @@ function G.FUNCS.join_lobby(e)
 	G.FUNCS.overlay_menu({
 		definition = G.UIDEF.create_UIBox_join_lobby_button(),
 	})
+	local text_input = G.OVERLAY_MENU:get_UIE_by_ID('text_input')
+	G.FUNCS.select_text_input(text_input)
 end
 
 function G.FUNCS.weekly_interrupt(e)
@@ -1042,7 +1050,8 @@ function G.FUNCS.skip_tutorial(e)
 end
 
 function G.FUNCS.join_from_clipboard(e)
-	MP.LOBBY.temp_code = MP.UTILS.get_from_clipboard()
+	local paste = MP.UTILS.get_from_clipboard()
+	MP.LOBBY.temp_code = string.sub(string.upper(paste:gsub("[^%a]", "")), 1, 5) -- cursed
 	MP.ACTIONS.join_lobby(MP.LOBBY.temp_code)
 end
 
