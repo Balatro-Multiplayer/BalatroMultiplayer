@@ -143,6 +143,12 @@ return {
 					"(Includes experimental variance)",
 				},
 			},
+			j_mp_the_broker = {
+				name = "The Broker",
+				text = {
+					"???",
+				},
+			},
 		},
 		Planet = {
 			c_mp_asteroid = {
