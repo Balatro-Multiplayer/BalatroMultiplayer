@@ -1312,11 +1312,7 @@ function Game:start_run(args)
 	G.HUD:recalculate();
 end
 
-local create_UIBox_game_over_ref = create_UIBox_game_over
-function create_UIBox_game_over()
-	if not MP.LOBBY.code then
-		return create_UIBox_game_over_ref()
-	end
+local function create_UIBox_mp_game_end(has_won)
 	MP.end_game_jokers = CardArea(
 		0,
 		0,
@@ -1329,23 +1325,38 @@ function create_UIBox_game_over()
 	else
 		G.FUNCS.load_end_game_jokers()
 	end
-	MP.ACTIONS.request_nemesis_stats()
 	MP.end_game_jokers_text = localize("k_enemy_jokers")
-	MP.nemesis_deck = CardArea(-100, -100, G.CARD_W, G.CARD_H, { type = 'deck' })
+
+	MP.ACTIONS.request_nemesis_stats()
+
+	MP.nemesis_deck = CardArea(-100, -100, G.CARD_W, G.CARD_H, { type = "deck" })
 	MP.nemesis_cards = {}
 	if not MP.nemesis_deck_received then
 		MP.ACTIONS.get_nemesis_deck()
 	else
 		G.FUNCS.load_nemesis_deck()
 	end
+
 	G.SETTINGS.paused = false
-	local eased_red = copy_table(G.GAME.round_resets.ante <= G.GAME.win_ante and G.C.RED or G.C.BLUE)
-	eased_red[4] = 0
-	ease_value(eased_red, 4, 0.8, nil, nil, true)
+
+	local eased_bg_colour
+	if has_won then
+		eased_bg_colour = copy_table(G.C.GREEN)
+		eased_bg_colour[4] = 0
+		ease_value(eased_bg_colour, 4, 0.5, nil, nil, true)
+	else
+		eased_bg_colour = copy_table(G.GAME.round_resets.ante <= G.GAME.win_ante and G.C.RED or G.C.BLUE)
+		eased_bg_colour[4] = 0
+		ease_value(eased_bg_colour, 4, 0.8, nil, nil, true)
+	end
+
 	local t = create_UIBox_generic_options({
-		bg_colour = eased_red,
-		no_back = true,
 		padding = 0,
+		bg_colour = eased_bg_coulour,
+		colour = has_won and G.C.BLACK or nil,
+		outline_colour = has_won and G.C.EDITION or nil,
+		no_back = true,
+		no_esc = has_won,
 		contents = {
 			{
 				n = G.UIT.R,
@@ -1355,10 +1366,12 @@ function create_UIBox_game_over()
 						n = G.UIT.O,
 						config = {
 							object = DynaText({
-								string = { localize("ph_game_over") },
-								colours = { G.C.RED },
+								string = { has_won and localize("ph_you_win") or localize("ph_game_over") },
+								colours = { has_won and G.C.EDITION or G.C.RED },
 								shadow = true,
 								float = true,
+								spacing = has_won and 10 or nil,
+								rotate = has_won,
 								scale = 1.5,
 								pop_in = 0.4,
 								maxw = 6.5,
@@ -1405,12 +1418,12 @@ function create_UIBox_game_over()
 									{
 										n = G.UIT.C,
 										config = {
-											maxw = 1,
-											minw = 1,
+											maxw = has_won and 0.8 or 1,
+											minw = has_won and 0.8 or 1,
 											minh = 0.7,
 											colour = G.C.CLEAR,
-											no_fill = false
-										}
+											no_fill = false,
+										},
 									},
 									{
 										n = G.UIT.C,
@@ -1435,358 +1448,9 @@ function create_UIBox_game_over()
 													colour = G.C.UI.TEXT_LIGHT,
 													scale = 0.65,
 													col = true,
-												}
-											}
-										}
-									},
-									{
-										n = G.UIT.C,
-										config = {
-											button = "view_nemesis_deck",
-											align = "cm",
-											padding = 0.12,
-											colour = G.C.BLUE,
-											emboss = 0.05,
-											minh = 0.7,
-											minw = 2,
-											maxw = 2,
-											r = 0.1,
-											shadow = true,
-											hover = true,
-										},
-										nodes = {
-											{
-												n = G.UIT.T,
-												config = {
-													text = localize("b_view_nemesis_deck"),
-													colour = G.C.UI.TEXT_LIGHT,
-													scale = 0.65,
-													col = true,
-												}
-											}
-										}
-									},
-									{
-										n = G.UIT.C,
-										config = {
-											maxw = 1,
-											minw = 1,
-											minh = 0.7,
-											colour = G.C.CLEAR,
-											no_fill = false
-										}
-									},
-								}
-							},
-							{
-								n = G.UIT.R,
-								config = { align = "cm" },
-								nodes = {
-									{
-										n = G.UIT.C,
-										config = { align = "cm", padding = 0.08 },
-										nodes = {
-											create_UIBox_round_scores_row("hand"),
-											create_UIBox_round_scores_row("poker_hand"),
-											{
-												n = G.UIT.R,
-												config = { align = "cm", padding = 0.08, minw = 2 },
-												nodes = {
-													{
-														n = G.UIT.T,
-														config = {
-															text = localize("ml_mp_kofi_message")[1],
-															scale = 0.35,
-															colour = G.C.UI.TEXT_LIGHT,
-															col = true,
-														},
-													},
-												},
-											},
-											{
-												n = G.UIT.R,
-												config = { align = "cm", padding = 0.08, minw = 2 },
-												nodes = {
-													{
-														n = G.UIT.T,
-														config = {
-															text = localize("ml_mp_kofi_message")[2],
-															scale = 0.35,
-															colour = G.C.UI.TEXT_LIGHT,
-															col = true,
-														},
-													},
-												},
-											},
-											{
-												n = G.UIT.R,
-												config = { align = "cm", padding = 0.08, minw = 2 },
-												nodes = {
-													{
-														n = G.UIT.T,
-														config = {
-															text = localize("ml_mp_kofi_message")[3],
-															scale = 0.35,
-															colour = G.C.UI.TEXT_LIGHT,
-															col = true,
-														},
-													},
-												},
-											},
-											{
-												n = G.UIT.R,
-												config = { align = "cm", padding = 0.08, minw = 2 },
-												nodes = {
-													{
-														n = G.UIT.T,
-														config = {
-															text = localize("ml_mp_kofi_message")[4],
-															scale = 0.35,
-															colour = G.C.UI.TEXT_LIGHT,
-															col = true,
-														},
-													},
-												},
-											},
-											{
-												n = G.UIT.R,
-												config = {
-													id = "ko-fi_button",
-													align = "cm",
-													padding = 0.1,
-													r = 0.1,
-													hover = true,
-													colour = HEX("72A5F2"),
-													button = "open_kofi",
-													shadow = true,
-												},
-												nodes = {
-													{
-														n = G.UIT.R,
-														config = {
-															align = "cm",
-															padding = 0,
-															no_fill = true,
-															maxw = 3,
-														},
-														nodes = {
-															{
-																n = G.UIT.T,
-																config = {
-																	text = localize("b_mp_kofi_button"),
-																	scale = 0.35,
-																	colour = G.C.UI.TEXT_LIGHT,
-																},
-															},
-														},
-													},
 												},
 											},
 										},
-									},
-									{
-										n = G.UIT.C,
-										config = { align = "tr", padding = 0.08 },
-										nodes = {
-											create_UIBox_round_scores_row("furthest_ante", G.C.FILTER),
-											create_UIBox_round_scores_row("furthest_round", G.C.FILTER),
-											create_UIBox_round_scores_row("seed", G.C.WHITE),
-											UIBox_button({
-												button = "copy_seed",
-												label = { localize("b_copy") },
-												colour = G.C.BLUE,
-												scale = 0.3,
-												minw = 2.3,
-												minh = 0.4,
-											}),
-											{
-												n = G.UIT.R,
-												config = { align = "cm", minh = 0.4, minw = 0.1 },
-												nodes = {},
-											},
-											UIBox_button({
-												id = "from_game_won",
-												button = "mp_return_to_lobby",
-												label = { localize("b_return_lobby") },
-												minw = 2.5,
-												maxw = 2.5,
-												minh = 1,
-												focus_args = { nav = "wide", snap_to = true },
-											}),
-											UIBox_button({
-												button = "lobby_leave",
-												label = { localize("b_leave_lobby") },
-												minw = 2.5,
-												maxw = 2.5,
-												minh = 1,
-												focus_args = { nav = "wide" },
-											}),
-										},
-									},
-								},
-							},
-						},
-					},
-				},
-			},
-		},
-	})
-	t.nodes[1] = {
-		n = G.UIT.R,
-		config = { align = "cm", padding = 0.1 },
-		nodes = {
-			{
-				n = G.UIT.C,
-				config = { align = "cm", padding = 2 },
-				nodes = {
-					{
-						n = G.UIT.O,
-						config = {
-							padding = 0,
-							id = "jimbo_spot",
-							object = Moveable(0, 0, G.CARD_W * 1.1, G.CARD_H * 1.1),
-						},
-					},
-				},
-			},
-			{ n = G.UIT.C, config = { align = "cm", padding = 0.1 }, nodes = { t.nodes[1] } },
-		},
-	}
-
-	return t
-end
-
-local create_UIBox_win_ref = create_UIBox_win
-function create_UIBox_win()
-	if not MP.LOBBY.code then
-		return create_UIBox_win_ref()
-	end
-	MP.end_game_jokers = CardArea(
-		0,
-		0,
-		5 * G.CARD_W,
-		G.CARD_H,
-		{ card_limit = G.GAME.starting_params.joker_slots, type = "joker", highlight_limit = 1 }
-	)
-	if not MP.end_game_jokers_received then
-		MP.ACTIONS.get_end_game_jokers()
-	else
-		G.FUNCS.load_end_game_jokers()
-	end
-	MP.end_game_jokers_text = localize("k_enemy_jokers")
-	MP.ACTIONS.request_nemesis_stats()
-	MP.nemesis_deck = CardArea(-100, -100, G.CARD_W, G.CARD_H, { type = 'deck' })
-	MP.nemesis_cards = {}
-	if not MP.nemesis_deck_received then
-		MP.ACTIONS.get_nemesis_deck()
-	else
-		G.FUNCS.load_nemesis_deck()
-	end
-	G.SETTINGS.paused = false
-	local eased_green = copy_table(G.C.GREEN)
-	eased_green[4] = 0
-	ease_value(eased_green, 4, 0.5, nil, nil, true)
-	local t = create_UIBox_generic_options({
-		padding = 0,
-		bg_colour = eased_green,
-		colour = G.C.BLACK,
-		outline_colour = G.C.EDITION,
-		no_back = true,
-		no_esc = true,
-		contents = {
-			{
-				n = G.UIT.R,
-				config = { align = "cm" },
-				nodes = {
-					{
-						n = G.UIT.O,
-						config = {
-							object = DynaText({
-								string = { localize("ph_you_win") },
-								colours = { G.C.EDITION },
-								shadow = true,
-								float = true,
-								spacing = 10,
-								rotate = true,
-								scale = 1.5,
-								pop_in = 0.4,
-								maxw = 6.5,
-							}),
-						},
-					},
-				},
-			},
-			{
-				n = G.UIT.R,
-				config = { align = "cm", padding = 0.15 },
-				nodes = {
-					{
-						n = G.UIT.C,
-						config = { align = "cm" },
-						nodes = {
-							{
-								n = G.UIT.R,
-								config = { align = "cm", padding = 0.08 },
-								nodes = {
-									{
-										n = G.UIT.T,
-										config = {
-											ref_table = MP,
-											ref_value = "end_game_jokers_text",
-											scale = 0.8,
-											maxw = 5,
-											shadow = true,
-										},
-									},
-								},
-							},
-							{
-								n = G.UIT.R,
-								config = { align = "cm", padding = 0.08 },
-								nodes = {
-									{ n = G.UIT.O, config = { object = MP.end_game_jokers } },
-								},
-							},
-							{
-								n = G.UIT.R,
-								config = { align = "cm", padding = 0.08 },
-								nodes = {
-									{
-										n = G.UIT.C,
-										config = {
-											maxw = 0.8,
-											minw = 0.8,
-											minh = 0.7,
-											colour = G.C.CLEAR,
-											no_fill = false
-										}
-									},
-									{
-										n = G.UIT.C,
-										config = {
-											button = "toggle_players_jokers",
-											align = "cm",
-											padding = 0.12,
-											colour = G.C.BLUE,
-											emboss = 0.05,
-											minh = 0.7,
-											minw = 2,
-											maxw = 2,
-											r = 0.1,
-											shadow = true,
-											hover = true,
-										},
-										nodes = {
-											{
-												n = G.UIT.T,
-												config = {
-													text = localize("b_toggle_jokers"),
-													colour = G.C.UI.TEXT_LIGHT,
-													scale = 0.65,
-													col = true,
-												}
-											}
-										}
 									},
 									{
 										n = G.UIT.C,
@@ -1803,7 +1467,7 @@ function create_UIBox_win()
 											r = 0.1,
 											shadow = true,
 											hover = true,
-											focus_args = { nav = "wide" },
+											focus_args = has_won and { nav = "wide" } or nil,
 										},
 										nodes = {
 											{
@@ -1813,21 +1477,21 @@ function create_UIBox_win()
 													colour = G.C.UI.TEXT_LIGHT,
 													scale = 0.65,
 													col = true,
-												}
-											}
-										}
+												},
+											},
+										},
 									},
 									{
 										n = G.UIT.C,
 										config = {
-											maxw = 0.8,
-											minw = 0.8,
+											maxw = has_won and 0.8 or 1,
+											minw = has_won and 0.8 or 1,
 											minh = 0.7,
 											colour = G.C.CLEAR,
-											no_fill = false
-										}
+											no_fill = false,
+										},
 									},
-								}
+								},
 							},
 							{
 								n = G.UIT.R,
@@ -1996,6 +1660,7 @@ function create_UIBox_win()
 			},
 		},
 	})
+
 	t.nodes[1] = {
 		n = G.UIT.R,
 		config = { align = "cm", padding = 0.1 },
@@ -2017,9 +1682,28 @@ function create_UIBox_win()
 			{ n = G.UIT.C, config = { align = "cm", padding = 0.1 }, nodes = { t.nodes[1] } },
 		},
 	}
-	--t.nodes[1].config.mid = true
-	t.config.id = "you_win_UI"
+
+	if has_won then
+		t.config.id = "you_win_UI"
+	end
+
 	return t
+end
+
+local create_UIBox_game_over_ref = create_UIBox_game_over
+function create_UIBox_game_over()
+	if not MP.LOBBY.code then
+		return create_UIBox_game_over_ref()
+	end
+	return create_UIBox_mp_game_end(false)
+end
+
+local create_UIBox_win_ref = create_UIBox_win
+function create_UIBox_win()
+	if not MP.LOBBY.code then
+		return create_UIBox_win_ref()
+	end
+	return create_UIBox_mp_game_end(true)
 end
 
 function G.FUNCS.overlay_endgame_menu()
