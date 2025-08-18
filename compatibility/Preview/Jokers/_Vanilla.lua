@@ -669,9 +669,20 @@ FNSJ.simulate_throwback = function(joker_obj, context)
    FN.SIM.JOKERS.x_mult_if_global(joker_obj, context)
 end
 FNSJ.simulate_hanging_chad = function(joker_obj, context)
-   if context.cardarea == G.play and context.repetition then
-      if context.other_card == context.scoring_hand[1] and not context.other_card.debuff then
-         FN.SIM.add_reps(joker_obj.ability.extra)
+   if joker_obj.ability.extra == 1 then
+      if context.cardarea == G.play and context.repetition then
+         if context.other_card == context.scoring_hand[1] and not context.other_card.debuff then
+            FN.SIM.add_reps(joker_obj.ability.extra)
+         end
+         if context.other_card == context.scoring_hand[2] and not context.other_card.debuff then
+            FN.SIM.add_reps(joker_obj.ability.extra)
+         end
+      end
+   else
+      if context.cardarea == G.play and context.repetition then
+         if context.other_card == context.scoring_hand[1] and not context.other_card.debuff then
+            FN.SIM.add_reps(joker_obj.ability.extra)
+         end
       end
    end
 end
