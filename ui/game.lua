@@ -1345,14 +1345,14 @@ local function create_UIBox_mp_game_end(has_won)
 		eased_bg_colour[4] = 0
 		ease_value(eased_bg_colour, 4, 0.5, nil, nil, true)
 	else
-		eased_bg_colour = copy_table(G.GAME.round_resets.ante <= G.GAME.win_ante and G.C.RED or G.C.BLUE)
+		eased_bg_colour = copy_table(G.C.RED)
 		eased_bg_colour[4] = 0
 		ease_value(eased_bg_colour, 4, 0.8, nil, nil, true)
 	end
 
 	local t = create_UIBox_generic_options({
 		padding = 0,
-		bg_colour = eased_bg_coulour,
+		bg_colour = eased_bg_colour,
 		colour = has_won and G.C.BLACK or nil,
 		outline_colour = has_won and G.C.EDITION or nil,
 		no_back = true,
