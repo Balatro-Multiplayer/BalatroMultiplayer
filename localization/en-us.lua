@@ -183,6 +183,34 @@ return {
 				},
 			},
 		},
+		Back = {
+			b_mp_violet = {
+				name = "Violet Deck",
+				text = {
+					"{C:attention}+1{} Voucher in shop",
+					"During Ante {C:attention}1{}, Vouchers",
+					"are {C:attention}50%{} off",
+				},
+			},
+			b_mp_sibyl = {
+				name = "Sibyl Deck",
+				text = {
+					"{C:planet}Planets{}, {C:attention}playing cards{}, and",
+					"{C:spectral}Spectral Packs{} will not appear",
+					"Start run with {C:spectral,T:c_medium}Medium",
+					"The only {C:spectral}Spectral{} card",
+					"is {C:spectral,T:c_medium}Medium",
+				},
+			},
+			b_mp_gradient = {
+				name = "Gradient Deck",
+				text = {
+					"Cards are also considered",
+					"one rank {C:attention}higher{} or {C:attention}lower",
+					"for all {C:attention}Joker{} effects",
+				},
+			},
+		},
 		Other = {
 			current_nemesis = {
 				name = "Nemesis",
