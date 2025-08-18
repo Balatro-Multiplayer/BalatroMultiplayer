@@ -1,6 +1,8 @@
 SMODS.Back({
 	key = "sibyl",
 	config = { consumables = {'c_medium'} },
+	atlas = "mp_decks",
+	pos = {x = 3, y = 0},
 	apply = function(self)
 		local spec_bans = {
 			j_constellation = true,
@@ -40,7 +42,7 @@ SMODS.Back({
 	end,
 })
 
--- billionth create card ref ever
+-- billionth create card hook ever
 local create_card_ref = create_card
 function create_card(_type, area, legendary, _rarity, skip_materialize, soulable, forced_key, key_append)
 	if G.GAME.modifiers.mp_sibyl and _type == "Spectral" then

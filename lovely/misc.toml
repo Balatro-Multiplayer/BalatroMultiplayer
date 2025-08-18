@@ -70,3 +70,15 @@ pattern = '''{string = 'rand()', colour = G.C.JOKER_GREY},{string = "#@"..(G.dec
 position = "at"
 payload = '''{string = 'rand()', colour = G.C.JOKER_GREY},{string = "#@"..(mp_collection and 'NOPE' or G.deck and G.deck.cards[1] and G.deck.cards[#G.deck.cards].base.id or 11)..(mp_collection and '' or G.deck and G.deck.cards[1] and G.deck.cards[#G.deck.cards].base.suit:sub(1,1) or 'D'), colour = G.C.RED},'''
 match_indent = true
+
+# this seed is passed through a billion functions, and never global scoped
+# just give it to us
+[[patches]]
+[patches.pattern]
+target = "game.lua"
+pattern = 'self.GAME.selected_back_key = selected_back'
+position = "after"
+payload = '''
+G._MP_SET_SEED = args.seed
+'''
+match_indent = true

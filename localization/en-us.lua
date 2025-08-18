@@ -184,12 +184,20 @@ return {
 			},
 		},
 		Back = {
-			b_mp_violet = {
-				name = "Violet Deck",
+			b_mp_cocktail = {
+				name = "Cocktail Deck",
 				text = {
-					"{C:attention}+1{} Voucher in shop",
-					"During Ante {C:attention}1{}, Vouchers",
-					"are {C:attention}50%{} off",
+					"Copies all effects",
+					"of {C:attention}3{} other decks",
+					"at random",
+				},
+			},
+			b_mp_gradient = {
+				name = "Gradient Deck",
+				text = {
+					"Cards are also considered",
+					"one rank {C:attention}higher{} or {C:attention}lower",
+					"for all {C:attention}Joker{} effects",
 				},
 			},
 			b_mp_sibyl = {
@@ -202,12 +210,12 @@ return {
 					"is {C:spectral,T:c_medium}Medium",
 				},
 			},
-			b_mp_gradient = {
-				name = "Gradient Deck",
+			b_mp_violet = {
+				name = "Violet Deck",
 				text = {
-					"Cards are also considered",
-					"one rank {C:attention}higher{} or {C:attention}lower",
-					"for all {C:attention}Joker{} effects",
+					"{C:attention}+1{} Voucher in shop",
+					"During Ante {C:attention}1{}, Vouchers",
+					"are {C:attention}50%{} off",
 				},
 			},
 		},

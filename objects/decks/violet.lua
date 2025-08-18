@@ -1,6 +1,8 @@
 SMODS.Back({
 	key = "violet",
 	config = {},
+	atlas = "mp_decks",
+	pos = {x = 0, y = 0},
 	apply = function(self)
 		SMODS.change_voucher_limit(1)
 		G.GAME.modifiers.mp_violet = true -- i forgot how you get the deck, whatever

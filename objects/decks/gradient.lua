@@ -1,6 +1,8 @@
 SMODS.Back({
 	key = "gradient",
 	config = {},
+	atlas = "mp_decks",
+	pos = {x = 0, y = 1},
 	apply = function(self)
 		G.GAME.modifiers.mp_gradient = true -- i forgot how you get the deck, whatever
 	end,
@@ -59,7 +61,7 @@ local function valid_trigger(card, joker)
 	end
 	if key == 'j_8_ball' then
 		return rank_check{9, 8, 7} -- i don't know if this is necessary? just prevents extra checks ig
-	elseif key == 'j_business_card' or key == 'j_reserved_parking' then
+	elseif key == 'j_business' or key == 'j_reserved_parking' then
 		return card:is_face()
 	elseif key == 'j_bloodstone' or key == 'j_mp_bloodstone' or key == 'j_mp_bloodstone2' then
 		return card:is_suit("Hearts")
@@ -84,7 +86,7 @@ end
 local calculate_joker_ref = Card.calculate_joker
 function Card:calculate_joker(context)
 	if not context.blueprint then -- very important because bloopy recursively calls this
-		if G.GAME.modifiers.mp_gradient and context.other_card then
+		if G.GAME.modifiers.mp_gradient and (context.other_card or self.config.center.key == 'j_superposition' or self.config.center.key == 'j_sixth_sense') then
 			for i = 1, 3 do
 				G.MP_GRADIENT = -i + 2
 				for i, card in ipairs(G.playing_cards) do -- it's actually insane that this doesn't blow up the game??? this is being run thousands of times wastefully
