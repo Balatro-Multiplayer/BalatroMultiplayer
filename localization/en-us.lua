@@ -149,6 +149,14 @@ return {
 					"???",
 				},
 			},
+			j_mp_vagabond_cheese = {
+				name = "Vagabond",
+				text = {
+					"Create a {C:purple}Tarot{} card",
+					"if hand is played",
+					"with {C:money}$4{} or less",
+				},
+			},
 		},
 		Planet = {
 			c_mp_asteroid = {
