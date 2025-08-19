@@ -75,15 +75,12 @@ function MP.UI.create_lobby_options_tab()
 			),
 			create_lobby_option_toggle("different_decks_toggle", "b_opts_player_diff_deck", "different_decks"),
 			create_lobby_option_toggle("multiplayer_jokers_toggle", "b_opts_multiplayer_jokers", "multiplayer_jokers"),
-<<<<<<< HEAD
 			create_lobby_option_toggle("normal_bosses_toggle", "b_opts_normal_bosses", "normal_bosses")
-=======
 			create_lobby_option_toggle("timer_toggle", "b_opts_timer", "timer"),
 			create_lobby_option_toggle("normal_bosses_toggle", "b_opts_normal_bosses", "normal_bosses"),
 			create_lobby_option_toggle("preview_disabled_toggle", "b_opts_disable_preview", "preview_disabled"),
 			create_lobby_option_toggle("order_toggle", "b_opts_the_order", "the_order"),
 			create_custom_seed_section(),
->>>>>>> 0b34288 (Boom add lobby options)
 		},
 	}
 end
