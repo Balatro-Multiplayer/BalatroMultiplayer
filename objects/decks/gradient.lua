@@ -68,11 +68,10 @@ local function valid_trigger(card, joker)
 	end
 end
 
--- honestly couldn't tell you why this doesn't work normally, but it doesn't
 local is_face_ref = Card.is_face
 function Card:is_face(from_boss)
 	local ret = is_face_ref(self, from_boss)
-	if G.GAME.modifiers.mp_gradient then
+	if G.GAME.modifiers.mp_gradient and not G.MP_GRADIENT then
 		local id = self:get_id() -- like seriously i want an explanation
 		if self.debuff and not from_boss then return end
 		if not ret and id == 10 or id == 14 then
@@ -82,11 +81,25 @@ function Card:is_face(from_boss)
 	return ret
 end
 
+-- hardcoded functions because honk shoo
+local function passkey(key)
+	if key == 'j_superposition' or key == 'j_sixth_sense' then
+		return true
+	end
+	return false
+end
+local function blacklist(key)
+	if key == 'j_photograph' or key == 'j_faceless' then
+		return true
+	end
+	return false
+end
+
 -- infamous calculate joker hook
 local calculate_joker_ref = Card.calculate_joker
 function Card:calculate_joker(context)
 	if not context.blueprint then -- very important because bloopy recursively calls this
-		if G.GAME.modifiers.mp_gradient and (context.other_card or self.config.center.key == 'j_superposition' or self.config.center.key == 'j_sixth_sense') then
+		if G.GAME.modifiers.mp_gradient and (context.other_card or passkey(self.config.center.key)) and not blacklist(self.config.center.key) then
 			for i = 1, 3 do
 				G.MP_GRADIENT = -i + 2
 				for i, card in ipairs(G.playing_cards) do -- it's actually insane that this doesn't blow up the game??? this is being run thousands of times wastefully

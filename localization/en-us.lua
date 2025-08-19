@@ -200,6 +200,14 @@ return {
 					"for all {C:attention}Joker{} effects",
 				},
 			},
+			b_mp_orange = {
+				name = "Orange Deck",
+				text = {
+					"Start run with a",
+					"{C:attention,T:p_mp_standard_giga}Giga Standard Pack{}, and",
+					"{C:attention}2{} copies of {C:tarot,T:c_hanged_man}The Hanged Man",
+				},
+			},
 			b_mp_sibyl = {
 				name = "Sibyl Deck",
 				text = {
@@ -226,6 +234,15 @@ return {
 					"{X:purple,C:white}#1#{}",
 					"Your one and only Nemesis",
 				},
+			},
+			p_mp_standard_giga = {
+				name = "Giga Standard Pack",
+				text = {
+					"Choose {C:attention}#1#{} of up to",
+					"{C:attention}#2#{C:attention} Playing{} cards to",
+					"add to your deck",
+					"{C:attention}Unskippable{}",
+				}
 			},
 		},
 	},
@@ -383,6 +400,7 @@ return {
 			k_weekly_description = "A special ruleset that changes weekly or bi-weekly. I guess you'll have to find out what it is! Currently: ",
 			k_smallworld = "Small World",
 			k_smallworld_description = "A heavily experimental ruleset, where 3/4 of everything in the game\nis randomly banned for some reason",
+			k_destabilized = "Destabilized",
 			k_oops_ex = "Oops!",
 			k_asteroids = "Asteroids",
 			k_amount_short = "Amt.",
@@ -441,6 +459,10 @@ return {
 		v_text = {
 			ch_c_hanging_chad_rework = { "{C:attention}Hanging Chad{} is {C:dark_edition}reworked" },
 			ch_c_glass_cards_rework = { "{C:attention}Glass Cards{} are {C:dark_edition}reworked" },
+			ch_c_mp_score_instability = { "Unbalanced score is {C:purple}destabilized{} further:" },
+			ch_c_mp_score_instability_LOC1 = { "  {C:inactive}Minimum of {C:attention}1 {C:mult}Mult" },
+			ch_c_mp_score_instability_LOC2 = { "  {C:inactive}Minimum of {C:attention}0 {C:chips}Chips" },
+			ch_c_mp_ante_scaling = { "{C:red}X#1#{} base Blind size" },
 		},
 		challenge_names = {
 			c_mp_misprint_deck = "Misprint Deck",
@@ -457,6 +479,7 @@ return {
 			c_mp_skip_off = "Skip-Off",
 			c_mp_lets_go_gambling = "Let's Go Gambling",
 			c_mp_speed = "Speed",
+			c_mp_balancing_act = "Balancing Act",
 		},
 	},
 }

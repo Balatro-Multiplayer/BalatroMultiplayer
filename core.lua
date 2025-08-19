@@ -206,6 +206,7 @@ MP.load_mp_dir("objects/blinds")
 MP.load_mp_dir("objects/decks")
 MP.load_mp_dir("objects/jokers")
 MP.load_mp_dir("objects/consumables")
+MP.load_mp_dir("objects/boosters")
 MP.load_mp_dir("objects/challenges")
 
 MP.load_mp_dir("ui")
