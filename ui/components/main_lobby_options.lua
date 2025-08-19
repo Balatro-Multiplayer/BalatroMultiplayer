@@ -12,28 +12,49 @@ local function create_main_lobby_options_title(info_area_id)
 		title = localize("k_gamemodes")
 	end
 
-	if title == "ERROR" then
-		return nil
-	end
+	if title == "ERROR" then return nil end
 
 	return {
 		n = G.UIT.R,
-		config = { id = 'ruleset_name', align = "cm", padding = 0.07 },
+		config = { id = "ruleset_name", align = "cm", padding = 0.07 },
 		nodes = {
 			{
 				n = G.UIT.R,
-				config = { align = "cm", r = 0.1, outline = 1, outline_colour = title_colour, colour = darken(title_colour, 0.3), minw = 2.9, emboss = 0.1, padding = 0.07, line_emboss = 1 },
+				config = {
+					align = "cm",
+					r = 0.1,
+					outline = 1,
+					outline_colour = title_colour,
+					colour = darken(title_colour, 0.3),
+					minw = 2.9,
+					emboss = 0.1,
+					padding = 0.07,
+					line_emboss = 1,
+				},
 				nodes = {
-					{ n = G.UIT.O, config = { object = DynaText({ string = title, colours = { G.C.WHITE }, shadow = true, float = true, y_offset = -4, scale = 0.45, maxw = 2.8 }) } },
-				}
+					{
+						n = G.UIT.O,
+						config = {
+							object = DynaText({
+								string = title,
+								colours = { G.C.WHITE },
+								shadow = true,
+								float = true,
+								y_offset = -4,
+								scale = 0.45,
+								maxw = 2.8,
+							}),
+						},
+					},
+				},
 			},
-		}
+		},
 	}
 end
 
 function MP.UI.Main_Lobby_Options(info_area_id, default_info_area, button_func, buttons_data)
 	local categories = {
-		create_main_lobby_options_title(info_area_id)
+		create_main_lobby_options_title(info_area_id),
 	}
 	for cat_idx, category in ipairs(buttons_data) do
 		local buttons = {}
@@ -49,12 +70,11 @@ function MP.UI.Main_Lobby_Options(info_area_id, default_info_area, button_func, 
 				col = true,
 				chosen = (cat_idx == 1 and btn_idx == 1 and "vert" or false),
 				label = { localize(data.button_localize_key) },
-				button =
-					button_func,
+				button = button_func,
 				colour = col,
 				minw = 4,
 				scale = 0.4,
-				minh = 0.6
+				minh = 0.6,
 			})
 			buttons[#buttons + 1] = { n = G.UIT.R, config = { align = "cm", padding = 0.05 }, nodes = { button } }
 		end
@@ -69,10 +89,10 @@ function MP.UI.Main_Lobby_Options(info_area_id, default_info_area, button_func, 
 				n = G.UIT.C,
 				config = { align = "cm", minh = 8, maxh = 8, minw = 11 },
 				nodes = {
-					{ n = G.UIT.O, config = { id = info_area_id, object = default_info_area } }
-				}
-			}
-		}
+					{ n = G.UIT.O, config = { id = info_area_id, object = default_info_area } },
+				},
+			},
+		},
 	})
 end
 
@@ -97,7 +117,7 @@ function MP.UI.Change_Main_Lobby_Options(e, info_area_id, info_area_func, defaul
 	if info_area.config.object then info_area.config.object:remove() end
 	info_area.config.object = UIBox({
 		definition = info_area_func(info_obj_name),
-		config = { align = "cm", parent = info_area }
+		config = { align = "cm", parent = info_area },
 	})
 
 	info_area.config.object:recalculate()

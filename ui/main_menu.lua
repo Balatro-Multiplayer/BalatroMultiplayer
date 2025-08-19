@@ -43,10 +43,10 @@ function wheel_of_fortune_the_card(card)
 	local chance = math.random(4)
 	if chance == 1 then
 		local editions = {
-			{ name = 'e_foil',       weight = 499 },
-			{ name = 'e_holo',       weight = 350 },
-			{ name = 'e_polychrome', weight = 150 },
-			{ name = 'e_negative',   weight = 1 }
+			{ name = "e_foil", weight = 499 },
+			{ name = "e_holo", weight = 350 },
+			{ name = "e_polychrome", weight = 150 },
+			{ name = "e_negative", weight = 1 },
 		}
 		local edition = poll_edition("main_menu" .. os.time(), nil, nil, true, editions)
 		card:set_edition(edition, true)
@@ -63,18 +63,14 @@ local function has_mod_manipulating_title_card()
 	-- (must use the mod's id, not its name)
 	local modlist = { "BUMod", "Cryptid", "Talisman" }
 	for _, modname in ipairs(modlist) do
-		if SMODS.Mods[modname] and SMODS.Mods[modname].can_load then
-			return true
-		end
+		if SMODS.Mods[modname] and SMODS.Mods[modname].can_load then return true end
 	end
 	return false
 end
 
 function make_wheel_of_fortune_a_card_func(card)
 	return function()
-		if card then
-			wheel_of_fortune_the_card(card)
-		end
+		if card then wheel_of_fortune_the_card(card) end
 		return true
 	end
 end
@@ -84,9 +80,7 @@ MP.title_card = nil
 function add_custom_multiplayer_cards(change_context)
 	local only_mod_affecting_title_card = not has_mod_manipulating_title_card()
 
-	if only_mod_affecting_title_card then
-		G.title_top.cards[1]:set_base(G.P_CARDS["S_A"], true)
-	end
+	if only_mod_affecting_title_card then G.title_top.cards[1]:set_base(G.P_CARDS["S_A"], true) end
 
 	-- Credit to the Cryptid mod for the original code to add a card to the main menu
 	local title_card = create_card("Base", G.title_top, nil, nil, nil, nil)
@@ -185,31 +179,31 @@ function Game:main_menu(change_context)
 end
 
 function G.UIDEF.ruleset_selection_options()
-	MP.LOBBY.fetched_weekly = 'smallworld' -- temp
+	MP.LOBBY.fetched_weekly = "smallworld" -- temp
 	MP.LOBBY.config.ruleset = "ruleset_mp_ranked"
 	MP.LoadReworks("ranked")
 
 	local default_ruleset_area = UIBox({
 		definition = G.UIDEF.ruleset_info("ranked"),
-		config = { align = "cm" }
+		config = { align = "cm" },
 	})
 
 	local ruleset_buttons_data = {
 		{
 			name = "k_competitive",
 			buttons = {
-				{ button_id = "ranked_ruleset_button",      button_localize_key = "k_ranked" },
+				{ button_id = "ranked_ruleset_button", button_localize_key = "k_ranked" },
 				{ button_id = "majorleague_ruleset_button", button_localize_key = "k_majorleague" },
 				{ button_id = "minorleague_ruleset_button", button_localize_key = "k_minorleague" },
-			}
+			},
 		},
 		{
 			name = "k_standard",
 			buttons = {
-				{ button_id = "blitz_ruleset_button",       button_localize_key = "k_blitz" },
+				{ button_id = "blitz_ruleset_button", button_localize_key = "k_blitz" },
 				{ button_id = "traditional_ruleset_button", button_localize_key = "k_traditional" },
-				{ button_id = "vanilla_ruleset_button",     button_localize_key = "k_vanilla" },
-			}
+				{ button_id = "vanilla_ruleset_button", button_localize_key = "k_vanilla" },
+			},
 		},
 		{
 			name = "k_other",
@@ -217,21 +211,27 @@ function G.UIDEF.ruleset_selection_options()
 				{ button_id = "badlatro_ruleset_button", button_localize_key = "k_badlatro" },
 				{ button_id = "sandbox_ruleset_button", button_localize_key = "k_sandbox" },
 				{ button_id = "smallworld_ruleset_button", button_localize_key = "k_smallworld" },
-			}
-		}
+			},
+		},
 	}
 
-	return MP.UI.Main_Lobby_Options("ruleset_area", default_ruleset_area,
-		"change_ruleset_selection", ruleset_buttons_data)
+	return MP.UI.Main_Lobby_Options(
+		"ruleset_area",
+		default_ruleset_area,
+		"change_ruleset_selection",
+		ruleset_buttons_data
+	)
 end
 
 function G.FUNCS.change_ruleset_selection(e)
-	if e.config.id == 'weekly_ruleset_button' then
-		if G.FUNCS.weekly_interrupt(e) then
-			return
-		end
+	if e.config.id == "weekly_ruleset_button" then
+		if G.FUNCS.weekly_interrupt(e) then return end
 	end
-	MP.UI.Change_Main_Lobby_Options(e, "ruleset_area", G.UIDEF.ruleset_info, "ranked_ruleset_button",
+	MP.UI.Change_Main_Lobby_Options(
+		e,
+		"ruleset_area",
+		G.UIDEF.ruleset_info,
+		"ranked_ruleset_button",
 		function(ruleset_name)
 			MP.LOBBY.config.ruleset = "ruleset_mp_" .. ruleset_name
 			MP.LoadReworks(ruleset_name)
@@ -246,7 +246,7 @@ function G.UIDEF.ruleset_info(ruleset_name)
 
 	local ruleset_info_banned_rework_tabs = UIBox({
 		definition = G.UIDEF.ruleset_tabs(ruleset),
-		config = { align = "cm" }
+		config = { align = "cm" },
 	})
 
 	local ruleset_disabled = ruleset.is_disabled()
@@ -263,8 +263,8 @@ function G.UIDEF.ruleset_info(ruleset_name)
 						n = G.UIT.R,
 						config = { align = "cm" },
 						nodes = {
-							{ n = G.UIT.O, config = { object = ruleset_info_banned_rework_tabs } }
-						}
+							{ n = G.UIT.O, config = { object = ruleset_info_banned_rework_tabs } },
+						},
 					},
 					{
 						n = G.UIT.R,
@@ -272,8 +272,8 @@ function G.UIDEF.ruleset_info(ruleset_name)
 						nodes = {
 							MP.UI.Disableable_Button({
 								id = "select_gamemode_button",
-								button = ruleset.forced_gamemode and "force_" .. ruleset.forced_gamemode or
-									"select_gamemode",
+								button = ruleset.forced_gamemode and "force_" .. ruleset.forced_gamemode
+									or "select_gamemode",
 								align = "cm",
 								padding = 0.05,
 								r = 0.1,
@@ -286,20 +286,20 @@ function G.UIDEF.ruleset_info(ruleset_name)
 								scale = 0.5,
 								enabled_ref_table = { val = not ruleset_disabled },
 								enabled_ref_value = "val",
-								disabled_text = { ruleset_disabled }
-							})
-						}
-					}
-				}
-			}
-		}
+								disabled_text = { ruleset_disabled },
+							}),
+						},
+					},
+				},
+			},
+		},
 	}
 end
 
 function G.UIDEF.ruleset_tabs(ruleset)
 	local default_tabs = UIBox({
 		definition = G.UIDEF.lobby_setup_tabs_definition(ruleset, "info", 1, true),
-		config = { align = "cm", tab_type = "info", chosen_tab = 1 }
+		config = { align = "cm", tab_type = "info", chosen_tab = 1 },
 	})
 
 	return {
@@ -314,8 +314,8 @@ function G.UIDEF.ruleset_tabs(ruleset)
 						n = G.UIT.R,
 						config = { align = "tm", colour = G.C.GREY, r = 0.1 },
 						nodes = {
-							{ n = G.UIT.O, config = { object = default_tabs } }
-						}
+							{ n = G.UIT.O, config = { object = default_tabs } },
+						},
 					},
 					{
 						n = G.UIT.R,
@@ -328,13 +328,13 @@ function G.UIDEF.ruleset_tabs(ruleset)
 								opt_args = { ui = default_tabs, ruleset = ruleset },
 								w = 5,
 								colour = G.C.RED,
-								cycle_shoulders = false
-							})
-						}
-					}
-				}
-			}
-		}
+								cycle_shoulders = false,
+							}),
+						},
+					},
+				},
+			},
+		},
 	}
 end
 
@@ -371,7 +371,7 @@ function G.FUNCS.ruleset_switch_tabs(args)
 	tabs_wrap.config.object:remove()
 	tabs_wrap.config.object = UIBox({
 		definition = def,
-		config = { align = "cm", parent = tabs_wrap }
+		config = { align = "cm", parent = tabs_wrap },
 	})
 
 	tabs_wrap.UIBox:recalculate()
@@ -431,24 +431,84 @@ local function create_bans_and_reworks_tabs(ruleset_or_gamemode, is_banned_tab, 
 	end
 
 	local forced_gamemode = nil
-	if ruleset_or_gamemode.forced_gamemode then
-		forced_gamemode = MP.Gamemodes[ruleset_or_gamemode.forced_gamemode]
-	end
+	if ruleset_or_gamemode.forced_gamemode then forced_gamemode = MP.Gamemodes[ruleset_or_gamemode.forced_gamemode] end
 
 	for k, v in ipairs({
-		{ type = localize("b_jokers"), obj_ids = is_banned_tab and copy_all_banned_ids(MP.DECK.BANNED_JOKERS, ruleset_or_gamemode.banned_jokers, forced_gamemode and forced_gamemode.banned_jokers) or merge_lists(ruleset_or_gamemode.reworked_jokers, forced_gamemode and forced_gamemode.reworked_jokers) },
-		{ type = localize("b_stat_consumables"), obj_ids = is_banned_tab and copy_all_banned_ids(MP.DECK.BANNED_CONSUMABLES, ruleset_or_gamemode.banned_consumables, forced_gamemode and forced_gamemode.banned_consumables) or merge_lists(ruleset_or_gamemode.reworked_consumables, forced_gamemode and forced_gamemode.reworked_consumables) },
-		{ type = localize("b_vouchers"), obj_ids = is_banned_tab and copy_all_banned_ids(MP.DECK.BANNED_VOUCHERS, ruleset_or_gamemode.banned_vouchers, forced_gamemode and forced_gamemode.banned_vouchers) or merge_lists(ruleset_or_gamemode.reworked_vouchers, forced_gamemode and forced_gamemode.reworked_vouchers) },
-		{ type = localize("b_enhanced_cards"), obj_ids = is_banned_tab and copy_all_banned_ids(MP.DECK.BANNED_ENHANCEMENTS, ruleset_or_gamemode.banned_enhancements, forced_gamemode and forced_gamemode.banned_enhancements) or merge_lists(ruleset_or_gamemode.reworked_enhancements, forced_gamemode and forced_gamemode.reworked_enhancements) },
-		{ type = localize("k_other"), obj_ids = is_banned_tab and { tags = copy_all_banned_ids(MP.DECK.BANNED_TAGS, ruleset_or_gamemode.banned_tags, forced_gamemode and forced_gamemode.banned_tags), blinds = copy_all_banned_ids(MP.DECK.BANNED_BLINDS, ruleset_or_gamemode.banned_blinds, forced_gamemode and forced_gamemode.banned_blinds) } or { tags = merge_lists(ruleset_or_gamemode.reworked_tags or {}, forced_gamemode and forced_gamemode.reworked_tags), blinds = merge_lists(ruleset_or_gamemode.reworked_blinds or {}, forced_gamemode and forced_gamemode.reworked_blinds) } } })
-	do
+		{
+			type = localize("b_jokers"),
+			obj_ids = is_banned_tab
+					and copy_all_banned_ids(
+						MP.DECK.BANNED_JOKERS,
+						ruleset_or_gamemode.banned_jokers,
+						forced_gamemode and forced_gamemode.banned_jokers
+					)
+				or merge_lists(ruleset_or_gamemode.reworked_jokers, forced_gamemode and forced_gamemode.reworked_jokers),
+		},
+		{
+			type = localize("b_stat_consumables"),
+			obj_ids = is_banned_tab and copy_all_banned_ids(
+				MP.DECK.BANNED_CONSUMABLES,
+				ruleset_or_gamemode.banned_consumables,
+				forced_gamemode and forced_gamemode.banned_consumables
+			) or merge_lists(
+				ruleset_or_gamemode.reworked_consumables,
+				forced_gamemode and forced_gamemode.reworked_consumables
+			),
+		},
+		{
+			type = localize("b_vouchers"),
+			obj_ids = is_banned_tab and copy_all_banned_ids(
+				MP.DECK.BANNED_VOUCHERS,
+				ruleset_or_gamemode.banned_vouchers,
+				forced_gamemode and forced_gamemode.banned_vouchers
+			) or merge_lists(
+				ruleset_or_gamemode.reworked_vouchers,
+				forced_gamemode and forced_gamemode.reworked_vouchers
+			),
+		},
+		{
+			type = localize("b_enhanced_cards"),
+			obj_ids = is_banned_tab and copy_all_banned_ids(
+				MP.DECK.BANNED_ENHANCEMENTS,
+				ruleset_or_gamemode.banned_enhancements,
+				forced_gamemode and forced_gamemode.banned_enhancements
+			) or merge_lists(
+				ruleset_or_gamemode.reworked_enhancements,
+				forced_gamemode and forced_gamemode.reworked_enhancements
+			),
+		},
+		{
+			type = localize("k_other"),
+			obj_ids = is_banned_tab and {
+				tags = copy_all_banned_ids(
+					MP.DECK.BANNED_TAGS,
+					ruleset_or_gamemode.banned_tags,
+					forced_gamemode and forced_gamemode.banned_tags
+				),
+				blinds = copy_all_banned_ids(
+					MP.DECK.BANNED_BLINDS,
+					ruleset_or_gamemode.banned_blinds,
+					forced_gamemode and forced_gamemode.banned_blinds
+				),
+			} or {
+				tags = merge_lists(
+					ruleset_or_gamemode.reworked_tags or {},
+					forced_gamemode and forced_gamemode.reworked_tags
+				),
+				blinds = merge_lists(
+					ruleset_or_gamemode.reworked_blinds or {},
+					forced_gamemode and forced_gamemode.reworked_blinds
+				),
+			},
+		},
+	}) do
 		v.idx = k
 		v.is_banned_tab = is_banned_tab
 		local tab_def = {
 			label = v.type,
 			chosen = (k == chosen_tab_idx),
 			tab_definition_function = G.UIDEF.ruleset_cardarea_definition,
-			tab_definition_function_args = v
+			tab_definition_function_args = v,
 		}
 		table.insert(banned_cards_tabs, tab_def)
 	end
@@ -464,9 +524,9 @@ local function create_bans_and_reworks_tabs(ruleset_or_gamemode, is_banned_tab, 
 				text_scale = 0.36,
 				no_shoulders = true,
 				no_loop = true,
-				tabs = banned_cards_tabs
-			})
-		}
+				tabs = banned_cards_tabs,
+			}),
+		},
 	}
 end
 
@@ -484,9 +544,9 @@ function G.UIDEF.lobby_setup_tabs_definition(ruleset_or_gamemode, tab_type, chos
 			{
 				n = G.UIT.C,
 				config = { align = "tm", padding = 0.2, r = 0.1, minw = 10.7, maxw = 10.7, minh = 5.75, maxh = 5.75 },
-				nodes = ruleset_or_gamemode.create_info_menu()
-			}
-		}
+				nodes = ruleset_or_gamemode.create_info_menu(),
+			},
+		},
 	}
 end
 
@@ -499,7 +559,7 @@ function G.UIDEF.ruleset_cardarea_definition(args)
 			local n_rows = math.max(1, 1 + math.floor(#obj_ids / 10) - math.floor(math.log(6, #obj_ids)))
 			local max_width = 1
 			for k, v in ipairs(obj_ids) do
-				local _row = math.ceil(n_rows * (k / (#obj_ids)))
+				local _row = math.ceil(n_rows * (k / #obj_ids))
 				card_rows[_row] = card_rows[_row] or {}
 				card_rows[_row][#card_rows[_row] + 1] = v
 				if #card_rows[_row] > max_width then max_width = #card_rows[_row] end
@@ -508,33 +568,34 @@ function G.UIDEF.ruleset_cardarea_definition(args)
 			local card_size = math.max(0.3, 0.8 - 0.01 * (max_width * n_rows))
 
 			for _, card_row in ipairs(card_rows) do
-				local card_area = CardArea(
-					0, 0,
-					width, height / n_rows,
-					{
-						card_limit = nil,
-						type = 'title_2',
-						view_deck = true,
-						highlight_limit = 0,
-						card_w = G.CARD_W *
-							card_size
-					}
-				)
+				local card_area = CardArea(0, 0, width, height / n_rows, {
+					card_limit = nil,
+					type = "title_2",
+					view_deck = true,
+					highlight_limit = 0,
+					card_w = G.CARD_W * card_size,
+				})
 
 				for k, v in ipairs(card_row) do -- Each card_row consists of Card IDs
-					local card = Card(0, 0, G.CARD_W * card_size, G.CARD_H * card_size, nil, G.P_CENTERS[v],
-						{ bypass_discovery_center = true, bypass_discovery_ui = true })
+					local card = Card(
+						0,
+						0,
+						G.CARD_W * card_size,
+						G.CARD_H * card_size,
+						nil,
+						G.P_CENTERS[v],
+						{ bypass_discovery_center = true, bypass_discovery_ui = true }
+					)
 					card_area:emplace(card)
 				end
 
-				table.insert(ret,
-					{
-						n = G.UIT.R,
-						config = { align = "cm" },
-						nodes = {
-							{ n = G.UIT.O, config = { object = card_area } }
-						}
-					})
+				table.insert(ret, {
+					n = G.UIT.R,
+					config = { align = "cm" },
+					nodes = {
+						{ n = G.UIT.O, config = { object = card_area } },
+					},
+				})
 			end
 		end
 
@@ -543,7 +604,9 @@ function G.UIDEF.ruleset_cardarea_definition(args)
 
 	local function get_ruleset_obj_grid(obj_ids, obj_ref_table, objs_per_row, obj_constructor, wrap_as_object)
 		local objs = {}
-		for _, v in ipairs(obj_ids) do objs[#objs + 1] = obj_ref_table[v] end
+		for _, v in ipairs(obj_ids) do
+			objs[#objs + 1] = obj_ref_table[v]
+		end
 		-- table.sort(objs, function (a, b) return a.order < b.order end)
 
 		local obj_grid = {}
@@ -557,10 +620,8 @@ function G.UIDEF.ruleset_cardarea_definition(args)
 				n = G.UIT.C,
 				config = { align = "cm", padding = 0.1 },
 				nodes = {
-					wrap_as_object
-					and { n = G.UIT.O, config = { object = obj } }
-					or obj
-				}
+					wrap_as_object and { n = G.UIT.O, config = { object = obj } } or obj,
+				},
 			})
 		end
 		for _, v in ipairs(obj_rows) do
@@ -572,10 +633,30 @@ function G.UIDEF.ruleset_cardarea_definition(args)
 
 	local function get_localised_label(objs, obj_type)
 		return (#objs > 0)
-			and
-			{ n = G.UIT.T, config = { text = localize({ type = "variable", key = args.is_banned_tab and "k_banned_objs" or "k_reworked_objs", vars = { obj_type } }), colour = lighten(G.C.L_BLACK, 0.5), scale = 0.33 } }
-			or
-			{ n = G.UIT.T, config = { text = localize({ type = "variable", key = args.is_banned_tab and "k_no_banned_objs" or "k_no_reworked_objs", vars = { obj_type } }), colour = lighten(G.C.L_BLACK, 0.5), scale = 0.33 } }
+				and {
+					n = G.UIT.T,
+					config = {
+						text = localize({
+							type = "variable",
+							key = args.is_banned_tab and "k_banned_objs" or "k_reworked_objs",
+							vars = { obj_type },
+						}),
+						colour = lighten(G.C.L_BLACK, 0.5),
+						scale = 0.33,
+					},
+				}
+			or {
+				n = G.UIT.T,
+				config = {
+					text = localize({
+						type = "variable",
+						key = args.is_banned_tab and "k_no_banned_objs" or "k_no_reworked_objs",
+						vars = { obj_type },
+					}),
+					colour = lighten(G.C.L_BLACK, 0.5),
+					scale = 0.33,
+				},
+			}
 	end
 
 	if args.type == localize("k_other") then
@@ -584,11 +665,17 @@ function G.UIDEF.ruleset_cardarea_definition(args)
 		end
 
 		local function blind_constructor(blind_spec)
-			local temp_blind = AnimatedSprite(0, 0, 1.1, 1.1,
-				G.ANIMATION_ATLAS[blind_spec.atlas] or G.ANIMATION_ATLAS['blind_chips'], blind_spec.pos)
+			local temp_blind = AnimatedSprite(
+				0,
+				0,
+				1.1,
+				1.1,
+				G.ANIMATION_ATLAS[blind_spec.atlas] or G.ANIMATION_ATLAS["blind_chips"],
+				blind_spec.pos
+			)
 			temp_blind:define_draw_steps({
-				{ shader = 'dissolve', shadow_height = 0.05 },
-				{ shader = 'dissolve' }
+				{ shader = "dissolve", shadow_height = 0.05 },
+				{ shader = "dissolve" },
 			})
 			temp_blind.float = true
 			temp_blind.states.hover.can = true
@@ -603,17 +690,18 @@ function G.UIDEF.ruleset_cardarea_definition(args)
 						juice_up(temp_blind, 0.05, 0.02)
 						temp_blind.config.h_popup = create_UIBox_blind_popup(blind_spec, true)
 						temp_blind.config.h_popup_config = {
-							align = 'cl',
+							align = "cl",
 							offset = { x = -0.1, y = 0 },
-							parent =
-								temp_blind
+							parent = temp_blind,
 						}
 						Node.hover(temp_blind)
 					end
 				end
 			end
 			temp_blind.stop_hover = function()
-				temp_blind.hovering = false; Node.stop_hover(temp_blind); temp_blind.hover_tilt = 0
+				temp_blind.hovering = false
+				Node.stop_hover(temp_blind)
+				temp_blind.hover_tilt = 0
 			end
 
 			return temp_blind
@@ -630,19 +718,27 @@ function G.UIDEF.ruleset_cardarea_definition(args)
 					n = G.UIT.C,
 					config = { align = "cm", padding = 0.05, r = 0.1, minw = 5.4, minh = 4.8, maxh = 4.8 },
 					nodes = {
-						{ n = G.UIT.R, config = { align = "cm", minh = 4 },       nodes = tag_grid },
-						{ n = G.UIT.R, config = { align = "cm", padding = 0.05 }, nodes = { get_localised_label(args.obj_ids.tags, localize("b_tags")) } }
-					}
+						{ n = G.UIT.R, config = { align = "cm", minh = 4 }, nodes = tag_grid },
+						{
+							n = G.UIT.R,
+							config = { align = "cm", padding = 0.05 },
+							nodes = { get_localised_label(args.obj_ids.tags, localize("b_tags")) },
+						},
+					},
 				},
 				{
 					n = G.UIT.C,
 					config = { align = "cm", padding = 0.05, r = 0.1, minw = 5.4, minh = 4.8, maxh = 4.8 },
 					nodes = {
-						{ n = G.UIT.R, config = { align = "cm", minh = 4 },       nodes = blind_grid },
-						{ n = G.UIT.R, config = { align = "cm", padding = 0.05 }, nodes = { get_localised_label(args.obj_ids.blinds, localize("b_blinds")) } }
-					}
-				}
-			}
+						{ n = G.UIT.R, config = { align = "cm", minh = 4 }, nodes = blind_grid },
+						{
+							n = G.UIT.R,
+							config = { align = "cm", padding = 0.05 },
+							nodes = { get_localised_label(args.obj_ids.blinds, localize("b_blinds")) },
+						},
+					},
+				},
+			},
 		}
 	else
 		local cards_grid = get_ruleset_cardarea(args.obj_ids, 10, 4)
@@ -655,11 +751,15 @@ function G.UIDEF.ruleset_cardarea_definition(args)
 					n = G.UIT.C,
 					config = { align = "cm", padding = 0.05, r = 0.1, minw = 10.8, minh = 4.8, maxh = 4.8 },
 					nodes = {
-						{ n = G.UIT.R, config = { align = "cm" },                 nodes = cards_grid },
-						{ n = G.UIT.R, config = { align = "cm", padding = 0.05 }, nodes = { get_localised_label(args.obj_ids, args.type) } }
-					}
-				}
-			}
+						{ n = G.UIT.R, config = { align = "cm" }, nodes = cards_grid },
+						{
+							n = G.UIT.R,
+							config = { align = "cm", padding = 0.05 },
+							nodes = { get_localised_label(args.obj_ids, args.type) },
+						},
+					},
+				},
+			},
 		}
 	end
 end
@@ -669,7 +769,7 @@ function G.UIDEF.gamemode_selection_options()
 
 	local default_gamemode_area = UIBox({
 		definition = G.UIDEF.gamemode_info("attrition"),
-		config = { align = "cm" }
+		config = { align = "cm" },
 	})
 
 	local gamemode_buttons_data = {
@@ -677,24 +777,35 @@ function G.UIDEF.gamemode_selection_options()
 			name = "k_battle",
 			buttons = {
 				{ button_id = "attrition_gamemode_button", button_localize_key = "k_attrition" },
-				{ button_id = "showdown_gamemode_button",  button_localize_key = "k_showdown" },
-			}
+				{ button_id = "showdown_gamemode_button", button_localize_key = "k_showdown" },
+			},
 		},
 		{
 			name = "k_challenge",
 			buttons = {
 				{ button_id = "survival_gamemode_button", button_localize_key = "k_survival" },
-			}
-		}
+			},
+		},
 	}
 
-	return MP.UI.Main_Lobby_Options("gamemode_area", default_gamemode_area,
-		"change_gamemode_selection", gamemode_buttons_data)
+	return MP.UI.Main_Lobby_Options(
+		"gamemode_area",
+		default_gamemode_area,
+		"change_gamemode_selection",
+		gamemode_buttons_data
+	)
 end
 
 function G.FUNCS.change_gamemode_selection(e)
-	MP.UI.Change_Main_Lobby_Options(e, "gamemode_area", G.UIDEF.gamemode_info, "attrition_gamemode_button",
-		function(gamemode_name) MP.LOBBY.config.gamemode = "gamemode_mp_" .. gamemode_name end)
+	MP.UI.Change_Main_Lobby_Options(
+		e,
+		"gamemode_area",
+		G.UIDEF.gamemode_info,
+		"attrition_gamemode_button",
+		function(gamemode_name)
+			MP.LOBBY.config.gamemode = "gamemode_mp_" .. gamemode_name
+		end
+	)
 end
 
 function G.UIDEF.gamemode_info(gamemode_name)
@@ -702,7 +813,7 @@ function G.UIDEF.gamemode_info(gamemode_name)
 
 	local gamemode_info_tabs = UIBox({
 		definition = G.UIDEF.gamemode_tabs(gamemode),
-		config = { align = "cm" }
+		config = { align = "cm" },
 	})
 
 	return {
@@ -717,8 +828,8 @@ function G.UIDEF.gamemode_info(gamemode_name)
 						n = G.UIT.R,
 						config = { align = "cm" },
 						nodes = {
-							{ n = G.UIT.O, config = { object = gamemode_info_tabs } }
-						}
+							{ n = G.UIT.O, config = { object = gamemode_info_tabs } },
+						},
 					},
 					{
 						n = G.UIT.R,
@@ -726,23 +837,41 @@ function G.UIDEF.gamemode_info(gamemode_name)
 						nodes = {
 							{
 								n = G.UIT.R,
-								config = { id = "start_lobby_button", button = "start_lobby", align = "cm", padding = 0.05, r = 0.1, minw = 8, minh = 0.8, colour = G.C.BLUE, hover = true, shadow = true },
+								config = {
+									id = "start_lobby_button",
+									button = "start_lobby",
+									align = "cm",
+									padding = 0.05,
+									r = 0.1,
+									minw = 8,
+									minh = 0.8,
+									colour = G.C.BLUE,
+									hover = true,
+									shadow = true,
+								},
 								nodes = {
-									{ n = G.UIT.T, config = { text = localize("b_create_lobby"), scale = 0.5, colour = G.C.UI.TEXT_LIGHT } }
-								}
-							}
-						}
-					}
-				}
-			}
-		}
+									{
+										n = G.UIT.T,
+										config = {
+											text = localize("b_create_lobby"),
+											scale = 0.5,
+											colour = G.C.UI.TEXT_LIGHT,
+										},
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+		},
 	}
 end
 
 function G.UIDEF.gamemode_tabs(gamemode)
 	local default_tabs = UIBox({
 		definition = G.UIDEF.lobby_setup_tabs_definition(gamemode, "info", 1, false),
-		config = { align = "cm", tab_type = "info", chosen_tab = 1 }
+		config = { align = "cm", tab_type = "info", chosen_tab = 1 },
 	})
 
 	return {
@@ -757,8 +886,8 @@ function G.UIDEF.gamemode_tabs(gamemode)
 						n = G.UIT.R,
 						config = { align = "tm", colour = G.C.GREY, r = 0.1 },
 						nodes = {
-							{ n = G.UIT.O, config = { object = default_tabs } }
-						}
+							{ n = G.UIT.O, config = { object = default_tabs } },
+						},
 					},
 					{
 						n = G.UIT.R,
@@ -771,13 +900,13 @@ function G.UIDEF.gamemode_tabs(gamemode)
 								opt_args = { ui = default_tabs, gamemode = gamemode },
 								w = 5,
 								colour = G.C.ORANGE,
-								cycle_shoulders = false
-							})
-						}
-					}
-				}
-			}
-		}
+								cycle_shoulders = false,
+							}),
+						},
+					},
+				},
+			},
+		},
 	}
 end
 
@@ -801,7 +930,7 @@ function G.FUNCS.gamemode_switch_tabs(args)
 	tabs_wrap.config.object:remove()
 	tabs_wrap.config.object = UIBox({
 		definition = def,
-		config = { align = "cm", parent = tabs_wrap }
+		config = { align = "cm", parent = tabs_wrap },
 	})
 
 	tabs_wrap.UIBox:recalculate()
@@ -876,15 +1005,15 @@ function G.UIDEF.override_main_menu_play_button()
 									colour = G.C.UI.TEXT_LIGHT,
 									scale = 0.45,
 								},
-							}
-						}
+							},
+						},
 					},
 					UIBox_button({
 						label = { localize("b_skip_tutorial") },
 						colour = G.C.RED,
 						button = "skip_tutorial",
 						minw = 5,
-					})
+					}),
 				},
 			})
 		)
@@ -933,7 +1062,7 @@ end
 function G.UIDEF.weekly_interrupt(loaded)
 	return (
 		create_UIBox_generic_options({
-			back_func = 'create_lobby',
+			back_func = "create_lobby",
 			contents = {
 				{
 					n = G.UIT.R,
@@ -949,8 +1078,8 @@ function G.UIDEF.weekly_interrupt(loaded)
 								colour = G.C.UI.TEXT_LIGHT,
 								scale = 0.45,
 							},
-						}
-					}
+						},
+					},
 				},
 				{
 					n = G.UIT.R,
@@ -962,19 +1091,20 @@ function G.UIDEF.weekly_interrupt(loaded)
 						{
 							n = G.UIT.T,
 							config = {
-								text = localize('k_currently_colon') .. localize('k_weekly_' .. MP.LOBBY.fetched_weekly), -- bad loc but ok
+								text = localize("k_currently_colon")
+									.. localize("k_weekly_" .. MP.LOBBY.fetched_weekly), -- bad loc but ok
 								colour = darken(G.C.UI.TEXT_LIGHT, 0.2),
 								scale = 0.35,
 							},
-						}
-					}
+						},
+					},
 				},
 				UIBox_button({
-					label = { localize('k_sync_locally') },
+					label = { localize("k_sync_locally") },
 					colour = G.C.DARK_EDITION,
 					button = "set_weekly",
 					minw = 5,
-				})
+				}),
 			},
 		})
 	)
@@ -1017,7 +1147,7 @@ function G.FUNCS.join_lobby(e)
 	G.FUNCS.overlay_menu({
 		definition = G.UIDEF.create_UIBox_join_lobby_button(),
 	})
-	local text_input = G.OVERLAY_MENU:get_UIE_by_ID('text_input')
+	local text_input = G.OVERLAY_MENU:get_UIE_by_ID("text_input")
 	G.FUNCS.select_text_input(text_input)
 end
 
@@ -1071,9 +1201,7 @@ function G.FUNCS.start_lobby(e)
 	-- Check if the current gamemode is valid. If it's not, default to attrition.
 	local gamemode_check = false
 	for k, _ in pairs(MP.Gamemodes) do
-		if k == MP.LOBBY.config.gamemode then
-			gamemode_check = true
-		end
+		if k == MP.LOBBY.config.gamemode then gamemode_check = true end
 	end
 	MP.LOBBY.config.gamemode = gamemode_check and MP.LOBBY.config.gamemode or "gamemode_mp_attrition"
 
@@ -1095,9 +1223,7 @@ G.FUNCS.wipe_off = function()
 		no_delete = true,
 		func = function()
 			delay(0.3)
-			if not G.screenwipe then
-				return true
-			end
+			if not G.screenwipe then return true end
 			G.screenwipe.children.particles.max = 0
 			G.E_MANAGER:add_event(Event({
 				trigger = "ease",
@@ -1137,12 +1263,8 @@ G.FUNCS.wipe_off = function()
 		blocking = false,
 		timer = "REAL",
 		func = function()
-			if not G.screenwipe then
-				return true
-			end
-			if G.screenwipecard then
-				G.screenwipecard:start_dissolve({ G.C.BLACK, G.C.ORANGE, G.C.GOLD, G.C.RED })
-			end
+			if not G.screenwipe then return true end
+			if G.screenwipecard then G.screenwipecard:start_dissolve({ G.C.BLACK, G.C.ORANGE, G.C.GOLD, G.C.RED }) end
 			if G.screenwipe:get_UIE_by_ID("text") then
 				for k, v in ipairs(G.screenwipe:get_UIE_by_ID("text").children) do
 					v.children[1].config.object:pop_out(4)
@@ -1158,9 +1280,7 @@ G.FUNCS.wipe_off = function()
 		blocking = false,
 		timer = "REAL",
 		func = function()
-			if not G.screenwipe then
-				return true
-			end
+			if not G.screenwipe then return true end
 			G.screenwipe.children.particles:remove()
 			G.screenwipe:remove()
 			G.screenwipe.children.particles = nil

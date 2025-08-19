@@ -99,9 +99,9 @@ return {
 			j_mp_hanging_chad = {
 				name = "Na włosku",
 				text = {
-                    "Aktywuj ponownie {C:attention}pierwszą{}",
-                    "i drugą zagraną kartę w punktacji",
-                    "jeszcze {C:attention}#1#{} raz(y)",
+					"Aktywuj ponownie {C:attention}pierwszą{}",
+					"i drugą zagraną kartę w punktacji",
+					"jeszcze {C:attention}#1#{} raz(y)",
 				},
 			},
 		},
@@ -122,7 +122,7 @@ return {
 				text = {
 					"Zmierz się z rywalem,",
 					"zdobądź więcej żetonów",
-					"niż przeciwnik"
+					"niż przeciwnik",
 				},
 			},
 		},
@@ -140,10 +140,10 @@ return {
 			m_mp_glass = {
 				name = "Szklany Joker",
 				text = {
-                    "Ten joker zdobywa {X:mult,C:white} X#1# {}",
-                    "do mnoż. za każdą zniszczoną",
-                    "{C:attention}Kartę Szklaną",
-                    "{C:inactive}(obecnie {X:mult,C:white} X#2# {C:inactive} do mnoż.)",
+					"Ten joker zdobywa {X:mult,C:white} X#1# {}",
+					"do mnoż. za każdą zniszczoną",
+					"{C:attention}Kartę Szklaną",
+					"{C:inactive}(obecnie {X:mult,C:white} X#2# {C:inactive} do mnoż.)",
 				},
 			},
 		},

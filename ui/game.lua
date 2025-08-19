@@ -2,12 +2,8 @@ local create_UIBox_blind_choice_ref = create_UIBox_blind_choice
 ---@diagnostic disable-next-line: lowercase-global
 function create_UIBox_blind_choice(type, run_info)
 	if MP.LOBBY.code then
-		if not G.GAME.blind_on_deck then
-			G.GAME.blind_on_deck = "Small"
-		end
-		if not run_info then
-			G.GAME.round_resets.blind_states[G.GAME.blind_on_deck] = "Select"
-		end
+		if not G.GAME.blind_on_deck then G.GAME.blind_on_deck = "Small" end
+		if not run_info then G.GAME.round_resets.blind_states[G.GAME.blind_on_deck] = "Select" end
 
 		local disabled = false
 		type = type or "Small"
@@ -20,11 +16,9 @@ function create_UIBox_blind_choice(type, run_info)
 
 		local blind_atlas = "blind_chips"
 		local blind_pos = blind_choice.config.pos
-		if blind_choice.config and blind_choice.config.atlas then
-			blind_atlas = blind_choice.config.atlas
-		end
+		if blind_choice.config and blind_choice.config.atlas then blind_atlas = blind_choice.config.atlas end
 		if nemesis then
-			blind_atlas = 'mp_player_blind_col'
+			blind_atlas = "mp_player_blind_col"
 			blind_pos = G.P_BLINDS[nemesis_blind_col].pos
 		end
 
@@ -45,9 +39,7 @@ function create_UIBox_blind_choice(type, run_info)
 				_poker_hands = MP.sorted_hand_list()
 			else
 				for k, v in pairs(G.GAME.hands) do
-					if v.visible then
-						_poker_hands[#_poker_hands + 1] = k
-					end
+					if v.visible then _poker_hands[#_poker_hands + 1] = k end
 				end
 			end
 
@@ -55,8 +47,9 @@ function create_UIBox_blind_choice(type, run_info)
 				pseudorandom_element(_poker_hands, pseudoseed("orbital"))
 		end
 
-		if G.GAME.round_resets.blind_choices[type] == "bl_mp_nemesis"
-			or G.GAME.round_resets.pvp_blind_choices[type] then
+		if
+			G.GAME.round_resets.blind_choices[type] == "bl_mp_nemesis" or G.GAME.round_resets.pvp_blind_choices[type]
+		then
 			local dt1 = DynaText({
 				string = { { string = localize("k_bl_life"), colour = G.C.FILTER } },
 				colours = { G.C.BLACK },
@@ -135,10 +128,16 @@ function create_UIBox_blind_choice(type, run_info)
 			type = "raw_descriptions",
 			key = blind_choice.config.key,
 			set = "Blind",
-			vars = { blind_choice.config.key == 'bl_ox' and localize(G.GAME.current_round.most_played_poker_hand, "poker_hands") or '' },
+			vars = {
+				blind_choice.config.key == "bl_ox"
+						and localize(G.GAME.current_round.most_played_poker_hand, "poker_hands")
+					or "",
+			},
 		})
-		local loc_name = (G.GAME.round_resets.blind_choices[type] == "bl_mp_nemesis" and (MP.LOBBY.is_host and MP.LOBBY.guest.username or MP.LOBBY.host.username))
-			or localize({ type = "name_text", key = blind_choice.config.key, set = "Blind" })
+		local loc_name = (
+			G.GAME.round_resets.blind_choices[type] == "bl_mp_nemesis"
+			and (MP.LOBBY.is_host and MP.LOBBY.guest.username or MP.LOBBY.host.username)
+		) or localize({ type = "name_text", key = blind_choice.config.key, set = "Blind" })
 
 		local blind_col = get_blind_main_colour(type)
 
@@ -146,16 +145,15 @@ function create_UIBox_blind_choice(type, run_info)
 			* blind_choice.config.mult
 			* G.GAME.starting_params.ante_scaling
 
-		if G.GAME.round_resets.blind_choices[type] == "bl_mp_nemesis"
-			or G.GAME.round_resets.pvp_blind_choices[type] then
+		if
+			G.GAME.round_resets.blind_choices[type] == "bl_mp_nemesis" or G.GAME.round_resets.pvp_blind_choices[type]
+		then
 			blind_amt = "????"
 		end
 
 		local text_table = loc_target
 
-		if G.GAME.round_resets.pvp_blind_choices[type] then
-			text_table[#text_table + 1] = localize("k_bl_mostchips")
-		end
+		if G.GAME.round_resets.pvp_blind_choices[type] then text_table[#text_table + 1] = localize("k_bl_mostchips") end
 
 		local blind_state = G.GAME.round_resets.blind_states[type]
 		local _reward = true
@@ -163,9 +161,7 @@ function create_UIBox_blind_choice(type, run_info)
 			---@diagnostic disable-next-line: cast-local-type
 			_reward = nil
 		end
-		if blind_state == "Select" then
-			blind_state = "Current"
-		end
+		if blind_state == "Select" then blind_state = "Current" end
 		local run_info_colour = run_info
 			and (
 				blind_state == "Defeated" and G.C.GREY
@@ -215,9 +211,11 @@ function create_UIBox_blind_choice(type, run_info)
 										shadow = true,
 										hover = true,
 										one_press = true,
-										func = (G.GAME.round_resets.blind_choices[type] == "bl_mp_nemesis"
-												or G.GAME.round_resets.pvp_blind_choices[type])
-											and "pvp_ready_button"
+										func = (
+											G.GAME.round_resets.blind_choices[type] == "bl_mp_nemesis"
+											or G.GAME.round_resets.pvp_blind_choices[type]
+										)
+												and "pvp_ready_button"
 											or nil,
 										button = "select_blind",
 									},
@@ -325,38 +323,38 @@ function create_UIBox_blind_choice(type, run_info)
 													},
 													nodes = {
 														text_table[1]
-														and {
-															n = G.UIT.R,
-															config = { align = "cm", maxw = 2.8 },
-															nodes = {
-																{
-																	n = G.UIT.T,
-																	config = {
-																		id = blind_choice.config.key,
-																		ref_table = { val = "" },
-																		ref_value = "val",
-																		scale = 0.32,
-																		colour = disabled
-																			and G.C.UI.TEXT_INACTIVE
-																			or G.C.WHITE,
-																		shadow = not disabled,
-																		func = "HUD_blind_debuff_prefix",
+																and {
+																	n = G.UIT.R,
+																	config = { align = "cm", maxw = 2.8 },
+																	nodes = {
+																		{
+																			n = G.UIT.T,
+																			config = {
+																				id = blind_choice.config.key,
+																				ref_table = { val = "" },
+																				ref_value = "val",
+																				scale = 0.32,
+																				colour = disabled
+																						and G.C.UI.TEXT_INACTIVE
+																					or G.C.WHITE,
+																				shadow = not disabled,
+																				func = "HUD_blind_debuff_prefix",
+																			},
+																		},
+																		{
+																			n = G.UIT.T,
+																			config = {
+																				text = text_table[1] or "-",
+																				scale = 0.32,
+																				colour = disabled
+																						and G.C.UI.TEXT_INACTIVE
+																					or G.C.WHITE,
+																				shadow = not disabled,
+																			},
+																		},
 																	},
-																},
-																{
-																	n = G.UIT.T,
-																	config = {
-																		text = text_table[1] or "-",
-																		scale = 0.32,
-																		colour = disabled
-																			and G.C.UI.TEXT_INACTIVE
-																			or G.C.WHITE,
-																		shadow = not disabled,
-																	},
-																},
-															},
-														}
-														or nil,
+																}
+															or nil,
 														text_table[2] and {
 															n = G.UIT.R,
 															config = { align = "cm", maxw = 2.8 },
@@ -447,37 +445,37 @@ function create_UIBox_blind_choice(type, run_info)
 													},
 												},
 												_reward
-												and {
-													n = G.UIT.R,
-													config = { align = "cm" },
-													nodes = {
-														{
-															n = G.UIT.T,
-															config = {
-																text = localize("ph_blind_reward"),
-																scale = 0.35,
-																colour = disabled and G.C.UI.TEXT_INACTIVE
-																	or G.C.WHITE,
-																shadow = not disabled,
+														and {
+															n = G.UIT.R,
+															config = { align = "cm" },
+															nodes = {
+																{
+																	n = G.UIT.T,
+																	config = {
+																		text = localize("ph_blind_reward"),
+																		scale = 0.35,
+																		colour = disabled and G.C.UI.TEXT_INACTIVE
+																			or G.C.WHITE,
+																		shadow = not disabled,
+																	},
+																},
+																{
+																	n = G.UIT.T,
+																	config = {
+																		text = string.rep(
+																			---@diagnostic disable-next-line: param-type-mismatch
+																			localize("$"),
+																			blind_choice.config.dollars
+																		) .. "+",
+																		scale = 0.35,
+																		colour = disabled and G.C.UI.TEXT_INACTIVE
+																			or G.C.MONEY,
+																		shadow = not disabled,
+																	},
+																},
 															},
-														},
-														{
-															n = G.UIT.T,
-															config = {
-																text = string.rep(
-																---@diagnostic disable-next-line: param-type-mismatch
-																	localize("$"),
-																	blind_choice.config.dollars
-																) .. "+",
-																scale = 0.35,
-																colour = disabled and G.C.UI.TEXT_INACTIVE
-																	or G.C.MONEY,
-																shadow = not disabled,
-															},
-														},
-													},
-												}
-												or nil,
+														}
+													or nil,
 											},
 										},
 									},
@@ -491,7 +489,7 @@ function create_UIBox_blind_choice(type, run_info)
 					config = { id = "blind_extras", align = "cm" },
 					nodes = {
 						extras,
-					}
+					},
 				},
 			},
 		}
@@ -506,20 +504,16 @@ end
 local get_blind_main_colourref = get_blind_main_colour
 function get_blind_main_colour(type) -- handles ui colour stuff
 	local nemesis = G.GAME.round_resets.blind_choices[type] == "bl_mp_nemesis" or type == "bl_mp_nemesis"
-	if nemesis then
-		type = MP.UTILS.get_nemesis_key()
-	end
+	if nemesis then type = MP.UTILS.get_nemesis_key() end
 	return get_blind_main_colourref(type)
 end
 
 local blind_change_colourref = Blind.change_colour
 function Blind:change_colour(blind_col) -- ensures that small/big blinds have proper colouration
 	local small = false
-	if self.config.blind.key == 'bl_mp_nemesis' then
+	if self.config.blind.key == "bl_mp_nemesis" then
 		local blind_key = MP.UTILS.get_nemesis_key()
-		if blind_key == "bl_small" or blind_key == "bl_big" then
-			small = true
-		end
+		if blind_key == "bl_small" or blind_key == "bl_big" then small = true end
 	end
 	local boss = self.boss
 	if small then self.boss = false end
@@ -528,15 +522,13 @@ function Blind:change_colour(blind_col) -- ensures that small/big blinds have pr
 end
 
 local blind_set_blindref = Blind.set_blind
-function Blind:set_blind(blind, reset, silent)                                                             -- hacking in proper spirals, far from good but whatever
+function Blind:set_blind(blind, reset, silent) -- hacking in proper spirals, far from good but whatever
 	blind_set_blindref(self, blind, reset, silent)
-	if (blind and blind.key == 'bl_mp_nemesis') or (self and self.name and self.name == 'bl_mp_nemesis') then -- this shouldn't break and this fix shouldn't work
+	if (blind and blind.key == "bl_mp_nemesis") or (self and self.name and self.name == "bl_mp_nemesis") then -- this shouldn't break and this fix shouldn't work
 		local boss = true
 		local showdown = false
 		local blind_key = MP.UTILS.get_nemesis_key()
-		if blind_key == "bl_small" or blind_key == "bl_big" then
-			boss = false
-		end
+		if blind_key == "bl_small" or blind_key == "bl_big" then boss = false end
 		if blind_key == "bl_final_heart" then -- should be made generic
 			showdown = true
 		end
@@ -546,14 +538,14 @@ end
 
 local ease_background_colour_blindref = ease_background_colour_blind
 function ease_background_colour_blind(state, blind_override) -- handles background
-	local blindname = ((blind_override or (G.GAME.blind and G.GAME.blind.name ~= '' and G.GAME.blind.name)) or 'Small Blind')
-	local blindname = (blindname == '' and 'Small Blind' or blindname)
+	local blindname = (
+		(blind_override or (G.GAME.blind and G.GAME.blind.name ~= "" and G.GAME.blind.name)) or "Small Blind"
+	)
+	local blindname = (blindname == "" and "Small Blind" or blindname)
 	if blindname == "bl_mp_nemesis" then
 		blind_override = MP.UTILS.get_nemesis_key()
 		for k, v in pairs(G.P_BLINDS) do
-			if blind_override == k then
-				blind_override = v.name
-			end
+			if blind_override == k then blind_override = v.name end
 		end
 	end
 	return ease_background_colour_blindref(state, blind_override)
@@ -561,14 +553,14 @@ end
 
 local add_round_eval_rowref = add_round_eval_row
 function add_round_eval_row(config) -- if i could post a skull emoji i would, wtf is this (cashout screen)
-	if config.name == 'blind1' and G.GAME.blind.config.blind.key == "bl_mp_nemesis" then
+	if config.name == "blind1" and G.GAME.blind.config.blind.key == "bl_mp_nemesis" then
 		G.GAME.blind.chip_text = MP.INSANE_INT.to_string(MP.GAME.enemy.score)
 
-		G.P_BLINDS["bl_mp_nemesis"].atlas = 'mp_player_blind_col'
+		G.P_BLINDS["bl_mp_nemesis"].atlas = "mp_player_blind_col"
 		G.GAME.blind.pos = G.P_BLINDS[MP.UTILS.get_nemesis_key()].pos -- this one is getting reset so no need to bother
 		add_round_eval_rowref(config)
 		G.E_MANAGER:add_event(Event({
-			trigger = 'before',
+			trigger = "before",
 			delay = 0.0,
 			func = function()
 				G.P_BLINDS["bl_mp_nemesis"].atlas = "mp_player_blind_chip" -- lmao
@@ -588,9 +580,7 @@ G.FUNCS.blind_choice_handler = function(e)
 		and e.config.id
 		and G.blind_select_opts[string.lower(e.config.id)]
 	then
-		if e.UIBox.role.xy_bond ~= "Weak" then
-			e.UIBox:set_role({ xy_bond = "Weak" })
-		end
+		if e.UIBox.role.xy_bond ~= "Weak" then e.UIBox:set_role({ xy_bond = "Weak" }) end
 		if
 			(e.config.ref_table.deck ~= "on" and e.config.id == G.GAME.blind_on_deck)
 			or (e.config.ref_table.deck ~= "off" and e.config.id ~= G.GAME.blind_on_deck)
@@ -649,8 +639,8 @@ G.FUNCS.blind_choice_handler = function(e)
 				e.config.draw_after = true
 				e.config.colour = adjust_alpha(
 					G.GAME.round_resets.blind_states[e.config.id] == "Skipped"
-					and mix_colours(G.C.BLUE, G.C.L_BLACK, 0.1)
-					or G.C.L_BLACK,
+							and mix_colours(G.C.BLUE, G.C.L_BLACK, 0.1)
+						or G.C.L_BLACK,
 					0.5
 				)
 				_border.parent.config.outline = nil
@@ -712,9 +702,7 @@ G.FUNCS.pvp_ready_button = function(e)
 		e.children[1].config.ref_table = MP.GAME
 		e.children[1].config.ref_value = "ready_blind_text"
 	end
-	if e.config.button == "mp_toggle_ready" then
-		e.config.colour = (MP.GAME.ready_blind and G.C.GREEN) or G.C.RED
-	end
+	if e.config.button == "mp_toggle_ready" then e.config.colour = (MP.GAME.ready_blind and G.C.GREEN) or G.C.RED end
 end
 
 local function update_blind_HUD()
@@ -733,11 +721,11 @@ local function update_blind_HUD()
 				G.HUD_blind:get_UIE_by_ID("HUD_blind").children[2].children[2].children[2].children[3].children[1].config.text =
 					localize("k_enemy_hands")
 				G.HUD_blind:get_UIE_by_ID("dollars_to_be_earned").config.object.config.string =
-				{ { ref_table = MP.GAME.enemy, ref_value = "hands" } }
+					{ { ref_table = MP.GAME.enemy, ref_value = "hands" } }
 				G.HUD_blind:get_UIE_by_ID("dollars_to_be_earned").config.object:update_text()
 				G.HUD_blind.alignment.offset.y = 0
 				if G.GAME.blind.config.blind.key == "bl_mp_nemesis" then -- this was just the first place i thought of to implement this sprite swapping, change if inappropriate
-					G.GAME.blind.children.animatedSprite.atlas = G.ANIMATION_ATLAS['mp_player_blind_col']
+					G.GAME.blind.children.animatedSprite.atlas = G.ANIMATION_ATLAS["mp_player_blind_col"]
 					local nemesis_blind_col = MP.UTILS.get_nemesis_key()
 					G.GAME.blind.children.animatedSprite:set_sprite_pos(G.P_BLINDS[nemesis_blind_col].pos)
 				end
@@ -750,7 +738,7 @@ end
 local function reset_blind_HUD()
 	if MP.LOBBY.code then
 		G.HUD_blind:get_UIE_by_ID("HUD_blind_name").config.object.config.string =
-		{ { ref_table = G.GAME.blind, ref_value = "loc_name" } }
+			{ { ref_table = G.GAME.blind, ref_value = "loc_name" } }
 		G.HUD_blind:get_UIE_by_ID("HUD_blind_name").config.object:update_text()
 		G.HUD_blind:get_UIE_by_ID("HUD_blind_count").config.ref_table = G.GAME.blind
 		G.HUD_blind:get_UIE_by_ID("HUD_blind_count").config.ref_value = "chip_text"
@@ -759,49 +747,49 @@ local function reset_blind_HUD()
 		G.HUD_blind:get_UIE_by_ID("HUD_blind").children[2].children[2].children[2].children[3].children[1].config.text =
 			localize("ph_blind_reward")
 		G.HUD_blind:get_UIE_by_ID("dollars_to_be_earned").config.object.config.string =
-		{ { ref_table = G.GAME.current_round, ref_value = "dollars_to_be_earned" } }
+			{ { ref_table = G.GAME.current_round, ref_value = "dollars_to_be_earned" } }
 		G.HUD_blind:get_UIE_by_ID("dollars_to_be_earned").config.object:update_text()
 	end
 end
 
 function G.UIDEF.confirmation_dialog()
-       return create_UIBox_generic_options({
-		       back_func = "options",
-               contents = {
-                       {
-                               n = G.UIT.R,
-                               config = {
-                                       padding = 0,
-                                       align = "cm",
-                               },
-                               nodes = {
-                                       {
-                                               n = G.UIT.R,
-                                               config = {
-                                                       padding = 0.5,
-                                                       align = "cm",
-                                               },
-                                               nodes = {
-                                                       {
-                                                               n = G.UIT.T,
-                                                               config = {
-                                                                       text = localize("k_are_you_sure"),
-                                                                       scale = 0.6,
-                                                                       shadow = true,
-                                                                       colour = G.C.UI.TEXT_LIGHT,
-                                                               },
-                                                       },
-                                               },
-                                       },
-                                       UIBox_button({
-                                               label = { localize("k_yes") },
-                                               button = "confirmation_dialog_yes",
-                                               minw = 5,
-                                       }),
-                               },
-                       },
-               },
-       })
+	return create_UIBox_generic_options({
+		back_func = "options",
+		contents = {
+			{
+				n = G.UIT.R,
+				config = {
+					padding = 0,
+					align = "cm",
+				},
+				nodes = {
+					{
+						n = G.UIT.R,
+						config = {
+							padding = 0.5,
+							align = "cm",
+						},
+						nodes = {
+							{
+								n = G.UIT.T,
+								config = {
+									text = localize("k_are_you_sure"),
+									scale = 0.6,
+									shadow = true,
+									colour = G.C.UI.TEXT_LIGHT,
+								},
+							},
+						},
+					},
+					UIBox_button({
+						label = { localize("k_yes") },
+						button = "confirmation_dialog_yes",
+						minw = 5,
+					}),
+				},
+			},
+		},
+	})
 end
 
 do
@@ -884,18 +872,23 @@ function Game:update_draw_to_hand(dt)
 
 				if MP.GAME.asteroids > 0 then -- launch asteroids, messy event garbage
 					delay(0.8)
-					update_hand_text({ sound = 'button', volume = 0.7, pitch = 0.8, delay = 0.3 },
-						{ handname = localize('k_asteroids'), chips = localize('k_amount_short'), mult = MP.GAME
-						.asteroids })
+					update_hand_text(
+						{ sound = "button", volume = 0.7, pitch = 0.8, delay = 0.3 },
+						{
+							handname = localize("k_asteroids"),
+							chips = localize("k_amount_short"),
+							mult = MP.GAME.asteroids,
+						}
+					)
 					delay(0.6)
 					local send = 0
 					for i = 1, MP.GAME.asteroids do
 						local perc = MP.GAME.asteroids - send
 						G.E_MANAGER:add_event(Event({
 							func = function()
-								play_sound('tarot1', 0.9 + (perc / 10), 1)
+								play_sound("tarot1", 0.9 + (perc / 10), 1)
 								return true
-							end
+							end,
 						}))
 						send = send + 1
 						update_hand_text({ delay = 0 }, { mult = MP.GAME.asteroids - send })
@@ -908,11 +901,13 @@ function Game:update_draw_to_hand(dt)
 							end
 							MP.GAME.asteroids = 0
 							return true
-						end
+						end,
 					}))
 					delay(0.7)
-					update_hand_text({ sound = 'button', volume = 0.7, pitch = 1.1, delay = 0 },
-						{ mult = 0, chips = 0, handname = '', level = '' })
+					update_hand_text(
+						{ sound = "button", volume = 0.7, pitch = 1.1, delay = 0 },
+						{ mult = 0, chips = 0, handname = "", level = "" }
+					)
 				end
 			end
 		end
@@ -964,9 +959,7 @@ local function eval_hand_and_jokers()
 					individual = true,
 					end_of_round = true,
 				})
-				if eval then
-					table.insert(effects, eval)
-				end
+				if eval then table.insert(effects, eval) end
 			end
 
 			if reps[j] == 1 then
@@ -1103,8 +1096,8 @@ function Game:update_new_round(dt)
 		-- Prevent player from losing
 		if to_big(G.GAME.chips) < to_big(G.GAME.blind.chips) and not MP.is_pvp_boss() then
 			G.GAME.blind.chips = -1
-			MP.GAME.wait_for_enemys_furthest_blind = (MP.LOBBY.config.gamemode == "gamemode_mp_survival") and
-			(tonumber(MP.GAME.lives) == 1)                                                                                          -- In Survival Mode, if this is the last live, wait for the enemy.
+			MP.GAME.wait_for_enemys_furthest_blind = (MP.LOBBY.config.gamemode == "gamemode_mp_survival")
+				and (tonumber(MP.GAME.lives) == 1) -- In Survival Mode, if this is the last live, wait for the enemy.
 			MP.ACTIONS.fail_round(G.GAME.current_round.hands_played)
 		end
 
@@ -1135,16 +1128,16 @@ end
 
 function MP.end_round()
 	-- This prevents duplicate execution during certain cases. e.g. Full deck discard before playing any hands.
-	if MP.GAME.round_ended then 
+	if MP.GAME.round_ended then
 		if not MP.GAME.duplicate_end then
 			MP.GAME.duplicate_end = true
-			sendDebugMessage('Duplicate end_round calls prevented.', 'MULTIPLAYER'); 
+			sendDebugMessage("Duplicate end_round calls prevented.", "MULTIPLAYER")
 		end
-		return true 
-	end 
+		return true
+	end
 
-	MP.GAME.round_ended  = true	
-	
+	MP.GAME.round_ended = true
+
 	G.GAME.blind.in_blind = false
 	local game_over = false
 	local game_won = false
@@ -1155,9 +1148,7 @@ function MP.end_round()
 	SMODS.calculate_context({ end_of_round = true, game_over = false })
 
 	G.GAME.unused_discards = (G.GAME.unused_discards or 0) + G.GAME.current_round.discards_left
-	if G.GAME.blind and G.GAME.blind.config.blind then
-		discover_card(G.GAME.blind.config.blind)
-	end
+	if G.GAME.blind and G.GAME.blind.config.blind then discover_card(G.GAME.blind.config.blind) end
 
 	if G.GAME.blind:get_type() == "Boss" then
 		local _handname, _played, _order = "High Card", -1, 100
@@ -1210,18 +1201,18 @@ function MP.end_round()
 		check_for_unlock({ type = "ante_up", ante = G.GAME.round_resets.ante + 1 })
 	end
 	G.FUNCS.draw_from_discard_to_deck()
-	
+
 	-- This handles an edge case where a player plays no hands, and discards the only cards in their deck.
 	-- Allows opponent to advance after playing anything, and eases a life from the person who discarded their deck.
-	if G.GAME.current_round.hands_played == 0 
-	   and G.GAME.current_round.discards_used > 0
-	   and MP.LOBBY.config.gamemode ~= "gamemode_mp_survival" then
-			if MP.is_pvp_boss() then
-				MP.ACTIONS.play_hand(0, 0)
-			end
-			
-			MP.ACTIONS.fail_round(1)
-	end	
+	if
+		G.GAME.current_round.hands_played == 0
+		and G.GAME.current_round.discards_used > 0
+		and MP.LOBBY.config.gamemode ~= "gamemode_mp_survival"
+	then
+		if MP.is_pvp_boss() then MP.ACTIONS.play_hand(0, 0) end
+
+		MP.ACTIONS.fail_round(1)
+	end
 
 	G.E_MANAGER:add_event(Event({
 		trigger = "after",
@@ -1232,10 +1223,16 @@ function MP.end_round()
 
 			local temp_furthest_blind = 0
 
-			if G.GAME.round_resets.blind_states.Small ~= "Defeated" and G.GAME.round_resets.blind_states.Small ~= "Skipped" then
+			if
+				G.GAME.round_resets.blind_states.Small ~= "Defeated"
+				and G.GAME.round_resets.blind_states.Small ~= "Skipped"
+			then
 				G.GAME.round_resets.blind_states.Small = "Defeated"
 				temp_furthest_blind = G.GAME.round_resets.ante * 10 + 1
-			elseif G.GAME.round_resets.blind_states.Big ~= "Defeated" and G.GAME.round_resets.blind_states.Big ~= "Skipped" then
+			elseif
+				G.GAME.round_resets.blind_states.Big ~= "Defeated"
+				and G.GAME.round_resets.blind_states.Big ~= "Skipped"
+			then
 				G.GAME.round_resets.blind_states.Big = "Defeated"
 				temp_furthest_blind = G.GAME.round_resets.ante * 10 + 2
 			else
@@ -1247,8 +1244,8 @@ function MP.end_round()
 				end
 			end
 
-			MP.GAME.furthest_blind = (temp_furthest_blind > MP.GAME.furthest_blind) and temp_furthest_blind or
-			MP.GAME.furthest_blind
+			MP.GAME.furthest_blind = (temp_furthest_blind > MP.GAME.furthest_blind) and temp_furthest_blind
+				or MP.GAME.furthest_blind
 			MP.ACTIONS.set_furthest_blind(MP.GAME.furthest_blind)
 
 			MP.GAME.pincher_index = MP.GAME.pincher_index + 1
@@ -1287,9 +1284,7 @@ function Game:start_run(args)
 
 	start_run_ref(self, args)
 
-	if not MP.LOBBY.connected or not MP.LOBBY.code or MP.LOBBY.config.disable_live_and_timer_hud then
-		return
-	end
+	if not MP.LOBBY.connected or not MP.LOBBY.code or MP.LOBBY.config.disable_live_and_timer_hud then return end
 
 	local scale = 0.4
 	local hud_ante = G.HUD:get_UIE_by_ID("hud_ante")
@@ -1309,7 +1304,7 @@ function Game:start_run(args)
 	hud_ante.children[2].children[3] = nil
 	hud_ante.children[2].children[4] = nil
 
-	G.HUD:recalculate();
+	G.HUD:recalculate()
 end
 
 local function create_UIBox_mp_game_end(has_won)
@@ -1683,51 +1678,45 @@ local function create_UIBox_mp_game_end(has_won)
 		},
 	}
 
-	if has_won then
-		t.config.id = "you_win_UI"
-	end
+	if has_won then t.config.id = "you_win_UI" end
 
 	return t
 end
 
 local create_UIBox_game_over_ref = create_UIBox_game_over
 function create_UIBox_game_over()
-	if not MP.LOBBY.code then
-		return create_UIBox_game_over_ref()
-	end
+	if not MP.LOBBY.code then return create_UIBox_game_over_ref() end
 	return create_UIBox_mp_game_end(false)
 end
 
 local create_UIBox_win_ref = create_UIBox_win
 function create_UIBox_win()
-	if not MP.LOBBY.code then
-		return create_UIBox_win_ref()
-	end
+	if not MP.LOBBY.code then return create_UIBox_win_ref() end
 	return create_UIBox_mp_game_end(true)
 end
 
 function G.FUNCS.overlay_endgame_menu()
 	G.FUNCS.overlay_menu({
 		definition = MP.GAME.won and create_UIBox_win() or create_UIBox_game_over(),
-		config = { no_esc = true }
+		config = { no_esc = true },
 	})
 	G.E_MANAGER:add_event(Event({
-		trigger = 'after',
+		trigger = "after",
 		delay = 2.5,
 		blocking = false,
-		func = (function()
-			if G.OVERLAY_MENU and G.OVERLAY_MENU:get_UIE_by_ID('jimbo_spot') then
+		func = function()
+			if G.OVERLAY_MENU and G.OVERLAY_MENU:get_UIE_by_ID("jimbo_spot") then
 				local Jimbo = Card_Character({ x = 0, y = 5 })
-				local spot = G.OVERLAY_MENU:get_UIE_by_ID('jimbo_spot')
+				local spot = G.OVERLAY_MENU:get_UIE_by_ID("jimbo_spot")
 				spot.config.object:remove()
 				spot.config.object = Jimbo
 				Jimbo.ui_object_updated = true
-				local jimbo_words = MP.GAME.won and 'wq_' .. math.random(1, 7) or 'lq_' .. math.random(1, 10)
+				local jimbo_words = MP.GAME.won and "wq_" .. math.random(1, 7) or "lq_" .. math.random(1, 10)
 				Jimbo:add_speech_bubble(jimbo_words, nil, { quip = true })
 				Jimbo:say_stuff(5)
 			end
 			return true
-		end)
+		end,
 	}))
 end
 
@@ -1740,33 +1729,30 @@ function G.UIDEF.view_nemesis_deck()
 end
 
 function G.UIDEF.create_UIBox_view_nemesis_deck()
-	return create_UIBox_generic_options(
-		{
-			back_func = 'overlay_endgame_menu',
-			contents = {
-				create_tabs({
-					tabs = {
-						{
-							label = localize('k_nemesis_deck'),
-							chosen = true,
-							tab_definition_function = G.UIDEF.view_nemesis_deck
-						},
-						{
-							label = localize('k_your_deck'),
-							tab_definition_function = G.UIDEF.view_deck
-						},
+	return create_UIBox_generic_options({
+		back_func = "overlay_endgame_menu",
+		contents = {
+			create_tabs({
+				tabs = {
+					{
+						label = localize("k_nemesis_deck"),
+						chosen = true,
+						tab_definition_function = G.UIDEF.view_nemesis_deck,
 					},
-					tab_h = 8,
-					snap_to_nav = true
-				})
-			},
-		})
+					{
+						label = localize("k_your_deck"),
+						tab_definition_function = G.UIDEF.view_deck,
+					},
+				},
+				tab_h = 8,
+				snap_to_nav = true,
+			}),
+		},
+	})
 end
 
 function G.FUNCS.toggle_players_jokers()
-	if not G.jokers or not MP.end_game_jokers then
-		return
-	end
+	if not G.jokers or not MP.end_game_jokers then return end
 
 	-- Avoid Jokers being removed from activating removal abilities (e.g. Negatives)
 	if MP.end_game_jokers.cards then
@@ -1783,9 +1769,7 @@ function G.FUNCS.toggle_players_jokers()
 		if MP.end_game_jokers_received then
 			G.FUNCS.load_end_game_jokers()
 		else
-			if MP.end_game_jokers.cards then
-				remove_all(MP.end_game_jokers.cards)
-			end
+			if MP.end_game_jokers.cards then remove_all(MP.end_game_jokers.cards) end
 			MP.end_game_jokers.cards = {}
 		end
 		MP.end_game_jokers_text = localize("k_enemy_jokers")
@@ -1799,19 +1783,15 @@ function G.FUNCS.view_nemesis_deck()
 		G.deck_preview = nil
 	end
 	G.FUNCS.overlay_menu({
-		definition = G.UIDEF.create_UIBox_view_nemesis_deck()
+		definition = G.UIDEF.create_UIBox_view_nemesis_deck(),
 	})
 end
 
 local ease_ante_ref = ease_ante
 function ease_ante(mod)
-	if not MP.LOBBY.code or MP.LOBBY.config.disable_live_and_timer_hud then
-		return ease_ante_ref(mod)
-	end
+	if not MP.LOBBY.code or MP.LOBBY.config.disable_live_and_timer_hud then return ease_ante_ref(mod) end
 	-- Prevents easing multiple times at once
-	if MP.GAME.antes_keyed[MP.GAME.ante_key] then
-		return
-	end
+	if MP.GAME.antes_keyed[MP.GAME.ante_key] then return end
 
 	-- pizza: remove discards
 	if MP.GAME.pizza_discards > 0 then
@@ -1836,9 +1816,7 @@ function ease_lives(mod)
 	G.E_MANAGER:add_event(Event({
 		trigger = "immediate",
 		func = function()
-			if not G.hand_text_area then
-				return
-			end
+			if not G.hand_text_area then return end
 
 			if MP.LOBBY.config.disable_live_and_timer_hud then
 				return true -- Returning nothing hangs the game because it's a part of an event
@@ -1894,8 +1872,8 @@ function reset_blinds()
 	reset_blinds_ref()
 	G.GAME.round_resets.pvp_blind_choices = {}
 	if MP.LOBBY.code then
-		local mp_small_choice, mp_big_choice, mp_boss_choice = MP.Gamemodes[MP.LOBBY.config.gamemode]:get_blinds_by_ante(
-		G.GAME.round_resets.ante)
+		local mp_small_choice, mp_big_choice, mp_boss_choice =
+			MP.Gamemodes[MP.LOBBY.config.gamemode]:get_blinds_by_ante(G.GAME.round_resets.ante)
 		G.GAME.round_resets.blind_choices.Small = mp_small_choice or G.GAME.round_resets.blind_choices.Small
 		G.GAME.round_resets.blind_choices.Big = mp_big_choice or G.GAME.round_resets.blind_choices.Big
 		G.GAME.round_resets.blind_choices.Boss = mp_boss_choice or G.GAME.round_resets.blind_choices.Boss
@@ -1944,7 +1922,7 @@ end
 
 local blind_disable_ref = Blind.disable
 function Blind:disable()
-	if MP.is_pvp_boss() and not (G.GAME.blind and G.GAME.blind.name == 'Verdant Leaf') then -- hackfix to make verdant work properly
+	if MP.is_pvp_boss() and not (G.GAME.blind and G.GAME.blind.name == "Verdant Leaf") then -- hackfix to make verdant work properly
 		return
 	end
 	blind_disable_ref(self)
@@ -2047,8 +2025,8 @@ local function hide_enemy_location()
 								{
 									n = G.UIT.T,
 									config = {
-										text = G.SETTINGS.language == "vi" and localize("k_lower_score") or
-										localize("k_round"),
+										text = G.SETTINGS.language == "vi" and localize("k_lower_score")
+											or localize("k_round"),
 										scale = 0.42,
 										colour = G.C.UI.TEXT_LIGHT,
 										shadow = true,
@@ -2063,8 +2041,8 @@ local function hide_enemy_location()
 								{
 									n = G.UIT.T,
 									config = {
-										text = G.SETTINGS.language == "vi" and localize("k_round") or
-										localize("k_lower_score"),
+										text = G.SETTINGS.language == "vi" and localize("k_round")
+											or localize("k_lower_score"),
 										scale = 0.42,
 										colour = G.C.UI.TEXT_LIGHT,
 										shadow = true,
@@ -2118,9 +2096,7 @@ function Game:update_shop(dt)
 		MP.GAME.spent_before_shop = to_big(MP.GAME.spent_total) + to_big(0)
 		show_enemy_location()
 	end
-	if G.STATE_COMPLETE and updated_location then
-		updated_location = false
-	end
+	if G.STATE_COMPLETE and updated_location then updated_location = false end
 	update_shop_ref(self, dt)
 end
 
@@ -2132,9 +2108,7 @@ function Game:update_blind_select(dt)
 		MP.ACTIONS.set_location("loc_selecting")
 		show_enemy_location()
 	end
-	if G.STATE_COMPLETE and updated_location then
-		updated_location = false
-	end
+	if G.STATE_COMPLETE and updated_location then updated_location = false end
 	update_blind_select_ref(self, dt)
 end
 
@@ -2164,9 +2138,7 @@ local skip_blind_ref = G.FUNCS.skip_blind
 G.FUNCS.skip_blind = function(e)
 	skip_blind_ref(e)
 	if MP.LOBBY.code then
-		if not MP.GAME.timer_started then
-			MP.GAME.timer = MP.GAME.timer + MP.LOBBY.config.timer_increment_seconds
-		end
+		if not MP.GAME.timer_started then MP.GAME.timer = MP.GAME.timer + MP.LOBBY.config.timer_increment_seconds end
 		MP.ACTIONS.skip(G.GAME.skips)
 
 		--Update the furthest blind
@@ -2179,8 +2151,8 @@ G.FUNCS.skip_blind = function(e)
 
 		MP.GAME.pincher_index = MP.GAME.pincher_index + 1
 
-		MP.GAME.furthest_blind = (temp_furthest_blind > MP.GAME.furthest_blind) and temp_furthest_blind or
-		MP.GAME.furthest_blind
+		MP.GAME.furthest_blind = (temp_furthest_blind > MP.GAME.furthest_blind) and temp_furthest_blind
+			or MP.GAME.furthest_blind
 
 		MP.ACTIONS.set_furthest_blind(MP.GAME.furthest_blind)
 	end
@@ -2198,37 +2170,35 @@ function G.FUNCS:continue_in_singleplayer(e)
 
 	-- Allow saving, save the run, and set up for continuation
 	G.F_NO_SAVING = false
-	G.SETTINGS.current_setup = 'Continue'
+	G.SETTINGS.current_setup = "Continue"
 	G.FUNCS.wipe_on()
 	save_run()
 	G:delete_run()
 
 	-- Load the saved game and start a new run in singleplayer
 	G.E_MANAGER:add_event(Event({
-		trigger = 'immediate',
+		trigger = "immediate",
 		no_delete = true,
 		func = function()
 			local profile = G.SETTINGS.profile
-			local save_path = profile .. '/save.jkr'
+			local save_path = profile .. "/save.jkr"
 			G.SAVED_GAME = get_compressed(save_path)
-			if G.SAVED_GAME ~= nil then
-				G.SAVED_GAME = STR_UNPACK(G.SAVED_GAME)
-			end
+			if G.SAVED_GAME ~= nil then G.SAVED_GAME = STR_UNPACK(G.SAVED_GAME) end
 			G:start_run({ savetext = G.SAVED_GAME })
 			return true
-		end
+		end,
 	}))
 	G.FUNCS.wipe_off()
 end
 
 function G.FUNCS.attention_text_realtime(args)
 	args = args or {}
-	args.text = args.text or 'test'
+	args.text = args.text or "test"
 	args.scale = args.scale or 1
 	args.colour = copy_table(args.colour or G.C.WHITE)
 	args.hold = (args.hold or 0)
 	args.pos = args.pos or { x = 0, y = 0 }
-	args.align = args.align or 'cm'
+	args.align = args.align or "cm"
 	args.emboss = args.emboss or nil
 
 	args.fade = 1
@@ -2242,26 +2212,55 @@ function G.FUNCS.attention_text_realtime(args)
 	end
 
 	args.uibox_config = {
-		align = args.align or 'cm',
+		align = args.align or "cm",
 		offset = args.offset or { x = 0, y = 0 },
 		major = args.cover or args.major or nil,
 	}
 
 	G.E_MANAGER:add_event(Event({
-		trigger = 'after',
-		timer = 'REAL',
+		trigger = "after",
+		timer = "REAL",
 		delay = 0,
 		blockable = false,
 		blocking = false,
 		func = function()
-			args.AT = UIBox {
+			args.AT = UIBox({
 				T = { args.pos.x, args.pos.y, 0, 0 },
-				definition =
-				{ n = G.UIT.ROOT, config = { align = args.cover_align or 'cm', minw = (args.cover and args.cover.T.w or 0.001) + (args.cover_padding or 0), minh = (args.cover and args.cover.T.h or 0.001) + (args.cover_padding or 0), padding = 0.03, r = 0.1, emboss = args.emboss, colour = args.cover_colour }, nodes = {
-					{ n = G.UIT.O, config = { draw_layer = 1, object = DynaText({ scale = args.scale, string = args.text, maxw = args.maxw, colours = { args.colour }, float = true, shadow = true, silent = not args.noisy, args.scale, pop_in = 0, pop_in_rate = 6, rotate = args.rotate or nil }) } },
-				} },
-				config = args.uibox_config
-			}
+				definition = {
+					n = G.UIT.ROOT,
+					config = {
+						align = args.cover_align or "cm",
+						minw = (args.cover and args.cover.T.w or 0.001) + (args.cover_padding or 0),
+						minh = (args.cover and args.cover.T.h or 0.001) + (args.cover_padding or 0),
+						padding = 0.03,
+						r = 0.1,
+						emboss = args.emboss,
+						colour = args.cover_colour,
+					},
+					nodes = {
+						{
+							n = G.UIT.O,
+							config = {
+								draw_layer = 1,
+								object = DynaText({
+									scale = args.scale,
+									string = args.text,
+									maxw = args.maxw,
+									colours = { args.colour },
+									float = true,
+									shadow = true,
+									silent = not args.noisy,
+									args.scale,
+									pop_in = 0,
+									pop_in_rate = 6,
+									rotate = args.rotate or nil,
+								}),
+							},
+						},
+					},
+				},
+				config = args.uibox_config,
+			})
 			args.AT.attention_text = true
 
 			args.text = args.AT.UIRoot.children[1].config.object
@@ -2269,7 +2268,7 @@ function G.FUNCS.attention_text_realtime(args)
 
 			if args.cover then
 				Particles(args.pos.x, args.pos.y, 0, 0, {
-					timer_type = 'TOTAL',
+					timer_type = "TOTAL",
 					timer = 0.01,
 					pulse_max = 15,
 					max = 0,
@@ -2286,22 +2285,22 @@ function G.FUNCS.attention_text_realtime(args)
 			if args.backdrop_colour then
 				args.backdrop_colour = copy_table(args.backdrop_colour)
 				Particles(args.pos.x, args.pos.y, 0, 0, {
-					timer_type = 'TOTAL',
+					timer_type = "TOTAL",
 					timer = 5,
 					scale = 2.4 * (args.backdrop_scale or 1),
 					lifespan = 5,
 					speed = 0,
 					attach = args.AT,
-					colours = { args.backdrop_colour }
+					colours = { args.backdrop_colour },
 				})
 			end
 			return true
-		end
+		end,
 	}))
 
 	G.E_MANAGER:add_event(Event({
-		trigger = 'after',
-		timer = 'REAL',
+		trigger = "after",
+		timer = "REAL",
 		delay = args.hold,
 		blockable = false,
 		blocking = false,
@@ -2321,7 +2320,7 @@ function G.FUNCS.attention_text_realtime(args)
 					return true
 				end
 			end
-		end
+		end,
 	}))
 end
 

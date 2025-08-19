@@ -29,9 +29,7 @@ SMODS.Joker({
 			return
 		end
 
-		if G.STAGE ~= G.STAGES.RUN then
-			return
-		end
+		if G.STAGE ~= G.STAGES.RUN then return end
 
 		local chips = G.GAME.stake >= 6 and card.ability.extra.highstake or card.ability.extra.extra
 		card.ability.t_chips = math.max((MP.GAME.enemy.lives - MP.GAME.lives) * chips, 0)

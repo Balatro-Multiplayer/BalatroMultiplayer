@@ -9,9 +9,7 @@ if SMODS.Mods["Distro"] and SMODS.Mods["Distro"].can_load then
 			if DiscordIPC and DiscordIPC.send_activity then
 				local send_activity_ref = DiscordIPC.send_activity
 				DiscordIPC.send_activity = function(bypass_block)
-					if MP.LOBBY.code and not bypass_block then
-						return
-					end
+					if MP.LOBBY.code and not bypass_block then return end
 					send_activity_ref()
 				end
 				return true
@@ -87,9 +85,7 @@ if SMODS.Mods["Distro"] and SMODS.Mods["Distro"].can_load then
 		if MP.LOBBY.code then
 			local enemy_username = nil
 			if MP.LOBBY.is_host then
-				if MP.LOBBY.guest then
-					enemy_username = MP.LOBBY.guest.username
-				end
+				if MP.LOBBY.guest then enemy_username = MP.LOBBY.guest.username end
 			else
 				enemy_username = MP.LOBBY.host.username
 			end

@@ -24,16 +24,16 @@ SMODS.Joker({
 	end,
 	calculate = function(self, card, context)
 		if
-			context.mp_speedrun 
-			and (not card.edition or card.edition.type ~= "mp_phantom") 
+			context.mp_speedrun
+			and (not card.edition or card.edition.type ~= "mp_phantom")
 			and #G.consumeables.cards + G.GAME.consumeable_buffer < G.consumeables.config.card_limit
 		then
 			G.GAME.consumeable_buffer = G.GAME.consumeable_buffer + 1
 			G.E_MANAGER:add_event(Event({
-				trigger = 'before',
+				trigger = "before",
 				delay = 0.0,
 				func = function()
-					local card = create_card('Spectral',G.consumeables, nil, nil, nil, nil, nil, 'mp_speedrun')
+					local card = create_card("Spectral", G.consumeables, nil, nil, nil, nil, nil, "mp_speedrun")
 					card:add_to_deck()
 					G.consumeables:emplace(card)
 					G.GAME.consumeable_buffer = 0
@@ -41,9 +41,9 @@ SMODS.Joker({
 				end,
 			}))
 			return {
-				message = localize('k_plus_spectral'),
+				message = localize("k_plus_spectral"),
 				colour = G.C.SECONDARY_SET.Spectral,
-				card = card
+				card = card,
 			}
 		end
 	end,

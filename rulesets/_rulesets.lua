@@ -18,14 +18,12 @@ MP.Ruleset = SMODS.GameObject:extend({
 		"reworked_enhancements",
 		"reworked_tags",
 		"reworked_blinds",
-		"create_info_menu"
+		"create_info_menu",
 	},
 	class_prefix = "ruleset",
 	inject = function(self)
 		MP.Rulesets[self.key] = self
-		if not G.P_CENTER_POOLS.Ruleset then
-			G.P_CENTER_POOLS.Ruleset = {}
-		end
+		if not G.P_CENTER_POOLS.Ruleset then G.P_CENTER_POOLS.Ruleset = {} end
 		table.insert(G.P_CENTER_POOLS.Ruleset, self)
 	end,
 	process_loc_text = function(self)
@@ -36,33 +34,33 @@ MP.Ruleset = SMODS.GameObject:extend({
 	end,
 	force_lobby_options = function(self)
 		return false
-	end
+	end,
 })
 
 function MP.ApplyBans()
-    if MP.LOBBY.code and MP.LOBBY.config.ruleset then
-        local ruleset = MP.Rulesets[MP.LOBBY.config.ruleset]
-        local gamemode = MP.Gamemodes["gamemode_mp_"..MP.LOBBY.type]
-        local banned_tables = {
-            "jokers",
-            "consumables",
-            "vouchers",
-            "enhancements",
-            "tags",
-            "blinds",
-        }
-        for _, table in ipairs(banned_tables) do
-            for _, v in ipairs(ruleset["banned_" .. table]) do
-                G.GAME.banned_keys[v] = true
-            end
-            for _, v in ipairs(gamemode["banned_" .. table]) do
-                G.GAME.banned_keys[v] = true
-            end
-            for k, v in pairs(MP.DECK["BANNED_" .. string.upper(table)]) do
-                G.GAME.banned_keys[k] = true
-            end
-        end
-    end
+	if MP.LOBBY.code and MP.LOBBY.config.ruleset then
+		local ruleset = MP.Rulesets[MP.LOBBY.config.ruleset]
+		local gamemode = MP.Gamemodes["gamemode_mp_" .. MP.LOBBY.type]
+		local banned_tables = {
+			"jokers",
+			"consumables",
+			"vouchers",
+			"enhancements",
+			"tags",
+			"blinds",
+		}
+		for _, table in ipairs(banned_tables) do
+			for _, v in ipairs(ruleset["banned_" .. table]) do
+				G.GAME.banned_keys[v] = true
+			end
+			for _, v in ipairs(gamemode["banned_" .. table]) do
+				G.GAME.banned_keys[v] = true
+			end
+			for k, v in pairs(MP.DECK["BANNED_" .. string.upper(table)]) do
+				G.GAME.banned_keys[k] = true
+			end
+		end
+	end
 end
 
 -- This function writes any center rework data to G.P_CENTERS, where they will be used later in its specified ruleset
@@ -72,9 +70,7 @@ function MP.ReworkCenter(args)
 
 	-- Convert single ruleset to list for backward compatibility
 	local rulesets = args.ruleset
-	if type(rulesets) == "string" then
-		rulesets = { rulesets }
-	end
+	if type(rulesets) == "string" then rulesets = { rulesets } end
 
 	-- Apply changes to all specified rulesets
 	for _, ruleset in ipairs(rulesets) do
@@ -82,9 +78,7 @@ function MP.ReworkCenter(args)
 		for k, v in pairs(args) do
 			if k ~= "key" and k ~= "ruleset" and k ~= "silent" then
 				center[ruleset_ .. k] = v
-				if not center["mp_vanilla_" .. k] then
-					center["mp_vanilla_" .. k] = center[k] or 'NULL'
-				end
+				if not center["mp_vanilla_" .. k] then center["mp_vanilla_" .. k] = center[k] or "NULL" end
 			end
 		end
 		center.mp_reworks = center.mp_reworks or {}
@@ -100,9 +94,7 @@ end
 -- You can also call this function with a key to only affect that specific joker (might be useful)
 function MP.LoadReworks(ruleset, key)
 	ruleset = ruleset or "vanilla"
-	if string.sub(ruleset, 1, 11) == "ruleset_mp_" then
-		ruleset = string.sub(ruleset, 12, #ruleset)
-	end
+	if string.sub(ruleset, 1, 11) == "ruleset_mp_" then ruleset = string.sub(ruleset, 12, #ruleset) end
 	local function process(key_, ruleset_)
 		local center = G.P_CENTERS[key_]
 		for k, v in pairs(center) do
@@ -112,10 +104,10 @@ function MP.LoadReworks(ruleset, key)
 					SMODS.remove_pool(G.P_JOKER_RARITY_POOLS[center[orig]], center.key)
 					SMODS.insert_pool(G.P_JOKER_RARITY_POOLS[center[k]], center, true)
 				end
-				if center[k] == 'NULL' then
+				if center[k] == "NULL" then
 					center[orig] = nil
 				else
-					center[orig] = center[k] 
+					center[orig] = center[k]
 				end
 			end
 		end
