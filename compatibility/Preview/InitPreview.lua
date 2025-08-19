@@ -34,10 +34,12 @@ function FN.PRE.start_new_coroutine()
 		FN.PRE.add_update_event("immediate") -- Force UI refresh
 
 		local start_time = os.time()
-		while os.time() - start_time < 5 do
-			FN.PRE.simulate() -- Force a simulation run
-			FN.PRE.add_update_event("immediate") -- Ensure UI updates
-			coroutine.yield() -- Allow game to continue running
+		if not MP.is_pvp_boss() then
+			while os.time() - start_time < 5 do
+				FN.PRE.simulate() -- Force a simulation run
+				FN.PRE.add_update_event("immediate") -- Ensure UI updates
+				coroutine.yield() -- Allow game to continue running
+			end
 		end
 		-- Delay for 5 seconds
 		FN.PRE.lock_updates = false
