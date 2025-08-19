@@ -4,6 +4,8 @@ if TMJ then
     G.FUNCS.tmj_spawn = function() error("This is not allowed in Multiplayer") end
 
     --TMJ v4
-    TMJ.FUNCS.CHEAT_TOGGLE = function() return end --this would otherwise return the toggle which allows below config to be changed
-    TMJ.config.disable_ctrl_enter = true 
+    if TMJ and TMJ.FUNCS and TMJ.config then 
+        TMJ.FUNCS.CHEAT_TOGGLE = function() return end --this would otherwise return the toggle which allows below config to be changed
+        TMJ.config.disable_ctrl_enter = true 
+    end
 end
