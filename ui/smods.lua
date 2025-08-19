@@ -1,5 +1,5 @@
 SMODS.Mods.Multiplayer.credits_tab = function()
-    local scale = 0.75
+	local scale = 0.75
 	return {
 		n = G.UIT.ROOT,
 		config = {
@@ -9,24 +9,24 @@ SMODS.Mods.Multiplayer.credits_tab = function()
 			minw = 6,
 			align = "cm",
 			padding = 0.2,
-			colour = G.C.BLACK
+			colour = G.C.BLACK,
 		},
 		nodes = {
 			{
 				n = G.UIT.R,
 				config = {
 					padding = 0.2,
-					align = "cm"
+					align = "cm",
 				},
 				nodes = {
 					{
 						n = G.UIT.T,
 						config = {
-							text = localize('k_created_by'),
+							text = localize("k_created_by"),
 							shadow = true,
 							scale = scale * 0.8,
-							colour = G.C.UI.TEXT_LIGHT
-						}
+							colour = G.C.UI.TEXT_LIGHT,
+						},
 					},
 					{
 						n = G.UIT.T,
@@ -34,46 +34,50 @@ SMODS.Mods.Multiplayer.credits_tab = function()
 							text = "Virtualized",
 							shadow = true,
 							scale = scale * 0.8,
-							colour = G.C.DARK_EDITION
-						}
-					}
-				}
+							colour = G.C.DARK_EDITION,
+						},
+					},
+				},
 			},
 			{
 				n = G.UIT.R,
 				config = {
 					padding = 0,
-					align = "cm"
+					align = "cm",
 				},
 				nodes = {
 					{
 						n = G.UIT.T,
 						config = {
-							text = localize('k_major_contributors'),
+							text = localize("k_major_contributors"),
 							shadow = true,
 							scale = scale * 0.8,
-							colour = G.C.UI.TEXT_LIGHT
-						}
+							colour = G.C.UI.TEXT_LIGHT,
+						},
 					},
-				}
+				},
 			},
 			{
 				n = G.UIT.R,
 				config = {
 					padding = 0.2,
-					align = "cm"
+					align = "cm",
 				},
 				nodes = {
 					{
 						n = G.UIT.T,
 						config = {
-							text = localize({ type = "variable", key = "k_credits_list", vars = { "TGMM, Senfinbrare, CUexter, Brawmario, Divvy, Andy, Steph,"}}),
+							text = localize({
+								type = "variable",
+								key = "k_credits_list",
+								vars = { "TGMM, Senfinbrare, CUexter, Brawmario, Divvy, Andy, Steph," },
+							}),
 							shadow = true,
 							scale = scale * 0.8,
-							colour = G.C.RED
-						}
-					}
-				}
+							colour = G.C.RED,
+						},
+					},
+				},
 			},
 			{
 				n = G.UIT.R,
@@ -85,9 +89,9 @@ SMODS.Mods.Multiplayer.credits_tab = function()
 					UIBox_button({
 						minw = 3.85,
 						button = "bmp_github",
-						label = {localize('b_github_project')}
-					})
-				}
+						label = { localize("b_github_project") },
+					}),
+				},
 			},
 			{
 				n = G.UIT.R,
@@ -99,19 +103,26 @@ SMODS.Mods.Multiplayer.credits_tab = function()
 					UIBox_button({
 						minw = 3.85 * 2,
 						button = "bmp_github",
-						label = {localize('b_mp_discord')}
-					})
-				}
+						label = { localize("b_mp_discord") },
+					}),
+				},
 			},
-		}
+		},
 	}
 end
 
 SMODS.Mods.Multiplayer.config_tab = function()
-	local blind_anim = AnimatedSprite(0,0, 1.4, 1.4, G.ANIMATION_ATLAS['mp_player_blind_col'], G.P_BLINDS[MP.UTILS.blind_col_numtokey(MP.LOBBY.blind_col)].pos)
+	local blind_anim = AnimatedSprite(
+		0,
+		0,
+		1.4,
+		1.4,
+		G.ANIMATION_ATLAS["mp_player_blind_col"],
+		G.P_BLINDS[MP.UTILS.blind_col_numtokey(MP.LOBBY.blind_col)].pos
+	)
 	blind_anim:define_draw_steps({
-		{shader = 'dissolve', shadow_height = 0.05},
-		{shader = 'dissolve'}
+		{ shader = "dissolve", shadow_height = 0.05 },
+		{ shader = "dissolve" },
 	})
 	local ret = {
 		n = G.UIT.ROOT,
@@ -123,21 +134,6 @@ SMODS.Mods.Multiplayer.config_tab = function()
 			colour = G.C.BLACK,
 		},
 		nodes = {
-			--[[{
-				n = G.UIT.R,
-				config = {
-					padding = 0.5,
-					align = "cm",
-				},
-				nodes = {
-					create_toggle({
-						id = "misprint_display_toggle",
-						label = localize("b_misprint_display"),
-						ref_table = SMODS.Mods["Multiplayer"].config,
-						ref_value = "misprint_display",
-					}),
-				},
-			},]]
 			{
 				n = G.UIT.R,
 				config = {
@@ -145,17 +141,17 @@ SMODS.Mods.Multiplayer.config_tab = function()
 					align = "cm",
 					on_demand_tooltip = {
 						text = {
-							localize('k_the_order_integration_desc'),
-							localize("k_the_order_credit")
-						}
+							localize("k_preview_integration_desc"),
+							localize("k_preview_credit"),
+						},
 					},
 				},
 				nodes = {
 					create_toggle({
-						id = "the_order_integration_toggle",
-						label = localize("b_the_order_integration"),
+						id = "fantoms_preview_integration_toggle",
+						label = localize("b_preview_integration"),
 						ref_table = SMODS.Mods["Multiplayer"].config.integrations,
-						ref_value = "TheOrder",
+						ref_value = "Preview",
 					}),
 				},
 			},
@@ -169,7 +165,7 @@ SMODS.Mods.Multiplayer.config_tab = function()
 					{
 						n = G.UIT.T,
 						config = {
-							text = localize("k_the_order_credit"),
+							text = localize("k_preview_credit"),
 							shadow = true,
 							scale = 0.375,
 							colour = G.C.UI.TEXT_INACTIVE,
@@ -239,19 +235,57 @@ SMODS.Mods.Multiplayer.config_tab = function()
 					id = "blind_col_changer",
 				},
 				nodes = {
-					{n=G.UIT.C, config={align = "cm"}, nodes={
-						{n=G.UIT.O, config={id = "blind_col_changer_sprite", object = blind_anim}},
-					}},
-					{n=G.UIT.C, config={align = "cm"}, nodes={
-						create_option_cycle({
-							id = "blind_col_changer_option",
-							label = localize{type ='name_text', key = MP.UTILS.blind_col_numtokey(MP.LOBBY.blind_col), set = 'Blind'},
-							scale = 0.8,
-							options = {1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25}, -- blind_cols are being saved as numbers because of this option cycle. if this is changed then we should probably change to keys
-							opt_callback = 'change_blind_col',
-							current_option = MP.LOBBY.blind_col
-						}),
-					}},
+					{
+						n = G.UIT.C,
+						config = { align = "cm" },
+						nodes = {
+							{ n = G.UIT.O, config = { id = "blind_col_changer_sprite", object = blind_anim } },
+						},
+					},
+					{
+						n = G.UIT.C,
+						config = { align = "cm" },
+						nodes = {
+							create_option_cycle({
+								id = "blind_col_changer_option",
+								label = localize({
+									type = "name_text",
+									key = MP.UTILS.blind_col_numtokey(MP.LOBBY.blind_col),
+									set = "Blind",
+								}),
+								scale = 0.8,
+								options = {
+									1,
+									2,
+									3,
+									4,
+									5,
+									6,
+									7,
+									8,
+									9,
+									10,
+									11,
+									12,
+									13,
+									14,
+									15,
+									16,
+									17,
+									18,
+									19,
+									20,
+									21,
+									22,
+									23,
+									24,
+									25,
+								}, -- blind_cols are being saved as numbers because of this option cycle. if this is changed then we should probably change to keys
+								opt_callback = "change_blind_col",
+								current_option = MP.LOBBY.blind_col,
+							}),
+						},
+					},
 				},
 			},
 		},
@@ -267,18 +301,26 @@ function G.FUNCS.bmp_github(e)
 	love.system.openURL("https://github.com/Balatro-Multiplayer/BalatroMultiplayer/")
 end
 
-function G.FUNCS.change_blind_col(args)	-- all we're doing is just saving + redefining the ui elements here
+function G.FUNCS.change_blind_col(args) -- all we're doing is just saving + redefining the ui elements here
 	MP.UTILS.save_blind_col(args.to_val)
 	MP.LOBBY.blind_col = args.to_val
-	local sprite = G.OVERLAY_MENU:get_UIE_by_ID('blind_col_changer_sprite')
+	local sprite = G.OVERLAY_MENU:get_UIE_by_ID("blind_col_changer_sprite")
 	sprite.config.object:remove()
-	sprite.config.object = AnimatedSprite(0,0, 1.4, 1.4, G.ANIMATION_ATLAS['mp_player_blind_col'], G.P_BLINDS[MP.UTILS.blind_col_numtokey(MP.LOBBY.blind_col)].pos)
+	sprite.config.object = AnimatedSprite(
+		0,
+		0,
+		1.4,
+		1.4,
+		G.ANIMATION_ATLAS["mp_player_blind_col"],
+		G.P_BLINDS[MP.UTILS.blind_col_numtokey(MP.LOBBY.blind_col)].pos
+	)
 	sprite.config.object:define_draw_steps({
-		{shader = 'dissolve', shadow_height = 0.05},
-		{shader = 'dissolve'}
+		{ shader = "dissolve", shadow_height = 0.05 },
+		{ shader = "dissolve" },
 	})
 	sprite.UIBox:recalculate()
-	local option = G.OVERLAY_MENU:get_UIE_by_ID('blind_col_changer_option')
-	option.children[1].children[1].config.text = localize{type ='name_text', key = MP.UTILS.blind_col_numtokey(MP.LOBBY.blind_col), set = 'Blind'}
+	local option = G.OVERLAY_MENU:get_UIE_by_ID("blind_col_changer_option")
+	option.children[1].children[1].config.text =
+		localize({ type = "name_text", key = MP.UTILS.blind_col_numtokey(MP.LOBBY.blind_col), set = "Blind" })
 	option.UIBox:recalculate()
 end

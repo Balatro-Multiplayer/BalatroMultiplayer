@@ -18,7 +18,7 @@ MP.Gamemode = SMODS.GameObject:extend({
 		"reworked_enhancements",
 		"reworked_tags",
 		"reworked_blinds",
-		"create_info_menu"
+		"create_info_menu",
 	},
 	class_prefix = "gamemode",
 	inject = function(self)

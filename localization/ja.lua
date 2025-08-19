@@ -89,7 +89,7 @@ return {
 				text = {
 					"自分のディスカード{C:red}+#1#{}",
 					"{X:purple,C:white}相手{} のディスカード {C:red}+#2#{}",
-					"{C:inactive}({C:attention}PvPブラインド{} {C:inactive}終了後に消滅する)"
+					"{C:inactive}({C:attention}PvPブラインド{} {C:inactive}終了後に消滅する)",
 				},
 			},
 			j_mp_pacifist = {
@@ -114,7 +114,7 @@ return {
 				text = {
 					"{X:purple,C:white}相手{} の一番高い",
 					"{C:legendary,E:1} ポーカーハンド{} のレベルを #1# 下げる",
-					"{C:inactive}({C:attention}PvPブラインド開始時{} {C:inactive}に効果が発動する)"
+					"{C:inactive}({C:attention}PvPブラインド開始時{} {C:inactive}に効果が発動する)",
 				},
 			},
 		},
@@ -315,8 +315,12 @@ return {
 			k_no_reworked_objs = "追加､修正された#1#はありません",
 		},
 		v_text = {
-			ch_c_hanging_chad_rework = { "{C:attention}ハンギングチャド{}は{C:dark_edition}マルチ用に改良されています。" },
-			ch_c_glass_cards_rework = { "{C:attention}グラスカード{}は{C:dark_edition}マルチ用に改良されています。" },
+			ch_c_hanging_chad_rework = {
+				"{C:attention}ハンギングチャド{}は{C:dark_edition}マルチ用に改良されています。",
+			},
+			ch_c_glass_cards_rework = {
+				"{C:attention}グラスカード{}は{C:dark_edition}マルチ用に改良されています。",
+			},
 		},
 		challenge_names = {
 			c_mp_misprint_deck = "バグシードデッキ",

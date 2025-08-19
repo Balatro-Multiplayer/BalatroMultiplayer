@@ -14,14 +14,10 @@ end
 local function get_mod_data()
 	local mod_table = {}
 	for key, mod in pairs(SMODS.Mods) do
-		if not mod.disabled and key ~= "Balatro" then
-			table.insert(mod_table, key .. "-" .. (mod.version or "UNK"))
-		end
+		if not mod.disabled and key ~= "Balatro" then table.insert(mod_table, key .. "-" .. (mod.version or "UNK")) end
 	end
 	for key, mod in pairs(MP.INTEGRATIONS) do
-		if mod then
-			table.insert(mod_table, key .. "-MultiplayerIntegration")
-		end
+		if mod then table.insert(mod_table, key .. "-MultiplayerIntegration") end
 	end
 	return mod_table
 end
@@ -34,6 +30,7 @@ function MP:generate_hash()
 	SMODS.Mods["Multiplayer"].config.unlocked = MP.UTILS.unlock_check()
 	table.insert(mod_data, 1, "unlocked=" .. tostring(SMODS.Mods["Multiplayer"].config.unlocked))
 	table.insert(mod_data, 1, "theOrder=" .. tostring(SMODS.Mods["Multiplayer"].config.integrations.TheOrder))
+	table.insert(mod_data, 1, "preview=" .. tostring(SMODS.Mods["Multiplayer"].config.integrations.Preview))
 	local mod_string = table.concat(mod_data, ";")
 	MP.MOD_STRING = mod_string
 	MP.MOD_HASH = hash(mod_string) or "0000"

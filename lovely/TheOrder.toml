@@ -11,7 +11,7 @@ target = "functions/common_events.lua"
 pattern = "local _, boss = pseudorandom_element(eligible_bosses, pseudoseed('boss'))"
 position = "at"
 payload = '''local boss = nil
-if MP.INTEGRATIONS.TheOrder then
+if MP.should_use_the_order() then
 	_, boss = pseudorandom_element(eligible_bosses, pseudoseed('boss'..G.GAME.round_resets.ante))
 else
 	_, boss = pseudorandom_element(eligible_bosses, pseudoseed('boss'))
@@ -25,7 +25,7 @@ match_indent = true
 target = "game.lua"
 pattern = "for k, v in pairs(self.GAME.pseudorandom) do if v == 0 then self.GAME.pseudorandom[k] = pseudohash(k..self.GAME.pseudorandom.seed) end end"
 position = "before"
-payload = '''if self.GAME.pseudorandom.seed:sub(1, 1) ~= "*" and MP.INTEGRATIONS.TheOrder then self.GAME.pseudorandom.seed = "*" .. self.GAME.pseudorandom.seed end'''
+payload = '''if self.GAME.pseudorandom.seed:sub(1, 1) ~= "*" and MP.should_use_the_order() then self.GAME.pseudorandom.seed = "*" .. self.GAME.pseudorandom.seed end'''
 match_indent = true
 
 # Ankh compat w/ previous patch
@@ -34,7 +34,7 @@ match_indent = true
 target = "game.lua"
 pattern = "self.GAME.pseudorandom.seed = hash_seed(self.GAME.pseudorandom.seed)"
 position = "before"
-payload = '''if self.GAME.pseudorandom.seed:sub(1, 1) ~= "*" and MP.INTEGRATIONS.TheOrder then self.GAME.pseudorandom.seed = "*" .. self.GAME.pseudorandom.seed end'''
+payload = '''if self.GAME.pseudorandom.seed:sub(1, 1) ~= "*" and MP.should_use_the_order() then self.GAME.pseudorandom.seed = "*" .. self.GAME.pseudorandom.seed end'''
 match_indent = true
 
 
@@ -91,7 +91,7 @@ match_indent = true
 target = "functions/common_events.lua"
 pattern = '''center = pseudorandom_element(_pool, pseudoseed(_pool_key..'_resample'..it))'''
 position = "at"
-payload = '''center = pseudorandom_element(_pool, pseudoseed(_pool_key..(MP.INTEGRATIONS.TheOrder and '' or ('_resample'..it)) ))'''
+payload = '''center = pseudorandom_element(_pool, pseudoseed(_pool_key..(MP.should_use_the_order() and '' or ('_resample'..it)) ))'''
 match_indent = true
 
 # Patch joker editions/stickers to be dependent on individual jokers rather than queue
@@ -101,9 +101,9 @@ target = "functions/common_events.lua"
 pattern = '''if (area == G.shop_jokers) or (area == G.pack_cards) then'''
 position = "before"
 payload = '''
-local _etpeareakey = MP.INTEGRATIONS.TheOrder and 'etperpoll' or (area == G.pack_cards and 'packetper' or 'etperpoll')
-local _rentareakey = MP.INTEGRATIONS.TheOrder and 'ssjr' or (area == G.pack_cards and 'packssjr' or 'ssjr')
-local _order = MP.INTEGRATIONS.TheOrder and center.key or ""
+local _etpeareakey = MP.should_use_the_order() and 'etperpoll' or (area == G.pack_cards and 'packetper' or 'etperpoll')
+local _rentareakey = MP.should_use_the_order() and 'ssjr' or (area == G.pack_cards and 'packssjr' or 'ssjr')
+local _order = MP.should_use_the_order() and center.key or ""
 '''
 match_indent = true
 
@@ -129,7 +129,7 @@ target = "functions/common_events.lua"
 pattern = '''local edition = poll_edition('edi'..(key_append or '')..G.GAME.round_resets.ante)'''
 position = "at"
 payload = '''
-if MP.INTEGRATIONS.TheOrder then key_append = nil end	-- why does this even use key_append again?
+if MP.should_use_the_order() then key_append = nil end	-- why does this even use key_append again?
 local edition = poll_edition(_order..'edi'..(key_append or '')..G.GAME.round_resets.ante)
 '''
 match_indent = true
@@ -142,7 +142,7 @@ target = "functions/common_events.lua"
 pattern = '''if pseudorandom('soul_'.._type..G.GAME.round_resets.ante) > 0.997 then
 	forced_key = 'c_soul''''
 position = "at"
-payload = '''if pseudorandom('soul_'..(MP.INTEGRATIONS.TheOrder and 'c_soul' or _type)..G.GAME.round_resets.ante) > 0.997 then
+payload = '''if pseudorandom('soul_'..(MP.should_use_the_order() and 'c_soul' or _type)..G.GAME.round_resets.ante) > 0.997 then
 	forced_key = 'c_soul''''
 match_indent = true
 
@@ -152,8 +152,8 @@ target = "functions/common_events.lua"
 pattern = '''if pseudorandom('soul_'.._type..G.GAME.round_resets.ante) > 0.997 then
 	forced_key = 'c_black_hole''''
 position = "at"
-payload = '''if pseudorandom('soul_'..(MP.INTEGRATIONS.TheOrder and 'c_black_hole' or _type)..G.GAME.round_resets.ante) > 0.997 then
-	if not (MP.INTEGRATIONS.TheOrder and forced_key) then
+payload = '''if pseudorandom('soul_'..(MP.should_use_the_order() and 'c_black_hole' or _type)..G.GAME.round_resets.ante) > 0.997 then
+	if not (MP.should_use_the_order() and forced_key) then
 		forced_key = 'c_black_hole'
 	end'''
 match_indent = true
@@ -164,7 +164,7 @@ match_indent = true
 target = "card.lua"
 pattern = '''local card = create_card('Joker', G.jokers, nil, 0.99, nil, nil, nil, 'wra')'''
 position = "at"
-payload = '''local card = create_card('Joker', G.jokers, nil, MP.INTEGRATIONS.TheOrder and 1 or 0.99, nil, nil, nil, 'wra')'''
+payload = '''local card = create_card('Joker', G.jokers, nil, MP.should_use_the_order() and 1 or 0.99, nil, nil, nil, 'wra')'''
 match_indent = true
 
 # Patch To-Do List rng to be the same on different operating systems
@@ -176,7 +176,7 @@ target = "card.lua"
 pattern = '''while not self.ability.to_do_poker_hand do'''
 position = "before"
 payload = '''
-if MP.INTEGRATIONS.TheOrder then
+if MP.should_use_the_order() then
 	_poker_hands = MP.sorted_hand_list(self.ability.to_do_poker_hand)
 end
 '''
@@ -188,7 +188,7 @@ target = "card.lua"
 pattern = '''self.ability.to_do_poker_hand = pseudorandom_element(_poker_hands, pseudoseed('to_do'))'''
 position = "before"
 payload = '''
-if MP.INTEGRATIONS.TheOrder then
+if MP.should_use_the_order() then
 	_poker_hands = MP.sorted_hand_list(self.ability.to_do_poker_hand)
 end
 '''

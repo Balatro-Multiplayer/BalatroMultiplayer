@@ -13,12 +13,12 @@ MP.Ruleset({
 	reworked_enhancements = {},
 	reworked_tags = {},
 	reworked_blinds = {},
-	create_info_menu = function ()
+	create_info_menu = function()
 		return {
 			{
 				n = G.UIT.R,
 				config = {
-					align = "tm"
+					align = "tm",
 				},
 				nodes = {
 					MP.UI.BackgroundGrouping(localize("k_has_multiplayer_content"), {
@@ -28,15 +28,15 @@ MP.Ruleset({
 								text = localize("k_no"),
 								scale = 0.8,
 								colour = G.C.RED,
-							}
-						}
-					}, {col = true, text_scale = 0.6}),
+							},
+						},
+					}, { col = true, text_scale = 0.6 }),
 					{
 						n = G.UIT.C,
 						config = {
 							minw = 0.1,
-							minh = 0.1
-						}
+							minh = 0.1,
+						},
 					},
 					MP.UI.BackgroundGrouping(localize("k_forces_lobby_options"), {
 						{
@@ -45,15 +45,15 @@ MP.Ruleset({
 								text = localize("k_no"),
 								scale = 0.8,
 								colour = G.C.RED,
-							}
-						}
-					}, {col = true, text_scale = 0.6}),
+							},
+						},
+					}, { col = true, text_scale = 0.6 }),
 					{
 						n = G.UIT.C,
 						config = {
 							minw = 0.1,
-							minh = 0.1
-						}
+							minh = 0.1,
+						},
 					},
 					MP.UI.BackgroundGrouping(localize("k_forces_gamemode"), {
 						{
@@ -62,23 +62,23 @@ MP.Ruleset({
 								text = localize("k_no"),
 								scale = 0.8,
 								colour = G.C.RED,
-							}
-						}
-					}, {col = true, text_scale = 0.6})
+							},
+						},
+					}, { col = true, text_scale = 0.6 }),
 				},
 			},
 			{
 				n = G.UIT.R,
 				config = {
 					minw = 0.05,
-					minh = 0.05
-				}
+					minh = 0.05,
+				},
 			},
 			{
 				n = G.UIT.R,
 				config = {
 					align = "cl",
-					padding = 0.1
+					padding = 0.1,
 				},
 				nodes = {
 					{
@@ -87,7 +87,7 @@ MP.Ruleset({
 							text = localize("k_vanilla_description"),
 							scale = 0.6,
 							colour = G.C.UI.TEXT_LIGHT,
-						}
+						},
 					},
 				},
 			},

@@ -16,17 +16,13 @@ if SMODS.Mods["Cryptid"] and SMODS.Mods["Cryptid"].can_load then
 
 	local defeat_ref = Blind.defeat
 	function Blind:defeat(silent)
-		if self.config.blind.key == nil then
-			self.config.blind.key = "bl_nil"
-		end
+		if self.config.blind.key == nil then self.config.blind.key = "bl_nil" end
 		defeat_ref(self, silent)
 	end
 
 	local save_run_ref = save_run
 	function save_run()
-		if G.F_NO_SAVING then
-			return
-		end
+		if G.F_NO_SAVING then return end
 		save_run_ref()
 	end
 

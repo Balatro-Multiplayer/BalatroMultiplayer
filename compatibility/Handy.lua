@@ -103,9 +103,7 @@ if Handy then
 							"select_blind_button"
 						)
 					end)
-					if not success or not button then
-						return false
-					end
+					if not success or not button then return false end
 					if button.config and button.config.func then
 						return Handy.fake_events.check({
 							func = G.FUNCS[button.config.func],

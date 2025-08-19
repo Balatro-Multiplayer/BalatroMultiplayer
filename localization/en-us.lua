@@ -31,7 +31,7 @@ return {
 			j_mp_skip_off = {
 				name = "Skip-Off",
 				text = {
-					"{C:blue}+#1#{} hand and {C:red}+#2#{} discard",
+					"{C:blue}+#1#{} Hands and {C:red}+#2#{} Discards",
 					"per additional {C:attention}Blind{} skipped",
 					"compared to your {X:purple,C:white}Nemesis{}",
 					"{C:inactive}(Currently {C:blue}+#3#{C:inactive}/{C:red}+#4#{C:inactive}, #5#)",
@@ -96,7 +96,7 @@ return {
 				text = {
 					"At the end of the next {C:attention}PvP Blind{},",
 					"consume this Joker and grant",
-					"{C:red}+#1#{} discard to you and",
+					"{C:red}+#1#{} discards to you and",
 					"{C:red}+#2#{} discards to your {X:purple,C:white}Nemesis{} for the ante",
 				},
 			},
@@ -107,7 +107,7 @@ return {
 					"not in a {C:attention}PvP Blind{}",
 				},
 			},
-			j_mp_hanging_chad = {
+			j_hanging_chad_mp_standard = {
 				name = "Hanging Chad",
 				text = {
 					"Retrigger {C:attention}first{} and {C:attention}second{}",
@@ -131,16 +131,7 @@ return {
 					"played cards with",
 					"{C:hearts}Heart{} suit to give",
 					"{X:mult,C:white} X#3# {} Mult when scored",
-				},
-			},
-			j_mp_bloodstone2 = {
-				name = "Bloodstone",
-				text = {
-					"{C:green}#1# in #2#{} chance for",
-					"played cards with",
-					"{C:hearts}Heart{} suit to give",
-					"{X:mult,C:white} X#3# {} Mult when scored",
-					"(Includes experimental variance)",
+					"{C:inactive}(Includes experimental variance){}",
 				},
 			},
 		},
@@ -289,8 +280,8 @@ return {
 			b_opts_player_diff_deck = "Players have different decks",
 			b_opts_normal_bosses = "Enable Boss Blind effects",
 			b_opts_timer = "Enable Timer",
-			b_opts_disable_preview = "Disable Score Preview (Coming Soon)",
-			b_opts_disable_the_order = "Disable The Order (Coming Soon)",
+			b_opts_disable_preview = "Disable Score Preview",
+			b_opts_the_order = "Enable The Order",
 			b_reset = "Reset",
 			b_set_custom_seed = "Set Custom Seed",
 			b_mp_kofi_button = "Supporting me on Ko-fi",
@@ -301,6 +292,7 @@ return {
 			b_lobby_info = "Lobby Info",
 			b_continue_singleplayer = "Continue in Singleplayer",
 			b_the_order_integration = "Enable The Order Integration",
+			b_preview_integration = "Enable Score Preview",
 			b_view_nemesis_deck = "View Decks",
 			b_toggle_jokers = "Toggle Jokers",
 			b_skip_tutorial = "Skip Tutorial",
@@ -346,6 +338,7 @@ return {
 			k_warning_no_order = "One player has The Order integration enabled while the other does not. This will cause the seeds to differ.",
 			k_warning_cheating1 = "If you are seeing this, your opponent may be cheating.",
 			k_warning_cheating2 = "If this is a ranked game, please send the message '%s' and then open a support ticket in #support",
+			k_warning_banned_mods = "One or more players have banned mods installed. These mods are not allowed in ranked games.",
 			k_message1 = "Hold on, my mom made pizza pops",
 			k_message2 = "One sec, i gotta grab my slow cooker pork roast",
 			k_message3 = "One moment, getting a call from my mom",
@@ -413,6 +406,8 @@ return {
 			k_your_deck = "Your Deck",
 			k_the_order_credit = "*Credit to @MathIsFun_",
 			k_the_order_integration_desc = "This will patch card creation to not be ante-based and use a single pool for every type/rarity",
+			k_preview_credit = "*Credit to @Fantom, @Divvy",
+			k_preview_integration_desc = "This will enable score preview before playing a hand",
 			k_requires_restart = "*Requires a restart to take effect",
 			k_new_weekly_ruleset = "A new weekly ruleset is available!",
 			k_currently_colon = "Currently: ",
