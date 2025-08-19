@@ -39,7 +39,9 @@ function create_UIBox_blind_choice(type, run_info)
 				_poker_hands = MP.sorted_hand_list()
 			else
 				for k, v in pairs(G.GAME.hands) do
-					if v.visible then _poker_hands[#_poker_hands + 1] = k end
+					if SMODS.is_poker_hand_visible(k) then
+						_poker_hands[#_poker_hands + 1] = k
+					end
 				end
 			end
 

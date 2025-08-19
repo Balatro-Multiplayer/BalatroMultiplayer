@@ -42,6 +42,8 @@ MP.INTEGRATIONS = {
 
 G.C.MULTIPLAYER = HEX("AC3232")
 
+MP.SMODS_VERSION = "1.0.0~BETA-0711a"
+
 function MP.should_use_the_order()
 	return MP.LOBBY and MP.LOBBY.config and MP.LOBBY.config.the_order
 end
