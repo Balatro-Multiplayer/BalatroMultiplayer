@@ -1,13 +1,9 @@
 FNSJ.simulate_mp_defensive_joker = function(joker_obj, context)
-	if context.cardarea == G.jokers and context.global then
-		FN.SIM.add_chips(joker_obj.ability.t_chips)
-	end
+	if context.cardarea == G.jokers and context.global then FN.SIM.add_chips(joker_obj.ability.t_chips) end
 end
 
 FNSJ.simulate_mp_taxes = function(joker_obj, context)
-	if context.cardarea == G.jokers and context.global then
-		FN.SIM.add_mult(joker_obj.ability.extra.mult)
-	end
+	if context.cardarea == G.jokers and context.global then FN.SIM.add_mult(joker_obj.ability.extra.mult) end
 end
 
 FNSJ.simulate_mp_pacifist = function(joker_obj, context)

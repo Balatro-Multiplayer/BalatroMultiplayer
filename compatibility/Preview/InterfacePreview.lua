@@ -7,14 +7,10 @@ local orig_hud = create_UIBox_HUD
 function create_UIBox_HUD()
 	local contents = orig_hud()
 
-	if not MP.INTEGRATIONS.Preview then
-		return contents
-	end
+	if not MP.INTEGRATIONS.Preview then return contents end
 
 	-- Check if preview is disabled in lobby options
-	if MP.LOBBY.config and MP.LOBBY.config.preview_disabled then
-		return contents
-	end
+	if MP.LOBBY.config and MP.LOBBY.config.preview_disabled then return contents end
 
 	local score_node_wrap =
 		{ n = G.UIT.R, config = { id = "fn_pre_score_wrap", align = "cm", padding = 0.1 }, nodes = {} }
@@ -141,9 +137,7 @@ end--]]
 -- TODO Implement
 function FN.get_preview_settings_page()
 	local function preview_score_toggle_callback(e)
-		if not G.HUD then
-			return
-		end
+		if not G.HUD then return end
 
 		if G.SETTINGS.FN.preview_score then
 			-- Preview was just enabled, so add preview node:
@@ -157,9 +151,7 @@ function FN.get_preview_settings_page()
 	end
 
 	local function preview_dollars_toggle_callback(_)
-		if not G.HUD then
-			return
-		end
+		if not G.HUD then return end
 
 		if G.SETTINGS.FN.preview_dollars then
 			-- Preview was just enabled, so add preview node:
@@ -173,9 +165,7 @@ function FN.get_preview_settings_page()
 	end
 
 	local function face_down_toggle_callback(_)
-		if not G.HUD then
-			return
-		end
+		if not G.HUD then return end
 
 		FN.PRE.data = FN.PRE.simulate()
 		G.HUD:recalculate()

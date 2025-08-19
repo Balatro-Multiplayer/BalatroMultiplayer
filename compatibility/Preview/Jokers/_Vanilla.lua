@@ -5,9 +5,7 @@
 local FNSJ = FN.SIM.JOKERS
 
 FNSJ.simulate_joker = function(joker_obj, context)
-	if context.cardarea == G.jokers and context.global then
-		FN.SIM.add_mult(joker_obj.ability.mult)
-	end
+	if context.cardarea == G.jokers and context.global then FN.SIM.add_mult(joker_obj.ability.mult) end
 end
 FNSJ.simulate_greedy_joker = function(joker_obj, context)
 	FN.SIM.JOKERS.add_suit_mult(joker_obj, context)
@@ -53,39 +51,29 @@ FNSJ.simulate_crafty = function(joker_obj, context)
 end
 FNSJ.simulate_half = function(joker_obj, context)
 	if context.cardarea == G.jokers and context.global then
-		if #context.full_hand <= joker_obj.ability.extra.size then
-			FN.SIM.add_mult(joker_obj.ability.extra.mult)
-		end
+		if #context.full_hand <= joker_obj.ability.extra.size then FN.SIM.add_mult(joker_obj.ability.extra.mult) end
 	end
 end
 FNSJ.simulate_stencil = function(joker_obj, context)
 	if context.cardarea == G.jokers and context.global then
 		local xmult = G.jokers.config.card_limit - #FN.SIM.env.jokers
 		for _, joker in ipairs(FN.SIM.env.jokers) do
-			if joker.ability.name == "Joker Stencil" then
-				xmult = xmult + 1
-			end
+			if joker.ability.name == "Joker Stencil" then xmult = xmult + 1 end
 		end
-		if joker_obj.ability.x_mult > 1 then
-			FN.SIM.x_mult(joker_obj.ability.x_mult)
-		end
+		if joker_obj.ability.x_mult > 1 then FN.SIM.x_mult(joker_obj.ability.x_mult) end
 	end
 end
 FNSJ.simulate_four_fingers = function(joker_obj, context)
 	-- Effect not relevant (Meta)
 end
 FNSJ.simulate_mime = function(joker_obj, context)
-	if context.cardarea == G.hand and context.repetition then
-		FN.SIM.add_reps(joker_obj.ability.extra)
-	end
+	if context.cardarea == G.hand and context.repetition then FN.SIM.add_reps(joker_obj.ability.extra) end
 end
 FNSJ.simulate_credit_card = function(joker_obj, context)
 	-- Effect not relevant (Meta)
 end
 FNSJ.simulate_ceremonial = function(joker_obj, context)
-	if context.cardarea == G.jokers and context.global then
-		FN.SIM.add_mult(joker_obj.ability.mult)
-	end
+	if context.cardarea == G.jokers and context.global then FN.SIM.add_mult(joker_obj.ability.mult) end
 end
 FNSJ.simulate_banner = function(joker_obj, context)
 	if context.cardarea == G.jokers and context.global then
@@ -110,9 +98,7 @@ FNSJ.simulate_loyalty_card = function(joker_obj, context)
 		local loyalty_diff = G.GAME.hands_played - joker_obj.ability.hands_played_at_create
 		local loyalty_remaining = ((joker_obj.ability.extra.every - 1) - loyalty_diff)
 			% (joker_obj.ability.extra.every + 1)
-		if loyalty_remaining == joker_obj.ability.extra.every then
-			FN.SIM.x_mult(joker_obj.ability.extra.Xmult)
-		end
+		if loyalty_remaining == joker_obj.ability.extra.every then FN.SIM.x_mult(joker_obj.ability.extra.Xmult) end
 	end
 end
 FNSJ.simulate_8_ball = function(joker_obj, context)
@@ -127,9 +113,7 @@ end
 FNSJ.simulate_dusk = function(joker_obj, context)
 	if context.cardarea == G.play and context.repetition then
 		-- Note: Checking against 1 is needed as hands_left is not decremented as part of simulation
-		if G.GAME.current_round.hands_left == 1 then
-			FN.SIM.add_reps(joker_obj.ability.extra)
-		end
+		if G.GAME.current_round.hands_left == 1 then FN.SIM.add_reps(joker_obj.ability.extra) end
 	end
 end
 FNSJ.simulate_raised_fist = function(joker_obj, context)
@@ -143,9 +127,7 @@ FNSJ.simulate_raised_fist = function(joker_obj, context)
 				raised_card = card
 			end
 		end
-		if raised_card == context.other_card and not context.other_card.debuff then
-			FN.SIM.add_mult(2 * cur_mult)
-		end
+		if raised_card == context.other_card and not context.other_card.debuff then FN.SIM.add_mult(2 * cur_mult) end
 	end
 end
 FNSJ.simulate_chaos = function(joker_obj, context)
@@ -189,9 +171,7 @@ FNSJ.simulate_pareidolia = function(joker_obj, context)
 	-- Effect not relevant (Meta)
 end
 FNSJ.simulate_gros_michel = function(joker_obj, context)
-	if context.cardarea == G.jokers and context.global then
-		FN.SIM.add_mult(joker_obj.ability.extra.mult)
-	end
+	if context.cardarea == G.jokers and context.global then FN.SIM.add_mult(joker_obj.ability.extra.mult) end
 end
 FNSJ.simulate_even_steven = function(joker_obj, context)
 	if context.cardarea == G.play and context.individual then
@@ -233,9 +213,7 @@ FNSJ.simulate_ride_the_bus = function(joker_obj, context)
 	if context.cardarea == G.jokers and context.before and not context.blueprint then
 		local faces = false
 		for _, scoring_card in ipairs(context.scoring_hand) do
-			if FN.SIM.is_face(scoring_card) then
-				faces = true
-			end
+			if FN.SIM.is_face(scoring_card) then faces = true end
 		end
 		if faces then
 			joker_obj.ability.mult = 0
@@ -243,9 +221,7 @@ FNSJ.simulate_ride_the_bus = function(joker_obj, context)
 			joker_obj.ability.mult = joker_obj.ability.mult + joker_obj.ability.extra
 		end
 	end
-	if context.cardarea == G.jokers and context.global then
-		FN.SIM.add_mult(joker_obj.ability.mult)
-	end
+	if context.cardarea == G.jokers and context.global then FN.SIM.add_mult(joker_obj.ability.mult) end
 end
 FNSJ.simulate_space = function(joker_obj, context)
 	-- TODO: Verify
@@ -277,9 +253,7 @@ FNSJ.simulate_blackboard = function(joker_obj, context)
 				black_suits = black_suits + 1
 			end
 		end
-		if black_suits == all_cards then
-			FN.SIM.x_mult(joker_obj.ability.extra)
-		end
+		if black_suits == all_cards then FN.SIM.x_mult(joker_obj.ability.extra) end
 	end
 end
 FNSJ.simulate_runner = function(joker_obj, context)
@@ -288,14 +262,10 @@ FNSJ.simulate_runner = function(joker_obj, context)
 			joker_obj.ability.extra.chips = joker_obj.ability.extra.chips + joker_obj.ability.extra.chip_mod
 		end
 	end
-	if context.cardarea == G.jokers and context.global then
-		FN.SIM.add_chips(joker_obj.ability.extra.chips)
-	end
+	if context.cardarea == G.jokers and context.global then FN.SIM.add_chips(joker_obj.ability.extra.chips) end
 end
 FNSJ.simulate_ice_cream = function(joker_obj, context)
-	if context.cardarea == G.jokers and context.global then
-		FN.SIM.add_chips(joker_obj.ability.extra.chips)
-	end
+	if context.cardarea == G.jokers and context.global then FN.SIM.add_chips(joker_obj.ability.extra.chips) end
 end
 FNSJ.simulate_dna = function(joker_obj, context)
 	if context.cardarea == G.jokers and context.before then
@@ -334,9 +304,7 @@ FNSJ.simulate_green_joker = function(joker_obj, context)
 	if context.cardarea == G.jokers and context.before and not context.blueprint then
 		joker_obj.ability.mult = joker_obj.ability.mult + joker_obj.ability.extra.hand_add
 	end
-	if context.cardarea == G.jokers and context.global then
-		FN.SIM.add_mult(joker_obj.ability.mult)
-	end
+	if context.cardarea == G.jokers and context.global then FN.SIM.add_mult(joker_obj.ability.mult) end
 end
 FNSJ.simulate_superposition = function(joker_obj, context)
 	-- Effect might be relevant?
@@ -349,9 +317,7 @@ FNSJ.simulate_todo_list = function(joker_obj, context)
 	end
 end
 FNSJ.simulate_cavendish = function(joker_obj, context)
-	if context.cardarea == G.jokers and context.global then
-		FN.SIM.x_mult(joker_obj.ability.extra.Xmult)
-	end
+	if context.cardarea == G.jokers and context.global then FN.SIM.x_mult(joker_obj.ability.extra.Xmult) end
 end
 FNSJ.simulate_card_sharp = function(joker_obj, context)
 	if context.cardarea == G.jokers and context.global then
@@ -361,9 +327,7 @@ FNSJ.simulate_card_sharp = function(joker_obj, context)
 	end
 end
 FNSJ.simulate_red_card = function(joker_obj, context)
-	if context.cardarea == G.jokers and context.global then
-		FN.SIM.add_mult(joker_obj.ability.mult)
-	end
+	if context.cardarea == G.jokers and context.global then FN.SIM.add_mult(joker_obj.ability.mult) end
 end
 FNSJ.simulate_madness = function(joker_obj, context)
 	FN.SIM.JOKERS.x_mult_if_global(joker_obj, context)
@@ -374,9 +338,7 @@ FNSJ.simulate_square = function(joker_obj, context)
 			joker_obj.ability.extra.chips = joker_obj.ability.extra.chips + joker_obj.ability.extra.chip_mod
 		end
 	end
-	if context.cardarea == G.jokers and context.global then
-		FN.SIM.add_chips(joker_obj.ability.extra.chips)
-	end
+	if context.cardarea == G.jokers and context.global then FN.SIM.add_chips(joker_obj.ability.extra.chips) end
 end
 FNSJ.simulate_seance = function(joker_obj, context)
 	-- Effect might be relevant? (Consumable)
@@ -442,9 +404,7 @@ end
 FNSJ.simulate_midas_mask = function(joker_obj, context)
 	if context.cardarea == G.jokers and context.before and not context.blueprint then
 		for _, card in ipairs(context.scoring_hand) do
-			if FN.SIM.is_face(card) then
-				FN.SIM.set_ability(card, G.P_CENTERS.m_gold)
-			end
+			if FN.SIM.is_face(card) then FN.SIM.set_ability(card, G.P_CENTERS.m_gold) end
 		end
 	end
 end
@@ -474,9 +434,7 @@ end
 FNSJ.simulate_erosion = function(joker_obj, context)
 	if context.cardarea == G.jokers and context.global then
 		local diff = G.GAME.starting_deck_size - #G.playing_cards
-		if diff > 0 then
-			FN.SIM.add_mult(joker_obj.ability.extra * diff)
-		end
+		if diff > 0 then FN.SIM.add_mult(joker_obj.ability.extra * diff) end
 	end
 end
 FNSJ.simulate_reserved_parking = function(joker_obj, context)
@@ -539,9 +497,7 @@ FNSJ.simulate_lucky_cat = function(joker_obj, context)
 		local function lucky_cat(field)
 			if context.other_card.lucky_trigger and context.other_card.lucky_trigger[field] then
 				joker_obj.ability.x_mult_range[field] = joker_obj.ability.x_mult_range[field] + joker_obj.ability.extra
-				if joker_obj.ability.x_mult_range[field] < 1 then
-					joker_obj.ability.x_mult_range[field] = 1
-				end -- Precaution
+				if joker_obj.ability.x_mult_range[field] < 1 then joker_obj.ability.x_mult_range[field] = 1 end -- Precaution
 			end
 		end
 		lucky_cat("min")
@@ -582,14 +538,10 @@ FNSJ.simulate_trading = function(joker_obj, context)
 	-- Effect not relevant (Discard)
 end
 FNSJ.simulate_flash = function(joker_obj, context)
-	if context.cardarea == G.jokers and context.global then
-		FN.SIM.add_mult(joker_obj.ability.mult)
-	end
+	if context.cardarea == G.jokers and context.global then FN.SIM.add_mult(joker_obj.ability.mult) end
 end
 FNSJ.simulate_popcorn = function(joker_obj, context)
-	if context.cardarea == G.jokers and context.global then
-		FN.SIM.add_mult(joker_obj.ability.mult)
-	end
+	if context.cardarea == G.jokers and context.global then FN.SIM.add_mult(joker_obj.ability.mult) end
 end
 FNSJ.simulate_trousers = function(joker_obj, context)
 	if context.cardarea == G.jokers and context.before and not context.blueprint then
@@ -597,9 +549,7 @@ FNSJ.simulate_trousers = function(joker_obj, context)
 			joker_obj.ability.mult = joker_obj.ability.mult + joker_obj.ability.extra
 		end
 	end
-	if context.cardarea == G.jokers and context.global then
-		FN.SIM.add_mult(joker_obj.ability.mult)
-	end
+	if context.cardarea == G.jokers and context.global then FN.SIM.add_mult(joker_obj.ability.mult) end
 end
 FNSJ.simulate_ancient = function(joker_obj, context)
 	if context.cardarea == G.play and context.individual then
@@ -625,9 +575,7 @@ FNSJ.simulate_walkie_talkie = function(joker_obj, context)
 	end
 end
 FNSJ.simulate_selzer = function(joker_obj, context)
-	if context.cardarea == G.play and context.repetition then
-		FN.SIM.add_reps(1)
-	end
+	if context.cardarea == G.play and context.repetition then FN.SIM.add_reps(1) end
 end
 FNSJ.simulate_castle = function(joker_obj, context)
 	if context.cardarea == G.hand and context.discard and not context.blueprint then
@@ -637,9 +585,7 @@ FNSJ.simulate_castle = function(joker_obj, context)
 			joker_obj.ability.extra.chips = joker_obj.ability.extra.chips + joker_obj.ability.extra.chip_mod
 		end
 	end
-	if context.cardarea == G.jokers and context.global then
-		FN.SIM.add_chips(joker_obj.ability.extra.chips)
-	end
+	if context.cardarea == G.jokers and context.global then FN.SIM.add_chips(joker_obj.ability.extra.chips) end
 end
 FNSJ.simulate_smiley = function(joker_obj, context)
 	if context.cardarea == G.play and context.individual then
@@ -664,9 +610,7 @@ end
 FNSJ.simulate_acrobat = function(joker_obj, context)
 	if context.cardarea == G.jokers and context.global then
 		-- Note: Checking against 1 is needed as hands_left is not decremented as part of simulation
-		if G.GAME.current_round.hands_left == 1 then
-			FN.SIM.x_mult(joker_obj.ability.extra)
-		end
+		if G.GAME.current_round.hands_left == 1 then FN.SIM.x_mult(joker_obj.ability.extra) end
 	end
 end
 FNSJ.simulate_sock_and_buskin = function(joker_obj, context)
@@ -677,9 +621,7 @@ FNSJ.simulate_sock_and_buskin = function(joker_obj, context)
 	end
 end
 FNSJ.simulate_swashbuckler = function(joker_obj, context)
-	if context.cardarea == G.jokers and context.global then
-		FN.SIM.add_mult(joker_obj.ability.mult)
-	end
+	if context.cardarea == G.jokers and context.global then FN.SIM.add_mult(joker_obj.ability.mult) end
 end
 FNSJ.simulate_troubadour = function(joker_obj, context)
 	-- Effect not relevant (Meta)
@@ -809,15 +751,11 @@ end
 FNSJ.simulate_blueprint = function(joker_obj, context)
 	local joker_to_mimic = nil
 	for idx, joker in ipairs(FN.SIM.env.jokers) do
-		if joker == joker_obj then
-			joker_to_mimic = FN.SIM.env.jokers[idx + 1]
-		end
+		if joker == joker_obj then joker_to_mimic = FN.SIM.env.jokers[idx + 1] end
 	end
 	if joker_to_mimic then
 		context.blueprint = (context.blueprint and (context.blueprint + 1)) or 1
-		if context.blueprint > #FN.SIM.env.jokers + 1 then
-			return
-		end
+		if context.blueprint > #FN.SIM.env.jokers + 1 then return end
 		FN.SIM.simulate_joker(joker_to_mimic, context)
 	end
 end
@@ -827,9 +765,7 @@ FNSJ.simulate_wee = function(joker_obj, context)
 			joker_obj.ability.extra.chips = joker_obj.ability.extra.chips + joker_obj.ability.extra.chip_mod
 		end
 	end
-	if context.cardarea == G.jokers and context.global then
-		FN.SIM.add_chips(joker_obj.ability.extra.chips)
-	end
+	if context.cardarea == G.jokers and context.global then FN.SIM.add_chips(joker_obj.ability.extra.chips) end
 end
 FNSJ.simulate_merry_andy = function(joker_obj, context)
 	-- Effect not relevant (Meta)
@@ -864,18 +800,10 @@ FNSJ.simulate_seeing_double = function(joker_obj, context)
 		-- Account for all 'real' suits:
 		for _, card in ipairs(context.scoring_hand) do
 			if card.ability.effect ~= "Wild Card" then
-				if FN.SIM.is_suit(card, "Hearts") then
-					inc_suit("Hearts")
-				end
-				if FN.SIM.is_suit(card, "Diamonds") then
-					inc_suit("Diamonds")
-				end
-				if FN.SIM.is_suit(card, "Spades") then
-					inc_suit("Spades")
-				end
-				if FN.SIM.is_suit(card, "Clubs") then
-					inc_suit("Clubs")
-				end
+				if FN.SIM.is_suit(card, "Hearts") then inc_suit("Hearts") end
+				if FN.SIM.is_suit(card, "Diamonds") then inc_suit("Diamonds") end
+				if FN.SIM.is_suit(card, "Spades") then inc_suit("Spades") end
+				if FN.SIM.is_suit(card, "Clubs") then inc_suit("Clubs") end
 			end
 		end
 
@@ -905,9 +833,7 @@ FNSJ.simulate_seeing_double = function(joker_obj, context)
 end
 FNSJ.simulate_matador = function(joker_obj, context)
 	if context.cardarea == G.jokers and context.debuffed_hand then
-		if G.GAME.blind.triggered then
-			FN.SIM.add_dollars(joker_obj.ability.extra)
-		end
+		if G.GAME.blind.triggered then FN.SIM.add_dollars(joker_obj.ability.extra) end
 	end
 end
 FNSJ.simulate_hit_the_road = function(joker_obj, context)
@@ -934,9 +860,7 @@ FNSJ.simulate_tribe = function(joker_obj, context)
 	FN.SIM.JOKERS.x_mult_if_global(joker_obj, context)
 end
 FNSJ.simulate_stuntman = function(joker_obj, context)
-	if context.cardarea == G.jokers and context.global then
-		FN.SIM.add_chips(joker_obj.ability.extra.chip_mod)
-	end
+	if context.cardarea == G.jokers and context.global then FN.SIM.add_chips(joker_obj.ability.extra.chip_mod) end
 end
 FNSJ.simulate_invisible = function(joker_obj, context)
 	-- Effect not relevant (Meta)
@@ -945,9 +869,7 @@ FNSJ.simulate_brainstorm = function(joker_obj, context)
 	local joker_to_mimic = FN.SIM.env.jokers[1]
 	if joker_to_mimic and joker_to_mimic ~= joker_obj then
 		context.blueprint = (context.blueprint and (context.blueprint + 1)) or 1
-		if context.blueprint > #FN.SIM.env.jokers + 1 then
-			return
-		end
+		if context.blueprint > #FN.SIM.env.jokers + 1 then return end
 		FN.SIM.simulate_joker(joker_to_mimic, context)
 	end
 end
@@ -956,16 +878,12 @@ FNSJ.simulate_satellite = function(joker_obj, context)
 end
 FNSJ.simulate_shoot_the_moon = function(joker_obj, context)
 	if context.cardarea == G.hand and context.individual then
-		if FN.SIM.is_rank(context.other_card, 12) and not context.other_card.debuff then
-			FN.SIM.add_mult(13)
-		end
+		if FN.SIM.is_rank(context.other_card, 12) and not context.other_card.debuff then FN.SIM.add_mult(13) end
 	end
 end
 FNSJ.simulate_drivers_license = function(joker_obj, context)
 	if context.cardarea == G.jokers and context.global then
-		if (joker_obj.ability.driver_tally or 0) >= 16 then
-			FN.SIM.x_mult(joker_obj.ability.extra)
-		end
+		if (joker_obj.ability.driver_tally or 0) >= 16 then FN.SIM.x_mult(joker_obj.ability.extra) end
 	end
 end
 FNSJ.simulate_cartomancer = function(joker_obj, context)
@@ -991,9 +909,7 @@ FNSJ.simulate_bootstraps = function(joker_obj, context)
 end
 FNSJ.simulate_caino = function(joker_obj, context)
 	if context.cardarea == G.jokers and context.global then
-		if joker_obj.ability.caino_xmult > 1 then
-			FN.SIM.x_mult(joker_obj.ability.caino_xmult)
-		end
+		if joker_obj.ability.caino_xmult > 1 then FN.SIM.x_mult(joker_obj.ability.caino_xmult) end
 	end
 end
 FNSJ.simulate_triboulet = function(joker_obj, context)

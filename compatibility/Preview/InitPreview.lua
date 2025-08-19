@@ -2,9 +2,7 @@
 --
 -- Global values that must be present for the rest of this mod to work.
 
-if not FN then
-	FN = {}
-end
+if not FN then FN = {} end
 
 FN.PRE = {
 	data = {
@@ -54,13 +52,9 @@ FN.PRE._start_up = Game.start_up
 function Game:start_up()
 	FN.PRE._start_up(self)
 
-	if not MP.INTEGRATIONS.Preview then
-		return
-	end
+	if not MP.INTEGRATIONS.Preview then return end
 
-	if not G.SETTINGS.FN then
-		G.SETTINGS.FN = {}
-	end
+	if not G.SETTINGS.FN then G.SETTINGS.FN = {} end
 	if not G.SETTINGS.FN.PRE then
 		G.SETTINGS.FN.PRE = true
 

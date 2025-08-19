@@ -42,9 +42,7 @@ function reset_idol_card()
 			end
 		end
 		--failsafe in case all are stone or no cards in deck. Defaults to Ace of Spades
-		if #valid_idol_cards == 0 then
-			return
-		end
+		if #valid_idol_cards == 0 then return end
 
 		local value_order = {}
 		for i, rank in ipairs(SMODS.Rank.obj_buffer) do
@@ -58,15 +56,11 @@ function reset_idol_card()
 
 		table.sort(valid_idol_cards, function(a, b)
 			-- Sort by count descending first
-			if a.count ~= b.count then
-				return a.count > b.count
-			end
+			if a.count ~= b.count then return a.count > b.count end
 
 			local a_suit = a.card.base.suit
 			local b_suit = b.card.base.suit
-			if suit_order[a_suit] ~= suit_order[b_suit] then
-				return suit_order[a_suit] < suit_order[b_suit]
-			end
+			if suit_order[a_suit] ~= suit_order[b_suit] then return suit_order[a_suit] < suit_order[b_suit] end
 
 			local a_value = a.card.base.value
 			local b_value = b.card.base.value
@@ -135,15 +129,11 @@ function reset_mail_rank()
 		end
 
 		-- Failsafe: all stone cards
-		if #valid_ranks == 0 then
-			return
-		end
+		if #valid_ranks == 0 then return end
 
 		-- Sort by count desc, then value asc
 		table.sort(valid_ranks, function(a, b)
-			if a.count ~= b.count then
-				return a.count > b.count
-			end
+			if a.count ~= b.count then return a.count > b.count end
 			return value_order[a.value] < value_order[b.value]
 		end)
 
@@ -284,9 +274,7 @@ end
 
 -- Helper function to make code more readable - deal with ante
 function MP.ante_based()
-	if MP.should_use_the_order() then
-		return 0
-	end
+	if MP.should_use_the_order() then return 0 end
 	return G.GAME.round_resets.ante
 end
 
@@ -295,17 +283,13 @@ function MP.order_round_based(ante_based)
 	if MP.should_use_the_order() then
 		return G.GAME.round_resets.ante .. (G.GAME.blind.config.blind.key or "") -- fine becase no boss shenanigans... change this if that happens
 	end
-	if ante_based then
-		return MP.ante_based()
-	end
+	if ante_based then return MP.ante_based() end
 	return ""
 end
 
 -- Helper function for a sorted hand list to fix pairs() jank
 function MP.sorted_hand_list(current_hand)
-	if not current_hand then
-		current_hand = "NULL"
-	end
+	if not current_hand then current_hand = "NULL" end
 	local _poker_hands = {}
 	local done = false
 	local order = 1
@@ -315,9 +299,7 @@ function MP.sorted_hand_list(current_hand)
 			if v.order == order then
 				order = order + 1
 				done = false
-				if v.visible and k ~= current_hand then
-					_poker_hands[#_poker_hands + 1] = k
-				end
+				if v.visible and k ~= current_hand then _poker_hands[#_poker_hands + 1] = k end
 			end
 		end
 	end

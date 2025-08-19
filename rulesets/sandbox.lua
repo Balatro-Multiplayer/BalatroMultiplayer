@@ -167,9 +167,7 @@ end
 
 -- your rng complaints have been noted and filed accordingly
 function cope_and_seethe_check(actual_odds)
-	if actual_odds >= 1 then
-		return true
-	end
+	if actual_odds >= 1 then return true end
 
 	-- how much easier (30%) do we make it for each successive roll?
 	local step = -0.3
@@ -242,9 +240,7 @@ SMODS.Joker({
 		local nine_tally = 0
 		if G.playing_cards ~= nil then
 			for k, v in pairs(G.playing_cards) do
-				if v:get_id() == 9 then
-					nine_tally = nine_tally + 1
-				end
+				if v:get_id() == 9 then nine_tally = nine_tally + 1 end
 			end
 		end
 
@@ -261,9 +257,7 @@ SMODS.Joker({
 	calc_dollar_bonus = function(self, card)
 		local nine_tally = 0
 		for k, v in pairs(G.playing_cards) do
-			if v:get_id() == 9 then
-				nine_tally = nine_tally + 1
-			end
+			if v:get_id() == 9 then nine_tally = nine_tally + 1 end
 		end
 		return (math.min(nine_tally, 4) + math.max(nine_tally - 4, 0) * card.ability.extra) or 0
 	end,

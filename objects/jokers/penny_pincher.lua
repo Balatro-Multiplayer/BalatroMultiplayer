@@ -26,12 +26,8 @@ SMODS.Joker({
 	calc_dollar_bonus = function(self, card)
 		local spent = MP.GAME.enemy.spent_in_shop[MP.GAME.pincher_index]
 		local money = 0
-		if spent then
-			money = math.floor(spent / card.ability.extra.nemesis_dollars)
-		end
-		if money > 0 then
-			return money
-		end
+		if spent then money = math.floor(spent / card.ability.extra.nemesis_dollars) end
+		if money > 0 then return money end
 	end,
 	mp_credits = {
 		idea = { "Nxkoozie" },

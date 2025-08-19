@@ -249,9 +249,7 @@ end
 function MP.UI.modlist_to_view(mods, text_colour)
 	local t = {}
 
-	if not mods then
-		return t
-	end
+	if not mods then return t end
 
 	for mod_name, mod_version in pairs(mods) do
 		local display_text = mod_version and (mod_name .. "-" .. mod_version) or mod_name
@@ -307,9 +305,7 @@ end
 
 ---@type fun(e: table | nil, args: { deck: string, stake: number | nil, seed: string | nil })
 function G.FUNCS.lobby_start_run(e, args)
-	if MP.LOBBY.config.different_decks == false then
-		G.FUNCS.copy_host_deck()
-	end
+	if MP.LOBBY.config.different_decks == false then G.FUNCS.copy_host_deck() end
 
 	local challenge = nil
 	if MP.LOBBY.deck.back == "Challenge Deck" then
@@ -372,25 +368,22 @@ end
 function G.FUNCS.lobby_leave(e)
 	if G.STAGE ~= G.STAGES.MAIN_MENU then
 		G.FUNCS.confirm_selection(function()
-                MP.LOBBY.code = nil
-				MP.ACTIONS.leave_lobby()
-				MP.UI.update_connection_status()
-				G.STATE = G.STATES.MENU
-        end)
+			MP.LOBBY.code = nil
+			MP.ACTIONS.leave_lobby()
+			MP.UI.update_connection_status()
+			G.STATE = G.STATES.MENU
+		end)
 	else
 		MP.LOBBY.code = nil
 		MP.ACTIONS.leave_lobby()
 		MP.UI.update_connection_status()
 		G.STATE = G.STATES.MENU
-	end 
-		
+	end
 end
 
 function G.FUNCS.lobby_choose_deck(e)
 	G.FUNCS.setup_run(e)
-	if G.OVERLAY_MENU then
-		G.OVERLAY_MENU:get_UIE_by_ID("run_setup_seed"):remove()
-	end
+	if G.OVERLAY_MENU then G.OVERLAY_MENU:get_UIE_by_ID("run_setup_seed"):remove() end
 end
 
 local start_run_ref = G.FUNCS.start_run
@@ -443,9 +436,9 @@ function G.FUNCS.display_lobby_main_menu_UI(e)
 end
 
 function G.FUNCS.mp_return_to_lobby()
-        G.FUNCS.confirm_selection(function()
-                MP.ACTIONS.stop_game()
-        end)
+	G.FUNCS.confirm_selection(function()
+		MP.ACTIONS.stop_game()
+	end)
 end
 
 function G.FUNCS.custom_seed_overlay(e)
@@ -463,12 +456,8 @@ local set_main_menu_UI_ref = set_main_menu_UI
 ---@diagnostic disable-next-line: lowercase-global
 function set_main_menu_UI()
 	if MP.LOBBY.code then
-		if G.MAIN_MENU_UI then
-			G.MAIN_MENU_UI:remove()
-		end
-		if G.STAGE == G.STAGES.MAIN_MENU then
-			G.FUNCS.display_lobby_main_menu_UI()
-		end
+		if G.MAIN_MENU_UI then G.MAIN_MENU_UI:remove() end
+		if G.STAGE == G.STAGES.MAIN_MENU then G.FUNCS.display_lobby_main_menu_UI() end
 	else
 		set_main_menu_UI_ref()
 	end
@@ -530,12 +519,8 @@ function G.FUNCS.mp_unstuck_blind()
 end
 
 function MP.UI.update_connection_status()
-	if G.HUD_connection_status then
-		G.HUD_connection_status:remove()
-	end
-	if G.STAGE == G.STAGES.MAIN_MENU then
-		G.HUD_connection_status = G.UIDEF.get_connection_status_ui()
-	end
+	if G.HUD_connection_status then G.HUD_connection_status:remove() end
+	if G.STAGE == G.STAGES.MAIN_MENU then G.HUD_connection_status = G.UIDEF.get_connection_status_ui() end
 end
 
 local gameMainMenuRef = Game.main_menu
@@ -556,11 +541,7 @@ end
 
 function MP.update_player_usernames()
 	if MP.LOBBY.code then
-		if G.MAIN_MENU_UI then
-			G.MAIN_MENU_UI:remove()
-		end
-		if G.STAGE == G.STAGES.MAIN_MENU then
-			G.FUNCS.display_lobby_main_menu_UI()
-		end
+		if G.MAIN_MENU_UI then G.MAIN_MENU_UI:remove() end
+		if G.STAGE == G.STAGES.MAIN_MENU then G.FUNCS.display_lobby_main_menu_UI() end
 	end
 end

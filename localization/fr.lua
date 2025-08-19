@@ -89,7 +89,7 @@ return {
 				text = {
 					"{C:red}+#1#{} défausse(s) et",
 					"{C:red}+#2#{} défausse(s) pour votre {X:purple,C:white}Némésis{}",
-					"{C:inactive}(Détruit après une {C:attention}Blinde PvP{}{C:inactive})"
+					"{C:inactive}(Détruit après une {C:attention}Blinde PvP{}{C:inactive})",
 				},
 			},
 			j_mp_pacifist = {
@@ -160,7 +160,7 @@ return {
 	},
 	misc = {
 		labels = {
-			 mp_phantom = "Fantôme",
+			mp_phantom = "Fantôme",
 		},
 		challenge_names = {
 			c_mp_standard = "Standard",
@@ -209,7 +209,7 @@ return {
 			b_continue_singleplayer = "Continuer en Solo",
 			b_the_order_integration = "Activer l'intégration de The Order",
 			b_view_nemesis_deck = "Voir le deck adverse",
-      		b_toggle_jokers = "Activer/Désactiver les Jokers",
+			b_toggle_jokers = "Activer/Désactiver les Jokers",
 			k_continue_singleplayer_tooltip = "Votre partie en solo sera écrasée",
 			k_enemy_score = "Score ennemi actuel",
 			k_enemy_hands = "Mains adverses restantes: ",

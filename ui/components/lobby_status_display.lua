@@ -72,19 +72,15 @@ local function get_warnings()
 	end
 
 	-- ???: What is this supposed to accomplish?
-	if MP.LOBBY.username == "Guest" then
-		table.insert(warnings, {
-			localize("k_set_name"),
-			G.C.UI.TEXT_LIGHT,
-		})
-	end
+	if MP.LOBBY.username == "Guest" then table.insert(warnings, {
+		localize("k_set_name"),
+		G.C.UI.TEXT_LIGHT,
+	}) end
 
-	if #warnings == 0 then
-		table.insert(warnings, {
-			" ",
-			G.C.UI.TEXT_LIGHT,
-		})
-	end
+	if #warnings == 0 then table.insert(warnings, {
+		" ",
+		G.C.UI.TEXT_LIGHT,
+	}) end
 
 	return warnings
 end

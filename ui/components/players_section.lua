@@ -1,7 +1,5 @@
 local function create_player_info_row(player, player_type, text_scale)
-	if not player or not player.username then
-		return nil
-	end
+	if not player or not player.username then return nil end
 
 	return {
 		n = G.UIT.R,

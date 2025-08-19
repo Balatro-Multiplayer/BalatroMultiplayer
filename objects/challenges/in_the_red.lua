@@ -12,7 +12,7 @@ SMODS.Challenge({
 	restrictions = {
 		banned_tags = {
 			{ id = "tag_investment" },
-		}
+		},
 	},
 	unlocked = function(self)
 		return true

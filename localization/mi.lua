@@ -73,9 +73,9 @@ return {
 			j_mp_magnet = {
 				name = "Autō",
 				text = {
-					 "Whai muri i te {C:attention}#1#{} rauna,",
-                    "hokona atu tēnei Hako, ā,",
-                    "ka {C:attention}tōruatia{} te {C:attention}Hako{} utu",
+					"Whai muri i te {C:attention}#1#{} rauna,",
+					"hokona atu tēnei Hako, ā,",
+					"ka {C:attention}tōruatia{} te {C:attention}Hako{} utu",
 					"nui rawa atu o tō {X:purple,C:white}Hoariri{}",
 					"{C:inactive}(I tēnei wā he {C:attention}#2#{C:inactive}/#3# rauna)",
 				},
@@ -97,12 +97,12 @@ return {
 				},
 			},
 			j_mp_hanging_chad = {
-				name="Mātangatanga",
-                text={
-                    "Ka purei anō te kāri {C:attention}tuatahi{} me te",
-                    "{C:attention}kāri tuarua{} i te wā ka tukuna kia",
-                    "{C:attention}#1#{} anō ngā wā",
-                },
+				name = "Mātangatanga",
+				text = {
+					"Ka purei anō te kāri {C:attention}tuatahi{} me te",
+					"{C:attention}kāri tuarua{} i te wā ka tukuna kia",
+					"{C:attention}#1#{} anō ngā wā",
+				},
 			},
 		},
 		Planet = {
@@ -135,12 +135,12 @@ return {
 		},
 		Enhanced = {
 			m_mp_glass = {
-				name="Kāri Karāhe",
-                text={
-                    "{X:mult,C:white} X#1# {} Rea",
-                    "He {C:green}#2#/#3#{} te tūpono ka",
-                    "pakaru te kāri",
-                },
+				name = "Kāri Karāhe",
+				text = {
+					"{X:mult,C:white} X#1# {} Rea",
+					"He {C:green}#2#/#3#{} te tūpono ka",
+					"pakaru te kāri",
+				},
 			},
 		},
 		Other = {
@@ -288,6 +288,6 @@ return {
 			c_mp_skip_off = "Mahue ki te Mahue",
 			c_mp_lets_go_gambling = "Kōkiri te Peti",
 			c_mp_speed = "Te Horo",
+		},
 	},
-},
 }

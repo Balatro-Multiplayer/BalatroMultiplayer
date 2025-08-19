@@ -251,10 +251,10 @@ return {
 			k_warning_no_order = "Một người chơi đang bật tích hợo The Order trong khi người kia thì không. Điều nãy sẽ khiến cùng một giống bị khác nhau.",
 			k_warning_cheating1 = "Nếu bạn thấy cái này, đối thủ có thể đang gian lận.",
 			k_warning_cheating2 = "Nếu đây là trận xếp hạng, hãy gửi tin nhắn '%s' rồi mở một vé hỗ trợ trong #support",
-			k_message1 = "Hold on, my mom made pizza pops", 				--These are suuposed to be "fake excuses" to stall\
+			k_message1 = "Hold on, my mom made pizza pops", --These are suuposed to be "fake excuses" to stall\
 			k_message2 = "One sec, i gotta grab my slow cooker pork roast", --opponents while you're working your way out.\
-			k_message3 = "One moment, getting a call from my mom", 			--The majority of players use English anyway\
-			k_message4 = "Brb, my cat is on fire",							--so I'm not touching any of this.
+			k_message3 = "One moment, getting a call from my mom", --The majority of players use English anyway\
+			k_message4 = "Brb, my cat is on fire", --so I'm not touching any of this.
 			k_message5 = "Wait, I think I left the stove on",
 			k_message6 = "Hold up, my pet rock just ran away",
 			k_message7 = "One sec, my plants are asking for water",
