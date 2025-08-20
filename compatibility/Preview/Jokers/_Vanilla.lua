@@ -554,7 +554,8 @@ end
 FNSJ.simulate_ancient = function(joker_obj, context)
 	if context.cardarea == G.play and context.individual then
 		if
-			FN.SIM.is_suit(context.other_card, G.GAME.current_round.ancient_card.suit) and not context.other_card.debuff
+			FN.SIM.is_suit(context.other_card, G.GAME.current_round.ancient_card.suit)
+			and not context.other_card.debuff
 		then
 			FN.SIM.x_mult(joker_obj.ability.extra)
 		end

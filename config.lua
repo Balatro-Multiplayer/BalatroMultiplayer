@@ -10,4 +10,5 @@ return {
 		["Preview"] = false,
 	},
 	["unlocked"] = true,
+	["preview"] = {},
 }

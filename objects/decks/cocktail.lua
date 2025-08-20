@@ -2,7 +2,7 @@ SMODS.Back({
 	key = "cocktail",
 	config = {},
 	atlas = "mp_decks",
-	pos = {x = 4, y = 0},
+	pos = { x = 4, y = 0 },
 	mod_whitelist = {
 		Multiplayer = true,
 	},
@@ -15,20 +15,16 @@ SMODS.Back({
 		G.GAME.modifiers.mp_cocktail = {}
 		local decks = {}
 		for k, v in pairs(G.P_CENTERS) do
-			if v.set == 'Back'
-			and k ~= "b_challenge"
-			and k ~= "b_mp_cocktail" then
-				if not (v.mod and not self.mod_whitelist[v.mod.id]) then
-					decks[#decks+1] = k
-				end
+			if v.set == "Back" and k ~= "b_challenge" and k ~= "b_mp_cocktail" then
+				if not (v.mod and not self.mod_whitelist[v.mod.id]) then decks[#decks + 1] = k end
 			end
 		end
-		pseudoshuffle(decks, pseudoseed('mp_cocktail'))
+		pseudoshuffle(decks, pseudoseed("mp_cocktail"))
 		local back = G.GAME.selected_back
 		for i = 1, 3 do
 			G.GAME.modifiers.mp_cocktail[i] = decks[i]
 			print(decks[i])
-			if decks[i] == 'b_checkered' then
+			if decks[i] == "b_checkered" then
 				back:change_to(G.P_CENTERS[decks[i]])
 				back:apply_to_run()
 				back:change_to(G.P_CENTERS["b_mp_cocktail"])
@@ -54,7 +50,7 @@ SMODS.Back({
 					if type(v) == "table" then
 						t3[k] = merge(v, {})
 					else
-						local index = safe and #t3+1 or k
+						local index = safe and #t3 + 1 or k
 						t3[index] = v
 					end
 				end
@@ -65,27 +61,25 @@ SMODS.Back({
 			back.effect.config = merge(back.effect.config, G.P_CENTERS[G.GAME.modifiers.mp_cocktail[i]].config)
 			if back.effect.config.voucher then
 				back.effect.config.vouchers = back.effect.config.vouchers or {}
-				back.effect.config.vouchers[#back.effect.config.vouchers+1] = back.effect.config.voucher
+				back.effect.config.vouchers[#back.effect.config.vouchers + 1] = back.effect.config.voucher
 				back.effect.config.voucher = nil
 			end
 			local obj = G.P_CENTERS[G.GAME.modifiers.mp_cocktail[i]]
-			if obj.apply and type(obj.apply) == 'function' then
-				obj:apply(back)
-			end
+			if obj.apply and type(obj.apply) == "function" then obj:apply(back) end
 		end
 		back.effect.mp_cocktailed = true
 		if not seeded then
 			G.E_MANAGER:add_event(Event({
-				func = (function()
+				func = function()
 					G.GAME.seeded = nil
 					return true
-				end)
+				end,
 			}))
 		end
 	end,
 	calculate = function(self, back, context)
 		for i = 1, 3 do
-			back:change_to(G.P_CENTERS[ G.GAME.modifiers.mp_cocktail[i] ])
+			back:change_to(G.P_CENTERS[G.GAME.modifiers.mp_cocktail[i]])
 			local ret1, ret2 = back:trigger_effect(context)
 			back:change_to(G.P_CENTERS["b_mp_cocktail"])
 			if ret1 or ret2 then return ret1, ret2 end

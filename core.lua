@@ -40,6 +40,11 @@ MP.INTEGRATIONS = {
 	Preview = SMODS.Mods["Multiplayer"].config.integrations.Preview,
 }
 
+MP.PREVIEW = {
+	text = SMODS.Mods["Multiplayer"].config.preview.text,
+	button = SMODS.Mods["Multiplayer"].config.preview.button,
+}
+
 G.C.MULTIPLAYER = HEX("AC3232")
 
 MP.SMODS_VERSION = "1.0.0~BETA-0711a"

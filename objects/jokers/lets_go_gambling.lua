@@ -17,8 +17,10 @@ SMODS.Joker({
 	perishable_compat = true,
 	config = { extra = { odds = 4, xmult = 4, dollars = 10, nemesis_odds = 4, nemesis_dollars = 10 } },
 	loc_vars = function(self, info_queue, card)
-		local numerator, denominator = SMODS.get_probability_vars(card, 1, card.ability.extra.odds, 'j_mp_lets_go_gambling')
-		local nem_numerator, nem_denominator = SMODS.get_probability_vars(card, 1, card.ability.extra.nemesis_odds, 'j_mp_lets_go_gambling_misfire')
+		local numerator, denominator =
+			SMODS.get_probability_vars(card, 1, card.ability.extra.odds, "j_mp_lets_go_gambling")
+		local nem_numerator, nem_denominator =
+			SMODS.get_probability_vars(card, 1, card.ability.extra.nemesis_odds, "j_mp_lets_go_gambling_misfire")
 		return {
 			vars = {
 				numerator,
@@ -41,12 +43,20 @@ SMODS.Joker({
 			and (not card.edition or card.edition.type ~= "mp_phantom")
 		then
 			local returns = nil
-			if SMODS.pseudorandom_probability(card, 'j_mp_lets_go_gambling', 1, card.ability.extra.odds) then
+			if SMODS.pseudorandom_probability(card, "j_mp_lets_go_gambling", 1, card.ability.extra.odds) then
 				returns = {}
 				returns.x_mult = card.ability.extra.xmult
 				returns.dollars = card.ability.extra.dollars
 			end
-			if MP.is_pvp_boss() and SMODS.pseudorandom_probability(card, 'j_mp_lets_go_gambling_misfire', 1, card.ability.extra.nemesis_odds) then
+			if
+				MP.is_pvp_boss()
+				and SMODS.pseudorandom_probability(
+					card,
+					"j_mp_lets_go_gambling_misfire",
+					1,
+					card.ability.extra.nemesis_odds
+				)
+			then
 				returns = returns or {}
 				MP.ACTIONS.lets_go_gambling_nemesis()
 				returns.message = localize("k_oops_ex")

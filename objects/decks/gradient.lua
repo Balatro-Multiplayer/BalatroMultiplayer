@@ -2,7 +2,7 @@ SMODS.Back({
 	key = "gradient",
 	config = {},
 	atlas = "mp_decks",
-	pos = {x = 0, y = 1},
+	pos = { x = 0, y = 1 },
 	apply = function(self)
 		G.GAME.modifiers.mp_gradient = true -- i forgot how you get the deck, whatever
 	end,
@@ -12,11 +12,9 @@ SMODS.Back({
 
 -- water is wet
 local function set_temp_id(card, key)
-	if not card.orig_id then
-		card.orig_id = card.base.id
-	end
+	if not card.orig_id then card.orig_id = card.base.id end
 	card.base.id = card.orig_id + G.MP_GRADIENT
-	if key ~= 'j_raised_fist' then -- otherwise it gets confused and triggers a second card
+	if key ~= "j_raised_fist" then -- otherwise it gets confused and triggers a second card
 		if card.base.id == 15 then
 			card.base.id = 2
 		elseif card.base.id == 1 then
@@ -44,11 +42,11 @@ local function valid_trigger(card, joker)
 	for i, v in ipairs(G.jokers.cards) do
 		if v == joker then pos = i end
 	end
-	while (key == 'j_blueprint' or key == 'j_brainstorm') and count <= #G.jokers.cards do
-		if key == 'j_blueprint' then
-			key = G.jokers.cards[pos+1] and G.jokers.cards[pos+1].config.center.key or 'NULL'
-			pos = pos+1
-		elseif key == 'j_brainstorm' then
+	while (key == "j_blueprint" or key == "j_brainstorm") and count <= #G.jokers.cards do
+		if key == "j_blueprint" then
+			key = G.jokers.cards[pos + 1] and G.jokers.cards[pos + 1].config.center.key or "NULL"
+			pos = pos + 1
+		elseif key == "j_brainstorm" then
 			key = G.jokers.cards[1].config.center.key
 			pos = 1
 		end
@@ -59,11 +57,11 @@ local function valid_trigger(card, joker)
 		end
 		return
 	end
-	if key == 'j_8_ball' then
-		return rank_check{9, 8, 7} -- i don't know if this is necessary? just prevents extra checks ig
-	elseif key == 'j_business' or key == 'j_reserved_parking' then
+	if key == "j_8_ball" then
+		return rank_check({ 9, 8, 7 }) -- i don't know if this is necessary? just prevents extra checks ig
+	elseif key == "j_business" or key == "j_reserved_parking" then
 		return card:is_face()
-	elseif key == 'j_bloodstone' or key == 'j_mp_bloodstone' or key == 'j_mp_bloodstone2' then
+	elseif key == "j_bloodstone" or key == "j_mp_bloodstone" or key == "j_mp_bloodstone2" then
 		return card:is_suit("Hearts")
 	end
 end
@@ -74,24 +72,18 @@ function Card:is_face(from_boss)
 	if G.GAME.modifiers.mp_gradient and not G.MP_GRADIENT then
 		local id = self:get_id() -- like seriously i want an explanation
 		if self.debuff and not from_boss then return end
-		if not ret and id == 10 or id == 14 then
-			return true
-		end
+		if not ret and id == 10 or id == 14 then return true end
 	end
 	return ret
 end
 
 -- hardcoded functions because honk shoo
 local function passkey(key)
-	if key == 'j_superposition' or key == 'j_sixth_sense' then
-		return true
-	end
+	if key == "j_superposition" or key == "j_sixth_sense" then return true end
 	return false
 end
 local function blacklist(key)
-	if key == 'j_photograph' or key == 'j_faceless' then
-		return true
-	end
+	if key == "j_photograph" or key == "j_faceless" then return true end
 	return false
 end
 
@@ -99,7 +91,11 @@ end
 local calculate_joker_ref = Card.calculate_joker
 function Card:calculate_joker(context)
 	if not context.blueprint then -- very important because bloopy recursively calls this
-		if G.GAME.modifiers.mp_gradient and (context.other_card or passkey(self.config.center.key)) and not blacklist(self.config.center.key) then
+		if
+			G.GAME.modifiers.mp_gradient
+			and (context.other_card or passkey(self.config.center.key))
+			and not blacklist(self.config.center.key)
+		then
 			for i = 1, 3 do
 				G.MP_GRADIENT = -i + 2
 				for i, card in ipairs(G.playing_cards) do -- it's actually insane that this doesn't blow up the game??? this is being run thousands of times wastefully
@@ -122,13 +118,11 @@ local update_ref = Card.update
 function Card:update(dt)
 	local ret = update_ref(self, dt)
 	if G.GAME.modifiers.mp_gradient then
-		if self.ability.name == "Cloud 9" then 
+		if self.ability.name == "Cloud 9" then
 			self.ability.nine_tally = 0
 			for k, v in pairs(G.playing_cards) do
 				local id = v:get_id()
-				if id == 8 or id == 9 or id == 10 then
-					self.ability.nine_tally = self.ability.nine_tally + 1
-				end
+				if id == 8 or id == 9 or id == 10 then self.ability.nine_tally = self.ability.nine_tally + 1 end
 			end
 		end
 	end

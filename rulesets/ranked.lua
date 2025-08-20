@@ -105,7 +105,7 @@ MP.Ruleset({
 	forced_lobby_options = true,
 	is_disabled = function(self)
 		if SMODS.version ~= MP.SMODS_VERSION then
-			return localize({type = "variable", key="k_ruleset_disabled_smods_version", vars = {MP.SMODS_VERSION}})
+			return localize({ type = "variable", key = "k_ruleset_disabled_smods_version", vars = { MP.SMODS_VERSION } })
 		end
 		if not MP.INTEGRATIONS.TheOrder then return localize("k_ruleset_disabled_the_order_required") end
 		return false

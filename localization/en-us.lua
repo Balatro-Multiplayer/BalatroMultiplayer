@@ -233,7 +233,7 @@ return {
 					"{C:attention}#2#{C:attention} Playing{} cards to",
 					"add to your deck",
 					"{C:attention}Unskippable{}",
-				}
+				},
 			},
 		},
 	},
@@ -324,6 +324,7 @@ return {
 			k_paste = "Paste From Clipboard",
 			k_username = "Username:",
 			k_enter_username = "Enter username",
+			k_customize_preview = "Customize Preview Text:",
 			k_join_discord = "Join the ",
 			k_discord_msg = "You can report any bugs and find players to play there",
 			k_enter_to_save = "Press enter to save",

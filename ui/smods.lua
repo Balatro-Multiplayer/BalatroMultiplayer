@@ -124,6 +124,8 @@ SMODS.Mods.Multiplayer.config_tab = function()
 		{ shader = "dissolve", shadow_height = 0.05 },
 		{ shader = "dissolve" },
 	})
+	MP.PREVIEW.text = SMODS.Mods["Multiplayer"].config.preview.text or ""
+	MP.PREVIEW.button = SMODS.Mods["Multiplayer"].config.preview.button or ""
 	local ret = {
 		n = G.UIT.ROOT,
 		config = {
@@ -189,6 +191,84 @@ SMODS.Mods.Multiplayer.config_tab = function()
 					},
 				},
 			},
+			MP.INTEGRATIONS.Preview and {
+				n = G.UIT.R,
+				config = {
+					padding = 0.10,
+					align = "cm",
+					id = "preview_text_input",
+				},
+				nodes = {
+					{
+						n = G.UIT.T,
+						config = {
+							scale = 0.5,
+							text = localize("k_customize_preview"),
+							colour = G.C.UI.TEXT_LIGHT,
+						},
+					},
+				},
+			} or nil,
+			MP.INTEGRATIONS.Preview and {
+				n = G.UIT.R,
+				config = {
+					padding = 0,
+					align = "cm",
+					id = "preview_text_input",
+				},
+				nodes = {
+					{
+						n = G.UIT.T,
+						config = {
+							scale = 0.3,
+							text = localize("k_enter_to_save"),
+							colour = G.C.UI.TEXT_LIGHT,
+						},
+					},
+				},
+			} or nil,
+			MP.INTEGRATIONS.Preview
+					and {
+						n = G.UIT.R,
+						config = {
+							padding = 0.15,
+							align = "cm",
+							id = "preview_text_input",
+						},
+						nodes = {
+							create_text_input({
+								id = "preview_text",
+								w = 4,
+								max_length = 25,
+								prompt_text = "CALCULATING", -- raw string but this doesn't need localization
+								colour = copy_table(G.C.BLACK),
+								hooked_colour = darken(copy_table(G.C.BLACK), 0.3),
+								ref_table = MP.PREVIEW,
+								ref_value = "text",
+								extended_corpus = true,
+								keyboard_offset = -3,
+								callback = function(val)
+									MP.UTILS.save_preview(MP.PREVIEW)
+								end,
+							}),
+							create_text_input({
+								id = "preview_button",
+								w = 4,
+								max_length = 25,
+								prompt_text = "Calculate Score",
+								colour = copy_table(G.C.RED),
+								hooked_colour = darken(copy_table(G.C.RED), 0.3),
+								ref_table = MP.PREVIEW,
+								ref_value = "button",
+								extended_corpus = true,
+								keyboard_offset = -3,
+								callback = function(val)
+									MP.UTILS.save_preview(MP.PREVIEW)
+								end,
+							}),
+						},
+					}
+				or nil,
 			{
 				n = G.UIT.R,
 				config = {
@@ -206,6 +286,7 @@ SMODS.Mods.Multiplayer.config_tab = function()
 						},
 					},
 					create_text_input({
+						id = "enter_username",
 						w = 4,
 						max_length = 25,
 						prompt_text = localize("k_enter_username"),

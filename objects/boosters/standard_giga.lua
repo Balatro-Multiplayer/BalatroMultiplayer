@@ -7,11 +7,11 @@ SMODS.Atlas({
 
 SMODS.Booster({
 	key = "standard_giga",
-	kind = 'Standard',
-	group_key = 'k_standard_pack',
+	kind = "Standard",
+	group_key = "k_standard_pack",
 	atlas = "standard_giga",
-	pos = {x = 0, y = 0},
-	config = {extra = 10, choose = 4},
+	pos = { x = 0, y = 0 },
+	config = { extra = 10, choose = 4 },
 	cost = 16,
 	weight = 0,
 	unskippable = true,
