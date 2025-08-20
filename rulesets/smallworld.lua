@@ -161,3 +161,68 @@ function find_joker(name, non_debuff)
 	end
 	return find_joker_ref(name, non_debuff)
 end
+
+-- replace banned tags
+local tag_init_ref = Tag.init
+function Tag:init(_tag, for_collection, _blind_type)
+	if MP.LOBBY.code and MP.LOBBY.config.ruleset == "ruleset_mp_smallworld" then
+		if G.GAME.banned_keys[_tag] then
+			local a = G.GAME.round_resets.ante
+			if MP.should_use_the_order() then G.GAME.round_resets.ante = 0 end
+			_tag = get_next_tag_key("replace")
+			G.GAME.round_resets.ante = a
+		end
+	end
+	tag_init_ref(self, _tag, for_collection, _blind_type)
+end
+
+-- spaghetti that's meant to randomize banned vouchers but cocktail is too fucked up to work with this rn
+--[[
+local apply_to_run_ref = Back.apply_to_run
+function Back:apply_to_run()
+	if MP.LOBBY.code and MP.LOBBY.config.ruleset == "ruleset_mp_smallworld" then
+		if self.effect.config.voucher then
+			G.E_MANAGER:add_event(Event({
+				func = function()
+					for k, v in pairs(G.GAME.current_round.voucher.spawn) do
+						G.GAME.banned_keys[k] = true
+					end
+					if G.GAME.banned_keys[self.effect.config.voucher] and not G.GAME.current_round.voucher.spawn[v] then
+						self.effect.config.voucher = get_next_voucher_key()
+					end
+					G.GAME.used_vouchers[self.effect.config.voucher] = true
+					for k, v in pairs(G.GAME.current_round.voucher.spawn) do
+						G.GAME.banned_keys[k] = nil
+					end
+					apply_to_run_ref(self)
+					return true
+				end,
+			}))
+			return
+		elseif self.effect.config.vouchers or self.effect.center.key == "b_mp_cocktail" then
+			G.E_MANAGER:add_event(Event({
+				func = function()
+					for k, v in pairs(G.GAME.current_round.voucher.spawn) do
+						G.GAME.banned_keys[k] = true
+					end
+					if self.effect.config.vouchers then
+						for i, v in ipairs(self.effect.config.vouchers) do
+							if G.GAME.banned_keys[v] and not G.GAME.current_round.voucher.spawn[v] then
+								self.effect.config.vouchers[i] = get_next_voucher_key()
+							end
+							G.GAME.used_vouchers[ self.effect.config.vouchers[i] ] = true
+						end
+					end
+					for k, v in pairs(G.GAME.current_round.voucher.spawn) do
+						G.GAME.banned_keys[k] = nil
+					end
+					apply_to_run_ref(self)
+					return true
+				end,
+			}))
+			return
+		end
+	end
+	return apply_to_run_ref(self)
+end
+]]

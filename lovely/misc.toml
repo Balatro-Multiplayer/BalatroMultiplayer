@@ -93,3 +93,12 @@ payload = '''
 elseif v.id == 'mp_ante_scaling' then
 	self.GAME.starting_params.ante_scaling = v.value'''
 match_indent = true
+
+# relevant only for small world
+[[patches]]
+[patches.pattern]
+target = "back.lua"
+pattern = '''local card = create_card('Tarot', G.consumeables, nil, nil, nil, nil, v, 'deck')'''
+position = "at"
+payload = '''local card = create_card(G.P_CENTERS[v].set, G.consumeables, nil, nil, nil, nil, v, 'deck')'''
+match_indent = true
