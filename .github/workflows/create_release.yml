@@ -1,0 +1,49 @@
+# .github/workflows/create_release.yml
+name: Create Release
+
+on:
+  push:
+    tags:
+      - "v[0-9]+.*"
+
+jobs:
+  release:
+    name: Create draft release
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Create release archive
+        run: |
+          REPO_NAME=$(basename $GITHUB_REPOSITORY)
+          VERSION="${{ github.ref_name }}"
+
+          git archive --format=zip --prefix="$REPO_NAME-$VERSION/" HEAD > "$REPO_NAME-$VERSION.zip"
+
+          echo "archive_name=$REPO_NAME-$VERSION.zip" >> $GITHUB_ENV
+
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref_name }}
+          release_name: ${{ github.ref_name }}
+          body: |
+            ## Notable Changes
+            TODO
+
+            **Download:** See attached zip file below
+          draft: true
+          prerelease: false
+
+      - name: Upload Release Asset
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./${{ env.archive_name }}
+          asset_name: ${{ env.archive_name }}
+          asset_content_type: application/zip
