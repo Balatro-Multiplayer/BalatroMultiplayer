@@ -51,9 +51,7 @@ local j_broken = {
 
 local card_init_ref = Card.init
 function Card:init(X, Y, W, H, card, center, params)
-	if center == nil then
-		center = j_broken
-	end
+	if center == nil then center = j_broken end
 	card_init_ref(self, X, Y, W, H, card, center, params)
 end
 

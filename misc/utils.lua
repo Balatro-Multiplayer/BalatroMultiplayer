@@ -7,9 +7,7 @@ function MP.UTILS.serialize_table(val, name, skipnewlines, depth)
 
 	local tmp = string.rep(" ", depth)
 
-	if name then
-		tmp = tmp .. name .. " = "
-	end
+	if name then tmp = tmp .. name .. " = " end
 
 	if type(val) == "table" then
 		tmp = tmp .. "{" .. (not skipnewlines and "\n" or "")
@@ -54,12 +52,10 @@ function MP.UTILS.wrapText(text, maxChars)
 end
 
 function MP.UTILS.get_array_index_by_value(options, value)
-    for i, v in ipairs(options) do
-        if v == value then
-            return i
-        end
-    end
-    return nil
+	for i, v in ipairs(options) do
+		if v == value then return i end
+	end
+	return nil
 end
 
 function MP.UTILS.save_username(text)
@@ -123,9 +119,7 @@ function MP.UTILS.get_nemesis_key() -- calling this function assumes the user is
 end
 
 function MP.UTILS.string_split(inputstr, sep)
-	if sep == nil then
-		sep = "%s"
-	end
+	if sep == nil then sep = "%s" end
 	local t = {}
 	for str in string.gmatch(inputstr, "([^" .. sep .. "]+)") do
 		table.insert(t, str)
@@ -211,21 +205,15 @@ function MP.UTILS.overlay_message(message)
 end
 
 function MP.UTILS.get_joker(key)
-	if not G.jokers or not G.jokers.cards then
-		return nil
-	end
+	if not G.jokers or not G.jokers.cards then return nil end
 	for i = 1, #G.jokers.cards do
-		if G.jokers.cards[i].ability.name == key then
-			return G.jokers.cards[i]
-		end
+		if G.jokers.cards[i].ability.name == key then return G.jokers.cards[i] end
 	end
 	return nil
 end
 
 function MP.UTILS.get_phantom_joker(key)
-	if not MP.shared or not MP.shared.cards then
-		return nil
-	end
+	if not MP.shared or not MP.shared.cards then return nil end
 	for i = 1, #MP.shared.cards do
 		if
 			MP.shared.cards[i].ability.name == key
@@ -239,24 +227,16 @@ function MP.UTILS.get_phantom_joker(key)
 end
 
 function MP.UTILS.run_for_each_joker(key, func)
-	if not G.jokers or not G.jokers.cards then
-		return
-	end
+	if not G.jokers or not G.jokers.cards then return end
 	for i = 1, #G.jokers.cards do
-		if G.jokers.cards[i].ability.name == key then
-			func(G.jokers.cards[i])
-		end
+		if G.jokers.cards[i].ability.name == key then func(G.jokers.cards[i]) end
 	end
 end
 
 function MP.UTILS.run_for_each_phantom_joker(key, func)
-	if not MP.shared or not MP.shared.cards then
-		return
-	end
+	if not MP.shared or not MP.shared.cards then return end
 	for i = 1, #MP.shared.cards do
-		if MP.shared.cards[i].ability.name == key then
-			func(MP.shared.cards[i])
-		end
+		if MP.shared.cards[i].ability.name == key then func(MP.shared.cards[i]) end
 	end
 end
 
@@ -343,9 +323,7 @@ function SMODS.create_mod_badges(obj, badges)
 			}
 			local function eq_col(x, y)
 				for i = 1, 4 do
-					if x[1] ~= y[1] then
-						return false
-					end
+					if x[1] ~= y[1] then return false end
 				end
 				return true
 			end
@@ -363,9 +341,7 @@ end
 function MP.UTILS.reverse_key_value_pairs(tbl, stringify_keys)
 	local reversed_tbl = {}
 	for k, v in pairs(tbl) do
-		if stringify_keys then
-			v = tostring(v)
-		end
+		if stringify_keys then v = tostring(v) end
 		reversed_tbl[v] = k
 	end
 	return reversed_tbl
@@ -391,9 +367,7 @@ end
 
 function MP.UTILS.get_deck_key_from_name(_name)
 	for k, v in pairs(G.P_CENTERS) do
-		if v.name == _name then
-			return k
-		end
+		if v.name == _name then return k end
 	end
 end
 
@@ -475,13 +449,9 @@ end
 local reversed_centers = nil
 
 function MP.UTILS.card_to_string(card)
-	if not card or not card.base or not card.base.suit or not card.base.value then
-		return ""
-	end
+	if not card or not card.base or not card.base.suit or not card.base.value then return "" end
 
-	if not reversed_centers then
-		reversed_centers = MP.UTILS.reverse_key_value_pairs(G.P_CENTERS)
-	end
+	if not reversed_centers then reversed_centers = MP.UTILS.reverse_key_value_pairs(G.P_CENTERS) end
 
 	local suit = string.sub(card.base.suit, 1, 1)
 
@@ -504,9 +474,7 @@ function MP.UTILS.card_to_string(card)
 end
 
 function MP.UTILS.joker_to_string(card)
-	if not card or not card.config or not card.config.center or not card.config.center.key then
-		return ""
-	end
+	if not card or not card.config or not card.config.center or not card.config.center.key then return "" end
 
 	local edition = card.edition and MP.UTILS.reverse_key_value_pairs(card.edition, true)["true"] or "none"
 	local eternal_or_perishable = "none"
@@ -541,25 +509,19 @@ function MP.UTILS.encrypt_ID()
 	local encryptID = 1
 	for key, center in pairs(G.P_CENTERS or {}) do
 		if type(key) == "string" and key:match("^j_") then
-			if center.cost and type(center.cost) == "number" then
-				encryptID = encryptID + center.cost
-			end
+			if center.cost and type(center.cost) == "number" then encryptID = encryptID + center.cost end
 			if center.config and type(center.config) == "table" then
 				encryptID = encryptID + MP.UTILS.sum_numbers_in_table(center.config)
 			end
 		elseif type(key) == "string" and key:match("^[cvp]_") then
 			if center.cost and type(center.cost) == "number" then
-				if center.cost == 0 then
-					return 0
-				end
+				if center.cost == 0 then return 0 end
 				encryptID = encryptID + center.cost
 			end
 		end
 	end
 	for key, value in pairs(G.GAME.starting_params or {}) do
-		if type(value) == "number" and value % 1 == 0 then
-			encryptID = encryptID * value
-		end
+		if type(value) == "number" and value % 1 == 0 then encryptID = encryptID * value end
 	end
 	local day = tonumber(os.date("%d")) or 1
 	encryptID = encryptID * day
@@ -611,9 +573,7 @@ function MP.UTILS.parse_Hash(hash)
 end
 
 function MP.UTILS.parse_modlist(mod_string)
-	if not mod_string or mod_string == "" then
-		return {}
-	end
+	if not mod_string or mod_string == "" then return {} end
 
 	local mods = {}
 
@@ -636,6 +596,38 @@ function MP.UTILS.parse_modlist(mod_string)
 	return mods
 end
 
+function MP.UTILS.get_banned_mods(mods)
+	local banned_mods = {}
+	if not mods then return banned_mods end
+
+	for mod_name, mod_version in pairs(mods) do
+		local ban_info = MP.BANNED_MODS[mod_name]
+		local is_banned = false
+
+		if ban_info then
+			if type(ban_info) == "boolean" then
+				-- Old format: ban all versions
+				is_banned = ban_info
+			elseif type(ban_info) == "string" then
+				-- New format: ban specific version
+				is_banned = (mod_version == ban_info)
+			elseif type(ban_info) == "table" then
+				-- Table format: ban multiple specific versions
+				for _, banned_version in ipairs(ban_info) do
+					if mod_version == banned_version then
+						is_banned = true
+						break
+					end
+				end
+			end
+		end
+
+		if is_banned then table.insert(banned_mods, mod_name) end
+	end
+
+	return banned_mods
+end
+
 function MP.UTILS.sum_numbers_in_table(t)
 	local sum = 0
 	for k, v in pairs(t) do
@@ -653,9 +645,7 @@ function MP.UTILS.get_culled_pool(_type, _rarity, _legendary, _append)
 	local pool = get_current_pool(_type, _rarity, _legendary, _append)
 	local ret = {}
 	for i, v in ipairs(pool) do
-		if v ~= 'UNAVAILABLE' then
-			ret[#ret+1] = v
-		end
+		if v ~= "UNAVAILABLE" then ret[#ret + 1] = v end
 	end
 	return ret
 end
@@ -666,9 +656,7 @@ function MP.UTILS.bxor(a, b)
 	while a > 0 and b > 0 do
 		local a_bit = a % 2
 		local b_bit = b % 2
-		if a_bit ~= b_bit then
-			res = res + bitval
-		end
+		if a_bit ~= b_bit then res = res + bitval end
 		bitval = bitval * 2
 		a = math.floor(a / 2)
 		b = math.floor(b / 2)
@@ -712,14 +700,10 @@ function MP.UTILS.server_connection_ID()
 
 		local serial_ptr = ffi.new("DWORD[1]")
 		local ok = ffi.C.GetVolumeInformationA("C:\\", nil, 0, serial_ptr, nil, nil, nil, 0)
-		if ok ~= 0 then
-			raw_id = tostring(serial_ptr[0])
-		end
+		if ok ~= 0 then raw_id = tostring(serial_ptr[0]) end
 	end
 
-	if not raw_id then
-		raw_id = os.getenv("USER") or os.getenv("USERNAME") or os_name
-	end
+	if not raw_id then raw_id = os.getenv("USER") or os.getenv("USERNAME") or os_name end
 
 	return MP.UTILS.encrypt_string(raw_id)
 end
@@ -745,9 +729,7 @@ local function save_global_env()
 	env.hook, env.mask, env.count = debug.gethook()
 
 	-- env.hook is "external hook" if is a C hook function
-	if env.hook ~= "external hook" then
-		debug.sethook()
-	end
+	if env.hook ~= "external hook" then debug.sethook() end
 
 	env.string_mt = getmetatable("")
 	debug.setmetatable("", nil)
@@ -758,32 +740,24 @@ end
 local function restore_global_env(env)
 	if env then
 		debug.setmetatable("", env.string_mt)
-		if env.hook ~= "external hook" then
-			debug.sethook(env.hook, env.mask, env.count)
-		end
+		if env.hook ~= "external hook" then debug.sethook(env.hook, env.mask, env.count) end
 	end
 end
 
 local function STR_UNPACK_CHECKED(str)
 	-- Code generated from STR_PACK should only return a table and nothing else
-	if str:sub(1, 8) ~= "return {" then
-		error('Invalid string header, expected "return {..."')
-	end
+	if str:sub(1, 8) ~= "return {" then error('Invalid string header, expected "return {..."') end
 
 	-- Protect against code injection by disallowing function definitions
 	-- This is a very naive check, but hopefully won't trigger false positives
-	if str:find("[^\"'%w_]function[^\"'%w_]") then
-		error("Function keyword detected")
-	end
+	if str:find("[^\"'%w_]function[^\"'%w_]") then error("Function keyword detected") end
 
 	-- Load with an empty environment, no functions or globals should be available
 	local chunk = assert(load(str, nil, "t", {}))
 	local global_env = save_global_env()
 	local success, str_unpacked = pcall(chunk)
 	restore_global_env(global_env)
-	if not success then
-		error(str_unpacked)
-	end
+	if not success then error(str_unpacked) end
 
 	return str_unpacked
 end
@@ -798,38 +772,26 @@ end
 function MP.UTILS.str_decode_and_unpack(str)
 	local success, str_decoded, str_decompressed, str_unpacked
 	success, str_decoded = pcall(love.data.decode, "string", "base64", str)
-	if not success then
-		return nil, str_decoded
-	end
+	if not success then return nil, str_decoded end
 	success, str_decompressed = pcall(love.data.decompress, "string", "gzip", str_decoded)
-	if not success then
-		return nil, str_decompressed
-	end
+	if not success then return nil, str_decompressed end
 	success, str_unpacked = pcall(STR_UNPACK_CHECKED, str_decompressed)
-	if not success then
-		return nil, str_unpacked
-	end
+	if not success then return nil, str_unpacked end
 	return str_unpacked
 end
 
 function MP.UTILS.get_standard_rulesets()
 	local ret = {}
 	for k, v in pairs(MP.Rulesets) do
-		if v.standard then
-			ret[#ret+1] = string.sub(v.key, 12, #v.key)
-		end
+		if v.standard then ret[#ret + 1] = string.sub(v.key, 12, #v.key) end
 	end
 	return ret
 end
 
 function MP.UTILS.is_standard_ruleset()
-	if MP.LOBBY.config.ruleset == nil then
-		return false
-	end
+	if MP.LOBBY.config.ruleset == nil then return false end
 	for _, ruleset in ipairs(MP.UTILS.get_standard_rulesets()) do
-		if MP.LOBBY.config.ruleset == "ruleset_mp_" .. ruleset then
-			return true
-		end
+		if MP.LOBBY.config.ruleset == "ruleset_mp_" .. ruleset then return true end
 	end
 	return false
 end
@@ -839,5 +801,5 @@ function MP.UTILS.get_weekly()
 end
 
 function MP.UTILS.is_weekly(arg)
-	return MP.UTILS.get_weekly() == arg and MP.LOBBY.config.ruleset == 'ruleset_mp_weekly'
+	return MP.UTILS.get_weekly() == arg and MP.LOBBY.config.ruleset == "ruleset_mp_weekly"
 end

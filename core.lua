@@ -1,4 +1,17 @@
 MP = SMODS.current_mod
+
+MP.BANNED_MODS = {
+	["Incantation"] = true,
+	["Brainstorm"] = true,
+	["DVPreview"] = true,
+	["Aura"] = true,
+	["NotJustYet"] = true,
+	["Showman"] = true,
+	["TagPreview"] = true,
+	["FantomsPreview"] = true,
+	["lovely"] = "0.7.1",
+}
+
 MP.LOBBY = {
 	connected = false,
 	temp_code = "",
@@ -24,9 +37,14 @@ MP.UI = {}
 MP.ACTIONS = {}
 MP.INTEGRATIONS = {
 	TheOrder = SMODS.Mods["Multiplayer"].config.integrations.TheOrder,
+	Preview = SMODS.Mods["Multiplayer"].config.integrations.Preview,
 }
 
 G.C.MULTIPLAYER = HEX("AC3232")
+
+function MP.should_use_the_order()
+	return MP.LOBBY and MP.LOBBY.config and MP.LOBBY.config.the_order
+end
 
 function MP.load_mp_file(file)
 	local chunk, err = SMODS.load_file(file, "Multiplayer")
@@ -73,6 +91,7 @@ function MP.reset_lobby_config(persist_ruleset_and_gamemode)
 		no_gold_on_round_loss = false,
 		death_on_round_loss = true,
 		different_seeds = false,
+		the_order = true,
 		starting_lives = 4,
 		pvp_start_round = 2,
 		timer_base_seconds = 150,
@@ -92,6 +111,7 @@ function MP.reset_lobby_config(persist_ruleset_and_gamemode)
 		timer = true,
 		timer_forgiveness = 0,
 		forced_config = false,
+		preview_disabled = false,
 	}
 end
 MP.reset_lobby_config()
@@ -158,7 +178,6 @@ MP.LOBBY.blind_col = MP.UTILS.get_blind_col()
 
 MP.LOBBY.config.weekly = MP.UTILS.get_weekly()
 
-
 if not SMODS.current_mod.lovely then
 	G.E_MANAGER:add_event(Event({
 		no_delete = true,
@@ -195,7 +214,7 @@ MP.load_mp_dir("ui/components") -- Gamemodes and rulesets need these
 
 MP.load_mp_dir("rulesets")
 if MP.LOBBY.config.weekly then -- this could be a function but why bother
-	MP.load_mp_file("rulesets/weeklies/"..MP.LOBBY.config.weekly..".lua")
+	MP.load_mp_file("rulesets/weeklies/" .. MP.LOBBY.config.weekly .. ".lua")
 end
 MP.load_mp_dir("gamemodes")
 

@@ -90,13 +90,9 @@ local function action_lobbyInfo(host, hostHash, hostCached, guest, guestHash, gu
 	-- once we enable more than 2 players
 	MP.LOBBY.ready_to_start = guest ~= nil and guestReady == "true"
 
-	if MP.LOBBY.is_host then
-		MP.ACTIONS.lobby_options()
-	end
+	if MP.LOBBY.is_host then MP.ACTIONS.lobby_options() end
 
-	if G.STAGE == G.STAGES.MAIN_MENU then
-		MP.ACTIONS.update_player_usernames()
-	end
+	if G.STAGE == G.STAGES.MAIN_MENU then MP.ACTIONS.update_player_usernames() end
 end
 
 local function action_error(message)
@@ -111,9 +107,7 @@ end
 
 local function action_disconnected()
 	MP.LOBBY.connected = false
-	if MP.LOBBY.code then
-		MP.LOBBY.code = nil
-	end
+	if MP.LOBBY.code then MP.LOBBY.code = nil end
 	MP.UI.update_connection_status()
 end
 
@@ -132,18 +126,18 @@ local function action_start_game(seed, stake_str)
 end
 
 local function begin_pvp_blind()
-        if MP.GAME.next_blind_context then
-                G.FUNCS.select_blind(MP.GAME.next_blind_context)
-        else
-                sendErrorMessage("No next blind context", "MULTIPLAYER")
-        end
+	if MP.GAME.next_blind_context then
+		G.FUNCS.select_blind(MP.GAME.next_blind_context)
+	else
+		sendErrorMessage("No next blind context", "MULTIPLAYER")
+	end
 end
 
 local function action_start_blind()
-        MP.GAME.ready_blind = false
-        MP.GAME.timer_started = false
-        MP.GAME.timer = MP.LOBBY.config.timer_base_seconds
-        MP.UI.start_pvp_countdown(begin_pvp_blind)
+	MP.GAME.ready_blind = false
+	MP.GAME.timer_started = false
+	MP.GAME.timer = MP.LOBBY.config.timer_base_seconds
+	MP.UI.start_pvp_countdown(begin_pvp_blind)
 end
 
 ---@param score_str string
@@ -167,9 +161,7 @@ local function action_enemy_info(score_str, hands_left_str, skips_str, lives_str
 		return
 	end
 
-	if MP.INSANE_INT.greater_than(score, MP.GAME.enemy.highest_score) then
-		MP.GAME.enemy.highest_score = score
-	end
+	if MP.INSANE_INT.greater_than(score, MP.GAME.enemy.highest_score) then MP.GAME.enemy.highest_score = score end
 
 	G.E_MANAGER:add_event(Event({
 		blockable = false,
@@ -272,13 +264,11 @@ local function action_lobby_options(options)
 		if k == "ruleset" then
 			if not MP.Rulesets[v] then
 				G.FUNCS.lobby_leave(nil)
-				MP.UTILS.overlay_message(
-					localize({
-						type = "variable",
-						key = "k_failed_to_join_lobby",
-						vars = { localize("k_ruleset_not_found") },
-					})
-				)
+				MP.UTILS.overlay_message(localize({
+					type = "variable",
+					key = "k_failed_to_join_lobby",
+					vars = { localize("k_ruleset_not_found") },
+				}))
 				return
 			end
 			local disabled = MP.Rulesets[v].is_disabled()
@@ -319,9 +309,7 @@ local function action_lobby_options(options)
 		MP.LOBBY.config[k] = parsed_v
 		if G.OVERLAY_MENU then
 			local config_uie = G.OVERLAY_MENU:get_UIE_by_ID(k .. "_toggle")
-			if config_uie then
-				G.FUNCS.toggle(config_uie)
-			end
+			if config_uie then G.FUNCS.toggle(config_uie) end
 		end
 		::continue::
 	end
@@ -354,9 +342,7 @@ end
 local cardremove = Card.remove
 function Card:remove()
 	local menu = G.OVERLAY_MENU
-	if self.edition and self.edition.type == "mp_phantom" then
-		G.OVERLAY_MENU = G.OVERLAY_MENU or true
-	end
+	if self.edition and self.edition.type == "mp_phantom" then G.OVERLAY_MENU = G.OVERLAY_MENU or true end
 	cardremove(self)
 	G.OVERLAY_MENU = menu
 end
@@ -367,9 +353,7 @@ function SMODS.find_card(key, count_debuffed)
 	local ret = smodsfindcard(key, count_debuffed)
 	local new_ret = {}
 	for i, v in ipairs(ret) do
-		if not v.edition or v.edition.type ~= "mp_phantom" then
-			new_ret[#new_ret + 1] = v
-		end
+		if not v.edition or v.edition.type ~= "mp_phantom" then new_ret[#new_ret + 1] = v end
 	end
 	return new_ret
 end
@@ -377,9 +361,7 @@ end
 -- don't poll edition
 local origedpoll = poll_edition
 function poll_edition(_key, _mod, _no_neg, _guaranteed, _options)
-	if G.OVERLAY_MENU then
-		return nil
-	end
+	if G.OVERLAY_MENU then return nil end
 	return origedpoll(_key, _mod, _no_neg, _guaranteed, _options)
 end
 
@@ -477,9 +459,7 @@ end
 
 local function action_lets_go_gambling_nemesis()
 	local card = MP.UTILS.get_phantom_joker("j_mp_lets_go_gambling")
-	if card then
-		card:juice_up()
-	end
+	if card then card:juice_up() end
 	ease_dollars(card and card.ability and card.ability.extra and card.ability.extra.nemesis_dollars or 5)
 end
 
@@ -496,17 +476,13 @@ end
 local function action_magnet()
 	local card = nil
 	for _, v in pairs(G.jokers.cards) do
-		if not card or v.sell_cost > card.sell_cost then
-			card = v
-		end
+		if not card or v.sell_cost > card.sell_cost then card = v end
 	end
 
 	if card then
 		local candidates = {}
 		for _, v in pairs(G.jokers.cards) do
-			if v.sell_cost == card.sell_cost then
-				table.insert(candidates, v)
-			end
+			if v.sell_cost == card.sell_cost then table.insert(candidates, v) end
 		end
 
 		-- Scale the pseudo from 0 - 1 to the number of candidates
@@ -556,9 +532,7 @@ end
 function G.FUNCS.load_end_game_jokers()
 	local card_area_save, success, err
 
-	if not MP.end_game_jokers or not MP.end_game_jokers_payload then
-		return
-	end
+	if not MP.end_game_jokers or not MP.end_game_jokers_payload then return end
 
 	card_area_save, err = MP.UTILS.str_decode_and_unpack(MP.end_game_jokers_payload)
 	if not card_area_save then
@@ -642,25 +616,19 @@ local function action_send_game_stats()
 	if G.GAME.used_vouchers then
 		local keys = {}
 		for k, v in pairs(G.GAME.used_vouchers) do
-			if v == true then
-				table.insert(keys, k)
-			end
+			if v == true then table.insert(keys, k) end
 		end
 		voucher_keys = table.concat(keys, "-")
 	end
 
 	-- Add voucher keys to stats string
-	if voucher_keys ~= "" then
-		stats_str = stats_str .. string.format(",vouchers:%s", voucher_keys)
-	end
+	if voucher_keys ~= "" then stats_str = stats_str .. string.format(",vouchers:%s", voucher_keys) end
 
 	Client.send(string.format("action:nemesisEndGameStats,%s", stats_str))
 end
 
 function G.FUNCS.load_nemesis_deck()
-	if not MP.nemesis_deck_string or not MP.nemesis_deck or not MP.nemesis_cards or not MP.LOBBY.code then
-		return
-	end
+	if not MP.nemesis_deck_string or not MP.nemesis_deck or not MP.nemesis_cards or not MP.LOBBY.code then return end
 
 	local card_strings = MP.UTILS.string_split(MP.nemesis_deck_string, ";")
 
@@ -669,9 +637,7 @@ function G.FUNCS.load_nemesis_deck()
 	end
 
 	for _, card_str in pairs(card_strings) do
-		if card_str == "" then
-			goto continue
-		end
+		if card_str == "" then goto continue end
 
 		local card_params = MP.UTILS.string_split(card_str, "-")
 
@@ -707,12 +673,8 @@ function G.FUNCS.load_nemesis_deck()
 			front = G.P_CARDS[front_key],
 			center = enhancement ~= "none" and G.P_CENTERS[enhancement] or nil,
 		}, MP.nemesis_deck, true, true, nil, false)
-		if edition ~= "none" then
-			card:set_edition({ [edition] = true }, true, true)
-		end
-		if seal ~= "none" then
-			card:set_seal(seal, true, true)
-		end
+		if edition ~= "none" then card:set_edition({ [edition] = true }, true, true) end
+		if seal ~= "none" then card:set_seal(seal, true, true) end
 
 		-- Remove the card from G.playing_cards and insert into MP.nemesis_cards
 		table.remove(G.playing_cards, #G.playing_cards)
@@ -729,18 +691,14 @@ local function action_receive_nemesis_deck(deck_str)
 end
 
 local function action_start_ante_timer(time)
-	if type(time) == "string" then
-		time = tonumber(time)
-	end
+	if type(time) == "string" then time = tonumber(time) end
 	MP.GAME.timer = time
 	MP.GAME.timer_started = true
 	G.E_MANAGER:add_event(MP.timer_event)
 end
 
 local function action_pause_ante_timer(time)
-	if type(time) == "string" then
-		time = tonumber(time)
-	end
+	if type(time) == "string" then time = tonumber(time) end
 	MP.GAME.timer = time
 	MP.GAME.timer_started = false
 end
@@ -788,12 +746,8 @@ function MP.ACTIONS.stop_game()
 end
 
 function MP.ACTIONS.fail_round(hands_used)
-	if MP.LOBBY.config.no_gold_on_round_loss then
-		G.GAME.blind.dollars = 0
-	end
-	if hands_used == 0 then
-		return
-	end
+	if MP.LOBBY.config.no_gold_on_round_loss then G.GAME.blind.dollars = 0 end
+	if hands_used == 0 then return end
 	Client.send("action:failRound")
 end
 
@@ -802,9 +756,7 @@ function MP.ACTIONS.version()
 end
 
 function MP.ACTIONS.set_location(location)
-	if MP.GAME.location == location then
-		return
-	end
+	if MP.GAME.location == location then return end
 	MP.GAME.location = location
 	Client.send(string.format("action:setLocation,location:%s", location))
 end
@@ -840,7 +792,6 @@ function MP.ACTIONS.set_ante(ante)
 end
 
 function MP.ACTIONS.new_round()
-
 	MP.GAME.duplicate_end = false
 	MP.GAME.round_ended = false
 	Client.send("action:newRound")
@@ -934,9 +885,7 @@ end
 
 function MP.ACTIONS.update_player_usernames()
 	if MP.LOBBY.code then
-		if G.MAIN_MENU_UI then
-			G.MAIN_MENU_UI:remove()
-		end
+		if G.MAIN_MENU_UI then G.MAIN_MENU_UI:remove() end
 		set_main_menu_UI()
 	end
 end
@@ -945,9 +894,7 @@ local function string_to_table(str)
 	local tbl = {}
 	for part in string.gmatch(str, "([^,]+)") do
 		local key, value = string.match(part, "([^:]+):(.+)")
-		if key and value then
-			tbl[key] = value
-		end
+		if key and value then tbl[key] = value end
 	end
 	return tbl
 end

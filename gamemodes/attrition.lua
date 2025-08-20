@@ -25,11 +25,11 @@ MP.Gamemode({
 	},
 	banned_enhancements = {},
 	banned_tags = {
-		"tag_boss"
+		"tag_boss",
 	},
 	banned_blinds = {
 		"bl_wall",
-		"bl_final_vessel"
+		"bl_final_vessel",
 	},
 	reworked_jokers = {},
 	reworked_consumables = {},
@@ -42,7 +42,7 @@ MP.Gamemode({
 			{
 				n = G.UIT.R,
 				config = {
-					align = "tm"
+					align = "tm",
 				},
 				nodes = {
 					{
@@ -51,7 +51,7 @@ MP.Gamemode({
 							text = MP.UTILS.wrapText(localize("k_attrition_description"), 70),
 							scale = 0.6,
 							colour = G.C.UI.TEXT_LIGHT,
-						}
+						},
 					},
 				},
 			},
@@ -59,125 +59,133 @@ MP.Gamemode({
 				n = G.UIT.R,
 				config = {
 					minw = 0.2,
-					minh = 0.2
-				}
+					minh = 0.2,
+				},
 			},
 			{
 				n = G.UIT.R,
 				config = {
 					align = "cm",
-					padding = 0.3
+					padding = 0.3,
 				},
 				nodes = {
 					{
 						n = G.UIT.C,
 						config = {
-							align = "cm"
+							align = "cm",
 						},
 						nodes = {
 							{
 								n = G.UIT.R,
 								config = {
-									align = "cm"
+									align = "cm",
 								},
 								nodes = {
-									MP.UI.BackgroundGrouping(localize({ type = "variable", key = "k_ante_number", vars = { "1" }}), {
+									MP.UI.BackgroundGrouping(
+										localize({ type = "variable", key = "k_ante_number", vars = { "1" } }),
 										{
-											n = G.UIT.O,
-											config = {
-												object = MP.UI.BlindChip.small()
-											}
+											{
+												n = G.UIT.O,
+												config = {
+													object = MP.UI.BlindChip.small(),
+												},
+											},
+											{
+												n = G.UIT.C,
+												config = {
+													minw = 0.2,
+													minh = 0.2,
+												},
+											},
+											{
+												n = G.UIT.O,
+												config = {
+													object = MP.UI.BlindChip.big(),
+												},
+											},
+											{
+												n = G.UIT.C,
+												config = {
+													minw = 0.2,
+													minh = 0.2,
+												},
+											},
+											{
+												n = G.UIT.O,
+												config = {
+													object = MP.UI.BlindChip.random(),
+												},
+											},
 										},
-										{
-											n = G.UIT.C,
-											config = {
-												minw = 0.2,
-												minh = 0.2
-											}
-										},
-										{
-											n = G.UIT.O,
-											config = {
-												object = MP.UI.BlindChip.big()
-											}
-										},
-										{
-											n = G.UIT.C,
-											config = {
-												minw = 0.2,
-												minh = 0.2
-											}
-										},
-										{
-											n = G.UIT.O,
-											config = {
-												object = MP.UI.BlindChip.random()
-											}
-										},
-									}, {text_scale = 0.6}),
-								}
+										{ text_scale = 0.6 }
+									),
+								},
 							},
 							{
 								n = G.UIT.R,
 								config = {
 									minw = 0.2,
-									minh = 0.2
-								}
+									minh = 0.2,
+								},
 							},
 							{
 								n = G.UIT.R,
 								config = {
-									align = "cm"
+									align = "cm",
 								},
 								nodes = {
-									MP.UI.BackgroundGrouping(localize({ type = "variable", key = "k_ante_min", vars = { "2" }}), {
+									MP.UI.BackgroundGrouping(
+										localize({ type = "variable", key = "k_ante_min", vars = { "2" } }),
 										{
-											n = G.UIT.O,
-											config = {
-												object = MP.UI.BlindChip.small()
-											}
+											{
+												n = G.UIT.O,
+												config = {
+													object = MP.UI.BlindChip.small(),
+												},
+											},
+											{
+												n = G.UIT.C,
+												config = {
+													minw = 0.2,
+													minh = 0.2,
+												},
+											},
+											{
+												n = G.UIT.O,
+												config = {
+													object = MP.UI.BlindChip.big(),
+												},
+											},
+											{
+												n = G.UIT.C,
+												config = {
+													minw = 0.2,
+													minh = 0.2,
+												},
+											},
+											{
+												n = G.UIT.O,
+												config = {
+													object = MP.UI.BlindChip.nemesis(),
+												},
+											},
 										},
-										{
-											n = G.UIT.C,
-											config = {
-												minw = 0.2,
-												minh = 0.2
-											}
-										},
-										{
-											n = G.UIT.O,
-											config = {
-												object = MP.UI.BlindChip.big()
-											}
-										},
-										{
-											n = G.UIT.C,
-											config = {
-												minw = 0.2,
-												minh = 0.2
-											}
-										},
-										{
-											n = G.UIT.O,
-											config = {
-												object = MP.UI.BlindChip.nemesis()
-											}
-										},
-									}, {text_scale = 0.6}),
-								}
+										{ text_scale = 0.6 }
+									),
+								},
 							},
 						},
 					},
 					{
 						n = G.UIT.C,
 						config = {
-							align = "cm"
+							align = "cm",
 						},
 						nodes = {
 							{
 								n = G.UIT.R,
 								config = {
-									align = "cm"
+									align = "cm",
 								},
 								nodes = {
 									MP.UI.BackgroundGrouping(localize("k_lives"), {
@@ -187,19 +195,19 @@ MP.Gamemode({
 												text = "4",
 												scale = 1.5,
 												colour = G.C.UI.TEXT_LIGHT,
-											}
+											},
 										},
-									}, {text_scale = 0.6}),
-								}
+									}, { text_scale = 0.6 }),
+								},
 							},
-						}
-					}
+						},
+					},
 				},
 			},
 			{
 				n = G.UIT.R,
 				config = {
-					align = "bm"
+					align = "bm",
 				},
 				nodes = {
 					{
@@ -208,10 +216,10 @@ MP.Gamemode({
 							text = localize("k_values_are_modifiable"),
 							scale = 0.4,
 							colour = G.C.UI.TEXT_LIGHT,
-						}
+						},
 					},
 				},
 			},
 		}
-	end
+	end,
 }):inject()

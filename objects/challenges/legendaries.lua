@@ -4,9 +4,9 @@ SMODS.Challenge({
 		modifiers = {
 			{
 				id = "joker_slots",
-				value = 6
-			}
-		}
+				value = 6,
+			},
+		},
 	},
 	jokers = {
 		{ id = "j_caino", eternal = true },

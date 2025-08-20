@@ -115,7 +115,7 @@ return {
 					"Verwijder #1# level van je",
 					"{X:purple,C:white}Aartsvijands'{} hoogste level",
 					"{C:legendary,E:1}poker hand{}",
-					"aan het begin van de {C:attention}PvP Blind{}"
+					"aan het begin van de {C:attention}PvP Blind{}",
 				},
 			},
 		},
@@ -208,7 +208,7 @@ return {
 			b_continue_singleplayer = "Speel verder in Singleplayer",
 			b_the_order_integration = "Schakel De Orde Integratie in",
 			b_view_nemesis_deck = "Toon Aartsvijands Kaartspel",
-      		b_toggle_jokers = "Schakel Jokers in",
+			b_toggle_jokers = "Schakel Jokers in",
 			-- What's the context of toggle jokers?
 			k_continue_singleplayer_tooltip = "Dit zal je huidige Singleplayer run overschrijden",
 			k_enemy_score = "Huidige score van je vijand",

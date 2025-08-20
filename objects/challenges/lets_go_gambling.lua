@@ -36,7 +36,7 @@ SMODS.Challenge({
 	},
 	deck = {
 		type = "Challenge Deck",
-		enhancement = "m_lucky"
+		enhancement = "m_lucky",
 	},
 	unlocked = function(self)
 		return true

@@ -75,7 +75,7 @@ function MP.UI.create_lobby_options_tab()
 			),
 			create_lobby_option_toggle("different_decks_toggle", "b_opts_player_diff_deck", "different_decks"),
 			create_lobby_option_toggle("multiplayer_jokers_toggle", "b_opts_multiplayer_jokers", "multiplayer_jokers"),
-			create_lobby_option_toggle("normal_bosses_toggle", "b_opts_normal_bosses", "normal_bosses")
+			create_lobby_option_toggle("normal_bosses_toggle", "b_opts_normal_bosses", "normal_bosses"),
 		},
 	}
 end

@@ -100,9 +100,9 @@ return {
 			j_mp_hanging_chad = {
 				name = "Недонадорванный бюллетень",
 				text = {
-                    "Эффекты {C:attention}первой{} и {C:attention}второй{}",
-                    "сыгранных карт срабатывают ещё {C:attention}#1#{} раз",
-					"при подсчёте"
+					"Эффекты {C:attention}первой{} и {C:attention}второй{}",
+					"сыгранных карт срабатывают ещё {C:attention}#1#{} раз",
+					"при подсчёте",
 				},
 			},
 		},
@@ -139,8 +139,8 @@ return {
 				name = "Стеклянная карта",
 				text = {
 					"{X:mult,C:white} X#1# {} множ.",
-                    "Имеет шанс {C:green}#2# к #3#{},",
-                    "что будет уничтожена"
+					"Имеет шанс {C:green}#2# к #3#{},",
+					"что будет уничтожена",
 				},
 			},
 		},
@@ -266,7 +266,9 @@ return {
 		},
 		v_text = {
 			ch_c_hanging_chad_rework = { "{C:attention}Ещё разок{} {C:dark_edition}переработан" },
-			ch_c_glass_cards_rework = { "{C:attention}Стеклянные карты{} {C:dark_edition}переработаны" },
+			ch_c_glass_cards_rework = {
+				"{C:attention}Стеклянные карты{} {C:dark_edition}переработаны",
+			},
 		},
 		challenge_names = {
 			c_mp_misprint_deck = "Колода с опечаткой",

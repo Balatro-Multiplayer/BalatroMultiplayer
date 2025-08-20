@@ -50,13 +50,29 @@ function MP.UI.create_UIBox_settings() -- optimize this please
 				n = G.UIT.R,
 				config = { align = "tm", padding = 0.05 },
 				nodes = {
-					{ n = G.UIT.T, config = { text = (localize("k_" .. ruleset) .. " " .. localize("k_" .. gamemode)), colour = G.C.UI.TEXT_LIGHT, scale = 0.6 } } }
+					{
+						n = G.UIT.T,
+						config = {
+							text = (localize("k_" .. ruleset) .. " " .. localize("k_" .. gamemode)),
+							colour = G.C.UI.TEXT_LIGHT,
+							scale = 0.6,
+						},
+					},
+				},
 			},
 			{
 				n = G.UIT.R,
 				config = { align = "tm", padding = 0.05 },
 				nodes = {
-					{ n = G.UIT.T, config = { text = (localize("k_current_seed") .. seed), colour = G.C.UI.TEXT_LIGHT, scale = 0.6 } } }
+					{
+						n = G.UIT.T,
+						config = {
+							text = (localize("k_current_seed") .. seed),
+							colour = G.C.UI.TEXT_LIGHT,
+							scale = 0.6,
+						},
+					},
+				},
 			},
 			{
 				n = G.UIT.R,
@@ -70,7 +86,8 @@ function MP.UI.create_UIBox_settings() -- optimize this please
 						label = localize("b_opts_cb_money"),
 						ref_table = MP.LOBBY.config,
 						ref_value = "gold_on_life_loss",
-					}) }
+					}),
+				},
 			},
 			{
 				n = G.UIT.R,
@@ -84,7 +101,8 @@ function MP.UI.create_UIBox_settings() -- optimize this please
 						label = localize("b_opts_no_gold_on_loss"),
 						ref_table = MP.LOBBY.config,
 						ref_value = "no_gold_on_round_loss",
-					}) }
+					}),
+				},
 			},
 			{
 				n = G.UIT.R,
@@ -98,7 +116,8 @@ function MP.UI.create_UIBox_settings() -- optimize this please
 						label = localize("b_opts_death_on_loss"),
 						ref_table = MP.LOBBY.config,
 						ref_value = "death_on_round_loss",
-					}) }
+					}),
+				},
 			},
 			{
 				n = G.UIT.R,
@@ -112,7 +131,8 @@ function MP.UI.create_UIBox_settings() -- optimize this please
 						label = localize("b_opts_diff_seeds"),
 						ref_table = MP.LOBBY.config,
 						ref_value = "different_seeds",
-					}) }
+					}),
+				},
 			},
 			{
 				n = G.UIT.R,
@@ -126,7 +146,8 @@ function MP.UI.create_UIBox_settings() -- optimize this please
 						label = localize("b_opts_player_diff_deck"),
 						ref_table = MP.LOBBY.config,
 						ref_value = "different_decks",
-					}) }
+					}),
+				},
 			},
 			{
 				n = G.UIT.R,
@@ -140,7 +161,8 @@ function MP.UI.create_UIBox_settings() -- optimize this please
 						label = localize("b_opts_multiplayer_jokers"),
 						ref_table = MP.LOBBY.config,
 						ref_value = "multiplayer_jokers",
-					}) }
+					}),
+				},
 			},
 			{
 				n = G.UIT.R,
@@ -154,9 +176,10 @@ function MP.UI.create_UIBox_settings() -- optimize this please
 						label = localize("b_opts_normal_bosses"),
 						ref_table = MP.LOBBY.config,
 						ref_value = "normal_bosses",
-					}) }
+					}),
+				},
 			},
-		}
+		},
 	}
 end
 
@@ -185,8 +208,8 @@ function MP.UI.create_UIBox_mods_list(type)
 			{
 				n = G.UIT.C,
 				config = { align = "cm" },
-				nodes = MP.UI.hash_str_to_view(
-					type == "host" and MP.LOBBY.host.hash_str or MP.LOBBY.guest.hash_str,
+				nodes = MP.UI.modlist_to_view(
+					type == "host" and MP.LOBBY.host.config.Mods or MP.LOBBY.guest.config.Mods,
 					G.C.UI.TEXT_DARK
 				),
 			},
@@ -318,9 +341,7 @@ end
 
 local ease_round_ref = ease_round
 function ease_round(mod)
-	if MP.LOBBY.code and (not MP.LOBBY.config.disable_live_and_timer_hud) and MP.LOBBY.config.timer then
-		return
-	end
+	if MP.LOBBY.code and not MP.LOBBY.config.disable_live_and_timer_hud and MP.LOBBY.config.timer then return end
 	ease_round_ref(mod)
 end
 
@@ -443,7 +464,6 @@ function MP.UI.start_pvp_countdown(callback)
 	}))
 end
 
-
 function G.FUNCS.set_timer_box(e)
 	if MP.LOBBY.config.timer then
 		if MP.GAME.timer_started then
@@ -461,7 +481,6 @@ function G.FUNCS.set_timer_box(e)
 	end
 end
 
-
 MP.timer_event = Event({
 	blockable = false,
 	blocking = false,
@@ -471,9 +490,7 @@ MP.timer_event = Event({
 	delay = 1,
 	timer = "UPTIME",
 	func = function()
-		if not MP.GAME.timer_started then
-			return true
-		end
+		if not MP.GAME.timer_started then return true end
 		MP.GAME.timer = MP.GAME.timer - 1
 		if MP.GAME.timer <= 0 then
 			MP.GAME.timer = 0

@@ -1,0 +1,46 @@
+[manifest]
+version = "1.0"
+dump_lua = true
+priority = 0
+
+[[patches]]
+[patches.copy]
+target = "globals.lua"
+position = "append"
+sources = [
+    "Compatibility/Preview/InitSimulate.lua",
+    "Compatibility/Preview/InitPreview.lua",
+]
+
+[[patches]]
+[patches.copy]
+target = "main.lua"
+position = "append"
+sources = [
+    "Compatibility/Preview/CorePreview.lua",
+    "Compatibility/Preview/UtilsPreview.lua",
+]
+
+[[patches]]
+[patches.copy]
+target = "functions/common_events.lua"
+position = "append"
+sources = [
+    "Compatibility/Preview/EngineSimulate.lua",
+    "Compatibility/Preview/UtilsSimulate.lua",
+]
+
+[[patches]]
+[patches.copy]
+target = "card.lua"
+position = "append"
+sources = [
+    "Compatibility/Preview/Jokers/_Vanilla.lua",
+    "Compatibility/Preview/Jokers/Multiplayer.lua",
+]
+
+[[patches]]
+[patches.copy]
+target = "functions/UI_definitions.lua"
+position = "append"
+sources = ["Compatibility/Preview/InterfacePreview.lua"]
