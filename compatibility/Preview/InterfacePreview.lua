@@ -1,5 +1,3 @@
---- Original: Divvy's Preview for Balatro - Interface.lua
---
 -- The user interface components that display simulation results.
 
 -- Append node for preview text to the HUD:
@@ -21,10 +19,6 @@ function create_UIBox_HUD()
 
 	table.insert(contents.nodes[1].nodes[1].nodes[4].nodes[1].nodes, score_node_wrap)
 	table.insert(contents.nodes[1].nodes[1].nodes[4].nodes[1].nodes, calculate_score_button_wrap)
-
-	--[[local dollars_node_wrap = {n=G.UIT.C, config={id = "fn_pre_dollars_wrap", align = "cm"}, nodes={}}
-   if G.SETTINGS.FN.preview_dollars then table.insert(dollars_node_wrap.nodes, FN.PRE.get_dollars_node()) end
-   table.insert(contents.nodes[1].nodes[1].nodes[5].nodes[2].nodes[3].nodes[1].nodes[1].nodes[1].nodes, dollars_node_wrap) --]]
 
 	return contents
 end
@@ -111,29 +105,6 @@ function FN.PRE.get_score_node()
 		},
 	}
 end
-
---[[function FN.PRE.get_dollars_node()
-   local top_color = FN.PRE.get_dollar_colour(0)
-   local bot_color = top_color
-   if FN.PRE.data ~= nil then
-      top_color = FN.PRE.get_dollar_colour(FN.PRE.data.dollars.max)
-      bot_color = FN.PRE.get_dollar_colour(FN.PRE.data.dollars.min)
-   else
-   end
-   return {n=G.UIT.C, config={id = "fn_pre_dollars", align = "cm"}, nodes={
-       {n=G.UIT.R, config={align = "cm"}, nodes={
-           {n=G.UIT.O, config={id = "fn_pre_dollars_top", func = "fn_pre_dollars_UI_set", object = DynaText({string = {{ref_table = FN.PRE.text.dollars, ref_value = "top"}}, colours = {top_color}, shadow = true, spacing = 2, bump = true, scale = 0.5})}}
-       }},
-       {n=G.UIT.R, config={minh = 0.05}, nodes={}},
-       {n=G.UIT.R, config={align = "cm"}, nodes={
-           {n=G.UIT.O, config={id = "fn_pre_dollars_bot", func = "fn_pre_dollars_UI_set", object = DynaText({string = {{ref_table = FN.PRE.text.dollars, ref_value = "bot"}}, colours = {bot_color}, shadow = true, spacing = 2, bump = true, scale = 0.5})}},
-       }}
-   }}
-end--]]
-
---
--- SETTINGS:
---
 
 -- TODO Implement
 function FN.get_preview_settings_page()

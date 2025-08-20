@@ -1,5 +1,3 @@
---- Original: Divvy's Simulation for Balatro - Utils.lua
---
 -- Utilities for writing simulation functions for jokers.
 --
 -- In general, these functions replicate the game's internal calculations and

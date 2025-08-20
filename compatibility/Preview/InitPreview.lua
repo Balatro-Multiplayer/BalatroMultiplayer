@@ -1,5 +1,3 @@
---- Original: Divvy's Preview for Balatro - Init.lua
---
 -- Global values that must be present for the rest of this mod to work.
 
 if not FN then FN = {} end

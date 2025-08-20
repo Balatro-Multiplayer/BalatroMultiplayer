@@ -1,5 +1,3 @@
---- Original: Divvy's Preview for Balatro - Core.lua
-
 -- The functions responsible for running the simulation at appropriate times;
 -- ie. whenever the player modifies card selection or card order.
 
@@ -28,9 +26,7 @@ function FN.PRE.simulate()
 	return FN.SIM.run()
 end
 
---
 -- SIMULATION UPDATE ADVICE:
---
 
 function FN.PRE.add_update_event(trigger)
 	function sim_func()
@@ -88,7 +84,6 @@ function FN.PRE.update_on_card_order_change(cardarea)
 		return
 	end
 	-- Important not to update on G.STATES.HAND_PLAYED, because it would reset the preview text!
-
 	if G.STATE == G.STATES.HAND_PLAYED then return end
 
 	local prev_order = nil
@@ -124,9 +119,7 @@ function FN.PRE.update_on_card_order_change(cardarea)
 	end
 end
 
---
 -- SIMULATION RESET ADVICE:
---
 
 function FN.PRE.add_reset_event(trigger)
 	function reset_func()
@@ -152,9 +145,7 @@ function G.FUNCS.discard_cards_from_highlighted(e, is_hook_blind)
 	if not is_hook_blind then FN.PRE.add_reset_event("immediate") end
 end
 
---
 -- USER INTERFACE ADVICE:
---
 
 -- Add animation to preview text:
 function G.FUNCS.fn_pre_score_UI_set(e)

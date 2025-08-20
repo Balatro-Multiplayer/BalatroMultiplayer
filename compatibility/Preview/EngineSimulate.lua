@@ -1,5 +1,3 @@
---- Original: Divvy's Simulation for Balatro - Engine.lua
---
 -- The heart of this library: it replicates the game's score evaluation.
 
 if not FN.SIM.run then

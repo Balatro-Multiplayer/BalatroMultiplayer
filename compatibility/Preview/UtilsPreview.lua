@@ -1,5 +1,3 @@
---- Original: Divvy's Preview for Balatro - Utils.lua
---
 -- Utilities for checking states and formatting display.
 
 function FN.PRE.is_enough_to_win(chips)
