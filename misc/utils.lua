@@ -118,6 +118,24 @@ function MP.UTILS.get_nemesis_key() -- calling this function assumes the user is
 	return ret
 end
 
+function MP.UTILS.save_preview(table)
+	for k, v in pairs(table) do
+		SMODS.Mods["Multiplayer"].config.preview[k] = v
+	end
+end
+
+function MP.UTILS.get_preview_cfg(index)
+	local ret = SMODS.Mods["Multiplayer"].config.preview[index]
+	if not ret or #ret < 1 then
+		if index == "text" then
+			ret = "CALCULATING"
+		else
+			ret = "Calculate Score"
+		end
+	end
+	return ret
+end
+
 function MP.UTILS.string_split(inputstr, sep)
 	if sep == nil then sep = "%s" end
 	local t = {}
@@ -780,10 +798,16 @@ function MP.UTILS.str_decode_and_unpack(str)
 	return str_unpacked
 end
 
-function MP.UTILS.get_standard_rulesets()
+function MP.UTILS.get_standard_rulesets(add)
 	local ret = {}
 	for k, v in pairs(MP.Rulesets) do
 		if v.standard then ret[#ret + 1] = string.sub(v.key, 12, #v.key) end
+	end
+	if add then
+		if type(add) == "string" then add = { add } end
+		for i, v in ipairs(add) do
+			ret[#ret + 1] = v
+		end
 	end
 	return ret
 end

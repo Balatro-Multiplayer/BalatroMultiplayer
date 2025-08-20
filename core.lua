@@ -40,7 +40,14 @@ MP.INTEGRATIONS = {
 	Preview = SMODS.Mods["Multiplayer"].config.integrations.Preview,
 }
 
+MP.PREVIEW = {
+	text = SMODS.Mods["Multiplayer"].config.preview.text,
+	button = SMODS.Mods["Multiplayer"].config.preview.button,
+}
+
 G.C.MULTIPLAYER = HEX("AC3232")
+
+MP.SMODS_VERSION = "1.0.0~BETA-0711a"
 
 function MP.should_use_the_order()
 	return MP.LOBBY and MP.LOBBY.config and MP.LOBBY.config.the_order
@@ -225,6 +232,7 @@ MP.load_mp_dir("objects/blinds")
 MP.load_mp_dir("objects/decks")
 MP.load_mp_dir("objects/jokers")
 MP.load_mp_dir("objects/consumables")
+MP.load_mp_dir("objects/boosters")
 MP.load_mp_dir("objects/challenges")
 
 MP.load_mp_dir("ui")

@@ -162,7 +162,7 @@ function G.FUNCS.fn_pre_score_UI_set(e)
 	local should_juice = false
 	if FN.PRE.lock_updates then
 		if e.config.id == "fn_pre_l" then
-			new_preview_text = " CALCULATING "
+			new_preview_text = " " .. MP.UTILS.get_preview_cfg("text") .. " "
 			should_juice = true
 		end
 	else

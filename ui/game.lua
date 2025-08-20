@@ -39,7 +39,7 @@ function create_UIBox_blind_choice(type, run_info)
 				_poker_hands = MP.sorted_hand_list()
 			else
 				for k, v in pairs(G.GAME.hands) do
-					if v.visible then _poker_hands[#_poker_hands + 1] = k end
+					if SMODS.is_poker_hand_visible(k) then _poker_hands[#_poker_hands + 1] = k end
 				end
 			end
 
@@ -872,14 +872,11 @@ function Game:update_draw_to_hand(dt)
 
 				if MP.GAME.asteroids > 0 then -- launch asteroids, messy event garbage
 					delay(0.8)
-					update_hand_text(
-						{ sound = "button", volume = 0.7, pitch = 0.8, delay = 0.3 },
-						{
-							handname = localize("k_asteroids"),
-							chips = localize("k_amount_short"),
-							mult = MP.GAME.asteroids,
-						}
-					)
+					update_hand_text({ sound = "button", volume = 0.7, pitch = 0.8, delay = 0.3 }, {
+						handname = localize("k_asteroids"),
+						chips = localize("k_amount_short"),
+						mult = MP.GAME.asteroids,
+					})
 					delay(0.6)
 					local send = 0
 					for i = 1, MP.GAME.asteroids do

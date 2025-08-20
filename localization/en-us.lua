@@ -174,12 +174,65 @@ return {
 				},
 			},
 		},
+		Back = {
+			b_mp_cocktail = {
+				name = "Cocktail Deck",
+				text = {
+					"Copies all effects",
+					"of {C:attention}3{} other decks",
+					"at random",
+				},
+			},
+			b_mp_gradient = {
+				name = "Gradient Deck",
+				text = {
+					"Cards are also considered",
+					"one rank {C:attention}higher{} or {C:attention}lower",
+					"for all {C:attention}Joker{} effects",
+				},
+			},
+			b_mp_orange = {
+				name = "Orange Deck",
+				text = {
+					"Start run with a",
+					"{C:attention,T:p_mp_standard_giga}Giga Standard Pack{}, and",
+					"{C:attention}2{} copies of {C:tarot,T:c_hanged_man}The Hanged Man",
+				},
+			},
+			b_mp_sibyl = {
+				name = "Sibyl Deck",
+				text = {
+					"{C:planet}Planets{}, {C:attention}playing cards{}, and",
+					"{C:spectral}Spectral Packs{} will not appear",
+					"Start run with {C:spectral,T:c_medium}Medium",
+					"The only {C:spectral}Spectral{} card",
+					"is {C:spectral,T:c_medium}Medium",
+				},
+			},
+			b_mp_violet = {
+				name = "Violet Deck",
+				text = {
+					"{C:attention}+1{} Voucher in shop",
+					"During Ante {C:attention}1{}, Vouchers",
+					"are {C:attention}50%{} off",
+				},
+			},
+		},
 		Other = {
 			current_nemesis = {
 				name = "Nemesis",
 				text = {
 					"{X:purple,C:white}#1#{}",
 					"Your one and only Nemesis",
+				},
+			},
+			p_mp_standard_giga = {
+				name = "Giga Standard Pack",
+				text = {
+					"Choose {C:attention}#1#{} of up to",
+					"{C:attention}#2#{C:attention} Playing{} cards to",
+					"add to your deck",
+					"{C:attention}Unskippable{}",
 				},
 			},
 		},
@@ -271,6 +324,7 @@ return {
 			k_paste = "Paste From Clipboard",
 			k_username = "Username:",
 			k_enter_username = "Enter username",
+			k_customize_preview = "Customize Preview Text:",
 			k_join_discord = "Join the ",
 			k_discord_msg = "You can report any bugs and find players to play there",
 			k_enter_to_save = "Press enter to save",
@@ -323,11 +377,11 @@ return {
 			k_traditional = "Traditional",
 			k_traditional_description = "This ruleset removes the aspects of Multiplayer that use time as a resource.\n\nThis ruleset allows you to play with the Multiplayer content,\nwhile still allowing for a methodical game.\n\nSome cards are balanced in this ruleset to better fit the Multiplayer meta:\n- Hanging Chad is reworked\n- Justice is removed\n- Glass is reworked\n\n(See the bans and reworks tabs for more info)",
 			k_majorleague = "Major League",
-			k_majorleague_description = "This is the official ruleset for Major League Balatro.\n\nThis ruleset is the same as the Vanilla ruleset with a few exceptions:\n- You must have The Order Integration disabled\n- The timer is set to 180 seconds\n- The first time the timer hits 0 seconds you will not lose a life",
+			k_majorleague_description = "This is the official ruleset for Major League Balatro.\n\nThis ruleset is the same as the Vanilla ruleset with a few exceptions:\n- The Order Integration is disabled\n- The timer is set to 180 seconds\n- The first time the timer hits 0 seconds you will not lose a life",
 			k_minorleague = "Minor League",
-			k_minorleague_description = "This is the official ruleset for Minor League Balatro.\n\nThis ruleset is the same as the Vanilla ruleset with a few exceptions:\n- You must have The Order Integration enabled\n- The timer is set to 180 seconds\n- The first time the timer hits 0 seconds you will not lose a life",
+			k_minorleague_description = "This is the official ruleset for Minor League Balatro.\n\nThis ruleset is the same as the Vanilla ruleset with a few exceptions:\n- The Order Integration is enabled\n- The timer is set to 180 seconds\n- The first time the timer hits 0 seconds you will not lose a life",
 			k_ranked = "Ranked",
-			k_ranked_description = "This is the official ruleset for playing Ranked Balatro Multiplayer.\n\nThis ruleset is the same as the Blitz ruleset with a few exceptions:\n- You must have The Order Integration enabled\n- You must be on the recommended Steamodded version",
+			k_ranked_description = "This is the official ruleset for playing Ranked Balatro Multiplayer.\n\nThis ruleset is the same as the Blitz ruleset with a few exceptions:\n- The Order Integration is enabled\n- You must be on the recommended Steamodded version",
 			k_badlatro = "Badlatro",
 			k_badlatro_description = "A weekly ruleset designed by @dr_monty_the_snek on the discord server\nthat has been added to the mod permanently.\n\nThis ruleset bans 48 jokers, consumables, tags, etc.",
 			k_attrition = "Attrition",
@@ -340,6 +394,7 @@ return {
 			k_weekly_description = "A special ruleset that changes weekly or bi-weekly. I guess you'll have to find out what it is! Currently: ",
 			k_smallworld = "Small World",
 			k_smallworld_description = "A heavily experimental ruleset, where 3/4 of everything in the game\nis randomly banned for some reason",
+			k_destabilized = "Destabilized",
 			k_oops_ex = "Oops!",
 			k_asteroids = "Asteroids",
 			k_amount_short = "Amt.",
@@ -400,6 +455,10 @@ return {
 		v_text = {
 			ch_c_hanging_chad_rework = { "{C:attention}Hanging Chad{} is {C:dark_edition}reworked" },
 			ch_c_glass_cards_rework = { "{C:attention}Glass Cards{} are {C:dark_edition}reworked" },
+			ch_c_mp_score_instability = { "Unbalanced score is {C:purple}destabilized{} further:" },
+			ch_c_mp_score_instability_LOC1 = { "  {C:inactive}Minimum of {C:attention}1 {C:mult}Mult" },
+			ch_c_mp_score_instability_LOC2 = { "  {C:inactive}Minimum of {C:attention}0 {C:chips}Chips" },
+			ch_c_mp_ante_scaling = { "{C:red}X#1#{} base Blind size" },
 		},
 		challenge_names = {
 			c_mp_misprint_deck = "Misprint Deck",
@@ -416,6 +475,7 @@ return {
 			c_mp_skip_off = "Skip-Off",
 			c_mp_lets_go_gambling = "Let's Go Gambling",
 			c_mp_speed = "Speed",
+			c_mp_balancing_act = "Balancing Act",
 		},
 	},
 }

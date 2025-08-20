@@ -42,6 +42,7 @@ function FN.PRE.get_calculate_score_button()
 			align = "cm",
 			minh = 0.42,
 			padding = 0.05,
+			minw = 3,
 			r = 0.02,
 			colour = G.C.RED,
 			hover = true,
@@ -55,7 +56,7 @@ function FN.PRE.get_calculate_score_button()
 					{
 						n = G.UIT.T,
 						config = {
-							text = "  Calculate Score  ",
+							text = MP.UTILS.get_preview_cfg("button"),
 							colour = G.C.UI.TEXT_LIGHT,
 							shadow = true,
 							scale = 0.36,
