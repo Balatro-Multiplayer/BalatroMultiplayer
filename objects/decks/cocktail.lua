@@ -24,10 +24,16 @@ SMODS.Back({
 		for i = 1, 3 do
 			G.GAME.modifiers.mp_cocktail[i] = decks[i]
 			print(decks[i])
-			if decks[i] == "b_checkered" then
-				back:change_to(G.P_CENTERS[decks[i]])
-				back:apply_to_run()
-				back:change_to(G.P_CENTERS["b_mp_cocktail"])
+			if decks[i] == "b_checkered" then -- hardcoded because cringe
+				G.E_MANAGER:add_event(Event({
+					func = function()
+						for k, v in pairs(G.playing_cards) do
+							if v.base.suit == "Clubs" then v:change_suit("Spades") end
+							if v.base.suit == "Diamonds" then v:change_suit("Hearts") end
+						end
+						return true
+					end,
+				}))
 			end
 		end
 		local function merge(t1, t2, safe)

@@ -191,6 +191,13 @@ return {
 					"for all {C:attention}Joker{} effects",
 				},
 			},
+			b_mp_indigo = {
+				name = "Indigo Deck",
+				text = {
+					"Choose {C:attention}1{} extra card",
+					"from all Booster Packs",
+				},
+			},
 			b_mp_orange = {
 				name = "Orange Deck",
 				text = {
