@@ -136,7 +136,7 @@ return {
 			j_lucky_cat_mp_sandbox = {
 				name = "Lucky Cat",
 				text = {
-					"YOUR ENTIRE DECK BECOMES A BEAUTIFUL CRYSTAL METH LAB",
+					"YOUR ENTIRE DECK BECOMES A BEAUTIFUL CRYSTAL LAB",
 					"WHERE EVERYTHING GETS MORE POWERFUL",
 					"AND MORE LIKELY TO EXPLODE!!!!",
 					"{C:inactive}(Currently {X:mult,C:white} X#2# {C:inactive} Mult)",
@@ -229,17 +229,17 @@ return {
 			j_misprint_mp_sandbox = {
 				name = "Misprint",
 				text = {
-					"LOTTERY TICKET SHOPPING ADDICT WHO DEMANDS TO SEE",
-					"THE SCRATCH-OFF BEFORE BUYING!!!!",
+					"LOTTERY TICKET SHOPPING ADDICT WHO DEMANDS",
+					"TO SEE THE SCRATCH-OFF BEFORE BUYING!!!!",
 					"{C:inactive}({C:mult}+#1#{C:inactive} Mult)",
 				},
 			},
 			j_castle_mp_sandbox = {
 				name = "Castle",
 				text = {
-					"SUIT MONOGAMIST WHO PICKS ONE SUIT AND",
-					"COMMITS FOR LIFE!!!!",
-					"{C:inactive}(Currently on #2#, {C:chips}+#1#{C:inactive} chips)",
+					"SUIT MONOGAMIST WHO PICKS ONE",
+					"{V:1}SUIT{} AND COMMITS FOR LIFE!!!!",
+					"{C:inactive}({C:chips}+#1#{C:inactive} chips)",
 				},
 			},
 			j_business_mp_sandbox = {
@@ -296,16 +296,17 @@ return {
 			j_scary_face_mp_sandbox = {
 				name = "Scary Face",
 				text = {
-					"FACE CARD IDENTITY CRISIS - SO SCARY",
-					"THE FACES RUN AWAY!!!!",
+					"FACE CARD IDENTITY CRISIS -",
+					"SO SCARY THE FACES RUN AWAY!!!!",
 				},
 			},
 			j_faceless_mp_sandbox = {
 				name = "Faceless Joker",
 				text = {
-					"ELITE FACE CARD SOMMELIER WHO CURATES ARTISANAL",
-					"THREE-VARIETY TASTING FLIGHTS FOR PREMIUM",
-					"DISPOSAL EXPERIENCES!!!!",
+					"ELITE FACE CARD SOMMELIER",
+					"WHO CURATES ARTISANAL",
+					"THREE-VARIETY TASTING FLIGHTS",
+					"FOR PREMIUM DISPOSAL EXPERIENCES!!!!",
 				},
 			},
 			j_throwback_mp_sandbox = {

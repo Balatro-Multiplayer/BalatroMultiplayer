@@ -147,25 +147,25 @@ MP.Ruleset({
 	end,
 }):inject()
 
--- How to rewrite a joker!!
+-- TODO broken:
+-- loyalty card
+-- misprint
 
--- First, take ownership of the joker and just set the vars correctly like this (note lack of suffix)
 SMODS.Joker:take_ownership("lucky_cat", {
 	loc_vars = function(self, info_queue, card)
 		return { vars = { card.ability.extra } }
 	end,
 })
 
--- Secondly, we use ReworkCenter and ...
 MP.ReworkCenter({
-	key = "j_lucky_cat", -- Set the key to override
-	ruleset = "sandbox", -- Always sandbox
-	config = { extra = { Xmult_gain = 0.25, Xmult = 1 } }, -- Starting variables and vars that get mutated
+	key = "j_lucky_cat",
+	ruleset = "sandbox",
+	config = { extra = { Xmult_gain = 0.25, Xmult = 1 } },
 	loc_vars = function(self, info_queue, card)
-		info_queue[#info_queue + 1] = G.P_CENTERS.m_lucky -- Should be ignored for subsequent jokers
+		info_queue[#info_queue + 1] = G.P_CENTERS.m_lucky
 		return { key = self.key .. "_mp_sandbox", vars = { card.ability.extra.Xmult_gain, card.ability.extra.Xmult } } -- Append "_mp_sandbox" to key AND pass relevant vars
 	end,
-	calculate = function(self, card, context) -- Ignore this for now - we can do it later!!
+	calculate = function(self, card, context)
 		if
 			context.individual
 			and context.cardarea == G.play
@@ -253,83 +253,83 @@ SMODS.Joker:take_ownership("mail", {
 	end,
 })
 
--- SMODS.Joker:take_ownership("hit_the_road", {
--- 	loc_vars = function(self, info_queue, card)
--- 		return { vars = { card.ability.extra } }
--- 	end,
--- })
+SMODS.Joker:take_ownership("hit_the_road", {
+	loc_vars = function(self, info_queue, card)
+		return { vars = { card.ability.extra } }
+	end,
+})
 
--- SMODS.Joker:take_ownership("red_card", {
--- 	loc_vars = function(self, info_queue, card)
--- 		return { vars = {} }
--- 	end,
--- })
+SMODS.Joker:take_ownership("red_card", {
+	loc_vars = function(self, info_queue, card)
+		return { vars = {} }
+	end,
+})
 
--- SMODS.Joker:take_ownership("misprint", {
--- 	loc_vars = function(self, info_queue, card)
--- 		return { vars = { card.ability.extra } }
--- 	end,
--- })
+SMODS.Joker:take_ownership("misprint", {
+	loc_vars = function(self, info_queue, card)
+		return { vars = { card.ability.extra } }
+	end,
+})
 
--- SMODS.Joker:take_ownership("castle", {
--- 	loc_vars = function(self, info_queue, card)
--- 		return { vars = { card.ability.extra.chips, card.ability.extra.suit } }
--- 	end,
--- })
+SMODS.Joker:take_ownership("castle", {
+	loc_vars = function(self, info_queue, card)
+		return { vars = { card.ability.extra } }
+	end,
+})
 
--- SMODS.Joker:take_ownership("business", {
--- 	loc_vars = function(self, info_queue, card)
--- 		return { vars = {} }
--- 	end,
--- })
+SMODS.Joker:take_ownership("business", {
+	loc_vars = function(self, info_queue, card)
+		return { vars = {} }
+	end,
+})
 
--- SMODS.Joker:take_ownership("delayed_grat", {
--- 	loc_vars = function(self, info_queue, card)
--- 		return { vars = {} }
--- 	end,
--- })
+SMODS.Joker:take_ownership("delayed_grat", {
+	loc_vars = function(self, info_queue, card)
+		return { vars = {} }
+	end,
+})
 
--- SMODS.Joker:take_ownership("photograph", {
--- 	loc_vars = function(self, info_queue, card)
--- 		return { vars = {} }
--- 	end,
--- })
+SMODS.Joker:take_ownership("photograph", {
+	loc_vars = function(self, info_queue, card)
+		return { vars = {} }
+	end,
+})
 
--- SMODS.Joker:take_ownership("golden_joker", {
--- 	loc_vars = function(self, info_queue, card)
--- 		return { vars = {} }
--- 	end,
--- })
+SMODS.Joker:take_ownership("golden", {
+	loc_vars = function(self, info_queue, card)
+		return { vars = {} }
+	end,
+})
 
--- SMODS.Joker:take_ownership("loyalty_card", {
--- 	loc_vars = function(self, info_queue, card)
--- 		return { vars = { card.ability.extra } }
--- 	end,
--- })
+SMODS.Joker:take_ownership("loyalty_card", {
+	loc_vars = function(self, info_queue, card)
+		return { vars = { card.ability.extra } }
+	end,
+})
 
--- SMODS.Joker:take_ownership("scary_face", {
--- 	loc_vars = function(self, info_queue, card)
--- 		return { vars = {} }
--- 	end,
--- })
+SMODS.Joker:take_ownership("scary_face", {
+	loc_vars = function(self, info_queue, card)
+		return { vars = {} }
+	end,
+})
 
--- SMODS.Joker:take_ownership("faceless", {
--- 	loc_vars = function(self, info_queue, card)
--- 		return { vars = {} }
--- 	end,
--- })
+SMODS.Joker:take_ownership("faceless", {
+	loc_vars = function(self, info_queue, card)
+		return { vars = {} }
+	end,
+})
 
--- SMODS.Joker:take_ownership("throwback", {
--- 	loc_vars = function(self, info_queue, card)
--- 		return { vars = {} }
--- 	end,
--- })
+SMODS.Joker:take_ownership("throwback", {
+	loc_vars = function(self, info_queue, card)
+		return { vars = {} }
+	end,
+})
 
--- SMODS.Joker:take_ownership("gros_michel", {
--- 	loc_vars = function(self, info_queue, card)
--- 		return { vars = {} }
--- 	end,
--- })
+SMODS.Joker:take_ownership("gros_michel", {
+	loc_vars = function(self, info_queue, card)
+		return { vars = {} }
+	end,
+})
 
 -- Rework all jokers with sandbox implementations
 MP.ReworkCenter({
@@ -446,9 +446,9 @@ MP.ReworkCenter({
 MP.ReworkCenter({
 	key = "j_hit_the_road",
 	ruleset = "sandbox",
-	config = { extra = { Xmult = 1 } },
+	config = { extra = { xmult_gain = 0.5, xmult = 1 } },
 	loc_vars = function(self, info_queue, card)
-		return { key = self.key .. "_mp_sandbox", vars = { card.ability.extra.Xmult } }
+		return { key = self.key .. "_mp_sandbox", vars = { card.ability.extra.xmult_gain, card.ability.extra.xmult } }
 	end,
 })
 
@@ -464,18 +464,33 @@ MP.ReworkCenter({
 MP.ReworkCenter({
 	key = "j_misprint",
 	ruleset = "sandbox",
-	config = { extra = { mult = 10 } },
+	config = { extra = { max = 46, min = -5, mult = 0 } },
 	loc_vars = function(self, info_queue, card)
 		return { key = self.key .. "_mp_sandbox", vars = { card.ability.extra.mult } }
+	end,
+	add_to_deck = function(self, card, from_debuff)
+		card.ability.extra.mult = pseudorandom("misprint_sandbox", card.ability.extra.min, card.ability.extra.max)
+	end,
+	calculate = function(self, card, context)
+		if context.joker_main then return {
+			mult = card.ability.extra.mult,
+		} end
 	end,
 })
 
 MP.ReworkCenter({
 	key = "j_castle",
 	ruleset = "sandbox",
-	config = { extra = { chips = 0, suit = "Spades" } },
+	config = { extra = { chips = 0, suit = "Diamonds" } },
 	loc_vars = function(self, info_queue, card)
-		return { key = self.key .. "_mp_sandbox", vars = { card.ability.extra.chips, card.ability.extra.suit } }
+		local suit = (G.GAME.current_round.castle_card or {}).suit or "Diamonds"
+		return {
+			key = self.key .. "_mp_sandbox",
+			vars = {
+				card.ability.extra.chips,
+				colours = { G.C.SUITS[suit] },
+			},
+		}
 	end,
 })
 
