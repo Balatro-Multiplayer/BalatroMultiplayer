@@ -149,7 +149,6 @@ MP.Ruleset({
 
 -- TODO broken:
 -- loyalty card
--- misprint
 
 SMODS.Joker:take_ownership("lucky_cat", {
 	loc_vars = function(self, info_queue, card)
@@ -315,7 +314,7 @@ SMODS.Joker:take_ownership("scary_face", {
 
 SMODS.Joker:take_ownership("faceless", {
 	loc_vars = function(self, info_queue, card)
-		return { vars = {} }
+		return {}
 	end,
 })
 
@@ -469,7 +468,7 @@ MP.ReworkCenter({
 		return { key = self.key .. "_mp_sandbox", vars = { card.ability.extra.mult } }
 	end,
 	add_to_deck = function(self, card, from_debuff)
-		card.ability.extra.mult = pseudorandom("misprint_sandbox", card.ability.extra.min, card.ability.extra.max)
+		card.ability.extra.mult = pseudorandom("misprint_sandbox", card.ability.extra.min, card.ability.extra.max) -- TODO replace with steamodded pseudorandom
 	end,
 	calculate = function(self, card, context)
 		if context.joker_main then return {
@@ -572,9 +571,38 @@ MP.ReworkCenter({
 MP.ReworkCenter({
 	key = "j_faceless",
 	ruleset = "sandbox",
-	config = { extra = {} },
+	config = { extra = { dollars = 20, faces = 9 } },
 	loc_vars = function(self, info_queue, card)
-		return { key = self.key .. "_mp_sandbox", vars = {} }
+		return { key = self.key .. "_mp_sandbox" }
+	end,
+	calculate = function(self, card, context)
+		if context.discard and context.other_card == context.full_hand[#context.full_hand] then
+			local jacks = 0
+			local queens = 0
+			local kings = 0
+
+			for _, discarded_card in ipairs(context.full_hand) do
+				local rank = discarded_card:get_id()
+				if rank == 11 then jacks = jacks + 1 end
+				if rank == 12 then queens = queens + 1 end
+				if rank == 13 then kings = kings + 1 end
+			end
+
+			if jacks == 1 and queens == 1 and kings == 1 then
+				G.GAME.dollar_buffer = (G.GAME.dollar_buffer or 0) + card.ability.extra.dollars
+				return {
+					dollars = card.ability.extra.dollars,
+					func = function()
+						G.E_MANAGER:add_event(Event({
+							func = function()
+								G.GAME.dollar_buffer = 0
+								return true
+							end,
+						}))
+					end,
+				}
+			end
+		end
 	end,
 })
 
