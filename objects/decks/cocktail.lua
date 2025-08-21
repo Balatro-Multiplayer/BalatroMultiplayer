@@ -23,7 +23,6 @@ SMODS.Back({
 		local back = G.GAME.selected_back
 		for i = 1, 3 do
 			G.GAME.modifiers.mp_cocktail[i] = decks[i]
-			print(decks[i])
 			if decks[i] == "b_checkered" then -- hardcoded because cringe
 				G.E_MANAGER:add_event(Event({
 					func = function()
