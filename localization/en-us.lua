@@ -229,8 +229,8 @@ return {
 			j_misprint_mp_sandbox = {
 				name = "Misprint",
 				text = {
-					"LOTTERY TICKET SHOPPING ADDICT WHO DEMANDS",
-					"TO SEE THE SCRATCH-OFF BEFORE BUYING!!!!",
+					"LOTTERY TICKET SHOPPING ADDICT WHO REFUSES",
+					"TO CHECK THE SCRATCH-OFF UNTIL AFTER BUYING!!!!",
 					"{C:inactive}({C:mult}+#1#{C:inactive} Mult)",
 				},
 			},
