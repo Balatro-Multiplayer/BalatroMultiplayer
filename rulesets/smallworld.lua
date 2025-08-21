@@ -135,6 +135,7 @@ function MP.ApplyBans()
 				pseudoshuffle(v, pseudoseed(k .. "_mp_smallworld"))
 				local threshold = math.floor(0.5 + (#v * 0.75))
 				local ii = 1
+				if k == "Voucher" then ii = ii + 1 end
 				for i, vv in ipairs(v) do
 					if ii <= threshold then
 						G.GAME.banned_keys[vv] = true
@@ -176,53 +177,34 @@ function Tag:init(_tag, for_collection, _blind_type)
 	tag_init_ref(self, _tag, for_collection, _blind_type)
 end
 
--- spaghetti that's meant to randomize banned vouchers but cocktail is too fucked up to work with this rn
---[[
 local apply_to_run_ref = Back.apply_to_run
 function Back:apply_to_run()
-	if MP.LOBBY.code and MP.LOBBY.config.ruleset == "ruleset_mp_smallworld" then
-		if self.effect.config.voucher then
-			G.E_MANAGER:add_event(Event({
-				func = function()
-					for k, v in pairs(G.GAME.current_round.voucher.spawn) do
-						G.GAME.banned_keys[k] = true
-					end
-					if G.GAME.banned_keys[self.effect.config.voucher] and not G.GAME.current_round.voucher.spawn[v] then
-						self.effect.config.voucher = get_next_voucher_key()
-					end
-					G.GAME.used_vouchers[self.effect.config.voucher] = true
-					for k, v in pairs(G.GAME.current_round.voucher.spawn) do
-						G.GAME.banned_keys[k] = nil
-					end
-					apply_to_run_ref(self)
-					return true
-				end,
-			}))
-			return
-		elseif self.effect.config.vouchers or self.effect.center.key == "b_mp_cocktail" then
-			G.E_MANAGER:add_event(Event({
-				func = function()
-					for k, v in pairs(G.GAME.current_round.voucher.spawn) do
-						G.GAME.banned_keys[k] = true
-					end
-					if self.effect.config.vouchers then
-						for i, v in ipairs(self.effect.config.vouchers) do
-							if G.GAME.banned_keys[v] and not G.GAME.current_round.voucher.spawn[v] then
-								self.effect.config.vouchers[i] = get_next_voucher_key()
-							end
-							G.GAME.used_vouchers[ self.effect.config.vouchers[i] ] = true
-						end
-					end
-					for k, v in pairs(G.GAME.current_round.voucher.spawn) do
-						G.GAME.banned_keys[k] = nil
-					end
-					apply_to_run_ref(self)
-					return true
-				end,
-			}))
-			return
-		end
-	end
+	if MP.LOBBY.code and MP.LOBBY.config.ruleset == "ruleset_mp_smallworld" then MP.apply_fake_back_vouchers(self) end
 	return apply_to_run_ref(self)
 end
-]]
+
+function MP.apply_fake_back_vouchers(back)
+	local vouchers = {}
+	if back.effect.config.voucher then vouchers = { back.effect.config.voucher } end
+	if back.effect.config.vouchers or #vouchers > 0 then
+		vouchers = back.effect.config.vouchers or vouchers
+		local fake_back = { effect = { config = { vouchers = copy_table(vouchers) } } }
+		fake_back.effect.center = G.P_CENTERS["b_red"]
+		fake_back.name = "FAKE"
+		back.effect.config.vouchers = nil
+		back.effect.config.voucher = nil
+		G.E_MANAGER:add_event(Event({
+			func = function()
+				for i, v in ipairs(fake_back.effect.config.vouchers) do
+					local voucher = v
+					if G.GAME.banned_keys[v] or G.GAME.used_vouchers[v] then voucher = get_next_voucher_key() end
+					G.GAME.used_vouchers[voucher] = true
+					fake_back.effect.config.vouchers[i] = voucher
+				end
+				G.GAME.current_round.voucher = SMODS.get_next_vouchers() -- the extreme jank doesn't matter as long as it's synced ig
+				apply_to_run_ref(fake_back)
+				return true
+			end,
+		}))
+	end
+end

@@ -73,6 +73,9 @@ SMODS.Back({
 			local obj = G.P_CENTERS[G.GAME.modifiers.mp_cocktail[i]]
 			if obj.apply and type(obj.apply) == "function" then obj:apply(back) end
 		end
+		if MP.LOBBY.code and MP.LOBBY.config.ruleset == "ruleset_mp_smallworld" then
+			MP.apply_fake_back_vouchers(back)
+		end
 		back.effect.mp_cocktailed = true
 		if not seeded then
 			G.E_MANAGER:add_event(Event({

@@ -379,7 +379,7 @@ return {
 			k_ante_number = "底注 #1#",
 			k_ante_range = "底注 #1#-#2#", -- For example, "Ante 1-2"
 			k_ante_min = "底注 #1#+", -- For example, "Ante 2+"
-			k_credits_list = "#1# 以及更多的人!" -- #1# gets replaced with a list of names
+			k_credits_list = "#1# 以及更多的人!", -- #1# gets replaced with a list of names
 		},
 		v_text = {
 			ch_c_hanging_chad_rework = { "{C:attention}未断选票{}有{C:dark_edition}修改" },
