@@ -91,6 +91,7 @@ return {
 					"{C:inactive}(Currently {C:attention}#2#{C:inactive}/#3# rounds)",
 				},
 			},
+
 			j_mp_pizza = {
 				name = "Pizza",
 				text = {
@@ -115,15 +116,6 @@ return {
 					"{C:attention}#1#{} additional time",
 				},
 			},
-			j_mp_cloud_9 = {
-				name = "Cloud 9",
-				text = {
-					"Earn {C:money}$1{} for each {C:attention}9{} in deck",
-					"(max {C:money}$4{}), then {C:money}$#1#{} for each",
-					"additional {C:attention}9{} at end of round",
-					"{C:inactive}(Currently {C:money}$#2#{}{C:inactive})",
-				},
-			},
 			j_mp_bloodstone = {
 				name = "Bloodstone",
 				text = {
@@ -131,6 +123,199 @@ return {
 					"played cards with",
 					"{C:hearts}Heart{} suit to give",
 					"{X:mult,C:white} X#3# {} Mult when scored",
+				},
+			},
+			j_mp_magnet_sandbox = {
+				name = "Magnet",
+				text = {
+					"After {C:attention}#1#{} rounds, sell",
+					"this card to {C:attention}Copy{} your {X:purple,C:white}Nemesis'{}",
+					"highest sell cost {C:attention}Joker{}",
+					"polarity inverts after {C:attention}#3#{} rounds",
+					"BECOMING WORTHLESS SCRAP METAL!!!!",
+					"{C:inactive}(Currently {C:attention}#2#{C:inactive}/#1# rounds)",
+				},
+			},
+			j_mp_cloud_9_sandbox = {
+				name = "Cloud 9",
+				text = {
+					"NUMERAL MONOCULTURE FARMER",
+					"converting your DIVERSE DECK into",
+					"PROFITABLE NINE PLANTATION!!!!",
+					"{C:inactive}({C:green}#1# in #2#{} {C:inactive}chance, currently {C:money}$#3#{}{C:inactive})",
+				},
+			},
+			j_mp_lucky_cat_sandbox = {
+				name = "Lucky Cat",
+				text = {
+					"FORTUNE-TO-FRAGILITY PIPELINE OPERATOR",
+					"lucky cats become GLASS CATS",
+					"with EXPONENTIAL POWER!!!!",
+					"{C:inactive}(Currently {X:mult,C:white} X#2# {C:inactive} Mult)",
+				},
+			},
+			j_mp_constellation_sandbox = {
+				name = "Constellation",
+				text = {
+					"planet maintenance anxiety disorder",
+					"MUST FEED THE TAMAGOCHI",
+					"or it WITHERS AWAY!!!!",
+					"{C:inactive}(Currently {X:mult,C:white} X#1# {C:inactive} Mult)",
+				},
+			},
+			j_mp_bloodstone_sandbox = {
+				name = "Bloodstone",
+				text = {
+					"PATCH NOTE REGRESSION SYNDROME",
+					"reverting to LAUNCH DAY TRAUMA",
+					"for NOSTALGIC POWER SPIKES!!!!",
+					"{C:inactive}({C:green}#1# in #2#{} {C:inactive}chance)",
+				},
+			},
+			j_mp_juggler_sandbox = {
+				name = "Juggler",
+				text = {
+					"HAND SIZE PERFECTIONIST",
+					"who must keep ALL THE CARDS",
+					"in the air AT ALL TIMES!!!!",
+					"{C:inactive}(Currently {C:attention}+#1#{C:inactive} hand size)",
+				},
+			},
+			j_mp_mail_sandbox = {
+				name = "Mail-in Rebate",
+				text = {
+					"RANK-LOCKED REBATE FORM",
+					"someone wrote {C:attention}#2#{} in",
+					"PERMANENT INK!!!!",
+				},
+			},
+			j_mp_hit_the_road_sandbox = {
+				name = "Hit the Road",
+				text = {
+					"HIGHWAY JACK DISPOSAL",
+					"launching {C:attention}Jacks{}",
+					"INTO THE ASPHALT FOREVER!!!!",
+					"{C:inactive}(Currently {X:mult,C:white} X#2# {C:inactive} Mult)",
+				},
+			},
+			j_mp_misprint_sandbox = {
+				name = "Misprint",
+				text = {
+					"SCHRODINGER'S LOTTERY PLAYER",
+					"ticket both WINS AND LOSES",
+					"until checked!!!!",
+					"{C:inactive}({V:1}#1#{C:inactive} Mult)",
+				},
+			},
+			j_mp_castle_sandbox = {
+				name = "Castle",
+				text = {
+					"DISCARD-BASED SUIT MARRIAGE",
+					"throws away ONLY {V:1}#1#{} forever",
+					"because THAT'S THEIR LOVE LANGUAGE!!!!",
+					"{C:inactive}(Currently {C:chips}+#2#{C:inactive} chips)",
+				},
+			},
+			j_mp_runner_sandbox = {
+				name = "Runner",
+				text = {
+					"SEQUENTIAL CARD SUPREMACIST",
+					"who believes ALL other",
+					"POKER HANDS are INFERIOR!!!!",
+					"{C:inactive}(Currently {C:chips}+#1#{C:inactive})",
+				},
+			},
+			j_mp_order_sandbox = {
+				name = "The Order",
+				text = {
+					"PEASANT UPRISING COORDINATOR",
+					"organizing the NUMBERS to overthrow",
+					"their FACE CARD OPPRESSORS!!!!",
+				},
+			},
+			j_mp_photograph_sandbox = {
+				name = "Photograph",
+				text = {
+					"SINGLE SHOT PHOTOGRAPHER who gets",
+					"ONE PERFECT FRAME PER HAND!!!!",
+				},
+			},
+			j_mp_ride_the_bus_sandbox = {
+				name = "Ride the Bus",
+				text = {
+					"FACE CARD SOBRIETY PROGRAM",
+					"ONE FACE CARD and you're",
+					"KICKED OFF THE BUS!!!!",
+					"{C:inactive}(Currently {C:mult}+#1#{C:inactive} Mult)",
+				},
+			},
+			j_mp_loyalty_card_sandbox = {
+				name = "Loyalty Card",
+				text = {
+					"HAND TYPE LOYALTY PROGRAM",
+					"betray {C:attention}#1#{}",
+					"and counter RESETS!!!!",
+					"{C:inactive}(Loyal for {C:attention}#2#/#3#{} {C:inactive}hands)",
+				},
+			},
+			j_mp_faceless_sandbox = {
+				name = "Faceless Joker",
+				text = {
+					"ELITE FACE CARD SOMMELIER",
+					"who curates artisanal",
+					"THREE-VARIETY TASTING FLIGHTS",
+					"for PREMIUM DISPOSAL EXPERIENCES!!!!",
+				},
+			},
+			j_mp_square_sandbox = {
+				name = "Square Joker",
+				text = {
+					"FOUR CARD PERFECTIONIST",
+					"who worships THE SACRED GEOMETRY OF",
+					"PERFECTLY BALANCED SQUARE ARRANGEMENTS!!!!",
+					"{C:inactive}(Currently {C:chips}+#1#{C:inactive} Chips)",
+				},
+			},
+			j_mp_throwback_sandbox = {
+				name = "Throwback",
+				text = {
+					"PROFESSIONAL COWARD CONSULTING SERVICES",
+					"i get PAID to run away from things",
+					"AND THE MORE I RUN THE STRONGER I GET!!!!",
+					"{C:inactive}(Currently {X:mult,C:white} X#1# {C:inactive} Mult)",
+				},
+			},
+			j_mp_vampire_sandbox = {
+				name = "Vampire",
+				text = {
+					"vampire economist CREATING",
+					"STONE-BASED CURRENCY",
+					"FROM LIFE FORCE!!!!",
+					"{C:inactive}(Currently {X:mult,C:white} X#2# {C:inactive} Mult)",
+				},
+			},
+			j_mp_baseball_sandbox = {
+				name = "Baseball Card",
+				text = {
+					'SPORTS CARD "CONTROVERSY"',
+					"disguised as BALANCE CHANGE!!!!",
+				},
+			},
+			j_mp_steel_joker_sandbox = {
+				name = "Steel Joker",
+				text = {
+					"STEEL REDUNDANCY SPECIALIST",
+					"every PLAYED ALLOY gets",
+					"DOUBLE-CHECKED!!!!",
+				},
+			},
+			j_mp_satellite_sandbox = {
+				name = "Satellite",
+				text = {
+					"chronic satellite degradation anxiety",
+					"INFRASTRUCTURE SLOWLY FALLS APART",
+					"WITHOUT CONSTANT PLANETARY UPGRADES!!!!",
+					"{C:inactive}(Currently {C:money}$#1#{C:inactive})",
 				},
 			},
 		},
@@ -238,6 +423,34 @@ return {
 					"{C:attention}#2#{C:attention} Playing{} cards to",
 					"add to your deck",
 					"{C:attention}Unskippable{}",
+				},
+			},
+		},
+		Stake = {
+			stake_mp_planet = {
+				name = "Planet Stake",
+				text = {
+					"{C:attention}Orange Stake{}'s cooler older sibling",
+					"who graciously returned your",
+					"{C:red}emotional support discard{} because",
+					"even they aren't that cruel",
+				},
+			},
+			stake_mp_spectral = {
+				name = "Spectral Stake",
+				text = {
+					"Applies {C:planet}Planet Stake{} effects, plus:",
+					"{C:money}Rental{} Jokers appear in shop",
+					"Required score scales",
+					"faster for each {C:attention}Ante",
+				},
+			},
+			stake_mp_spectralplus = {
+				name = "Spectral+ Stake",
+				text = {
+					"Applies {C:planet}Spectral Stake{} effects, plus:",
+					"Required score scales",
+					"even faster for each {C:attention}Ante",
 				},
 			},
 		},
