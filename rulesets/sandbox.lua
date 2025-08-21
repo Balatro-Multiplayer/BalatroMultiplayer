@@ -44,6 +44,7 @@ MP.Ruleset({
 		"j_loyalty_card",
 		"j_scary_face",
 		"j_faceless",
+		"j_flash",
 		"j_throwback",
 		"j_gros_michel",
 		-- "j_idol",
@@ -149,6 +150,7 @@ MP.Ruleset({
 
 -- TODO broken:
 -- loyalty card
+-- some joker in collection crashes
 
 SMODS.Joker:take_ownership("lucky_cat", {
 	loc_vars = function(self, info_queue, card)
@@ -172,7 +174,10 @@ MP.ReworkCenter({
 			and not context.blueprint
 		then
 			card.ability.extra.Xmult = card.ability.extra.Xmult + card.ability.extra.Xmult_gain
-			context.other_card:set_ability("m_glass", nil, true)
+			-- TODO verify this
+			if SMODS.pseudorandom_probability(card, "j_lucky_cat_mp_sandbox", 1, 3) then
+				context.other_card:set_ability("m_glass", nil, true)
+			end
 			return {
 				message = localize("k_upgrade_ex"),
 				colour = G.C.MULT,
@@ -229,6 +234,12 @@ SMODS.Joker:take_ownership("reserved_parking", {
 })
 
 SMODS.Joker:take_ownership("egg", {
+	loc_vars = function(self, info_queue, card)
+		return { vars = {} }
+	end,
+})
+
+SMODS.Joker:take_ownership("flash", {
 	loc_vars = function(self, info_queue, card)
 		return { vars = {} }
 	end,
@@ -361,9 +372,32 @@ MP.ReworkCenter({
 MP.ReworkCenter({
 	key = "j_constellation",
 	ruleset = "sandbox",
-	config = { extra = { Xmult = 1 } },
+	config = { extra = { Xmult = 1, Xmult_gain = 0.2, Xmult_loss = 0.1 } },
 	loc_vars = function(self, info_queue, card)
-		return { key = self.key .. "_mp_sandbox", vars = { card.ability.extra.Xmult } }
+		return {
+			key = self.key .. "_mp_sandbox",
+			vars = { card.ability.extra.Xmult },
+		}
+	end,
+	calculate = function(self, card, context)
+		-- Gain mult when planet card is used
+		if context.using_consumeable and not context.blueprint and context.consumeable.ability.set == "Planet" then
+			card.ability.extra.Xmult = card.ability.extra.Xmult + card.ability.extra.Xmult_gain
+			return {
+				message = localize({ type = "variable", key = "a_xmult", vars = { card.ability.extra.Xmult } }),
+			}
+		end
+		-- Apply mult during main calculation
+		if context.joker_main then return {
+			xmult = card.ability.extra.Xmult,
+		} end
+		-- Lose mult at end of round
+		if context.end_of_round and not context.individual and not context.repetition then
+			card.ability.extra.Xmult = math.max(0.1, card.ability.extra.Xmult - card.ability.extra.Xmult_loss)
+			return {
+				message = localize("k_reset"),
+			}
+		end
 	end,
 })
 
@@ -524,15 +558,6 @@ MP.ReworkCenter({
 })
 
 MP.ReworkCenter({
-	key = "j_photograph",
-	ruleset = "sandbox",
-	config = { extra = {} },
-	loc_vars = function(self, info_queue, card)
-		return { key = self.key .. "_mp_sandbox", vars = {} }
-	end,
-})
-
-MP.ReworkCenter({
 	key = "j_ride_the_bus",
 	ruleset = "sandbox",
 	config = { extra = { mult_gain = 5, mult = 0 } },
@@ -553,9 +578,57 @@ MP.ReworkCenter({
 MP.ReworkCenter({
 	key = "j_loyalty_card",
 	ruleset = "sandbox",
-	config = { extra = { Xmult = 1 } },
+	config = { extra = { Xmult = 6, every = 4, loyalty_remaining = 4, poker_hand = "High Card" } },
 	loc_vars = function(self, info_queue, card)
-		return { key = self.key .. "_mp_sandbox", vars = { card.ability.extra.Xmult } }
+		return {
+			key = self.key .. "_mp_sandbox",
+			vars = {
+				localize(card.ability.extra.poker_hand, "poker_hands"),
+				card.ability.extra.Xmult,
+				localize({
+					type = "variable",
+					key = (card.ability.extra.loyalty_remaining == 0 and "loyalty_active" or "loyalty_inactive"),
+					vars = { card.ability.extra.loyalty_remaining },
+				}),
+			},
+		}
+	end,
+	add_to_deck = function(self, card, from_debuff)
+		local _poker_hands = {}
+		for handname, _ in pairs(G.GAME.hands) do
+			if SMODS.is_poker_hand_visible(handname) then _poker_hands[#_poker_hands + 1] = handname end
+		end
+		card.ability.extra.poker_hand = pseudorandom_element(_poker_hands, "loyalty_card_sandbox")
+	end,
+	calculate = function(self, card, context)
+		if context.before and context.main_eval then
+			if context.scoring_name == card.ability.extra.poker_hand then
+				-- Played the loyal hand - decrease loyalty_remaining
+				if card.ability.extra.loyalty_remaining > 0 then
+					card.ability.extra.loyalty_remaining = card.ability.extra.loyalty_remaining - 1
+				end
+			else
+				-- Played a different hand - relationship broken, reset loyalty
+				card.ability.extra.loyalty_remaining = card.ability.extra.every
+				return {
+					message = localize("k_reset"),
+					colour = G.C.RED,
+				}
+			end
+		end
+		if context.joker_main then
+			if not context.blueprint then
+				if card.ability.extra.loyalty_remaining == 0 then
+					local eval = function(card)
+						return card.ability.extra.loyalty_remaining == 0 and not G.RESET_JIGGLES
+					end
+					juice_card_until(card, eval, true)
+				end
+			end
+			if card.ability.extra.loyalty_remaining == 0 then return {
+				xmult = card.ability.extra.Xmult,
+			} end
+		end
 	end,
 })
 
@@ -603,6 +676,54 @@ MP.ReworkCenter({
 				}
 			end
 		end
+	end,
+})
+
+MP.ReworkCenter({
+	key = "j_flash",
+	ruleset = "sandbox",
+	config = { extra = { mult_gain = 10, mult = 0, reroll_cost = 10 } },
+	loc_vars = function(self, info_queue, card)
+		return { key = self.key .. "_mp_sandbox", vars = { card.ability.extra.mult_gain, card.ability.extra.mult } }
+	end,
+	add_to_deck = function(self, card, from_debuff)
+		print("TODO 10 reroll cost")
+		-- SMODS.change_free_rerolls(card.ability.extra.rerolls)
+	end,
+	remove_from_deck = function(self, card, from_debuff)
+		print("TODO 10 now reroll cost should disappear")
+		-- SMODS.change_free_rerolls(-card.ability.extra.rerolls)
+	end,
+	-- calculate = function(self, card, context)
+	-- 	if context.reroll_shop and not context.blueprint then
+	-- 		card.ability.extra.mult = card.ability.extra.mult + card.ability.extra.mult_gain
+	-- 		return {
+	-- 			message = localize({ type = "variable", key = "a_mult", vars = { card.ability.extra.mult } }),
+	-- 			colour = G.C.MULT,
+	-- 		}
+	-- 	end
+	-- 	if context.joker_main then return {
+	-- 		mult = card.ability.extra.mult,
+	-- 	} end
+	-- end,
+})
+
+MP.ReworkCenter({
+	key = "j_photograph",
+	ruleset = "sandbox",
+	config = { extra = 5 },
+	loc_vars = function(self, info_queue, card)
+		return { key = self.key .. "_mp_sandbox", vars = { card.ability.extra } }
+	end,
+	calculate = function(self, card, context)
+		if context.individual and context.cardarea == G.play and context.other_card:is_face() then
+			local is_first_face = false
+			if context.scoring_hand[1]:is_face() then is_first_face = true end
+			if #context.full_hand == 1 and is_first_face then return {
+				xmult = card.ability.extra,
+			} end
+		end
+		return nil, true
 	end,
 })
 

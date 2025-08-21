@@ -136,9 +136,9 @@ return {
 			j_lucky_cat_mp_sandbox = {
 				name = "Lucky Cat",
 				text = {
-					"YOUR ENTIRE DECK BECOMES A BEAUTIFUL CRYSTAL LAB",
-					"WHERE EVERYTHING GETS MORE POWERFUL",
-					"AND MORE LIKELY TO EXPLODE!!!!",
+					"YOUR ENTIRE DECK BECOMES A BEAUTIFUL",
+					"CRYSTAL MATH LAB WHERE EVERYTHING GETS",
+					"MORE POWERFUL AND MORE LIKELY TO EXPLODE!!!!",
 					"{C:inactive}(Currently {X:mult,C:white} X#2# {C:inactive} Mult)",
 				},
 			},
@@ -288,9 +288,9 @@ return {
 			j_loyalty_card_mp_sandbox = {
 				name = "Loyalty Card",
 				text = {
-					"MONOGAMOUS POKER RELATIONSHIP - ONE HAND TYPE",
-					"TILL DEATH DO US PART!!!!",
-					"{C:inactive}({X:mult,C:white} X#1# {C:inactive} Mult)",
+					"MONOGAMOUS POKER RELATIONSHIP WITH {C:attention}#1#{} -",
+					"ONE HAND TYPE TILL DEATH DO US PART!!!!",
+					"{C:inactive}(#3#)",
 				},
 			},
 			j_scary_face_mp_sandbox = {
