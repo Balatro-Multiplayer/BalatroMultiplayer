@@ -21,6 +21,31 @@ MP.Ruleset({
 		"j_mp_cloud_9",
 		"j_mp_bloodstone2",
 		"j_mp_hanging_chad",
+		"j_lucky_cat",
+		"j_stencil",
+		"j_constellation",
+		"j_bloodstone",
+		"j_reserved_parking",
+		"j_egg",
+		"j_chaos",
+		"j_turtle_bean",
+		"j_juggler",
+		"j_mail",
+		"j_hit_the_road",
+		"j_red_card",
+		"j_misprint",
+		"j_castle",
+		"j_business",
+		"j_runner",
+		"j_delayed_grat",
+		"j_photograph",
+		"j_ride_the_bus",
+		"j_golden",
+		"j_loyalty_card",
+		"j_scary_face",
+		"j_faceless",
+		"j_throwback",
+		"j_gros_michel",
 		-- "j_idol",
 		-- "j_square",
 	},
@@ -113,51 +138,448 @@ MP.Ruleset({
 		}
 	end,
 
-	is_disabled = function(self)
-		return "temporarily offline while the mothership sorts itself out"
-		-- if not MP.INTEGRATIONS.TheOrder then
-		-- 	return localize("k_ruleset_disabled_the_order_required")
-		-- end
-		-- return false
-	end,
-
 	forced_lobby_options = true,
 
 	force_lobby_options = function(self)
 		MP.LOBBY.config.preview_disabled = true
-		MP.LOBBY.config.different_seeds = true
+		MP.LOBBY.config.different_seeds = false
 		return true
 	end,
 }):inject()
 
--- Oops artwork - no functional changes but visual identity for sandbox
--- SMODS.Atlas({
--- 	key = "sandbox_oops",
--- 	path = "j_sandbox_oops2.png",
--- 	px = 71,
--- 	py = 95,
+-- How to rewrite a joker!!
+
+-- First, take ownership of the joker and just set the vars correctly like this (note lack of suffix)
+SMODS.Joker:take_ownership("lucky_cat", {
+	loc_vars = function(self, info_queue, card)
+		return { vars = { card.ability.extra } }
+	end,
+})
+
+-- Secondly, we use ReworkCenter and ...
+MP.ReworkCenter({
+	key = "j_lucky_cat", -- Set the key to override
+	ruleset = "sandbox", -- Always sandbox
+	config = { extra = { Xmult_gain = 0.25, Xmult = 1 } }, -- Starting variables and vars that get mutated
+	loc_vars = function(self, info_queue, card)
+		info_queue[#info_queue + 1] = G.P_CENTERS.m_lucky -- Should be ignored for subsequent jokers
+		return { key = self.key .. "_mp_sandbox", vars = { card.ability.extra.Xmult_gain, card.ability.extra.Xmult } } -- Append "_mp_sandbox" to key AND pass relevant vars
+	end,
+	calculate = function(self, card, context) -- Ignore this for now - we can do it later!!
+		if
+			context.individual
+			and context.cardarea == G.play
+			and context.other_card.lucky_trigger
+			and not context.blueprint
+		then
+			card.ability.extra.Xmult = card.ability.extra.Xmult + card.ability.extra.Xmult_gain
+			context.other_card:set_ability("m_glass", nil, true)
+			return {
+				message = localize("k_upgrade_ex"),
+				colour = G.C.MULT,
+				message_card = card,
+			}
+		end
+		if context.joker_main then return {
+			xmult = card.ability.extra.Xmult,
+		} end
+	end,
+})
+
+-- Take ownership of all jokers that will be reworked
+SMODS.Joker:take_ownership("stencil", {
+	loc_vars = function(self, info_queue, card)
+		return { vars = { card.ability.extra } }
+	end,
+})
+
+SMODS.Joker:take_ownership("runner", {
+	loc_vars = function(self, info_queue, card)
+		return { vars = { card.ability.extra } }
+	end,
+})
+
+SMODS.Joker:take_ownership("constellation", {
+	loc_vars = function(self, info_queue, card)
+		return { vars = { card.ability.extra } }
+	end,
+})
+
+SMODS.Joker:take_ownership("bloodstone", {
+	loc_vars = function(self, info_queue, card)
+		return { vars = { card.ability.extra } }
+	end,
+})
+
+SMODS.Joker:take_ownership("chaos", {
+	loc_vars = function(self, info_queue, card)
+		return { vars = { card.ability.extra.rerolls } }
+	end,
+})
+
+SMODS.Joker:take_ownership("ride_the_bus", {
+	loc_vars = function(self, info_queue, card)
+		return { vars = { card.ability.extra } }
+	end,
+})
+
+SMODS.Joker:take_ownership("reserved_parking", {
+	loc_vars = function(self, info_queue, card)
+		return { vars = {} }
+	end,
+})
+
+SMODS.Joker:take_ownership("egg", {
+	loc_vars = function(self, info_queue, card)
+		return { vars = {} }
+	end,
+})
+
+SMODS.Joker:take_ownership("turtle_bean", {
+	loc_vars = function(self, info_queue, card)
+		return { vars = { card.ability.extra } }
+	end,
+})
+
+SMODS.Joker:take_ownership("juggler", {
+	loc_vars = function(self, info_queue, card)
+		return { vars = {} }
+	end,
+})
+
+SMODS.Joker:take_ownership("mail", {
+	loc_vars = function(self, info_queue, card)
+		return { vars = { card.ability.extra } }
+	end,
+})
+
+-- SMODS.Joker:take_ownership("hit_the_road", {
+-- 	loc_vars = function(self, info_queue, card)
+-- 		return { vars = { card.ability.extra } }
+-- 	end,
 -- })
 
--- MP.ReworkCenter({
--- 	key = "j_oops",
--- 	atlas = "mp_sandbox_oops",
--- 	pos = { x = 0, y = 0 },
--- 	ruleset = "sandbox",
--- 	silent = true,
+-- SMODS.Joker:take_ownership("red_card", {
+-- 	loc_vars = function(self, info_queue, card)
+-- 		return { vars = {} }
+-- 	end,
 -- })
 
--- MP.ReworkCenter({
--- 	key = "j_square",
--- 	ruleset = "sandbox",
--- 	config = { extra = { chips = 64, chip_mod = 4 } },
+-- SMODS.Joker:take_ownership("misprint", {
+-- 	loc_vars = function(self, info_queue, card)
+-- 		return { vars = { card.ability.extra } }
+-- 	end,
 -- })
 
--- MP.ReworkCenter({
--- 	key = "j_idol",
--- 	ruleset = "sandbox",
--- 	rarity = 3,
--- 	cost = 8,
+-- SMODS.Joker:take_ownership("castle", {
+-- 	loc_vars = function(self, info_queue, card)
+-- 		return { vars = { card.ability.extra.chips, card.ability.extra.suit } }
+-- 	end,
 -- })
+
+-- SMODS.Joker:take_ownership("business", {
+-- 	loc_vars = function(self, info_queue, card)
+-- 		return { vars = {} }
+-- 	end,
+-- })
+
+-- SMODS.Joker:take_ownership("delayed_grat", {
+-- 	loc_vars = function(self, info_queue, card)
+-- 		return { vars = {} }
+-- 	end,
+-- })
+
+-- SMODS.Joker:take_ownership("photograph", {
+-- 	loc_vars = function(self, info_queue, card)
+-- 		return { vars = {} }
+-- 	end,
+-- })
+
+-- SMODS.Joker:take_ownership("golden_joker", {
+-- 	loc_vars = function(self, info_queue, card)
+-- 		return { vars = {} }
+-- 	end,
+-- })
+
+-- SMODS.Joker:take_ownership("loyalty_card", {
+-- 	loc_vars = function(self, info_queue, card)
+-- 		return { vars = { card.ability.extra } }
+-- 	end,
+-- })
+
+-- SMODS.Joker:take_ownership("scary_face", {
+-- 	loc_vars = function(self, info_queue, card)
+-- 		return { vars = {} }
+-- 	end,
+-- })
+
+-- SMODS.Joker:take_ownership("faceless", {
+-- 	loc_vars = function(self, info_queue, card)
+-- 		return { vars = {} }
+-- 	end,
+-- })
+
+-- SMODS.Joker:take_ownership("throwback", {
+-- 	loc_vars = function(self, info_queue, card)
+-- 		return { vars = {} }
+-- 	end,
+-- })
+
+-- SMODS.Joker:take_ownership("gros_michel", {
+-- 	loc_vars = function(self, info_queue, card)
+-- 		return { vars = {} }
+-- 	end,
+-- })
+
+-- Rework all jokers with sandbox implementations
+MP.ReworkCenter({
+	key = "j_stencil",
+	ruleset = "sandbox",
+	config = { extra = { Xmult = 1.5 } },
+	loc_vars = function(self, info_queue, card)
+		return {
+			key = self.key .. "_mp_sandbox",
+			vars = {
+				G.jokers and math.max(
+					1.5,
+					((G.jokers.config.card_limit - #G.jokers.cards) + #SMODS.find_card("j_stencil", true)) * 1.5
+				) or 1.5,
+			},
+		}
+	end,
+	calculate = function(self, card, context)
+		if context.joker_main then
+			return {
+				xmult = math.max(
+					1.5,
+					((G.jokers.config.card_limit - #G.jokers.cards) + #SMODS.find_card("j_stencil", true)) * 1.5
+				),
+			}
+		end
+	end,
+})
+
+MP.ReworkCenter({
+	key = "j_constellation",
+	ruleset = "sandbox",
+	config = { extra = { Xmult = 1 } },
+	loc_vars = function(self, info_queue, card)
+		return { key = self.key .. "_mp_sandbox", vars = { card.ability.extra.Xmult } }
+	end,
+})
+
+MP.ReworkCenter({
+	key = "j_bloodstone",
+	ruleset = "sandbox",
+	config = { extra = {} },
+	loc_vars = function(self, info_queue, card)
+		return { key = self.key .. "_mp_sandbox", vars = {} }
+	end,
+})
+
+MP.ReworkCenter({
+	key = "j_reserved_parking",
+	ruleset = "sandbox",
+	config = { extra = {} },
+	loc_vars = function(self, info_queue, card)
+		return { key = self.key .. "_mp_sandbox", vars = {} }
+	end,
+})
+
+MP.ReworkCenter({
+	key = "j_egg",
+	ruleset = "sandbox",
+	config = { extra = {} },
+	loc_vars = function(self, info_queue, card)
+		return { key = self.key .. "_mp_sandbox", vars = {} }
+	end,
+})
+
+MP.ReworkCenter({
+	key = "j_chaos",
+	ruleset = "sandbox",
+	config = { extra = { rerolls = 9999 } },
+	loc_vars = function(self, info_queue, card)
+		return { key = self.key .. "_mp_sandbox", vars = {} }
+	end,
+	add_to_deck = function(self, card, from_debuff)
+		SMODS.change_free_rerolls(card.ability.extra.rerolls)
+	end,
+	remove_from_deck = function(self, card, from_debuff)
+		SMODS.change_free_rerolls(-card.ability.extra.rerolls)
+	end,
+})
+
+MP.ReworkCenter({
+	key = "j_turtle_bean",
+	ruleset = "sandbox",
+	config = { extra = { rounds = 5 } },
+	loc_vars = function(self, info_queue, card)
+		return { key = self.key .. "_mp_sandbox", vars = { card.ability.extra.rounds } }
+	end,
+})
+
+MP.ReworkCenter({
+	key = "j_juggler",
+	ruleset = "sandbox",
+	config = { extra = {} },
+	loc_vars = function(self, info_queue, card)
+		return { key = self.key .. "_mp_sandbox", vars = {} }
+	end,
+})
+
+MP.ReworkCenter({
+	key = "j_mail",
+	ruleset = "sandbox",
+	config = { extra = { discards = 0 } },
+	loc_vars = function(self, info_queue, card)
+		return {
+			key = self.key .. "_mp_sandbox",
+			vars = {
+				card.ability.extra.discards,
+				(localize((G.GAME.current_round.mail_card or {}).rank or "Ace", "ranks")) .. "s",
+			},
+		}
+	end,
+})
+
+MP.ReworkCenter({
+	key = "j_hit_the_road",
+	ruleset = "sandbox",
+	config = { extra = { Xmult = 1 } },
+	loc_vars = function(self, info_queue, card)
+		return { key = self.key .. "_mp_sandbox", vars = { card.ability.extra.Xmult } }
+	end,
+})
+
+MP.ReworkCenter({
+	key = "j_red_card",
+	ruleset = "sandbox",
+	config = { extra = {} },
+	loc_vars = function(self, info_queue, card)
+		return { key = self.key .. "_mp_sandbox", vars = {} }
+	end,
+})
+
+MP.ReworkCenter({
+	key = "j_misprint",
+	ruleset = "sandbox",
+	config = { extra = { mult = 10 } },
+	loc_vars = function(self, info_queue, card)
+		return { key = self.key .. "_mp_sandbox", vars = { card.ability.extra.mult } }
+	end,
+})
+
+MP.ReworkCenter({
+	key = "j_castle",
+	ruleset = "sandbox",
+	config = { extra = { chips = 0, suit = "Spades" } },
+	loc_vars = function(self, info_queue, card)
+		return { key = self.key .. "_mp_sandbox", vars = { card.ability.extra.chips, card.ability.extra.suit } }
+	end,
+})
+
+MP.ReworkCenter({
+	key = "j_business",
+	ruleset = "sandbox",
+	config = { extra = {} },
+	loc_vars = function(self, info_queue, card)
+		return { key = self.key .. "_mp_sandbox", vars = {} }
+	end,
+})
+
+MP.ReworkCenter({
+	key = "j_runner",
+	ruleset = "sandbox",
+	config = { extra = { chips = 0, chip_mod = 50 } },
+	loc_vars = function(self, info_queue, card)
+		return {
+			key = self.key .. "_mp_sandbox",
+			vars = { (card.ability.extra.chips / card.ability.extra.chip_mod) or 0 },
+		}
+	end,
+})
+
+MP.ReworkCenter({
+	key = "j_delayed_grat",
+	ruleset = "sandbox",
+	config = { extra = {} },
+	loc_vars = function(self, info_queue, card)
+		return { key = self.key .. "_mp_sandbox", vars = {} }
+	end,
+})
+
+MP.ReworkCenter({
+	key = "j_photograph",
+	ruleset = "sandbox",
+	config = { extra = {} },
+	loc_vars = function(self, info_queue, card)
+		return { key = self.key .. "_mp_sandbox", vars = {} }
+	end,
+})
+
+MP.ReworkCenter({
+	key = "j_ride_the_bus",
+	ruleset = "sandbox",
+	config = { extra = { mult_gain = 5, mult = 0 } },
+	loc_vars = function(self, info_queue, card)
+		return { key = self.key .. "_mp_sandbox", vars = { card.ability.extra.mult_gain, card.ability.extra.mult } }
+	end,
+})
+
+MP.ReworkCenter({
+	key = "j_golden",
+	ruleset = "sandbox",
+	config = { extra = {} },
+	loc_vars = function(self, info_queue, card)
+		return { key = self.key .. "_mp_sandbox", vars = {} }
+	end,
+})
+
+MP.ReworkCenter({
+	key = "j_loyalty_card",
+	ruleset = "sandbox",
+	config = { extra = { Xmult = 1 } },
+	loc_vars = function(self, info_queue, card)
+		return { key = self.key .. "_mp_sandbox", vars = { card.ability.extra.Xmult } }
+	end,
+})
+
+MP.ReworkCenter({
+	key = "j_scary_face",
+	ruleset = "sandbox",
+	config = { extra = {} },
+	loc_vars = function(self, info_queue, card)
+		return { key = self.key .. "_mp_sandbox", vars = {} }
+	end,
+})
+
+MP.ReworkCenter({
+	key = "j_faceless",
+	ruleset = "sandbox",
+	config = { extra = {} },
+	loc_vars = function(self, info_queue, card)
+		return { key = self.key .. "_mp_sandbox", vars = {} }
+	end,
+})
+
+MP.ReworkCenter({
+	key = "j_throwback",
+	ruleset = "sandbox",
+	config = { extra = {} },
+	loc_vars = function(self, info_queue, card)
+		return { key = self.key .. "_mp_sandbox", vars = {} }
+	end,
+})
+
+MP.ReworkCenter({
+	key = "j_gros_michel",
+	ruleset = "sandbox",
+	config = { extra = {} },
+	loc_vars = function(self, info_queue, card)
+		return { key = self.key .. "_mp_sandbox", vars = {} }
+	end,
+})
 
 -- Global state for persistent bias across bloodstone calls
 if not MP.bloodstone_bias then
