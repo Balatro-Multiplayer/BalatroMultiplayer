@@ -1,6 +1,6 @@
 SMODS.Joker({
 	key = "hanging_chad",
-	-- no_collection = true,
+	no_collection = true,
 	unlocked = true,
 	discovered = true,
 	blueprint_compat = true,

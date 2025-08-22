@@ -60,6 +60,9 @@ function MP.ApplyBans()
 				G.GAME.banned_keys[k] = true
 			end
 		end
+		for _, v in ipairs(ruleset["banned_silent"] or {}) do
+			G.GAME.banned_keys[v] = true
+		end
 	end
 end
 

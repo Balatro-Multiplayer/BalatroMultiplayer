@@ -2,7 +2,8 @@ MP.Ruleset({
 	key = "ranked",
 	multiplayer_content = true,
 	standard = true,
-	banned_jokers = { "j_bloodstone", "j_hanging_chad" },
+	banned_silent = { "j_bloodstone", "j_hanging_chad" },
+	banned_jokers = {},
 	banned_consumables = {
 		"c_justice",
 	},
@@ -12,7 +13,6 @@ MP.Ruleset({
 	banned_blinds = {},
 	reworked_jokers = {
 		"j_mp_hanging_chad",
-		"j_mp_bloodstone",
 	},
 	reworked_consumables = {},
 	reworked_vouchers = {},
