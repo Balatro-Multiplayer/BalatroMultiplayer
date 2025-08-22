@@ -115,7 +115,8 @@ return {
 					"{C:attention}#1#{} additional time",
 				},
 			},
-			j_mp_cloud_9 = {
+			-- TODO rewrite!
+			j_mp_cloud_9_sandbox = {
 				name = "Cloud 9",
 				text = {
 					"Earn {C:money}$1{} for each {C:attention}9{} in deck",
