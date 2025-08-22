@@ -10,7 +10,7 @@ SMODS.Joker({
 	rarity = 2,
 	cost = 7,
 	pos = { x = 0, y = 8 },
-	-- no_collection = true,
+	no_collection = true,
 	in_pool = function(self)
 		return MP.UTILS.is_standard_ruleset() and MP.LOBBY.code
 	end,
