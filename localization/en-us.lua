@@ -131,7 +131,6 @@ return {
 					"played cards with",
 					"{C:hearts}Heart{} suit to give",
 					"{X:mult,C:white} X#3# {} Mult when scored",
-					"{C:inactive}(Includes experimental variance){}",
 				},
 			},
 		},
