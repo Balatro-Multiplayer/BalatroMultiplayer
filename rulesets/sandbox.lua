@@ -752,65 +752,6 @@ if not MP.bloodstone_bias then
 	MP.bloodstone_bias = MP.starting_bloodstone_bias
 end
 
--- your rng complaints have been noted and filed accordingly
-function cope_and_seethe_check(actual_odds)
-	if actual_odds >= 1 then return true end
-
-	-- how much easier (30%) do we make it for each successive roll?
-	local step = -0.3
-	local roll = pseudorandom("bloodstone") + MP.bloodstone_bias
-
-	if roll < actual_odds then
-		MP.bloodstone_bias = MP.starting_bloodstone_bias
-		return true
-	else
-		MP.bloodstone_bias = MP.bloodstone_bias + step
-		return false
-	end
-end
-
-SMODS.Joker({
-	key = "bloodstone2",
-	unlocked = true,
-	discovered = true,
-	blueprint_compat = true,
-	perishable_compat = true,
-	eternal_compat = true,
-	rarity = 3,
-	cost = 7,
-	pos = { x = 0, y = 8 },
-	no_collection = true,
-	in_pool = function(self)
-		return MP.LOBBY.config.ruleset == "ruleset_mp_sandbox" and MP.LOBBY.code
-	end,
-	config = { extra = { odds = 2, Xmult = 1.5 }, mp_sticker_balanced = true },
-	loc_vars = function(self, info_queue, card)
-		return {
-			vars = {
-				"" .. (G.GAME and G.GAME.probabilities.normal or 1),
-				card.ability.extra.odds,
-				card.ability.extra.Xmult,
-			},
-		}
-	end,
-	calculate = function(self, card, context)
-		if context.cardarea == G.play and context.individual then
-			if context.other_card:is_suit("Hearts") then
-				local bloodstone_hit = cope_and_seethe_check(G.GAME.probabilities.normal / card.ability.extra.odds)
-				if bloodstone_hit then
-					return {
-						extra = { x_mult = card.ability.extra.Xmult },
-						message = G.GAME.probabilities.normal < 2 and "Cope!" or nil,
-						sound = "voice2",
-						volume = 0.3,
-						card = card,
-					}
-				end
-			end
-		end
-	end,
-})
-
 SMODS.Joker({
 	key = "cloud_9",
 	no_collection = true,
