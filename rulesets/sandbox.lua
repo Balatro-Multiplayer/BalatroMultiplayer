@@ -6,7 +6,6 @@ MP.Ruleset({
 	multiplayer_content = true,
 	banned_jokers = {
 		"j_cloud_9",
-		"j_hanging_chad",
 		"j_bloodstone",
 	},
 	banned_consumables = {
@@ -20,7 +19,6 @@ MP.Ruleset({
 	reworked_jokers = {
 		"j_mp_cloud_9",
 		"j_mp_bloodstone2",
-		"j_mp_hanging_chad",
 		"j_lucky_cat",
 		"j_stencil",
 		"j_constellation",
@@ -149,8 +147,8 @@ MP.Ruleset({
 }):inject()
 
 -- TODO broken:
--- loyalty card
--- some joker in collection crashes
+-- test loyalty card and constelaltion
+-- page 8 in joker collection crashes (chad? throwback???)
 
 SMODS.Joker:take_ownership("lucky_cat", {
 	loc_vars = function(self, info_queue, card)
@@ -205,7 +203,7 @@ SMODS.Joker:take_ownership("runner", {
 
 SMODS.Joker:take_ownership("constellation", {
 	loc_vars = function(self, info_queue, card)
-		return { vars = { card.ability.extra } }
+		return { vars = { card.ability.XMult } }
 	end,
 })
 
@@ -372,28 +370,28 @@ MP.ReworkCenter({
 MP.ReworkCenter({
 	key = "j_constellation",
 	ruleset = "sandbox",
-	config = { extra = { Xmult = 1, Xmult_gain = 0.2, Xmult_loss = 0.1 } },
+	config = { extra = { Xmult = 1, extra = 0.2, Xmult_loss = 0.1 } },
 	loc_vars = function(self, info_queue, card)
 		return {
 			key = self.key .. "_mp_sandbox",
-			vars = { card.ability.extra.Xmult },
+			vars = { card.ability.extra, card.ability.Xmult },
 		}
 	end,
 	calculate = function(self, card, context)
 		-- Gain mult when planet card is used
 		if context.using_consumeable and not context.blueprint and context.consumeable.ability.set == "Planet" then
-			card.ability.extra.Xmult = card.ability.extra.Xmult + card.ability.extra.Xmult_gain
+			card.ability.Xmult = card.ability.Xmult + card.ability.Xmult_gain
 			return {
 				message = localize({ type = "variable", key = "a_xmult", vars = { card.ability.extra.Xmult } }),
 			}
 		end
 		-- Apply mult during main calculation
 		if context.joker_main then return {
-			xmult = card.ability.extra.Xmult,
+			xmult = card.ability.Xmult,
 		} end
 		-- Lose mult at end of round
 		if context.end_of_round and not context.individual and not context.repetition then
-			card.ability.extra.Xmult = math.max(0.1, card.ability.extra.Xmult - card.ability.extra.Xmult_loss)
+			card.ability.Xmult = math.max(0.1, card.ability.Xmult - card.ability.Xmult_loss)
 			return {
 				message = localize("k_reset"),
 			}
@@ -488,7 +486,7 @@ MP.ReworkCenter({
 MP.ReworkCenter({
 	key = "j_red_card",
 	ruleset = "sandbox",
-	config = { extra = {} },
+	config = { extra = 5 },
 	loc_vars = function(self, info_queue, card)
 		return { key = self.key .. "_mp_sandbox", vars = {} }
 	end,
@@ -530,10 +528,11 @@ MP.ReworkCenter({
 MP.ReworkCenter({
 	key = "j_business",
 	ruleset = "sandbox",
-	config = { extra = {} },
+	config = { extra = 4 },
 	loc_vars = function(self, info_queue, card)
 		return { key = self.key .. "_mp_sandbox", vars = {} }
 	end,
+	-- TODO add con!!
 })
 
 MP.ReworkCenter({
@@ -551,7 +550,7 @@ MP.ReworkCenter({
 MP.ReworkCenter({
 	key = "j_delayed_grat",
 	ruleset = "sandbox",
-	config = { extra = {} },
+	config = { extra = 5 }, -- TODO make this lose money otherwise
 	loc_vars = function(self, info_queue, card)
 		return { key = self.key .. "_mp_sandbox", vars = {} }
 	end,
@@ -560,7 +559,7 @@ MP.ReworkCenter({
 MP.ReworkCenter({
 	key = "j_ride_the_bus",
 	ruleset = "sandbox",
-	config = { extra = { mult_gain = 5, mult = 0 } },
+	config = { extra = 5 },
 	loc_vars = function(self, info_queue, card)
 		return { key = self.key .. "_mp_sandbox", vars = { card.ability.extra.mult_gain, card.ability.extra.mult } }
 	end,
@@ -569,7 +568,7 @@ MP.ReworkCenter({
 MP.ReworkCenter({
 	key = "j_golden",
 	ruleset = "sandbox",
-	config = { extra = {} },
+	config = { extra = 15 },
 	loc_vars = function(self, info_queue, card)
 		return { key = self.key .. "_mp_sandbox", vars = {} }
 	end,
@@ -635,10 +634,11 @@ MP.ReworkCenter({
 MP.ReworkCenter({
 	key = "j_scary_face",
 	ruleset = "sandbox",
-	config = { extra = {} },
+	config = { extra = 100 },
 	loc_vars = function(self, info_queue, card)
 		return { key = self.key .. "_mp_sandbox", vars = {} }
 	end,
+	-- TODO calc could prob do only what it normally does before / after...?
 })
 
 MP.ReworkCenter({
@@ -676,6 +676,7 @@ MP.ReworkCenter({
 				}
 			end
 		end
+		return nil, true -- TODO untested but...
 	end,
 })
 
@@ -730,7 +731,7 @@ MP.ReworkCenter({
 MP.ReworkCenter({
 	key = "j_throwback",
 	ruleset = "sandbox",
-	config = { extra = {} },
+	config = { extra = { xmult = 0.75 } },
 	loc_vars = function(self, info_queue, card)
 		return { key = self.key .. "_mp_sandbox", vars = {} }
 	end,
