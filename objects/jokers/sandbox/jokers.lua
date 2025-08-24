@@ -103,11 +103,11 @@ SMODS.Joker({
 		end
 		-- Apply mult during main calculation
 		if context.joker_main then return {
-			xmult = card.ability.Xmult,
+			xmult = card.ability.extra.Xmult,
 		} end
 		-- Lose mult at end of round
 		if context.end_of_round and not context.individual and not context.repetition then
-			card.ability.Xmult = math.max(1, card.ability.extra.Xmult - card.ability.extra.Xmult_loss)
+			card.ability.extra.Xmult = math.max(1, card.ability.extra.Xmult - card.ability.extra.Xmult_loss)
 			return {
 				message = localize("k_reset"),
 			}
@@ -418,10 +418,9 @@ SMODS.Joker({
 			local is_first_face = false
 			if context.scoring_hand[1]:is_face() then is_first_face = true end
 			if #context.full_hand == 1 and is_first_face then return {
-				xmult = card.ability.extra,
+				xmult = card.ability.extra.xmult,
 			} end
 		end
-		return nil, true
 	end,
 	in_pool = function(self)
 		return MP.LOBBY.config.ruleset == "ruleset_mp_sandbox" and MP.LOBBY.code
