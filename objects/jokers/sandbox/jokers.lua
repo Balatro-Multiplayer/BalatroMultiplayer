@@ -492,7 +492,7 @@ SMODS.Joker({
 				colour = G.C.CHIPS,
 			}
 		end
-		if context.joker_main then return {
+		if context.joker_main and #context.full_hand == 4 then return {
 			chips = card.ability.extra.chips,
 		} end
 	end,
