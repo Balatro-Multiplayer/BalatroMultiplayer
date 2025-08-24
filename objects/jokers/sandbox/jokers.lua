@@ -520,19 +520,24 @@ SMODS.Joker({
 			card.ability.extra.hands_this_round = card.ability.extra.hands_this_round + 1
 
 			-- Market reacts to your performance
-			local market_roll = SMODS.pseudorandom(card, "market_react")
-
 			if context.scoring_hand and #context.scoring_hand >= 5 then
-				-- Big hand = BULL MARKET
-				if market_roll < 0.6 then card.ability.extra.market_mood = "bull" end
+				-- Big hand = BULL MARKET (60% chance)
+				if SMODS.pseudorandom_probability(card, "market_react_bull", 6, 10) then 
+					card.ability.extra.market_mood = "bull" 
+				end
 			elseif mult < 50 then
-				-- Weak hand = BEAR MARKET
-				if market_roll < 0.4 then card.ability.extra.market_mood = "bear" end
+				-- Weak hand = BEAR MARKET (40% chance)
+				if SMODS.pseudorandom_probability(card, "market_react_bear", 4, 10) then 
+					card.ability.extra.market_mood = "bear" 
+				end
 			end
 
-			-- Random moon shots
-			if market_roll < 0.05 then card.ability.extra.market_mood = "moon" end
-			if market_roll > 0.98 then card.ability.extra.market_mood = "crash" end
+			-- Random moon shots (5% chance) and crashes (2% chance)
+			if SMODS.pseudorandom_probability(card, "market_react_moon", 1, 20) then 
+				card.ability.extra.market_mood = "moon" 
+			elseif SMODS.pseudorandom_probability(card, "market_react_crash", 1, 50) then 
+				card.ability.extra.market_mood = "crash" 
+			end
 		end
 
 		-- Reroll shop events - market volatility affects costs
@@ -542,26 +547,26 @@ SMODS.Joker({
 					return 0
 				end,
 				bull = function()
-					if SMODS.pseudorandom(card, "bull_reroll") < 0.3 then
-						return math.floor(1 + SMODS.pseudorandom(card, "bull_reroll_amount") * 3) -- gain 1-3 dollars
+					if SMODS.pseudorandom_probability(card, "bull_reroll") < 0.3 then
+						return math.floor(1 + SMODS.pseudorandom_probability(card, "bull_reroll_amount") * 3) -- gain 1-3 dollars
 					end
 					return 0
 				end,
 				bear = function()
-					if SMODS.pseudorandom(card, "bear_reroll") < 0.4 then
-						return -math.floor(1 + SMODS.pseudorandom(card, "bear_reroll_amount") * 2) -- lose 1-2 dollars
+					if SMODS.pseudorandom_probability(card, "bear_reroll") < 0.4 then
+						return -math.floor(1 + SMODS.pseudorandom_probability(card, "bear_reroll_amount") * 2) -- lose 1-2 dollars
 					end
 					return 0
 				end,
 				moon = function()
-					if SMODS.pseudorandom(card, "moon_reroll") < 0.5 then
-						return math.floor(5 + SMODS.pseudorandom(card, "moon_reroll_amount") * 10) -- gain 5-15 dollars
+					if SMODS.pseudorandom_probability(card, "moon_reroll") < 0.5 then
+						return math.floor(5 + SMODS.pseudorandom_probability(card, "moon_reroll_amount") * 10) -- gain 5-15 dollars
 					end
 					return 0
 				end,
 				crash = function()
-					if SMODS.pseudorandom(card, "crash_reroll") < 0.7 then
-						return -math.floor(3 + SMODS.pseudorandom(card, "crash_reroll_amount") * 5) -- lose 3-8 dollars
+					if SMODS.pseudorandom_probability(card, "crash_reroll") < 0.7 then
+						return -math.floor(3 + SMODS.pseudorandom_probability(card, "crash_reroll_amount") * 5) -- lose 3-8 dollars
 					end
 					return 0
 				end,
@@ -585,26 +590,26 @@ SMODS.Joker({
 					return 0
 				end,
 				bull = function()
-					if SMODS.pseudorandom(card, "bull_blind") < 0.2 then
-						return math.floor(2 + SMODS.pseudorandom(card, "bull_blind_amount") * 4) -- gain 2-6 dollars
+					if SMODS.pseudorandom_probability(card, "bull_blind") < 0.2 then
+						return math.floor(2 + SMODS.pseudorandom_probability(card, "bull_blind_amount") * 4) -- gain 2-6 dollars
 					end
 					return 0
 				end,
 				bear = function()
-					if SMODS.pseudorandom(card, "bear_blind") < 0.3 then
-						return -math.floor(1 + SMODS.pseudorandom(card, "bear_blind_amount") * 3) -- lose 1-4 dollars
+					if SMODS.pseudorandom_probability(card, "bear_blind") < 0.3 then
+						return -math.floor(1 + SMODS.pseudorandom_probability(card, "bear_blind_amount") * 3) -- lose 1-4 dollars
 					end
 					return 0
 				end,
 				moon = function()
-					if SMODS.pseudorandom(card, "moon_blind") < 0.15 then
-						return math.floor(10 + SMODS.pseudorandom(card, "moon_blind_amount") * 20) -- gain 10-30 dollars
+					if SMODS.pseudorandom_probability(card, "moon_blind") < 0.15 then
+						return math.floor(10 + SMODS.pseudorandom_probability(card, "moon_blind_amount") * 20) -- gain 10-30 dollars
 					end
 					return 0
 				end,
 				crash = function()
-					if SMODS.pseudorandom(card, "crash_blind") < 0.5 then
-						return -math.floor(2 + SMODS.pseudorandom(card, "crash_blind_amount") * 6) -- lose 2-8 dollars
+					if SMODS.pseudorandom_probability(card, "crash_blind") < 0.5 then
+						return -math.floor(2 + SMODS.pseudorandom_probability(card, "crash_blind_amount") * 6) -- lose 2-8 dollars
 					end
 					return 0
 				end,
@@ -625,9 +630,9 @@ SMODS.Joker({
 		local base_interest = G.GAME.interest_amount
 		local multipliers = {
 			stable = 1.0,
-			bull = 2.5 + SMODS.pseudorandom(card, "bull_bonus") * 2, -- 2.5x to 4.5x
-			bear = 0.1 + SMODS.pseudorandom(card, "bear_penalty") * 0.4, -- 0.1x to 0.5x
-			moon = 8 + SMODS.pseudorandom(card, "moon_bonus") * 7, -- 8x to 15x
+			bull = 2.5 + SMODS.pseudorandom_probability(card, "bull_bonus") * 2, -- 2.5x to 4.5x
+			bear = 0.1 + SMODS.pseudorandom_probability(card, "bear_penalty") * 0.4, -- 0.1x to 0.5x
+			moon = 8 + SMODS.pseudorandom_probability(card, "moon_bonus") * 7, -- 8x to 15x
 			crash = 0,
 		}
 		return math.floor(base_interest * multipliers[card.ability.extra.market_mood])
