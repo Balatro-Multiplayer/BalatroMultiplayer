@@ -20,6 +20,7 @@ MP.Ruleset({
 		"j_photograph",
 		"j_cloud_9",
 		"j_square",
+		"j_to_the_moon",
 	},
 	banned_consumables = {
 		"c_justice",
@@ -44,6 +45,7 @@ MP.Ruleset({
 		"j_mp_photograph_sandbox",
 		"j_mp_cloud_9_sandbox",
 		"j_mp_square_sandbox",
+		"j_mp_to_the_moon_sandbox",
 	},
 	reworked_consumables = {},
 	reworked_vouchers = {},
@@ -377,3 +379,41 @@ SMODS.Tag({
 -- 		})
 -- 	end
 -- end
+
+-- Directly pulled from SMODS code
+
+SMODS.Stake({
+	name = "Planet Stake",
+	unlocked = true,
+	key = "planet",
+	pos = { x = 1, y = 1 },
+	sticker_pos = { x = 2, y = 1 },
+	applied_stakes = { "gold" },
+	modifiers = function()
+		G.GAME.modifiers.no_blind_reward = G.GAME.modifiers.no_blind_reward or {}
+		G.GAME.modifiers.no_blind_reward.Small = true
+		G.GAME.modifiers.scaling = (G.GAME.modifiers.scaling or 1) + 1
+		G.GAME.modifiers.enable_eternals_in_shop = true
+		G.GAME.modifiers.scaling = (G.GAME.modifiers.scaling or 1) + 1
+		-- no blue
+		G.GAME.modifiers.enable_perishables_in_shop = true -- orange
+	end,
+	colour = G.C.Planet,
+	shiny = true,
+	above_stake = "tarot",
+})
+
+SMODS.Stake({
+	name = "Spectral Stake",
+	unlocked = true,
+	key = "spectral",
+	applied_stakes = { "mp_stake_planet" },
+	pos = { x = 2, y = 1 },
+	sticker_pos = { x = 3, y = 1 },
+	modifiers = function()
+		G.GAME.modifiers.enable_rentals_in_shop = true -- gold
+	end,
+	colour = G.C.SECONDARY_SET.Spectral,
+	shiny = true,
+	above_stake = "mp_stake_planet",
+})
