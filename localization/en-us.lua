@@ -325,6 +325,16 @@ return {
 					"THE ORIGINAL FRUIT!!!",
 				},
 			},
+			j_mp_to_the_moon_sandbox = {
+				name = "To the Moon",
+				text = {
+					"DERANGED DAY TRADER WITH SEVERE MARKET VOLATILITY",
+					"ADDICTION - REFUSES STABLE RETURNS AND DEMANDS",
+					"EMOTIONAL ROLLER COASTER TRADING!!!",
+					"Interest varies wildly based on market conditions",
+					"{C:inactive}(Current market mood: {C:attention}#1#{C:inactive})",
+				},
+			},
 		},
 		Planet = {
 			c_mp_asteroid = {
@@ -431,6 +441,27 @@ return {
 					"{C:attention}#2#{C:attention} Playing{} cards to",
 					"add to your deck",
 					"{C:attention}Unskippable{}",
+				},
+			},
+		},
+		Stake = {
+			stake_mp_planet = {
+				name = "Planet Stake",
+				text = {
+					"Applies {C:red}Red{}, {C:green}Green{}, {C:black}Black{},",
+					"{C:purple}Purple{}, and {C:orange}Orange{} stake effects",
+					"{C:attention}Small Blind{} gives no reward money",
+					"{C:attention}Eternal{} Jokers appear in shop",
+					"{C:purple}Purple Stake{} Base Ante scaling",
+					"{C:dark_edition}Perishable{} Jokers appear in shop",
+				},
+			},
+			stake_mp_spectral = {
+				name = "Spectral Stake",
+				text = {
+					"Applies {C:planet}Planet Stake{} effects, plus:",
+					"Start with {C:red}-1{} discard",
+					"{C:money}Rental{} Jokers appear in shop",
 				},
 			},
 		},
