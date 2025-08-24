@@ -268,9 +268,11 @@ SMODS.Joker({
 				colour = G.C.CHIPS,
 			}
 		end
-		if context.joker_main then return {
-			chips = card.ability.extra.chips,
-		} end
+		if context.joker_main and next(context.poker_hands["Straight"]) then
+			return {
+				chips = card.ability.extra.chips,
+			}
+		end
 	end,
 	in_pool = function(self)
 		return MP.LOBBY.config.ruleset == "ruleset_mp_sandbox" and MP.LOBBY.code
