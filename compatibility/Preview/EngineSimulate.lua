@@ -249,7 +249,7 @@ if not FN.SIM.run then
 	end
 
 	function FN.SIM.simulate_deck_effects()
-		if G.GAME.selected_back.name == "Plasma Deck" then
+		if FN.SIM.is_deck("b_plasma") then
 			local function plasma(data)
 				local sum = data.chips + data.mult
 				local half_sum = math.floor(sum / 2)
@@ -260,6 +260,21 @@ if not FN.SIM.run then
 			plasma(FN.SIM.running.min)
 			plasma(FN.SIM.running.exact)
 			plasma(FN.SIM.running.max)
+		elseif G.GAME.modifiers.mp_score_instability then
+			local function unplasma(data)
+				local diff = data.chips - data.mult
+				if diff > 0 then
+					diff = math.min(diff, data.mult - 1)
+				elseif diff < 0 then
+					diff = math.max(diff, -data.chips)
+				end
+				data.chips = mod_chips(data.chips+diff)
+				data.mult = mod_mult(data.mult-diff)
+			end
+
+			unplasma(FN.SIM.running.min)
+			unplasma(FN.SIM.running.exact)
+			unplasma(FN.SIM.running.max)
 		else
 			-- Other decks do not impact scoring; refer to Back:trigger_effect(..)
 		end
