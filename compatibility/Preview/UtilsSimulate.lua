@@ -136,17 +136,20 @@ function FN.SIM.is_rank(card_data, ranks)
 	if type(ranks) == "number" then ranks = { ranks } end
 	if FN.SIM.is_deck("b_mp_gradient") then
 		local temp = {}
-	
+
 		for i, v in ipairs(ranks) do
 			temp[v - 1] = true
 			temp[v] = true
 			temp[v + 1] = true
 		end
-		
+
 		ranks = {}
 		for k, v in pairs(temp) do
-			if k == 15 then k = 2
-			elseif k == 1 then k = 14 end
+			if k == 15 then
+				k = 2
+			elseif k == 1 then
+				k = 14
+			end
 			table.insert(ranks, k)
 		end
 		table.sort(ranks)
@@ -224,9 +227,7 @@ function FN.SIM.is_deck(deck)
 		return true
 	elseif G.GAME.selected_back.effect.center.key == "b_mp_cocktail" then
 		for i = 1, 3 do
-			if G.GAME.modifiers.mp_cocktail[i] == deck then
-				return true
-			end
+			if G.GAME.modifiers.mp_cocktail[i] == deck then return true end
 		end
 	end
 	return false
