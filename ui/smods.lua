@@ -102,7 +102,7 @@ SMODS.Mods.Multiplayer.credits_tab = function()
 				nodes = {
 					UIBox_button({
 						minw = 3.85 * 2,
-						button = "bmp_github",
+						button = "bmp_discord",
 						label = { localize("b_mp_discord") },
 					}),
 				},

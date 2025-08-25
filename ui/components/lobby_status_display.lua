@@ -21,15 +21,6 @@ local function get_warnings()
 	end
 
 	local current_player = MP.LOBBY.is_host and MP.LOBBY.host or MP.LOBBY.guest
-	local current_has_order = current_player and current_player.config and current_player.config.TheOrder
-	local other_has_order = other_player and other_player.config and other_player.config.TheOrder
-
-	if (MP.LOBBY.ready_to_start or not MP.LOBBY.is_host) and current_has_order ~= other_has_order then
-		table.insert(warnings, {
-			localize("k_warning_no_order"),
-			SMODS.Gradients.warning_text,
-		})
-	end
 
 	if MP.LOBBY.ready_to_start or not MP.LOBBY.is_host then
 		local hostSteamoddedVersion = MP.LOBBY.host and MP.LOBBY.host.config and MP.LOBBY.host.config.Mods["Steamodded"]

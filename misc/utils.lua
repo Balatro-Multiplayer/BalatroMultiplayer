@@ -563,7 +563,6 @@ function MP.UTILS.parse_Hash(hash)
 	local config = {
 		encryptID = nil,
 		unlocked = nil,
-		theOrder = nil,
 		Mods = {},
 	}
 
@@ -575,8 +574,6 @@ function MP.UTILS.parse_Hash(hash)
 			config.encryptID = tonumber(val)
 		elseif key == "unlocked" then
 			config.unlocked = val == "true"
-		elseif key == "theOrder" then
-			config.TheOrder = val == "true"
 		elseif key ~= "serversideConnectionID" then
 			table.insert(mod_data, part)
 		end

@@ -35,7 +35,7 @@ function create_UIBox_blind_choice(type, run_info)
 
 		if not G.GAME.orbital_choices[G.GAME.round_resets.ante][type] then
 			local _poker_hands = {}
-			if MP.INTEGRATIONS.TheOrder then
+			if MP.should_use_the_order() then
 				_poker_hands = MP.sorted_hand_list()
 			else
 				for k, v in pairs(G.GAME.hands) do
