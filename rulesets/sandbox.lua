@@ -380,8 +380,6 @@ SMODS.Tag({
 -- 	end
 -- end
 
--- Directly pulled from SMODS code
-
 SMODS.Stake({
 	name = "Planet Stake",
 	unlocked = true,

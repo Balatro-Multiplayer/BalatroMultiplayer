@@ -4,6 +4,27 @@
 --
 --
 
+SMODS.Atlas({
+	key = "misprint_sandbox",
+	path = "j_misprint_sandbox.png",
+	px = 71,
+	py = 95,
+})
+
+SMODS.Atlas({
+	key = "castle_sandbox",
+	path = "j_castle_sandbox.png",
+	px = 71,
+	py = 95,
+})
+
+SMODS.Atlas({
+	key = "photograph_sandbox",
+	path = "j_photograph_sandbox.png",
+	px = 71,
+	py = 95,
+})
+
 SMODS.Joker({
 	key = "lucky_cat_sandbox",
 	blueprint_compat = true,
@@ -184,10 +205,10 @@ SMODS.Joker({
 -- TODO: Show ?? when it appears in shop instead!
 SMODS.Joker({
 	key = "misprint_sandbox",
+	atlas = "misprint_sandbox",
 	blueprint_compat = true,
 	rarity = 1,
 	cost = 4,
-	pos = { x = 6, y = 2 },
 	ruleset = "sandbox",
 	config = { extra = { max = 46, min = -5, mult = 0 } },
 	loc_vars = function(self, info_queue, card)
@@ -209,11 +230,11 @@ SMODS.Joker({
 -- TODO: Make set on purchase or when in shop!
 SMODS.Joker({
 	key = "castle_sandbox",
+	atlas = "castle_sandbox",
 	blueprint_compat = true,
 	perishable_compat = false,
 	rarity = 2,
 	cost = 6,
-	pos = { x = 9, y = 15 },
 	config = { extra = { chips = 50, chip_mod = 10 } },
 	loc_vars = function(self, info_queue, card)
 		local suit = (G.GAME.current_round.castle_card or {}).suit or "Spades"
@@ -407,11 +428,11 @@ SMODS.Joker({
 SMODS.Joker({
 	key = "photograph_sandbox",
 	blueprint_compat = true,
+	atlas = "photograph_sandbox",
 	rarity = 1,
 	cost = 5,
-	pos = { x = 2, y = 13 },
 	pixel_size = { h = 95 / 1.2 },
-	config = { extra = { xmult = 2 } },
+	config = { extra = { xmult = 5 } },
 	loc_vars = function(self, info_queue, card)
 		return { vars = { card.ability.extra.xmult } }
 	end,
@@ -522,21 +543,21 @@ SMODS.Joker({
 			-- Market reacts to your performance
 			if context.scoring_hand and #context.scoring_hand >= 5 then
 				-- Big hand = BULL MARKET (60% chance)
-				if SMODS.pseudorandom_probability(card, "market_react_bull", 6, 10) then 
-					card.ability.extra.market_mood = "bull" 
+				if SMODS.pseudorandom_probability(card, "market_react_bull", 6, 10) then
+					card.ability.extra.market_mood = "bull"
 				end
 			elseif mult < 50 then
 				-- Weak hand = BEAR MARKET (40% chance)
-				if SMODS.pseudorandom_probability(card, "market_react_bear", 4, 10) then 
-					card.ability.extra.market_mood = "bear" 
+				if SMODS.pseudorandom_probability(card, "market_react_bear", 4, 10) then
+					card.ability.extra.market_mood = "bear"
 				end
 			end
 
 			-- Random moon shots (5% chance) and crashes (2% chance)
-			if SMODS.pseudorandom_probability(card, "market_react_moon", 1, 20) then 
-				card.ability.extra.market_mood = "moon" 
-			elseif SMODS.pseudorandom_probability(card, "market_react_crash", 1, 50) then 
-				card.ability.extra.market_mood = "crash" 
+			if SMODS.pseudorandom_probability(card, "market_react_moon", 1, 20) then
+				card.ability.extra.market_mood = "moon"
+			elseif SMODS.pseudorandom_probability(card, "market_react_crash", 1, 50) then
+				card.ability.extra.market_mood = "crash"
 			end
 		end
 
