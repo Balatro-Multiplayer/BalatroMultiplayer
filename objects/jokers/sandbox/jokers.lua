@@ -5,6 +5,13 @@
 --
 
 SMODS.Atlas({
+	key = "lucky_cat_sandbox",
+	path = "j_lucky_cat_sandbox.png",
+	px = 71,
+	py = 95,
+})
+
+SMODS.Atlas({
 	key = "misprint_sandbox",
 	path = "j_misprint_sandbox.png",
 	px = 71,
@@ -27,11 +34,11 @@ SMODS.Atlas({
 
 SMODS.Joker({
 	key = "lucky_cat_sandbox",
+	atlas = "lucky_cat_sandbox",
 	blueprint_compat = true,
 	perishable_compat = false,
 	rarity = 2,
 	cost = 6,
-	pos = { x = 5, y = 14 },
 	config = { extra = { Xmult_gain = 0.25, Xmult = 1 } },
 	loc_vars = function(self, info_queue, card)
 		info_queue[#info_queue + 1] = G.P_CENTERS.m_lucky
