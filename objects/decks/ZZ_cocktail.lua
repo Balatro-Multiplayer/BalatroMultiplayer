@@ -19,6 +19,7 @@ SMODS.Back({
 				if not (v.mod and not self.mod_whitelist[v.mod.id]) then decks[#decks + 1] = k end
 			end
 		end
+		table.sort(decks)
 		pseudoshuffle(decks, pseudoseed("mp_cocktail"))
 		local back = G.GAME.selected_back
 		for i = 1, 3 do

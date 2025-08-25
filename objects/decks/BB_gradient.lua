@@ -25,11 +25,25 @@ end
 
 -- if code runs twice it needs a func ig
 local function reset_ids()
-	G.MP_GRADIENT = nil
-	for i, card in ipairs(G.playing_cards) do
-		card.base.id = card.orig_id
-		card.orig_id = nil
+	if G.MP_GRADIENT then
+		G.MP_GRADIENT = nil
+		for i, card in ipairs(G.playing_cards) do
+			card.base.id = card.orig_id
+			card.orig_id = nil
+		end
 	end
+	-- i am checking for G.MP_GRADIENT here. why?
+	-- i know this code. i built it myself. this function will always be run at the correct time.
+	-- or so i thought. alas, the day after release, i was humbled by a crashlog relating to this exact issue.
+	-- i have reordered the code before, this was nothing new. i knew exactly what it was caused by, and i recreated it fairly easily.
+	-- but the logic has expanded in complexity since then. no more can i follow where one line ends and the other begins.
+	-- the code was watered with passion and motivation, but it grew into thick, thorny vines that stab my hands and block my vision.
+	-- there is only pain for the person who decides to touch this. the code does not have emotion, it does not care.
+	-- in some twisted way, i am attached to it. it falls short of the greatness expected, but it accomplishes so much.
+	-- as a gift, for all it has done, i shift it, ever so slightly, that it thrives.
+	
+	-- tldr: i have no idea what this shit is doing anymore, this check shouldn't be necessary
+	-- checking this prevents a crash and doesn't seem to break anything
 end
 
 -- hardcoded dumb stuff, because cards that could trigger but don't due to rng are dumb and stupid and don't return anything

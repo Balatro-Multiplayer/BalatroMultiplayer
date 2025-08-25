@@ -175,7 +175,7 @@ function Tag:init(_tag, for_collection, _blind_type)
 		end
 	end
 	if orbital then
-		G.orbital_hand = pseudorandom_element(MP.sorted_hand_list())
+		G.orbital_hand = pseudorandom_element(MP.sorted_hand_list(), pseudoseed("orbital_replace"))
 	end
 	tag_init_ref(self, _tag, for_collection, _blind_type)
 	G.orbital_hand = old
@@ -188,6 +188,7 @@ function Back:apply_to_run()
 end
 
 function MP.apply_fake_back_vouchers(back)
+	return -- disable func
 	local vouchers = {}
 	if back.effect.config.voucher then vouchers = { back.effect.config.voucher } end
 	if back.effect.config.vouchers or #vouchers > 0 then
