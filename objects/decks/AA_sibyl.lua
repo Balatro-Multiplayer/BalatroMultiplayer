@@ -29,7 +29,16 @@ SMODS.Back({
 		for k, v in pairs(G.P_TAGS) do
 			if spec_bans[k] then G.GAME.banned_keys[k] = true end
 		end
-		G.GAME.planet_rate = 0
+		G.E_MANAGER:add_event(Event({
+			func = function()
+				G.E_MANAGER:add_event(Event({
+					func = function()
+						G.GAME.planet_rate = 0
+						return true
+					end,
+				}))
+			end,
+		}))
 		G.GAME.modifiers.mp_sibyl = true
 	end,
 })
