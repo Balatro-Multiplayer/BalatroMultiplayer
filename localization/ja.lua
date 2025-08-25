@@ -2,7 +2,7 @@
 -- 気になる点がありましたらサーバー内でもDMでもお気軽にご相談ください!
 return {
 	descriptions = {
-			Tag = {
+		Tag = {
 			tag_mp_sandbox_rare = {
 				name = "ギャンブルタグ",
 				text = {
@@ -46,7 +46,7 @@ return {
 					"PvPブラインド中では",
 					"{C:green}#6#分の#5#{} の確率で",
 					"{X:purple,C:white}相手{} が {C:money}$#7#{} 獲得する",
-					"こともある"
+					"こともある",
 				},
 			},
 			j_mp_speedrun = {
@@ -97,7 +97,7 @@ return {
 				text = {
 					"自分のディスカード{C:red}+#1#{}",
 					"{X:purple,C:white}相手{} のディスカード {C:red}+#2#{}",
-					"{C:inactive}({C:attention}PvPブラインド{} {C:inactive}終了後に消滅する)"
+					"{C:inactive}({C:attention}PvPブラインド{} {C:inactive}終了後に消滅する)",
 				},
 			},
 			j_mp_pacifist = {
@@ -107,7 +107,7 @@ return {
 					"倍率 {X:mult,C:white}X#1#{}",
 				},
 			},
-			j_hanging_chad_mp_standard = {
+			j_mp_hanging_chad = {
 				name = "ハンギングチャド",
 				text = {
 					"プレイしたカードで、",
@@ -115,7 +115,7 @@ return {
 					"再発動する",
 				},
 			},
-				j_mp_cloud_9 = {
+			j_mp_cloud_9 = {
 				name = "クラウド9",
 				text = {
 					"ラウンド終了時",
@@ -127,10 +127,9 @@ return {
 			j_mp_bloodstone = {
 				name = "ブラッドストーン",
 				text = {
-                    "出した {C:hearts}ハートのカード{} が",
-                    "得点されるたびに",
-                    "{C:green}#2#分の#1#{} の確率で 倍率 {X:mult,C:white}X#3#{}",
-					"{C:inactive}両者との発動誤差を調整(β){}",
+					"出した {C:hearts}ハートのカード{} が",
+					"得点されるたびに",
+					"{C:green}#2#分の#1#{} の確率で 倍率 {X:mult,C:white}X#3#{}",
 				},
 			},
 		},
@@ -140,7 +139,7 @@ return {
 				text = {
 					"{X:purple,C:white}相手{} の一番高い",
 					"{C:legendary,E:1} ポーカーハンド{} のレベルを #1# 下げる",
-					"{C:inactive}({C:attention}PvPブラインド開始時{} {C:inactive}に効果が発動する)"
+					"{C:inactive}({C:attention}PvPブラインド開始時{} {C:inactive}に効果が発動する)",
 				},
 			},
 		},
@@ -382,11 +381,15 @@ return {
 			k_ante_number = "アンティ #1#",
 			k_ante_range = "アンティ #1#､#2#", -- For example, "Ante 1-2"
 			k_ante_min = "アンティ #1#以降", -- For example, "Ante 2+"
-			k_credits_list = "#1# など..." -- #1# gets replaced with a list of names
+			k_credits_list = "#1# など...", -- #1# gets replaced with a list of names
 		},
 		v_text = {
-			ch_c_hanging_chad_rework = { "{C:attention}ハンギングチャド{}は{C:dark_edition}マルチ用に改良されています。" },
-			ch_c_glass_cards_rework = { "{C:attention}グラスカード{}は{C:dark_edition}マルチ用に改良されています。" },
+			ch_c_hanging_chad_rework = {
+				"{C:attention}ハンギングチャド{}は{C:dark_edition}マルチ用に改良されています。",
+			},
+			ch_c_glass_cards_rework = {
+				"{C:attention}グラスカード{}は{C:dark_edition}マルチ用に改良されています。",
+			},
 		},
 		challenge_names = {
 			c_mp_misprint_deck = "バグシードデッキ",
