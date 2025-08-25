@@ -151,9 +151,7 @@ end
 
 local showman_ref = SMODS.showman
 function SMODS.showman(card_key)
-	if MP.LOBBY.code and MP.LOBBY.config.ruleset == "ruleset_mp_smallworld" then
-		return true
-	end
+	if MP.LOBBY.code and MP.LOBBY.config.ruleset == "ruleset_mp_smallworld" then return true end
 	return showman_ref(card_key)
 end
 
@@ -165,18 +163,16 @@ function Tag:init(_tag, for_collection, _blind_type)
 	if MP.LOBBY.code and MP.LOBBY.config.ruleset == "ruleset_mp_smallworld" then
 		if G.GAME.banned_keys[_tag] and not G.OVERLAY_MENU then
 			local a = G.GAME.round_resets.ante
-			
+
 			if MP.should_use_the_order() then G.GAME.round_resets.ante = 10 end
-			
+
 			_tag = get_next_tag_key("replace")
-			if _tag == 'tag_orbital' then orbital = true end
-			
+			if _tag == "tag_orbital" then orbital = true end
+
 			G.GAME.round_resets.ante = a
 		end
 	end
-	if orbital then
-		G.orbital_hand = pseudorandom_element(MP.sorted_hand_list(), pseudoseed("orbital_replace"))
-	end
+	if orbital then G.orbital_hand = pseudorandom_element(MP.sorted_hand_list(), pseudoseed("orbital_replace")) end
 	tag_init_ref(self, _tag, for_collection, _blind_type)
 	G.orbital_hand = old
 end

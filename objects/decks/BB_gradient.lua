@@ -41,7 +41,7 @@ local function reset_ids()
 	-- there is only pain for the person who decides to touch this. the code does not have emotion, it does not care.
 	-- in some twisted way, i am attached to it. it falls short of the greatness expected, but it accomplishes so much.
 	-- as a gift, for all it has done, i shift it, ever so slightly, that it thrives.
-	
+
 	-- tldr: i have no idea what this shit is doing anymore, this check shouldn't be necessary
 	-- checking this prevents a crash and doesn't seem to break anything
 end

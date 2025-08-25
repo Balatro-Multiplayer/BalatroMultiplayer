@@ -21,7 +21,7 @@ local function get_warnings()
 	end
 
 	local current_player = MP.LOBBY.is_host and MP.LOBBY.host or MP.LOBBY.guest
-	
+
 	if MP.LOBBY.ready_to_start or not MP.LOBBY.is_host then
 		local hostSteamoddedVersion = MP.LOBBY.host and MP.LOBBY.host.config and MP.LOBBY.host.config.Mods["Steamodded"]
 		local guestSteamoddedVersion = MP.LOBBY.guest
