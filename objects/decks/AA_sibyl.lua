@@ -37,6 +37,15 @@ SMODS.Back({
 -- billionth create card hook ever
 local create_card_ref = create_card
 function create_card(_type, area, legendary, _rarity, skip_materialize, soulable, forced_key, key_append)
-	if G.GAME.modifiers.mp_sibyl and _type == "Spectral" then forced_key = "c_medium" end
+	if G.GAME.modifiers.mp_sibyl and _type == "Spectral" then
+		G.GAME.banned_keys["c_medium"] = nil
+		forced_key = "c_medium"
+	end
 	return create_card_ref(_type, area, legendary, _rarity, skip_materialize, soulable, forced_key, key_append)
+end
+
+local set_seal_ref = Card.set_seal
+function Card:set_seal(_seal, silent, immediate)
+	if G.GAME.modifiers.mp_sibyl and _seal then _seal = "Purple" end
+	return set_seal_ref(self, _seal, silent, immediate)
 end

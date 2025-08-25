@@ -268,8 +268,8 @@ if not FN.SIM.run then
 				elseif diff < 0 then
 					diff = math.max(diff, -data.chips)
 				end
-				data.chips = mod_chips(data.chips+diff)
-				data.mult = mod_mult(data.mult-diff)
+				data.chips = mod_chips(data.chips + diff)
+				data.mult = mod_mult(data.mult - diff)
 			end
 
 			unplasma(FN.SIM.running.min)
