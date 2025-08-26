@@ -46,10 +46,7 @@ local function reset_ids()
 	-- checking this prevents a crash and doesn't seem to break anything
 end
 
--- hardcoded dumb stuff, because cards that could trigger but don't due to rng are dumb and stupid and don't return anything
--- ALSO i have to add a whole get blueprint key thing it's so stupid
--- all this to avoid lovely patching? who cares
-local function valid_trigger(card, joker)
+local function get_bp(joker)
 	local key = joker.config.center.key
 	local count = 0
 	local pos = 0
@@ -64,7 +61,17 @@ local function valid_trigger(card, joker)
 			key = G.jokers.cards[1].config.center.key
 			pos = 1
 		end
+		count = count + 1
 	end
+	return key
+end
+
+-- hardcoded dumb stuff, because cards that could trigger but don't due to rng are dumb and stupid and don't return anything
+-- ALSO i have to add a whole get blueprint key thing (above) it's so stupid
+-- all this to avoid lovely patching? who cares
+local function valid_trigger(card, joker)
+	local key = joker.config.center.key
+	key = get_bp(joker)
 	local function rank_check(ranks)
 		for i, v in ipairs(ranks) do
 			if card:get_id() == v then return true end
@@ -92,11 +99,13 @@ function Card:is_face(from_boss)
 end
 
 -- hardcoded functions because honk shoo
-local function passkey(key)
+local function passkey(joker)
+	local key = get_bp(joker)
 	if key == "j_superposition" or key == "j_sixth_sense" then return true end
 	return false
 end
-local function blacklist(key)
+local function blacklist(joker)
+	local key = get_bp(joker)
 	if key == "j_photograph" or key == "j_faceless" then return true end
 	return false
 end
@@ -107,8 +116,8 @@ function Card:calculate_joker(context)
 	if not context.blueprint then -- very important because bloopy recursively calls this
 		if
 			G.GAME.modifiers.mp_gradient
-			and (context.other_card or passkey(self.config.center.key))
-			and not blacklist(self.config.center.key)
+			and (context.other_card or passkey(self))
+			and not blacklist(self)
 		then
 			for i = 1, 3 do
 				G.MP_GRADIENT = -i + 2
