@@ -1089,7 +1089,7 @@ function Game:update_new_round(dt)
 		G.FUNCS.draw_from_discard_to_deck()
 		MP.GAME.end_pvp = false
 	end
-	if MP.LOBBY.code and not G.STATE_COMPLETE and not (G.GAME.STOP_USE and G.GAME.STOP_USE > 0) then
+	if MP.LOBBY.code and not G.STATE_COMPLETE then
 		-- Prevent player from losing
 		if to_big(G.GAME.chips) < to_big(G.GAME.blind.chips) and not MP.is_pvp_boss() then
 			G.GAME.blind.chips = -1
