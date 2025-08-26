@@ -1065,7 +1065,7 @@ function Game:update_hand_played(dt)
 		}))
 	end
 
-	if MP.GAME.end_pvp and MP.is_pvp_boss() then
+	if MP.GAME.end_pvp and MP.is_pvp_boss() and not (G.GAME.STOP_USE and G.GAME.STOP_USE > 0) then
 		G.STATE_COMPLETE = false
 		G.STATE = G.STATES.NEW_ROUND
 		MP.GAME.end_pvp = false

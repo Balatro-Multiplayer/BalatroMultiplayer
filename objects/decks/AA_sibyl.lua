@@ -37,6 +37,7 @@ SMODS.Back({
 						return true
 					end,
 				}))
+				return true
 			end,
 		}))
 		G.GAME.modifiers.mp_sibyl = true
