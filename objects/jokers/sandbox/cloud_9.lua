@@ -25,9 +25,9 @@ SMODS.Joker({
 			},
 		}
 	end,
-	-- in_pool = function(self)
-	-- 	return MP.LOBBY.config.ruleset == "ruleset_mp_sandbox" and MP.LOBBY.code
-	-- end,
+	in_pool = function(self)
+		return MP.LOBBY.config.ruleset == "ruleset_mp_sandbox" and MP.LOBBY.code
+	end,
 	calc_dollar_bonus = function(self, card)
 		local nine_tally = 0
 		for k, v in pairs(G.playing_cards) do
@@ -36,4 +36,3 @@ SMODS.Joker({
 		return (math.min(nine_tally, 4) + math.max(nine_tally - 4, 0) * card.ability.extra) or 0
 	end,
 })
-
