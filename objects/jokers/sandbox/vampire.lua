@@ -1,10 +1,17 @@
+SMODS.Atlas({
+	key = "vampire_sandbox",
+	path = "j_vampire_sandbox.png",
+	px = 71,
+	py = 95,
+})
+
 SMODS.Joker({
 	key = "vampire_sandbox",
 	blueprint_compat = true,
 	perishable_compat = false,
 	rarity = 2,
 	cost = 7,
-	pos = { x = 2, y = 12 },
+	atlas = "vampire_sandbox",
 	config = { extra = { Xmult_gain = 0.2, Xmult = 1 } },
 	loc_vars = function(self, info_queue, card)
 		return { vars = { card.ability.extra.Xmult_gain, card.ability.extra.Xmult } }

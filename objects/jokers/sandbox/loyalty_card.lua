@@ -1,9 +1,16 @@
+SMODS.Atlas({
+	key = "loyalty_card_sandbox",
+	path = "j_loyalty_card_sandbox.png",
+	px = 71,
+	py = 95,
+})
+
 SMODS.Joker({
 	key = "loyalty_card_sandbox",
 	blueprint_compat = true,
 	rarity = 2,
 	cost = 5,
-	pos = { x = 4, y = 2 },
+	atlas = "loyalty_card_sandbox",
 	config = { extra = { Xmult = 6, every = 4, loyalty_remaining = 4, poker_hand = "???" } },
 	loc_vars = function(self, info_queue, card)
 		return {
@@ -58,4 +65,3 @@ SMODS.Joker({
 		return MP.LOBBY.config.ruleset == "ruleset_mp_sandbox" and MP.LOBBY.code
 	end,
 })
-

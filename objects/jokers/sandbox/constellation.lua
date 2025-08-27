@@ -1,10 +1,17 @@
+SMODS.Atlas({
+	key = "constellation_sandbox",
+	path = "j_constellation_sandbox.png",
+	px = 71,
+	py = 95,
+})
+
 SMODS.Joker({
 	key = "constellation_sandbox",
 	blueprint_compat = true,
 	perishable_compat = false,
 	rarity = 2,
 	cost = 6,
-	pos = { x = 9, y = 10 },
+	atlas = "constellation_sandbox",
 	config = { extra = { Xmult = 1, Xmult_mod = 0.2, Xmult_loss = 0.1 } },
 	loc_vars = function(self, info_queue, card)
 		return { vars = { card.ability.extra.Xmult_mod, card.ability.extra.Xmult } }
@@ -33,4 +40,3 @@ SMODS.Joker({
 		return MP.LOBBY.config.ruleset == "ruleset_mp_sandbox" and MP.LOBBY.code
 	end,
 })
-

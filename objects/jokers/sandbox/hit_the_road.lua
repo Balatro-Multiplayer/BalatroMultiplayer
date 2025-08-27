@@ -1,10 +1,17 @@
+SMODS.Atlas({
+	key = "hit_the_road_sandbox",
+	path = "j_hit_the_road_sandbox.png",
+	px = 71,
+	py = 95,
+})
+
 SMODS.Joker({
 	key = "hit_the_road_sandbox",
 	unlocked = true,
 	blueprint_compat = true,
 	rarity = 3,
 	cost = 8,
-	pos = { x = 8, y = 5 },
+	atlas = "hit_the_road_sandbox",
 	config = { extra = { xmult_gain = 0.75, xmult = 1 } },
 	loc_vars = function(self, info_queue, card)
 		return { vars = { card.ability.extra.xmult_gain, card.ability.extra.xmult } }

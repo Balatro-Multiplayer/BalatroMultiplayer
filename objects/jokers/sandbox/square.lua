@@ -1,10 +1,16 @@
+SMODS.Atlas({
+	key = "square_sandbox",
+	path = "j_square_sandbox.png",
+	px = 71,
+	py = 95,
+})
 SMODS.Joker({
 	key = "square_sandbox",
 	blueprint_compat = true,
 	perishable_compat = false,
 	rarity = 1,
 	cost = 4,
-	pos = { x = 9, y = 11 },
+	atlas = "square_sandbox",
 	pixel_size = { h = 71 },
 	config = { extra = { chips = 64, chip_mod = 16 } },
 	loc_vars = function(self, info_queue, card)
