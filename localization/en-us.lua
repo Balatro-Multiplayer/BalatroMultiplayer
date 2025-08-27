@@ -337,6 +337,15 @@ return {
 					"{C:inactive}(Current market mood: {C:attention}#1#{C:inactive})",
 				},
 			},
+			j_mp_vampire_sandbox = {
+				name = "Vampire",
+				text = {
+					"BLOOD ADDICTION LIFESTYLE CONSULTANT WHO GETS STRONGER",
+					"BY TURNING YOUR BEAUTIFUL CARDS INTO BORING ROCKS",
+					"BUT AT LEAST THEY'RE VAMPIRE ROCKS!!!!",
+					"{C:inactive}(Currently {X:mult,C:white} X#2# {C:inactive} Mult)",
+				},
+			},
 		},
 		Planet = {
 			c_mp_asteroid = {
