@@ -27,4 +27,7 @@ SMODS.Joker({
 			xmult = card.ability.extra.xmult,
 		} end
 	end,
+	in_pool = function(self)
+		return MP.LOBBY.config.ruleset == "ruleset_mp_sandbox" and MP.LOBBY.code
+	end,
 })
