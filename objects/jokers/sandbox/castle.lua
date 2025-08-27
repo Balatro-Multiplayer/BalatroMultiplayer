@@ -11,14 +11,14 @@ SMODS.Joker({
 	perishable_compat = false,
 	rarity = 2,
 	cost = 6,
-	config = { extra = { chips = 50, chip_mod = 10 } },
+	config = { extra = { chips = 0, chip_mod = 12, suit = nil } },
 	loc_vars = function(self, info_queue, card)
-		local suit = (G.GAME.current_round.castle_card or {}).suit or "Spades"
+		local suit = card.ability.extra.suit or G.GAME.current_round.castle_card.suit or "Spades"
 		return {
 			vars = {
-				localize(suit, "suits_singular"),
-				card.ability.extra.chips,
+				localize(suit, "suits_plural"),
 				colours = { G.C.SUITS[suit] },
+				card.ability.extra.chips,
 			},
 		}
 	end,
@@ -38,6 +38,10 @@ SMODS.Joker({
 		if context.joker_main then return {
 			chips = card.ability.extra.chips,
 		} end
+	end,
+	-- todo playtest
+	add_to_deck = function(self, card, from_debuff)
+		card.ability.extra.suit = G.GAME.current_round.castle_card.suit
 	end,
 
 	in_pool = function(self)

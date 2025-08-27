@@ -145,6 +145,7 @@ MP.Ruleset({
 	end,
 }):inject()
 
+-- TODO 1/3 chance at 2x
 -- MP.ReworkCenter({
 -- 	key = "j_bloodstone",
 -- 	ruleset = "sandbox",
