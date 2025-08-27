@@ -43,7 +43,6 @@ SMODS.Joker({
 	add_to_deck = function(self, card, from_debuff)
 		card.ability.extra.suit = G.GAME.current_round.castle_card.suit
 	end,
-
 	in_pool = function(self)
 		return MP.LOBBY.config.ruleset == "ruleset_mp_sandbox" and MP.LOBBY.code
 	end,
