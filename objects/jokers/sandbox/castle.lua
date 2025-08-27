@@ -4,6 +4,7 @@ SMODS.Atlas({
 	px = 71,
 	py = 95,
 })
+
 SMODS.Joker({
 	key = "castle_sandbox",
 	atlas = "castle_sandbox",
