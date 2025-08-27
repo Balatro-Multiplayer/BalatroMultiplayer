@@ -459,20 +459,27 @@ return {
 			stake_mp_planet = {
 				name = "Planet Stake",
 				text = {
-					"Applies {C:red}Red{}, {C:green}Green{}, {C:black}Black{},",
-					"{C:purple}Purple{}, and {C:orange}Orange{} stake effects",
-					"{C:attention}Small Blind{} gives no reward money",
-					"{C:attention}Eternal{} Jokers appear in shop",
-					"{C:purple}Purple Stake{} Base Ante scaling",
-					"{C:dark_edition}Perishable{} Jokers appear in shop",
+					"{C:attention}Orange Stake{}'s cooler older sibling",
+					"who graciously returned your",
+					"{C:red}emotional support discard{} because",
+					"even they aren't that cruel",
 				},
 			},
 			stake_mp_spectral = {
 				name = "Spectral Stake",
 				text = {
 					"Applies {C:planet}Planet Stake{} effects, plus:",
-					"Start with {C:red}-1{} discard",
 					"{C:money}Rental{} Jokers appear in shop",
+					"Required score scales",
+					"faster for each {C:attention}Ante",
+				},
+			},
+			stake_mp_spectralplus = {
+				name = "Spectral+ Stake",
+				text = {
+					"Applies {C:planet}Spectral Stake{} effects, plus:",
+					"Required score scales",
+					"even faster for each {C:attention}Ante",
 				},
 			},
 		},
