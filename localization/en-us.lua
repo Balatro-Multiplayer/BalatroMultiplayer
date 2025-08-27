@@ -288,6 +288,7 @@ return {
 			b_opts_timer = "Enable Timer",
 			b_opts_disable_preview = "Disable Score Preview",
 			b_opts_the_order = "Enable The Order",
+			b_opts_legacy_smallworld = "Legacy Small World mechanics",
 			b_reset = "Reset",
 			b_set_custom_seed = "Set Custom Seed",
 			b_mp_kofi_button = "Supporting me on Ko-fi",

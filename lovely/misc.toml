@@ -100,7 +100,7 @@ match_indent = true
 target = "back.lua"
 pattern = '''local card = create_card('Tarot', G.consumeables, nil, nil, nil, nil, v, 'deck')'''
 position = "at"
-payload = '''local card = create_card(G.P_CENTERS[v].set, G.consumeables, nil, nil, nil, nil, v, 'deck')'''
+payload = '''local card = create_card(MP.legacy_smallworld() and 'Tarot' or G.P_CENTERS[v].set, G.consumeables, nil, nil, nil, nil, v, 'deck')'''
 match_indent = true
 
 # STEAMODDED BUG - fix seeing double
