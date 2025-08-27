@@ -192,15 +192,17 @@ return {
 				name = "Turtle Bean",
 				text = {
 					"COUNTDOWN TO EXPLOSION LIFESTYLE -",
-					"SLOW AND STEADY",
-					"UNTIL MASSIVE PAYOFF DETONATION!!!!",
+					"SLOW AND STEADY UNTIL",
+					"MASSIVE PAYOFF DETONATION!!!!",
 				},
 			},
 			j_mp_juggler_sandbox = {
 				name = "Juggler",
 				text = {
-					"HAND SIZE PERFECTIONIST WHO MUST KEEP ALL THE",
-					"BALLS IN THE AIR AT ALL TIMES!!!!",
+					"HAND SIZE PERFECTIONIST WHO",
+					"MUST KEEP ALL THE BALLS",
+					"IN THE AIR AT ALL TIMES!!!!",
+					"{C:inactive}(Currently at {C:attention}+#1#{C:inactive})",
 				},
 			},
 			j_mp_mail_sandbox = {
@@ -214,9 +216,9 @@ return {
 			j_mp_hit_the_road_sandbox = {
 				name = "Hit the Road",
 				text = {
-					"JACK DISPOSAL SERVICE OPERATOR - JACKS LITERALLY",
-					"HIT THE ROAD FOREVER!!!!",
-					"{C:inactive}(Currently {X:mult,C:white} X#1# {C:inactive} Mult)",
+					"JACK DISPOSAL SERVICE OPERATOR -",
+					"JACKS LITERALLY HIT THE ROAD FOREVER!!!!",
+					"{C:inactive}(Currently {X:mult,C:white} X#2# {C:inactive} Mult)",
 				},
 			},
 			j_mp_red_card_sandbox = {
