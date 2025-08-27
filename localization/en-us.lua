@@ -240,8 +240,8 @@ return {
 				name = "Castle",
 				text = {
 					"SUIT MONOGAMIST WHO PICKS ONE",
-					"{V:1}SUIT{} AND COMMITS FOR LIFE!!!!",
-					"{C:inactive}({C:chips}+#1#{C:inactive} chips)",
+					"SUIT AND COMMITS FOR LIFE!!!!",
+					"{C:inactive}Married to {V:1}#1#{}, {C:inactive}currently {C:chips}+#2#{C:inactive} chips",
 				},
 			},
 			j_mp_business_sandbox = {
