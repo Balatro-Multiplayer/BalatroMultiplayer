@@ -670,3 +670,88 @@ SMODS.Joker({
 		return MP.LOBBY.config.ruleset == "ruleset_mp_sandbox" and MP.LOBBY.code
 	end,
 })
+
+SMODS.Joker({
+	key = "hit_the_road_sandbox",
+	unlocked = true,
+	blueprint_compat = true,
+	rarity = 3,
+	cost = 8,
+	pos = { x = 8, y = 5 },
+	config = { extra = { xmult_gain = 0.75, xmult = 1 } },
+	loc_vars = function(self, info_queue, card)
+		return { vars = { card.ability.extra.xmult_gain, card.ability.extra.xmult } }
+	end,
+	calculate = function(self, card, context)
+		if
+			context.discard
+			and not context.blueprint
+			and not context.other_card.debuff
+			and context.other_card:get_id() == 11
+		then
+			card.ability.extra.xmult = card.ability.extra.xmult + card.ability.extra.xmult_gain
+			return {
+				message = localize({ type = "variable", key = "a_xmult", vars = { card.ability.extra.xmult } }),
+				colour = G.C.RED,
+				remove = true,
+			}
+		end
+		if context.joker_main then return {
+			xmult = card.ability.extra.xmult,
+		} end
+	end,
+})
+
+SMODS.Joker({
+	key = "juggler_sandbox",
+	blueprint_compat = false,
+	rarity = 1,
+	cost = 4,
+	pos = { x = 0, y = 1 },
+	config = { extra = { h_size = 3 } },
+	loc_vars = function(self, info_queue, card)
+		return { vars = { card.ability.extra.h_size } }
+	end,
+	add_to_deck = function(self, card, from_debuff)
+		G.hand:change_size(card.ability.extra.h_size)
+	end,
+	remove_from_deck = function(self, card, from_debuff)
+		G.hand:change_size(-card.ability.extra.h_size)
+	end,
+	calculate = function(self, card, context)
+		if context.before and context.main_eval and not context.blueprint then
+			print("Playing Juggler")
+			print(#context.full_hand)
+			if #context.full_hand < 5 then
+				card.ability.extra.h_size = card.ability.extra.h_size - 1
+				G.hand:change_size(-1)
+				card_eval_status_text(card, "extra", nil, nil, nil, { message = "-1 Hand Size" }) -- TODO localize
+
+				if card.ability.extra.h_size <= 0 then
+					G.E_MANAGER:add_event(Event({
+						func = function()
+							play_sound("tarot1")
+							card.T.r = -0.2
+							card:juice_up(0.3, 0.4)
+							card.states.drag.is = false
+							card.children.center.pinch.x = true
+							G.E_MANAGER:add_event(Event({
+								trigger = "after",
+								delay = 0.3,
+								blockable = false,
+								func = function()
+									G.jokers:remove_card(card)
+									card:remove()
+									card = nil
+									return true
+								end,
+							}))
+							return true
+						end,
+					}))
+					card_eval_status_text(card, "extra", nil, nil, nil, { message = localize("k_extinct_ex") })
+				end
+			end
+		end
+	end,
+})
