@@ -464,7 +464,7 @@ return {
 			ch_c_glass_cards_rework = { "{C:attention}Glass Cards{} are {C:dark_edition}reworked" },
 			ch_c_mp_score_instability = { "Unbalanced score is {C:purple}destabilized{} further:" },
 			ch_c_mp_score_instability_EXAMPLE = {
-				"  {C:inactive}(ex: {C:chips}250{C:inactive}x{C:mult}350{C:inactive} -> {C:chips}200{C:inactive}x{C:mult}400{C:inactive})",
+				"  {C:inactive}(ex: {C:chips}30{C:inactive}x{C:mult}24{C:inactive} -> {C:chips}36{C:inactive}x{C:mult}18{C:inactive})",
 			},
 			ch_c_mp_score_instability_LOC1 = { "  {C:inactive}Minimum of {C:attention}1 {C:mult}Mult" },
 			ch_c_mp_score_instability_LOC2 = { "  {C:inactive}Minimum of {C:attention}0 {C:chips}Chips" },
