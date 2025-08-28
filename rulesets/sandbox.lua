@@ -382,12 +382,10 @@ SMODS.Tag({
 
 SMODS.Stake({
 	name = "Planet Stake",
-	unlocked = true,
-	unlocked_stake = "gold",
-	-- it doesn't show up without
-	-- applied_stakes = "gold"
-	-- but if i have it, then the stake view crashes the game
 	key = "planet",
+	unlocked = true,
+	-- it doesn't show up without
+	applied_stakes = { "gold" },
 	pos = { x = 1, y = 1 },
 	sticker_pos = { x = 3, y = 1 },
 	modifiers = function()
@@ -403,14 +401,12 @@ SMODS.Stake({
 	end,
 	colour = G.C.Planet,
 	shiny = true,
-	above_stake = "gold",
 })
 
 SMODS.Stake({
 	name = "Spectral Stake",
 	unlocked = true,
 	key = "spectral",
-	-- here it works fine though
 	applied_stakes = { "planet" },
 	pos = { x = 3, y = 1 },
 	sticker_pos = { x = 3, y = 1 }, --
@@ -420,10 +416,8 @@ SMODS.Stake({
 	end,
 	colour = HEX("000000"),
 	shiny = true,
-	above_stake = "planet",
 })
 
--- just for fun
 SMODS.Stake({
 	name = "Spectral+ Stake",
 	unlocked = true,
@@ -436,5 +430,4 @@ SMODS.Stake({
 	end,
 	colour = HEX("000000"),
 	shiny = true,
-	above_stake = "spectral",
 })
