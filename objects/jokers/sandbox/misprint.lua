@@ -4,6 +4,7 @@ SMODS.Atlas({
 	px = 71,
 	py = 95,
 })
+
 SMODS.Joker({
 	key = "misprint_sandbox",
 	atlas = "misprint_sandbox",
@@ -16,7 +17,7 @@ SMODS.Joker({
 		return { vars = { card.ability.extra.mult } }
 	end,
 	add_to_deck = function(self, card, from_debuff)
-		card.ability.extra.mult = pseudorandom("misprint_sandbox", card.ability.extra.min, card.ability.extra.max) -- TODO replace with steamodded pseudorandom
+		card.ability.extra.mult = pseudorandom("misprint_sandbox", card.ability.extra.min, card.ability.extra.max) -- TODO replace with steamodded pseudorandom or not
 	end,
 	calculate = function(self, card, context)
 		if context.joker_main then return {
@@ -27,4 +28,3 @@ SMODS.Joker({
 		return MP.LOBBY.config.ruleset == "ruleset_mp_sandbox" and MP.LOBBY.code
 	end,
 })
-
