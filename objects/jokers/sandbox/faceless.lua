@@ -1,9 +1,16 @@
+SMODS.Atlas({
+	key = "faceless_sandbox",
+	path = "j_faceless_sandbox.png",
+	px = 71,
+	py = 95,
+})
+
 SMODS.Joker({
 	key = "faceless_sandbox",
 	blueprint_compat = true,
 	rarity = 1,
 	cost = 4,
-	pos = { x = 1, y = 11 },
+	atlas = "faceless_sandbox",
 	config = { extra = { dollars = 5, faces = 3 } },
 	loc_vars = function(self, info_queue, card)
 		return { vars = { card.ability.extra.dollars, card.ability.extra.faces } }

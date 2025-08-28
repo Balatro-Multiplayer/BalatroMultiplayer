@@ -340,16 +340,6 @@ return {
 					"THE ORIGINAL FRUIT!!!",
 				},
 			},
-			j_mp_to_the_moon_sandbox = {
-				name = "To the Moon",
-				text = {
-					"DERANGED DAY TRADER WITH SEVERE MARKET VOLATILITY",
-					"ADDICTION - REFUSES STABLE RETURNS AND DEMANDS",
-					"EMOTIONAL ROLLER COASTER TRADING!!!",
-					"Interest varies wildly based on market conditions",
-					"{C:inactive}(Current market mood: {C:attention}#1#{C:inactive})",
-				},
-			},
 			j_mp_vampire_sandbox = {
 				name = "Vampire",
 				text = {

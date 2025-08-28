@@ -1,9 +1,16 @@
+SMODS.Atlas({
+	key = "baseball_sandbox",
+	path = "j_baseball_sandbox.png",
+	px = 71,
+	py = 95,
+})
+
 SMODS.Joker({
-	key = "baseball",
+	key = "baseball_sandbox",
 	blueprint_compat = true,
 	rarity = 3,
 	cost = 8,
-	pos = { x = 6, y = 14 },
+	atlas = "baseball_sandbox",
 	config = { extra = { xmult = 1.5 } },
 	loc_vars = function(self, info_queue, card)
 		return { vars = { card.ability.extra.xmult } }
@@ -21,4 +28,5 @@ SMODS.Joker({
 			}
 		end
 	end,
+	mp_credits = { idea = "Sylvie" },
 })

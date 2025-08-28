@@ -1,9 +1,15 @@
+SMODS.Atlas({
+	key = "juggler_sandbox",
+	path = "j_juggler_sandbox.png",
+	px = 71,
+	py = 95,
+})
 SMODS.Joker({
 	key = "juggler_sandbox",
 	blueprint_compat = false,
 	rarity = 1,
 	cost = 4,
-	pos = { x = 0, y = 1 },
+	atlas = "juggler_sandbox",
 	config = { extra = { h_size = 3 } },
 	loc_vars = function(self, info_queue, card)
 		return { vars = { card.ability.extra.h_size } }

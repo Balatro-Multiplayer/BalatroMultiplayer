@@ -334,6 +334,66 @@ SMODS.Tag({
 	end,
 })
 
+-- SMODS.Tag({
+-- 	key = "tobenamed tag",
+-- 	pos = { x = 5, y = 1 },
+-- 	config = { h_size = 3 },
+-- 	in_pool = function(self)
+-- 		return MP.LOBBY.config.ruleset == "ruleset_mp_sandbox" and MP.LOBBY.code
+-- 	end,
+-- 	loc_vars = function(self, info_queue, tag)
+-- 		return { vars = { tag.config.h_size } }
+-- 	end,
+-- 	apply = function(self, tag, context)
+-- 		if context.type == "round_start_bonus" then
+-- 			tag:yep("+", G.C.BLUE, function()
+-- 				return true
+-- 			end)
+-- 			G.hand:change_size(tag.config.h_size)
+-- 			G.GAME.round_resets.temp_handsize = (G.GAME.round_resets.temp_handsize or 0) + tag.config.h_size
+-- 			tag.triggered = true
+-- 			return true
+-- 		end
+-- 	end,
+-- })
+
+-- SMODS.Tag({
+-- 	key = "sandbox_skip",
+-- 	atlas = "sandbox_skip",
+-- 	object_type = "Tag",
+-- 	dependencies = {
+-- 		items = {},
+-- 	},
+-- 	in_pool = function(self)
+-- 		return MP.LOBBY.config.ruleset == "ruleset_mp_sandbox" and MP.LOBBY.code
+-- 	end,
+-- 	name = "Skip Tag",
+-- 	discovered = true,
+-- 	order = 3,
+-- 	min_ante = 1,
+-- 	no_collection = true,
+-- 	config = {
+-- 		type = "pvp_boss_mult",
+-- 		base_mult = 1.5,
+-- 		ante_mult = 0.5,
+-- 	},
+-- 	requires = "j_blueprint",
+-- 	loc_vars = function(self)
+-- 		local current_mult = self.config.base_mult + (self.config.ante_mult * (G.GAME.round_resets.ante or 1))
+-- 		return { vars = { self.config.base_mult, self.config.ante_mult, current_mult } }
+-- 	end,
+-- 	apply = function(self, tag, context)
+-- 		if context.type == "pvp_boss_mult" then
+-- 			local mult_bonus = tag.config.base_mult + (tag.config.ante_mult * (G.GAME.round_resets.ante or 1))
+-- 			tag:yep("+" .. mult_bonus .. "x", G.C.MULT, function()
+-- 				return true
+-- 			end)
+-- 			tag.triggered = true
+-- 			return mult_bonus
+-- 		end
+-- 	end,
+-- })
+
 -- Standard pack card creation for sandbox ruleset
 -- Skips glass enhancement (excluded from enhancement pool)
 -- 40% chance (0.6 threshold) for any enhancement to be applied (like vanilla)
