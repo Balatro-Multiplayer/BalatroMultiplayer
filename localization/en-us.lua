@@ -370,9 +370,9 @@ return {
 			j_mp_steel_joker_sandbox = {
 				name = "Steel Joker",
 				text = {
-					"STEEL PERFECTION OBSESSIVE",
-					"WHO DOUBLE-CHECKS EVERY",
-					"PREMIUM METAL SAMPLE!!!!",
+					"INDUSTRIAL GRADE METAL CERTIFICATION EXPERT",
+					"WHO DOUBLE-CHECKS EVERY PREMIUM",
+					"METAL SAMPLE!!!!",
 				},
 			},
 		},
