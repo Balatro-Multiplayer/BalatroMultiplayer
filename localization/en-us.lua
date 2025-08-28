@@ -365,6 +365,16 @@ return {
 					"METAL SAMPLE!!!!",
 				},
 			},
+			j_mp_satellite_sandbox = {
+				name = "Satellite",
+				text = {
+					"{C:attention} NOT IMPLEMENTED YET",
+					"ORBITAL MAINTENANCE CONTRACTOR WITH",
+					"CHRONIC SATELLITE DEGRADATION ANXIETY -",
+					"INFRASTRUCTURE SLOWLY FALLS APART",
+					"WITHOUT CONSTANT PLANETARY UPGRADES!!!!",
+				},
+			},
 		},
 		Planet = {
 			c_mp_asteroid = {

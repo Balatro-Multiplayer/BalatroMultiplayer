@@ -25,8 +25,7 @@ SMODS.Joker({
 			and not context.blueprint
 		then
 			card.ability.extra.Xmult = card.ability.extra.Xmult + card.ability.extra.Xmult_gain
-			-- TODO verify this
-			if SMODS.pseudorandom_probability(card, "j_lucky_cat_mp_sandbox", 1, 3) then
+			if SMODS.pseudorandom_probability(card, "j_lucky_cat_mp_sandbox", 1, 4) then
 				context.other_card:set_ability("m_glass", nil, true)
 			end
 			return {
@@ -47,4 +46,3 @@ SMODS.Joker({
 		return false
 	end,
 })
-

@@ -20,7 +20,6 @@ SMODS.Joker({
 		if context.before and context.main_eval and not context.blueprint then
 			local enhanced = {}
 			for _, scored_card in ipairs(context.scoring_hand) do
-				-- TODO verify!
 				if
 					next(SMODS.get_enhancements(scored_card))
 					and not scored_card.debuff
