@@ -311,6 +311,18 @@ return {
 					"FOR PREMIUM DISPOSAL EXPERIENCES!!!!",
 				},
 			},
+			j_mp_square_sandbox = {
+				name = "Square Joker",
+				text = {
+					"FOUR CARD PERFECTIONIST WHO WORSHIPS",
+					"THE SACRED GEOMETRY OF PERFECTLY",
+					"BALANCED SQUARE ARRANGEMENTS!!!!",
+					-- "{C:chips}+#1#{} Chips if played hand",
+					-- "contains exactly {C:attention}4{} cards",
+					-- "Chips increase by {C:chips}+#2#{} when triggered",
+					"{C:inactive}(Currently {C:chips}+#1#{C:inactive} Chips)",
+				},
+			},
 			j_mp_throwback_sandbox = {
 				name = "Throwback",
 				text = {

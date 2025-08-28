@@ -145,7 +145,6 @@ MP.Ruleset({
 	end,
 }):inject()
 
--- TODO 1/3 chance at 2x
 -- MP.ReworkCenter({
 -- 	key = "j_bloodstone",
 -- 	ruleset = "sandbox",
@@ -384,10 +383,13 @@ SMODS.Tag({
 SMODS.Stake({
 	name = "Planet Stake",
 	unlocked = true,
+	unlocked_stake = "gold",
+	-- it doesn't show up without
+	-- applied_stakes = "gold"
+	-- but if i have it, then the stake view crashes the game
 	key = "planet",
 	pos = { x = 1, y = 1 },
-	sticker_pos = { x = 3, y = 1 }, -- just reusing gold because cba
-	applied_stakes = { "gold" },
+	sticker_pos = { x = 3, y = 1 },
 	modifiers = function()
 		-- green to black
 		G.GAME.modifiers.no_blind_reward = G.GAME.modifiers.no_blind_reward or {}
@@ -408,10 +410,10 @@ SMODS.Stake({
 	name = "Spectral Stake",
 	unlocked = true,
 	key = "spectral",
+	-- here it works fine though
 	applied_stakes = { "planet" },
-	pos = { x = 0, y = 1 },
-	-- pos = { x = 3, y = 1 },
-	-- sticker_pos = { x = 3, y = 1 }, --
+	pos = { x = 3, y = 1 },
+	sticker_pos = { x = 3, y = 1 }, --
 	modifiers = function()
 		G.GAME.modifiers.enable_rentals_in_shop = true -- gold
 		G.GAME.modifiers.scaling = (G.GAME.modifiers.scaling or 1) + 1 -- yeehaw this actually works without doing anything else

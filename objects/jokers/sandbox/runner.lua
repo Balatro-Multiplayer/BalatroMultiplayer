@@ -1,10 +1,17 @@
+SMODS.Atlas({
+	key = "runner_sandbox",
+	path = "j_runner_sandbox.png",
+	px = 71,
+	py = 95,
+})
+
 SMODS.Joker({
 	key = "runner_sandbox",
 	blueprint_compat = true,
 	perishable_compat = false,
 	rarity = 1,
 	cost = 5,
-	pos = { x = 3, y = 10 },
+	atlas = "runner_sandbox",
 	config = { extra = { chips = 0, chip_mod = 50 } },
 	loc_vars = function(self, info_queue, card)
 		return { vars = { card.ability.extra.chips } }
