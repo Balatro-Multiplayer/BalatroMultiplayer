@@ -1,3 +1,10 @@
+SMODS.Atlas({
+	key = "cloud_9_sandbox",
+	path = "j_cloud_9_sandbox.png",
+	px = 71,
+	py = 95,
+})
+
 local function calculate_cloud_9_bonus(card)
 	local nine_tally = 0
 	if G.playing_cards ~= nil then
@@ -23,7 +30,7 @@ SMODS.Joker({
 	eternal_compat = true,
 	rarity = 2,
 	cost = 7,
-	pos = { x = 7, y = 12 },
+	atlas = "cloud_9_sandbox",
 	config = { extra = { money = 2, odds = 4 }, mp_sticker_balanced = true },
 	loc_vars = function(self, info_queue, card)
 		local numerator, denominator =
