@@ -293,7 +293,7 @@ return {
 				text = {
 					"MONOGAMOUS POKER RELATIONSHIP WITH {C:attention}#1#{} -",
 					"ONE HAND TYPE TILL DEATH DO US PART!!!!",
-					"{C:inactive}(#3#)",
+					"{C:inactive}(Loyal for {C:attention}#2#{} {C:inactive}hands)",
 				},
 			},
 			j_mp_scary_face_sandbox = {
