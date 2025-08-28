@@ -10,7 +10,7 @@ SMODS.Joker({
 	rarity = 1,
 	cost = 4,
 	atlas = "juggler_sandbox",
-	config = { extra = { h_size = 3 } },
+	config = { extra = { h_size = 3 }, mp_sticker_balanced = true },
 	loc_vars = function(self, info_queue, card)
 		return { vars = { card.ability.extra.h_size } }
 	end,

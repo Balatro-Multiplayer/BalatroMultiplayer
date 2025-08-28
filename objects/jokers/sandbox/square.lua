@@ -12,7 +12,7 @@ SMODS.Joker({
 	cost = 4,
 	atlas = "square_sandbox",
 	pixel_size = { h = 71 },
-	config = { extra = { chips = 64, chip_mod = 16 } },
+	config = { extra = { chips = 64, chip_mod = 16 }, mp_sticker_balanced = true },
 	loc_vars = function(self, info_queue, card)
 		return { vars = { card.ability.extra.chips, card.ability.extra.chip_mod } }
 	end,
