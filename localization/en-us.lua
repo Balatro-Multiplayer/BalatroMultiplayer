@@ -127,10 +127,11 @@ return {
 			j_mp_cloud_9_sandbox = {
 				name = "Cloud 9",
 				text = {
-					"Earn {C:money}$1{} for each {C:attention}9{} in deck",
-					"(max {C:money}$4{}), then {C:money}$#1#{} for each",
-					"additional {C:attention}9{} at end of round",
-					"{C:inactive}(Currently {C:money}$#2#{}{C:inactive})",
+					"NINE CULTIVATION SYNDROME - ",
+					"GROWS AN ORGANIC GARDEN",
+					"OF PROFITABLE BRICKS!!!!",
+					"{C:green}#1# in #2#{} {C:inactive}chance for scored cards",
+					"{C:inactive}to ascend to Cloud 9",
 				},
 			},
 			j_mp_lucky_cat_sandbox = {

@@ -1,3 +1,18 @@
+local function calculate_cloud_9_bonus(card)
+	local nine_tally = 0
+	if G.playing_cards ~= nil then
+		for k, v in pairs(G.playing_cards) do
+			if v:get_id() == 9 then nine_tally = nine_tally + 1 end
+		end
+	end
+
+	local base_bonus = math.min(nine_tally, 4)
+	local excess_nines = math.max(nine_tally - 4, 0)
+	local multiplied_bonus = excess_nines * card.ability.extra.money
+
+	return base_bonus + multiplied_bonus
+end
+
 SMODS.Joker({
 	key = "cloud_9_sandbox",
 	-- no_collection = true,
@@ -9,19 +24,16 @@ SMODS.Joker({
 	rarity = 2,
 	cost = 7,
 	pos = { x = 7, y = 12 },
-	config = { extra = 2, mp_sticker_balanced = true },
+	config = { extra = { money = 2, odds = 4 }, mp_sticker_balanced = true },
 	loc_vars = function(self, info_queue, card)
-		local nine_tally = 0
-		if G.playing_cards ~= nil then
-			for k, v in pairs(G.playing_cards) do
-				if v:get_id() == 9 then nine_tally = nine_tally + 1 end
-			end
-		end
+		local numerator, denominator =
+			SMODS.get_probability_vars(card, 1, card.ability.extra.odds, "j_mp_cloud_9_sandbox")
 
 		return {
 			vars = {
-				card.ability.extra,
-				(math.min(nine_tally, 4) + math.max(nine_tally - 4, 0) * card.ability.extra) or 0,
+				numerator,
+				denominator,
+				calculate_cloud_9_bonus(card),
 			},
 		}
 	end,
@@ -29,10 +41,15 @@ SMODS.Joker({
 		return MP.LOBBY.config.ruleset == "ruleset_mp_sandbox" and MP.LOBBY.code
 	end,
 	calc_dollar_bonus = function(self, card)
-		local nine_tally = 0
-		for k, v in pairs(G.playing_cards) do
-			if v:get_id() == 9 then nine_tally = nine_tally + 1 end
+		return calculate_cloud_9_bonus(card)
+	end,
+	calculate = function(self, card, context)
+		if context.individual and context.cardarea == G.play and not context.other_card.debuff then
+			if SMODS.pseudorandom_probability(card, "j_mp_cloud_9_sandbox", 1, 4) then
+				SMODS.modify_rank(context.other_card, 9 - context.other_card:get_id())
+				play_sound("card1", 1)
+				context.other_card:juice_up(0.3, 0.3)
+			end
 		end
-		return (math.min(nine_tally, 4) + math.max(nine_tally - 4, 0) * card.ability.extra) or 0
 	end,
 })
