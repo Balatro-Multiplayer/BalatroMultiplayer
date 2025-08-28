@@ -28,5 +28,5 @@ SMODS.Joker({
 			}
 		end
 	end,
-	mp_credits = { idea = "Sylvie" },
+	mp_credits = { idea = { "Sylvie" } },
 })
