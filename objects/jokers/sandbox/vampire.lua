@@ -19,6 +19,7 @@ SMODS.Joker({
 	calculate = function(self, card, context)
 		if context.before and context.main_eval and not context.blueprint then
 			local enhanced = {}
+			local stone_cards = {}
 			for _, scored_card in ipairs(context.scoring_hand) do
 				if
 					next(SMODS.get_enhancements(scored_card))
@@ -36,6 +37,8 @@ SMODS.Joker({
 							return true
 						end,
 					}))
+				elseif SMODS.has_enhancement(scored_card, "m_stone") and not scored_card.debuff then
+					stone_cards[#stone_cards + 1] = scored_card
 				end
 			end
 
@@ -44,6 +47,14 @@ SMODS.Joker({
 				return {
 					message = localize({ type = "variable", key = "a_xmult", vars = { card.ability.extra.Xmult } }),
 					colour = G.C.MULT,
+				}
+			end
+
+			if #stone_cards > 0 then
+				ease_dollars(5 * #stone_cards)
+				return {
+					message = localize("$") .. (5 * #stone_cards),
+					colour = G.C.MONEY,
 				}
 			end
 		end

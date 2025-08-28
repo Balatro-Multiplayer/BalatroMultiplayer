@@ -217,8 +217,8 @@ return {
 			j_mp_hit_the_road_sandbox = {
 				name = "Hit the Road",
 				text = {
-					"JACK DISPOSAL SERVICE OPERATOR -",
-					"JACKS LITERALLY HIT THE ROAD FOREVER!!!!",
+					"HIGHWAY JACK DISPOSAL launching {C:attention}jacks{}",
+					"INTO THE ASPHALT FOREVER!!!!",
 					"{C:inactive}(Currently {X:mult,C:white} X#2# {C:inactive} Mult)",
 				},
 			},
@@ -232,9 +232,10 @@ return {
 			j_mp_misprint_sandbox = {
 				name = "Misprint",
 				text = {
-					"LOTTERY TICKET SHOPPING ADDICT WHO REFUSES",
-					"TO CHECK THE SCRATCH-OFF UNTIL AFTER BUYING!!!!",
-					"{C:inactive}({C:mult}+#1#{C:inactive} Mult)",
+					"SCHRODINGER'S LOTTERY PLAYER -",
+					"ticket both WINS AND LOSES",
+					"until checked!!!!",
+					"{C:inactive}({C:mult}#1#{C:inactive} Mult)",
 				},
 			},
 			j_mp_castle_sandbox = {
@@ -340,21 +341,29 @@ return {
 					"THE ORIGINAL FRUIT!!!",
 				},
 			},
+			-- j_mp_vampire_sandbox = {
+			-- 	name = "Vampire",
+			-- 	text = {
+			-- 		"BLOOD ADDICTION LIFESTYLE CONSULTANT WHO GETS STRONGER",
+			-- 		"BY TURNING YOUR BEAUTIFUL CARDS INTO BORING ROCKS",
+			-- 		"BUT AT LEAST THEY'RE VAMPIRE ROCKS!!!!",
+			-- 		"{C:inactive}(Currently {X:mult,C:white} X#2# {C:inactive} Mult)",
+			-- 	},
+			-- },
 			j_mp_vampire_sandbox = {
 				name = "Vampire",
 				text = {
-					"BLOOD ADDICTION LIFESTYLE CONSULTANT WHO GETS STRONGER",
-					"BY TURNING YOUR BEAUTIFUL CARDS INTO BORING ROCKS",
-					"BUT AT LEAST THEY'RE VAMPIRE ROCKS!!!!",
+					"vampire economist CREATING",
+					"STONE-BASED CURRENCY",
+					"FROM LIFE FORCE!!!!",
 					"{C:inactive}(Currently {X:mult,C:white} X#2# {C:inactive} Mult)",
 				},
 			},
 			j_mp_baseball_sandbox = {
 				name = "Baseball Card",
 				text = {
-					"SPORTS MEMORABILIA HOARDER WHO GOT A RAISE",
-					"FROM THE TOURNAMENT DIRECTORS BECAUSE",
-					"APPARENTLY 1.5X WASN'T CUTTING IT ANYMORE!!!!",
+					"SPORTS CARD LAUNDERING OPERATION",
+					"disguised as BALANCE CHANGE!!!!",
 				},
 			},
 			j_mp_steel_joker_sandbox = {
@@ -368,7 +377,7 @@ return {
 			j_mp_satellite_sandbox = {
 				name = "Satellite",
 				text = {
-					"{C:attention} NOT IMPLEMENTED YET",
+					"{C:attention} NOT YET IMPLEMENTED",
 					"ORBITAL MAINTENANCE CONTRACTOR WITH",
 					"CHRONIC SATELLITE DEGRADATION ANXIETY -",
 					"INFRASTRUCTURE SLOWLY FALLS APART",
