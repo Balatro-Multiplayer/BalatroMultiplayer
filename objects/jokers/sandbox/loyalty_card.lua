@@ -16,11 +16,7 @@ SMODS.Joker({
 		return {
 			vars = {
 				card.ability.extra.poker_hand,
-				localize({
-					type = "variable",
-					key = (card.ability.extra.loyalty_remaining == 0 and "loyalty_active" or "loyalty_inactive"),
-					vars = { card.ability.extra.loyalty_remaining },
-				}),
+				math.abs(card.ability.extra.every - card.ability.extra.loyalty_remaining),
 			},
 		}
 	end,
@@ -56,9 +52,12 @@ SMODS.Joker({
 					juice_card_until(card, eval, true)
 				end
 			end
-			if card.ability.extra.loyalty_remaining == 0 then return {
-				xmult = card.ability.extra.Xmult,
-			} end
+			if card.ability.extra.loyalty_remaining == 0 then
+				card.ability.extra.loyalty_remaining = card.ability.extra.every
+				return {
+					xmult = card.ability.extra.Xmult,
+				}
+			end
 		end
 	end,
 	in_pool = function(self)
