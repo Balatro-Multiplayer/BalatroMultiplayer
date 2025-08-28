@@ -11,7 +11,7 @@ SMODS.Joker({
 	rarity = 1,
 	cost = 4,
 	atlas = "faceless_sandbox",
-	config = { extra = { dollars = 5, faces = 3 } },
+	config = { extra = { dollars = 5, faces = 3 }, mp_sticker_balanced = true },
 	loc_vars = function(self, info_queue, card)
 		return { vars = { card.ability.extra.dollars, card.ability.extra.faces } }
 	end,

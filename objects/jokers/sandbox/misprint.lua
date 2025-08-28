@@ -11,7 +11,7 @@ SMODS.Joker({
 	rarity = 1,
 	cost = 4,
 	ruleset = "sandbox",
-	config = { extra = { max = 46, min = -5, mult = 0 } },
+	config = { extra = { max = 46, min = -5, mult = 0 }, mp_sticker_balanced = true },
 	loc_vars = function(self, info_queue, card)
 		return { vars = { card.ability.extra.mult } }
 	end,

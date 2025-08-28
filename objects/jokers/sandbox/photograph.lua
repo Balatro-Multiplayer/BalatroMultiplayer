@@ -11,7 +11,7 @@ SMODS.Joker({
 	rarity = 1,
 	cost = 5,
 	pixel_size = { h = 95 / 1.2 },
-	config = { extra = { xmult = 5 } },
+	config = { extra = { xmult = 5 }, mp_sticker_balanced = true },
 	loc_vars = function(self, info_queue, card)
 		return { vars = { card.ability.extra.xmult } }
 	end,

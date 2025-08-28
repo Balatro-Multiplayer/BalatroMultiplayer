@@ -10,7 +10,7 @@ SMODS.Joker({
 	rarity = 2,
 	cost = 7,
 	atlas = "steel_joker_sandbox",
-	config = { extra = { repetitions = 1 } },
+	config = { extra = { repetitions = 1 }, mp_sticker_balanced = true },
 	loc_vars = function(self, info_queue, card)
 		info_queue[#info_queue + 1] = G.P_CENTERS.m_steel
 	end,
