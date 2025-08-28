@@ -359,6 +359,22 @@ return {
 					"{C:inactive}(Currently {X:mult,C:white} X#2# {C:inactive} Mult)",
 				},
 			},
+			j_mp_baseball_sandbox = {
+				name = "Baseball Card",
+				text = {
+					"SPORTS MEMORABILIA HOARDER WHO GOT A RAISE",
+					"FROM THE TOURNAMENT DIRECTORS BECAUSE",
+					"APPARENTLY 1.5X WASN'T CUTTING IT ANYMORE!!!!",
+				},
+			},
+			j_mp_steel_joker_sandbox = {
+				name = "Steel Joker",
+				text = {
+					"STEEL PERFECTION OBSESSIVE",
+					"WHO DOUBLE-CHECKS EVERY",
+					"PREMIUM METAL SAMPLE!!!!",
+				},
+			},
 		},
 		Planet = {
 			c_mp_asteroid = {

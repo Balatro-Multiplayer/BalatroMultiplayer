@@ -25,7 +25,7 @@ SMODS.Joker({
 					next(SMODS.get_enhancements(scored_card))
 					and not scored_card.debuff
 					and not scored_card.vampired
-					and not SMODS.has_enhancement(scored_card, "m_stone")
+					and not SMODS.has_enhancement(scored_card, "m_stone") -- todo like this - does it even work?
 				then
 					enhanced[#enhanced + 1] = scored_card
 					scored_card.vampired = true
