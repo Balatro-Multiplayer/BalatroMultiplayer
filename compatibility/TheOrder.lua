@@ -268,7 +268,6 @@ function get_next_voucher_key(_from_tag)
 			it = it + 1
 			center = pseudorandom_element(culled, pseudoseed("Voucher0"))
 		end
-
 		return center
 	end
 	return nextvoucherkey(_from_tag)

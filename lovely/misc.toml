@@ -148,3 +148,15 @@ for i = 1, #hand do
 	end
 end'''
 match_indent = true
+
+# i was the one who pred this line, i guess it became a problem
+[[patches]]
+[patches.pattern]
+target = "functions/misc_functions.lua"
+pattern = '''if G.SETTINGS.paused and key ~= 'to_do' then return math.random() end'''
+position = "at"
+payload = '''
+-- disabled by Multiplayer because of voucher rng calls while paused 
+-- if G.SETTINGS.paused and key ~= 'to_do' then return math.random() end
+'''
+match_indent = true
