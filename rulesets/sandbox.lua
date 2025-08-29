@@ -95,7 +95,7 @@ MP.Ruleset({
 							config = {
 								text = localize("k_yes"),
 								scale = 0.8,
-								colour = G.C.RED,
+								colour = G.C.GREEN,
 							},
 						},
 					}, { col = true, text_scale = 0.6 }),
