@@ -170,10 +170,10 @@ return {
 			j_mp_juggler_sandbox = {
 				name = "Juggler",
 				text = {
-					"HAND SIZE PERFECTIONIST WHO",
+					"hand size perfectionist WHO",
 					"MUST KEEP ALL THE BALLS",
 					"IN THE AIR AT ALL TIMES!!!!",
-					"{C:inactive}(Currently {C:attention}+#1#{C:inactive})",
+					"{C:inactive}(Currently {C:attention}+#1#{C:inactive} hand size)",
 				},
 			},
 			j_mp_mail_sandbox = {
@@ -211,34 +211,26 @@ return {
 					"{C:inactive}(Currently {C:chips}+#2#{C:inactive} chips)",
 				},
 			},
-			j_mp_business_sandbox = {
-				name = "Business Card",
-				text = {
-					"CORPORATE EXPENSE REPORTING - MUST DISCARD RECEIPT",
-					"BEFORE CLAIMING FACE CARD REIMBURSEMENT!!!!",
-				},
-			},
 			j_mp_runner_sandbox = {
 				name = "Runner",
 				text = {
-					"SEQUENTIAL CARD SUPREMACIST WHO BELIEVES ALL",
-					"OTHER POKER HANDS ARE INFERIOR!!!!",
-					"{C:inactive}(Hands played: {C:chips}+#1#{C:inactive})",
+					"SEQUENTIAL CARD SUPREMACIST",
+					"who believes ALL other",
+					"POKER HANDS are INFERIOR!!!!",
+					"{C:inactive}(Currently {C:chips}+#1#{C:inactive})",
 				},
 			},
-			j_mp_delayed_grat_sandbox = {
-				name = "Delayed Gratification",
+			j_mp_order_sandbox = {
+				name = "The Order",
 				text = {
-					"DISCARD ABSTINENCE PROGRAM MEMBER - GETS PAID",
-					"FOR PERFECT SELF-CONTROL!!!!",
+					"TODO",
 				},
 			},
 			j_mp_photograph_sandbox = {
 				name = "Photograph",
 				text = {
-					"SINGLE SHOT PHOTOGRAPHER",
-					"who gets ONE PERFECT",
-					"FRAME PER HAND!!!!",
+					"SINGLE SHOT PHOTOGRAPHER who gets",
+					"ONE PERFECT FRAME PER HAND!!!!",
 				},
 			},
 			j_mp_photograph_2_sandbox = {
@@ -253,16 +245,9 @@ return {
 				name = "Ride the Bus",
 				text = {
 					"FACE CARD SOBRIETY PROGRAM",
-					"one face card and",
-					"YOU'RE KICKED OFF THE BUS!!!!",
+					"one FACE CARD and you're",
+					"KICKED OFF THE BUS!!!!",
 					"{C:inactive}(Currently {C:mult}+#1#{C:inactive} Mult)",
-				},
-			},
-			j_mp_golden_sandbox = {
-				name = "Golden Joker",
-				text = {
-					"EXTREME FINANCIAL HOARDER - GETS RICH BY",
-					"NEVER SPENDING A PENNY!!!!",
 				},
 			},
 			j_mp_loyalty_card_sandbox = {
@@ -274,26 +259,19 @@ return {
 					"{C:inactive}(Loyal for {C:attention}#2#{} {C:inactive}hands)",
 				},
 			},
-			j_mp_scary_face_sandbox = {
-				name = "Scary Face",
-				text = {
-					"FACE CARD IDENTITY CRISIS -",
-					"SO SCARY THE FACES RUN AWAY!!!!",
-				},
-			},
 			j_mp_faceless_sandbox = {
 				name = "Faceless Joker",
 				text = {
 					"ELITE FACE CARD SOMMELIER",
 					"who curates artisanal",
-					"three-variety tasting flights",
-					"FOR PREMIUM DISPOSAL EXPERIENCES!!!!",
+					"THREE-VARIETY TASTING FLIGHTS",
+					"for PREMIUM DISPOSAL EXPERIENCES!!!!",
 				},
 			},
 			j_mp_square_sandbox = {
 				name = "Square Joker",
 				text = {
-					"FOUR CARD PERFECTIONIST",
+					"FOUR CARD PERFECTIONIST who",
 					"worships the SACRED GEOMETRY of",
 					"PERFECTLY BALANCED SQUARE ARRANGEMENTS!!!!",
 					"{C:inactive}(Currently {C:chips}+#1#{C:inactive} Chips)",
@@ -344,9 +322,9 @@ return {
 			j_mp_satellite_sandbox = {
 				name = "Satellite",
 				text = {
-					"orbital maintenance contractor WITH",
-					"CHRONIC SATELLITE DEGRADATION ANXIETY",
-					"infrastructure slowly falls apart without",
+					"ORBITAL MAINTENANCE CONTRACTOR with",
+					"chronic satellite degradation anxiety",
+					"infrastructure SLOWLY FALLS APART without",
 					"CONSTANT PLANETARY UPGRADES!!!!",
 					"{C:inactive}(Currently {C:money}$#1#{C:inactive})",
 				},
