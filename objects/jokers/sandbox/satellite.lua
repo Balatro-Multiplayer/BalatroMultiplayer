@@ -14,23 +14,28 @@ SMODS.Joker({
 	atlas = "satellite_sandbox",
 	config = { extra = { dollars = 1 } },
 	loc_vars = function(self, info_queue, card)
-		local planets_used = 0
-		for k, v in pairs(G.GAME.consumeable_usage) do
-			if v.set == "Planet" then planets_used = planets_used + 1 end
+		return { vars = { card.ability.extra.dollars } }
+	end,
+	calculate = function(self, card, context)
+		if context.using_consumeable and not context.blueprint and context.consumeable.ability.set == "Planet" then
+			card.ability.extra.dollars = card.ability.extra.dollars + 1
+			return {
+				message = localize({ type = "variable", key = "k_val_up", vars = { 1 } }),
+			}
 		end
-		return { vars = { card.ability.extra.dollars, planets_used * card.ability.extra.dollars } }
+		if context.ending_shop and not context.blueprint then
+			if card.ability.extra.dollars > 0 then
+				local decrease = math.min(card.ability.extra.dollars, 2)
+				card.ability.extra.dollars = card.ability.extra.dollars - decrease
+				play_sound("slice1", 0.96 + math.random() * 0.08)
+				play_sound("slice1", 0.86 + math.random() * 0.08)
+				return {
+					message = localize({ type = "variable", key = "k_melted_ex", vars = { decrease } }),
+				}
+			end
+		end
 	end,
 	calc_dollar_bonus = function(self, card)
-		local planets_used = 0
-		for k, v in pairs(G.GAME.consumeable_usage) do
-			if v.set == "Planet" then planets_used = planets_used + 1 end
-		end
-		return planets_used > 0 and planets_used * card.ability.extra.dollars or nil
-	end,
-	locked_loc_vars = function(self, info_queue, card)
-		return { vars = { 400 } }
-	end,
-	check_for_unlock = function(self, args) -- equivalent to `unlock_condition = { type = 'money', extra = 400 }`
-		return args.type == "money" and G.GAME.dollars >= 400 -- See note about Talisman on the wiki
+		return card.ability.extra.dollars > 0 and card.ability.extra.dollars or nil
 	end,
 })
