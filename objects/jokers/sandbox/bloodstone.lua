@@ -1,3 +1,10 @@
+SMODS.Atlas({
+	key = "bloodstone_sandbox",
+	path = "j_bloodstone_sandbox.png",
+	px = 71,
+	py = 95,
+})
+
 SMODS.Joker({
 	key = "bloodstone_sandbox",
 	no_collection = MP.sandbox_no_collection,
@@ -5,7 +12,7 @@ SMODS.Joker({
 	blueprint_compat = true,
 	rarity = 2,
 	cost = 7,
-	pos = { x = 0, y = 8 },
+	atlas = "bloodstone_sandbox",
 	config = { extra = { odds = 3, Xmult = 2 }, mp_sticker_balanced = true },
 	loc_vars = function(self, info_queue, card)
 		local numerator, denominator =

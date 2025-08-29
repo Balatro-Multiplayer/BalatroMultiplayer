@@ -8,6 +8,7 @@ MP.Ruleset({
 	banned_jokers = {},
 	banned_silent = {
 		"j_hanging_chad",
+		"j_ride_the_bus",
 		"j_baseball",
 		"j_bloodstone",
 		"j_castle",
@@ -38,6 +39,7 @@ MP.Ruleset({
 
 	reworked_jokers = {
 		"j_mp_hanging_chad",
+		"j_mp_ride_the_bus_sandbox",
 		"j_mp_baseball_sandbox",
 		"j_mp_bloodstone_sandbox",
 		"j_mp_castle_sandbox",
