@@ -12,9 +12,9 @@ SMODS.Joker({
 	rarity = 2,
 	cost = 6,
 	atlas = "constellation_sandbox",
-	config = { extra = { Xmult = 1, Xmult_mod = 0.2, Xmult_loss = 0.1 }, mp_sticker_balanced = true },
+	config = { extra = { Xmult = 1, Xmult_mod = 0.2, Xmult_loss = 0.2 }, mp_sticker_balanced = true },
 	loc_vars = function(self, info_queue, card)
-		return { vars = { card.ability.extra.Xmult_mod, card.ability.extra.Xmult } }
+		return { vars = { card.ability.extra.Xmult } }
 	end,
 	calculate = function(self, card, context)
 		-- Gain mult when planet card is used
@@ -29,10 +29,15 @@ SMODS.Joker({
 			xmult = card.ability.extra.Xmult,
 		} end
 		-- Lose mult at end of round
-		if context.end_of_round and not context.individual and not context.repetition then
+		if context.end_of_round and not context.blueprint and not context.individual and not context.repetition then
 			card.ability.extra.Xmult = math.max(1, card.ability.extra.Xmult - card.ability.extra.Xmult_loss)
 			return {
-				message = localize("k_reset"),
+				message = localize({
+					type = "variable",
+					key = "a_xmult_minus",
+					vars = { card.ability.extra.Xmult_loss },
+				}),
+				colour = G.C.RED,
 			}
 		end
 	end,

@@ -145,8 +145,9 @@ return {
 			j_mp_constellation_sandbox = {
 				name = "Constellation",
 				text = {
-					"PLANET MAINTENANCE ANXIETY DISORDER - MUST FEED THE",
-					"TAMAGOCHI OR IT WITHERS AWAY!!!!",
+					"PLANET MAINTENANCE ANXIETY DISORDER",
+					"must feed the tamagochi",
+					"OR IT WITHERS AWAY!!!!",
 					"{C:inactive}(Currently {X:mult,C:white} X#1# {C:inactive} Mult)",
 				},
 			},
@@ -339,11 +340,11 @@ return {
 			j_mp_satellite_sandbox = {
 				name = "Satellite",
 				text = {
-					"{C:attention} NOT YET IMPLEMENTED",
-					"ORBITAL MAINTENANCE CONTRACTOR WITH",
-					"CHRONIC SATELLITE DEGRADATION ANXIETY -",
-					"INFRASTRUCTURE SLOWLY FALLS APART",
-					"WITHOUT CONSTANT PLANETARY UPGRADES!!!!",
+					"orbital maintenance contractor WITH",
+					"CHRONIC SATELLITE DEGRADATION ANXIETY",
+					"infrastructure slowly falls apart without",
+					"CONSTANT PLANETARY UPGRADES!!!!",
+					"{C:inactive}(Currently {C:money}$#1#{C:inactive})",
 				},
 			},
 		},
