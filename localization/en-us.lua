@@ -130,7 +130,7 @@ return {
 					"NUMERAL MONOCULTURE FARMER",
 					"converting your DIVERSE DECK into",
 					"PROFITABLE NINE PLANTATION!!!!",
-					"{C:inactive}({C:green}#1# in #2#{} {C:inactive}chance)",
+					"{C:inactive}({C:green}#1# in #2#{} {C:inactive}chance, currently {C:money}$#3#{}{C:inactive})",
 				},
 			},
 			j_mp_lucky_cat_sandbox = {
@@ -154,8 +154,10 @@ return {
 			j_mp_bloodstone_sandbox = {
 				name = "Bloodstone",
 				text = {
-					"HEART-OPERATED SLOT MACHINE",
-					"with EMOTIONAL VOLATILITY!!!!",
+					"PATCH NOTE REGRESSION SYNDROME",
+					"reverting to LAUNCH DAY TRAUMA",
+					"for NOSTALGIC POWER SPIKES!!!!",
+					"{C:inactive}({C:green}#1# in #2#{} {C:inactive}chance)",
 				},
 			},
 			-- j_mp_egg_sandbox = {
@@ -171,7 +173,7 @@ return {
 					"HAND SIZE PERFECTIONIST WHO",
 					"MUST KEEP ALL THE BALLS",
 					"IN THE AIR AT ALL TIMES!!!!",
-					"{C:inactive}(Currently at {C:attention}+#1#{C:inactive})",
+					"{C:inactive}(Currently {C:attention}+#1#{C:inactive})",
 				},
 			},
 			j_mp_mail_sandbox = {
@@ -194,7 +196,7 @@ return {
 			j_mp_misprint_sandbox = {
 				name = "Misprint",
 				text = {
-					"SCHRODINGER'S LOTTERY PLAYER -",
+					"SCHRODINGER'S LOTTERY PLAYER",
 					"ticket both WINS AND LOSES",
 					"until checked!!!!",
 					"{C:inactive}({C:mult}#1#{C:inactive} Mult)",
@@ -204,9 +206,9 @@ return {
 				name = "Castle",
 				text = {
 					"DISCARD-BASED SUIT MARRIAGE",
-					"throws away ONLY {V:1}#1#{} forever because",
-					"THAT'S THEIR LOVE LANGUAGE!!!!",
-					"{C:inactive}Currently {C:chips}+#2#{C:inactive} chips",
+					"throws away ONLY {V:1}#1#{} forever",
+					"because THAT'S THEIR LOVE LANGUAGE!!!!",
+					"{C:inactive}(Currently {C:chips}+#2#{C:inactive} chips)",
 				},
 			},
 			j_mp_business_sandbox = {
@@ -234,14 +236,15 @@ return {
 			j_mp_photograph_sandbox = {
 				name = "Photograph",
 				text = {
-					"SINGLE SHOT PHOTOGRAPHER WHO GETS ONE",
-					"PERFECT FRAME PER HAND!!!!",
+					"SINGLE SHOT PHOTOGRAPHER",
+					"who gets ONE PERFECT",
+					"FRAME PER HAND!!!!",
 				},
 			},
 			j_mp_photograph_2_sandbox = {
 				name = "Photograph",
 				text = {
-					"{C:attention}SINGLE EXPOSURE EXTREMIST",
+					"SINGLE EXPOSURE EXTREMIST",
 					"you get ONE CHANCE",
 					"at PERFECTION!!!!",
 				},
@@ -264,8 +267,8 @@ return {
 				name = "Loyalty Card",
 				text = {
 					"HAND TYPE LOYALTY PROGRAM",
-					"betray {C:attention}#1#{} and counter",
-					"RESETS!!!!",
+					"betray {C:attention}#1#{}",
+					"and counter RESETS!!!!",
 					"{C:inactive}(Loyal for {C:attention}#2#{} {C:inactive}hands)",
 				},
 			},
@@ -288,20 +291,19 @@ return {
 			j_mp_square_sandbox = {
 				name = "Square Joker",
 				text = {
-					"FOUR CARD PERFECTIONIST WHO WORSHIPS",
-					"THE SACRED GEOMETRY OF PERFECTLY",
-					"BALANCED SQUARE ARRANGEMENTS!!!!",
+					"FOUR CARD PERFECTIONIST",
+					"worships the SACRED GEOMETRY of",
+					"PERFECTLY BALANCED SQUARE ARRANGEMENTS!!!!",
 					"{C:inactive}(Currently {C:chips}+#1#{C:inactive} Chips)",
 				},
 			},
 			j_mp_throwback_sandbox = {
 				name = "Throwback",
 				text = {
-					"professional coward consulting services",
-					'"I GET PAID TO RUN AWAY FROM THINGS',
-					"AND THE MORE I RUN",
-					'THE STRONGER I GET"!!!!',
-					"{C:inactive}(Currently {X:mult,C:white} X#2# {C:inactive} Mult)",
+					"PROFESSIONAL COWARD CONSULTING SERVICES",
+					"i get paid to run away from things",
+					"AND THE MORE I RUN THE STRONGER I GET!!!!",
+					"{C:inactive}(Currently {X:mult,C:white} X#1# {C:inactive} Mult)",
 				},
 			},
 			-- j_mp_vampire_sandbox = {

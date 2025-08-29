@@ -20,6 +20,7 @@ SMODS.Joker({
 		if context.using_consumeable and not context.blueprint and context.consumeable.ability.set == "Planet" then
 			card.ability.extra.dollars = card.ability.extra.dollars + 1
 			return {
+				-- todo fix
 				message = localize({ type = "variable", key = "k_val_up", vars = { 1 } }),
 			}
 		end
@@ -29,6 +30,7 @@ SMODS.Joker({
 				card.ability.extra.dollars = card.ability.extra.dollars - decrease
 				play_sound("slice1", 0.96 + math.random() * 0.08)
 				play_sound("slice1", 0.86 + math.random() * 0.08)
+				-- todo fix
 				return {
 					message = localize({ type = "variable", key = "k_melted_ex", vars = { decrease } }),
 				}
