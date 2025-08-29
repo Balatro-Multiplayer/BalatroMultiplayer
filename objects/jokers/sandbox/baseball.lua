@@ -30,4 +30,7 @@ SMODS.Joker({
 		end
 	end,
 	mp_credits = { idea = { "Sylvie" } },
+	in_pool = function(self)
+		return MP.LOBBY.config.ruleset == "ruleset_mp_sandbox" and MP.LOBBY.code
+	end,
 })

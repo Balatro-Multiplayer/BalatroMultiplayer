@@ -232,8 +232,7 @@ MP.load_mp_dir("objects/stickers")
 MP.load_mp_dir("objects/blinds")
 MP.load_mp_dir("objects/decks")
 MP.load_mp_dir("objects/jokers")
--- TODO remove this before launch!!!
-MP.sandbox_no_collection = false
+
 MP.load_mp_dir("objects/jokers/sandbox")
 MP.load_mp_dir("objects/consumables")
 MP.load_mp_dir("objects/boosters")

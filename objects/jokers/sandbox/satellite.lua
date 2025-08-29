@@ -41,4 +41,7 @@ SMODS.Joker({
 	calc_dollar_bonus = function(self, card)
 		return card.ability.extra.dollars > 0 and card.ability.extra.dollars or nil
 	end,
+	in_pool = function(self)
+		return MP.LOBBY.config.ruleset == "ruleset_mp_sandbox" and MP.LOBBY.code
+	end,
 })

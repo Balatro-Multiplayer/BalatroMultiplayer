@@ -326,3 +326,7 @@ SMODS.Stake({
 	colour = HEX("000000"),
 	shiny = true,
 })
+
+-- TODO fix this before launch!!!
+MP.sandbox_no_collection = false
+MP.sandbox_enabled_in_sp = true
