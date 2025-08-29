@@ -2,7 +2,6 @@ MP.SANDBOX = {}
 
 MP.Ruleset({
 	key = "sandbox",
-	standard = true,
 	multiplayer_content = true,
 	-- todo should be able to be omitted
 	banned_jokers = {},
@@ -39,6 +38,7 @@ MP.Ruleset({
 	banned_blinds = {},
 
 	reworked_jokers = {
+		"j_mp_magnet",
 		"j_mp_hanging_chad",
 		"j_mp_ride_the_bus_sandbox",
 		"j_mp_baseball_sandbox",
