@@ -6,18 +6,23 @@ SMODS.Atlas({
 })
 
 SMODS.Joker({
-	key = "order",
+	key = "order_sandbox",
 	unlocked = false,
 	blueprint_compat = true,
 	rarity = 3,
 	cost = 8,
 	atlas = "order_sandbox",
-	config = { extra = { Xmult = 3, type = "Straight" }, mp_sticker_balanced = true },
+	config = { extra = { Xmult = 5, type = "Straight" }, mp_sticker_balanced = true },
 	loc_vars = function(self, info_queue, card)
 		return { vars = { card.ability.extra.Xmult, localize(card.ability.extra.type, "poker_hands") } }
 	end,
 	calculate = function(self, card, context)
 		if context.joker_main and next(context.poker_hands[card.ability.extra.type]) then
+			-- Check if any of the cards in the hand are face cards
+			for i = 1, #context.scoring_hand do
+				local scoring_card = context.scoring_hand[i]
+				if scoring_card:is_face() then return end
+			end
 			return {
 				xmult = card.ability.extra.Xmult,
 			}
