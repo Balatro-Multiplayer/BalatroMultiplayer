@@ -127,29 +127,19 @@ return {
 			j_mp_cloud_9_sandbox = {
 				name = "Cloud 9",
 				text = {
-					"NINE CULTIVATION SYNDROME - ",
-					"GROWS AN ORGANIC GARDEN",
-					"OF PROFITABLE BRICKS!!!!",
-					"{C:green}#1# in #2#{} {C:inactive}chance for scored cards",
-					"{C:inactive}to ascend to Cloud 9",
+					"NUMERAL MONOCULTURE FARMER",
+					"converting your DIVERSE DECK into",
+					"PROFITABLE NINE PLANTATION!!!!",
+					"{C:inactive}({C:green}#1# in #2#{} {C:inactive}chance)",
 				},
 			},
 			j_mp_lucky_cat_sandbox = {
 				name = "Lucky Cat",
 				text = {
-					"YOUR ENTIRE DECK BECOMES A BEAUTIFUL",
-					"CRYSTAL MATH LAB WHERE EVERYTHING GETS",
-					"MORE POWERFUL AND MORE LIKELY TO EXPLODE!!!!",
+					"FORTUNE-TO-FRAGILITY PIPELINE OPERATOR",
+					"lucky cats become GLASS CATS",
+					"with EXPONENTIAL POWER!!!!",
 					"{C:inactive}(Currently {X:mult,C:white} X#2# {C:inactive} Mult)",
-				},
-			},
-			j_mp_stencil_sandbox = {
-				name = "Joker Stencil",
-				text = {
-					"MINIMALIST LIFESTYLE GURU",
-					"WHO ACHIEVES ENLIGHTENMENT",
-					"THROUGH REFUSING TO BUY ANYTHING!!!!",
-					"{C:inactive}(Currently {X:mult,C:white} X#1# {C:inactive})",
 				},
 			},
 			j_mp_constellation_sandbox = {
@@ -163,40 +153,17 @@ return {
 			j_mp_bloodstone_sandbox = {
 				name = "Bloodstone",
 				text = {
-					"HEART SUIT GAMBLING ADDICT WHO TURNED POKER",
-					"INTO ACTUAL SLOT MACHINE!!!!",
+					"HEART-OPERATED SLOT MACHINE",
+					"with EMOTIONAL VOLATILITY!!!!",
 				},
 			},
-			j_mp_reserved_parking_sandbox = {
-				name = "Reserved Parking",
-				text = {
-					"FACE CARD ELITIST WHO KICKS ALL THE PEASANT",
-					"NUMBERS OUT OF THEIR HAND!!!!",
-				},
-			},
-			j_mp_egg_sandbox = {
-				name = "Egg",
-				text = {
-					"SELL VALUE HOSTAGE TAKER -",
-					'"NOBODY LEAVES UNTIL THE EGG SAYS SO!"!!!!',
-				},
-			},
-			j_mp_chaos_sandbox = {
-				name = "Chaos the Clown",
-				text = {
-					"DECK ENTROPY ACCELERATIONIST",
-					"WHO ACHIEVES INFINITE REROLLS",
-					"THROUGH PURE DESTRUCTION!!!!",
-				},
-			},
-			j_mp_turtle_bean_sandbox = {
-				name = "Turtle Bean",
-				text = {
-					"COUNTDOWN TO EXPLOSION LIFESTYLE -",
-					"SLOW AND STEADY UNTIL",
-					"MASSIVE PAYOFF DETONATION!!!!",
-				},
-			},
+			-- j_mp_egg_sandbox = {
+			-- 	name = "Egg",
+			-- 	text = {
+			-- 		"SELL VALUE HOSTAGE TAKER -",
+			-- 		'"NOBODY LEAVES UNTIL THE EGG SAYS SO!"!!!!',
+			-- 	},
+			-- },
 			j_mp_juggler_sandbox = {
 				name = "Juggler",
 				text = {
@@ -209,24 +176,18 @@ return {
 			j_mp_mail_sandbox = {
 				name = "Mail-in Rebate",
 				text = {
-					"OBSESSIVE SINGLE-RANK DISPOSAL SERVICE -",
-					'"THE REBATE REQUIRES #2#, KAREN"!!!!',
-					"{C:inactive}(#2# discarded: #1#)",
+					"RANK-LOCKED REBATE FORM",
+					"someone wrote {C:attention}#2#{} in",
+					"PERMANENT INK!!!!",
 				},
 			},
 			j_mp_hit_the_road_sandbox = {
 				name = "Hit the Road",
 				text = {
-					"HIGHWAY JACK DISPOSAL launching {C:attention}jacks{}",
+					"HIGHWAY JACK DISPOSAL",
+					"launching {C:attention}Jacks{}",
 					"INTO THE ASPHALT FOREVER!!!!",
 					"{C:inactive}(Currently {X:mult,C:white} X#2# {C:inactive} Mult)",
-				},
-			},
-			j_mp_red_card_sandbox = {
-				name = "Red Card",
-				text = {
-					"NOW A PACK SKIPPING REWARDS PROGRAM MEMBER -",
-					"GETS PAID TO SAY NO!!!!",
 				},
 			},
 			j_mp_misprint_sandbox = {
@@ -241,9 +202,10 @@ return {
 			j_mp_castle_sandbox = {
 				name = "Castle",
 				text = {
-					"SUIT MONOGAMIST WHO PICKS ONE",
-					"SUIT AND COMMITS FOR LIFE!!!!",
-					"{C:inactive}Married to {V:1}#1#{}, {C:inactive}currently {C:chips}+#2#{C:inactive} chips",
+					"DISCARD-BASED SUIT MARRIAGE",
+					"throws away ONLY {V:1}#1#{} forever because",
+					"THAT'S THEIR LOVE LANGUAGE!!!!",
+					"{C:inactive}Currently {C:chips}+#2#{C:inactive} chips",
 				},
 			},
 			j_mp_business_sandbox = {
@@ -275,6 +237,14 @@ return {
 					"PERFECT FRAME PER HAND!!!!",
 				},
 			},
+			j_mp_photograph_2_sandbox = {
+				name = "Photograph",
+				text = {
+					"{C:attention}SINGLE EXPOSURE EXTREMIST",
+					"you get ONE CHANCE",
+					"at PERFECTION!!!!",
+				},
+			},
 			j_mp_ride_the_bus_sandbox = {
 				name = "Ride the Bus",
 				text = {
@@ -292,8 +262,9 @@ return {
 			j_mp_loyalty_card_sandbox = {
 				name = "Loyalty Card",
 				text = {
-					"MONOGAMOUS POKER RELATIONSHIP WITH {C:attention}#1#{} -",
-					"ONE HAND TYPE TILL DEATH DO US PART!!!!",
+					"HAND TYPE LOYALTY PROGRAM",
+					"betray {C:attention}#1#{} and counter",
+					"RESETS!!!!",
 					"{C:inactive}(Loyal for {C:attention}#2#{} {C:inactive}hands)",
 				},
 			},
@@ -308,8 +279,8 @@ return {
 				name = "Faceless Joker",
 				text = {
 					"ELITE FACE CARD SOMMELIER",
-					"WHO CURATES ARTISANAL",
-					"THREE-VARIETY TASTING FLIGHTS",
+					"who curates artisanal",
+					"three-variety tasting flights",
 					"FOR PREMIUM DISPOSAL EXPERIENCES!!!!",
 				},
 			},
@@ -319,26 +290,17 @@ return {
 					"FOUR CARD PERFECTIONIST WHO WORSHIPS",
 					"THE SACRED GEOMETRY OF PERFECTLY",
 					"BALANCED SQUARE ARRANGEMENTS!!!!",
-					-- "{C:chips}+#1#{} Chips if played hand",
-					-- "contains exactly {C:attention}4{} cards",
-					-- "Chips increase by {C:chips}+#2#{} when triggered",
 					"{C:inactive}(Currently {C:chips}+#1#{C:inactive} Chips)",
 				},
 			},
 			j_mp_throwback_sandbox = {
 				name = "Throwback",
 				text = {
-					"PROFESSIONAL COWARD CONSULTING SERVICES -",
-					'"I GET PAID TO RUN AWAY FROM THINGS AND THE MORE',
-					"I RUN THE STRONGER I GET!!!!",
-				},
-			},
-			j_mp_gros_michel_sandbox = {
-				name = "Gros Michel",
-				text = {
-					"EXTINCT BANANA VARIETY HISTORICAL REENACTOR",
-					"WHO MIGHT SPONTANEOUSLY DISAPPEAR LIKE",
-					"THE ORIGINAL FRUIT!!!",
+					"professional coward consulting services",
+					'"I GET PAID TO RUN AWAY FROM THINGS',
+					"AND THE MORE I RUN",
+					'THE STRONGER I GET"!!!!',
+					"{C:inactive}(Currently {X:mult,C:white} X#2# {C:inactive} Mult)",
 				},
 			},
 			-- j_mp_vampire_sandbox = {
@@ -369,9 +331,9 @@ return {
 			j_mp_steel_joker_sandbox = {
 				name = "Steel Joker",
 				text = {
-					"INDUSTRIAL GRADE METAL CERTIFICATION EXPERT",
-					"WHO DOUBLE-CHECKS EVERY PREMIUM",
-					"METAL SAMPLE!!!!",
+					"STEEL REDUNDANCY SPECIALIST",
+					"every metal card gets",
+					"DOUBLE-CHECKED!!!!",
 				},
 			},
 			j_mp_satellite_sandbox = {

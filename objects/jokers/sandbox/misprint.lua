@@ -12,11 +12,12 @@ SMODS.Joker({
 	rarity = 1,
 	cost = 4,
 	ruleset = "sandbox",
-	config = { extra = { max = 46, min = -5, mult = "???" }, mp_sticker_balanced = true },
+	config = { extra = { max = 46, min = -23, mult = "???" }, mp_sticker_balanced = true },
 	loc_vars = function(self, info_queue, card)
 		return { vars = { card.ability.extra.mult } }
 	end,
 	add_to_deck = function(self, card, from_debuff)
+		-- todo let oops all 6s secretly adjust this
 		card.ability.extra.mult = pseudorandom("misprint_sandbox", card.ability.extra.min, card.ability.extra.max) -- TODO replace with steamodded pseudorandom or not
 	end,
 	calculate = function(self, card, context)
