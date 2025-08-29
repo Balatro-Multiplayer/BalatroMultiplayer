@@ -7,6 +7,7 @@ SMODS.Atlas({
 
 SMODS.Joker({
 	key = "constellation_sandbox",
+	no_collection = MP.sandbox_no_collection,
 	blueprint_compat = true,
 	perishable_compat = false,
 	rarity = 2,

@@ -7,6 +7,7 @@ SMODS.Atlas({
 
 SMODS.Joker({
 	key = "hit_the_road_sandbox",
+	no_collection = MP.sandbox_no_collection,
 	unlocked = true,
 	blueprint_compat = true,
 	rarity = 3,

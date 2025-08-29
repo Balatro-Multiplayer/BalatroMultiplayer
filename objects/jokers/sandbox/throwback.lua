@@ -39,6 +39,7 @@ SMODS.Atlas({
 
 SMODS.Joker({
 	key = "throwback_sandbox",
+	no_collection = MP.sandbox_no_collection,
 	unlocked = false,
 	blueprint_compat = true,
 	rarity = 2,

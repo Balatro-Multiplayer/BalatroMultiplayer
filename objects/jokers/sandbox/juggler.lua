@@ -6,6 +6,7 @@ SMODS.Atlas({
 })
 SMODS.Joker({
 	key = "juggler_sandbox",
+	no_collection = MP.sandbox_no_collection,
 	blueprint_compat = false,
 	rarity = 1,
 	cost = 4,

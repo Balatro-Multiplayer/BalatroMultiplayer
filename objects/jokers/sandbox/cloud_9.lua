@@ -22,7 +22,7 @@ end
 
 SMODS.Joker({
 	key = "cloud_9_sandbox",
-	-- no_collection = true,
+	no_collection = MP.sandbox_no_collection,
 	unlocked = true,
 	discovered = true,
 	blueprint_compat = false,
