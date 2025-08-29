@@ -205,14 +205,13 @@ return {
 					"{C:attention}2{} copies of {C:tarot,T:c_hanged_man}The Hanged Man",
 				},
 			},
-			b_mp_sibyl = {
-				name = "Sibyl Deck",
+			b_mp_oracle = {
+				name = "Oracle Deck",
 				text = {
-					"{C:planet}Planets{}, {C:attention}playing cards{}, and",
-					"{C:spectral}Spectral Packs{} will not appear",
 					"Start run with {C:spectral,T:c_medium}Medium",
-					"The only {C:spectral}Spectral{} card",
-					"is {C:spectral,T:c_medium}Medium",
+					"and {C:attention,T:v_clearance_sale}Clearance Sale",
+					"Balance is capped",
+					"at {C:money}$50",
 				},
 			},
 			b_mp_violet = {

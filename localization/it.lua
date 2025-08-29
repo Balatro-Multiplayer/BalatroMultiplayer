@@ -79,7 +79,8 @@ return {
 				text = {
 					"Quando la tua {X:purple,C:white}Nemesi{} vende",
 					"una carta, guadagna {C:mult}+#1#{} Molt.",
-					"Si aggiorna quando viene","selezionato il {C:attention}Buio PvP",
+					"Si aggiorna quando viene",
+					"selezionato il {C:attention}Buio PvP",
 					"{C:inactive}(Attualmente {C:mult}+#2#{C:inactive} Molt)",
 				},
 			},
@@ -124,7 +125,7 @@ return {
 					"tuo {C:attention}mazzo completo {C:inactive}(massimo {C:money}$4{}{C:inactive})",
 					"poi {C:money}$#1#{} per ogni {C:attention}9",
 					"in più alla fine del round",
-					"{C:inactive}(Attualmente {C:money}$#2#{C:inactive})",	--linea in più
+					"{C:inactive}(Attualmente {C:money}$#2#{C:inactive})", --linea in più
 				},
 			},
 			j_mp_bloodstone = {
@@ -290,7 +291,7 @@ return {
 			b_opts_normal_bosses = "Attiva l'effetto del buio Boss nei round PvP",
 			b_opts_timer = "Abilita Timer",
 			b_opts_disable_preview = "Disabilita l'anteprima del punteggio",
-			b_opts_the_order = "Abilita il Jolly \"L'ordine\"",
+			b_opts_the_order = 'Abilita il Jolly "L\'ordine"',
 			b_reset = "Reset",
 			b_set_custom_seed = "Imposta seed specifico",
 			b_mp_kofi_button = "supporta il creatore su Ko-fi",
@@ -300,7 +301,7 @@ return {
 			b_players = "Giocatori",
 			b_lobby_info = "Info Lobby",
 			b_continue_singleplayer = "Continua in Giocatore singolo",
-			b_the_order_integration = "Abilita il Jolly \"L'ordine\"",
+			b_the_order_integration = 'Abilita il Jolly "L\'ordine"',
 			b_preview_integration = "Abilita l'anteprima del punteggio",
 			b_view_nemesis_deck = "Guarda mazzo",
 			b_toggle_jokers = "Mostra Jolly Nemesi",
@@ -343,7 +344,7 @@ return {
 			k_set_name = "Imposta il tuo nome utente nel menu principale! (Mods > Multiplayer > Configurazione)",
 			k_mod_hash_warning = "I giocatori hanno mod diverse o versioni di mod diverse! Questo può causare errori!",
 			k_steamodded_warning = "I giocatori hanno diverse versioni di Steamodded installate. Questo può causare ai semi di cambiare.",
-			k_warning_unlock_profile = "ATTENZIONE! Stai giocando con un profilo non totalmente sbloccato!\nSe questa partita è classificata/torneo, per favore crea un nuovo profilo e premi \"Sblocca tutto\" nelle impostazioni del profilo",
+			k_warning_unlock_profile = 'ATTENZIONE! Stai giocando con un profilo non totalmente sbloccato!\nSe questa partita è classificata/torneo, per favore crea un nuovo profilo e premi "Sblocca tutto" nelle impostazioni del profilo',
 			k_warning_nemesis_unlock = "ATTENZIONE! Il tuo avversario sta giocando con un profilo non totalmente sbloccato!\nPer favore se questa partita è classificata/torneo AVVISALO ADESSO!",
 			k_warning_no_order = "Un giocatore ha l'opzione (Abilita il Jolly \"L'ordine\") abilitata, mentre l'altro no. Questo renderà i vostri seed diversi.",
 			k_warning_cheating1 = "È probabile che il tuo avversario stia barando.",
@@ -382,9 +383,9 @@ return {
 			k_vanilla = "Vanilla",
 			k_vanilla_description = "Le regole vanilla rimuovono tutto il contenuto Multigiocatore,\npermettendoti di giocare il gioco com'era originariamente pensato.\n\nQueste regole includono alcune modifiche Multigiocatore\ncome il timer che può essere disabilitato nelle opzioni della Lobby",
 			k_blitz = "Blitz",
-			k_blitz_description = "Le regole Blitz includono carte e caratteristiche che incitano ad \nusare il tempo come una risorsa.\n\nAlcune carte sono bilanciate per adattarle al Multigiocatore:\n- \"Scheda non valida\" è modificata\n- \"Giustizia\" è rimossa\n- Le \"Carte di vetro\" sono modificate\n\n(Guarda la scheda dei ban e delle aggiunte/modifiche per più info)",
+			k_blitz_description = 'Le regole Blitz includono carte e caratteristiche che incitano ad \nusare il tempo come una risorsa.\n\nAlcune carte sono bilanciate per adattarle al Multigiocatore:\n- "Scheda non valida" è modificata\n- "Giustizia" è rimossa\n- Le "Carte di vetro" sono modificate\n\n(Guarda la scheda dei ban e delle aggiunte/modifiche per più info)',
 			k_traditional = "Tradizionale",
-			k_traditional_description = "Le regole tradizionali rimuovono le carte del Multigiocatore\nche trattano il tempo come una risorsa,\npermettendoti un gioco ancora più metodico.\n\nAlcune carte sono bilanciate per adattarle al Multigiocatore:\n- \"Scheda non valida\" è modificata\n- \"Giustizia\" è rimossa\n- Le \"Carte di vetro\" sono modificate\n\n(Guarda la scheda dei ban e delle aggiunte/modifiche per più info)",
+			k_traditional_description = 'Le regole tradizionali rimuovono le carte del Multigiocatore\nche trattano il tempo come una risorsa,\npermettendoti un gioco ancora più metodico.\n\nAlcune carte sono bilanciate per adattarle al Multigiocatore:\n- "Scheda non valida" è modificata\n- "Giustizia" è rimossa\n- Le "Carte di vetro" sono modificate\n\n(Guarda la scheda dei ban e delle aggiunte/modifiche per più info)',
 			k_majorleague = "Lega Maggiore",
 			k_majorleague_description = "Queste sono le regole ufficiali per la Lega Maggiore di\nBalatro Multigiocatore.\n\nQueste regole sono identiche a quelle Vanilla con alcune eccezioni:\n- L'opzione (Abilita il Jolly \"L'ordine\") è disabilitata\n- Il timer è impostato su 180 secondi\n- La prima volta che il timer arriva a 0 non perderai una vita",
 			k_minorleague = "Lega Minore",
@@ -424,8 +425,8 @@ return {
 			k_sync_locally = "Sincronizza localmente (riavvia il gioco)",
 			k_bans = "Ban",
 			k_reworks = "Aggiunte/Modifiche",
-			k_ruleset_disabled_the_order_required = "\"L'ordine\" è necessario",
-			k_ruleset_disabled_the_order_banned = "\"L'ordine\" è bandito",
+			k_ruleset_disabled_the_order_required = '"L\'ordine" è necessario',
+			k_ruleset_disabled_the_order_banned = '"L\'ordine" è bandito',
 			k_ruleset_not_found = "Regole sconosciute",
 			k_tutorial_not_complete = "Devi completare il tutorial prima di poter giocare il Multigiocatore",
 			k_created_by = "Creato da",
@@ -457,9 +458,9 @@ return {
 			k_ruleset_disabled_smods_version = "Versione SMODS #1# necessaria",
 			k_failed_to_join_lobby = "Errore nel connettersi alla lobby: #1#",
 			k_ante_number = "Ante #1#",
-			k_ante_range = "Ante #1#-#2#",	--Per esempio, "Ante 1-2"
-			k_ante_min = "Ante #1#+",	--Per esempio, "Ante 2+"
-			k_credits_list = "#1# e altri ancora!",	--#1# viene rimpiazzato con una lista di nomi
+			k_ante_range = "Ante #1#-#2#", --Per esempio, "Ante 1-2"
+			k_ante_min = "Ante #1#+", --Per esempio, "Ante 2+"
+			k_credits_list = "#1# e altri ancora!", --#1# viene rimpiazzato con una lista di nomi
 		},
 		v_text = {
 			ch_c_hanging_chad_rework = { "{C:attention}Scheda non valida{} è {C:dark_edition}modificata" },

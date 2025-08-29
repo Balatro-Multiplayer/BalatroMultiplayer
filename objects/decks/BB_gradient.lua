@@ -114,11 +114,7 @@ end
 local calculate_joker_ref = Card.calculate_joker
 function Card:calculate_joker(context)
 	if not context.blueprint then -- very important because bloopy recursively calls this
-		if
-			G.GAME.modifiers.mp_gradient
-			and (context.other_card or passkey(self))
-			and not blacklist(self)
-		then
+		if G.GAME.modifiers.mp_gradient and (context.other_card or passkey(self)) and not blacklist(self) then
 			for i = 1, 3 do
 				G.MP_GRADIENT = -i + 2
 				for i, card in ipairs(G.playing_cards) do -- it's actually insane that this doesn't blow up the game??? this is being run thousands of times wastefully

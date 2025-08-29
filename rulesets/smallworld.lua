@@ -131,9 +131,7 @@ function MP.ApplyBans()
 				pseudoshuffle(v, pseudoseed(k .. "_mp_smallworld"))
 				local threshold = math.floor(0.5 + (#v * 0.75))
 				local ii = 1
-				if k == "Voucher" and not MP.legacy_smallworld() then
-					ii = ii + 1
-				end
+				if k == "Voucher" and not MP.legacy_smallworld() then ii = ii + 1 end
 				for i, vv in ipairs(v) do
 					if ii <= threshold then
 						G.GAME.banned_keys[vv] = true
