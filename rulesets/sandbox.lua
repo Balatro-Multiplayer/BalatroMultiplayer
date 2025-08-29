@@ -21,6 +21,7 @@ MP.Ruleset({
 		"j_lucky_cat",
 		"j_mail",
 		"j_misprint",
+		"j_order",
 		"j_photograph",
 		"j_runner",
 		"j_satellite",
@@ -52,6 +53,7 @@ MP.Ruleset({
 		"j_mp_lucky_cat_sandbox",
 		"j_mp_mail_sandbox",
 		"j_mp_misprint_sandbox",
+		"j_mp_order_sandbox",
 		"j_mp_photograph_sandbox",
 		"j_mp_runner_sandbox",
 		"j_mp_satellite_sandbox",
@@ -302,7 +304,7 @@ SMODS.Stake({
 	key = "spectral",
 	applied_stakes = { "planet" },
 	pos = { x = 3, y = 1 },
-	sticker_pos = { x = 3, y = 1 }, --
+	sticker_pos = { x = 3, y = 1 },
 	modifiers = function()
 		G.GAME.modifiers.enable_rentals_in_shop = true -- gold
 		G.GAME.modifiers.scaling = (G.GAME.modifiers.scaling or 1) + 1 -- yeehaw
@@ -317,7 +319,7 @@ SMODS.Stake({
 	key = "spectralplus",
 	applied_stakes = { "spectral" },
 	pos = { x = 4, y = 1 },
-	-- sticker_pos = { x = 3, y = 1 },
+	sticker_pos = { x = 3, y = 1 },
 	modifiers = function()
 		G.GAME.modifiers.scaling = (G.GAME.modifiers.scaling or 1) + 1 -- let's try a hardcore mode
 	end,
