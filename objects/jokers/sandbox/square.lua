@@ -4,6 +4,7 @@ SMODS.Atlas({
 	px = 71,
 	py = 95,
 })
+
 SMODS.Joker({
 	key = "square_sandbox",
 	no_collection = MP.sandbox_no_collection,

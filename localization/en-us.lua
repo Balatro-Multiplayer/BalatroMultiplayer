@@ -252,8 +252,10 @@ return {
 			j_mp_ride_the_bus_sandbox = {
 				name = "Ride the Bus",
 				text = {
-					"FACE CARD SOBRIETY PROGRAM - ONE FACE CARD",
-					"AND YOU'RE KICKED OFF THE BUS!!!!",
+					"FACE CARD SOBRIETY PROGRAM",
+					"one face card and",
+					"YOU'RE KICKED OFF THE BUS!!!!",
+					"{C:inactive}(Currently {C:mult}+#1#{C:inactive} Mult)",
 				},
 			},
 			j_mp_golden_sandbox = {
