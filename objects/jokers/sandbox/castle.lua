@@ -17,7 +17,7 @@ SMODS.Joker({
 		local suit = card.ability.extra.suit or G.GAME.current_round.castle_card.suit or "Spades"
 		return {
 			vars = {
-				localize(suit, "suits_plural"),
+				string.upper(localize(suit, "suits_plural")),
 				colours = { G.C.SUITS[suit] },
 				card.ability.extra.chips,
 			},
