@@ -7,6 +7,9 @@ SMODS.Atlas({
 
 SMODS.Joker({
 	key = "loyalty_card_sandbox",
+
+	unlocked = true,
+	discovered = true,
 	no_collection = MP.sandbox_no_collection,
 	blueprint_compat = true,
 	rarity = 2,

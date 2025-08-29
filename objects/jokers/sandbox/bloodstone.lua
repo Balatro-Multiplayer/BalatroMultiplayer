@@ -8,7 +8,8 @@ SMODS.Atlas({
 SMODS.Joker({
 	key = "bloodstone_sandbox",
 	no_collection = MP.sandbox_no_collection,
-	unlocked = false,
+	unlocked = true,
+	discovered = true,
 	blueprint_compat = true,
 	rarity = 2,
 	cost = 7,

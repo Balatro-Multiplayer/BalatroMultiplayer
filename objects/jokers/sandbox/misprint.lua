@@ -8,6 +8,8 @@ SMODS.Atlas({
 SMODS.Joker({
 	key = "misprint_sandbox",
 	no_collection = MP.sandbox_no_collection,
+	unlocked = true,
+	discovered = true,
 	atlas = "misprint_sandbox",
 	blueprint_compat = true,
 	rarity = 1,

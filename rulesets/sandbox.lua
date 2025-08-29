@@ -153,7 +153,7 @@ MP.Ruleset({
 
 	force_lobby_options = function(self)
 		MP.LOBBY.config.preview_disabled = true
-		MP.lobby.config.the_order = false
+		MP.LOBBY.config.the_order = false
 		return true
 	end,
 }):inject()

@@ -10,6 +10,9 @@ SMODS.Joker({
 	no_collection = MP.sandbox_no_collection,
 	blueprint_compat = true,
 	perishable_compat = false,
+
+	unlocked = true,
+	discovered = true,
 	rarity = 1,
 	cost = 5,
 	atlas = "runner_sandbox",

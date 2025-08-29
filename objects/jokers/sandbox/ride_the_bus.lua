@@ -10,6 +10,9 @@ SMODS.Joker({
 	blueprint_compat = true,
 	perishable_compat = false,
 	no_collection = MP.sandbox_no_collection,
+
+	unlocked = true,
+	discovered = true,
 	rarity = 1,
 	cost = 6,
 	atlas = "ride_the_bus_sandbox",

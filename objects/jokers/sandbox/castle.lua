@@ -8,6 +8,8 @@ SMODS.Atlas({
 SMODS.Joker({
 	key = "castle_sandbox",
 	no_collection = MP.sandbox_no_collection,
+	unlocked = true,
+	discovered = true,
 	atlas = "castle_sandbox",
 	blueprint_compat = true,
 	perishable_compat = false,

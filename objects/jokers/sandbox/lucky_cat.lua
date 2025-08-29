@@ -6,6 +6,9 @@ SMODS.Atlas({
 })
 SMODS.Joker({
 	key = "lucky_cat_sandbox",
+
+	unlocked = true,
+	discovered = true,
 	no_collection = MP.sandbox_no_collection,
 	atlas = "lucky_cat_sandbox",
 	blueprint_compat = true,

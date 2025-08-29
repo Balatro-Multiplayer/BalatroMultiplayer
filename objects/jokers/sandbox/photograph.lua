@@ -7,6 +7,9 @@ SMODS.Atlas({
 SMODS.Joker({
 	key = "photograph_sandbox",
 	no_collection = MP.sandbox_no_collection,
+
+	unlocked = true,
+	discovered = true,
 	blueprint_compat = true,
 	atlas = "photograph_sandbox",
 	rarity = 1,

@@ -8,6 +8,9 @@ SMODS.Atlas({
 SMODS.Joker({
 	key = "vampire_sandbox",
 	no_collection = MP.sandbox_no_collection,
+
+	unlocked = true,
+	discovered = true,
 	blueprint_compat = true,
 	perishable_compat = false,
 	rarity = 2,

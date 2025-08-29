@@ -7,6 +7,9 @@ SMODS.Atlas({
 SMODS.Joker({
 	key = "steel_joker_sandbox",
 	no_collection = MP.sandbox_no_collection,
+
+	unlocked = true,
+	discovered = true,
 	blueprint_compat = true,
 	rarity = 2,
 	cost = 7,

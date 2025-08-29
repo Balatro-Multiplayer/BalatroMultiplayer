@@ -8,7 +8,8 @@ SMODS.Atlas({
 SMODS.Joker({
 	key = "satellite_sandbox",
 	no_collection = MP.sandbox_no_collection,
-	unlocked = false,
+	unlocked = true,
+	discovered = true,
 	blueprint_compat = false,
 	rarity = 2,
 	cost = 6,
