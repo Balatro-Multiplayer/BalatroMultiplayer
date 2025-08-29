@@ -5,6 +5,7 @@ SMODS.Atlas({
 
 SMODS.Joker({
 	key = "runner_sandbox",
+	no_collection = MP.sandbox_no_collection,
 	blueprint_compat = true,
 	perishable_compat = false,
 	rarity = 1,

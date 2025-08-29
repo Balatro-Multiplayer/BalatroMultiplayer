@@ -8,6 +8,7 @@ SMODS.Atlas({
 
 SMODS.Joker({
 	key = "mail_sandbox",
+	no_collection = MP.sandbox_no_collection,
 	blueprint_compat = true,
 	rarity = 1,
 	cost = 4,
