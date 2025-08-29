@@ -1,6 +1,8 @@
 SMODS.Atlas({
 	key = "runner_sandbox",
 	path = "j_runner_sandbox.png",
+	px = 71,
+	py = 95,
 })
 
 SMODS.Joker({

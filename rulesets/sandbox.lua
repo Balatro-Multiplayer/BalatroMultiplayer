@@ -4,23 +4,29 @@ MP.Ruleset({
 	key = "sandbox",
 	standard = true,
 	multiplayer_content = true,
-	banned_jokers = {
-		"j_cloud_9",
+	-- todo should be able to be omitted
+	banned_jokers = {},
+	banned_silent = {
+		"j_hanging_chad",
+		"j_baseball",
 		"j_bloodstone",
-		"j_lucky_cat",
-		"j_stencil",
+		"j_castle",
+		"j_cloud_9",
 		"j_constellation",
-		"j_chaos",
+		"j_faceless",
+		"j_hit_the_road",
+		"j_juggler",
+		"j_loyalty_card",
+		"j_lucky_cat",
 		"j_mail",
 		"j_misprint",
-		"j_castle",
-		"j_runner",
-		"j_loyalty_card",
-		"j_faceless",
 		"j_photograph",
-		"j_cloud_9",
+		"j_runner",
+		"j_satellite",
 		"j_square",
-		"j_to_the_moon",
+		"j_steel_joker",
+		"j_throwback",
+		"j_vampire",
 	},
 	banned_consumables = {
 		"c_justice",
@@ -32,26 +38,29 @@ MP.Ruleset({
 
 	reworked_jokers = {
 		"j_mp_hanging_chad",
-		"j_mp_lucky_cat_sandbox",
-		"j_mp_stencil_sandbox",
+		"j_mp_baseball_sandbox",
+		"j_mp_bloodstone_sandbox",
+		"j_mp_castle_sandbox",
+		"j_mp_cloud_9_sandbox",
 		"j_mp_constellation_sandbox",
-		"j_mp_chaos_sandbox",
+		"j_mp_faceless_sandbox",
+		"j_mp_hit_the_road_sandbox",
+		"j_mp_juggler_sandbox",
+		"j_mp_loyalty_card_sandbox",
+		"j_mp_lucky_cat_sandbox",
 		"j_mp_mail_sandbox",
 		"j_mp_misprint_sandbox",
-		"j_mp_castle_sandbox",
-		"j_mp_runner_sandbox",
-		"j_mp_loyalty_card_sandbox",
-		"j_mp_faceless_sandbox",
 		"j_mp_photograph_sandbox",
-		"j_mp_cloud_9_sandbox",
+		"j_mp_runner_sandbox",
+		"j_mp_satellite_sandbox",
 		"j_mp_square_sandbox",
-		"j_mp_to_the_moon_sandbox",
+		"j_mp_steel_joker_sandbox",
+		"j_mp_throwback_sandbox",
+		"j_mp_vampire_sandbox",
 	},
 	reworked_consumables = {},
 	reworked_vouchers = {},
-	reworked_enhancements = {
-		-- "m_glass",
-	},
+	reworked_enhancements = {},
 	reworked_blinds = {},
 	reworked_tags = { "tag_mp_sandbox_rare" },
 
@@ -84,7 +93,7 @@ MP.Ruleset({
 						{
 							n = G.UIT.T,
 							config = {
-								text = localize("k_no"),
+								text = localize("k_yes"),
 								scale = 0.8,
 								colour = G.C.RED,
 							},
@@ -140,130 +149,10 @@ MP.Ruleset({
 
 	force_lobby_options = function(self)
 		MP.LOBBY.config.preview_disabled = true
-		MP.LOBBY.config.different_seeds = false
+		MP.lobby.config.the_order = false
 		return true
 	end,
 }):inject()
-
--- MP.ReworkCenter({
--- 	key = "j_bloodstone",
--- 	ruleset = "sandbox",
--- 	config = { extra = {} },
--- 	loc_vars = function(self, info_queue, card)
--- 		return { key = self.key .. "_mp_sandbox", vars = {} }
--- 	end,
--- })
-
--- MP.ReworkCenter({
--- 	key = "j_reserved_parking",
--- 	ruleset = "sandbox",
--- 	config = { extra = {} },
--- 	loc_vars = function(self, info_queue, card)
--- 		return { key = self.key .. "_mp_sandbox", vars = {} }
--- 	end,
--- })
-
--- MP.ReworkCenter({
--- 	key = "j_egg",
--- 	ruleset = "sandbox",
--- 	config = { extra = {} },
--- 	loc_vars = function(self, info_queue, card)
--- 		return { key = self.key .. "_mp_sandbox", vars = {} }
--- 	end,
--- })
-
--- MP.ReworkCenter({
--- 	key = "j_turtle_bean",
--- 	ruleset = "sandbox",
--- 	config = { extra = { rounds = 5 } },
--- 	loc_vars = function(self, info_queue, card)
--- 		return { key = self.key .. "_mp_sandbox", vars = { card.ability.extra.rounds } }
--- 	end,
--- })
-
--- MP.ReworkCenter({
--- 	key = "j_juggler",
--- 	ruleset = "sandbox",
--- 	config = { extra = {} },
--- 	loc_vars = function(self, info_queue, card)
--- 		return { key = self.key .. "_mp_sandbox", vars = {} }
--- 	end,
--- })
-
--- MP.ReworkCenter({
--- 	key = "j_hit_the_road",
--- 	ruleset = "sandbox",
--- 	config = { extra = { xmult_gain = 0.5, xmult = 1 } },
--- 	loc_vars = function(self, info_queue, card)
--- 		return { key = self.key .. "_mp_sandbox", vars = { card.ability.extra.xmult_gain, card.ability.extra.xmult } }
--- 	end,
--- })
-
--- MP.ReworkCenter({
--- 	key = "j_red_card",
--- 	ruleset = "sandbox",
--- 	config = { extra = 5 },
--- 	loc_vars = function(self, info_queue, card)
--- 		return { key = self.key .. "_mp_sandbox", vars = {} }
--- 	end,
--- })
--- )
-
--- MP.ReworkCenter({
--- 	key = "j_business",
--- 	ruleset = "sandbox",
--- 	config = { extra = 4 },
--- 	loc_vars = function(self, info_queue, card)
--- 		return { key = self.key .. "_mp_sandbox", vars = {} }
--- 	end,
--- 	-- TODO add con!!
--- })
-
--- MP.ReworkCenter({
--- 	key = "j_ride_the_bus",
--- 	ruleset = "sandbox",
--- 	config = { extra = 5 },
--- 	loc_vars = function(self, info_queue, card)
--- 		return { key = self.key .. "_mp_sandbox", vars = { card.ability.extra.mult_gain, card.ability.extra.mult } }
--- 	end,
--- })
-
--- MP.ReworkCenter({
--- 	key = "j_golden",
--- 	ruleset = "sandbox",
--- 	config = { extra = 15 },
--- 	loc_vars = function(self, info_queue, card)
--- 		return { key = self.key .. "_mp_sandbox", vars = {} }
--- 	end,
--- })
-
--- MP.ReworkCenter({
--- 	key = "j_scary_face",
--- 	ruleset = "sandbox",
--- 	config = { extra = 100 },
--- 	loc_vars = function(self, info_queue, card)
--- 		return { key = self.key .. "_mp_sandbox", vars = {} }
--- 	end,
--- 	-- TODO calc could prob do only what it normally does before / after...?
--- })
-
--- MP.ReworkCenter({
--- 	key = "j_throwback",
--- 	ruleset = "sandbox",
--- 	config = { extra = { xmult = 0.75 } },
--- 	loc_vars = function(self, info_queue, card)
--- 		return { key = self.key .. "_mp_sandbox", vars = {} }
--- 	end,
--- })
-
--- MP.ReworkCenter({
--- 	key = "j_gros_michel",
--- 	ruleset = "sandbox",
--- 	config = { extra = {} },
--- 	loc_vars = function(self, info_queue, card)
--- 		return { key = self.key .. "_mp_sandbox", vars = {} }
--- 	end,
--- })
 
 SMODS.Atlas({
 	key = "sandbox_rare",
@@ -334,66 +223,6 @@ SMODS.Tag({
 	end,
 })
 
--- SMODS.Tag({
--- 	key = "tobenamed tag",
--- 	pos = { x = 5, y = 1 },
--- 	config = { h_size = 3 },
--- 	in_pool = function(self)
--- 		return MP.LOBBY.config.ruleset == "ruleset_mp_sandbox" and MP.LOBBY.code
--- 	end,
--- 	loc_vars = function(self, info_queue, tag)
--- 		return { vars = { tag.config.h_size } }
--- 	end,
--- 	apply = function(self, tag, context)
--- 		if context.type == "round_start_bonus" then
--- 			tag:yep("+", G.C.BLUE, function()
--- 				return true
--- 			end)
--- 			G.hand:change_size(tag.config.h_size)
--- 			G.GAME.round_resets.temp_handsize = (G.GAME.round_resets.temp_handsize or 0) + tag.config.h_size
--- 			tag.triggered = true
--- 			return true
--- 		end
--- 	end,
--- })
-
--- SMODS.Tag({
--- 	key = "sandbox_skip",
--- 	atlas = "sandbox_skip",
--- 	object_type = "Tag",
--- 	dependencies = {
--- 		items = {},
--- 	},
--- 	in_pool = function(self)
--- 		return MP.LOBBY.config.ruleset == "ruleset_mp_sandbox" and MP.LOBBY.code
--- 	end,
--- 	name = "Skip Tag",
--- 	discovered = true,
--- 	order = 3,
--- 	min_ante = 1,
--- 	no_collection = true,
--- 	config = {
--- 		type = "pvp_boss_mult",
--- 		base_mult = 1.5,
--- 		ante_mult = 0.5,
--- 	},
--- 	requires = "j_blueprint",
--- 	loc_vars = function(self)
--- 		local current_mult = self.config.base_mult + (self.config.ante_mult * (G.GAME.round_resets.ante or 1))
--- 		return { vars = { self.config.base_mult, self.config.ante_mult, current_mult } }
--- 	end,
--- 	apply = function(self, tag, context)
--- 		if context.type == "pvp_boss_mult" then
--- 			local mult_bonus = tag.config.base_mult + (tag.config.ante_mult * (G.GAME.round_resets.ante or 1))
--- 			tag:yep("+" .. mult_bonus .. "x", G.C.MULT, function()
--- 				return true
--- 			end)
--- 			tag.triggered = true
--- 			return mult_bonus
--- 		end
--- 	end,
--- })
-
 -- Standard pack card creation for sandbox ruleset
 -- Skips glass enhancement (excluded from enhancement pool)
 -- 40% chance (0.6 threshold) for any enhancement to be applied (like vanilla)
@@ -445,6 +274,8 @@ SMODS.Stake({
 	key = "planet",
 	unlocked = true,
 	-- it doesn't show up without
+	-- TODO this is broken - doesn't show up in list without this
+	-- but crashes in stake overview screen
 	applied_stakes = { "gold" },
 	pos = { x = 1, y = 1 },
 	sticker_pos = { x = 3, y = 1 },
@@ -472,7 +303,7 @@ SMODS.Stake({
 	sticker_pos = { x = 3, y = 1 }, --
 	modifiers = function()
 		G.GAME.modifiers.enable_rentals_in_shop = true -- gold
-		G.GAME.modifiers.scaling = (G.GAME.modifiers.scaling or 1) + 1 -- yeehaw this actually works without doing anything else
+		G.GAME.modifiers.scaling = (G.GAME.modifiers.scaling or 1) + 1 -- yeehaw
 	end,
 	colour = HEX("000000"),
 	shiny = true,

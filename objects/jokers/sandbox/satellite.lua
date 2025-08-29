@@ -13,7 +13,7 @@ SMODS.Joker({
 	rarity = 2,
 	cost = 6,
 	atlas = "satellite_sandbox",
-	config = { extra = { dollars = 1 } },
+	config = { extra = { dollars = 1 }, mp_sticker_balanced = true },
 	loc_vars = function(self, info_queue, card)
 		return { vars = { card.ability.extra.dollars } }
 	end,
