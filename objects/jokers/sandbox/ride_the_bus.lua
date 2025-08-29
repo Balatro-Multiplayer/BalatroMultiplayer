@@ -9,6 +9,7 @@ SMODS.Joker({
 	key = "ride_the_bus_sandbox",
 	blueprint_compat = true,
 	perishable_compat = false,
+	no_collection = MP.sandbox_no_collection,
 	rarity = 1,
 	cost = 6,
 	atlas = "ride_the_bus_sandbox",

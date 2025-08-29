@@ -13,21 +13,24 @@ SMODS.Joker({
 	rarity = 1,
 	cost = 4,
 	atlas = "mail_sandbox",
-	config = { extra = { dollars = 8 }, mp_sticker_balanced = true },
+	config = { extra = { dollars = 8, rank = nil }, mp_sticker_balanced = true },
 	loc_vars = function(self, info_queue, card)
+		local rank = card.ability.extra.rank or (G.GAME.current_round.mail_card or {}).rank or "Ace"
 		return {
 			vars = {
 				card.ability.extra.dollars,
-				localize((G.GAME.current_round.mail_card or {}).rank or "Ace", "ranks"),
+				localize(rank, "ranks"),
 			},
 		}
 	end,
-	-- TODO actually implemnt add_to_deck behaviour
+	add_to_deck = function(self, card, from_debuff)
+		card.ability.extra.rank = G.GAME.current_round.mail_card.rank
+	end,
 	calculate = function(self, card, context)
 		if
 			context.discard
 			and not context.other_card.debuff
-			and context.other_card:get_id() == G.GAME.current_round.mail_card.id
+			and context.other_card:get_id() == card.ability.extra.rank
 		then
 			G.GAME.dollar_buffer = (G.GAME.dollar_buffer or 0) + card.ability.extra.dollars
 			return {
