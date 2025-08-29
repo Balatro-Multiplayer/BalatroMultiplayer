@@ -32,4 +32,5 @@ SMODS.Joker({
 			chips = card.ability.extra.chips,
 		} end
 	end,
+	mp_credits = { idea = { "Owen" } },
 })
