@@ -146,8 +146,8 @@ return {
 				name = "Constellation",
 				text = {
 					"PLANET MAINTENANCE ANXIETY DISORDER",
-					"must feed the tamagochi",
-					"OR IT WITHERS AWAY!!!!",
+					"must FEED THE TAMAGOCHI",
+					"or it WITHERS AWAY!!!!",
 					"{C:inactive}(Currently {X:mult,C:white} X#1# {C:inactive} Mult)",
 				},
 			},
@@ -223,7 +223,9 @@ return {
 			j_mp_order_sandbox = {
 				name = "The Order",
 				text = {
-					"TODO",
+					"PEASANT UPRISING COORDINATOR",
+					"organizing the NUMBERS to overthrow",
+					"their FACE CARD OPPRESSORS!!!!",
 				},
 			},
 			j_mp_photograph_sandbox = {
