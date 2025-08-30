@@ -131,7 +131,7 @@ function MP.ApplyBans()
 				pseudoshuffle(v, pseudoseed(k .. "_mp_smallworld"))
 				local threshold = math.floor(0.5 + (#v * 0.75))
 				local ii = 1
-				if k == "Voucher" then ii = ii + 1 end
+				if k == "Voucher" and not MP.legacy_smallworld() then ii = ii + 1 end
 				for i, vv in ipairs(v) do
 					if ii <= threshold then
 						G.GAME.banned_keys[vv] = true
@@ -160,7 +160,7 @@ local tag_init_ref = Tag.init
 function Tag:init(_tag, for_collection, _blind_type)
 	local orbital = false
 	local old = G.orbital_hand -- i think this is always nil here but just to be safe
-	if MP.LOBBY.code and MP.LOBBY.config.ruleset == "ruleset_mp_smallworld" then
+	if MP.LOBBY.code and MP.LOBBY.config.ruleset == "ruleset_mp_smallworld" and not MP.legacy_smallworld() then
 		if G.GAME.banned_keys[_tag] and not G.OVERLAY_MENU then
 			local a = G.GAME.round_resets.ante
 
@@ -179,7 +179,9 @@ end
 
 local apply_to_run_ref = Back.apply_to_run
 function Back:apply_to_run()
-	if MP.LOBBY.code and MP.LOBBY.config.ruleset == "ruleset_mp_smallworld" then MP.apply_fake_back_vouchers(self) end
+	if MP.LOBBY.code and MP.LOBBY.config.ruleset == "ruleset_mp_smallworld" and not MP.legacy_smallworld() then
+		MP.apply_fake_back_vouchers(self)
+	end
 	return apply_to_run_ref(self)
 end
 
@@ -207,4 +209,8 @@ function MP.apply_fake_back_vouchers(back)
 			end,
 		}))
 	end
+end
+
+function MP.legacy_smallworld()
+	return MP.LOBBY.code and MP.LOBBY.config and MP.LOBBY.config.legacy_smallworld
 end

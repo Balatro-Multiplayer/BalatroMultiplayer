@@ -119,6 +119,7 @@ function MP.reset_lobby_config(persist_ruleset_and_gamemode)
 		timer_forgiveness = 0,
 		forced_config = false,
 		preview_disabled = false,
+		legacy_smallworld = false,
 	}
 end
 MP.reset_lobby_config()

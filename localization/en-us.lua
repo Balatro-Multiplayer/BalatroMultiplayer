@@ -205,14 +205,13 @@ return {
 					"{C:attention}2{} copies of {C:tarot,T:c_hanged_man}The Hanged Man",
 				},
 			},
-			b_mp_sibyl = {
-				name = "Sibyl Deck",
+			b_mp_oracle = {
+				name = "Oracle Deck",
 				text = {
-					"{C:planet}Planets{}, {C:attention}playing cards{}, and",
-					"{C:spectral}Spectral Packs{} will not appear",
 					"Start run with {C:spectral,T:c_medium}Medium",
-					"The only {C:spectral}Spectral{} card",
-					"is {C:spectral,T:c_medium}Medium",
+					"and {C:attention,T:v_clearance_sale}Clearance Sale",
+					"Balance is capped",
+					"at {C:money}$50",
 				},
 			},
 			b_mp_violet = {
@@ -288,6 +287,7 @@ return {
 			b_opts_timer = "Enable Timer",
 			b_opts_disable_preview = "Disable Score Preview",
 			b_opts_the_order = "Enable The Order",
+			b_opts_legacy_smallworld = "Legacy Small World mechanics",
 			b_reset = "Reset",
 			b_set_custom_seed = "Set Custom Seed",
 			b_mp_kofi_button = "Supporting me on Ko-fi",

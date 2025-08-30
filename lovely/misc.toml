@@ -100,7 +100,7 @@ match_indent = true
 target = "back.lua"
 pattern = '''local card = create_card('Tarot', G.consumeables, nil, nil, nil, nil, v, 'deck')'''
 position = "at"
-payload = '''local card = create_card(G.P_CENTERS[v].set, G.consumeables, nil, nil, nil, nil, v, 'deck')'''
+payload = '''local card = create_card(MP.legacy_smallworld() and 'Tarot' or G.P_CENTERS[v].set, G.consumeables, nil, nil, nil, nil, v, 'deck')'''
 match_indent = true
 
 # STEAMODDED BUG - fix seeing double
@@ -147,4 +147,16 @@ for i = 1, #hand do
 		end
 	end
 end'''
+match_indent = true
+
+# i was the one who pred this line, i guess it became a problem
+[[patches]]
+[patches.pattern]
+target = "functions/misc_functions.lua"
+pattern = '''if G.SETTINGS.paused and key ~= 'to_do' then return math.random() end'''
+position = "at"
+payload = '''
+-- disabled by Multiplayer because of voucher rng calls while paused 
+-- if G.SETTINGS.paused and key ~= 'to_do' then return math.random() end
+'''
 match_indent = true
