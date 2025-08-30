@@ -6,7 +6,7 @@ SMODS.Atlas({
 })
 
 SMODS.Joker({
-	key = "magnet",
+	key = "magnet_sandbox",
 	atlas = "magnet",
 	rarity = 3,
 	cost = 7,
@@ -15,10 +15,16 @@ SMODS.Joker({
 	blueprint_compat = false,
 	eternal_compat = false,
 	perishable_compat = true,
-	config = { extra = { rounds = 2, current_rounds = 0 } },
+	config = { extra = { rounds = 2, current_rounds = 0, max_rounds = 5 } },
 	loc_vars = function(self, info_queue, card)
 		MP.UTILS.add_nemesis_info(info_queue)
-		return { vars = { card.ability.extra.rounds, card.ability.extra.current_rounds, card.ability.extra.rounds } }
+		return {
+			vars = {
+				card.ability.extra.rounds,
+				card.ability.extra.current_rounds,
+				card.ability.extra.max_rounds,
+			},
+		}
 	end,
 	in_pool = function(self)
 		return MP.LOBBY.code and MP.LOBBY.config.multiplayer_jokers and MP.LOBBY.config.ruleset == "ruleset_mp_sandbox"
@@ -62,7 +68,39 @@ SMODS.Joker({
 		then
 			MP.ACTIONS.magnet()
 		end
+		if
+			context.end_of_round
+			and card.ability.extra.current_rounds > 5
+			and not context.other_card
+			and not context.blueprint
+			and not context.debuffed
+		then
+			G.E_MANAGER:add_event(Event({
+				func = function()
+					play_sound("tarot1")
+					card.T.r = -0.2
+					card:juice_up(0.3, 0.4)
+					card.states.drag.is = false
+					card.children.center.pinch.x = true
+					G.E_MANAGER:add_event(Event({
+						trigger = "after",
+						delay = 0.3,
+						blockable = false,
+						func = function()
+							G.jokers:remove_card(card)
+							card:remove()
+							card = nil
+							return true
+						end,
+					}))
+					return true
+				end,
+			}))
+			card_eval_status_text(card, "extra", nil, nil, nil, { message = localize("k_no_reward") })
+			-- MP.ACTIONS.magnet()
+		end
 	end,
+
 	mp_credits = {
 		idea = { "Zilver" },
 		art = { "Ganpan140" },

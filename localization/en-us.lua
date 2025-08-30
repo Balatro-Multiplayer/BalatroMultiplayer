@@ -91,6 +91,17 @@ return {
 					"{C:inactive}(Currently {C:attention}#2#{C:inactive}/#3# rounds)",
 				},
 			},
+			j_mp_magnet_sandbox = {
+				name = "Magnet",
+				text = {
+					"After {C:attention}#1#{} rounds,",
+					"sell this card to {C:attention}Copy{}",
+					"your {X:purple,C:white}Nemesis'{} highest ",
+					"sell cost {C:attention}Joker{}",
+					"AND LEAVE IT FOR TOO LONG AND IT LOSES POLARITY!!!!",
+					"{C:inactive}(Currently {C:attention}#2#{C:inactive}/#1# rounds (max #4#))",
+				},
+			},
 			j_mp_pizza = {
 				name = "Pizza",
 				text = {
@@ -145,8 +156,8 @@ return {
 			j_mp_constellation_sandbox = {
 				name = "Constellation",
 				text = {
-					"PLANET MAINTENANCE ANXIETY DISORDER",
-					"must FEED THE TAMAGOCHI",
+					"planet maintenance anxiety disorder",
+					"MUST FEED THE TAMAGOCHI",
 					"or it WITHERS AWAY!!!!",
 					"{C:inactive}(Currently {X:mult,C:white} X#1# {C:inactive} Mult)",
 				},
@@ -247,7 +258,7 @@ return {
 				name = "Ride the Bus",
 				text = {
 					"FACE CARD SOBRIETY PROGRAM",
-					"one FACE CARD and you're",
+					"ONE FACE CARD and you're",
 					"KICKED OFF THE BUS!!!!",
 					"{C:inactive}(Currently {C:mult}+#1#{C:inactive} Mult)",
 				},
@@ -265,16 +276,16 @@ return {
 				name = "Faceless Joker",
 				text = {
 					"ELITE FACE CARD SOMMELIER",
-					"who curates artisanal",
-					"THREE-VARIETY TASTING FLIGHTS",
-					"for PREMIUM DISPOSAL EXPERIENCES!!!!",
+					"requires ONE OF EACH ROYAL",
+					"for the PERFECT J-Q-K",
+					"TASTING FLIGHT!!!!",
 				},
 			},
 			j_mp_square_sandbox = {
 				name = "Square Joker",
 				text = {
-					"FOUR CARD PERFECTIONIST who",
-					"worships the SACRED GEOMETRY of",
+					"FOUR CARD PERFECTIONIST",
+					"who worships THE SACRED GEOMETRY OF",
 					"PERFECTLY BALANCED SQUARE ARRANGEMENTS!!!!",
 					"{C:inactive}(Currently {C:chips}+#1#{C:inactive} Chips)",
 				},
@@ -283,7 +294,7 @@ return {
 				name = "Throwback",
 				text = {
 					"PROFESSIONAL COWARD CONSULTING SERVICES",
-					"i get paid to run away from things",
+					"i get PAID to run away from things",
 					"AND THE MORE I RUN THE STRONGER I GET!!!!",
 					"{C:inactive}(Currently {X:mult,C:white} X#1# {C:inactive} Mult)",
 				},
@@ -317,16 +328,15 @@ return {
 				name = "Steel Joker",
 				text = {
 					"STEEL REDUNDANCY SPECIALIST",
-					"every metal card gets",
+					"EVERY ALLOY gets",
 					"DOUBLE-CHECKED!!!!",
 				},
 			},
 			j_mp_satellite_sandbox = {
 				name = "Satellite",
 				text = {
-					"ORBITAL MAINTENANCE CONTRACTOR with",
 					"chronic satellite degradation anxiety",
-					"infrastructure SLOWLY FALLS APART without",
+					"INFRASTRUCTURE SLOWLY FALLS APART WITHOUT",
 					"CONSTANT PLANETARY UPGRADES!!!!",
 					"{C:inactive}(Currently {C:money}$#1#{C:inactive})",
 				},

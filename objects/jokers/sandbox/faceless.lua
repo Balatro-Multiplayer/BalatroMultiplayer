@@ -8,7 +8,6 @@ SMODS.Atlas({
 SMODS.Joker({
 	key = "faceless_sandbox",
 	no_collection = MP.sandbox_no_collection,
-
 	unlocked = true,
 	discovered = true,
 	blueprint_compat = true,
@@ -32,7 +31,7 @@ SMODS.Joker({
 				if rank == 13 then kings = kings + 1 end
 			end
 
-			if jacks == 1 and queens == 1 and kings == 1 then
+			if jacks >= 1 and queens >= 1 and kings >= 1 then
 				G.GAME.dollar_buffer = (G.GAME.dollar_buffer or 0) + card.ability.extra.dollars
 				return {
 					dollars = card.ability.extra.dollars,
