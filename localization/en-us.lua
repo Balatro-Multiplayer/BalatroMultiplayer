@@ -276,9 +276,9 @@ return {
 				name = "Faceless Joker",
 				text = {
 					"ELITE FACE CARD SOMMELIER",
-					"requires ONE OF EACH ROYAL",
-					"for the PERFECT J-Q-K",
-					"TASTING FLIGHT!!!!",
+					"who curates artisanal",
+					"THREE-VARIETY TASTING FLIGHTS",
+					"for PREMIUM DISPOSAL EXPERIENCES!!!!",
 				},
 			},
 			j_mp_square_sandbox = {
