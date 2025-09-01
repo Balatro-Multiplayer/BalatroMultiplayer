@@ -182,6 +182,13 @@ return {
 					"at random",
 				},
 			},
+			b_mp_cocktail2 = {
+				name = "Aura's Cocktail",
+				text = {
+					"Copies all effects",
+					"of {C:attention}3{} hand-picked decks",
+				},
+			},
 			b_mp_gradient = {
 				name = "Gradient Deck",
 				text = {

@@ -15,7 +15,7 @@ SMODS.Back({
 		G.GAME.modifiers.mp_cocktail = {}
 		local decks = {}
 		for k, v in pairs(G.P_CENTERS) do
-			if v.set == "Back" and k ~= "b_challenge" and k ~= "b_mp_cocktail" then
+			if v.set == "Back" and k ~= "b_challenge" and k ~= "b_mp_cocktail" and k ~= "b_mp_cocktail2" then
 				if not (v.mod and not self.mod_whitelist[v.mod.id]) then decks[#decks + 1] = k end
 			end
 		end
