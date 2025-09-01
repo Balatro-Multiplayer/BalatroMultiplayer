@@ -38,7 +38,7 @@ MP.Ruleset({
 	banned_blinds = {},
 
 	reworked_jokers = {
-		"j_mp_magnet",
+		"j_mp_magnet_sandbox",
 		"j_mp_hanging_chad",
 		"j_mp_ride_the_bus_sandbox",
 		"j_mp_baseball_sandbox",
