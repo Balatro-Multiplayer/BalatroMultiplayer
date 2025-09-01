@@ -181,9 +181,9 @@ return {
 			j_mp_juggler_sandbox = {
 				name = "Juggler",
 				text = {
-					"hand size perfectionist WHO",
-					"MUST KEEP ALL THE BALLS",
-					"IN THE AIR AT ALL TIMES!!!!",
+					"HAND SIZE PERFECTIONIST",
+					"who must keep ALL THE CARDS",
+					"in the air AT ALL TIMES!!!!",
 					"{C:inactive}(Currently {C:attention}+#1#{C:inactive} hand size)",
 				},
 			},
@@ -269,7 +269,7 @@ return {
 					"HAND TYPE LOYALTY PROGRAM",
 					"betray {C:attention}#1#{}",
 					"and counter RESETS!!!!",
-					"{C:inactive}(Loyal for {C:attention}#2#{} {C:inactive}hands)",
+					"{C:inactive}(Loyal for {C:attention}#2#/#3#{} {C:inactive}hands)",
 				},
 			},
 			j_mp_faceless_sandbox = {
@@ -328,7 +328,7 @@ return {
 				name = "Steel Joker",
 				text = {
 					"STEEL REDUNDANCY SPECIALIST",
-					"EVERY ALLOY gets",
+					"every PLAYED ALLOY gets",
 					"DOUBLE-CHECKED!!!!",
 				},
 			},

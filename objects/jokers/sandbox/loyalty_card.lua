@@ -21,6 +21,7 @@ SMODS.Joker({
 			vars = {
 				card.ability.extra.poker_hand,
 				math.abs(card.ability.extra.every - card.ability.extra.loyalty_remaining),
+				card.ability.extra.loyalty_remaining,
 			},
 		}
 	end,

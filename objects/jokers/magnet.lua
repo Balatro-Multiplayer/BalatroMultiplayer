@@ -97,7 +97,6 @@ SMODS.Joker({
 				end,
 			}))
 			card_eval_status_text(card, "extra", nil, nil, nil, { message = localize("k_no_reward") })
-			-- MP.ACTIONS.magnet()
 		end
 	end,
 
