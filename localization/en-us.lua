@@ -320,7 +320,7 @@ return {
 			j_mp_baseball_sandbox = {
 				name = "Baseball Card",
 				text = {
-					"SPORTS CARD LAUNDERING OPERATION",
+					'SPORTS CARD "CONTROVERSY"',
 					"disguised as BALANCE CHANGE!!!!",
 				},
 			},
@@ -336,8 +336,8 @@ return {
 				name = "Satellite",
 				text = {
 					"chronic satellite degradation anxiety",
-					"INFRASTRUCTURE SLOWLY FALLS APART WITHOUT",
-					"CONSTANT PLANETARY UPGRADES!!!!",
+					"INFRASTRUCTURE SLOWLY FALLS APART",
+					"WITHOUT CONSTANT PLANETARY UPGRADES!!!!",
 					"{C:inactive}(Currently {C:money}$#1#{C:inactive})",
 				},
 			},
