@@ -94,12 +94,12 @@ return {
 			j_mp_magnet_sandbox = {
 				name = "Magnet",
 				text = {
-					"After {C:attention}#1#{} rounds,",
-					"sell this card to {C:attention}Copy{}",
-					"your {X:purple,C:white}Nemesis'{} highest ",
-					"sell cost {C:attention}Joker{}",
-					"AND LEAVE IT FOR TOO LONG AND IT LOSES POLARITY!!!!",
-					"{C:inactive}(Currently {C:attention}#2#{C:inactive}/#1# rounds (max #4#))",
+					"After {C:attention}#1#{} rounds, sell",
+					"this card to {C:attention}Copy{} your {X:purple,C:white}Nemesis'{}",
+					"highest sell cost {C:attention}Joker{}",
+					"polarity inverts after {C:attention}#3#{} rounds",
+					"BECOMING WORTHLESS SCRAP METAL!!!!",
+					"{C:inactive}(Currently {C:attention}#2#{C:inactive}/#1# rounds)",
 				},
 			},
 			j_mp_pizza = {
@@ -210,7 +210,7 @@ return {
 					"SCHRODINGER'S LOTTERY PLAYER",
 					"ticket both WINS AND LOSES",
 					"until checked!!!!",
-					"{C:inactive}({C:mult}#1#{C:inactive} Mult)",
+					"{C:inactive}({V:1}#1#{C:inactive} Mult)",
 				},
 			},
 			j_mp_castle_sandbox = {

@@ -15,13 +15,15 @@ SMODS.Joker({
 	rarity = 1,
 	cost = 4,
 	ruleset = "sandbox",
-	config = { extra = { max = 46, min = -23, mult = "???" }, mp_sticker_balanced = true },
+	config = { extra = { max = 46, min = -23, mult = "???", color = G.C.MULT }, mp_sticker_balanced = true },
 	loc_vars = function(self, info_queue, card)
-		return { vars = { card.ability.extra.mult } }
+		return { vars = { card.ability.extra.mult, colours = { card.ability.extra.color } } }
 	end,
 	add_to_deck = function(self, card, from_debuff)
-		-- todo let oops all 6s secretly adjust this
-		card.ability.extra.mult = pseudorandom("misprint_sandbox", card.ability.extra.min, card.ability.extra.max) -- TODO replace with steamodded pseudorandom or not
+		local numerator, denominator = SMODS.get_probability_vars(card, 1, 2, "j_mp_misprint_sandbox")
+		card.ability.extra.mult = numerator
+			* pseudorandom("misprint_sandbox", card.ability.extra.min, card.ability.extra.max)
+		if numerator > 1 then card.ability.extra.color = G.C.GREEN end
 	end,
 	calculate = function(self, card, context)
 		if context.joker_main then return {
