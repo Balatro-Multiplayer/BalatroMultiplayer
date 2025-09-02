@@ -91,17 +91,7 @@ return {
 					"{C:inactive}(Currently {C:attention}#2#{C:inactive}/#3# rounds)",
 				},
 			},
-			j_mp_magnet_sandbox = {
-				name = "Magnet",
-				text = {
-					"After {C:attention}#1#{} rounds, sell",
-					"this card to {C:attention}Copy{} your {X:purple,C:white}Nemesis'{}",
-					"highest sell cost {C:attention}Joker{}",
-					"polarity inverts after {C:attention}#3#{} rounds",
-					"BECOMING WORTHLESS SCRAP METAL!!!!",
-					"{C:inactive}(Currently {C:attention}#2#{C:inactive}/#1# rounds)",
-				},
-			},
+
 			j_mp_pizza = {
 				name = "Pizza",
 				text = {
@@ -133,6 +123,17 @@ return {
 					"played cards with",
 					"{C:hearts}Heart{} suit to give",
 					"{X:mult,C:white} X#3# {} Mult when scored",
+				},
+			},
+			j_mp_magnet_sandbox = {
+				name = "Magnet",
+				text = {
+					"After {C:attention}#1#{} rounds, sell",
+					"this card to {C:attention}Copy{} your {X:purple,C:white}Nemesis'{}",
+					"highest sell cost {C:attention}Joker{}",
+					"polarity inverts after {C:attention}#3#{} rounds",
+					"BECOMING WORTHLESS SCRAP METAL!!!!",
+					"{C:inactive}(Currently {C:attention}#2#{C:inactive}/#1# rounds)",
 				},
 			},
 			j_mp_cloud_9_sandbox = {
@@ -171,13 +172,6 @@ return {
 					"{C:inactive}({C:green}#1# in #2#{} {C:inactive}chance)",
 				},
 			},
-			-- j_mp_egg_sandbox = {
-			-- 	name = "Egg",
-			-- 	text = {
-			-- 		"SELL VALUE HOSTAGE TAKER -",
-			-- 		'"NOBODY LEAVES UNTIL THE EGG SAYS SO!"!!!!',
-			-- 	},
-			-- },
 			j_mp_juggler_sandbox = {
 				name = "Juggler",
 				text = {
@@ -246,14 +240,6 @@ return {
 					"ONE PERFECT FRAME PER HAND!!!!",
 				},
 			},
-			j_mp_photograph_2_sandbox = {
-				name = "Photograph",
-				text = {
-					"SINGLE EXPOSURE EXTREMIST",
-					"you get ONE CHANCE",
-					"at PERFECTION!!!!",
-				},
-			},
 			j_mp_ride_the_bus_sandbox = {
 				name = "Ride the Bus",
 				text = {
@@ -299,15 +285,6 @@ return {
 					"{C:inactive}(Currently {X:mult,C:white} X#1# {C:inactive} Mult)",
 				},
 			},
-			-- j_mp_vampire_sandbox = {
-			-- 	name = "Vampire",
-			-- 	text = {
-			-- 		"BLOOD ADDICTION LIFESTYLE CONSULTANT WHO GETS STRONGER",
-			-- 		"BY TURNING YOUR BEAUTIFUL CARDS INTO BORING ROCKS",
-			-- 		"BUT AT LEAST THEY'RE VAMPIRE ROCKS!!!!",
-			-- 		"{C:inactive}(Currently {X:mult,C:white} X#2# {C:inactive} Mult)",
-			-- 	},
-			-- },
 			j_mp_vampire_sandbox = {
 				name = "Vampire",
 				text = {
