@@ -9,7 +9,7 @@ MP.BANNED_MODS = {
 	["Showman"] = true,
 	["TagPreview"] = true,
 	["FantomsPreview"] = true,
-	["lovely"] = "0.7.1",
+	["Lovely"] = "0.7.1",
 }
 
 MP.LOBBY = {
