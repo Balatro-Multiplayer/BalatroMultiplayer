@@ -1,5 +1,5 @@
 SMODS.Atlas({
-	key = "sandbox_error",
+	key = "error_sandbox",
 	path = "j_ERROR_sandbox.png",
 	px = 71,
 	py = 95,
@@ -7,15 +7,15 @@ SMODS.Atlas({
 
 for i = 1, 21 do
 	SMODS.Joker({
-		key = "preview_disabled_sandbox_" .. i,
+		key = "error_sandbox_" .. i,
 		loc_vars = function(self, info_queue, card)
 			local r_mults = {}
 			for i = 1, 333 do
 				r_mults[#r_mults + 1] = tostring(i)
 			end
-			local loc_mult = "$"
-			main_start = {
-				{ n = G.UIT.T, config = { text = "NO PREVIEW", colour = G.C.GREEN, scale = 0.58 } },
+			local loc_mult = "(CURRENTLY " .. math.random(1, 333) .. ")"
+			main_end = {
+				{ n = G.UIT.T, config = { text = loc_mult, colour = lighten(G.C.PURPLE, 0.4), scale = 0.32 } },
 				{
 					n = G.UIT.O,
 					config = {
@@ -25,7 +25,7 @@ for i = 1, 21 do
 							pop_in_rate = 9999999,
 							silent = true,
 							random_element = true,
-							pop_delay = 1.2,
+							pop_delay = 0.3,
 							scale = 0.32,
 							min_cycle_time = 0,
 						}),
@@ -85,13 +85,13 @@ for i = 1, 21 do
 				},
 			}
 			return {
-				main_start = main_start,
+				main_end = main_end,
 				-- modified localization key trickery to ensure we always use this localization, thanks toneblock
-				key = "j_mp_preview_disabled_sandbox",
+				key = "j_mp_error_sandbox",
 			}
 		end,
 
-		atlas = "sandbox_error",
+		atlas = "error_sandbox",
 		no_collection = MP.sandbox_no_collection,
 		unlocked = true,
 		discovered = true,

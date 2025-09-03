@@ -42,7 +42,7 @@ MP.Ruleset({
 			"j_mp_magnet_sandbox",
 		}
 		for i = 1, 21 do
-			table.insert(jokers, "j_mp_preview_disabled_sandbox_" .. i)
+			table.insert(jokers, "j_mp_error_sandbox_" .. i)
 		end
 		return jokers
 	end)(),

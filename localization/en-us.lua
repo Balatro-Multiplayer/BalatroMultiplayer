@@ -318,14 +318,14 @@ return {
 					"{C:inactive}(Currently {C:money}$#1#{C:inactive})",
 				},
 			},
-			j_mp_preview_disabled_sandbox = {
+			j_mp_error_sandbox = {
 				name = "????",
 				text = {
 					-- "PREVIEW DISABLED",
+					"{X:purple,C:white,s:0.85}something's{} {X:purple,C:white,s:0.85}wrong",
 					-- "PREVIEW DISABLED",
 					-- "PREVIEW DISABLED",
-					"{C:inactive}(CURRENTLY {C:money}$7{C:inactive})",
-					"{X:black,C:white}something's{} {X:black,C:white}wrong",
+					-- "{C:inactive}(CURRENTLY {C:money}$7{C:inactive})",
 				},
 			},
 		},
