@@ -52,7 +52,7 @@ SMODS.Joker({
 	end,
 	calculate = function(self, card, context)
 		if context.individual and context.cardarea == G.play and not context.other_card.debuff then
-			if SMODS.pseudorandom_probability(card, "j_mp_cloud_9_sandbox", 1, 4) then
+			if SMODS.pseudorandom_probability(card, "j_mp_cloud_9_sandbox", 1, card.ability.extra.odds) then
 				SMODS.modify_rank(context.other_card, 9 - context.other_card:get_id())
 				play_sound("card1", 1)
 				context.other_card:juice_up(0.3, 0.3)

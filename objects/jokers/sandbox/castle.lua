@@ -31,7 +31,7 @@ SMODS.Joker({
 			context.discard
 			and not context.blueprint
 			and not context.other_card.debuff
-			and context.other_card:is_suit(G.GAME.current_round.castle_card.suit)
+			and context.other_card:is_suit(card.ability.extra.suit)
 		then
 			card.ability.extra.chips = card.ability.extra.chips + card.ability.extra.chip_mod
 			return {
@@ -45,7 +45,9 @@ SMODS.Joker({
 	end,
 	-- todo playtest
 	add_to_deck = function(self, card, from_debuff)
-		card.ability.extra.suit = G.GAME.current_round.castle_card.suit
+		if card.ability.extra.suit == nil then
+			card.ability.extra.suit = G.GAME.current_round.castle_card.suit
+		end
 	end,
 	in_pool = function(self)
 		return MP.LOBBY.config.ruleset == "ruleset_mp_sandbox" and MP.LOBBY.code
