@@ -8,15 +8,14 @@ SMODS.Atlas({
 for i = 1, 21 do
 	SMODS.Joker({
 		key = "preview_disabled_sandbox_" .. i,
-		-- modified localization key trickery, thanks toneblock
 		loc_vars = function(self, info_queue, card)
 			local r_mults = {}
-			for i = 1, 21 do
+			for i = 1, 333 do
 				r_mults[#r_mults + 1] = tostring(i)
 			end
 			local loc_mult = "$"
 			main_start = {
-				{ n = G.UIT.T, config = { text = "  +", colour = G.C.MULT, scale = 0.32 } },
+				{ n = G.UIT.T, config = { text = "NO PREVIEW", colour = G.C.GREEN, scale = 0.58 } },
 				{
 					n = G.UIT.O,
 					config = {
@@ -26,7 +25,7 @@ for i = 1, 21 do
 							pop_in_rate = 9999999,
 							silent = true,
 							random_element = true,
-							pop_delay = 0.5,
+							pop_delay = 1.2,
 							scale = 0.32,
 							min_cycle_time = 0,
 						}),
@@ -49,25 +48,36 @@ for i = 1, 21 do
 										),
 									colour = G.C.MONEY,
 								},
-								loc_mult,
-								loc_mult,
-								loc_mult,
-								loc_mult,
-								loc_mult,
-								loc_mult,
-								loc_mult,
-								loc_mult,
-								loc_mult,
-								loc_mult,
-								loc_mult,
-								loc_mult,
-								loc_mult,
+								"$",
+								"€",
+								"¥",
+								"despair",
+								"£",
+								"₹",
+								"₽",
+								"₩",
+								"¢",
+								"₿",
+								"◊",
+								-- loc_mult,
+								-- loc_mult,
+								-- loc_mult,
+								-- loc_mult,
+								-- loc_mult,
+								-- loc_mult,
+								-- loc_mult,
+								-- loc_mult,
+								-- loc_mult,
+								-- loc_mult,
+								-- loc_mult,
+								-- loc_mult,
+								-- loc_mult,
 							},
 							colours = { G.C.UI.TEXT_DARK },
 							pop_in_rate = 9999999,
 							silent = true,
 							random_element = true,
-							pop_delay = 0.2011,
+							pop_delay = 0.5333,
 							scale = 0.32,
 							min_cycle_time = 0,
 						}),
@@ -76,6 +86,7 @@ for i = 1, 21 do
 			}
 			return {
 				main_start = main_start,
+				-- modified localization key trickery to ensure we always use this localization, thanks toneblock
 				key = "j_mp_preview_disabled_sandbox",
 			}
 		end,
@@ -85,6 +96,6 @@ for i = 1, 21 do
 		unlocked = true,
 		discovered = true,
 		in_pool = false,
-		mp_credits = { art = { "aura!" } },
+		mp_credits = { art = { "aura?" } },
 	})
 end
