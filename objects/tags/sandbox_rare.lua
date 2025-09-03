@@ -7,7 +7,7 @@ SMODS.Atlas({
 
 -- Gambling Tag: 1 in 2 chance to generate a rare joker in shop
 SMODS.Tag({
-	key = "sandbox_rare",
+	key = "sandbox_rare", -- i wholeheartedly swear to change the naming of key and assets xoxo
 	atlas = "sandbox_rare",
 	object_type = "Tag",
 	dependencies = {
@@ -16,7 +16,7 @@ SMODS.Tag({
 	in_pool = function(self)
 		return MP.LOBBY.config.ruleset == "ruleset_mp_sandbox" and MP.LOBBY.code
 	end,
-	name = "Rare Tag",
+	name = "Gambling Tag",
 	discovered = true,
 	order = 2,
 	min_ante = 2, -- less degeneracy
