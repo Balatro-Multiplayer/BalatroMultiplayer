@@ -27,7 +27,8 @@ SMODS.Joker({
 		}
 	end,
 	add_to_deck = function(self, card, from_debuff)
-		card.ability.extra.rank = G.GAME.current_round.mail_card.rank
+		-- Don't overwrite rank if card is re-added after debuff
+		if card.ability.extra.rank == nil then card.ability.extra.rank = G.GAME.current_round.mail_card.rank end
 	end,
 	calculate = function(self, card, context)
 		if
