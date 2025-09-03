@@ -36,16 +36,49 @@ for i = 1, 21 do
 					config = {
 						object = DynaText({
 							string = {
-								{ string = "rand()", colour = G.C.JOKER_GREY },
+								{ string = "segfault", colour = G.C.RED },
+								{ string = "NullPointerException", colour = G.C.ORANGE },
+								{ string = "undefined is not a function", colour = G.C.PURPLE },
+								{ string = "malloc(): corrupted top size", colour = G.C.RED },
+								{ string = "stack overflow", colour = G.C.ORANGE },
+								{ string = "memory leak detected", colour = G.C.YELLOW },
+								{ string = "FATAL ERROR", colour = G.C.RED },
+								{ string = "core dumped", colour = G.C.JOKER_GREY },
+								{ string = "buffer overflow", colour = G.C.ORANGE },
+								{ string = "access violation", colour = G.C.RED },
+								{ string = "cannot read property of null", colour = G.C.PURPLE },
+								{ string = "division by zero", colour = G.C.YELLOW },
+								{ string = "infinite recursion", colour = G.C.ORANGE },
+								{ string = "out of memory", colour = G.C.RED },
+								{ string = "reference before assignment", colour = G.C.PURPLE },
+								{ string = "index out of bounds", colour = G.C.YELLOW },
+								{ string = "panic: runtime error", colour = G.C.RED },
+								{ string = "assertion failed", colour = G.C.ORANGE },
+								{ string = "deadlock detected", colour = G.C.JOKER_GREY },
+								{ string = "race condition", colour = G.C.YELLOW },
+								{ string = "double free", colour = G.C.RED },
+								{ string = "use after free", colour = G.C.ORANGE },
+								{ string = "corrupted heap", colour = G.C.RED },
+								{ string = "invalid opcode", colour = G.C.PURPLE },
+								{ string = "bus error", colour = G.C.ORANGE },
+								{ string = "illegal instruction", colour = G.C.RED },
+								{ string = "floating point exception", colour = G.C.YELLOW },
+								{ string = "timeout exceeded", colour = G.C.JOKER_GREY },
+								{ string = "connection refused", colour = G.C.PURPLE },
+								{ string = "404 not found", colour = G.C.ORANGE },
+								{ string = "500 internal error", colour = G.C.RED },
+								{ string = "syntax error", colour = G.C.PURPLE },
+								{ string = "type error", colour = G.C.YELLOW },
+								{ string = "permission denied", colour = G.C.RED },
+								{ string = "file not found", colour = G.C.ORANGE },
+								{ string = "disk full", colour = G.C.YELLOW },
+								{ string = "network unreachable", colour = G.C.JOKER_GREY },
+								{ string = "broken pipe", colour = G.C.ORANGE },
+								{ string = "killed by signal 9", colour = G.C.RED },
+								{ string = "zombie process", colour = G.C.JOKER_GREY },
+								{ string = "thread pool exhausted", colour = G.C.PURPLE },
 								{
-									string = "#@"
-										.. (G.deck and G.deck.cards[1] and G.deck.cards[#G.deck.cards].base.id or 11)
-										.. (
-											G.deck
-												and G.deck.cards[1]
-												and G.deck.cards[#G.deck.cards].base.suit:sub(1, 1)
-											or "D"
-										),
+									string = "0x" .. string.format("%08X", math.random(0, 0xFFFFFFFF)),
 									colour = G.C.MONEY,
 								},
 								"$",
