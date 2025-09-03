@@ -38,6 +38,7 @@ MP.Ruleset({
 
 	reworked_jokers = (function()
 		local jokers = {
+			"j_mp_hanging_chad",
 			"j_mp_magnet_sandbox",
 		}
 		for i = 1, 21 do
