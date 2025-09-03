@@ -321,11 +321,11 @@ return {
 			j_mp_preview_disabled_sandbox = {
 				name = "????",
 				text = {
-					"PREVIEW DISABLED",
-					"PREVIEW DISABLED",
-					"PREVIEW DISABLED",
-					"{X:purple,C:white}something's{} {X:purple,C:white}wrong",
+					-- "PREVIEW DISABLED",
+					-- "PREVIEW DISABLED",
+					-- "PREVIEW DISABLED",
 					"{C:inactive}(CURRENTLY {C:money}$7{C:inactive})",
+					"{X:black,C:white}something's{} {X:black,C:white}wrong",
 				},
 			},
 		},
