@@ -6,6 +6,7 @@ SMODS.Back({
 	apply = function(self)
 		G.GAME.modifiers.mp_gradient = true -- i forgot how you get the deck, whatever
 	end,
+	mp_credits = { art = { "aura!", "Ganpan140" }, code = { "Toneblock" } },
 })
 
 -- we need to define a bunch of local functions first for some reason
