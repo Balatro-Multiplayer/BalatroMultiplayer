@@ -318,6 +318,16 @@ return {
 					"{C:inactive}(Currently {C:money}$#1#{C:inactive})",
 				},
 			},
+			j_mp_preview_disabled_sandbox = {
+				name = "????",
+				text = {
+					"PREVIEW DISABLED",
+					"PREVIEW DISABLED",
+					"PREVIEW DISABLED",
+					"{X:purple,C:white}something's{} {X:purple,C:white}wrong",
+					"{C:inactive}(CURRENTLY {C:money}$7{C:inactive})",
+				},
+			},
 		},
 		Planet = {
 			c_mp_asteroid = {

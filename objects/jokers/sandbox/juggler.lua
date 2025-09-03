@@ -26,8 +26,6 @@ SMODS.Joker({
 	end,
 	calculate = function(self, card, context)
 		if context.before and context.main_eval and not context.blueprint then
-			print("Playing Juggler")
-			print(#context.full_hand)
 			if #context.full_hand < 5 then
 				card.ability.extra.h_size = card.ability.extra.h_size - 1
 				G.hand:change_size(-1)
