@@ -34,7 +34,7 @@ SMODS.Joker({
 			},
 		}
 	end,
-	in_pool = function(self)
+	mp_include = function(self)
 		return MP.LOBBY.code and MP.LOBBY.config.multiplayer_jokers
 	end,
 	update = function(self, card, dt)

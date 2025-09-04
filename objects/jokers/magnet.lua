@@ -20,7 +20,7 @@ SMODS.Joker({
 		MP.UTILS.add_nemesis_info(info_queue)
 		return { vars = { card.ability.extra.rounds, card.ability.extra.current_rounds, card.ability.extra.rounds } }
 	end,
-	in_pool = function(self)
+	mp_include = function(self)
 		return false
 		-- return MP.LOBBY.code and MP.LOBBY.config.multiplayer_jokers and MP.LOBBY.config.ruleset == "ruleset_mp_sandbox"
 	end,

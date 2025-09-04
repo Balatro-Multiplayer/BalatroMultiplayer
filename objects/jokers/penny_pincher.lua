@@ -20,8 +20,11 @@ SMODS.Joker({
 		MP.UTILS.add_nemesis_info(info_queue)
 		return { vars = { card.ability.extra.dollars, card.ability.extra.nemesis_dollars } }
 	end,
+	mp_include = function(self)
+		return MP.LOBBY.code and MP.LOBBY.config.multiplayer_jokers
+	end,
 	in_pool = function(self)
-		return (MP.LOBBY.code and MP.LOBBY.config.multiplayer_jokers) and MP.GAME.pincher_unlock -- do NOT replace this with G.GAME.round_resets.ante >= 3, order sets ante to 0
+		return MP.GAME.pincher_unlock -- do NOT replace this with G.GAME.round_resets.ante >= 3, order sets ante to 0
 	end,
 	calc_dollar_bonus = function(self, card)
 		local spent = MP.GAME.enemy.spent_in_shop[MP.GAME.pincher_index]
