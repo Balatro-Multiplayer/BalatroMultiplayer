@@ -43,11 +43,8 @@ SMODS.Joker({
 			chips = card.ability.extra.chips,
 		} end
 	end,
-	-- todo playtest
 	add_to_deck = function(self, card, from_debuff)
-		if card.ability.extra.suit == nil then
-			card.ability.extra.suit = G.GAME.current_round.castle_card.suit
-		end
+		if card.ability.extra.suit == nil then card.ability.extra.suit = G.GAME.current_round.castle_card.suit end
 	end,
 	in_pool = function(self)
 		return MP.LOBBY.config.ruleset == "ruleset_mp_sandbox" and MP.LOBBY.code
