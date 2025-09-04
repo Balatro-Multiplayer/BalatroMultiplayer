@@ -42,11 +42,7 @@ SMODS.Joker({
 			xmult = card.ability.extra.Xmult,
 		} end
 	end,
-	in_pool = function(self, args)
-		if not (MP.LOBBY.config.ruleset == "ruleset_mp_sandbox" and MP.LOBBY.code) then return false end
-		for _, playing_card in ipairs(G.playing_cards or {}) do
-			if SMODS.has_enhancement(playing_card, "m_lucky") then return true end
-		end
-		return false
+	in_pool = function(self)
+		return MP.LOBBY.config.ruleset == "ruleset_mp_sandbox" and MP.LOBBY.code
 	end,
 })

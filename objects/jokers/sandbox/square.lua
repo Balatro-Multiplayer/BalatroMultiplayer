@@ -21,9 +21,6 @@ SMODS.Joker({
 	loc_vars = function(self, info_queue, card)
 		return { vars = { card.ability.extra.chips, card.ability.extra.chip_mod } }
 	end,
-	in_pool = function(self)
-		return MP.LOBBY.config.ruleset == "ruleset_mp_sandbox" and MP.LOBBY.code
-	end,
 	calculate = function(self, card, context)
 		if context.before and context.main_eval and not context.blueprint and #context.full_hand == 4 then
 			card.ability.extra.chips = card.ability.extra.chips + card.ability.extra.chip_mod
@@ -37,4 +34,7 @@ SMODS.Joker({
 		} end
 	end,
 	mp_credits = { idea = { "Owen" } },
+	in_pool = function(self)
+		return MP.LOBBY.config.ruleset == "ruleset_mp_sandbox" and MP.LOBBY.code
+	end,
 })

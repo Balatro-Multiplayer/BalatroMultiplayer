@@ -27,9 +27,6 @@ SMODS.Joker({
 			},
 		}
 	end,
-	in_pool = function(self)
-		return MP.LOBBY.code and MP.LOBBY.config.multiplayer_jokers and MP.LOBBY.config.ruleset == "ruleset_mp_sandbox"
-	end,
 	add_to_deck = function(self, card, from_debuffed)
 		if not from_debuffed and (not card.edition or card.edition.type ~= "mp_phantom") then
 			MP.ACTIONS.send_phantom("j_mp_magnet")
@@ -104,4 +101,7 @@ SMODS.Joker({
 		art = { "Ganpan140" },
 		code = { "Virtualized" },
 	},
+	in_pool = function(self)
+		return MP.LOBBY.code and MP.LOBBY.config.multiplayer_jokers and MP.LOBBY.config.ruleset == "ruleset_mp_sandbox"
+	end,
 })
