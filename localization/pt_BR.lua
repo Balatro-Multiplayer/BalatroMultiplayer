@@ -148,12 +148,71 @@ return {
 				},
 			},
 		},
+		Back = {
+			b_mp_cocktail = {
+				name = "Baralho Coquetel",
+				text = {
+					"Copia todos os efeitos",
+					"de {C:attention}3{} outros baralhos",
+					"aleatoriamente",
+				},
+			},
+			b_mp_gradient = {
+				name = "Baralho Gradiente",
+				text = {
+					"Cartas também são consideradas",
+					"uma classe {C:attention}acima{} ou {C:attention}abaixo",
+					"para todos os efeitos de {C:attention}Curinga{}",
+				},
+			},
+			b_mp_indigo = {
+				name = "Baralho Índigo",
+				text = {
+					"Escolha {C:attention}1{} carta extra",
+					"em Pacotes de Reforço",
+				},
+			},
+			b_mp_orange = {
+				name = "Baralho Laranja",
+				text = {
+					"Comece a partida com um",
+					"{C:attention,T:p_mp_standard_giga}Pacote Padrão Giga{}, e",
+					"{C:attention}2{} cópias de {C:tarot,T:c_hanged_man}O Enforcado",
+				},
+			},
+			b_mp_oracle = {
+				name = "Baralho Oráculo",
+				text = {
+					"Comece a partida com {C:spectral,T:c_medium}Médium",
+					"e {C:attention,T:v_clearance_sale}Promoção",
+					"Dinheiro é limitado",
+					"a {C:money}$50",
+				},
+			},
+			b_mp_violet = {
+				name = "Baralho Violeta",
+				text = {
+					"{C:attention}+1{} Cupom na loja",
+					"Durante a aposta {C:attention}1{}, Cupons",
+					"são {C:attention}50%{} mais baratos",
+				},
+			},
+		},
 		Other = {
 			current_nemesis = {
 				name = "Rival",
 				text = {
 					"{X:purple,C:white}#1#{}",
 					"Seu único rival",
+				},
+			},
+			p_mp_standard_giga = {
+				name = "Pacote Padrão Giga",
+				text = {
+					"Escolha {C:attention}#1#{} de até",
+					"{C:attention}#2#{C:attention} cartas{} para",
+					"adicionar ao seu baralho",
+					"{C:attention}Não é possível ignorar{}",
 				},
 			},
 		},
