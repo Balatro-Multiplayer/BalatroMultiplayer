@@ -127,7 +127,9 @@ for i = 1, 21 do
 		no_collection = MP.sandbox_no_collection,
 		unlocked = true,
 		discovered = true,
-		in_pool = false,
+		in_pool = function(self)
+			return false
+		end,
 		mp_credits = { art = { "aura?" } },
 	})
 end
