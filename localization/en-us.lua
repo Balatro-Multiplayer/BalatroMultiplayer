@@ -597,7 +597,7 @@ return {
 			k_current_seed = "Current seed: ",
 			k_random = "Random",
 			k_standard = "Standard",
-			k_sandbox = "Steph's Sandbox",
+			k_sandbox = "Sandbox",
 			k_sandbox_description = "Like normal mode but someone gave the cards coffee and they're\nfeeling chatty.",
 			k_vanilla = "Vanilla",
 			k_vanilla_description = "This ruleset removes all Multiplayer content,\nallowing you to play the game as originally designed.\n\nThis ruleset still includes Multiplayer features like the timer.\n\n(Disableable in Lobby Options)",
