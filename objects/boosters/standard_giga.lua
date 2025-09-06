@@ -32,6 +32,9 @@ SMODS.Booster({
 			key_append = "sta" .. s_append,
 		}
 	end,
+	mp_include = function(self)
+		return false
+	end,
 })
 
 -- unskippable pack hook here, why not

@@ -19,7 +19,7 @@ SMODS.Consumable({
 		MP.UTILS.add_nemesis_info(info_queue)
 		return { vars = { 1 } }
 	end,
-	in_pool = function(self)
+	mp_include = function(self)
 		return MP.LOBBY.code and MP.LOBBY.config.multiplayer_jokers
 	end,
 	can_use = function(self, card)

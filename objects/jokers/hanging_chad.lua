@@ -33,7 +33,7 @@ SMODS.Joker({
 			end
 		end
 	end,
-	in_pool = function(self)
+	mp_include = function(self)
 		return MP.UTILS.is_standard_ruleset() and MP.LOBBY.code
 	end,
 })
