@@ -6,6 +6,7 @@ SMODS.Back({
 	apply = function(self)
 		G.GAME.modifiers.oracle_max = 50
 	end,
+	mp_credits = { art = { "aura!", "Ganpan140" }, code = { "Toneblock" } },
 })
 
 -- billionth create card hook ever

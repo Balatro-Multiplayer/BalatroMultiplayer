@@ -94,6 +94,7 @@ SMODS.Back({
 			if ret1 or ret2 then return ret1, ret2 end
 		end
 	end,
+	mp_credits = { art = { "aura!", "shai1n" }, code = { "Toneblock" } },
 })
 
 local change_to_ref = Back.change_to
