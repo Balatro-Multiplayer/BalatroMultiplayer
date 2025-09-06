@@ -171,12 +171,80 @@ return {
 				},
 			},
 		},
+		Back = {
+			b_mp_cocktail = {
+				name = "カクテルデッキ",
+				text = {
+					"他のデッキの効果を",
+					"ランダムに {C:attention}3つ{} 付与する",
+				},
+			},
+			b_mp_gradient = {
+				name = "グラデーションデッキ",
+				text = {
+					"数字によって発動する",
+					"ジョーカーの条件に対して、",
+					"トランプの数字の {C:attention}誤差が1{} あっても",
+					"発動するようになる",
+				},
+			},
+			b_mp_indigo = {
+				name = "あい色デッキ",
+				text = {
+					"ブースターパック開封時の",
+					"選択可能枚数 {C:attention}+1",
+				},
+			},
+			b_mp_orange = {
+				name = "オレンジデッキ",
+				text = {
+					"{C:attention,T:p_mp_standard_giga}ギガスタンダードパック{} を開封し、",
+					"{C:tarot,T:c_hanged_man}吊された男{} を {C:attention}2枚{} 持った状態で",
+					"ゲームスタート",
+				},
+			},
+
+			b_mp_oracle = {
+				name = "神託デッキ",
+				text = {
+					"{C:spectral,T:c_medium}ミディアム{} と {C:attention,T:v_clearance_sale}クリアランスセール{} を",
+					"持った状態でゲームスタート",
+					"所持金を最大 {C:money}$50{} までしか",
+					"持つことができない",
+				},
+			},
+			b_mp_sibyl = {
+				name = "古の巫女デッキ",
+				text = {
+					"{C:spectral,T:c_medium}ミディアム{} を持った状態で",
+					"ゲームスタート",
+					"その他の {C:spectral}スペクトルカード{}、{C:planet}惑星カード{}、",
+					"{C:attention}スタンダードパック{} は一切登場しない",
+				},
+			},
+			b_mp_violet = {
+				name = "バイオレットデッキ",
+				text = {
+					" バウチャーの商品数 {C:attention}+1{}",
+					"{C:attention}アンティ1{} の時のみ",
+					"バウチャーの値段が {C:attention}50%OFF{}",
+				},
+			},
+		},
 		Other = {
 			current_nemesis = {
 				name = "相手",
 				text = {
 					"{X:purple,C:white}#1#{}",
 					"キミの唯一無二のライバルだ。",
+				},
+			},
+			p_mp_standard_giga = {
+				name = "ギガスタンダードパック",
+				text = {
+					"{C:attention}#2#枚{} の {C:attention}トランプ{} の中から",
+					"{C:attention}#1#枚{} 選んでデッキに追加することができる",
+					"{C:inactive}(スキップすることはできない)",
 				},
 			},
 		},
@@ -196,6 +264,7 @@ return {
 		dictionary = {
 			b_singleplayer = "シングルプレイ",
 			b_join_lobby = "ロビーに参加",
+			b_join_lobby_clipboard = "クリップボードから参加",
 			b_return_lobby = "ロビーに戻る",
 			b_reconnect = "再接続",
 			b_create_lobby = "ロビーの作成",
@@ -221,23 +290,27 @@ return {
 			b_opts_lives = "ライフ",
 			b_opts_multiplayer_jokers = "マルチプレイオリジナルカードを有効",
 			b_opts_player_diff_deck = "お互いに別デッキ､別ステークでプレイ",
-			b_opts_normal_bosses = "通常のボスブラインドの効果ありでPvPを行う",
+			b_opts_normal_bosses = "通常のボスブラインドの制限ありでPvPを行う",
 			b_opts_timer = "タイマーを使用する",
+			b_opts_disable_preview = "電卓MODを無効",
+			b_opts_the_order = "「The Order」MODを有効",
 			b_reset = "リセット",
 			b_set_custom_seed = "シード値を指定",
 			b_mp_kofi_button = "サポートページへ",
 			b_unstuck = "詰み防止処置(β)",
 			b_unstuck_blind = "PvPﾌﾞﾗｲﾝﾄﾞに進まなかったとき",
-			b_misprint_display = "山札の一番上のカードを表示する",
+			b_misprint_display = "山札の一番上のカードを表示",
 			b_players = "プレイヤー",
 			b_lobby_info = "ロビー情報",
-			b_continue_singleplayer = "シングルプレイで再開する",
-			b_the_order_integration = "「The Order」MODを有効にする",
+			b_continue_singleplayer = "シングルプレイで再開",
+			b_the_order_integration = "「The Order」MODを有効",
+			b_preview_integration = "電卓MODを有効",
 			b_view_nemesis_deck = "デッキを見る",
 			b_toggle_jokers = "ジョーカー切替",
 			b_skip_tutorial = "チュートリアルをスキップ",
-			k_yes = "あり",
-			k_no = "なし",
+			k_yes = "はい",
+			k_no = "いいえ",
+			k_are_you_sure = "本当によろしいですか?",
 			k_has_multiplayer_content = "マルチプレイオリジナルアイテム",
 			k_forces_lobby_options = "ロビー設定の強制",
 			k_forces_gamemode = "ゲームモードの強制",
@@ -263,6 +336,7 @@ return {
 			k_paste = "クリップボードからペースト",
 			k_username = "ユーザーネーム",
 			k_enter_username = "ニックネームを入力",
+			k_customize_preview = "電卓機能のテキスト変更",
 			k_join_discord = "Balatro Multiplayer Discordサーバー",
 			k_discord_msg = "MODについての最新情報をお届け中！",
 			k_enter_to_save = "Enterで保存",
@@ -290,6 +364,10 @@ return {
 			k_connect_player = "参加者一覧",
 			k_opts_only_host = "設定を変更できるのはホストのみです",
 			k_opts_gm = "詳細設定",
+			k_lobby_general = "一般",
+			k_lobby_gameplay = "ゲーム設定",
+			k_lobby_modifiers = "詳細設定",
+			k_lobby_advanced = "高度な設定",
 			k_opts_pvp_start_round = "PvP初戦アンティ",
 			k_opts_pvp_timer = "タイマーの秒数",
 			k_opts_showdown_starting_antes = "PvP初戦アンティ(バーサスルール限定)",
@@ -327,7 +405,9 @@ return {
 			k_survival_description = "PvPブラインドがないモードです。\n通常のBalatroと同じルールで、相手がクリアしたブラインドより先のブラインドをクリアした方の勝ちです。",
 			k_weekly = "ウィークリー",
 			k_weekly_description = "1～2週間ごとに変更される特別なルールセットです。どんなルールかは見てからのお楽しみ！ 現在 ",
-			k_weekly_smallworld = "小さな世界",
+			k_smallworld = "小さな世界",
+			k_smallworld_description = "ゲーム内のほぼすべての要素のうち、4分の3がランダムに出現しなくなるルールです。(β)",
+			k_destabilized = "アンバランス",
 			k_oops_ex = "ハズレ！",
 			k_asteroids = "小惑星",
 			k_amount_short = "金額",
@@ -339,7 +419,9 @@ return {
 			k_nemesis_deck = "相手のデッキ",
 			k_your_deck = "自分のデッキ",
 			k_the_order_credit = "製作 @MathIsFun_",
-			k_the_order_integration_desc = "これにより、ショップに並ぶカードの内部テーブルがアンティごとに変更ではなく、常に1つの内部テーブルだけを使用するMODが適用されます",
+			k_the_order_integration_desc = "ショップに並ぶカードの内部テーブルがアンティごとに変更ではなく、常に1つの内部テーブルだけを使用するMODが適用されます",
+			k_preview_credit = "製作 @Fantom, @Divvy",
+			k_preview_integration_desc = "カードを出す前にスコアがわかるようになります (確率を含むカードがある場合は最小値と最大値が表示されます)",
 			k_requires_restart = "有効にするには再起動が必要です",
 			k_new_weekly_ruleset = "ウィークリールールセットが新登場！",
 			k_currently_colon = "現在 ",
@@ -384,12 +466,20 @@ return {
 			k_credits_list = "#1# など...", -- #1# gets replaced with a list of names
 		},
 		v_text = {
+
 			ch_c_hanging_chad_rework = {
 				"{C:attention}ハンギングチャド{}は{C:dark_edition}マルチ用に改良されています。",
 			},
 			ch_c_glass_cards_rework = {
 				"{C:attention}グラスカード{}は{C:dark_edition}マルチ用に改良されています。",
 			},
+			ch_c_mp_score_instability = { "チップと倍率が {C:purple}アンバランス{} になる" },
+			ch_c_mp_score_instability_EXAMPLE = {
+				"  {C:inactive}(例: {C:chips}30{C:inactive}x{C:mult}24{C:inactive} -> {C:chips}36{C:inactive}x{C:mult}18{C:inactive})",
+			},
+			ch_c_mp_score_instability_LOC1 = { "  {C:mult}倍率{} の最小値 {C:attention}1" },
+			ch_c_mp_score_instability_LOC2 = { "  {C:chips}チップ{} の最小値 {C:attention}0" },
+			ch_c_mp_ante_scaling = { "ノルマスコア {C:red}#1#倍{}" },
 		},
 		challenge_names = {
 			c_mp_misprint_deck = "バグシードデッキ",
@@ -406,6 +496,7 @@ return {
 			c_mp_skip_off = "おサボり",
 			c_mp_lets_go_gambling = "Let's ギャンブル！",
 			c_mp_speed = "タイムアタック対決",
+			c_mp_balancing_act = "ニセプラズマ",
 		},
 	},
 }
