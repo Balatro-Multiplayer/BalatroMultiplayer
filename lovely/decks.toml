@@ -1,0 +1,48 @@
+[manifest]
+version = "1.0.0"
+dump_lua = true
+priority = 2147483600
+
+# max
+[[patches]]
+[patches.pattern]
+target = 'functions/common_events.lua'
+pattern = '''G.GAME.dollars = G.GAME.dollars + mod'''
+position = 'before'
+payload = '''
+if G.GAME.modifiers.oracle_max then
+	mod = math.min(G.GAME.modifiers.oracle_max - G.GAME.dollars, mod)
+	if mod == 0 and G.GAME.dollars >= G.GAME.modifiers.oracle_max then
+		text = "MAX"
+		col = G.C.RED
+	end
+end
+'''
+match_indent = true
+times = 1
+
+# recreate this because we can't spoof past a math.abs
+# sigh
+[[patches]]
+[patches.pattern]
+target = 'functions/common_events.lua'
+pattern = '''        attention_text({
+          text = text..tostring(math.abs(mod)),'''
+position = 'before'
+payload = '''
+if text == "MAX" then
+	attention_text({
+		text = text,
+		scale = 0.8,
+		hold = 0.7,
+		cover = dollar_UI.parent,
+		cover_colour = col,
+		align = 'cm',
+	})
+	play_sound("timpani", 0.9, 0.7) -- timpani spam makes good sfx
+	play_sound("timpani", 1.2, 0.7)
+	return
+end
+'''
+match_indent = true
+times = 1
