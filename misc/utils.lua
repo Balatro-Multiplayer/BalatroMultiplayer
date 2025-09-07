@@ -621,12 +621,12 @@ function MP.UTILS.parse_modlist(mod_entries)
 	for _, mod_entry in ipairs(mod_entries) do
 		local mod_name, mod_version
 
-		local dash_pos = string.find(mod_entry, "-")
-		if dash_pos then
-			mod_name = string.sub(mod_entry, 1, dash_pos - 1)
-			mod_version = string.sub(mod_entry, dash_pos + 1)
-		else
+		-- Split on the LAST dash to handle mod names with dashes (e.g., "lovely-compat-trance-v0.0.0")
+		mod_name, mod_version = string.match(mod_entry, "^(.-)%-([^%-]*)$")
+		if not mod_name then
+			-- No dash found, entire string is mod name
 			mod_name = mod_entry
+			mod_version = nil
 		end
 
 		mods[mod_name] = mod_version
