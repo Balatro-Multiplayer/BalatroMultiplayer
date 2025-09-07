@@ -592,7 +592,9 @@ function MP.UTILS.parse_Hash(hash)
 	end
 
 	config.Mods = MP.UTILS.parse_modlist(mod_data)
-	-- TODO: We prob don't need to return mod_string anymore; can use config.Mods as a cleaner interface for the host/guest's mods
+	-- this is for backwards compatibility
+	-- We don't need to return mod_string anymore; can use config.Mods as a cleaner interface for the host/guest's mods
+	-- and hash this in what we send to the server instead
 	local mod_string = table.concat(mod_data, ";")
 
 	return config, mod_string
