@@ -554,6 +554,18 @@ function MP.UTILS.encrypt_ID()
 	return encryptID
 end
 
+-- Parses a semicolon-delimited hash string containing client configuration data
+--
+-- Input format: "encryptID=123456;unlocked=true;ModName1-1.0.0;ModName2-2.1.0;serversideConnectionID=abc123"
+--
+-- Returns:
+--   config (table): Parsed configuration object with structure:
+--     {
+--       encryptID = number,     -- Client's encryption ID
+--       unlocked = boolean,     -- Whether client has all content unlocked
+--       Mods = table           -- Parsed mod list (see parse_modlist for structure)
+--     }
+--   mod_string (string): Semicolon-delimited string of mod entries only (for backward compatibility)
 function MP.UTILS.parse_Hash(hash)
 	local parts = {}
 	for part in string.gmatch(hash, "([^;]+)") do
@@ -579,33 +591,47 @@ function MP.UTILS.parse_Hash(hash)
 		end
 	end
 
-	-- TODO Can be simplified by parsing the `mod_data` instead of the concatenated mod_string
-	-- TODO: We prob don't need to return mod_string anymore; can use config.Mods as a cleaner interface for the host/guest's mods
+	config.Mods = MP.UTILS.parse_modlist(mod_data)
+	-- this is for backwards compatibility
+	-- We don't need to return mod_string anymore; can use config.Mods as a cleaner interface for the host/guest's mods
+	-- and hash this in what we send to the server instead
 	local mod_string = table.concat(mod_data, ";")
-	config.Mods = MP.UTILS.parse_modlist(mod_string)
 
 	return config, mod_string
 end
 
-function MP.UTILS.parse_modlist(mod_string)
-	if not mod_string or mod_string == "" then return {} end
+-- Parses an array of mod entries into a mod table
+--
+-- Input: Array of mod entry strings: {"ModName1-1.0.0", "ModName2-2.1.0", "ModName3"}
+--
+-- Returns:
+--   mods (table): Key-value pairs where:
+--     - key = mod name (string)
+--     - value = mod version (string) or nil if no version specified
+--
+-- Example output:
+--   {
+--     ModName1 = "1.0.0",
+--     ModName2 = "2.1.0",
+--     ModName3 = nil
+--   }
+function MP.UTILS.parse_modlist(mod_entries)
+	if not mod_entries then return {} end
 
 	local mods = {}
 
-	for mod_entry in string.gmatch(mod_string, "([^;]+)") do
-		if mod_entry ~= "" and not string.find(mod_entry, "=") then
-			local mod_name, mod_version
+	for _, mod_entry in ipairs(mod_entries) do
+		local mod_name, mod_version
 
-			local dash_pos = string.find(mod_entry, "-")
-			if dash_pos then
-				mod_name = string.sub(mod_entry, 1, dash_pos - 1)
-				mod_version = string.sub(mod_entry, dash_pos + 1)
-			else
-				mod_name = mod_entry
-			end
-
-			mods[mod_name] = mod_version
+		-- Split on the LAST dash to handle mod names with dashes (e.g., "lovely-compat-trance-v0.0.0")
+		mod_name, mod_version = string.match(mod_entry, "^(.-)%-([^%-]*)$")
+		if not mod_name then
+			-- No dash found, entire string is mod name
+			mod_name = mod_entry
+			mod_version = nil
 		end
+
+		mods[mod_name] = mod_version
 	end
 
 	return mods
