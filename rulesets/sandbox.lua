@@ -28,9 +28,7 @@ MP.Ruleset({
 		"j_throwback",
 		"j_vampire",
 	},
-	banned_consumables = {
-		"c_justice",
-	},
+	banned_consumables = {},
 	banned_vouchers = {},
 	banned_enhancements = {},
 	banned_tags = { "tag_rare" },
