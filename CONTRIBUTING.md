@@ -2,7 +2,7 @@
 
 Thank you for your interest in contributing to Balatro Multiplayer! We're building the definitive multiplayer experience for Balatro. Ready to make poker roguelikes even more unhinged? You've found the right repo.
 
-This little guide will help ensure consistency and quality across the codebase. Follow it and your PRs will merge. Ignore it and maintainers will reject your PR with the enthusiasm of a Celestial Pack hitting Jupiter.
+This little guide will help ensure consistency and quality across the codebase. Follow it and your PRs will merge. Ignore it and maintainers will reject your PR with the enthusiasm of a Neptune card.
 
 Let's build something that would make Jimbo proud.
 
