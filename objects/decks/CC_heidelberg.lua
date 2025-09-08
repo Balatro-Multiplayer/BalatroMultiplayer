@@ -7,16 +7,8 @@ SMODS.Atlas({
 
 SMODS.Back({
 	key = "heidelberg",
-	config = {},
 	atlas = "b_heidelberg",
 	mp_credits = { art = { "aura!" }, code = { "steph" } },
-	-- apply = function(self)
-	-- 	SMODS.change_voucher_limit(1)
-	-- 	G.GAME.modifiers.mp_violet = true -- i forgot how you get the deck, whatever
-	-- end,
-	-- loc_vars = function(self, info_queue, card)
-	-- info_queue[#info_queue + 1] = { key = "e_negative_consumable", set = "Edition", config = { extra = 1 } }
-	-- end,
 	calculate = function(self, back, context)
 		if context.ending_shop and G.consumeables.cards[1] then
 			G.E_MANAGER:add_event(Event({
@@ -33,6 +25,3 @@ SMODS.Back({
 		end
 	end,
 })
-
--- TODO: Perkeo effect on calculate on this deck
--- this is legendary deck
