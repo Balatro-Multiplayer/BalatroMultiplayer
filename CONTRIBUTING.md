@@ -39,74 +39,7 @@ git push origin feature/your-feature
 # Then create PR on GitHub
 ```
 
-**Verify Setup**: Test that stylua works (`stylua --version`) and your Balatro installation has the required dependencies before starting development.
-
-## Code Style Guidelines
-
-### Lua Style Conventions
-
-**Indentation**: Use tabs, not spaces
-```lua
-function MP.example_function()
-	local example_var = "value"
-	if condition then
-		-- nested code uses tabs
-		return true
-	end
-end
-```
-
-**Naming Conventions**:
-- Variables and functions: `snake_case`
-- Constants: `UPPER_SNAKE_CASE`
-- Local variables: `snake_case`
-- Table keys: `snake_case`
-
-```lua
--- Good
-local player_count = 4
-local MP_CONFIG = {}
-function MP.get_lobby_code()
-
--- Bad
-local playerCount = 4
-local mpConfig = {}
-function MP.getLobbyCode()
-```
-
-**Table Formatting**:
-```lua
--- Good: aligned values, trailing comma on multiline
-MP.LOBBY = {
-	connected = false,
-	temp_code = "",
-	config = {},
-}
-
--- Single-line tables are acceptable for short entries
-local simple = {a = 1, b = 2}
-```
-
-**Comments**:
-- Use `--` for single-line comments
-- Place comments above the code they describe
-- Use descriptive comments for complex logic
-
-```lua
--- Calculate the multiplier based on current game state
-local mult = base_mult * modifier
-```
-
-**String Formatting**:
-- Use double quotes for strings by default
-- Use single quotes when the string contains double quotes
-
-### File Organization
-
-**File Structure**:
-- Keep related functionality in logical directories (`objects/`, `ui/`, `networking/`)
-- Use descriptive filenames that indicate purpose
-- Group similar objects together (jokers, consumables, etc.)
+**Verify Setup**: Test that stylua works (`stylua --version`) before starting development.
 
 ### Code Formatting
 
@@ -122,23 +55,16 @@ stylua .  # to format all files
 - **VS Code**: [Lua Language Server extension](https://marketplace.visualstudio.com/items?itemName=sumneko.lua) + StyLua
 - **JetBrains**: [SumnekoLua](https://plugins.jetbrains.com/plugin/22315-sumnekolua) + StyLua
 
+**File Structure**:
+- Keep related functionality in logical directories (`objects/`, `ui/`, `networking/`)
+- Use descriptive filenames that indicate purpose
+- Group similar objects together (jokers, consumables, etc.)
 
 ### Balatro-Specific Patterns
 
 **Mod Integration Pattern**:
-```lua
--- PREFERRED (but currently broken): MP.ReworkCenter approach
--- MP.ReworkCenter({
---     key = "j_example",
---     ruleset = MP.UTILS.get_standard_rulesets(),
---     calculate = function(self, card, context)
---         -- implementation
---     end,
--- })
-
--- CURRENT WORKAROUND: Use standard SMODS patterns
--- Refer to existing implementations in objects/ directories for working examples
-```
+* Use standard SMODS patterns
+* Refer to existing implementation in objects/ directories for working examples
 
 **Networking Actions**:
 ```lua
@@ -161,9 +87,8 @@ end
 
 ## Contribution Guidelines
 
-1. **Branch Naming**: Use descriptive names like `feature/new-gamemode` or `fix/lobby-crash`
-2. **Commits**: Write clear, descriptive commit messages
-3. **Testing**: Test your changes thoroughly across different scenarios
+1. **Commits**: Write clear, descriptive commit messages
+2. **Testing**: Test your changes thoroughly across different scenarios
 
 ## Testing Guidelines
 
@@ -182,15 +107,7 @@ All contributions go through code review. Reviewers will check for:
 - Compatibility with existing features
 - Security implications (networking code)
 
-## Performance Considerations
-
-- Minimize network traffic in multiplayer scenarios
-- Use efficient data structures for game state
-- Be mindful of memory usage in long games
-- Profile performance-critical code paths
-
 ## Questions?
 
 - Check existing [GitHub Issues](https://github.com/Balatro-Multiplayer/BalatroMultiplayer/issues)
 - Join the [Discord server](https://discord.gg/balatromp) for discussion
-- Open an issue or DM developers for clarification on contribution guidelines
