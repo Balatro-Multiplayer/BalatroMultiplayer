@@ -378,7 +378,7 @@ return {
 			k_current_seed = "Seed attuale: ",
 			k_random = "Casuale",
 			k_standard = "Standard",
-			k_sandbox = "La sandbox di Steph",
+			k_sandbox = "La sandbox",
 			k_sandbox_description = "Delle regole identiche a quelle Blitz,\nma qualcuno ha dato il caffè alle carte e ora si sentono loquaci.",
 			k_vanilla = "Vanilla",
 			k_vanilla_description = "Le regole vanilla rimuovono tutto il contenuto Multigiocatore,\npermettendoti di giocare il gioco com'era originariamente pensato.\n\nQueste regole includono alcune modifiche Multigiocatore\ncome il timer che può essere disabilitato nelle opzioni della Lobby",

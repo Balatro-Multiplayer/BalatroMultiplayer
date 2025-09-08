@@ -280,6 +280,7 @@ function SMODS.create_mod_badges(obj, badges)
 			local scale_fac = calced_text_width > max_text_width and max_text_width / calced_text_width or 1
 			return scale_fac
 		end
+		-- doesn't work for decks since they lack tooltips but ONE DAY MAYBE???
 		if obj.mp_credits.art or obj.mp_credits.code or obj.mp_credits.idea then
 			local scale_fac = {}
 			local min_scale_fac = 1

@@ -4,7 +4,7 @@
 local configs = {
 	vanilla = { x_mult = 2, break_chance = 4 },
 	standard = { x_mult = 1.5, break_chance = 4 }, -- hack for now
-	ruleset_mp_sandbox = { x_mult = 2.5, break_chance = 3 },
+	ruleset_mp_sandbox = { x_mult = 1.5, break_chance = 3 },
 }
 
 SMODS.Enhancement:take_ownership("glass", {

@@ -3,6 +3,7 @@ SMODS.Back({
 	config = { consumables = { "c_hanged_man", "c_hanged_man" } },
 	atlas = "mp_decks",
 	pos = { x = 2, y = 0 },
+	mp_credits = { art = { "aura!" }, code = { "Toneblock" } },
 	apply = function(self)
 		stop_use()
 		local lock = self.key

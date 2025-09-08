@@ -302,7 +302,7 @@ return {
 			k_current_seed = "目前种子: ",
 			k_random = "随机",
 			k_standard = "标准",
-			k_sandbox = "Steph 的沙盒",
+			k_sandbox = "的沙盒",
 			k_sandbox_description = "类似于经典模式，但是有人给牌喝了点咖啡，令它们变得好像有点话多。",
 			k_vanilla = "原味香草",
 			k_vanilla_description = "此规则集移除了所有多人游戏内容，使您能够以游戏最初设计的方式进行游玩。\n\n此规则集仍包含多人游戏功能，如计时器。\n\n（可在房间设置中禁用）",
