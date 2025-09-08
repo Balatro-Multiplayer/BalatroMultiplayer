@@ -1194,7 +1194,6 @@ function G.FUNCS.start_lobby(e)
 		MP.LOBBY.config.starting_lives = 1
 		MP.LOBBY.config.disable_live_and_timer_hud = true
 	else
-		MP.LOBBY.config.starting_lives = 4
 		MP.LOBBY.config.disable_live_and_timer_hud = false
 	end
 

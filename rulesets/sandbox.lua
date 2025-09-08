@@ -54,7 +54,7 @@ MP.Ruleset({
 		return MP.UI.CreateRulesetInfoMenu({
 			multiplayer_content = true,
 			forced_lobby_options = true,
-			description_key = "k_sandbox_description"
+			description_key = "k_sandbox_description",
 		})
 	end,
 
@@ -63,6 +63,7 @@ MP.Ruleset({
 	force_lobby_options = function(self)
 		MP.LOBBY.config.preview_disabled = true
 		MP.LOBBY.config.the_order = false
+		MP.LOBBY.config.starting_lives = 3
 		return true
 	end,
 }):inject()
