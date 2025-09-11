@@ -8,8 +8,8 @@ priority = 0
 target = "globals.lua"
 position = "append"
 sources = [
-    "Compatibility/Preview/InitSimulate.lua",
-    "Compatibility/Preview/InitPreview.lua",
+    "compatibility/Preview/InitSimulate.lua",
+    "compatibility/Preview/InitPreview.lua",
 ]
 
 [[patches]]
@@ -17,8 +17,8 @@ sources = [
 target = "main.lua"
 position = "append"
 sources = [
-    "Compatibility/Preview/CorePreview.lua",
-    "Compatibility/Preview/UtilsPreview.lua",
+    "compatibility/Preview/CorePreview.lua",
+    "compatibility/Preview/UtilsPreview.lua",
 ]
 
 [[patches]]
@@ -26,8 +26,8 @@ sources = [
 target = "functions/common_events.lua"
 position = "append"
 sources = [
-    "Compatibility/Preview/EngineSimulate.lua",
-    "Compatibility/Preview/UtilsSimulate.lua",
+    "compatibility/Preview/EngineSimulate.lua",
+    "compatibility/Preview/UtilsSimulate.lua",
 ]
 
 [[patches]]
@@ -35,12 +35,12 @@ sources = [
 target = "card.lua"
 position = "append"
 sources = [
-    "Compatibility/Preview/Jokers/_Vanilla.lua",
-    "Compatibility/Preview/Jokers/Multiplayer.lua",
+    "compatibility/Preview/Jokers/_Vanilla.lua",
+    "compatibility/Preview/Jokers/Multiplayer.lua",
 ]
 
 [[patches]]
 [patches.copy]
 target = "functions/UI_definitions.lua"
 position = "append"
-sources = ["Compatibility/Preview/InterfacePreview.lua"]
+sources = ["compatibility/Preview/InterfacePreview.lua"]
