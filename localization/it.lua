@@ -118,16 +118,6 @@ return {
 					"{C:attention}#1#{} volta in più",
 				},
 			},
-			j_mp_cloud_9 = {
-				name = "Nove nuvoloso",
-				text = {
-					"Guadagni {C:money}$1{} per ogni {C:attention}9{} nel",
-					"tuo {C:attention}mazzo completo {C:inactive}(massimo {C:money}$4{}{C:inactive})",
-					"poi {C:money}$#1#{} per ogni {C:attention}9",
-					"in più alla fine del round",
-					"{C:inactive}(Attualmente {C:money}$#2#{C:inactive})", --linea in più
-				},
-			},
 			j_mp_bloodstone = {
 				name = "Diaspro sanguinoso",
 				text = {
@@ -135,6 +125,210 @@ return {
 					"le carte giocate con",
 					"seme {C:hearts}Cuori{} diano",
 					"{X:mult,C:white} X#3# {} Molt quando assegna punti",
+				},
+			},
+			j_mp_magnet_sandbox = {
+				name = "Magnete",
+				text = {
+					"Dopo {C:attention}#1#{} round, vendi",
+					"questa carta per {C:attention}Copiare{}",
+					"il {C:attention}Jolly{} più costoso",
+					"della tua {X:purple,C:white}Nemesi",
+					"la polarità si inverte dopo {C:attention}#3#{} round",
+					"DIVENTANDO UN INUTILE ROTTAME METALLICO!!!!",
+					"{C:inactive}(Attualmente {C:attention}#2#{C:inactive}/#1# round)",
+				},
+			},
+			j_mp_cloud_9_sandbox = {
+				name = "Nove nuvoloso",
+				text = {
+					"CONTADINO MONOCOLTURE DI NUMERI",
+					"converte il tuo MAZZO DIVERSIFICATO in",
+					"PIANTAGIONI DI NOVE REDDITIZI!!!!",
+					"{C:inactive}({C:green}#1# probabilità su #2#{}{C:inactive}, attualmente {C:money}$#3#{}{C:inactive})",
+				},
+			},
+			j_mp_lucky_cat_sandbox = {
+				name = "Gatto della fortuna",
+				text = {
+					"OPERATORE DI TUBATURE DA-FORTUNA-A-FRAGILITÀ",
+					"il Gatto della fortuna diventa il GATTO DI VETRO",
+					"con un POTERE ESPONENZIALE!!!!",
+					"{C:inactive}(Attualmente {X:mult,C:white} X#2# {C:inactive}Molt)",
+				},
+			},
+			j_mp_constellation_sandbox = {
+				name = "Costellazione",
+				text = {
+					"disturbo d'ansia da manutenzione del pianeta",
+					"DEVI NUTRIRE IL TAMAGOTCHI",
+					"o APPASSIRÀ!!!!",
+					"{C:inactive}(Attualmente {X:mult,C:white} X#1# {C:inactive}Molt)",
+				},
+			},
+			j_mp_bloodstone_sandbox = {
+				name = "Diaspro sanguinoso",
+				text = {
+					"SINDROME DA REGRESSIONE DELLA PATCH NOTE",
+					"tornando al TRAUMA DEL GIORNO DEL LANCIO",
+					"per PICCHI DI POTERE NOSTALGICI!!!!",
+					"{C:inactive}({C:green}#1# probabilità su #2#{}{C:inactive})",
+				},
+			},
+			j_mp_juggler_sandbox = {
+				name = "Giocoliere",
+				text = {
+					"PERFEZIONISTA DELLA DIMENSIONE DELLA MANO",
+					"che deve tenere TUTTE LE CARTE",
+					"in aria COSTANTEMENTE!!!!",
+					"{C:inactive}(Attualmente {C:attention}+#1#{C:inactive} carte della mano)",
+				},
+			},
+			j_mp_mail_sandbox = {
+				name = "Offerta per posta",
+				text = {
+					"MODULO D'OFFERTA BLOCCATO PER VALORE",
+					"qualcuno ha scritto {C:attention}#2#{}",
+					"con l'INCHIOSTRO INDELEBILE!!!!",
+				},
+			},
+			j_mp_hit_the_road_sandbox = {
+				name = "In viaggio",
+				text = {
+					"SMALTIMENTO JACK AUTOSTRADALI",
+					"lanciando dei {C:attention}Jack{}",
+					"NELL'ASFALTO PER SEMPRE!!!!",
+					"{C:inactive}(Attualmente {X:mult,C:white} X#2# {C:inactive} Molt)",
+				},
+			},
+			j_mp_misprint_sandbox = {
+				name = "Errore di stampa",
+				text = {
+					"LOTTERIA DI SCHRODINGER, i biglietti del",
+					"GIOCATORE sono sia VINCENTI che PERDENTI",
+					"finche osservati!!!!",
+					"{C:inactive}({V:1}#1#{C:inactive} Molt)",
+				},
+			},
+			j_mp_castle_sandbox = {
+				name = "Castello",
+				text = {
+					"MATRIMONIO DI SEME BASATO SULLO SCARTO",
+					"butta via SOLO {V:1}#1#{} per sempre",
+					"perché QUESTO È IL LORO LINGUAGGIO D'AMORE!!!!",
+					"{C:inactive}(Attualmente {C:chips}+#2#{C:inactive} Fiche)",
+				},
+			},
+			j_mp_runner_sandbox = {
+				name = "Corridore",
+				text = {
+					"SUPREMATISTA DELLE SEQUENZIALI",
+					"che crede che TUTTE le altre",
+					"MANI DI POKER sono INFERIORI!!!!",
+					"{C:inactive}(Attualmente {C:chips}+#1#{C:inactive} Fiche)",
+				},
+			},
+			j_mp_order_sandbox = {
+				name = "L'ordine",
+				text = {
+					"COORDINATORE DELLA RIVOLTA CONTADINA",
+					"organizzando i NUMERI per rovesciare",
+					"i loro OPPRESSORI FIGURE!!!!",
+				},
+			},
+			j_mp_photograph_sandbox = {
+				name = "Fotografia",
+				text = {
+					"FOTOGRAFO DALLO SCATTO SINGOLO che prende",
+					"UNA FOTO PERFETTA PER MANO!!!!",
+				},
+			},
+			j_mp_ride_the_bus_sandbox = {
+				name = "Giro sull'autobus",
+				text = {
+					"PROGRAMMA DI SOBRIETÀ PER LE FIGURE",
+					"UNA FIGURA e sei",
+					"FUORI DAL BUS!!!!",
+					"{C:inactive}(Attualmente {C:mult}+#1#{C:inactive} Molt)",
+				},
+			},
+			j_mp_loyalty_card_sandbox = {
+				name = "Carta fedeltà",
+				text = {
+					"PROGRAMMA FEDELTÀ PER TIPO DI MANO",
+					"tradisci {C:attention}#1#{}",
+					"e il contatore SI RESETTA!!!!",
+					"{C:inactive}(Fedele per {C:attention}#2#/#3#{} {C:inactive}mani)",
+				},
+			},
+			j_mp_faceless_sandbox = {
+				name = "Jolly senza volto",
+				text = {
+					"SOMMELIER D'ELITE DELLE FIGURE",
+					"che cura l'artigianato",
+					"DEGUSTAZIONE A TRE VARIETÀ",
+					"per un ESPERIENZA DI SCARTO PREMIUM!!!!",
+				},
+			},
+			j_mp_square_sandbox = {
+				name = "Jolly squadrato",
+				text = {
+					"PERFEZIONISTA DELLE QUATTRO CARTE",
+					"che venera LA SACRA GEOMETRIA DEGLI",
+					"ARRANGIAMENTI PERFETTAMENTE BILANCIATI DEL QUADRATO!!!!",
+					"{C:inactive}(Attualmente {C:chips}+#1#{C:inactive} Fiche)",
+				},
+			},
+			j_mp_throwback_sandbox = {
+				name = "Tuffo nel passato",
+				text = {
+					"SERVIZI DI CONSULENZA PROFESSIONALE DA CODARDI",
+					"io vengo PAGATO per scappare dalle cose",
+					"E PIÙ SCAPPO PIÙ DIVENTO FORTE!!!!",
+					"{C:inactive}(Attualmente {X:mult,C:white} X#1# {C:inactive} Molt)",
+				},
+			},
+			j_mp_vampire_sandbox = {
+				name = "Vampiro",
+				text = {
+					"vampiro economista CREA",
+					"VALUTA BASATA SUI SASSI",
+					"DALLA FORZA VITALE!!!!",
+					"{C:inactive}(Attualmente {X:mult,C:white} X#2# {C:inactive} Molt)",
+				},
+			},
+			j_mp_baseball_sandbox = {
+				name = "Carta da baseball",
+				text = {
+					'LA "CONTROVERSIA" DELLE CARTE SPORTIVE',
+					"travestita da CAMBIO DI BILANCIO!!!!",
+				},
+			},
+			j_mp_steel_joker_sandbox = {
+				name = "Jolly d'acciaio",
+				text = {
+					"SPECIALISTA IN RINDONDANZA DELL'ACCIAIO",
+					"ogni LEGA GIOCATA viene",
+					"RICONTROLLATA!!!!",
+				},
+			},
+			j_mp_satellite_sandbox = {
+				name = "Satellite",
+				text = {
+					"ansia cronica da degredo del satellite",
+					"L'INFRASTRUTTURA CASCA A PEZZI LENTAMENTE",
+					"SENZA COSTANTI MIGLIORAMENTI PLANETARI!!!!",
+					"{C:inactive}(Attualmente {C:money}$#1#{C:inactive})",
+				},
+			},
+			j_mp_error_sandbox = {
+				name = "????",
+				text = {
+					"PREVIEW DISABLED",
+					"{X:purple,C:white,s:0.85}something's{} {X:purple,C:white,s:0.85}wrong",
+					"PREVIEW DISABLED",
+					"PREVIEW DISABLED",
+					-- "{C:inactive}(CURRENTLY {C:money}$7{C:inactive})",
 				},
 			},
 		},
@@ -209,14 +403,13 @@ return {
 					"{C:attention}2{} copie de {C:tarot,T:c_hanged_man}Il matto",
 				},
 			},
-			b_mp_sibyl = {
-				name = "Mazzo della sibilla",
+			b_mp_oracle = {
+				name = "Mazzo dell'oracolo",
 				text = {
-					"{C:planet}Pianeti{}, {C:attention}carte{} e",
-					"{C:spectral}Buste spettrali{} non appariranno.",
-					"Inizi con {C:spectral,T:c_medium}Medium{}.",
-					"L'unica carta {C:spectral}Spettrale",
-					"è {C:spectral,T:c_medium}Medium",
+					"Inizi con {C:spectral,T:c_medium}Medium",
+					"e {C:attention,T:v_clearance_sale}Svendita.",
+					"I soldi sono limitati",
+					"a {C:money}$50",
 				},
 			},
 			b_mp_violet = {
@@ -225,6 +418,15 @@ return {
 					"{C:attention}+1{} Buono nel negozio.",
 					"Durante l'Ante {C:attention}1{}, i Buoni",
 					"hanno uno sconto del {C:attention}50%{}",
+				},
+			},
+			b_mp_heidelberg = {
+				name = "Mazzo Heidelberg",
+				text = {
+					"Crea una copia {C:dark_edition}Negativa{} di",
+					"{C:attention}1{} carta {C:attention}consumabile",
+					"casuale in tuo possesso",
+					"alla fine del {C:attention}negozio",
 				},
 			},
 		},
@@ -243,6 +445,32 @@ return {
 					"{C:attention}#2#{} carte da {C:attention}gioco{} da",
 					"aggiungere al tuo mazzo",
 					"{C:attention}Non si può saltare{}",
+				},
+			},
+		},
+		Stake = {
+			stake_mp_planet = {
+				name = "Puntata pianeta",
+				text = {
+					"il fratello più figo della {C:attention}Puntata arancione{}",
+					"che ti ha gentilmente reso il tuo {C:red}scarto",
+					"{C:red}come supporto emotivo{} perché non è così crudele",
+				},
+			},
+			stake_mp_spectral = {
+				name = "Puntata spettrale",
+				text = {
+					"Si applica alla {C:planet}Puntata pianeta{} e in più:",
+					"i Jolly {C:money}A noleggio{} appaiono nel negozio",
+					"Richiede scale di punteggio, più veloce per ogni {C:attention}Ante",
+				},
+			},
+			stake_mp_spectralplus = {
+				name = "Puntata spettrale+",
+				text = {
+					"Si applica alla {C:planet}Puntata spettrale{} e in più:",
+					"Richiede scale di punteggio",
+					"ancora più veloce per ogni {C:attention}Ante",
 				},
 			},
 		},
@@ -292,6 +520,7 @@ return {
 			b_opts_timer = "Abilita Timer",
 			b_opts_disable_preview = "Disabilita l'anteprima del punteggio",
 			b_opts_the_order = 'Abilita il Jolly "L\'ordine"',
+			b_opts_legacy_smallworld = "Meccaniche legacy per Small World",
 			b_reset = "Reset",
 			b_set_custom_seed = "Imposta seed specifico",
 			b_mp_kofi_button = "supporta il creatore su Ko-fi",
@@ -378,7 +607,7 @@ return {
 			k_current_seed = "Seed attuale: ",
 			k_random = "Casuale",
 			k_standard = "Standard",
-			k_sandbox = "La sandbox",
+			k_sandbox = "Sandbox",
 			k_sandbox_description = "Delle regole identiche a quelle Blitz,\nma qualcuno ha dato il caffè alle carte e ora si sentono loquaci.",
 			k_vanilla = "Vanilla",
 			k_vanilla_description = "Le regole vanilla rimuovono tutto il contenuto Multigiocatore,\npermettendoti di giocare il gioco com'era originariamente pensato.\n\nQueste regole includono alcune modifiche Multigiocatore\ncome il timer che può essere disabilitato nelle opzioni della Lobby",
@@ -466,6 +695,9 @@ return {
 			ch_c_hanging_chad_rework = { "{C:attention}Scheda non valida{} è {C:dark_edition}modificata" },
 			ch_c_glass_cards_rework = { "Le {C:attention}Carte di vetro{} sono {C:dark_edition}modificate" },
 			ch_c_mp_score_instability = { "Il punteggio sbilanciato è {C:purple}destabilizzato{} ulteriormente:" },
+			ch_c_mp_score_instability_EXAMPLE = {
+				"  {C:inactive}(ex: {C:chips}30{C:inactive}x{C:mult}24{C:inactive} -> {C:chips}36{C:inactive}x{C:mult}18{C:inactive})",
+			},
 			ch_c_mp_score_instability_LOC1 = { "  {C:inactive}Minimo di {C:attention}1 {C:mult}Molt" },
 			ch_c_mp_score_instability_LOC2 = { "  {C:inactive}Minimo di {C:attention}0 {C:chips}Fiche" },
 			ch_c_mp_ante_scaling = { "{C:red}X#1#{} dimensione base del Buio" },
