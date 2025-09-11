@@ -29,12 +29,12 @@ SMODS.Joker({
 	end,
 	add_to_deck = function(self, card, from_debuffed)
 		if not from_debuffed and (not card.edition or card.edition.type ~= "mp_phantom") then
-			MP.ACTIONS.send_phantom("j_mp_magnet")
+			MP.ACTIONS.send_phantom("j_mp_magnet_sandbox")
 		end
 	end,
 	remove_from_deck = function(self, card, from_debuff)
 		if not from_debuff and (not card.edition or card.edition.type ~= "mp_phantom") then
-			MP.ACTIONS.remove_phantom("j_mp_magnet")
+			MP.ACTIONS.remove_phantom("j_mp_magnet_sandbox")
 		end
 	end,
 	calculate = function(self, card, context)
