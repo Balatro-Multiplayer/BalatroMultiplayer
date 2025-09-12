@@ -52,7 +52,7 @@ if SMODS.Mods["JokerDisplay"] and SMODS.Mods["JokerDisplay"].can_load then
 				})
 			end,
 		}
-		jd_def["j_mp_magnet"] = {
+		jd_def["j_mp_magnet_sandbox"] = {
 			reminder_text = {
 				{ text = "(" },
 				{ ref_table = "card.joker_display_values", ref_value = "active" },

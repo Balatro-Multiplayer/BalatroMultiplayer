@@ -81,17 +81,6 @@ return {
 					"{C:inactive}(Currently {C:mult}+#2#{C:inactive} Mult)",
 				},
 			},
-			j_mp_magnet = {
-				name = "Magnet",
-				text = {
-					"After {C:attention}#1#{} rounds,",
-					"sell this card to {C:attention}Copy{}",
-					"your {X:purple,C:white}Nemesis'{} highest ",
-					"sell cost {C:attention}Joker{}",
-					"{C:inactive}(Currently {C:attention}#2#{C:inactive}/#3# rounds)",
-				},
-			},
-
 			j_mp_pizza = {
 				name = "Pizza",
 				text = {
