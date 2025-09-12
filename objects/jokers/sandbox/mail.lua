@@ -32,7 +32,6 @@ SMODS.Joker({
 			card.ability.extra.rank = G.GAME.current_round.mail_card.rank
 			card.ability.extra.card_id = G.GAME.current_round.mail_card.id
 		end
-		print(card.ability.extra.rank)
 	end,
 	calculate = function(self, card, context)
 		if
