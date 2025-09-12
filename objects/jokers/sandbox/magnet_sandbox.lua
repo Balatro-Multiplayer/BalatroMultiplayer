@@ -12,7 +12,7 @@ SMODS.Joker({
 	cost = 7,
 	unlocked = true,
 	discovered = true,
-	no_collection = true,
+	no_collection = MP.sandbox_no_collection,
 	blueprint_compat = false,
 	eternal_compat = false,
 	perishable_compat = true,
