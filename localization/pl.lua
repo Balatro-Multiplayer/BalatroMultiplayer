@@ -160,7 +160,7 @@ return {
 				name = "Gradientowa talia",
 				text = {
 					"Karty są także traktowane jak",
-					"jedna ranga {C:attention}wyższa{} lub {C:attention}mniejsza",
+					"jedna ranga {C:attention}wyższa{} lub {C:attention}niższa",
 					"przez wszystkie efekty {C:attention}jokerów{}",
 				},
 			},
