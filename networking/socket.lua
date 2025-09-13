@@ -67,10 +67,10 @@ local mainThreadMessageQueue = function()
 		for _ = 1, requestsPerCycle do
 			local msg = uiToNetworkChannel:pop()
 			if msg then
-				if msg:find("^action") ~= nil then
-					Networking.Client:send(msg .. "\n")
-				elseif msg == "connect" then
+				if msg == "{\"action\":\"connect\"}" then
 					Networking.connect()
+				else
+					Networking.Client:send(msg .. "\n")
 				end
 			else
 				-- If there are no more messages, yield
@@ -126,7 +126,7 @@ local networkPacketQueue = function()
 					isRetry = false
 
 					timerCoroutine = coroutine.create(timer)
-					networkToUiChannel:push("action:disconnected")
+					networkToUiChannel:push("{\"action\":\"disconnected\"}")
 				else
 					-- If there are no more packets, yield
 					coroutine.yield()
@@ -166,13 +166,13 @@ while true do
 
 			timerCoroutine = coroutine.create(timer)
 
-			networkToUiChannel:push("action:disconnected")
+			networkToUiChannel:push("{\"action\":\"disconnected\"}")
 		end
 
 		if isRetry then
 			retryCount = retryCount + 1
 			-- Send keepAlive without cutting the line
-			uiToNetworkChannel:push("action:keepAlive")
+			uiToNetworkChannel:push("{\"action\":\"keepAlive\"}")
 
 			-- Restart the timer
 			timerCoroutine = coroutine.create(timer)
