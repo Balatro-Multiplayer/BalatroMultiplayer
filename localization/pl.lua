@@ -105,7 +105,6 @@ return {
 				},
 			},
 		},
-		
 		Planet = {
 			c_mp_asteroid = {
 				name = "Asteroida",
