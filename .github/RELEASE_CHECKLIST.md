@@ -3,8 +3,9 @@
 ## Creating the main ZIP
 *(This ensures we keep the DEV tag on the source code and ensures BMM and balatromp.com don't break, since they rely on the "BalatroMultiplayer.zip" file existing for each release)*
 1. Download the source code.
-2. Uncompress the source code and Open `Multiplayer.json` to remove "~DEV" from the version tag.
+2. Uncompress the source code and open `Multiplayer.json` to remove "~DEV" from the version tag.
 3. Recompress the source code, ensuring to recomopress from the files instead of the outer folder, and name it exactly "BalatroMultiplayer.zip".
+4. Upload `BalatroMultiplayer.zip` with the release.
 
 ## Uploading the server files
 *(We upload the server files for each OS with every release so that people don't have to go digging for these files)*
