@@ -174,7 +174,7 @@ return {
 			b_mp_orange = {
 				name = "Pomarańczowa talia",
 				text = {
-					"Rozpoczynacz przyjęcie z",
+					"Rozpoczynacz podejście z",
 					"{C:attention,T:p_mp_standard_giga}gigapaczką standardową{} oraz",
 					"{C:attention}2{} kopiami {C:tarot,T:c_hanged_man}Wisielca",
 				},
@@ -182,7 +182,7 @@ return {
 			b_mp_oracle = {
 				name = "Wyroczniowa talia",
 				text = {
-					"Rozpoczynacz przyjęcie z"
+					"Rozpoczynacz podejście z"
 					"kartą {C:spectral,T:c_medium}Medium",
 					"i {C:attention,T:v_clearance_sale}Wyprzedarz",
 					"Limit pieniędzy to {C:money}$50",             
