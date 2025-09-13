@@ -105,6 +105,7 @@ return {
 				},
 			},
 		},
+		
 		Planet = {
 			c_mp_asteroid = {
 				name = "Asteroida",
@@ -147,12 +148,108 @@ return {
 				},
 			},
 		},
+		Back = {
+			b_mp_cocktail = {
+				name = "Koktajlowa talia",
+				text = {
+					"Kopiuje efekty",
+					"{C:attention}3{} innych",
+					"losowych talii",
+				},
+			},
+			b_mp_gradient = {
+				name = "Gradientowa talia",
+				text = {
+					"Karty są także traktowane jak",
+					"jedna ranga {C:attention}wyższa{} lub {C:attention}mniejsza",
+					"przez wszystkie efekty {C:attention}jokerów{}",
+				},
+			},
+			b_mp_indigo = {
+				name = "Talia indigo",
+				text = {
+					"Wybierz {C:attention}1{} dodatkową kartę",
+					"w paczkach wzmacniających",
+				},
+			},
+			b_mp_orange = {
+				name = "Pomarańczowa talia",
+				text = {
+					"Rozpoczynacz przyjęcie z",
+					"{C:attention,T:p_mp_standard_giga}gigapaczką standardową{} oraz",
+					"{C:attention}2{} kopiami {C:tarot,T:c_hanged_man}Wisielca",
+				},
+			},
+			b_mp_oracle = {
+				name = "Wyroczniowa talia",
+				text = {
+					"Rozpoczynacz przyjęcie z"
+					"kartą {C:spectral,T:c_medium}Medium",
+					"i {C:attention,T:v_clearance_sale}Wyprzedarz",
+					"Limit pieniędzy to {C:money}$50",             
+				},
+			},
+			b_mp_violet = {
+				name = "Fioletowa talia",
+				text = {
+					"{C:attention}+1{} kupon w sklepach.",
+					"W wejściu {C:attention}1{}, kupony",
+					"mają zniżkę {C:attention}50%{}",
+				},
+			},
+			b_mp_heidelberg = {
+				name = "Heidelbergowa talia",
+				text = {
+					"Tworzy {C:dark_edition}Negatyw{}",
+					"{C:attention}1{} losowej posiadanej",
+					"{C:attention}zużywalnej{} karty",
+					"na końcu zakupów w {C:attention}sklepie",
+				},
+			},
+		},                               
 		Other = {
 			current_nemesis = {
 				name = "Nemesis",
 				text = {
 					"{X:purple,C:white}#1#{}",
 					"Twój jeden i jedyny Nemesis",
+				},
+			},
+			p_mp_standard_giga = {
+				name = "Gigapaczka standardowa",
+				text = {
+					"Wybierz {C:attention}#1#{} z",
+					"{C:attention}#2#{} kart {C:attention}rozgrywających{}, by",
+					"dodać je do swojej talii",
+					"{C:attention}Niepomijalna{}",
+				},
+			},
+		},
+		Stake = {
+			stake_mp_planet = {
+				name = "Planetowa stawka",
+				text = {
+					"Fajniejsza, starsza siostra {C:attention}pomarańczowej{},",
+					"{C:attention}stawki{} która łaskawie oddała ci",
+					"{C:red}zrzutkę wsparcia emocjonalnego{}, bo",
+					"nawet ona nie jest taka okrutna",
+				},
+			},
+			stake_mp_spectral = {
+				name = "Stawka ducha",
+				text = {
+					"Stosuje efekty {C:planet}planetowej stawki{} plus:",
+					"{C:money}Wyporzyczane{} jokery pojawiają się,",
+					"Wymagany wynik skaluje się",
+					"jeszcze szybciej dla każdego {C:attention}wejścia",
+				},
+			},
+			stake_mp_spectralplus = {
+				name = "Stawka ducha+",
+				text = {
+					"Stosuje efekty {C:planet}stawki ducha{} plus:",
+					"Wymagany wynik skaluje się",
+					"jeszcze szybciej dla każdego {C:attention}wejścia",
 				},
 			},
 		},
