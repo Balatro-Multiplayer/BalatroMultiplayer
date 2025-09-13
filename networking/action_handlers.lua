@@ -1,6 +1,9 @@
+local json = require "json"
+
 Client = {}
 
 function Client.send(msg)
+	msg = json.encode(msg)
 	if msg ~= "{\"action\":\"keepAliveAck\"}" then
 		sendTraceMessage(string.format("Client sent message: %s", msg), "MULTIPLAYER")
 	end
