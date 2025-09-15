@@ -42,6 +42,7 @@ MP.Ruleset({
 		for i = 1, 21 do
 			table.insert(jokers, "j_mp_error_sandbox_" .. i)
 		end
+		table.insert(jokers, "j_mp_idol_sandbox")
 		return jokers
 	end)(),
 	reworked_consumables = {},

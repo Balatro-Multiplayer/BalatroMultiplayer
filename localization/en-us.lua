@@ -307,6 +307,14 @@ return {
 					"{C:inactive}(Currently {C:money}$#1#{C:inactive})",
 				},
 			},
+			j_mp_idol_sandbox = {
+				name = "Idol",
+				text = {
+					"SUIT-BLIND ZEALOT",
+					"accepting ALL {C:attention}#1#{} DEVOTION",
+					"with {X:mult,C:white}X#2#{} ENTHUSIASM!!!!",
+				},
+			},
 			j_mp_error_sandbox = {
 				name = "????",
 				text = {
