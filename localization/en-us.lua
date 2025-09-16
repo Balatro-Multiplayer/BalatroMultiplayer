@@ -155,9 +155,9 @@ return {
 			j_mp_bloodstone_sandbox = {
 				name = "Bloodstone",
 				text = {
-					"PATCH NOTE REGRESSION SYNDROME",
+					"{V:1}PATCH NOTE REGRESSION SYNDROME",
 					"reverting to LAUNCH DAY TRAUMA",
-					"for NOSTALGIC POWER SPIKES!!!!",
+					"for NOSTALGIC {X:mult,C:white}X#3#{} POWER SPIKES!!!!",
 					"{C:inactive}({C:green}#1# in #2#{} {C:inactive}chance)",
 				},
 			},
@@ -307,12 +307,30 @@ return {
 					"{C:inactive}(Currently {C:money}$#1#{C:inactive})",
 				},
 			},
-			j_mp_idol_sandbox = {
+			j_mp_idol_sandbox_bw = {
 				name = "Idol",
 				text = {
 					"SUIT-BLIND ZEALOT",
 					"accepting ALL {C:attention}#1#{} DEVOTION",
 					"with {X:mult,C:white}X#2#{} ENTHUSIASM!!!!",
+				},
+			},
+			j_mp_idol_sandbox_color = {
+				name = "THE Idol",
+				text = {
+					"DEVOTIONAL PRESSURE COOKER",
+					"building STEAM for {C:attention}#1#{} of {V:1}#3#{}",
+					"until EXPLOSIVE RELEASE!!!!",
+					"{C:inactive}(Currently {X:mult,C:white} X#2# {C:inactive} Mult)",
+				},
+			},
+			j_mp_idol_sandbox_fantom = {
+				name = "Fantom's Idol",
+				text = {
+					"STATISTICAL SUPREMACY COMPLEX",
+					"worshipping your MOST COMMON",
+					"{C:attention}#1#{} of {V:1}#2#{} combo for",
+					"{X:mult,C:white}X#3#{} DIVINE POWER!!!!",
 				},
 			},
 			j_mp_error_sandbox = {

@@ -18,7 +18,7 @@ SMODS.Joker({
 	loc_vars = function(self, info_queue, card)
 		local numerator, denominator =
 			SMODS.get_probability_vars(card, 1, card.ability.extra.odds, "j_mp_bloodstone_sandbox")
-		return { vars = { numerator, denominator } }
+		return { vars = { numerator, denominator, card.ability.extra.Xmult, colours = { G.C.SUITS["Hearts"] } } }
 	end,
 	calculate = function(self, card, context)
 		if

@@ -39,10 +39,15 @@ MP.Ruleset({
 			"j_mp_hanging_chad",
 			"j_mp_magnet_sandbox",
 		}
-		for i = 1, 21 do
+		for i = 1, 10 do
 			table.insert(jokers, "j_mp_error_sandbox_" .. i)
 		end
-		table.insert(jokers, "j_mp_idol_sandbox")
+		table.insert(jokers, "j_mp_bloodstone_sandbox")
+		for i = 11, 20 do
+			table.insert(jokers, "j_mp_error_sandbox_" .. i)
+		end
+		table.insert(jokers, "j_mp_idol_sandbox_bw")
+		table.insert(jokers, "j_mp_idol_sandbox_color")
 		return jokers
 	end)(),
 	reworked_consumables = {},
@@ -70,4 +75,4 @@ MP.Ruleset({
 }):inject()
 
 -- debugging hotswitch
-MP.sandbox_no_collection = true
+MP.sandbox_no_collection = false
