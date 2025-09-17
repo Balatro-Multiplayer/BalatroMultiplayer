@@ -38,9 +38,20 @@ MP.Ruleset = SMODS.GameObject:extend({
 })
 
 function MP.ApplyBans()
+	local ruleset_key = nil
+	local gamemode = nil
+
 	if MP.LOBBY.code and MP.LOBBY.config.ruleset then
-		local ruleset = MP.Rulesets[MP.LOBBY.config.ruleset]
-		local gamemode = MP.Gamemodes["gamemode_mp_" .. MP.LOBBY.type]
+		ruleset_key = MP.LOBBY.config.ruleset
+		gamemode = MP.Gamemodes["gamemode_mp_" .. MP.LOBBY.type]
+	elseif MP.SP and MP.SP.ruleset then
+		ruleset_key = MP.SP.ruleset
+	end
+
+	print("Applying ruleset " .. ruleset_key)
+
+	if ruleset_key then
+		local ruleset = MP.Rulesets[ruleset_key]
 		local banned_tables = {
 			"jokers",
 			"consumables",
@@ -52,9 +63,12 @@ function MP.ApplyBans()
 		for _, table in ipairs(banned_tables) do
 			for _, v in ipairs(ruleset["banned_" .. table]) do
 				G.GAME.banned_keys[v] = true
+				print("Banning" .. v)
 			end
-			for _, v in ipairs(gamemode["banned_" .. table]) do
-				G.GAME.banned_keys[v] = true
+			if gamemode then
+				for _, v in ipairs(gamemode["banned_" .. table]) do
+					G.GAME.banned_keys[v] = true
+				end
 			end
 			for k, v in pairs(MP.DECK["BANNED_" .. string.upper(table)]) do
 				G.GAME.banned_keys[k] = true
