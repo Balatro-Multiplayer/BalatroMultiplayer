@@ -1110,9 +1110,11 @@ function G.UIDEF.weekly_interrupt(loaded)
 	)
 end
 
+MP.SP = {}
 function G.FUNCS.setup_run_singleplayer(e)
 	G.SETTINGS.paused = true
 	MP.LOBBY.config.ruleset = nil
+	MP.SP.ruleset = "ruleset_mp_smallworld"
 	MP.LOBBY.config.gamemode = nil
 	G.FUNCS.setup_run(e)
 end
