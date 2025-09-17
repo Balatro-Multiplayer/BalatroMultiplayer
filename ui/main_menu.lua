@@ -1114,9 +1114,16 @@ MP.SP = {}
 function G.FUNCS.setup_run_singleplayer(e)
 	G.SETTINGS.paused = true
 	MP.LOBBY.config.ruleset = nil
-	MP.SP.ruleset = "ruleset_mp_smallworld"
+	MP.SP.ruleset = nil
+	-- MP.SP.ruleset = "ruleset_mp_smallworld"
 	MP.LOBBY.config.gamemode = nil
-	G.FUNCS.setup_run(e)
+
+	G.SETTINGS.paused = true
+	G.FUNCS.overlay_menu({
+		definition = G.UIDEF.sp_ruleset_selection_options(),
+	})
+	-- TODO i think this will come later ackshually!!
+	-- G.FUNCS.setup_run(e)
 end
 
 function G.FUNCS.play_options(e)

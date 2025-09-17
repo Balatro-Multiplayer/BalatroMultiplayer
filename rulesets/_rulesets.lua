@@ -63,7 +63,6 @@ function MP.ApplyBans()
 		for _, table in ipairs(banned_tables) do
 			for _, v in ipairs(ruleset["banned_" .. table]) do
 				G.GAME.banned_keys[v] = true
-				print("Banning" .. v)
 			end
 			if gamemode then
 				for _, v in ipairs(gamemode["banned_" .. table]) do
@@ -111,6 +110,7 @@ end
 -- You can also call this function with a key to only affect that specific joker (might be useful)
 function MP.LoadReworks(ruleset, key)
 	ruleset = ruleset or "vanilla"
+	print("LoadReworks called with ruleset " .. ruleset)
 	if string.sub(ruleset, 1, 11) == "ruleset_mp_" then ruleset = string.sub(ruleset, 12, #ruleset) end
 	local function process(key_, ruleset_)
 		local center = G.P_CENTERS[key_]
