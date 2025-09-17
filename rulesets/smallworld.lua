@@ -32,6 +32,7 @@ MP.Ruleset({
 
 local apply_bans_ref = MP.ApplyBans
 function MP.ApplyBans()
+	print("Overriden applybans called")
 	local ret = apply_bans_ref()
 	if MP.LOBBY.config.ruleset == "ruleset_mp_smallworld" or MP.SP.ruleset == "ruleset_mp_smallworld" then
 		local tables = {}

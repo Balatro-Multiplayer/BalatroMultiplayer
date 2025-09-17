@@ -1277,7 +1277,7 @@ end
 
 local start_run_ref = Game.start_run
 function Game:start_run(args)
-	MP.LoadReworks(MP.LOBBY.config.ruleset)
+	MP.LoadReworks(MP.LOBBY.config.ruleset or MP.SP.ruleset)
 
 	start_run_ref(self, args)
 
