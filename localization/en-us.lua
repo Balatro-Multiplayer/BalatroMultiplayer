@@ -308,15 +308,15 @@ return {
 				},
 			},
 			j_mp_idol_sandbox_bw = {
-				name = "Idol",
+				name = "Zealot Idol",
 				text = {
-					"SUIT-BLIND ZEALOT",
+					"SUIT-BLIND PURIST",
 					"accepting ALL {C:attention}#1#{} DEVOTION",
 					"with {X:mult,C:white}X#2#{} ENTHUSIASM!!!!",
 				},
 			},
 			j_mp_idol_sandbox_color = {
-				name = "THE Idol",
+				name = "Tantrum Idol",
 				text = {
 					"DEVOTIONAL PRESSURE COOKER",
 					"building STEAM for {C:attention}#1#{} of {V:1}#3#{}",
@@ -325,7 +325,7 @@ return {
 				},
 			},
 			j_mp_idol_sandbox_fantom = {
-				name = "Fantom's Idol",
+				name = "Meta Idol",
 				text = {
 					"STATISTICAL SUPREMACY COMPLEX",
 					"worshipping your MOST COMMON",
