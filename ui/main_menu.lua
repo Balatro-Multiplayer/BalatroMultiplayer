@@ -1,22 +1,5 @@
 MP.load_mp_dir("ui/main_menu") -- while we extract stuff
 
--- TODO witchcraft
-MP.SP = {}
-function G.FUNCS.setup_run_singleplayer(e)
-	G.SETTINGS.paused = true
-	MP.LOBBY.config.ruleset = nil
-	MP.SP.ruleset = nil
-	-- MP.SP.ruleset = "ruleset_mp_smallworld"
-	MP.LOBBY.config.gamemode = nil
-
-	G.SETTINGS.paused = true
-	G.FUNCS.overlay_menu({
-		definition = G.UIDEF.sp_ruleset_selection_options(),
-	})
-	-- TODO i think this will come later ackshually!!
-	-- G.FUNCS.setup_run(e)
-end
-
 -- TODO: extracted some gnarly business logic here that doesn't belong in UI layer
 -- this stuff actually configures game state and starts lobbies
 -- should prob live in lobby_setup.lua or something, these are just bridges from button clicks
