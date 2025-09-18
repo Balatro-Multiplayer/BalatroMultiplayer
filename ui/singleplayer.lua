@@ -1,5 +1,4 @@
 function G.FUNCS.start_sp_for_real(e)
-	-- TODO maybe remove overlay shit and unpause?
 	G.FUNCS.setup_run(e)
 end
 
