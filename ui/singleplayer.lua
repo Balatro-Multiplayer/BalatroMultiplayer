@@ -1,3 +1,16 @@
+MP.SP = {}
+function G.FUNCS.setup_run_singleplayer(e)
+	G.SETTINGS.paused = true
+	MP.LOBBY.config.ruleset = nil
+	MP.SP.ruleset = nil
+	MP.LOBBY.config.gamemode = nil
+
+	G.SETTINGS.paused = true
+	G.FUNCS.overlay_menu({
+		definition = G.UIDEF.sp_ruleset_selection_options(),
+	})
+end
+
 function G.FUNCS.start_sp_for_real(e)
 	G.FUNCS.setup_run(e)
 end
