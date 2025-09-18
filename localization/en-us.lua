@@ -503,6 +503,25 @@ return {
 				},
 			},
 		},
+		Spectral = {
+			c_mp_ouija_sandbox = {
+				name = "Ouija",
+				text = {
+					"Destroy {C:attention}3{} random cards,",
+					"then convert all remaining",
+					"cards to a single random {C:attention}rank",
+				},
+			},
+			c_mp_ectoplasm_sandbox = {
+				name = "Ectoplasm",
+				text = {
+					"Add {C:dark_edition}Negative{} to",
+					"a random {C:attention}Joker,",
+					"Randomly apply one of:",
+					"{C:red}-1{} hand, {C:red}-1{} discard, or {C:red}-1{} hand size",
+				},
+			},
+		},
 	},
 	misc = {
 		labels = {
