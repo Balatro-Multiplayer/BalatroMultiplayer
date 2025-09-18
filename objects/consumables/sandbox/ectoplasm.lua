@@ -1,9 +1,8 @@
 -- Ectoplasm
--- TODO impl change:
--- Change from (-1, -2, ... hand size)
--- to random
--- -1 hand size, -1 hand, -1 discard
--- (yes you can die...?)
+-- Current version: Random: -1 hand size, -1 hand, -1 discard
+-- Other options:
+-- always just -1 hand size (not incrementing)
+-- and/or: also makes a random joker perishable
 SMODS.Consumable({
 	key = "ectoplasm_sandbox",
 	set = "Spectral",
@@ -22,22 +21,17 @@ SMODS.Consumable({
 			delay = 0.4,
 			func = function()
 				-- Randomly pick one of three negative effects
-				local effect = pseudorandom("ectoplasm_sandbox", 1, 3)
+				local effect = math.floor(pseudorandom("ectoplasm_sandbox") * 3) + 1
 
 				if effect == 1 then
-					-- Apply hand change
 					G.GAME.round_resets.hands = G.GAME.round_resets.hands - 1
 					ease_hands_played(-1)
 				elseif effect == 2 then
-					-- Apply discard change
 					G.GAME.round_resets.discards = G.GAME.round_resets.discards - 1
 					ease_discard(-1)
 				else
-					-- Apply hand size change
 					G.hand:change_size(-1)
 				end
-
-				-- TODO another effect (maybe the main one?): make a random joker perishable
 
 				-- positive effect: negative joker
 				if #editionless_jokers then
