@@ -5,12 +5,12 @@
 -- -1 hand size, -1 hand, -1 discard
 -- (yes you can die...?)
 SMODS.Consumable({
-	key = "ectoplasm",
+	key = "ectoplasm_sandbox",
 	set = "Spectral",
 	pos = { x = 8, y = 4 },
 	loc_vars = function(self, info_queue, card)
 		info_queue[#info_queue + 1] = G.P_CENTERS.e_negative
-		return { vars = { G.GAME.ecto_minus or 1 } }
+		return { vars = { G.GAME.ecto_minus or 1 }, mp_sticker_balanced = true }
 	end,
 	in_pool = function(self)
 		return MP.LOBBY.code and MP.LOBBY.config.ruleset == "ruleset_mp_sandbox"
