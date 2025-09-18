@@ -1,3 +1,5 @@
+-- currently self-contained to the blast radius of a single file
+
 MP.SP = {}
 function G.FUNCS.setup_run_singleplayer(e)
 	G.SETTINGS.paused = true
@@ -9,10 +11,6 @@ function G.FUNCS.setup_run_singleplayer(e)
 	G.FUNCS.overlay_menu({
 		definition = G.UIDEF.sp_ruleset_selection_options(),
 	})
-end
-
-function G.FUNCS.start_sp_for_real(e)
-	G.FUNCS.setup_run(e)
 end
 
 function G.UIDEF.sp_ruleset_selection_options()
@@ -103,9 +101,6 @@ function G.UIDEF.ruleset_info_singleplayer(ruleset_name)
 end
 
 function G.FUNCS.change_ruleset_selection_singleplayer(e)
-	-- if e.config.id == "weekly_ruleset_button" then
-	-- 	if G.FUNCS.weekly_interrupt(e) then return end
-	-- end
 	MP.UI.Change_Main_Lobby_Options(
 		e,
 		"ruleset_area",
@@ -116,4 +111,10 @@ function G.FUNCS.change_ruleset_selection_singleplayer(e)
 			MP.LoadReworks(ruleset_name)
 		end
 	)
+end
+
+--
+
+function G.FUNCS.start_sp_for_real(e)
+	G.FUNCS.setup_run(e)
 end
