@@ -1085,10 +1085,13 @@ end
 local update_new_round_ref = Game.update_new_round
 function Game:update_new_round(dt)
 	if MP.GAME.end_pvp then
-		G.FUNCS.draw_from_hand_to_deck()
-		G.FUNCS.draw_from_discard_to_deck()
-		MP.GAME.end_pvp = false
-	end
+        if (not G.STATE == G.STATES.NEW_ROUND) then
+            G.FUNCS.draw_from_hand_to_deck()
+            G.FUNCS.draw_from_discard_to_deck()
+        end
+        G.STATE = G.STATES.NEW_ROUND
+        MP.GAME.end_pvp = false
+    end
 	if MP.LOBBY.code and not G.STATE_COMPLETE then
 		-- Prevent player from losing
 		if to_big(G.GAME.chips) < to_big(G.GAME.blind.chips) and not MP.is_pvp_boss() then
