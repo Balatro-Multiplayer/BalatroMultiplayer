@@ -118,7 +118,6 @@ local function get_most_common_card()
 		end
 	end
 
-	-- Failsafe in case all are stone or no cards in deck
 	if #valid_idol_cards == 0 then return { id = 14, rank = "Ace", suit = "Spades", count = 0 } end
 
 	-- Sort by count descending first, then by suit/value for consistency
