@@ -48,6 +48,7 @@ MP.Ruleset({
 		end
 		table.insert(jokers, "j_mp_idol_sandbox_bw")
 		table.insert(jokers, "j_mp_idol_sandbox_color")
+		table.insert(jokers, "j_mp_idol_sandbox_fantom")
 		return jokers
 	end)(),
 	reworked_consumables = {},
