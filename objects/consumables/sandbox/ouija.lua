@@ -3,18 +3,18 @@ SMODS.Consumable({
 	key = "ouija_sandbox",
 	set = "Spectral",
 	pos = { x = 7, y = 4 },
-	config = { mp_sticker_balanced = true },
+	config = { extra = { destroy = 3 }, mp_sticker_balanced = true },
 	in_pool = function(self)
 		return MP.LOBBY.code and MP.LOBBY.config.ruleset == "ruleset_mp_sandbox"
 	end,
 	loc_vars = function(self, info_queue, card)
-		return { mp_sticker_balanced = true }
+		return { vars = { card.ability.extra.destroy } }
 	end,
 	use = function(self, card, area, copier)
 		local used_tarot = copier or card
 		G.E_MANAGER:add_event(Event({
 			trigger = "after",
-			delay = 0.4,
+			delay = 0.2,
 			func = function()
 				play_sound("tarot1")
 				used_tarot:juice_up(0.3, 0.5)
@@ -22,10 +22,8 @@ SMODS.Consumable({
 			end,
 		}))
 
-		-- Destroy 3 random cards first
-		-- todo: replace w pseudorandom_element x3 + pop?
 		local cards_to_destroy = {}
-		for i = 1, math.min(3, #G.hand.cards) do
+		for i = 1, math.min(card.ability.extra.destroy, #G.hand.cards) do
 			local remaining_cards = {}
 			for j, hand_card in ipairs(G.hand.cards) do
 				local already_marked = false
@@ -58,7 +56,7 @@ SMODS.Consumable({
 		-- Wait for destruction, then flip remaining cards
 		G.E_MANAGER:add_event(Event({
 			trigger = "after",
-			delay = 0.5,
+			delay = 1,
 			func = function()
 				for i = 1, #G.hand.cards do
 					local percent = 1.15 - (i - 0.999) / (#G.hand.cards - 0.998) * 0.3
@@ -83,7 +81,7 @@ SMODS.Consumable({
 		local _rank = pseudorandom_element(SMODS.Ranks, "ouija")
 		G.E_MANAGER:add_event(Event({
 			trigger = "after",
-			delay = 1.0,
+			delay = 0.8,
 			func = function()
 				for i = 1, #G.hand.cards do
 					if G.hand.cards[i] and not G.hand.cards[i].destroyed then
@@ -105,7 +103,7 @@ SMODS.Consumable({
 		-- Flip cards back
 		G.E_MANAGER:add_event(Event({
 			trigger = "after",
-			delay = 1.5,
+			delay = 1.2,
 			func = function()
 				for i = 1, #G.hand.cards do
 					if G.hand.cards[i] and not G.hand.cards[i].destroyed then
@@ -130,8 +128,7 @@ SMODS.Consumable({
 		delay(0.5)
 	end,
 	can_use = function(self, card)
-		return G.hand and #G.hand.cards > 3
-		-- return G.hand and #G.hand.cards > 0
+		return G.hand and #G.hand.cards >= card.ability.extra.destroy
 	end,
 	-- draw = function(self, card, layer)
 	-- 	-- This is for the Spectral shader. You don't need this with `set = "Spectral"`
