@@ -81,10 +81,6 @@ local function action_lobbyInfo(host, hostHash, hostCached, guest, guestHash, gu
 		MP.LOBBY.guest = {}
 	end
 
-	-- Backwards compatibility for old server, assume guest is ready
-	-- TODO: Remove this once new server gets released
-	guestReady = guestReady or true
-
 	-- TODO: This should check for player count instead
 	-- once we enable more than 2 players
 	MP.LOBBY.ready_to_start = guest ~= nil and guestReady
