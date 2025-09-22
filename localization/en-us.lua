@@ -507,7 +507,7 @@ return {
 			c_mp_ouija_sandbox = {
 				name = "Ouija",
 				text = {
-					"Destroy {C:attention}3{} random cards,",
+					"Destroy {C:attention}#1#{} random cards,",
 					"then convert all remaining",
 					"cards to a single random {C:attention}rank",
 				},
