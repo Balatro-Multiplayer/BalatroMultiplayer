@@ -3,6 +3,7 @@ SMODS.Consumable({
 	key = "ouija_sandbox",
 	set = "Spectral",
 	pos = { x = 7, y = 4 },
+	config = { mp_sticker_balanced = true },
 	in_pool = function(self)
 		return MP.LOBBY.code and MP.LOBBY.config.ruleset == "ruleset_mp_sandbox"
 	end,
