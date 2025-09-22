@@ -28,7 +28,7 @@ MP.Ruleset({
 		"j_throwback",
 		"j_vampire",
 	},
-	banned_consumables = {},
+	banned_consumables = { "c_ouija", "c_ectoplasm" },
 	banned_vouchers = {},
 	banned_enhancements = {},
 	banned_tags = { "tag_rare" },
@@ -51,7 +51,7 @@ MP.Ruleset({
 		table.insert(jokers, "j_mp_idol_sandbox_fantom")
 		return jokers
 	end)(),
-	reworked_consumables = {},
+	reworked_consumables = { "c_mp_ouija_sandbox", "c_mp_ectoplasm_sandbox" },
 	reworked_vouchers = {},
 	reworked_enhancements = {},
 	reworked_blinds = {},

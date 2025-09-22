@@ -7,9 +7,10 @@ SMODS.Consumable({
 	key = "ectoplasm_sandbox",
 	set = "Spectral",
 	pos = { x = 8, y = 4 },
+	config = { mp_sticker_balanced = true },
 	loc_vars = function(self, info_queue, card)
 		info_queue[#info_queue + 1] = G.P_CENTERS.e_negative
-		return { vars = { G.GAME.ecto_minus or 1 }, mp_sticker_balanced = true }
+		return { vars = { G.GAME.ecto_minus or 1 } }
 	end,
 	in_pool = function(self)
 		return MP.LOBBY.code and MP.LOBBY.config.ruleset == "ruleset_mp_sandbox"
