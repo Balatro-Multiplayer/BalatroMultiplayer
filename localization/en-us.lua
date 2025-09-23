@@ -622,6 +622,7 @@ return {
 			k_lives = "Lives",
 			k_lost_life = "Lost a life",
 			k_total_lives_lost = " Total Lives Lost ($4 each)",
+			k_comeback_money_sandbox = " Comeback Money ($3 × ante cleared)",
 			k_attrition_name = "Attrition",
 			k_enter_lobby_code = "Enter Lobby Code",
 			k_paste = "Paste From Clipboard",
