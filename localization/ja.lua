@@ -3,7 +3,7 @@
 return {
 	descriptions = {
 		Tag = {
-			tag_mp_sandbox_rare = {
+			tag_mp_gambling_sandbox = {
 				name = "ギャンブルタグ",
 				text = {
 					"次回のジョーカーの商品を、{C:green}#2# 分の #1#{} の確率で",
