@@ -1,12 +1,19 @@
 return {
 	descriptions = {
 		Tag = {
-			tag_mp_sandbox_rare = {
+			tag_mp_gambling_sandbox = {
 				name = "Gambling Tag",
 				text = {
 					"{C:green}#1# in #2#{} chance",
 					"Shop has a free",
 					"{C:red}Rare Joker{}",
+				},
+			},
+			tag_mp_juggle_sandbox = {
+				name = "Juggle Tag",
+				text = {
+					"{C:attention}+#1#{} hand size",
+					"next {C:attention}PvP Blind",
 				},
 			},
 		},
