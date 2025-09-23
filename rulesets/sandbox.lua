@@ -31,7 +31,7 @@ MP.Ruleset({
 	banned_consumables = { "c_ouija", "c_ectoplasm" },
 	banned_vouchers = {},
 	banned_enhancements = {},
-	banned_tags = { "tag_rare", "tag_juggle" },
+	banned_tags = { "tag_rare", "tag_juggle", "tag_investment" },
 	banned_blinds = {},
 
 	reworked_jokers = (function()
@@ -55,7 +55,7 @@ MP.Ruleset({
 	reworked_vouchers = {},
 	reworked_enhancements = {},
 	reworked_blinds = {},
-	reworked_tags = { "tag_mp_gambling_sandbox", "tag_mp_juggle_sandbox" },
+	reworked_tags = { "tag_mp_gambling_sandbox", "tag_mp_juggle_sandbox", "tag_mp_investment_sandbox" },
 
 	create_info_menu = function()
 		return MP.UI.CreateRulesetInfoMenu({
