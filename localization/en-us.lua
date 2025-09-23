@@ -16,6 +16,15 @@ return {
 					"next {C:attention}PvP Blind",
 				},
 			},
+			tag_mp_investment_sandbox = {
+				name = "Investment Tag",
+				text = {
+					"After defeating",
+					"the Boss Blind, gain:",
+					"{C:money}$#1#{} + {C:money}$#2#{} per Ante",
+					"{C:inactive}(Currently {C:money}$#3#{C:inactive})",
+				},
+			},
 		},
 		Joker = {
 			j_broken = {
