@@ -47,14 +47,15 @@ SMODS.Atlas({
 	py = 95,
 })
 
+-- TODO make implementation work
 SMODS.Joker({
 	key = "idol_sandbox_color",
 	no_collection = MP.sandbox_no_collection,
 	unlocked = true,
 	discovered = true,
 	blueprint_compat = false,
-	rarity = 3,
-	cost = 8,
+	rarity = 2,
+	cost = 6,
 	atlas = "idol_sandbox_color",
 	config = { extra = { xmult = 1.5, charge = 0.5 }, mp_sticker_balanced = true },
 	loc_vars = function(self, info_queue, card)
@@ -77,8 +78,7 @@ SMODS.Joker({
 			and context.other_card:get_id() == G.GAME.current_round.idol_card.id
 			and context.other_card:is_suit(G.GAME.current_round.idol_card.suit)
 		then
-			-- todo increase and reset xmult
-			--
+			-- todo apply and reset xmult
 			return {
 				xmult = card.ability.extra.xmult,
 			}
@@ -91,8 +91,8 @@ SMODS.Joker({
 				colour = G.C.MULT,
 			}
 		end
+		-- TODO if end of round juice up and increase xmult
 	end,
-	-- TODO if end of round juice up and increase xmult
 	in_pool = function(self)
 		return MP.LOBBY.config.ruleset == "ruleset_mp_sandbox" and MP.LOBBY.code
 	end,
@@ -101,6 +101,7 @@ SMODS.Joker({
 -- Fantom's idol
 -- Gives 1x + (0.05x * card count) mult per card if you play
 -- specifically your most common rank+suit
+-- TODO test implementation
 local function get_most_common_card()
 	local count_map = {}
 	local valid_idol_cards = {}
@@ -157,9 +158,9 @@ SMODS.Joker({
 	unlocked = true,
 	discovered = true,
 	blueprint_compat = false,
-	rarity = 3,
-	cost = 8,
-	atlas = "idol_sandbox_color",
+	rarity = 2,
+	cost = 6,
+	atlas = "idol_sandbox_color", -- TODO create new sprite
 	config = { extra = { xmult = 1.0, xmult_per_card = 0.05 }, mp_sticker_balanced = true },
 	loc_vars = function(self, info_queue, card)
 		local most_common_card = get_most_common_card()

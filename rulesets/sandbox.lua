@@ -27,6 +27,7 @@ MP.Ruleset({
 		"j_steel_joker",
 		"j_throwback",
 		"j_vampire",
+		"j_mp_idol",
 	},
 	banned_consumables = { "c_ouija", "c_ectoplasm" },
 	banned_vouchers = {},
@@ -74,6 +75,23 @@ MP.Ruleset({
 		return true
 	end,
 }):inject()
+
+local apply_bans_ref = MP.ApplyBans
+function MP.ApplyBans()
+	local ret = apply_bans_ref()
+	if MP.LOBBY.code and MP.LOBBY.config.ruleset == "ruleset_mp_sandbox" then
+		local idol_keys = { "j_mp_idol_sandbox_bw", "j_mp_idol_sandbox_color", "j_mp_idol_sandbox_fantom" }
+
+		table.sort(idol_keys)
+		pseudoshuffle(idol_keys, pseudoseed("idol_selection_mp_sandbox"))
+
+		for i = 2, #idol_keys do
+			G.GAME.banned_keys[idol_keys[i]] = true
+		end
+	end
+	print(MP.UTILS.serialize_table(G.GAME.banned_keys))
+	return ret
+end
 
 -- debugging hotswitch
 MP.sandbox_no_collection = false
