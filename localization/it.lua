@@ -84,16 +84,6 @@ return {
 					"{C:inactive}(Attualmente {C:mult}+#2#{C:inactive} Molt)",
 				},
 			},
-			j_mp_magnet = {
-				name = "Magnete",
-				text = {
-					"Dopo {C:attention}#1#{} round,",
-					"vendi questa carta per {C:attention}Copiare{}",
-					"il {C:attention}Jolly{} più costoso",
-					"della tua {X:purple,C:white}Nemesi",
-					"{C:inactive}(Attualmente {C:attention}#2#{C:inactive}/#3# round)",
-				},
-			},
 			j_mp_pizza = {
 				name = "Pizza",
 				text = {
