@@ -5,7 +5,7 @@ local json = require "json"
 function action_player_list_update(data)
     MP.LOBBY.players = data.players or {}
     MP.LOBBY.host_id = data.host_id
-    MP.LOBBY.is_host = (MP.LOBBY.host_id == G.SETTINGS.steam_id)
+    MP.LOBBY.is_host = (data.host_id == G.SETTINGS.steam_id)
 
     local all_ready = true
     if #MP.LOBBY.players < (MP.max_players or 3) then
@@ -47,6 +47,7 @@ function action_game_state_update(data)
             score = MP.INSANE_INT.empty(),
             hands = 4,
             lives = MP.LOBBY.config.starting_lives,
+            highest_score = MP.INSANE_INT.empty()
         }
     end
 
@@ -55,6 +56,10 @@ function action_game_state_update(data)
     if not state_data then return end
 
     local score = MP.INSANE_INT.from_string(tostring(state_data.score or '0'))
+    if MP.INSANE_INT.greater_than(score, enemy_state.highest_score) then
+        enemy_state.highest_score = score
+    end
+
     enemy_state.hands = tonumber(state_data.hands) or enemy_state.hands
     enemy_state.lives = tonumber(state_data.lives) or enemy_state.lives
 
@@ -87,12 +92,14 @@ end
 function MP.P2P_send_to_host(msg, reliable)
     local steamworks = G.STEAM.I
     if MP.LOBBY.is_host then
-        G.E_MANAGER:add_event(Event({
-            func = function()
-                handle_message_from_client(G.SETTINGS.steam_id, msg)
-                return true
-            end,
-        }))
+        if MP.SERVER and MP.SERVER.handle_message_from_client then
+            G.E_MANAGER:add_event(Event({
+                func = function()
+                    MP.SERVER.handle_message_from_client(G.SETTINGS.steam_id, msg)
+                    return true
+                end,
+            }))
+        end
         return
     end
     if not steamworks or not MP.LOBBY.host_id then return end
@@ -144,7 +151,7 @@ function Game:update(dt)
 		local parsedAction, err = json.decode(msg)
 
 		if parsedAction then
-            if parsedAction.type ~= "player_list_update" and parsedAction.sender_id ~= MP.LOBBY.host_id and not MP.LOBBY.is_host then
+            if not MP.LOBBY.is_host and parsedAction.sender_id and parsedAction.sender_id ~= MP.LOBBY.host_id then
                 -- Ignore messages not from the host
             else
 			    if parsedAction.type == "player_list_update" then action_player_list_update(parsedAction)
