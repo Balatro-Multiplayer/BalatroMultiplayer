@@ -131,7 +131,6 @@ local function handle_message_from_client(steam_id, msg_decoded)
             return
         end
 
-        msg_decoded.sender_id = steam_id
         send_to_all_except(steam_id, json.encode(msg_decoded), false)
     elseif msg_decoded.type == "ante_up" then
         local msg = {
