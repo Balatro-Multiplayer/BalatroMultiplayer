@@ -1,5 +1,7 @@
 MP = SMODS.current_mod
 
+MP.max_players = 3
+
 MP.BANNED_MODS = {
 	["Incantation"] = true,
 	["Brainstorm"] = true,
@@ -26,8 +28,7 @@ MP.LOBBY = {
 	},
 	username = "Guest",
 	blind_col = 1,
-	host = {},
-	guest = {},
+	players = {},
 	is_host = false,
 	ready_to_start = false,
 }
@@ -135,18 +136,7 @@ function MP.reset_game_states()
 		comeback_bonus_given = true,
 		comeback_bonus = 0,
 		end_pvp = false,
-		enemy = {
-			score = MP.INSANE_INT.empty(),
-			score_text = "0",
-			hands = 4,
-			location = localize("loc_selecting"),
-			skips = 0,
-			lives = MP.LOBBY.config.starting_lives,
-			sells = 0,
-			sells_per_ante = {},
-			spent_in_shop = {},
-			highest_score = MP.INSANE_INT.empty(),
-		},
+		enemies = {},
 		location = "loc_selecting",
 		next_blind_context = nil,
 		ante_key = tostring(math.random()),
@@ -216,6 +206,7 @@ SMODS.Atlas({
 MP.load_mp_dir("compatibility")
 
 MP.load_mp_file("networking/action_handlers.lua")
+MP.SERVER = MP.load_mp_file("BalatroMultiplayer_Server.lua")
 
 MP.load_mp_dir("ui/components") -- Gamemodes and rulesets need these
 
@@ -242,8 +233,3 @@ MP.load_mp_dir("ui")
 
 MP.load_mp_file("misc/disable_restart.lua")
 MP.load_mp_file("misc/mod_hash.lua")
-
-local SOCKET = MP.load_mp_file("networking/socket.lua")
-MP.NETWORKING_THREAD = love.thread.newThread(SOCKET)
-MP.NETWORKING_THREAD:start(SMODS.Mods["Multiplayer"].config.server_url, SMODS.Mods["Multiplayer"].config.server_port)
-MP.ACTIONS.connect()
