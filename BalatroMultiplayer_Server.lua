@@ -28,12 +28,10 @@ local function lobby_initialised_callback()
 end
 
 local function p2p_session_request_callback(request)
-    if #players_ingame < (MP.max_players or 3) then
-        for k, v in pairs(players_ingame) do
-            if v.id and v.id == request.steam_id_remote then
-                steamworks:accept_p2p_session_with_user(request.steam_id_remote)
-                return
-            end
+    for k, v in pairs(players_ingame) do
+        if v.id and v.id == request.steam_id_remote then
+            steamworks:accept_p2p_session_with_user(request.steam_id_remote)
+            return
         end
     end
 end
@@ -44,18 +42,24 @@ local function lobby_chat_update_callback(update)
         local num_lobby_members = steamworks:get_num_lobby_members(update.steam_id_lobby)
         for i=1, num_lobby_members do
             local member_steam_id = steamworks:get_lobby_member_by_index(update.steam_id_lobby, i-1)
-            table.insert(players_ingame, {
+            players_ingame[#players_ingame+1] = {
                 id = member_steam_id,
                 name = steamworks:get_friend_persona_name(member_steam_id),
                 state = "connected"
-            })
+            }
         end
 
         local msg = {
             type = "player_list_update",
-            host_id = G.SETTINGS.steam_id,
-            players = players_ingame
+            players = {}
         }
+        for k, v in pairs(players_ingame) do
+            msg.players[#msg.players+1] = {
+                id = v.id,
+                name = v.name,
+                state = v.state
+            }
+        end
         send_to_all(json.encode(msg), true)
     end
 end
@@ -77,50 +81,92 @@ local function lobby_created_callback(result)
     end
 end
 
-function handle_message_from_client(steam_id, msg_decoded)
+local function handle_message_from_client(steam_id, msg_decoded)
     if not players_ingame then return end
 
     if msg_decoded.type == "ready" then
         local all_ready = true
-        for _, v in ipairs(players_ingame) do
+        for k, v in pairs(players_ingame) do
             if v.id == steam_id then
                 v.state = "ready"
             end
+        end
+        for k, v in pairs(players_ingame) do
             if v.state ~= "ready" then
                 all_ready = false
             end
         end
 
-        if all_ready and #players_ingame == (MP.max_players or 3) then
-            local msg = { type = "start_game", blind = G.GAME.round_resets.blind, stake = G.GAME.stake, seed = G.GAME.starting_params.seed }
+        if all_ready then
+            local msg = {
+                type = "start_game",
+                blind = G.GAME.round_resets.blind,
+                stake = G.GAME.stake,
+                seed = G.GAME.starting_params.seed
+            }
             send_to_all(json.encode(msg), true)
             G.FUNCS.start_run()
         else
-            local msg = { type = "player_list_update", host_id = G.SETTINGS.steam_id, players = players_ingame }
+            local msg = {
+                type = "player_list_update",
+                players = {}
+            }
+            for k, v in pairs(players_ingame) do
+                msg.players[#msg.players+1] = {
+                    id = v.id,
+                    name = v.name,
+                    state = v.state
+                }
+            end
             send_to_all(json.encode(msg), true)
         end
     elseif msg_decoded.type == "game_state" then
-        msg_decoded.sender_id = steam_id
         if msg_decoded.state.game_end then
-            local msg = { type = "game_over", winner = msg_decoded.state.game_end.winner }
+            local winner = msg_decoded.state.game_end.winner
+            local msg = {
+                type = "game_over",
+                winner = winner
+            }
             send_to_all(json.encode(msg), true)
             return
         end
-        send_to_all_except(steam_id, json.encode(msg_decoded), false)
-    else
-        -- For all other messages, just broadcast them to other clients
+
         msg_decoded.sender_id = steam_id
-        send_to_all_except(steam_id, json.encode(msg_decoded), true)
+        send_to_all_except(steam_id, json.encode(msg_decoded), false)
+    elseif msg_decoded.type == "ante_up" then
+        local msg = {
+            type = "ante_up"
+        }
+        send_to_all_except(steam_id, json.encode(msg), true)
+        G.E_MANAGER:add_event(Event({
+            func = function()
+                G.GAME.FUNCS.ante_up()
+                return true
+            end
+        }))
+    elseif msg_decoded.type == "next_round" then
+        local msg = {
+            type = "next_round",
+            blind = msg_decoded.blind,
+            from_blind_select = msg_decoded.from_blind_select
+        }
+        send_to_all_except(steam_id, json.encode(msg), true)
+        G.E_MANAGER:add_event(Event({
+            func = function()
+                G.GAME.FUNCS.next_round(msg_decoded.blind, msg_decoded.from_blind_select)
+                return true
+            end
+        }))
     end
 end
 
-function init_server(player_count)
+local function init_server(player_count)
     steamworks:create_lobby("public", player_count, lobby_created_callback)
     steamworks:register_callback("p2p_session_request", p2p_session_request_callback)
     steamworks:register_callback("lobby_chat_update", lobby_chat_update_callback)
 end
 
-function update(dt)
+local function update(dt)
     local msg_size, steam_id = steamworks:is_p2p_packet_available(0)
     while msg_size > 0 do
         local msg = steamworks:read_p2p_message(msg_size, 0)
@@ -130,7 +176,7 @@ function update(dt)
     end
 end
 
-function on_game_end()
+local function on_game_end()
     if lobby_id then
         steamworks:leave_lobby(lobby_id)
         lobby_id = nil
@@ -141,6 +187,5 @@ end
 return {
     init = init_server,
     update = update,
-    on_game_end = on_game_end,
-    handle_message_from_client = handle_message_from_client
+    on_game_end = on_game_end
 }

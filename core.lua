@@ -1,7 +1,5 @@
 MP = SMODS.current_mod
 
-MP.max_players = 3
-
 MP.BANNED_MODS = {
 	["Incantation"] = true,
 	["Brainstorm"] = true,
@@ -206,7 +204,6 @@ SMODS.Atlas({
 MP.load_mp_dir("compatibility")
 
 MP.load_mp_file("networking/action_handlers.lua")
-MP.SERVER = MP.load_mp_file("BalatroMultiplayer_Server.lua")
 
 MP.load_mp_dir("ui/components") -- Gamemodes and rulesets need these
 
@@ -233,3 +230,8 @@ MP.load_mp_dir("ui")
 
 MP.load_mp_file("misc/disable_restart.lua")
 MP.load_mp_file("misc/mod_hash.lua")
+
+local SOCKET = MP.load_mp_file("networking/socket.lua")
+MP.NETWORKING_THREAD = love.thread.newThread(SOCKET)
+MP.NETWORKING_THREAD:start(SMODS.Mods["Multiplayer"].config.server_url, SMODS.Mods["Multiplayer"].config.server_port)
+MP.ACTIONS.connect()

@@ -8,7 +8,7 @@ function action_player_list_update(data)
     MP.LOBBY.is_host = (data.host_id == G.SETTINGS.steam_id)
 
     local all_ready = true
-    if #MP.LOBBY.players < (MP.max_players or 3) then
+    if #MP.LOBBY.players < (MP.max_players or 2) then
         all_ready = false
     end
 
@@ -83,6 +83,85 @@ end
 function action_lose_game()
 	G.STATE_COMPLETE = false
 	G.STATE = G.STATES.GAME_OVER
+end
+
+-- This needs to be available for the P2P senders
+function handle_message_from_client(steam_id, msg_decoded)
+    if not players_ingame then return end
+
+    if msg_decoded.type == "ready" then
+        local all_ready = true
+        for k, v in pairs(players_ingame) do
+            if v.id == steam_id then
+                v.state = "ready"
+            end
+        end
+        for k, v in pairs(players_ingame) do
+            if v.state ~= "ready" then
+                all_ready = false
+            end
+        end
+
+        if all_ready then
+            local msg = {
+                type = "start_game",
+                blind = G.GAME.round_resets.blind,
+                stake = G.GAME.stake,
+                seed = G.GAME.starting_params.seed
+            }
+            send_to_all(json.encode(msg), true)
+            G.FUNCS.start_run()
+        else
+            local msg = {
+                type = "player_list_update",
+                players = {}
+            }
+            for k, v in pairs(players_ingame) do
+                msg.players[#msg.players+1] = {
+                    id = v.id,
+                    name = v.name,
+                    state = v.state
+                }
+            end
+            send_to_all(json.encode(msg), true)
+        end
+    elseif msg_decoded.type == "game_state" then
+        if msg_decoded.state.game_end then
+            local winner = msg_decoded.state.game_end.winner
+            local msg = {
+                type = "game_over",
+                winner = winner
+            }
+            send_to_all(json.encode(msg), true)
+            return
+        end
+
+        send_to_all_except(steam_id, json.encode(msg_decoded), false)
+    elseif msg_decoded.type == "ante_up" then
+        local msg = {
+            type = "ante_up"
+        }
+        send_to_all_except(steam_id, json.encode(msg), true)
+        G.E_MANAGER:add_event(Event({
+            func = function()
+                G.GAME.FUNCS.ante_up()
+                return true
+            end
+        }))
+    elseif msg_decoded.type == "next_round" then
+        local msg = {
+            type = "next_round",
+            blind = msg_decoded.blind,
+            from_blind_select = msg_decoded.from_blind_select
+        }
+        send_to_all_except(steam_id, json.encode(msg), true)
+        G.E_MANAGER:add_event(Event({
+            func = function()
+                G.GAME.FUNCS.next_round(msg_decoded.blind, msg_decoded.from_blind_select)
+                return true
+            end
+        }))
+    end
 end
 
 -- #endregion
