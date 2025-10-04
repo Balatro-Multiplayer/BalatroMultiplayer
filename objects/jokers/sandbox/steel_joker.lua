@@ -29,7 +29,7 @@ SMODS.Joker({
 			}
 		end
 	end,
-	in_pool = function(self)
+	mp_include = function(self)
 		return MP.LOBBY.config.ruleset == "ruleset_mp_sandbox" and MP.LOBBY.code
 		-- in case we want vanilla-ish behaviour just change to this
 		-- if not (MP.LOBBY.config.ruleset == "ruleset_mp_sandbox" and MP.LOBBY.code) then return false end
@@ -37,5 +37,8 @@ SMODS.Joker({
 		-- 	if SMODS.has_enhancement(playing_card, "m_steel") then return true end
 		-- end
 		-- return false
+		-- !!
+		-- !! above statement should be in an in_pool func
+		-- !!
 	end,
 })
