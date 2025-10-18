@@ -169,3 +169,17 @@ for i, v in ipairs(MP.UTILS.get_culled_pool("Enhanced")) do
 '''
 match_indent = true
 times = 3
+
+# Stop game from replacing the multiplayer "ready up" button with "select blind" button
+[[patches]]
+[patches.pattern]
+target = '''functions/button_callbacks.lua'''
+pattern = """_top_button.config.button = 'select_blind'"""
+position = "at"
+payload = '''
+if _top_button.config.button ~= "mp_toggle_ready" then
+	_top_button.config.button = "select_blind"
+end
+'''
+match_indent = true
+times = 1
