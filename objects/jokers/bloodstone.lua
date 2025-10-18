@@ -11,7 +11,7 @@ SMODS.Joker({
 	cost = 7,
 	pos = { x = 0, y = 8 },
 	no_collection = true,
-	in_pool = function(self)
+	mp_include = function(self)
 		return MP.UTILS.is_standard_ruleset() and MP.LOBBY.code
 	end,
 	config = { extra = { odds = 2, Xmult = 1.5 } },

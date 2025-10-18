@@ -160,3 +160,38 @@ payload = '''
 -- if G.SETTINGS.paused and key ~= 'to_do' then return math.random() end
 '''
 match_indent = true
+
+# mp_exclude function
+# avoids UNAVAILABLE substitution for rng preservation
+# unfortunate timing but lua doesn't have continue, so this is an uninvasive patch
+[[patches]]
+[patches.pattern]
+target = "functions/common_events.lua"
+pattern = '''
+	_pool[#_pool + 1] = 'UNAVAILABLE'
+end
+'''
+position = "after"
+payload = '''
+if mp_exclude then
+	table.remove(_pool) -- remove whatever was just done
+end
+'''
+match_indent = true
+
+# just dumb stuff to prevent spaghetti from duping in_pool and mp_exclude conditions
+[[patches]]
+[patches.pattern]
+target = "functions/common_events.lua"
+pattern = '''if v.in_pool and type(v.in_pool) == 'function' then'''
+position = "before"
+payload = '''
+local mp_exclude = nil
+if v.mp_include and type(v.mp_include) == 'function' then
+	if not v:mp_include() then
+		add = nil
+		mp_exclude = true
+	end
+end
+'''
+match_indent = true
