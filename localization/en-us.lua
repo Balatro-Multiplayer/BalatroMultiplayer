@@ -377,8 +377,9 @@ return {
 			b_mp_indigo = {
 				name = "Indigo Deck",
 				text = {
-					"Choose {C:attention}1{} extra card",
+					"Choose {C:attention}twice{} as many cards",
 					"from all Booster Packs",
+					"Booster Packs are {C:attention}unskippable{}",
 				},
 			},
 			b_mp_orange = {
@@ -394,8 +395,8 @@ return {
 				text = {
 					"Start run with {C:spectral,T:c_medium}Medium",
 					"and {C:attention,T:v_clearance_sale}Clearance Sale",
-					"Balance is capped",
-					"at {C:money}$50",
+					"Balance is capped at",
+					"{C:money}$50{} + {C:attention}current interest cap{}",
 				},
 			},
 			b_mp_violet = {
@@ -637,11 +638,11 @@ return {
 			k_preview_credit = "*Credit to @Fantom, @Divvy",
 			k_preview_integration_desc = "This will enable score preview before playing a hand",
 			k_requires_restart = "*Requires a restart to take effect",
-			k_new_weekly_ruleset = "A new weekly ruleset is available!",
-			k_currently_colon = "Currently: ",
-			k_sync_locally = "Sync locally (Restarts game)",
+			k_cocktail_select = "Select deck cards to include them",
+			k_cocktail_rightclick = "Right-click to select all",
 			k_bans = "Bans",
 			k_reworks = "Reworks",
+			k_edit = "Edit",
 			k_ruleset_disabled_the_order_required = "The Order is Required",
 			k_ruleset_disabled_the_order_banned = "The Order is Banned",
 			k_ruleset_not_found = "Unknown ruleset",

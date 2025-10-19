@@ -3,6 +3,10 @@ version = "1.0.0"
 dump_lua = true
 priority = 2147483600
 
+
+# ---- Oracle Deck
+
+
 # max
 [[patches]]
 [patches.pattern]
@@ -11,8 +15,8 @@ pattern = '''G.GAME.dollars = G.GAME.dollars + mod'''
 position = 'before'
 payload = '''
 if G.GAME.modifiers.oracle_max then
-	mod = oracle_apply_dollar_cap(mod, G.GAME.dollars, G.GAME.modifiers.oracle_max)
-	if oracle_should_show_max(mod, G.GAME.dollars, G.GAME.modifiers.oracle_max) then
+	mod = oracle_apply_dollar_cap(mod, G.GAME.dollars, G.GAME.modifiers.oracle_max + G.GAME.interest_cap)
+	if oracle_should_show_max(mod, G.GAME.dollars, G.GAME.modifiers.oracle_max + G.GAME.interest_cap) then
 		text = "MAX"
 		col = G.C.RED
 	end

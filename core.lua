@@ -35,7 +35,6 @@ MP.GAME = {}
 MP.UI = {}
 MP.ACTIONS = {}
 MP.INTEGRATIONS = {
-	TheOrder = SMODS.Mods["Multiplayer"].config.integrations.TheOrder,
 	Preview = SMODS.Mods["Multiplayer"].config.integrations.Preview,
 }
 
@@ -46,7 +45,7 @@ MP.PREVIEW = {
 
 G.C.MULTIPLAYER = HEX("AC3232")
 
-MP.SMODS_VERSION = "1.0.0~BETA-0711a"
+MP.SMODS_VERSION = "1.0.0~BETA-1016c"
 
 function MP.should_use_the_order()
 	return MP.LOBBY and MP.LOBBY.config and MP.LOBBY.config.the_order and MP.LOBBY.code
@@ -113,6 +112,7 @@ function MP.reset_lobby_config(persist_ruleset_and_gamemode)
 		sleeve = "sleeve_casl_none",
 		stake = 1,
 		challenge = "",
+		cocktail = "",
 		multiplayer_jokers = true,
 		timer = true,
 		timer_forgiveness = 0,
