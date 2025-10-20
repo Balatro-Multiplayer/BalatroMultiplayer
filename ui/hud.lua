@@ -426,9 +426,23 @@ function MP.UI.start_pvp_countdown(callback)
 	end
 	MP.GAME.pvp_countdown = seconds
 
+	G.CONTROLLER.locks.enter_pvp = true
+
 	local function show_next()
 		if MP.GAME.pvp_countdown <= 0 then
 			if callback then callback() end
+			G.E_MANAGER:add_event(Event({
+				no_delete = true,
+				trigger = 'after',
+				blocking = false,
+				blockable = false,
+				delay = 1,
+				timer = 'TOTAL',
+				func = function()
+					G.CONTROLLER.locks.enter_pvp = nil
+					return true
+				end
+			}))
 			return true
 		end
 
