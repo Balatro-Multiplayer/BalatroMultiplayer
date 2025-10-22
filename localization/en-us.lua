@@ -639,6 +639,7 @@ return {
 			k_preview_integration_desc = "This will enable score preview before playing a hand",
 			k_requires_restart = "*Requires a restart to take effect",
 			k_cocktail_select = "Select deck cards to include them",
+			k_cocktail_shiftclick = "Shift-click to foil, foiled decks will always be selected",
 			k_cocktail_rightclick = "Right-click to select all",
 			k_bans = "Bans",
 			k_reworks = "Reworks",

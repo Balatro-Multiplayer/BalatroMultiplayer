@@ -13,12 +13,13 @@ SMODS.Back({
 		if seed then seeded = true end
 		G.GAME.pseudorandom.seed = seed or generate_starting_seed()
 		G.GAME.modifiers.mp_cocktail = {}
-		local decks = MP.get_cocktail_decks(true)
+		local decks, forced = MP.get_cocktail_decks(true)
 		pseudoshuffle(decks, pseudoseed("mp_cocktail"))
 		local back = G.GAME.selected_back
-		for i = 1, math.min(3, #decks) do
-			G.GAME.modifiers.mp_cocktail[i] = decks[i]
-			if decks[i] == "b_checkered" then -- hardcoded because cringe
+		
+		local function add_deck(num, deck)
+			G.GAME.modifiers.mp_cocktail[num] = deck
+			if deck == "b_checkered" then -- hardcoded because cringe
 				G.E_MANAGER:add_event(Event({
 					func = function()
 						for k, v in pairs(G.playing_cards) do
@@ -29,6 +30,13 @@ SMODS.Back({
 					end,
 				}))
 			end
+		end
+			
+		for i = 1, #forced do
+			add_deck(i, forced[i])
+		end
+		for i = 1 + #forced, math.min(3, #decks) do
+			add_deck(i, decks[i])
 		end
 		local function merge(t1, t2, safe)
 			local t3 = {}
@@ -88,6 +96,7 @@ SMODS.Back({
 
 function MP.get_cocktail_decks(cull)
 	local ret = {}
+	local forced = {}
 	for k, v in pairs(G.P_CENTERS) do
 		if v.set == "Back" and k ~= "b_challenge" and k ~= "b_mp_cocktail" then
 			if not (v.mod and not G.P_CENTERS["b_mp_cocktail"].mod_whitelist[v.mod.id]) then ret[#ret + 1] = k end
@@ -99,11 +108,13 @@ function MP.get_cocktail_decks(cull)
 		for i, v in ipairs(ret) do
 			if MP.cocktail_cfg_readpos(i, true) == "1" then
 				_ret[#_ret+1] = ret[i]
+			elseif MP.cocktail_cfg_readpos(i, true) == "2" then
+				forced[#forced+1] = ret[i]
 			end
 		end
 		ret = _ret
 	end
-	return ret
+	return ret, forced
 end
 
 local change_to_ref = Back.change_to
@@ -150,7 +161,9 @@ function Card:click() -- i'd rather deal with the cardarea but this is fine i su
 				card.sprite_facing = 'back'
 				card.facing = 'back'
 				card.mp_cocktail_select = v
-				card.highlighted = MP.cocktail_cfg_readpos(i) == "1" and true or false
+				local num = MP.cocktail_cfg_readpos(i)
+				card.highlighted = tonumber(num) >= 1 and true or false
+				card.mp_cocktail_forced = num == "2" and true or false
 			end
 			G.GAME.viewed_back = G.P_CENTERS["b_mp_cocktail"]
 			deck_tables = {}
@@ -174,6 +187,9 @@ function Card:click() -- i'd rather deal with the cardarea but this is fine i su
 					},
 					{n=G.UIT.R, config={align = "cl", padding = 0}, nodes={
 						{n=G.UIT.T, config={text = localize("k_cocktail_select"), scale = 0.48, colour = G.C.WHITE}},
+					}},
+					{n=G.UIT.R, config={align = "cl", padding = 0}, nodes={
+						{n=G.UIT.T, config={text = localize("k_cocktail_shiftclick"), scale = 0.32, colour = G.C.WHITE}},
 					}},
 					{n=G.UIT.R, config={align = "cl", padding = 0}, nodes={
 						{n=G.UIT.T, config={text = localize("k_cocktail_rightclick"), scale = 0.32, colour = G.C.WHITE}},
@@ -213,6 +229,60 @@ function Card:draw(layer)
 	end
 end
 
+SMODS.DrawStep({
+	key = "mp_cocktail_forced",
+	order = 5,
+	func = function(self)
+		if self.mp_cocktail_forced then
+			self.children.back:draw_shader("foil", nil, self.ARGS.send_to_shader)
+		end
+	end,
+	conditions = { vortex = false, facing = "back" },
+})
+
+local hover_ref = Card.hover
+function Card:hover()
+	hover_ref(self)
+	if self.mp_cocktail_select then
+		self.ability_UIBox_table = self:generate_UIBox_ability_table()
+		self.config.h_popup = G.UIDEF.card_h_popup(self)
+		self.config.h_popup_config = self:align_h_popup()
+		Node.hover(self)
+	end
+end
+
+local generate_card_ui_ref = generate_card_ui
+function generate_card_ui(_c, full_UI_table, specific_vars, card_type, badges, hide_desc, main_start, main_end, card)
+	if card and card.mp_cocktail_select then
+		_c = G.P_CENTERS[card.mp_cocktail_select]
+		local ret = generate_card_ui_ref(_c, full_UI_table, specific_vars, "Back", badges, hide_desc, main_start, main_end, card)
+		if not _c.generate_ui or type(_c.generate_ui) ~= 'function' then
+			-- i literally can't get the vars from anywhere else so we're thunk coding
+			
+			local name_to_check =  G.P_CENTERS[card.mp_cocktail_select].name
+			
+			if name_to_check == 'Blue Deck' then specific_vars = {_c.config.hands}
+			elseif name_to_check == 'Red Deck' then specific_vars = {_c.config.discards}
+			elseif name_to_check == 'Yellow Deck' then specific_vars = {_c.config.dollars}
+			elseif name_to_check == 'Green Deck' then specific_vars = {_c.config.extra_hand_bonus, _c.config.extra_discard_bonus}
+			elseif name_to_check == 'Black Deck' then specific_vars = {_c.config.joker_slot, -_c.config.hands}
+			elseif name_to_check == 'Magic Deck' then specific_vars = {localize{type = 'name_text', key = 'v_crystal_ball', set = 'Voucher'}, localize{type = 'name_text', key = 'c_fool', set = 'Tarot'}}
+			elseif name_to_check == 'Nebula Deck' then specific_vars = {localize{type = 'name_text', key = 'v_telescope', set = 'Voucher'}, -1}
+			elseif name_to_check == 'Zodiac Deck' then specific_vars = {localize{type = 'name_text', key = 'v_tarot_merchant', set = 'Voucher'}, 
+          		                  localize{type = 'name_text', key = 'v_planet_merchant', set = 'Voucher'},
+          		                  localize{type = 'name_text', key = 'v_overstock_norm', set = 'Voucher'}}
+			elseif name_to_check == 'Painted Deck' then specific_vars = {_c.config.hand_size, _c.config.joker_slot}
+			elseif name_to_check == 'Anaglyph Deck' then specific_vars = {localize{type = 'name_text', key = 'tag_double', set = 'Tag'}}
+			elseif name_to_check == 'Plasma Deck' then specific_vars = {_c.config.ante_scaling}
+			end
+			
+			localize{type = 'descriptions', key = _c.key, set = _c.set, nodes = ret.main, vars = specific_vars}
+		end
+		return ret
+	end
+	return generate_card_ui_ref(_c, full_UI_table, specific_vars, card_type, badges, hide_desc, main_start, main_end, card)
+end
+
 local can_highlight_ref = CardArea.can_highlight
 function CardArea:can_highlight(card)
 	if card.mp_cocktail_select then return true end
@@ -222,7 +292,24 @@ end
 local highlight_ref = Card.highlight
 function Card:highlight(is_highlighted)
 	if self.mp_cocktail_select then
-		MP.cocktail_cfg_edit(is_highlighted, self.mp_cocktail_select)
+		local shift = G.CONTROLLER.held_keys["lshift"] or G.CONTROLLER.held_keys["rshift"]
+		if shift and self.mp_cocktail_forced then
+			is_highlighted = false
+			self.mp_cocktail_forced = false
+		elseif self.mp_cocktail_forced then
+			is_highlighted = true
+			self.mp_cocktail_forced = false
+		elseif shift then
+			is_highlighted = true
+			if MP.cocktail_get_forced_num() < 3 then
+				self.mp_cocktail_forced = true
+				play_sound('foil1', 1.5, 0.3)
+			else
+				play_sound("timpani", 0.9, 0.7)
+				play_sound("timpani", 1.2, 0.7)
+			end
+		end
+		MP.cocktail_cfg_edit(self.mp_cocktail_forced and 2 or is_highlighted, self.mp_cocktail_select)
 	end
 	return highlight_ref(self, is_highlighted)
 end
@@ -244,6 +331,7 @@ function Controller:queue_R_cursor_press(x, y)
 		for i = 1, #G.cocktail_select do
 			for j = 1, #G.cocktail_select[i].cards do
 				G.cocktail_select[i].cards[j].highlighted = highlight
+				G.cocktail_select[i].cards[j].mp_cocktail_forced = false
 			end
 		end
 		if highlight then
@@ -259,6 +347,7 @@ end
 function MP.cocktail_cfg_edit(bool, deck) -- strings are easier to send, and it's just ones and zeroes
 	local decks = MP.get_cocktail_decks()
 	local cfg = SMODS.Mods["Multiplayer"].config
+	local num = (bool == 2) and "2" or (bool and "1" or "0")
 	if (not cfg.cocktail) or #decks ~= #cfg.cocktail then
 		local string = ""
 		for i = 1, #decks do
@@ -269,7 +358,7 @@ function MP.cocktail_cfg_edit(bool, deck) -- strings are easier to send, and it'
 	if not deck then
 		local string = ""
 		for i = 1, #decks do
-			string = string..(bool and "1" or "0")
+			string = string..num
 		end
 		cfg.cocktail = string
 	else
@@ -278,7 +367,7 @@ function MP.cocktail_cfg_edit(bool, deck) -- strings are easier to send, and it'
 				local function replace(str, pos, d)
 					return str:sub(1, pos-1)..d..str:sub(pos+1)
 				end
-				cfg.cocktail = replace(cfg.cocktail, i, bool and "1" or "0")
+				cfg.cocktail = replace(cfg.cocktail, i, num)
 				break
 			end
 		end
@@ -320,6 +409,18 @@ function MP.cocktail_check_edited()
 	end
 	return false
 end
+
+function MP.cocktail_get_forced_num()
+	local str = SMODS.Mods["Multiplayer"].config.cocktail
+	local c = 0
+	for i = 1, #str do
+		if string.sub(str, i, i) == "2" then
+			c = c + 1
+		end
+	end
+	return c
+end
+
 
 local localize_ref = localize
 function localize(args, misc_cat)
