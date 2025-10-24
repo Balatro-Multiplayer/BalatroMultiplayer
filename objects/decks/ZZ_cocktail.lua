@@ -13,12 +13,16 @@ SMODS.Back({
 		if seed then seeded = true end
 		G.GAME.pseudorandom.seed = seed or generate_starting_seed()
 		G.GAME.modifiers.mp_cocktail = {}
+		G.GAME.modifiers.mp_cocktail_sticker = {}
 		local decks, forced = MP.get_cocktail_decks(true)
 		pseudoshuffle(decks, pseudoseed("mp_cocktail"))
 		local back = G.GAME.selected_back
 		
-		local function add_deck(num, deck)
+		local function add_deck(num, deck, sticker)
 			G.GAME.modifiers.mp_cocktail[num] = deck
+			if sticker then
+				G.GAME.modifiers.mp_cocktail_sticker[num] = deck
+			end
 			if deck == "b_checkered" then -- hardcoded because cringe
 				G.E_MANAGER:add_event(Event({
 					func = function()
@@ -33,10 +37,10 @@ SMODS.Back({
 		end
 			
 		for i = 1, #forced do
-			add_deck(i, forced[i])
+			add_deck(i, forced[i], true)
 		end
 		for i = 1 + #forced, math.min(3, #decks) do
-			add_deck(i, decks[i])
+			add_deck(i, decks[i], MP.cocktail_cfg_readpos("show", true) ~= "H" and true or false)
 		end
 		local function merge(t1, t2, safe)
 			local t3 = {}
@@ -166,6 +170,7 @@ function Card:click() -- i'd rather deal with the cardarea but this is fine i su
 				card.mp_cocktail_forced = num == "2" and true or false
 			end
 			G.GAME.viewed_back = G.P_CENTERS["b_mp_cocktail"]
+			MP.show_cocktail_decks = MP.cocktail_cfg_readpos("show") ~= "H" and true or false
 			deck_tables = {}
 			for i = 1, #G.cocktail_select do
 				deck_tables[i] = {
@@ -180,6 +185,26 @@ function Card:click() -- i'd rather deal with the cardarea but this is fine i su
 				back_func = "setup_run",
 				snap_back = true,
 				contents = {
+					{
+						n = G.UIT.R,
+						config = {
+							padding = 0.0,
+							align = "cl",
+						},
+						nodes = {
+							create_toggle({
+								id = "show_cocktail_decks",
+								label = "Show active decks during run",
+								ref_table = MP,
+								ref_value = "show_cocktail_decks",
+								callback = function(bool)
+									print(bool)
+									MP.cocktail_cfg_edit(bool, "show")
+								end,
+							}),
+						},
+					},
+					{n=G.UIT.R, config={align = "cl", padding = 0.4, minh = 0.4}}, -- empty space row because i'm bad at ui
 					{
 						n = G.UIT.R,
 						config = { align = "cm", minw = 2.5, padding = 0.1, r = 0.1, colour = G.C.BLACK, emboss = 0.05 },
@@ -348,11 +373,12 @@ function MP.cocktail_cfg_edit(bool, deck) -- strings are easier to send, and it'
 	local decks = MP.get_cocktail_decks()
 	local cfg = SMODS.Mods["Multiplayer"].config
 	local num = (bool == 2) and "2" or (bool and "1" or "0")
-	if (not cfg.cocktail) or #decks ~= #cfg.cocktail then
+	if (not cfg.cocktail) or #decks + 1 ~= #cfg.cocktail then
 		local string = ""
 		for i = 1, #decks do
 			string = string.."1"
 		end
+		string = string.."H"
 		cfg.cocktail = string
 	end
 	if not deck then
@@ -360,16 +386,21 @@ function MP.cocktail_cfg_edit(bool, deck) -- strings are easier to send, and it'
 		for i = 1, #decks do
 			string = string..num
 		end
+		local show = MP.cocktail_cfg_readpos("show")
+		string = string..show
 		cfg.cocktail = string
 	else
+		local function replace(str, pos, d)
+			return str:sub(1, pos-1)..d..str:sub(pos+1)
+		end
 		for i, v in ipairs(decks) do
 			if v == deck then
-				local function replace(str, pos, d)
-					return str:sub(1, pos-1)..d..str:sub(pos+1)
-				end
 				cfg.cocktail = replace(cfg.cocktail, i, num)
 				break
 			end
+		end
+		if deck == "show" then
+			cfg.cocktail = replace(cfg.cocktail, #cfg.cocktail, bool and "S" or "H")
 		end
 	end
 	MP.LOBBY.config.cocktail = cfg.cocktail
@@ -379,12 +410,16 @@ end
 function MP.cocktail_cfg_readpos(pos, construct)
 	local decks = MP.get_cocktail_decks() -- copypasted code. unsure how to make this less messy without making it more messy
 	local cfg = SMODS.Mods["Multiplayer"].config
-	if (not cfg.cocktail) or #decks ~= #cfg.cocktail then
+	if (not cfg.cocktail) or #decks + 1 ~= #cfg.cocktail then
 		local string = ""
 		for i = 1, #decks do
 			string = string.."1"
 		end
+		string = string.."H"
 		cfg.cocktail = string
+	end
+	if pos == "show" then
+		pos = #cfg.cocktail
 	end
 	if construct then
 		return MP.cocktail_cfg_get():sub(pos, pos)
@@ -402,10 +437,13 @@ end
 
 function MP.cocktail_check_edited()
 	local str = MP.cocktail_cfg_get()
-	for i = 1, #str do
+	for i = 1, #str - 1 do
 		if string.sub(str, i, i) ~= "1" then
 			return true
 		end
+	end
+	if string.sub(str, #str, #str) ~= "H" then
+		return true
 	end
 	return false
 end
@@ -413,14 +451,13 @@ end
 function MP.cocktail_get_forced_num()
 	local str = SMODS.Mods["Multiplayer"].config.cocktail
 	local c = 0
-	for i = 1, #str do
+	for i = 1, #str - 1 do
 		if string.sub(str, i, i) == "2" then
 			c = c + 1
 		end
 	end
 	return c
 end
-
 
 local localize_ref = localize
 function localize(args, misc_cat)
@@ -433,3 +470,68 @@ function localize(args, misc_cat)
 	end
 	return ret
 end
+
+SMODS.Atlas({
+	key = "cocktail_deck_stickers",
+	path = "deck_stickers.png",
+	px = 71,
+	py = 95,
+})
+
+-- honestly this could have been a list
+-- whatever
+local sticker_x_pos = {
+	b_red = 0,
+	b_blue = 1,
+	b_yellow = 2,
+	b_green = 3,
+	b_black = 4,
+	b_magic = 5,
+	b_nebula = 6,
+	b_ghost = 7,
+	b_abandoned = 8,
+	b_checkered = 9,
+	b_zodiac = 10,
+	b_painted = 11,
+	b_anaglyph = 12,
+	b_plasma = 13,
+	b_erratic = 14,
+	b_mp_orange = 15,
+	b_mp_indigo = 16,
+	b_mp_violet = 17,
+	b_mp_white = 18,
+	b_mp_oracle = 19,
+	b_mp_gradient = 20,
+	b_mp_heidelberg = 21,
+}
+
+SMODS.DrawStep({
+	key = "back_cocktail",
+	order = 11,
+	func = function(self)
+		if G.STAGE == G.STAGES.RUN and G.GAME and G.GAME.modifiers and G.GAME.modifiers.mp_cocktail_sticker then
+			if self.area and self.area.config.type == 'deck' then
+				for i, v in ipairs(G.GAME.modifiers.mp_cocktail_sticker) do
+					local key = "mp_cocktail_"..v..i
+					if not G.shared_stickers[key] then
+						G.shared_stickers[key] = Sprite(0, 0, G.CARD_W, G.CARD_H, G.ASSET_ATLAS["mp_cocktail_deck_stickers"], {x = sticker_x_pos[v], y = i-1})
+					end
+					G.shared_stickers[key].role.draw_major = self
+					local sticker_offset = self.sticker_offset or {}
+					G.shared_stickers[key]:draw_shader(
+						"dissolve",
+						nil,
+						nil,
+						true,
+						self.children.center,
+						nil,
+						self.sticker_rotation,
+						sticker_offset.x,
+						sticker_offset.y
+					)
+				end
+			end
+		end
+	end,
+	conditions = { vortex = false, facing = "back" },
+})

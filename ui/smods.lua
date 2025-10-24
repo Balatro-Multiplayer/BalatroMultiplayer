@@ -369,6 +369,26 @@ SMODS.Mods.Multiplayer.config_tab = function()
 					},
 				},
 			},
+			{
+				n = G.UIT.R,
+				config = {
+					padding = 0,
+					align = "cm",
+					on_demand_tooltip = {
+						text = {
+							"*Applies in singleplayer and vanilla rulesets",
+						},
+					},
+				},
+				nodes = {
+					create_toggle({
+						id = "singleplayer_hide_content_toggle",
+						label = "Hide Multiplayer content*",
+						ref_table = SMODS.Mods["Multiplayer"].config,
+						ref_value = "hide_mp_content",
+					}),
+				},
+			},
 		},
 	}
 	return ret

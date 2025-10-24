@@ -88,6 +88,7 @@ end
 
 MP.load_mp_file("misc/utils.lua")
 MP.load_mp_file("misc/insane_int.lua")
+MP.load_mp_file("misc/hide_content.lua")
 
 function MP.reset_lobby_config(persist_ruleset_and_gamemode)
 	sendDebugMessage("Resetting lobby options", "MULTIPLAYER")
