@@ -1,10 +1,10 @@
-local json = require "json"
+local json = require("json")
 
 Client = {}
 
 function Client.send(msg)
 	msg = json.encode(msg)
-	if msg ~= "{\"action\":\"keepAliveAck\"}" then
+	if msg ~= '{"action":"keepAliveAck"}' then
 		sendTraceMessage(string.format("Client sent message: %s", msg), "MULTIPLAYER")
 	end
 	love.thread.getChannel("uiToNetwork"):push(msg)
@@ -17,7 +17,7 @@ function MP.ACTIONS.set_username(username)
 		Client.send({
 			action = "username",
 			username = MP.LOBBY.username .. "~" .. MP.LOBBY.blind_col,
-			modHash = MP.MOD_STRING
+			modHash = MP.MOD_STRING,
 		})
 	end
 end
@@ -32,7 +32,7 @@ local function action_connected()
 	Client.send({
 		action = "username",
 		username = MP.LOBBY.username .. "~" .. MP.LOBBY.blind_col,
-		modHash = MP.MOD_STRING
+		modHash = MP.MOD_STRING,
 	})
 end
 
@@ -98,7 +98,7 @@ end
 
 local function action_keep_alive()
 	Client.send({
-		action = "keepAliveAck"
+		action = "keepAliveAck",
 	})
 end
 
@@ -573,7 +573,7 @@ local function action_get_end_game_jokers()
 	if not G.jokers or not G.jokers.cards then
 		Client.send({
 			action = "receiveEndGameJokers",
-			keys = {}
+			keys = {},
 		})
 		return
 	end
@@ -590,7 +590,7 @@ local function action_get_end_game_jokers()
 
 	Client.send({
 		action = "receiveEndGameJokers",
-		keys = jokers_encoded
+		keys = jokers_encoded,
 	})
 end
 
@@ -601,14 +601,14 @@ local function action_get_nemesis_deck()
 	end
 	Client.send({
 		action = "receiveNemesisDeck",
-		cards = deck_str
+		cards = deck_str,
 	})
 end
 
 local function action_send_game_stats()
 	if not MP.GAME.stats then
 		Client.send({
-			action = "nemesisEndGameStats"
+			action = "nemesisEndGameStats",
 		})
 		return
 	end
@@ -715,63 +715,63 @@ end
 function MP.ACTIONS.create_lobby(gamemode)
 	Client.send({
 		action = "createLobby",
-		gameMode = gamemode
+		gameMode = gamemode,
 	})
 end
 
 function MP.ACTIONS.join_lobby(code)
 	Client.send({
 		action = "joinLobby",
-		code = code
+		code = code,
 	})
 end
 
 function MP.ACTIONS.ready_lobby()
 	Client.send({
-		action = "readyLobby"
+		action = "readyLobby",
 	})
 end
 
 function MP.ACTIONS.unready_lobby()
 	Client.send({
-		action = "unreadyLobby"
+		action = "unreadyLobby",
 	})
 end
 
 function MP.ACTIONS.lobby_info()
 	Client.send({
-		action = "lobbyInfo"
+		action = "lobbyInfo",
 	})
 end
 
 function MP.ACTIONS.leave_lobby()
 	Client.send({
-		action = "leaveLobby"
+		action = "leaveLobby",
 	})
 end
 
 function MP.ACTIONS.start_game()
 	Client.send({
-		action = "startGame"
+		action = "startGame",
 	})
 end
 
 function MP.ACTIONS.ready_blind(e)
 	MP.GAME.next_blind_context = e
 	Client.send({
-		action = "readyBlind"
+		action = "readyBlind",
 	})
 end
 
 function MP.ACTIONS.unready_blind()
 	Client.send({
-		action = "unreadyBlind"
+		action = "unreadyBlind",
 	})
 end
 
 function MP.ACTIONS.stop_game()
 	Client.send({
-		action = "stopGame"
+		action = "stopGame",
 	})
 end
 
@@ -779,14 +779,14 @@ function MP.ACTIONS.fail_round(hands_used)
 	if MP.LOBBY.config.no_gold_on_round_loss then G.GAME.blind.dollars = 0 end
 	if hands_used == 0 then return end
 	Client.send({
-		action = "failRound"
+		action = "failRound",
 	})
 end
 
 function MP.ACTIONS.version()
 	Client.send({
 		action = "version",
-		version = MULTIPLAYER_VERSION
+		version = MULTIPLAYER_VERSION,
 	})
 end
 
@@ -795,7 +795,7 @@ function MP.ACTIONS.set_location(location)
 	MP.GAME.location = location
 	Client.send({
 		action = "setLocation",
-		location = location
+		location = location,
 	})
 end
 
@@ -817,13 +817,13 @@ function MP.ACTIONS.play_hand(score, hands_left)
 	Client.send({
 		action = "playHand",
 		score = fixed_score,
-		handsLeft = hands_left
+		handsLeft = hands_left,
 	})
 end
 
 function MP.ACTIONS.lobby_options()
 	local msg = {
-		action = "lobbyOptions"
+		action = "lobbyOptions",
 	}
 	for k, v in pairs(MP.LOBBY.config) do
 		msg[tostring(k)] = v
@@ -834,7 +834,7 @@ end
 function MP.ACTIONS.set_ante(ante)
 	Client.send({
 		action = "setAnte",
-		ante = ante
+		ante = ante,
 	})
 end
 
@@ -842,112 +842,112 @@ function MP.ACTIONS.new_round()
 	MP.GAME.duplicate_end = false
 	MP.GAME.round_ended = false
 	Client.send({
-		action = "newRound"
+		action = "newRound",
 	})
 end
 
 function MP.ACTIONS.set_furthest_blind(furthest_blind)
 	Client.send({
 		action = "setFurthestBlind",
-		furthestBlind = furthest_blind
+		furthestBlind = furthest_blind,
 	})
 end
 
 function MP.ACTIONS.skip(skips)
 	Client.send({
 		action = "skip",
-		skips = skips
+		skips = skips,
 	})
 end
 
 function MP.ACTIONS.send_phantom(key)
 	Client.send({
 		action = "sendPhantom",
-		key = key
+		key = key,
 	})
 end
 
 function MP.ACTIONS.remove_phantom(key)
 	Client.send({
 		action = "removePhantom",
-		key = key
+		key = key,
 	})
 end
 
 function MP.ACTIONS.asteroid()
 	Client.send({
-		action = "asteroid"
+		action = "asteroid",
 	})
 end
 
 function MP.ACTIONS.sold_joker()
 	Client.send({
-		action = "soldJoker"
+		action = "soldJoker",
 	})
 end
 
 function MP.ACTIONS.lets_go_gambling_nemesis()
 	Client.send({
-		action = "letsGoGamblingNemesis"
+		action = "letsGoGamblingNemesis",
 	})
 end
 
 function MP.ACTIONS.eat_pizza(discards)
 	Client.send({
 		action = "eatPizza",
-		whole = discards
+		whole = discards,
 	})
 end
 
 function MP.ACTIONS.spent_last_shop(amount)
 	Client.send({
 		action = "spentLastShop",
-		amount = amount
+		amount = amount,
 	})
 end
 
 function MP.ACTIONS.magnet()
 	Client.send({
-		action = "magnet"
+		action = "magnet",
 	})
 end
 
 function MP.ACTIONS.magnet_response(key)
 	Client.send({
 		action = "magnetResponse",
-		key = key
+		key = key,
 	})
 end
 
 function MP.ACTIONS.get_end_game_jokers()
 	Client.send({
-		action = "getEndGameJokers"
+		action = "getEndGameJokers",
 	})
 end
 
 function MP.ACTIONS.get_nemesis_deck()
 	Client.send({
-		action = "getNemesisDeck"
+		action = "getNemesisDeck",
 	})
 end
 
 function MP.ACTIONS.send_game_stats()
 	Client.send({
-		action = "sendGameStats"
+		action = "sendGameStats",
 	})
 	action_send_game_stats()
 end
 
 function MP.ACTIONS.request_nemesis_stats()
 	Client.send({
-		action = "endGameStatsRequested"
+		action = "endGameStatsRequested",
 	})
 end
 
 function MP.ACTIONS.start_ante_timer()
 	Client.send({
 		action = "startAnteTimer",
-		time = MP.GAME.timer
+		time = MP.GAME.timer,
 	})
 	action_start_ante_timer(MP.GAME.timer)
 end
@@ -955,21 +955,21 @@ end
 function MP.ACTIONS.pause_ante_timer()
 	Client.send({
 		action = "pauseAnteTimer",
-		time = MP.GAME.timer
+		time = MP.GAME.timer,
 	})
 	action_pause_ante_timer(MP.GAME.timer) -- TODO
 end
 
 function MP.ACTIONS.fail_timer()
 	Client.send({
-		action = "failTimer"
+		action = "failTimer",
 	})
 end
 
 function MP.ACTIONS.sync_client()
 	Client.send({
 		action = "syncClient",
-		isCached = _RELEASE_MODE
+		isCached = _RELEASE_MODE,
 	})
 end
 
@@ -978,7 +978,7 @@ end
 -- Utils
 function MP.ACTIONS.connect()
 	Client.send({
-		action = "connect"
+		action = "connect",
 	})
 end
 

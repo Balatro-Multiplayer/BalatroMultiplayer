@@ -433,15 +433,15 @@ function MP.UI.start_pvp_countdown(callback)
 			if callback then callback() end
 			G.E_MANAGER:add_event(Event({
 				no_delete = true,
-				trigger = 'after',
+				trigger = "after",
 				blocking = false,
 				blockable = false,
 				delay = 1,
-				timer = 'TOTAL',
+				timer = "TOTAL",
 				func = function()
 					G.CONTROLLER.locks.enter_pvp = nil
 					return true
-				end
+				end,
 			}))
 			return true
 		end

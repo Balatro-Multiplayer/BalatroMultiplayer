@@ -240,4 +240,3 @@ end
 function FN.SIM.mod_mult(_mult)
 	return _mult
 end
-

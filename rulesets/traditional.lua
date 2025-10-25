@@ -28,7 +28,7 @@ MP.Ruleset({
 		return MP.UI.CreateRulesetInfoMenu({
 			multiplayer_content = true,
 			forced_lobby_options = false,
-			description_key = "k_traditional_description"
+			description_key = "k_traditional_description",
 		})
 	end,
 	force_lobby_options = function(self)
