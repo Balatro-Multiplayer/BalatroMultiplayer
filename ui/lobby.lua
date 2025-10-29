@@ -537,7 +537,7 @@ end
 
 function G.FUNCS.reconnect(e)
 	MP.ACTIONS.connect()
-	G.FUNCS:exit_overlay_menu()
+	G.FUNCS.exit_overlay_menu()
 end
 
 function MP.update_player_usernames()
