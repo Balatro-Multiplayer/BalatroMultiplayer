@@ -22,6 +22,11 @@ function MP.UI.lobby_info()
 						chosen = false,
 						tab_definition_function = MP.UI.create_UIBox_settings, -- saying settings because _options is used in lobby
 					},
+					G.GAME.modifiers.view_nemesis_deck and {
+						label = localize("b_nemesis_info"),
+						chosen = false,
+						tab_definition_function = MP.UI.create_UIBox_nemesis_info,
+					} or nil,
 				},
 				tab_h = 8,
 				snap_to_nav = true,
@@ -335,6 +340,42 @@ function MP.UI.create_UIBox_player_row(type)
 					},
 				},
 			},
+		},
+	}
+end
+
+
+function MP.UI.create_UIBox_nemesis_info()
+	if MP.nemesis_info_jokers then
+		MP.nemesis_info_jokers:remove()
+		MP.nemesis_info_jokers = nil
+	end
+	MP.nemesis_info_jokers = CardArea(
+		0,
+		0,
+		5 * G.CARD_W,
+		G.CARD_H,
+		{ card_limit = G.GAME.starting_params.joker_slots, type = "joker", highlight_limit = 1 }
+	)
+	return {
+		n = G.UIT.ROOT,
+		config = {
+			emboss = 0.05,
+			minh = 6,
+			r = 0.1,
+			minw = 10,
+			align = "tm",
+			padding = 0.2,
+			colour = G.C.BLACK,
+		},
+		nodes = {
+			{
+				n = G.UIT.R,
+				config = { align = "cm", padding = 0, no_fill = true },
+				nodes = {
+					{ n = G.UIT.O, config = { object = MP.nemesis_info_jokers } },
+				},
+			}
 		},
 	}
 end

@@ -703,6 +703,8 @@ return {
 			ch_c_mp_only_medium = { "All {C:spectral}Spectral{} cards are {C:spectral}Mediums{}" },
 			ch_c_mp_only_purple_seals = { "All {C:attention}seals{} are {C:purple}Purple Seals{}" },
 			ch_c_mp_sibyl_CREDITS = { "{C:inactive}(Art by {C:attention}Ganpan14O{C:inactive})" },
+			ch_c_mp_polymorph_spam = { "On selecting blind, all held {C:attention}Jokers{} and {C:attention}Consumables{}" },
+			ch_c_mp_polymorph_spam_EXTENDED = { "are transmuted into the next card in their collection" },
 		},
 		challenge_names = {
 			c_mp_misprint_deck = "Misprint Deck",
@@ -721,6 +723,7 @@ return {
 			c_mp_speed = "Speed",
 			c_mp_balancing_act = "Balancing Act",
 			c_mp_salvaged_sibyl = "Salvaged Sibyl",
+			c_mp_polymorph_spam = "Polymorph Spam",
 		},
 	},
 }
