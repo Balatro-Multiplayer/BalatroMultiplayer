@@ -194,7 +194,7 @@ function FN.SIM.set_ability(card_data, center)
 		order = center.order or nil,
 		forced_selection = card_data.ability and card_data.ability.forced_selection or nil,
 		perma_bonus = card_data.ability and card_data.ability.perma_bonus or 0,
-		bonus = (card_data.ability and card_data.ability.bonus or 0) + (center.config.bonus or 0),
+		bonus = center.config.bonus or 0,
 	}
 end
 
