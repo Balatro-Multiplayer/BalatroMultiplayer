@@ -35,21 +35,34 @@ MP.Ruleset({
 	banned_tags = { "tag_rare", "tag_juggle", "tag_investment" },
 	banned_blinds = {},
 
+	-- Shuffle reworked jokers to randomize the overview panel order
 	reworked_jokers = (function()
 		local jokers = {
 			"j_mp_hanging_chad",
-			"j_mp_magnet_sandbox",
+			"j_mp_misprint_sandbox",
+			"j_mp_castle_sandbox",
+			"j_mp_mail_sandbox",
+			"j_mp_square_sandbox",
+			"j_mp_throwback_sandbox",
+			"j_mp_vampire_sandbox",
+			"j_mp_steel_joker_sandbox",
+			"j_mp_baseball_sandbox",
+			"j_mp_idol_sandbox_bw",
+			"j_mp_idol_sandbox_color",
+			"j_mp_idol_sandbox_fantom",
 		}
-		for i = 1, 10 do
+
+		-- Add error jokers
+		for i = 1, 14 do
 			table.insert(jokers, "j_mp_error_sandbox_" .. i)
 		end
-		table.insert(jokers, "j_mp_bloodstone_sandbox")
-		for i = 11, 20 do
-			table.insert(jokers, "j_mp_error_sandbox_" .. i)
+
+		-- Fisher-Yates shuffle
+		for i = #jokers, 2, -1 do
+			local j = math.random(1, i)
+			jokers[i], jokers[j] = jokers[j], jokers[i]
 		end
-		table.insert(jokers, "j_mp_idol_sandbox_bw")
-		table.insert(jokers, "j_mp_idol_sandbox_color")
-		table.insert(jokers, "j_mp_idol_sandbox_fantom")
+
 		return jokers
 	end)(),
 	reworked_consumables = { "c_mp_ouija_sandbox", "c_mp_ectoplasm_sandbox" },
