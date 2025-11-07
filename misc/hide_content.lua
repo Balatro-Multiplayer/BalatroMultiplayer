@@ -7,7 +7,7 @@ function MP.should_hide_mp_content()
 	return false
 end
 
-local hidden_tbl = { "Stake", "Back" }
+local hidden_tbl = { "Stake", "Back" } -- Challenges are at bottom of file
 
 for _, hidden in ipairs(hidden_tbl) do
 	G.P_CENTER_POOLS[hidden .. "_non_mp"] = {}
@@ -42,4 +42,31 @@ for k, v in pairs(hooks) do
 		local orig = vv.tbl[vv.str]
 		vv.tbl[vv.str] = hook(orig, k)
 	end
+end
+
+-- slightly modified exception code for challenges
+
+G.CHALLENGES_non_mp = {}
+for i, v in ipairs(G.CHALLENGES) do
+	if not v.mod or v.mod ~= "Multiplayer" then table.insert(G.CHALLENGES_non_mp, v) end
+end
+
+local ch_hooks = {
+	{ tbl = G.UIDEF, str = "challenges" },
+	{ tbl = G.UIDEF, str = "challenge_list" },
+}
+
+local function ch_hook(orig)
+	return function(...)
+		local temp = G.CHALLENGES
+		if MP.should_hide_mp_content() then G.CHALLENGES = G.CHALLENGES_non_mp end
+		local results = orig(...)
+		G.CHALLENGES = temp
+		return results
+	end
+end
+
+for i, v in pairs(ch_hooks) do
+	local orig = v.tbl[v.str]
+	v.tbl[v.str] = ch_hook(orig)
 end

@@ -389,7 +389,7 @@ end
 function G.FUNCS.mp_timer_button(e)
 	if MP.LOBBY.config.timer then
 		if MP.GAME.ready_blind then
-			if not MP.GAME.timer_started then
+			if not MP.GAME.timer_started and MP.GAME.timer > 0 then
 				MP.ACTIONS.start_ante_timer()
 			else
 				MP.ACTIONS.pause_ante_timer()
