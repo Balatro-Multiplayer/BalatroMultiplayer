@@ -89,20 +89,30 @@ MP.Ruleset({
 	end,
 }):inject()
 
+--- Randomly selects one idol variant to be available in the sandbox ruleset
+--- Bans the other two idol variants to ensure only one is available per game
+--- Uses pseudorandom selection based on the lobby seed for consistency across players
+--- @return nil
+local function select_random_idol()
+	local idol_keys = { "j_mp_idol_sandbox_bw", "j_mp_idol_sandbox_color", "j_mp_idol_sandbox_fantom" }
+	table.sort(idol_keys)
+
+	-- Pseudorandom shuffle using the lobby seed so all players get the same idol
+	pseudoshuffle(idol_keys, pseudoseed("idol_selection_mp_sandbox"))
+
+	-- Ban all idols except the first one (which is now randomly selected)
+	for i = 2, #idol_keys do
+		G.GAME.banned_keys[idol_keys[i]] = true
+	end
+end
+
 local apply_bans_ref = MP.ApplyBans
 function MP.ApplyBans()
 	local ret = apply_bans_ref()
-	if MP.LOBBY.code and MP.LOBBY.config.ruleset == "ruleset_mp_sandbox" then
-		local idol_keys = { "j_mp_idol_sandbox_bw", "j_mp_idol_sandbox_color", "j_mp_idol_sandbox_fantom" }
 
-		table.sort(idol_keys)
-		pseudoshuffle(idol_keys, pseudoseed("idol_selection_mp_sandbox"))
+	-- Apply sandbox-specific idol selection when in sandbox ruleset
+	if MP.LOBBY.code and MP.LOBBY.config.ruleset == "ruleset_mp_sandbox" then select_random_idol() end
 
-		for i = 2, #idol_keys do
-			G.GAME.banned_keys[idol_keys[i]] = true
-		end
-	end
-	print(MP.UTILS.serialize_table(G.GAME.banned_keys))
 	return ret
 end
 
