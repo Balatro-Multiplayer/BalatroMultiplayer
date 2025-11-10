@@ -34,6 +34,6 @@ SMODS.Joker({
 	end,
 	mp_credits = { idea = { "LocalThunk" } },
 	in_pool = function(self)
-		return MP.LOBBY.config.ruleset == "ruleset_mp_sandbox" and MP.LOBBY.code
+		return MP.SANDBOX.is_joker_allowed(self.key)
 	end,
 })

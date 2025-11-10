@@ -36,7 +36,7 @@ SMODS.Joker({
 		end
 	end,
 	in_pool = function(self)
-		return MP.LOBBY.config.ruleset == "ruleset_mp_sandbox" and MP.LOBBY.code
+		return MP.SANDBOX.is_joker_allowed(self.key)
 	end,
 })
 
@@ -94,7 +94,7 @@ SMODS.Joker({
 		-- TODO if end of round juice up and increase xmult
 	end,
 	in_pool = function(self)
-		return MP.LOBBY.config.ruleset == "ruleset_mp_sandbox" and MP.LOBBY.code
+		return MP.SANDBOX.is_joker_allowed(self.key)
 	end,
 })
 
@@ -188,6 +188,6 @@ SMODS.Joker({
 		end
 	end,
 	in_pool = function(self)
-		return MP.LOBBY.config.ruleset == "ruleset_mp_sandbox" and MP.LOBBY.code
+		return MP.SANDBOX.is_joker_allowed(self.key)
 	end,
 })

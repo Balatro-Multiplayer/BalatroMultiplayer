@@ -1,33 +1,67 @@
 MP.SANDBOX = {}
 
+-- Centralized allowlist for sandbox jokers (actual pool)
+MP.SANDBOX.allowed_jokers = {
+	"j_mp_hanging_chad",
+	"j_mp_misprint_sandbox",
+	"j_mp_castle_sandbox",
+	"j_mp_mail_sandbox",
+	"j_mp_square_sandbox",
+	"j_mp_throwback_sandbox",
+	"j_mp_vampire_sandbox",
+	"j_mp_steel_joker_sandbox",
+	"j_mp_baseball_sandbox",
+	"j_mp_hit_the_road_sandbox",
+	"j_mp_idol_sandbox_bw",
+	"j_mp_idol_sandbox_color",
+	"j_mp_idol_sandbox_fantom",
+	-- Out of rotation
+	-- "j_mp_bloodstone_sandbox",
+	-- "j_mp_cloud_9_sandbox",
+	-- "j_mp_constellation_sandbox",
+	-- "j_mp_faceless_sandbox",
+	-- "j_mp_hit_the_road_sandbox",
+	-- "j_mp_juggler_sandbox",
+	-- "j_mp_loyalty_card_sandbox",
+	-- "j_mp_lucky_cat_sandbox",
+	-- "j_mp_magnet_sandbox",
+	-- "j_mp_order_sandbox",
+	-- "j_mp_photograph_sandbox",
+	-- "j_mp_ride_the_bus_sandbox",
+	-- "j_mp_runner_sandbox",
+	-- "j_mp_satellite_sandbox",
+}
+
+--- Centralized allowlist check for sandbox jokers
+--- @param joker_key string The key of the joker to check (e.g., "j_mp_mail_sandbox")
+--- @return boolean true if the joker is allowed in the sandbox ruleset and in a multiplayer lobby
+function MP.SANDBOX.is_joker_allowed(joker_key)
+	if not MP.LOBBY.code then return false end
+	if MP.LOBBY.config.ruleset ~= "ruleset_mp_sandbox" then return false end
+
+	for _, allowed_key in ipairs(MP.SANDBOX.allowed_jokers) do
+		if allowed_key == joker_key then return true end
+	end
+
+	return false
+end
+
 MP.Ruleset({
 	key = "sandbox",
 	multiplayer_content = true,
 	banned_jokers = {},
 	banned_silent = {
 		"j_hanging_chad",
-		"j_ride_the_bus",
-		"j_baseball",
-		"j_bloodstone",
-		"j_castle",
-		"j_cloud_9",
-		"j_constellation",
-		"j_faceless",
-		"j_hit_the_road",
-		"j_juggler",
-		"j_loyalty_card",
-		"j_lucky_cat",
-		"j_mail",
 		"j_misprint",
-		"j_order",
-		"j_photograph",
-		"j_runner",
-		"j_satellite",
+		"j_castle",
+		"j_mail",
 		"j_square",
-		"j_steel_joker",
 		"j_throwback",
+		"j_hit_the_road",
 		"j_vampire",
-		"j_mp_idol",
+		"j_steel_joker",
+		"j_baseball",
+		"j_idol",
 	},
 	banned_consumables = { "c_ouija", "c_ectoplasm" },
 	banned_vouchers = {},
@@ -37,22 +71,13 @@ MP.Ruleset({
 
 	-- Shuffle reworked jokers to randomize the overview panel order
 	reworked_jokers = (function()
-		local jokers = {
-			"j_mp_hanging_chad",
-			"j_mp_misprint_sandbox",
-			"j_mp_castle_sandbox",
-			"j_mp_mail_sandbox",
-			"j_mp_square_sandbox",
-			"j_mp_throwback_sandbox",
-			"j_mp_vampire_sandbox",
-			"j_mp_steel_joker_sandbox",
-			"j_mp_baseball_sandbox",
-			"j_mp_idol_sandbox_bw",
-			"j_mp_idol_sandbox_color",
-			"j_mp_idol_sandbox_fantom",
-		}
+		-- Copy the allowlist
+		local jokers = {}
+		for _, key in ipairs(MP.SANDBOX.allowed_jokers) do
+			table.insert(jokers, key)
+		end
 
-		-- Add error jokers
+		-- Add error jokers (for overview only, not in actual pool)
 		for i = 1, 14 do
 			table.insert(jokers, "j_mp_error_sandbox_" .. i)
 		end
