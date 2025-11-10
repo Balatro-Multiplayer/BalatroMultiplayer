@@ -47,6 +47,6 @@ SMODS.Joker({
 		if card.ability.extra.suit == nil then card.ability.extra.suit = G.GAME.current_round.castle_card.suit end
 	end,
 	mp_include = function(self)
-		return MP.LOBBY.config.ruleset == "ruleset_mp_sandbox" and MP.LOBBY.code
+		return MP.SANDBOX.is_joker_allowed(self.key)
 	end,
 })
