@@ -4,7 +4,8 @@ SMODS.Stake({
 	unlocked = true,
 	applied_stakes = {},
 	above_stake = "gold",
-	pos = { x = 1, y = 1 },
+	atlas = "sandbox_stakes",
+	pos = { x = 0, y = 0 },
 	sticker_pos = { x = 3, y = 1 },
 	modifiers = function()
 		-- green to black
@@ -18,5 +19,5 @@ SMODS.Stake({
 		G.GAME.modifiers.enable_perishables_in_shop = true -- orange
 	end,
 	colour = G.C.Planet,
-	shiny = true,
+	-- shiny = true,
 })
