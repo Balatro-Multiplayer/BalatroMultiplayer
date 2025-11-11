@@ -495,10 +495,11 @@ return {
 			stake_mp_planet = {
 				name = "Planet Stake",
 				text = {
-					"{C:attention}Orange Stake{}'s cooler older sibling",
-					"who graciously returned your",
-					"{C:red}emotional support discard{} because",
-					"even they aren't that cruel",
+					"Applies {C:black}Black Stake{} effects, plus:",
+					"Shop can have {C:attention}Perishable{} Jokers",
+					"{C:inactive,s:0.8}(Debuffed after 5 Rounds)",
+					"Required score scales",
+					"faster for each {C:attention}Ante",
 				},
 			},
 			stake_mp_spectral = {
