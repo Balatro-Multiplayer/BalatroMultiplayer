@@ -60,6 +60,9 @@ SMODS.Joker({
 		return {
 			vars = {
 				calculate_total_mult(card),
+				card.ability.extra.base_mult,
+				card.ability.extra.skip_bonus,
+				card.ability.extra.round_penalty,
 			},
 		}
 	end,
