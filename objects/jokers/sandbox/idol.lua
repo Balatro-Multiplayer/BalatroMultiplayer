@@ -169,6 +169,7 @@ SMODS.Joker({
 				localize(most_common_card.rank, "ranks"),
 				localize(most_common_card.suit, "suits_plural"),
 				xmult,
+				card.ability.extra.xmult_per_card,
 				colours = { G.C.SUITS[most_common_card.suit] },
 			},
 		}

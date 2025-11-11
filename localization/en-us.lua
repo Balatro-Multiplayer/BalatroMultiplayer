@@ -189,36 +189,35 @@ return {
 			j_mp_mail_sandbox = {
 				name = "Mail-in Rebate",
 				text = {
-					"RANK-LOCKED REBATE FORM",
-					"someone wrote {C:attention}#2#{} in",
-					"PERMANENT INK!!!!",
+					"Earn {C:money}$#1#{} for each",
+					"discarded {C:attention}#2#{}",
+					"{s:0.8}Rank never changes",
 				},
 			},
 			j_mp_hit_the_road_sandbox = {
 				name = "Hit the Road",
 				text = {
-					"HIGHWAY JACK DISPOSAL",
-					"launching {C:attention}Jacks{}",
-					"INTO THE ASPHALT FOREVER!!!!",
+					"This Joker gains {X:mult,C:white}X0.75{} Mult",
+					"for every {C:attention}Jack{} discarded",
+					"Discarded Jacks are {C:attention}destroyed{}",
 					"{C:inactive}(Currently {X:mult,C:white} X#2# {C:inactive} Mult)",
 				},
 			},
 			j_mp_misprint_sandbox = {
 				name = "Misprint",
 				text = {
-					"SCHRODINGER'S LOTTERY PLAYER",
-					"ticket both WINS AND LOSES",
-					"until checked!!!!",
-					"{C:inactive}({V:1}#1#{C:inactive} Mult)",
+					"{V:1}#1#{} Mult",
+					"{C:attention}Value revealed on purchase{}",
+					"{C:green}Printing errors compound{}",
 				},
 			},
 			j_mp_castle_sandbox = {
 				name = "Castle",
 				text = {
-					"DISCARD-BASED SUIT MARRIAGE",
-					"throws away ONLY {V:1}#1#{} forever",
-					"because THAT'S THEIR LOVE LANGUAGE!!!!",
-					"{C:inactive}(Currently {C:chips}+#2#{C:inactive} chips)",
+					"This Joker gains {C:chips}#3{} Chips",
+					"per discarded {V:1}#1#{}",
+					"Suit locked on purchase",
+					"{C:inactive}(Currently {C:chips}+#2#{C:inactive} Chips)",
 				},
 			},
 			j_mp_runner_sandbox = {
@@ -233,9 +232,9 @@ return {
 			j_mp_order_sandbox = {
 				name = "The Order",
 				text = {
-					"PEASANT UPRISING COORDINATOR",
-					"organizing the NUMBERS to overthrow",
-					"their FACE CARD OPPRESSORS!!!!",
+					"{X:mult,C:white}X4{} Mult if played",
+					"hand contains a {C:attention}Straight{}",
+					"with {C:attention}no face cards{}",
 				},
 			},
 			j_mp_photograph_sandbox = {
@@ -257,10 +256,9 @@ return {
 			j_mp_loyalty_card_sandbox = {
 				name = "Loyalty Card",
 				text = {
-					"HAND TYPE LOYALTY PROGRAM",
-					"betray {C:attention}#1#{}",
-					"and counter RESETS!!!!",
-					"{C:inactive}(Loyal for {C:attention}#2#/#3#{} {C:inactive}hands)",
+					"{X:mult,C:white}X6{} Mult every {C:attention}#3#{}",
+					"hands played of {C:attention}#1#{}",
+					"{C:inactive}(#2#/#3#)",
 				},
 			},
 			j_mp_faceless_sandbox = {
@@ -275,43 +273,46 @@ return {
 			j_mp_square_sandbox = {
 				name = "Square Joker",
 				text = {
-					"FOUR CARD PERFECTIONIST",
-					"who worships THE SACRED GEOMETRY OF",
-					"PERFECTLY BALANCED SQUARE ARRANGEMENTS!!!!",
+					"This Joker gains {C:chips}+#2#{} Chips",
+					"if played hand has",
+					"exactly {C:attention}4{} cards",
+					"{C:attention}Only applies with 4-card hands{}",
 					"{C:inactive}(Currently {C:chips}+#1#{C:inactive} Chips)",
 				},
 			},
 			j_mp_throwback_sandbox = {
 				name = "Throwback",
 				text = {
-					"PROFESSIONAL COWARD CONSULTING SERVICES",
-					"i get PAID to run away from things",
-					"AND THE MORE I RUN THE STRONGER I GET!!!!",
+					"{X:mult,C:white}X#2#{} Base Mult for each",
+					"{C:attention}Blind{} skipped this run",
+					"{X:mult,C:white}X#3#{} Mult next Blind after skipping",
+					"Loses {X:mult,C:white}X#4#{} when Blind not skipped",
 					"{C:inactive}(Currently {X:mult,C:white} X#1# {C:inactive} Mult)",
 				},
 			},
 			j_mp_vampire_sandbox = {
 				name = "Vampire",
 				text = {
-					"vampire economist CREATING",
-					"STONE-BASED CURRENCY",
-					"FROM LIFE FORCE!!!!",
+					"This Joker gains {X:mult,C:white}X#1#{} Mult per",
+					"scoring {C:attention}Enhanced card{} played",
+					"Played enhanced cards become {C:attention}Stone{}",
+					"Stone cards give {C:money}$#3#{} when played",
 					"{C:inactive}(Currently {X:mult,C:white} X#2# {C:inactive} Mult)",
 				},
 			},
 			j_mp_baseball_sandbox = {
 				name = "Baseball Card",
 				text = {
-					'SPORTS CARD "CONTROVERSY"',
-					"disguised as BALANCE CHANGE!!!!",
+					"{C:green}Uncommon{} Jokers",
+					"each give",
+					"{X:mult,C:white}X#1#{} Mult",
 				},
 			},
 			j_mp_steel_joker_sandbox = {
 				name = "Steel Joker",
 				text = {
-					"STEEL REDUNDANCY SPECIALIST",
-					"every PLAYED ALLOY gets",
-					"DOUBLE-CHECKED!!!!",
+					"Played Steel cards",
+					"are {C:attention}retriggered{}",
 				},
 			},
 			j_mp_satellite_sandbox = {
@@ -326,9 +327,10 @@ return {
 			j_mp_idol_sandbox_bw = {
 				name = "Zealot Idol",
 				text = {
-					"SUIT-BLIND PURIST",
-					"accepting ALL {C:attention}#1#{} DEVOTION",
-					"with {X:mult,C:white}X#2#{} ENTHUSIASM!!!!",
+					"Each played {C:attention}#1#{}",
+					"gives {X:mult,C:white}X#2#{} Mult",
+					"when scored",
+					"{s:0.8}Card changes every round",
 				},
 			},
 			j_mp_idol_sandbox_color = {
@@ -343,10 +345,10 @@ return {
 			j_mp_idol_sandbox_fantom = {
 				name = "Meta Idol",
 				text = {
-					"STATISTICAL SUPREMACY COMPLEX",
-					"worshipping your MOST COMMON",
-					"{C:attention}#1#{} of {V:1}#2#{} combo for",
-					"{X:mult,C:white}X#3#{} DIVINE POWER!!!!",
+					"Most common card gives",
+					"{X:mult,C:white}X#3#{} Mult when scored",
+					"{X:mult,C:white}+X#4#{} per copy in deck{}",
+					"{C:inactive}(Currently {C:attention}#1#{} of {V:1}#2#{})",
 				},
 			},
 			j_mp_error_sandbox = {
@@ -674,7 +676,7 @@ return {
 			k_random = "Random",
 			k_standard = "Standard",
 			k_sandbox = "Sandbox",
-			k_sandbox_description = "Like normal mode but someone gave the cards coffee and they're\nfeeling chatty.",
+			k_sandbox_description = "Score preview disabled. No flowcharts.\nEleven jokers replaced with personality disorders.\nOuija destroys cards instead of hand size.\nThree jealous Idols compete for your run.\nEverything else you knew? Check the wiki.",
 			k_vanilla = "Vanilla",
 			k_vanilla_description = "This ruleset removes all Multiplayer content,\nallowing you to play the game as originally designed.\n\nThis ruleset still includes Multiplayer features like the timer.\n\n(Disableable in Lobby Options)",
 			k_blitz = "Standard",
