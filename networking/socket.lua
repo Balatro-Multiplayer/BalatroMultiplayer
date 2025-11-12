@@ -50,7 +50,10 @@ function Networking.connect()
 
 	if connectionResult ~= 1 then
 		SEND_THREAD_DEBUG_MESSAGE(string.format("%s", errorMessage))
-		networkToUiChannel:push("action:error,message:Failed to connect to multiplayer server")
+		networkToUiChannel:push(json.encode({
+			action = "error",
+			message = "Failed to connect to multiplayer server",
+		}))
 	else
 		isSocketClosed = false
 	end

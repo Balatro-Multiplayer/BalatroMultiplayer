@@ -1008,6 +1008,19 @@ function Game:update(dt)
 	repeat
 		local msg = love.thread.getChannel("networkToUi"):pop()
 		if msg then
+			-- horribly messy catch
+			if string.sub(msg, 1, 1) == "a" then
+				if msg ~= "action:keepAlive" then
+					local networkToUiChannel = love.thread.getChannel("networkToUi")
+					networkToUiChannel:push(json.encode({
+						action = "error",
+						message = "Attempting to connect to outdated server",
+					}))
+					networkToUiChannel:push("{\"action\":\"disconnected\"}")
+				end
+				return
+			end
+
 			local parsedAction = json.decode(msg)
 
 			if not ((parsedAction.action == "keepAlive") or (parsedAction.action == "keepAliveAck")) then
