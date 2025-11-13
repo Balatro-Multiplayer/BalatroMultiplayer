@@ -236,8 +236,8 @@ if not FN.SIM.run then
 			local function flint(data)
 				local half_chips = math.floor(data.chips / 2 + 0.5)
 				local half_mult = math.floor(data.mult / 2 + 0.5)
-				data.chips = mod_chips(math.max(half_chips, 0))
-				data.mult = mod_mult(math.max(half_mult, 1))
+				data.chips = FN.SIM.mod_chips(math.max(half_chips, 0))
+				data.mult = FN.SIM.mod_mult(math.max(half_mult, 1))
 			end
 
 			flint(FN.SIM.running.min)
@@ -253,8 +253,8 @@ if not FN.SIM.run then
 			local function plasma(data)
 				local sum = data.chips + data.mult
 				local half_sum = math.floor(sum / 2)
-				data.chips = mod_chips(half_sum)
-				data.mult = mod_mult(half_sum)
+				data.chips = FN.SIM.mod_chips(half_sum)
+				data.mult = FN.SIM.mod_mult(half_sum)
 			end
 
 			plasma(FN.SIM.running.min)
@@ -268,8 +268,8 @@ if not FN.SIM.run then
 				elseif diff < 0 then
 					diff = math.max(diff, -data.chips)
 				end
-				data.chips = mod_chips(data.chips + diff)
-				data.mult = mod_mult(data.mult - diff)
+				data.chips = FN.SIM.mod_chips(data.chips + diff)
+				data.mult = FN.SIM.mod_mult(data.mult - diff)
 			end
 
 			unplasma(FN.SIM.running.min)
@@ -288,19 +288,82 @@ if not FN.SIM.run then
 
 		if blind_obj.name == "The Hook" then
 			blind_obj.triggered = true
-			for _ = 1, math.min(2, #FN.SIM.env.held_cards) do
-				-- TODO: Identify cards-in-hand that can affect score, simulate with/without them for min/max
-				local selected_card, card_key = pseudorandom_element(FN.SIM.env.held_cards, pseudoseed("hook"))
-				table.remove(FN.SIM.env.held_cards, card_key)
-				for _, joker in ipairs(FN.SIM.env.jokers) do
-					-- Note that the cardarea argument is largely arbitrary (used for FN.SIM.JOKERS),
-					-- I use G.hand because The Hook discards from the hand
-					FN.SIM.simulate_joker(
-						joker,
-						FN.SIM.get_context(G.hand, { discard = true, other_card = selected_card })
-					)
+
+			local held = FN.SIM.env.held_cards
+			local n = #held
+			local combinations = {}
+
+			-- Generate all 0, 1, or 2 card discard combinations
+			for i = 0, math.min(2, n) do
+				if i == 0 then
+					table.insert(combinations, {})
+				elseif i == 1 then
+					for a = 1, n do
+						table.insert(combinations, { a })
+					end
+				elseif i == 2 then
+					for a = 1, n - 1 do
+						for b = a + 1, n do
+							table.insert(combinations, { a, b })
+						end
+					end
 				end
 			end
+
+			local min_score, max_score = math.huge, -math.huge
+			local min_dollars, max_dollars = math.huge, -math.huge
+
+			for _, discard_idxs in ipairs(combinations) do
+				-- Deep copy held cards
+				local held_copy = {}
+				for i, card in ipairs(held) do
+					held_copy[i] = copy_table(card)
+				end
+
+				-- Remove discard cards from held_copy
+				table.sort(discard_idxs, function(a, b)
+					return a > b
+				end)
+				for _, idx in ipairs(discard_idxs) do
+					table.remove(held_copy, idx)
+				end
+
+				-- Backup and replace held cards temporarily
+				local backup_held = FN.SIM.env.held_cards
+				FN.SIM.env.held_cards = held_copy
+
+				-- Reset sim state
+				FN.SIM.running.min = { chips = 0, mult = 0, dollars = 0 }
+				FN.SIM.running.exact = { chips = 0, mult = 0, dollars = 0 }
+				FN.SIM.running.max = { chips = 0, mult = 0, dollars = 0 }
+
+				-- Simulate score
+				FN.SIM.simulate_joker_before_effects()
+				FN.SIM.add_base_chips_and_mult()
+				FN.SIM.simulate_blind_effects()
+				FN.SIM.simulate_scoring_cards()
+				FN.SIM.simulate_held_cards()
+				FN.SIM.simulate_joker_global_effects()
+				FN.SIM.simulate_consumable_effects()
+				FN.SIM.simulate_deck_effects()
+
+				-- Evaluate score
+				local res = FN.SIM.get_results()
+				min_score = math.min(min_score, res.score.min)
+				max_score = math.max(max_score, res.score.max)
+				min_dollars = math.min(min_dollars, res.dollars.min)
+				max_dollars = math.max(max_dollars, res.dollars.max)
+
+				-- Restore original held cards
+				FN.SIM.env.held_cards = backup_held
+			end
+
+			-- Overwrite final min/max range based on permutations
+			FN.SIM.running.min = { chips = min_score, mult = 1, dollars = min_dollars }
+			FN.SIM.running.max = { chips = max_score, mult = 1, dollars = max_dollars }
+
+			-- NOTE: FN.SIM.running.exact remains unset here; it's not relevant in this projection context
+			return true -- Prevent default simulation since we’ve replaced it entirely
 		end
 
 		if blind_obj.name == "The Tooth" then

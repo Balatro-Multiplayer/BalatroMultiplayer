@@ -70,7 +70,7 @@ times = 1
 [[patches]]
 [patches.pattern]
 target = "card.lua"
-pattern = '''if self.ability.name == 'Baseball Card' and (context.other_joker.config.center.rarity == 2 or context.other_joker.config.center.rarity == "Uncommon") and self ~= context.other_joker then'''
+pattern = '''if self.ability.name == 'Baseball Card' and self ~= context.other_joker and context.other_joker:is_rarity("Uncommon") then'''
 position = 'after'
 payload = '''if context.other_joker.edition and context.other_joker.edition.type == 'mp_phantom' then return end'''
 match_indent = true

@@ -1,0 +1,142 @@
+# Handles all the assorted end_round behaviour in many patches, in an attempt to preserve compatibility where possible
+[manifest]
+version = "1.0.0"
+dump_lua = true
+priority = 2147483600
+
+# handle duplicate end
+[[patches]]
+[patches.regex]
+target = "functions/state_events.lua"
+pattern = '''function end_round\(\)(?<pre>[\s\S]+?)func = function\(\)'''
+position = 'after'
+payload = '''
+if MP.handle_duplicate_end() then
+	return true
+end
+if MP.LOBBY.code then
+	MP.GAME.round_ended = true
+end
+'''
+match_indent = true
+times = 1
+
+# water is wet
+# the game over code was ripped out from the original function. here? it just shouldn't run, i think
+[[patches]]
+[patches.pattern]
+target = "functions/state_events.lua"
+pattern = '''-- context.end_of_round calculations'''
+position = 'before'
+payload = '''
+if MP.LOBBY.code then
+	game_over = false
+end
+'''
+match_indent = true
+times = 1
+
+# prevent winning (i don't know if this is needed)
+[[patches]]
+[patches.pattern]
+target = "functions/state_events.lua"
+pattern = '''if game_over then'''
+position = 'before'
+payload = '''
+if MP.LOBBY.code then
+	game_won = nil
+	G.GAME.won = nil
+end
+'''
+match_indent = true
+times = 1
+
+# handle deck out
+[[patches]]
+[patches.pattern]
+target = "functions/state_events.lua"
+pattern = '''G.FUNCS.draw_from_discard_to_deck()'''
+position = 'after'
+payload = '''
+MP.handle_deck_out()
+'''
+match_indent = true
+times = 1
+
+## survival mode things
+
+# define local var
+[[patches]]
+[patches.pattern]
+target = "functions/state_events.lua"
+pattern = '''
+G.STATE = G.STATES.ROUND_EVAL
+G.STATE_COMPLETE = false
+'''
+position = 'after'
+payload = '''
+local temp_furthest_blind = 0
+'''
+match_indent = true
+times = 1
+
+# small
+[[patches]]
+[patches.pattern]
+target = "functions/state_events.lua"
+pattern = '''
+G.GAME.round_resets.blind_states.Small = 'Defeated'
+'''
+position = 'after'
+payload = '''
+temp_furthest_blind = G.GAME.round_resets.ante * 10 + 1
+'''
+match_indent = true
+times = 1
+
+# big
+[[patches]]
+[patches.pattern]
+target = "functions/state_events.lua"
+pattern = '''
+G.GAME.round_resets.blind_states.Big = 'Defeated'
+'''
+position = 'after'
+payload = '''
+temp_furthest_blind = G.GAME.round_resets.ante * 10 + 2
+'''
+match_indent = true
+times = 1
+
+# boss
+[[patches]]
+[patches.pattern]
+target = "functions/state_events.lua"
+pattern = '''
+G.GAME.round_resets.blind_states.Boss = 'Defeated'
+'''
+position = 'after'
+payload = '''
+temp_furthest_blind = (G.GAME.round_resets.ante - 1) * 10 + 3
+'''
+match_indent = true
+times = 1
+
+# set furthest blind and pincher index
+[[patches]]
+[patches.pattern]
+target = "functions/state_events.lua"
+pattern = '''
+if G.GAME.round_resets.temp_handsize then G.hand:change_size(-G.GAME.round_resets.temp_handsize); G.GAME.round_resets.temp_handsize = nil end
+'''
+position = 'before'
+payload = '''
+if MP.LOBBY.code then
+	MP.GAME.furthest_blind = (temp_furthest_blind > MP.GAME.furthest_blind) and temp_furthest_blind or MP.GAME.furthest_blind
+	MP.ACTIONS.set_furthest_blind(MP.GAME.furthest_blind)
+
+	MP.GAME.pincher_index = MP.GAME.pincher_index + 1
+end
+'''
+match_indent = true
+times = 1

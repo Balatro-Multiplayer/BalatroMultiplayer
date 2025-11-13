@@ -17,7 +17,7 @@ MP.Ruleset({
 		return MP.UI.CreateRulesetInfoMenu({
 			multiplayer_content = false,
 			forced_lobby_options = false,
-			description_key = "k_vanilla_description"
+			description_key = "k_vanilla_description",
 		})
 	end,
 }):inject()

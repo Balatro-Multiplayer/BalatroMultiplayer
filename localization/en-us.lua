@@ -374,11 +374,30 @@ return {
 					"for all {C:attention}Joker{} effects",
 				},
 			},
+			b_mp_heidelberg = {
+				name = "Heidelberg Deck",
+				text = {
+					"Creates a {C:dark_edition}Negative{} copy of",
+					"{C:attention}1{} random {C:attention}consumable{}",
+					"card in your possession",
+					"at the end of the {C:attention}shop",
+				},
+			},
 			b_mp_indigo = {
 				name = "Indigo Deck",
 				text = {
-					"Choose {C:attention}1{} extra card",
+					"Choose {C:attention}twice{} as many cards",
 					"from all Booster Packs",
+					"Booster Packs are {C:attention}unskippable{}",
+				},
+			},
+			b_mp_oracle = {
+				name = "Oracle Deck",
+				text = {
+					"Start run with {C:spectral,T:c_medium}Medium",
+					"and {C:attention,T:v_clearance_sale}Clearance Sale",
+					"Balance is capped at",
+					"{C:money}$50{} + {C:attention}current interest cap{}",
 				},
 			},
 			b_mp_orange = {
@@ -389,15 +408,6 @@ return {
 					"{C:attention}2{} copies of {C:tarot,T:c_hanged_man}The Hanged Man",
 				},
 			},
-			b_mp_oracle = {
-				name = "Oracle Deck",
-				text = {
-					"Start run with {C:spectral,T:c_medium}Medium",
-					"and {C:attention,T:v_clearance_sale}Clearance Sale",
-					"Balance is capped",
-					"at {C:money}$50",
-				},
-			},
 			b_mp_violet = {
 				name = "Violet Deck",
 				text = {
@@ -406,13 +416,12 @@ return {
 					"are {C:attention}50%{} off",
 				},
 			},
-			b_mp_heidelberg = {
-				name = "Heidelberg Deck",
+			b_mp_white = {
+				name = "White Deck",
 				text = {
-					"Creates a {C:dark_edition}Negative{} copy of",
-					"{C:attention}1{} random {C:attention}consumable{}",
-					"card in your possession",
-					"at the end of the {C:attention}shop",
+					"View {X:purple,C:white}Nemesis'{} current",
+					"deck and Joker setup",
+					"{C:inactive}(Updates at PvP blind){}",
 				},
 			},
 		},
@@ -431,6 +440,12 @@ return {
 					"{C:attention}#2#{C:attention} Playing{} cards to",
 					"add to your deck",
 					"{C:attention}Unskippable{}",
+				},
+			},
+			mp_transmutations = {
+				name = "Transmutations",
+				text = {
+					"{C:purple,s:1.1}Will transmute into:",
 				},
 			},
 		},
@@ -637,11 +652,12 @@ return {
 			k_preview_credit = "*Credit to @Fantom, @Divvy",
 			k_preview_integration_desc = "This will enable score preview before playing a hand",
 			k_requires_restart = "*Requires a restart to take effect",
-			k_new_weekly_ruleset = "A new weekly ruleset is available!",
-			k_currently_colon = "Currently: ",
-			k_sync_locally = "Sync locally (Restarts game)",
+			k_cocktail_select = "Select deck cards to include them",
+			k_cocktail_shiftclick = "Shift-click to foil, foiled decks will always be selected",
+			k_cocktail_rightclick = "Right-click to select all",
 			k_bans = "Bans",
 			k_reworks = "Reworks",
+			k_edit = "Edit",
 			k_ruleset_disabled_the_order_required = "The Order is Required",
 			k_ruleset_disabled_the_order_banned = "The Order is Banned",
 			k_ruleset_not_found = "Unknown ruleset",
@@ -689,6 +705,17 @@ return {
 			ch_c_mp_score_instability_LOC1 = { "  {C:inactive}Minimum of {C:attention}1 {C:mult}Mult" },
 			ch_c_mp_score_instability_LOC2 = { "  {C:inactive}Minimum of {C:attention}0 {C:chips}Chips" },
 			ch_c_mp_ante_scaling = { "{C:red}X#1#{} base Blind size" },
+			ch_c_mp_no_shop_planets = { "{C:planet}Planets{} no longer appear in the {C:attention}shop" },
+			ch_c_mp_only_medium = { "All {C:spectral}Spectral{} cards are {C:spectral}Mediums{}" },
+			ch_c_mp_only_purple_seals = { "All {C:attention}seals{} are {C:purple}Purple Seals{}" },
+			ch_c_mp_sibyl_CREDITS = { "{C:inactive}(Art by {C:attention}Ganpan14O{C:inactive})" },
+			ch_c_mp_polymorph_spam = {
+				"On selecting blind, all held {C:attention}Jokers{} and {C:attention}Consumables{}",
+			},
+			ch_c_mp_polymorph_spam_EXTENDED1 = {
+				"are transmuted into the {C:attention}N{}th next card in their collection,",
+			},
+			ch_c_mp_polymorph_spam_EXTENDED2 = { "where {C:attention}N{} is its current position in slots" },
 		},
 		challenge_names = {
 			c_mp_misprint_deck = "Misprint Deck",
@@ -706,6 +733,8 @@ return {
 			c_mp_lets_go_gambling = "Let's Go Gambling",
 			c_mp_speed = "Speed",
 			c_mp_balancing_act = "Balancing Act",
+			c_mp_salvaged_sibyl = "Salvaged Sibyl",
+			c_mp_polymorph_spam = "Polymorph Spam",
 		},
 	},
 }
