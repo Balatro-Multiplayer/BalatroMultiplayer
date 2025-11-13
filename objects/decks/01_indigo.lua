@@ -47,7 +47,7 @@ local function is_usable(card)
 		elseif key == "c_judgement" then
 			return check_joker_space(card)
 		elseif key == "c_wheel_of_fortune" then
-			if next(card.eligible_strength_jokers) then return true end
+			if card.eligible_strength_jokers and next(card.eligible_strength_jokers) then return true end
 			return false
 		elseif card.ability.consumeable.max_highlighted then
 			if #G.hand.cards >= (card.ability.consumeable.min_highlighted or 1) then return true end
@@ -77,15 +77,12 @@ local function is_usable(card)
 			end
 			return bool
 		elseif key == "c_ectoplasm" or key == "c_hex" then
-			if next(card.eligible_editionless_jokers) then return true end
+			if card.eligible_editionless_jokers and next(card.eligible_editionless_jokers) then return true end
 			return false
 		elseif key == "c_wraith" or key == "c_ankh" or key == "c_soul" then
 			return check_joker_space(card)
 		elseif card.ability.consumeable.max_highlighted then
-			if
-				card.ability.consumeable.mod_num >= #G.hand.cards
-				and #G.hand.cards >= (card.ability.consumeable.min_highlighted or 1)
-			then
+			if #G.hand.cards >= (card.ability.consumeable.min_highlighted or 1) then
 				return true
 			end
 			return false
@@ -93,7 +90,7 @@ local function is_usable(card)
 			return true
 		end
 	end
-	return true -- hopefully no mod compat doesn't kill a run
+	return true -- hopefully no mod compat doesn't kill a run (it will)
 end
 
 local can_skip_ref = G.FUNCS.can_skip_booster

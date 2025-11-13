@@ -449,7 +449,7 @@ end
 local r_cursor_press_ref = Controller.queue_R_cursor_press
 function Controller:queue_R_cursor_press(x, y)
 	local ret = r_cursor_press_ref(self, x, y)
-	if G.cocktail_select then
+	if G.cocktail_select and G.cocktail_select[1].cards then -- bruh
 		local highlight = true
 		for i = 1, #G.cocktail_select do
 			for j = 1, #G.cocktail_select[i].cards do
