@@ -442,6 +442,12 @@ return {
 					"{C:attention}Unskippable{}",
 				},
 			},
+			mp_transmutations = {
+				name = "Transmutations",
+				text = {
+					"{C:purple,s:1.1}Will transmute into:",
+				},
+			},
 		},
 		Stake = {
 			stake_mp_planet = {
@@ -703,8 +709,13 @@ return {
 			ch_c_mp_only_medium = { "All {C:spectral}Spectral{} cards are {C:spectral}Mediums{}" },
 			ch_c_mp_only_purple_seals = { "All {C:attention}seals{} are {C:purple}Purple Seals{}" },
 			ch_c_mp_sibyl_CREDITS = { "{C:inactive}(Art by {C:attention}Ganpan14O{C:inactive})" },
-			ch_c_mp_polymorph_spam = { "On selecting blind, all held {C:attention}Jokers{} and {C:attention}Consumables{}" },
-			ch_c_mp_polymorph_spam_EXTENDED = { "are transmuted into the next card in their collection" },
+			ch_c_mp_polymorph_spam = {
+				"On selecting blind, all held {C:attention}Jokers{} and {C:attention}Consumables{}",
+			},
+			ch_c_mp_polymorph_spam_EXTENDED1 = {
+				"are transmuted into the {C:attention}N{}th next card in their collection,",
+			},
+			ch_c_mp_polymorph_spam_EXTENDED2 = { "where {C:attention}N{} is its current position in slots" },
 		},
 		challenge_names = {
 			c_mp_misprint_deck = "Misprint Deck",

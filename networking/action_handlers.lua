@@ -199,6 +199,11 @@ local function action_enemy_info(score_str, hands_left_str, skips_str, lives_str
 		end,
 	}))
 
+	if MP.GAME.enemy.lives > lives then
+		play_sound("holo1", 0.865, 0.9)
+		play_sound("gong", 0.765, 0.4)
+	end
+
 	MP.GAME.enemy.hands = hands_left
 	MP.GAME.enemy.skips = skips
 	MP.GAME.enemy.lives = lives
@@ -699,6 +704,20 @@ local function action_receive_nemesis_deck(deck_str)
 end
 
 local function action_start_ante_timer(time)
+	for i = 1, 3 do
+		local wait_time = (0.15 * (i - 1))
+		G.E_MANAGER:add_event(Event({
+			blocking = false,
+			blockable = false,
+			trigger = "after",
+			delay = G.SETTINGS.GAMESPEED * wait_time,
+			func = function()
+				play_sound("timpani", 0.55 + 0.25 * i, 0.7)
+				play_sound("generic1", 0.75 + 0.25 * i, 0.7)
+				return true
+			end,
+		}))
+	end
 	if type(time) == "string" then time = tonumber(time) end
 	MP.GAME.timer = time
 	MP.GAME.timer_started = true
@@ -1016,7 +1035,7 @@ function Game:update(dt)
 						action = "error",
 						message = "Attempting to connect to outdated server",
 					}))
-					networkToUiChannel:push("{\"action\":\"disconnected\"}")
+					networkToUiChannel:push('{"action":"disconnected"}')
 				end
 				return
 			end

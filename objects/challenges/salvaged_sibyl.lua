@@ -20,30 +20,39 @@ SMODS.Challenge({
 			{ id = "v_planet_merchant", ids = { "v_planet_tycoon" } },
 			{ id = "v_telescope", ids = { "v_observatory" } },
 			{ id = "v_magic_trick", ids = { "v_illusion" } },
-			{ id = "p_celestial_normal_1", ids = { 
-				"p_celestial_normal_2",
-				"p_celestial_normal_3",
-				"p_celestial_normal_4",
-				"p_celestial_jumbo_1",
-				"p_celestial_jumbo_2",
-				"p_celestial_mega_1",
-				"p_celestial_mega_2",
-			}},
-			{ id = "p_spectral_normal_1", ids = { 
-				"p_spectral_normal_2",
-				"p_spectral_jumbo_1",
-				"p_spectral_mega_1",
-			}},
-			{ id = "p_standard_normal_1", ids = { 
-				"p_standard_normal_2",
-				"p_standard_normal_3",
-				"p_standard_normal_4",
-				"p_standard_jumbo_1",
-				"p_standard_jumbo_2",
-				"p_standard_mega_1",
-				"p_standard_mega_2",
-			}},
-		}
+			{
+				id = "p_celestial_normal_1",
+				ids = {
+					"p_celestial_normal_2",
+					"p_celestial_normal_3",
+					"p_celestial_normal_4",
+					"p_celestial_jumbo_1",
+					"p_celestial_jumbo_2",
+					"p_celestial_mega_1",
+					"p_celestial_mega_2",
+				},
+			},
+			{
+				id = "p_spectral_normal_1",
+				ids = {
+					"p_spectral_normal_2",
+					"p_spectral_jumbo_1",
+					"p_spectral_mega_1",
+				},
+			},
+			{
+				id = "p_standard_normal_1",
+				ids = {
+					"p_standard_normal_2",
+					"p_standard_normal_3",
+					"p_standard_normal_4",
+					"p_standard_jumbo_1",
+					"p_standard_jumbo_2",
+					"p_standard_mega_1",
+					"p_standard_mega_2",
+				},
+			},
+		},
 	},
 	apply = function(self)
 		G.GAME.selected_back.atlas = "mp_decks"
