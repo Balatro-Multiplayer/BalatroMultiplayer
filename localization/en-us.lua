@@ -386,7 +386,7 @@ return {
 			b_mp_indigo = {
 				name = "Indigo Deck",
 				text = {
-					"Choose {C:attention}twice{} as many cards",
+					"Choose {C:attention}+1{} additional card",
 					"from all Booster Packs",
 					"Booster Packs are {C:attention}unskippable{}",
 				},
