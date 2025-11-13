@@ -476,18 +476,28 @@ function Controller:queue_R_cursor_press(x, y)
 	return ret
 end
 
+-- kill me
+G.E_MANAGER:add_event(Event({
+	func = function()
+		local decks = MP.get_cocktail_decks()
+		local cfg = SMODS.Mods["Multiplayer"].config
+		if (not cfg.cocktail) or #decks + 1 ~= #cfg.cocktail then
+			local string = ""
+			for i = 1, #decks do
+				string = string .. "1"
+			end
+			string = string .. "H"
+			cfg.cocktail = string
+		end
+		SMODS.save_mod_config(SMODS.Mods["Multiplayer"])
+		return true
+	end,
+}))
+
 function MP.cocktail_cfg_edit(bool, deck) -- strings are easier to send, and it's just ones and zeroes
 	local decks = MP.get_cocktail_decks()
 	local cfg = SMODS.Mods["Multiplayer"].config
 	local num = (bool == 2) and "2" or (bool and "1" or "0")
-	if (not cfg.cocktail) or #decks + 1 ~= #cfg.cocktail then
-		local string = ""
-		for i = 1, #decks do
-			string = string .. "1"
-		end
-		string = string .. "H"
-		cfg.cocktail = string
-	end
 	if not deck then
 		local string = ""
 		for i = 1, #decks do
@@ -515,14 +525,6 @@ end
 function MP.cocktail_cfg_readpos(pos, construct)
 	local decks = MP.get_cocktail_decks() -- copypasted code. unsure how to make this less messy without making it more messy
 	local cfg = SMODS.Mods["Multiplayer"].config
-	if (not cfg.cocktail) or #decks + 1 ~= #cfg.cocktail then
-		local string = ""
-		for i = 1, #decks do
-			string = string .. "1"
-		end
-		string = string .. "H"
-		cfg.cocktail = string
-	end
 	if pos == "show" then pos = #cfg.cocktail end
 	if construct then return MP.cocktail_cfg_get():sub(pos, pos) end
 	return cfg.cocktail:sub(pos, pos)
