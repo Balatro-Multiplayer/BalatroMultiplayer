@@ -60,6 +60,7 @@ local function is_usable(card)
 			if #G.hand.cards > 1 then -- vanilla bug?
 				return true
 			end
+			return false
 		elseif key == "c_aura" then
 			local bool = false
 			for i, v in ipairs(G.hand.cards) do
@@ -72,8 +73,13 @@ local function is_usable(card)
 		elseif key == "c_ectoplasm" or key == "c_hex" then
 			if card.eligible_editionless_jokers and next(card.eligible_editionless_jokers) then return true end
 			return false
-		elseif key == "c_wraith" or key == "c_ankh" or key == "c_soul" then
+		elseif key == "c_wraith" or key == "c_soul" then
 			return check_joker_space(card)
+		elseif key == "c_ankh" then
+			if G.jokers.cards[1] then
+				return check_joker_space(card)
+			end
+			return false
 		elseif card.ability.consumeable.max_highlighted then
 			if #G.hand.cards >= (card.ability.consumeable.min_highlighted or 1) then
 				return true
