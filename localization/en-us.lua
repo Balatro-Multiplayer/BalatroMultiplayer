@@ -347,7 +347,7 @@ return {
 				text = {
 					"Most common card gives",
 					"{X:mult,C:white}X#3#{} Mult when scored",
-					"{X:mult,C:white}+X#4#{} per copy in deck{}",
+					"({X:mult,C:white}+X#4#{} per copy in deck)",
 					"{C:inactive}(Currently {C:attention}#1#{} of {V:1}#2#{})",
 				},
 			},
@@ -676,7 +676,7 @@ return {
 			k_random = "Random",
 			k_standard = "Standard",
 			k_sandbox = "Sandbox",
-			k_sandbox_description = "Score preview disabled. No flowcharts.\nEleven jokers replaced with personality disorders.\nOuija destroys cards instead of hand size.\nThree jealous Idols compete for your run.\nEverything else you knew? Check the wiki.",
+			k_sandbox_description = "Three jealous Idols now compete for your run!\nTwelve jokers replaced with personality disorders.\nOuija destroys cards instead of hand size.\nScore preview disabled. No flowcharts.\nEverything else you knew? Check the wiki!",
 			k_vanilla = "Vanilla",
 			k_vanilla_description = "This ruleset removes all Multiplayer content,\nallowing you to play the game as originally designed.\n\nThis ruleset still includes Multiplayer features like the timer.\n\n(Disableable in Lobby Options)",
 			k_blitz = "Standard",
