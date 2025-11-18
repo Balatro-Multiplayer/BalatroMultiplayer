@@ -175,7 +175,6 @@ for i, v in ipairs(MP.UTILS.get_culled_pool("Enhanced")) do
 '''
 match_indent = true
 times = 3
-<<<<<<< HEAD
 
 # Stop game from replacing the multiplayer "ready up" button with "select blind" button
 [[patches]]
@@ -190,5 +189,3 @@ end
 '''
 match_indent = true
 times = 1
-=======
->>>>>>> f59a4df (Comeback money change)
