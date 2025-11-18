@@ -79,6 +79,9 @@ local function valid_trigger(card, joker)
 		end
 		return
 	end
+	if not card.base then -- ??????????????????????
+		return false
+	end
 	if key == "j_8_ball" then
 		return rank_check({ 8 }) -- this being a table looks stupid now
 	elseif key == "j_business" or key == "j_reserved_parking" then
