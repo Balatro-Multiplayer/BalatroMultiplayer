@@ -28,9 +28,7 @@ function FN.PRE.start_new_coroutine()
 	FN.PRE.show_preview = true
 	FN.PRE.add_update_event("immediate") -- Force UI refresh
 	local delay = 0
-	if MP.LOBBY.code and not MP.is_pvp_boss() then
-		delay = 5 * G.SETTINGS.GAMESPEED
-	end
+	if MP.LOBBY.code and not MP.is_pvp_boss() then delay = 5 * G.SETTINGS.GAMESPEED end
 	local func = function()
 		FN.PRE.simulate()
 		FN.PRE.lock_updates = false
