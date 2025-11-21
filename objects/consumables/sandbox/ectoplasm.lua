@@ -1,8 +1,3 @@
--- Ectoplasm
--- Current version: Random: -1 hand size, -1 hand, -1 discard
--- Other options:
--- always just -1 hand size (not incrementing)
--- and/or: also makes a random joker perishable
 SMODS.Consumable({
 	key = "ectoplasm_sandbox",
 	set = "Spectral",

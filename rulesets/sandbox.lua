@@ -129,7 +129,11 @@ MP.Ruleset({
 --- Uses pseudorandom selection based on the lobby seed for consistency across players
 --- @return nil
 local function select_random_idol()
-	local idol_keys = { "j_mp_idol_sandbox_bw", "j_mp_idol_sandbox_color", "j_mp_idol_sandbox_fantom" }
+	local idol_keys = {
+		"j_mp_idol_sandbox_bw",
+		--	"j_mp_idol_sandbox_color",
+		"j_mp_idol_sandbox_fantom",
+	}
 	table.sort(idol_keys)
 
 	-- Pseudorandom shuffle using the lobby seed so all players get the same idol
