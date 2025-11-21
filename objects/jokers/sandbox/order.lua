@@ -30,6 +30,10 @@ SMODS.Joker({
 			else
 				-- Didn't play a Straight - reset to base value
 				card.ability.extra.Xmult = 3
+				return {
+					message = localize("k_reset"),
+					colour = G.C.RED,
+				}
 			end
 		end
 		if context.joker_main and next(context.poker_hands[card.ability.extra.type]) then
