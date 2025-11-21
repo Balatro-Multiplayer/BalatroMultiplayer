@@ -14,7 +14,7 @@ SMODS.Joker({
 	rarity = 3,
 	cost = 8,
 	atlas = "baseball_sandbox",
-	config = { extra = { xmult = 1.5 }, mp_sticker_balanced = true },
+	config = { extra = { xmult = 2 }, mp_sticker_balanced = true },
 	loc_vars = function(self, info_queue, card)
 		return { vars = { card.ability.extra.xmult } }
 	end,
@@ -33,6 +33,6 @@ SMODS.Joker({
 	end,
 	mp_credits = { idea = { "Sylvie" } },
 	mp_include = function(self)
-		return MP.LOBBY.config.ruleset == "ruleset_mp_sandbox" and MP.LOBBY.code
+		return MP.SANDBOX.is_joker_allowed(self.key)
 	end,
 })

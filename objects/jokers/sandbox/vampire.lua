@@ -16,9 +16,9 @@ SMODS.Joker({
 	rarity = 2,
 	cost = 7,
 	atlas = "vampire_sandbox",
-	config = { extra = { Xmult_gain = 0.2, Xmult = 1 }, mp_sticker_balanced = true },
+	config = { extra = { Xmult_gain = 0.2, Xmult = 1, stone_money = 3 }, mp_sticker_balanced = true },
 	loc_vars = function(self, info_queue, card)
-		return { vars = { card.ability.extra.Xmult_gain, card.ability.extra.Xmult } }
+		return { vars = { card.ability.extra.Xmult_gain, card.ability.extra.Xmult, card.ability.extra.stone_money } }
 	end,
 	calculate = function(self, card, context)
 		if context.before and context.main_eval and not context.blueprint then
@@ -55,9 +55,9 @@ SMODS.Joker({
 			end
 
 			if #stone_cards > 0 then
-				ease_dollars(5 * #stone_cards)
+				ease_dollars(card.ability.extra.stone_money * #stone_cards)
 				return {
-					message = localize("$") .. (5 * #stone_cards),
+					message = localize("$") .. (card.ability.extra.stone_money * #stone_cards),
 					colour = G.C.MONEY,
 				}
 			end
@@ -67,6 +67,6 @@ SMODS.Joker({
 		} end
 	end,
 	mp_include = function(self)
-		return MP.LOBBY.config.ruleset == "ruleset_mp_sandbox" and MP.LOBBY.code
+		return MP.SANDBOX.is_joker_allowed(self.key)
 	end,
 })

@@ -1,12 +1,28 @@
 return {
 	descriptions = {
 		Tag = {
-			tag_mp_sandbox_rare = {
+			tag_mp_gambling_sandbox = {
 				name = "Gambling Tag",
 				text = {
 					"{C:green}#1# in #2#{} chance",
 					"Shop has a free",
 					"{C:red}Rare Joker{}",
+				},
+			},
+			tag_mp_juggle_sandbox = {
+				name = "Juggle Tag",
+				text = {
+					"{C:attention}+#1#{} hand size",
+					"next {C:attention}PvP Blind",
+				},
+			},
+			tag_mp_investment_sandbox = {
+				name = "Investment Tag",
+				text = {
+					"After defeating",
+					"the Boss Blind, gain:",
+					"{C:money}$#1#{} + {C:money}$#2#{} per Ante",
+					"{C:inactive}(Currently {C:money}$#3#{C:inactive})",
 				},
 			},
 		},
@@ -155,9 +171,9 @@ return {
 			j_mp_bloodstone_sandbox = {
 				name = "Bloodstone",
 				text = {
-					"PATCH NOTE REGRESSION SYNDROME",
+					"{V:1}PATCH NOTE REGRESSION SYNDROME",
 					"reverting to LAUNCH DAY TRAUMA",
-					"for NOSTALGIC POWER SPIKES!!!!",
+					"for NOSTALGIC {X:mult,C:white}X#3#{} POWER SPIKES!!!!",
 					"{C:inactive}({C:green}#1# in #2#{} {C:inactive}chance)",
 				},
 			},
@@ -173,36 +189,35 @@ return {
 			j_mp_mail_sandbox = {
 				name = "Mail-in Rebate",
 				text = {
-					"RANK-LOCKED REBATE FORM",
-					"someone wrote {C:attention}#2#{} in",
-					"PERMANENT INK!!!!",
+					"Earn {C:money}$#1#{} for each",
+					"discarded {C:attention}#2#{}",
+					"{s:0.8}Rank never changes",
 				},
 			},
 			j_mp_hit_the_road_sandbox = {
 				name = "Hit the Road",
 				text = {
-					"HIGHWAY JACK DISPOSAL",
-					"launching {C:attention}Jacks{}",
-					"INTO THE ASPHALT FOREVER!!!!",
+					"This Joker gains {X:mult,C:white}X0.75{} Mult",
+					"for every {C:attention}Jack{} discarded",
+					"Discarded Jacks are {C:attention}destroyed{}",
 					"{C:inactive}(Currently {X:mult,C:white} X#2# {C:inactive} Mult)",
 				},
 			},
 			j_mp_misprint_sandbox = {
 				name = "Misprint",
 				text = {
-					"SCHRODINGER'S LOTTERY PLAYER",
-					"ticket both WINS AND LOSES",
-					"until checked!!!!",
-					"{C:inactive}({V:1}#1#{C:inactive} Mult)",
+					"{V:1}#1#{} Mult",
+					"{C:attention}Value revealed on purchase{}",
+					"{C:green}Printing errors compound{}",
 				},
 			},
 			j_mp_castle_sandbox = {
 				name = "Castle",
 				text = {
-					"DISCARD-BASED SUIT MARRIAGE",
-					"throws away ONLY {V:1}#1#{} forever",
-					"because THAT'S THEIR LOVE LANGUAGE!!!!",
-					"{C:inactive}(Currently {C:chips}+#2#{C:inactive} chips)",
+					"This Joker gains {C:chips}#3{} Chips",
+					"per discarded {V:1}#1#{}",
+					"Suit locked on purchase",
+					"{C:inactive}(Currently {C:chips}+#2#{C:inactive} Chips)",
 				},
 			},
 			j_mp_runner_sandbox = {
@@ -217,9 +232,10 @@ return {
 			j_mp_order_sandbox = {
 				name = "The Order",
 				text = {
-					"PEASANT UPRISING COORDINATOR",
-					"organizing the NUMBERS to overthrow",
-					"their FACE CARD OPPRESSORS!!!!",
+					"{X:mult,C:white}X3{} Mult if played hand contains a {C:attention}Straight{}",
+					"Gains {X:mult,C:white}X#1#{} Mult for each consecutive {C:attention}Straight{} played",
+					"Resets when any other hand is played",
+					"{C:inactive}(Currently {X:mult,C:white}X#2#{C:inactive} Mult)",
 				},
 			},
 			j_mp_photograph_sandbox = {
@@ -241,10 +257,9 @@ return {
 			j_mp_loyalty_card_sandbox = {
 				name = "Loyalty Card",
 				text = {
-					"HAND TYPE LOYALTY PROGRAM",
-					"betray {C:attention}#1#{}",
-					"and counter RESETS!!!!",
-					"{C:inactive}(Loyal for {C:attention}#2#/#3#{} {C:inactive}hands)",
+					"{X:mult,C:white}X6{} Mult every {C:attention}#3#{}",
+					"hands played of {C:attention}#1#{}",
+					"{C:inactive}(#2#/#3#)",
 				},
 			},
 			j_mp_faceless_sandbox = {
@@ -259,43 +274,46 @@ return {
 			j_mp_square_sandbox = {
 				name = "Square Joker",
 				text = {
-					"FOUR CARD PERFECTIONIST",
-					"who worships THE SACRED GEOMETRY OF",
-					"PERFECTLY BALANCED SQUARE ARRANGEMENTS!!!!",
+					"This Joker gains {C:chips}+#2#{} Chips",
+					"if played hand has",
+					"exactly {C:attention}4{} cards",
+					"{C:attention}Only applies with 4-card hands{}",
 					"{C:inactive}(Currently {C:chips}+#1#{C:inactive} Chips)",
 				},
 			},
 			j_mp_throwback_sandbox = {
 				name = "Throwback",
 				text = {
-					"PROFESSIONAL COWARD CONSULTING SERVICES",
-					"i get PAID to run away from things",
-					"AND THE MORE I RUN THE STRONGER I GET!!!!",
+					"{X:mult,C:white}X#2#{} Base Mult for each",
+					"{C:attention}Blind{} skipped this run",
+					"{X:mult,C:white}X#3#{} Mult next Blind after skipping",
+					"Loses {X:mult,C:white}X#4#{} when Blind not skipped",
 					"{C:inactive}(Currently {X:mult,C:white} X#1# {C:inactive} Mult)",
 				},
 			},
 			j_mp_vampire_sandbox = {
 				name = "Vampire",
 				text = {
-					"vampire economist CREATING",
-					"STONE-BASED CURRENCY",
-					"FROM LIFE FORCE!!!!",
+					"This Joker gains {X:mult,C:white}X#1#{} Mult per",
+					"scoring {C:attention}Enhanced card{} played",
+					"Played enhanced cards become {C:attention}Stone{}",
+					"Stone cards give {C:money}$#3#{} when played",
 					"{C:inactive}(Currently {X:mult,C:white} X#2# {C:inactive} Mult)",
 				},
 			},
 			j_mp_baseball_sandbox = {
 				name = "Baseball Card",
 				text = {
-					'SPORTS CARD "CONTROVERSY"',
-					"disguised as BALANCE CHANGE!!!!",
+					"{C:green}Uncommon{} Jokers",
+					"each give",
+					"{X:mult,C:white}X#1#{} Mult",
 				},
 			},
 			j_mp_steel_joker_sandbox = {
 				name = "Steel Joker",
 				text = {
-					"STEEL REDUNDANCY SPECIALIST",
-					"every PLAYED ALLOY gets",
-					"DOUBLE-CHECKED!!!!",
+					"Played Steel cards",
+					"are {C:attention}retriggered{}",
 				},
 			},
 			j_mp_satellite_sandbox = {
@@ -305,6 +323,33 @@ return {
 					"INFRASTRUCTURE SLOWLY FALLS APART",
 					"WITHOUT CONSTANT PLANETARY UPGRADES!!!!",
 					"{C:inactive}(Currently {C:money}$#1#{C:inactive})",
+				},
+			},
+			j_mp_idol_sandbox_bw = {
+				name = "Zealot Idol",
+				text = {
+					"Each played {C:attention}#1#{}",
+					"gives {X:mult,C:white}X#2#{} Mult",
+					"when scored",
+					"{s:0.8}Card changes every round",
+				},
+			},
+			j_mp_idol_sandbox_color = {
+				name = "Tantrum Idol",
+				text = {
+					"DEVOTIONAL PRESSURE COOKER",
+					"building STEAM for {C:attention}#1#{} of {V:1}#3#{}",
+					"until EXPLOSIVE RELEASE!!!!",
+					"{C:inactive}(Currently {X:mult,C:white} X#2# {C:inactive} Mult)",
+				},
+			},
+			j_mp_idol_sandbox_fantom = {
+				name = "Meta Idol",
+				text = {
+					"Most common card gives",
+					"{X:mult,C:white}X#3#{} Mult when scored",
+					"({X:mult,C:white}+X#4#{} per copy in deck)",
+					"{C:inactive}(Currently {C:attention}#1#{} of {V:1}#2#{})",
 				},
 			},
 			j_mp_error_sandbox = {
@@ -453,10 +498,11 @@ return {
 			stake_mp_planet = {
 				name = "Planet Stake",
 				text = {
-					"{C:attention}Orange Stake{}'s cooler older sibling",
-					"who graciously returned your",
-					"{C:red}emotional support discard{} because",
-					"even they aren't that cruel",
+					"Applies {C:black}Black Stake{} effects, plus:",
+					"Shop can have {C:attention}Perishable{} Jokers",
+					"{C:inactive,s:0.8}(Debuffed after 5 Rounds)",
+					"Required score scales",
+					"faster for each {C:attention}Ante",
 				},
 			},
 			stake_mp_spectral = {
@@ -474,6 +520,25 @@ return {
 					"Applies {C:planet}Spectral Stake{} effects, plus:",
 					"Required score scales",
 					"even faster for each {C:attention}Ante",
+				},
+			},
+		},
+		Spectral = {
+			c_mp_ouija_sandbox = {
+				name = "Ouija",
+				text = {
+					"Destroy {C:attention}#1#{} random cards,",
+					"then convert all remaining",
+					"cards to a single random {C:attention}rank",
+				},
+			},
+			c_mp_ectoplasm_sandbox = {
+				name = "Ectoplasm",
+				text = {
+					"Add {C:dark_edition}Negative{} to",
+					"a random {C:attention}Joker,",
+					"Randomly apply one of:",
+					"{C:red}-1{} hand, {C:red}-1{} discard, or {C:red}-1{} hand size",
 				},
 			},
 		},
@@ -561,6 +626,7 @@ return {
 			k_lives = "Lives",
 			k_lost_life = "Lost a life",
 			k_total_lives_lost = " Total Lives Lost ($4 each)",
+			k_comeback_money_sandbox = " Comeback Money ($3 × ante cleared)",
 			k_attrition_name = "Attrition",
 			k_enter_lobby_code = "Enter Lobby Code",
 			k_paste = "Paste From Clipboard",
@@ -611,7 +677,7 @@ return {
 			k_random = "Random",
 			k_standard = "Standard",
 			k_sandbox = "Sandbox",
-			k_sandbox_description = "Like normal mode but someone gave the cards coffee and they're\nfeeling chatty.",
+			k_sandbox_description = "Three jealous Idols now compete for your run!\nTwelve jokers replaced with personality disorders.\nOuija destroys cards instead of hand size.\nScore preview disabled. No flowcharts.\nEverything else you knew? Check the wiki!",
 			k_vanilla = "Vanilla",
 			k_vanilla_description = "This ruleset removes all Multiplayer content,\nallowing you to play the game as originally designed.\n\nThis ruleset still includes Multiplayer features like the timer.\n\n(Disableable in Lobby Options)",
 			k_blitz = "Standard",

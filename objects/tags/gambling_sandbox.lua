@@ -1,14 +1,14 @@
 SMODS.Atlas({
-	key = "sandbox_rare",
-	path = "tag_sandbox_rare.png",
+	key = "gambling_sandbox",
+	path = "tag_gambling_sandbox.png",
 	px = 32,
 	py = 32,
 })
 
 -- Gambling Tag: 1 in 2 chance to generate a rare joker in shop
 SMODS.Tag({
-	key = "sandbox_rare", -- i wholeheartedly swear to change the naming of key and assets xoxo
-	atlas = "sandbox_rare",
+	key = "gambling_sandbox",
+	atlas = "gambling_sandbox",
 	object_type = "Tag",
 	dependencies = {
 		items = {},
@@ -18,9 +18,8 @@ SMODS.Tag({
 	end,
 	name = "Gambling Tag",
 	discovered = true,
-	order = 2,
 	min_ante = 2, -- less degeneracy
-	no_collection = true,
+	no_collection = MP.sandbox_no_collection,
 	config = {
 		type = "store_joker_create",
 		odds = 2,

@@ -3,7 +3,7 @@
 return {
 	descriptions = {
 		Tag = {
-			tag_mp_sandbox_rare = {
+			tag_mp_gambling_sandbox = {
 				name = "ギャンブルタグ",
 				text = {
 					"次回のジョーカーの商品を、{C:green}#2# 分の #1#{} の確率で",
@@ -26,6 +26,7 @@ return {
 					"差1つにつき",
 					"チップ {C:chips}+#1#{}",
 					"{C:inactive}(現在 チップ {C:chips}+#2#{C:inactive})",
+					"{C:inactive}(チップ数はステークにより異なる)",
 				},
 			},
 			j_mp_skip_off = {
@@ -115,6 +116,14 @@ return {
 					"再発動する",
 				},
 			},
+			j_mp_bloodstone = {
+				name = "ブラッドストーン",
+				text = {
+					"出した {C:hearts}ハートのカード{} が",
+					"得点されるたびに",
+					"{C:green}#2#分の#1#{} の確率で 倍率 {X:mult,C:white}X#3#{}",
+				},
+			},
 			j_mp_cloud_9 = {
 				name = "クラウド9",
 				text = {
@@ -124,12 +133,213 @@ return {
 					"{C:inactive}(現在合計 {C:money}$#2#{}{C:inactive})",
 				},
 			},
-			j_mp_bloodstone = {
+			j_mp_magnet_sandbox = {
+				name = "マグネット",
+				text = {
+					"{C:attention}#1#{} ラウンド後",
+					"このジョーカーを売ると",
+					"{X:purple,C:white}相手{} の最も売値が高い {C:attention}ジョーカー{}を {C:attention}複製{} する",
+					"ただし {C:attention}#3#{} ラウンド後には",
+					"磁性が壊れて {C:attention}ただのゴミになってしまう!",
+					"{C:inactive}(あと {C:attention}#2#/#1# {C:inactive})",
+				},
+			},
+			j_mp_cloud_9_sandbox = {
+				name = "ぶっトぶ快感",
+				text = {
+					"",
+					"私は {C:attention}9{} を専門に栽培している農家だ。",
+					"キミも一緒に {C:attention}育てないか?",
+					"{C:attention}稼ぎはいいぞ?",
+					"{C:inactive}({C:green}#2# 分の #1#{} {C:inactive}の確率)",
+					"{C:inactive}(現在 {C:money}$#3#{}{C:inactive})",
+				},
+			},
+			j_mp_lucky_cat_sandbox = {
+				name = "いたずら招き猫",
+				text = {
+					"ラッキーカードでお金を当ててくれるのはうれしいのニャ!",
+					"でももっと高得点もとってほしいニャ...",
+					"そうニャ! {C:attention}発動に成功したらガラスカードにしてあげる{} ニャ!",
+					"喜んでもらえること間違いなしなのニャ!",
+					"{C:inactive}(現在 倍率 {X:mult,C:white} X#2# {C:inactive})",
+				},
+			},
+			j_mp_constellation_sandbox = {
+				name = "きみなにざっち",
+				text = {
+					"キミ何座?",
+					"たまごっちみたいに {C:attention}ごはんをあげ続けないと",
+					"{C:attention}どんどん弱っていっちゃうよ!",
+					"{C:inactive}(現在 倍率 {X:mult,C:white} X#1# {C:inactive})",
+				},
+			},
+			j_mp_bloodstone_sandbox = {
 				name = "ブラッドストーン",
 				text = {
-					"出した {C:hearts}ハートのカード{} が",
-					"得点されるたびに",
-					"{C:green}#2#分の#1#{} の確率で 倍率 {X:mult,C:white}X#3#{}",
+					"初心に帰って楽しもう!",
+					"リリース開始時に割と不評だった効果に逆戻りだ!",
+					"{C:hearts}ハートのカード{} {C:inactive}がスコアされた時、",
+					"{C:inactive}{C:green}#2# 分の #1#{} {C:inactive}の確率で 倍率 {X:mult,C:white} X2 ",
+				},
+			},
+			j_mp_juggler_sandbox = {
+				name = "ジャグラー",
+				text = {
+					"ジャグリングは自分ができる限界の個数で",
+					"キメるのが一番カッコイイと思ってるんだ!",
+					"{C:attention}キミは5枚が限界なんだろ?{} 僕に見せてよ!",
+					"{C:attention}手を抜いたら帰っちゃうからね!",
+					"{C:inactive}(現在 ハンドサイズ {C:attention}+#1#{C:inactive})",
+				},
+			},
+			j_mp_mail_sandbox = {
+				name = "迷惑されメール",
+				text = {
+					"油性ペンで {C:attention}#2#{} と書かれている...",
+					"誰かのイタズラで対象の数字が固定されてしまった!!",
+				},
+			},
+			j_mp_hit_the_road_sandbox = {
+				name = "道路工事看板",
+				text = {
+					"{X:blue,C:white}ご迷惑をおかけします{}",
+					"{C:blue}ジャック のカードで",
+					"{C:blue}道路をつくっています",
+					"{C:blue}20XX 年 〇 月 × 日 まで",
+					"{C:blue}時間帯 8:00 ~ 17:00",
+					"{C:inactive}(現在 倍率{X:mult,C:white} X#2# {C:inactive})",
+				},
+			},
+			j_mp_misprint_sandbox = {
+				name = "ミスプリント宝くじ",
+				text = {
+					"ちょっと運試し!",
+					"{C:attention}買わないと倍率の値がいくつかわからないぞ!",
+					"{C:inactive}倍率 ({V:1}#1#{C:inactive})",
+				},
+			},
+			j_mp_castle_sandbox = {
+				name = "チャペル",
+				text = {
+					"スーツをテーマにした結婚式のご依頼をいただいた際には、",
+					"花びらの代わりに {V:1}#1#のカード{} {C:attention}を捨てて{} シャワーをいたしました。",
+					"それがお二人にとっての一番の愛の贈り物なのですから。",
+					"{C:inactive}(現在 チップ {C:chips}+#2#{C:inactive})",
+				},
+			},
+			j_mp_runner_sandbox = {
+				name = "熱血ランナー",
+				text = {
+					"そこのキミ! 最高の役って何だと思う？",
+					"やっぱストレートだよな! 分かってんな～お前!",
+					"じゃあ、{C:attention}ストレート以外出されても助けてやんねぇから!",
+					"よろしくな!",
+					"{C:inactive}(現在 チップ {C:chips}+#1#{C:inactive})",
+				},
+			},
+			j_mp_order_sandbox = {
+				name = "反フェイス同盟「オーダー」",
+				text = {
+					"{C:attention}フェイスカードなんてなくても",
+					"{C:attention}私たち数字がストレートになって力を合わせれば",
+					"きっとこの勝負に勝てるんだ!!",
+				},
+			},
+			j_mp_photograph_sandbox = {
+				name = "人見知りな写真家",
+				text = {
+					"私は人物の写真には一際自信があるんですが、",
+					"{C:attention}一度に2人以上で来られると全く力が出なくて...",
+					"ご希望の際はお一人ずつでお願いします",
+				},
+			},
+			j_mp_ride_the_bus_sandbox = {
+				name = "リフジンバス",
+				text = {
+					"本日も当バスをご利用いただきありがとうございます。",
+					"当バスでは、{C:attention}お客様のフェイスカードのスコアを確認した場合、",
+					"{C:attention}バスが消滅いたします。",
+					"ご理解、ご協力をお願いいたします。",
+					"{C:inactive}(現在 倍率 {C:mult}+#1#{C:inactive})",
+				},
+			},
+			j_mp_loyalty_card_sandbox = {
+				name = "偽りのポイントカード",
+				text = {
+					"{C:attention}連続での役のご利用{} でポイントが貯まります!",
+					"今回の役は {C:attention}#1#{} !",
+					"{C:inactive}注意:効果が発動するまでの回数の表記に",
+					"{C:inactive}不具合が発生しています",
+					"{C:inactive}(発動まで {C:attention}#2#/#3#{} {C:inactive})",
+				},
+			},
+			j_mp_faceless_sandbox = {
+				name = "フェイスカードソムリエ",
+				text = {
+					"よりプレミアムなプレイ体験をお楽しみいただくため、",
+					"{C:attention}フェイスカード3種類を一度に回収させて頂いた場合にのみ",
+					"{C:attention}通常より多額の資金{} をご提供しております。",
+				},
+			},
+			j_mp_square_sandbox = {
+				name = "四角形信者",
+				text = {
+					"四角形は最もバランスのとれた神聖な形です。",
+					"四方位、四季、四肢、キリストの十字架など、",
+					"この世は全て4の要素からなる物から構成されているのです。",
+					"{C:attention}4枚ずつ出していただかなければ助力は致しません。",
+					"{C:inactive}(現在 チップ {C:chips}+#1#{C:inactive})",
+				},
+			},
+			j_mp_throwback_sandbox = {
+				name = "迷惑系Youtuber",
+				text = {
+					"オレサマは逃げることでメシを食ってるんだ!",
+					"{C:attention}大胆な逃げ方をすればするほど数が伸びて",
+					"サイコーにアガるんだよ!!",
+					"{C:inactive}(現在 倍率 {X:mult,C:white} X#1# {C:inactive})",
+				},
+			},
+			j_mp_vampire_sandbox = {
+				name = "異界の銀行員",
+				text = {
+					"お前のデッキの {C:attention}便利なカードを石に{} して",
+					"俺らの通貨として使ってやる!!",
+					"{C:inactive}(現在 倍率{X:mult,C:white} X#2# {C:inactive})",
+				},
+			},
+			j_mp_baseball_sandbox = {
+				name = "ベースボールカード",
+				text = {
+					"ちょっとワクワクした?",
+					"{C:attention}普通のとなーんにも変わってないよ!",
+				},
+			},
+			j_mp_steel_joker_sandbox = {
+				name = "ベテランのスチール検品係",
+				text = {
+					"{C:attention}出してくれたスチールカードの",
+					"{C:attention}二重チェック{}は欠かさないぞ!",
+				},
+			},
+			j_mp_satellite_sandbox = {
+				name = "サテライト",
+				text = {
+					"この人工衛星は {C:attention}惑星カードを燃料に",
+					"資金を提供しております。",
+					"ご協力をお願いいたします。",
+					"{C:inactive}(現在 {C:money}$#1#{C:inactive})",
+				},
+			},
+			j_mp_error_sandbox = {
+				name = "繧ｸ繝ｧ繝ｼ繧ｫ繝ｼ",
+				text = {
+					-- "PREVIEW DISABLED",
+					"{X:purple,C:white,s:0.85}なニカが{} {X:purple,C:white,s:0.85}おカしイ...",
+					-- "PREVIEW DISABLED",
+					-- "PREVIEW DISABLED",
+					-- "{C:inactive}(CURRENTLY {C:money}$7{C:inactive})",
 				},
 			},
 		},
@@ -138,7 +348,7 @@ return {
 				name = "小惑星",
 				text = {
 					"{X:purple,C:white}相手{} の一番高い",
-					"{C:legendary,E:1} ポーカーハンド{} のレベルを #1# 下げる",
+					"{C:legendary,E:1}役{} のレベルを #1# 下げる",
 					"{C:inactive}({C:attention}PvPブラインド開始時{} {C:inactive}に効果が発動する)",
 				},
 			},
@@ -230,6 +440,12 @@ return {
 					"バウチャーの値段が {C:attention}50%OFF{}",
 				},
 			},
+			b_mp_heidelberg = {
+				name = "ペルケオデッキ",
+				text = {
+					"{C:attention,T:j_perkeo}ペルケオ{} の効果を持つ",
+				},
+			},
 		},
 		Other = {
 			current_nemesis = {
@@ -245,6 +461,31 @@ return {
 					"{C:attention}#2#枚{} の {C:attention}トランプ{} の中から",
 					"{C:attention}#1#枚{} 選んでデッキに追加することができる",
 					"{C:inactive}(スキップすることはできない)",
+				},
+			},
+		},
+		Stake = {
+			stake_mp_planet = {
+				name = "プラネットステーク",
+				text = {
+					"{C:attention}オレンジステーク{} のアニキ",
+					"{C:blue}ブルーステーク{} のディスカード {C:red}-1{} を",
+					"ナシにしてくれる優しいヤツ",
+				},
+			},
+			stake_mp_spectral = {
+				name = "スペクトルステーク",
+				text = {
+					"{C:planet}プラネットステーク{} の効果に加え、",
+					"ショップに {C:money}レンタルジョーカー{} が並ぶことがある",
+					"ノルマスコアの上昇がゴールドステークより大きくなる",
+				},
+			},
+			stake_mp_spectralplus = {
+				name = "スペクトルステーク+",
+				text = {
+					"{C:planet}スペクトルステーク{} の効果に加え、",
+					"ノルマスコアの上昇がさらに大きくなる",
 				},
 			},
 		},
@@ -410,8 +651,8 @@ return {
 			k_destabilized = "アンバランス",
 			k_oops_ex = "ハズレ！",
 			k_asteroids = "小惑星",
-			k_amount_short = "金額",
-			k_filed_ex = "提出!",
+			k_amount_short = "amt.",
+			k_filed_ex = "提出しました!",
 			k_timer = "タイマー",
 			k_mods_list = "使用しているMOD",
 			k_enemy_jokers = "相手のジョーカー",
