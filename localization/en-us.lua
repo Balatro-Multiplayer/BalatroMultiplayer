@@ -232,9 +232,10 @@ return {
 			j_mp_order_sandbox = {
 				name = "The Order",
 				text = {
-					"{X:mult,C:white}X4{} Mult if played",
-					"hand contains a {C:attention}Straight{}",
-					"with {C:attention}no face cards{}",
+					"{X:mult,C:white}X3{} Mult if played hand contains a {C:attention}Straight{}",
+					"Gains {X:mult,C:white}X#1#{} Mult for each consecutive {C:attention}Straight{} played",
+					"Resets when any other hand is played",
+					"{C:inactive}(Currently {X:mult,C:white}X#2#{C:inactive} Mult)",
 				},
 			},
 			j_mp_photograph_sandbox = {
