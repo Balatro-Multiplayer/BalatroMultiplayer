@@ -99,6 +99,7 @@ local function mass_polymorph(area)
 				if included(v.key) then
 					if swap == 1 then
 						card:set_ability(v)
+						card:set_cost()
 						done = true
 						break
 					end

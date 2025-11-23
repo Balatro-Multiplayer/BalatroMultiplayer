@@ -236,6 +236,7 @@ MP.load_mp_dir("objects/jokers/sandbox")
 MP.load_mp_dir("objects/stakes")
 MP.load_mp_dir("objects/tags")
 MP.load_mp_dir("objects/consumables")
+MP.load_mp_dir("objects/consumables/sandbox")
 MP.load_mp_dir("objects/boosters")
 MP.load_mp_dir("objects/challenges")
 

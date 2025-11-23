@@ -21,13 +21,21 @@ position = 'after'
 payload = '''
   if not MP.GAME.comeback_bonus_given then
 		MP.GAME.comeback_bonus_given = true
+		local comeback_bonus
+
+		if MP.LOBBY.config.ruleset == "ruleset_mp_sandbox" then
+		    comeback_bonus = 3 * (G.GAME.round_resets.ante - 1)
+		else
+		    comeback_bonus = 4 * MP.GAME.comeback_bonus
+		end
+
 		add_round_eval_row({
 			bonus = true,
 			name = "comeback",
 			pitch = pitch,
-			dollars = 4 * MP.GAME.comeback_bonus,
+			dollars = comeback_bonus,
 		})
-		dollars = dollars + 4 * MP.GAME.comeback_bonus
+		dollars = dollars + comeback_bonus
 	end'''
 match_indent = false
 times = 1
@@ -38,22 +46,30 @@ target = "functions/common_events.lua"
 pattern = '''elseif config.name == 'hands' then'''
 position = 'before'
 payload = '''elseif config.name == "comeback" then
+  local bonus
+  if MP.LOBBY.config.ruleset == "ruleset_mp_sandbox" then
+	bonus = G.GAME.round_resets.ante - 1
+  else
+	bonus = MP.GAME.comeback_bonus
+  end
   table.insert(left_text, {
     n = G.UIT.T,
     config = {
-      text = MP.GAME.comeback_bonus,
+      text = bonus,
       scale = 0.8 * scale,
       colour = G.C.PURPLE,
       shadow = true,
       juice = true,
     },
   })
+
+  local comeback_money_key = MP.LOBBY.config.ruleset == "ruleset_mp_sandbox" and "k_comeback_money_sandbox" or "k_total_lives_lost"
   table.insert(left_text, {
     n = G.UIT.O,
     config = {
       object = DynaText({
         string = {
-          localize("k_total_lives_lost"),
+          localize(comeback_money_key),
         },
         colours = { G.C.UI.TEXT_LIGHT },
         shadow = true,

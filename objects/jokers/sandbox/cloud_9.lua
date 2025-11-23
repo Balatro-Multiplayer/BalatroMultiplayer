@@ -45,7 +45,7 @@ SMODS.Joker({
 		}
 	end,
 	mp_include = function(self)
-		return MP.LOBBY.config.ruleset == "ruleset_mp_sandbox" and MP.LOBBY.code
+		return MP.SANDBOX.is_joker_allowed(self.key)
 	end,
 	calc_dollar_bonus = function(self, card)
 		return calculate_cloud_9_bonus(card)

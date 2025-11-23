@@ -2,7 +2,7 @@
 return {
 	descriptions = {
 		Tag = {
-			tag_mp_sandbox_rare = {
+			tag_mp_gambling_sandbox = {
 				name = "赌博标签",
 				text = {
 					"{C:green}#1#/#2#{}几率",

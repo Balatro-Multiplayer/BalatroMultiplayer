@@ -76,14 +76,10 @@ local function is_usable(card)
 		elseif key == "c_wraith" or key == "c_soul" then
 			return check_joker_space(card)
 		elseif key == "c_ankh" then
-			if G.jokers.cards[1] then
-				return check_joker_space(card)
-			end
+			if G.jokers.cards[1] then return check_joker_space(card) end
 			return false
 		elseif card.ability.consumeable.max_highlighted then
-			if #G.hand.cards >= (card.ability.consumeable.min_highlighted or 1) then
-				return true
-			end
+			if #G.hand.cards >= (card.ability.consumeable.min_highlighted or 1) then return true end
 			return false
 		else
 			return true

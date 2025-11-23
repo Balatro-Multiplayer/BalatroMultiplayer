@@ -84,7 +84,7 @@ SMODS.Back({
 		if MP.cocktail_check_edited() then G.GAME.seeded = true end
 	end,
 	calculate = function(self, back, context)
-		for i = 1, 3 do
+		for i = 1, #G.GAME.modifiers.mp_cocktail do
 			back:change_to(G.P_CENTERS[G.GAME.modifiers.mp_cocktail[i]])
 			local ret1, ret2 = back:trigger_effect(context)
 			back:change_to(G.P_CENTERS["b_mp_cocktail"])
@@ -139,6 +139,7 @@ function Card:click() -- i'd rather deal with the cardarea but this is fine i su
 			G.GAME.viewed_back
 			and G.GAME.viewed_back.effect
 			and G.GAME.viewed_back.effect.center.key == "b_mp_cocktail"
+			and self.facing == "back"
 		then
 			-- boilerplate robbed from cryptid's decaying corpse
 			if G.cocktail_select then
@@ -323,6 +324,7 @@ function Card:draw(layer)
 			and G.GAME.viewed_back
 			and G.GAME.viewed_back.effect
 			and G.GAME.viewed_back.effect.center.key == "b_mp_cocktail"
+			and self.facing == "back"
 		self.children.view_deck.states.visible = bool
 	end
 end
@@ -607,7 +609,8 @@ SMODS.DrawStep({
 		if G.STAGE == G.STAGES.RUN and G.GAME and G.GAME.modifiers and G.GAME.modifiers.mp_cocktail_sticker then
 			if self.area and self.area.config.type == "deck" then
 				for i, v in ipairs(G.GAME.modifiers.mp_cocktail_sticker) do
-					local key = "mp_cocktail_" .. v .. i
+					local num = math.min(i, 3)
+					local key = "mp_cocktail_" .. v .. num
 					if not G.shared_stickers[key] then
 						G.shared_stickers[key] = Sprite(
 							0,
@@ -615,7 +618,7 @@ SMODS.DrawStep({
 							G.CARD_W,
 							G.CARD_H,
 							G.ASSET_ATLAS["mp_cocktail_deck_stickers"],
-							{ x = sticker_x_pos[v], y = i - 1 }
+							{ x = sticker_x_pos[v], y = num - 1 }
 						)
 					end
 					G.shared_stickers[key].role.draw_major = self
