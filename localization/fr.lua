@@ -2,12 +2,28 @@
 return {
 	descriptions = {
 		Tag = {
-			tag_mp_sandbox_rare = {
+			tag_mp_gambling_sandbox = {
 				name = "Badge jeu de hasard",
 				text = {
 					"{C:green}#1# chance sur #2#{}",
 					"que le Magasin ait un",
 					"{C:red}Joker Rare{} gratuit",
+				},
+			},
+			tag_mp_juggle_sandbox = {
+				name = "Badge de jongleur",
+				text = {
+					"Taille de la main {C:attention}+#1#{}",
+					"à la prochaine {C:attention}blinde JcJ",
+				},
+			},
+			tag_mp_investment_sandbox = {
+				name = "Badge d'investissement",
+				text = {
+					"Après avoir battu la",
+					"blinde Boss, obtient :",
+					"{C:money}$#1#{} + {C:money}$#2#{} par mise initiale",
+					"{C:inactive}(Actuellement {C:money}$#3#{C:inactive})",
 				},
 			},
 		},
@@ -32,7 +48,7 @@ return {
 			j_mp_skip_off = {
 				name = "Marelle",
 				text = {
-					"{C:blue}+#1#{} Mains et {C:red}+#2#{} Défausses",
+					"{C:blue}+#1#{} mains et {C:red}+#2#{} Défausses",
 					"par {C:attention}blinde{} passée",
 					"{C:attention}de plus{} que votre {X:purple,C:white}Némésis{}",
 					"{C:inactive}(Actuellement {C:blue}+#3#{C:inactive}/{C:red}+#4#{C:inactive}, #5#)",
@@ -42,7 +58,7 @@ return {
 				name = "Machine à sous",
 				text = {
 					"{C:green}#1# chance sur #2#{} d'octroyer",
-					"{X:mult,C:white}X#3#{} Multi et {C:money}$#4#{}",
+					"Multi {X:mult,C:white}X#3#{} et {C:money}$#4#{}",
 					"{C:green}#5# chance sur #6#{} de donner",
 					"{C:money}$#7#{} à votre {X:purple,C:white}Némésis{} en {C:attention}blinde JcJ",
 				},
@@ -60,15 +76,15 @@ return {
 				name = "Joker conjoint",
 				text = {
 					"Pendant une {C:attention}blinde JcJ{}, octroie",
-					"{X:mult,C:white}X#1#{} Multi pour chaque {C:blue}Main{}",
+					"Multi {X:mult,C:white}X#1#{} pour chaque {C:blue}main{}",
 					"restante de votre {X:purple,C:white}Némésis{}",
-					"{C:inactive}(Max {X:mult,C:white}X#2#{C:inactive} Multi, actuellement {X:mult,C:white}X#3#{C:inactive} Multi)",
+					"{C:inactive}(Max Multi {X:mult,C:white}X#2#{C:inactive}, actuellement Multi {X:mult,C:white}X#3#{C:inactive})",
 				},
 			},
 			j_mp_penny_pincher = {
 				name = "Grippe-sou",
 				text = {
-					"A la fin d'une manche, gagnez {C:money}$#1#{}",
+					"A la fin d'une manche, obtenez {C:money}$#1#{}",
 					"par {C:money}$#2#{} dépensés par votre {X:purple,C:white}Némésis{}",
 					"dans le magasin correspondant",
 					"de la {C:attention}dernière mise initiale{}",
@@ -77,11 +93,11 @@ return {
 			j_mp_taxes = {
 				name = "Impôts",
 				text = {
-					"Octroie {C:mult}+#1#{} Multi pour chaque carte",
+					"Octroie Multi {C:mult}+#1#{} pour chaque carte",
 					"{C:attention}vendue{} par votre {X:purple,C:white}Némésis{}",
 					"depuis la dernière {C:attention}blinde JcJ{},",
 					"s'actualise quand la {C:attention}blinde JcJ{} est sélectionnée",
-					"{C:inactive}(Actuellement {C:mult}+#2#{C:inactive} Multi)",
+					"{C:inactive}(Actuellement Multi {C:mult}+#2#{C:inactive})",
 				},
 			},
 			j_mp_pizza = {
@@ -97,7 +113,7 @@ return {
 			j_mp_pacifist = {
 				name = "Pacifiste",
 				text = {
-					"Octroie {X:mult,C:white}X#1#{} Multi",
+					"Octroie Multi {X:mult,C:white}X#1#{}",
 					"{C:attention}sauf{} pendant les {C:attention}blindes JcJ{}",
 				},
 			},
@@ -115,7 +131,7 @@ return {
 					"{C:green}#1# chance sur #2#{}",
 					"pour que les cartes jouées avec une",
 					"couleur {C:hearts}coeur{} octroient",
-					"{X:mult,C:white} X#3# {} Multi en marquant",
+					"Multi {X:mult,C:white} X#3# {} en marquant",
 				},
 			},
 			j_mp_magnet_sandbox = {
@@ -145,7 +161,7 @@ return {
 					"OPÉRATEUR DE PIPELINE FORTUNE-VERS-FRAGILITÉ",
 					"les chats chanceux deviennent des CHATS DE VERRE",
 					"avec un POUVOIR EXPONENTIEL !!!!",
-					"{C:inactive}(Actuellement {X:mult,C:white} X#2# {C:inactive} Multi)",
+					"{C:inactive}(Actuellement Multi {X:mult,C:white} X#2# {C:inactive})",
 				},
 			},
 			j_mp_constellation_sandbox = {
@@ -154,15 +170,15 @@ return {
 					"Anxiété liée à l'entretien de la planète",
 					"IL FAUT NOURRIR LE TAMAGOCHI",
 					"sinon il DISPARAÎT !!!!",
-					"{C:inactive}(Actuellement {X:mult,C:white} X#1# {C:inactive} Multi)",
+					"{C:inactive}(Actuellement Multi {X:mult,C:white} X#1# {C:inactive})",
 				},
 			},
 			j_mp_bloodstone_sandbox = {
 				name = "Pierre de sang",
 				text = {
-					"SYNDROME DE RÉGRESSION DES MISES À JOUR",
+					"{V:1}SYNDROME DE RÉGRESSION DES MISES À JOUR",
 					"retour au TRAUMATISME DU JOUR DE LANCEMENT",
-					"pour des PICS DE PUISSANCE NOSTALGIQUES !!!!",
+					"pour des PICS DE PUISSANCE {X:mult,C:white}X#3#{} NOSTALGIQUES !!!!",
 					"{C:inactive}({C:green}#1# chance sur #2#{} {C:inactive})",
 				},
 			},
@@ -172,41 +188,40 @@ return {
 					"PERFECTIONNISTE DE LA TAILLE DES MAINS",
 					"qui doit garder TOUTES LES CARTES",
 					"en l'air EN PERMANANCE !!!!",
-					"{C:inactive}(Actuellement {C:attention}+#1#{C:inactive} à la taille de la Main)",
+					"{C:inactive}(Actuellement {C:attention}+#1#{C:inactive} à la taille de la main)",
 				},
 			},
 			j_mp_mail_sandbox = {
 				name = "Remise par courrier",
 				text = {
-					"FORMULAIRE DE REMISE RÉSERVÉ AU RANG",
-					"quelqu'un a écrit {C:attention}#2#{} à",
-					"L'ENCRE INDÉLÉBILE !!!!",
+					"Obtenez {C:money}$#1#{} pour chaque",
+					"{C:attention}#2#{} défaussé",
+					"{s:0.8}La carte ne change jamais",
 				},
 			},
 			j_mp_hit_the_road_sandbox = {
 				name = "Prendre la route",
 				text = {
-					"ÉLIMINATION DES VALETS AUTOROUTIERS",
-					"enfouissage des {C:attention}Valets{}",
-					"DANS L'ASPHALTE POUR TOUJOURS !!!!",
-					"{C:inactive}(Actuellement {X:mult,C:white} X#2# {C:inactive} Multi)",
+					"Ce Joker octroie Multi {X:mult,C:white}X0.75{}",
+					"pour chaque {C:attention}Valet{} défaussé",
+					"Les Valets défaussés sont {C:attention}détruits{}",
+					"{C:inactive}(Actuellement Multi {X:mult,C:white} X#2# {C:inactive})",
 				},
 			},
 			j_mp_misprint_sandbox = {
 				name = "Erreur d'impression",
 				text = {
-					"LE JOUEUR DE LOTERIE DE SCHRODINGER",
-					"le ticket GAGNE ET PERD",
-					"jusqu'à ce qu'il soit vérifié !!!!",
-					"{C:inactive}({V:1}#1#{C:inactive} Multi)",
+					"Multi {V:1}#1#{}",
+					"{C:attention}Valeur révélée à l'achat{}",
+					"{C:green}Les erreurs d'impression s'accumulent{}",
 				},
 			},
 			j_mp_castle_sandbox = {
 				name = "Château",
 				text = {
-					"COSTUME DE MARIAGE BASÉ SUR LES DÉFAUSSES",
-					"jette SEULEMENT {V:1}#1#{} pour toujpurs",
-					"car C'EST LEUR LANGAGE AMOUREUX !!!!",
+					"Ce Joker octroie {C:chips}#3{} Jetons",
+					"par carte {V:1}#1#{} défaussée",
+					"La couleur est bloquée à l'achat",
 					"{C:inactive}(Actuellement {C:chips}+#2#{C:inactive} Jetons)",
 				},
 			},
@@ -222,9 +237,10 @@ return {
 			j_mp_order_sandbox = {
 				name = "L'Ordre",
 				text = {
-					"COORDINATEUR DU SOULÈVEMENT PAYSAN",
-					"organisant les NOMBRES pour renverser",
-					"leurs OPPRESSEURS CARTES FIGURES !!!!",
+					"Multi {X:mult,C:white}X3{} si la main jouée contient une {C:attention}Suite{}",
+					"Obtient Multi {X:mult,C:white}X#1#{} pour chaque {C:attention}Suite{} consécutive jouée",
+					"Se réinitialise quand une autre main est jouée",
+					"{C:inactive}(Actuellement Multi {X:mult,C:white}X#2#{C:inactive})",
 				},
 			},
 			j_mp_photograph_sandbox = {
@@ -240,16 +256,15 @@ return {
 					"PROGRAMME DE SOBRIÉTÉ DES CARTES FIGURES",
 					"UNE SEULE CARTE FIGURE et vous êtes",
 					"VIRÉS DU BUS !!!!",
-					"{C:inactive}(Actuellement {C:mult}+#1#{C:inactive} Multi)",
+					"{C:inactive}(Actuellement Multi {C:mult}+#1#{C:inactive})",
 				},
 			},
 			j_mp_loyalty_card_sandbox = {
 				name = "Carte de fidélité",
 				text = {
-					"PROGRAMME DE FIDÉLITÉ DE TYPE DE MAIN",
-					"trahis {C:attention}#1#{}",
-					"et le compteur SE RÉINITIALISE !!!!",
-					"{C:inactive}(Loyal pour {C:attention}#2#/#3#{}{C:inactive} Mains)",
+					"Multi {X:mult,C:white}X6{} toutes les {C:attention}#3#{}",
+					"mains {C:attention}#1#{} jouées",
+					"{C:inactive}(#2#/#3#)",
 				},
 			},
 			j_mp_faceless_sandbox = {
@@ -264,43 +279,46 @@ return {
 			j_mp_square_sandbox = {
 				name = "Joker carré",
 				text = {
-					"PERFECTIONNISTE DES QUATRE CARTES",
-					"qui vénère LA GÉOMÉTRIE SACRÉE DES",
-					"ASSEMBLAGES CARRÉS PARFAITEMENT ÉQUILIBRÉS !!!!",
+					"Ce Joker octroie {C:chips}+#2#{} Jetons",
+					"si la main jouée possède",
+					"exactement {C:attention}4{} cartes",
+					"{C:attention}S'applique uniquement pour les mains de 4 cartes{}",
 					"{C:inactive}(Actuellement {C:chips}+#1#{C:inactive} Jetons)",
 				},
 			},
 			j_mp_throwback_sandbox = {
 				name = "Rappel",
 				text = {
-					"SERVICES DE CONSULTATION PROFESSIONNELS POUR LÂCHES",
-					"je suis PAYÉ pour fuir les problèmes",
-					"ET PLUS JE FUIS PLUS JE DEVIENS FORT !!!!",
-					"{C:inactive}(Actuellement {X:mult,C:white} X#1# {C:inactive} Multi)",
+					"Multi de base {X:mult,C:white}X#2#{} pour chaque",
+					"{C:attention}blinde{} passée durant cette partie",
+					"Multi {X:mult,C:white}X#3#{} à la prochaine blinde après l'avoir passée",
+					"Perds Multi {X:mult,C:white}X#4#{} lorsque la blinde n'est pas passée",
+					"{C:inactive}(Actuellement Multi {X:mult,C:white} X#1# {C:inactive})",
 				},
 			},
 			j_mp_vampire_sandbox = {
 				name = "Vampire",
 				text = {
-					"vampire économiste CRÉANT",
-					"UNE MONNAIE BASÉE SUR LA PIERRE",
-					"À PARTIR DE LA FORCE VITALE !!!!",
-					"{C:inactive}(Actuellement {X:mult,C:white} X#2# {C:inactive} Multi)",
+					"Ce joker octroie Multi {X:mult,C:white}X#1#{} par",
+					"{C:attention}carte améliorée{} jouée marquant des points",
+					"Elles deviennent ensuite des {C:attention}cartes Pierre{}",
+					"Les cartes Pierre jouées octroient {C:money}$#3#{}",
+					"{C:inactive}(Actuellement Multi {X:mult,C:white} X#2# {C:inactive})",
 				},
 			},
 			j_mp_baseball_sandbox = {
 				name = "Carte de baseball",
 				text = {
-					'"CONTROVERSE" liée aux CARTES DE SPORT',
-					"déguisée en CHANGEMENT DE SOLDE !!!!",
+					"Les Jokers {C:green}Peu communs{}",
+					"octroient chacun",
+					"Multi {X:mult,C:white}X#1#{}",
 				},
 			},
 			j_mp_steel_joker_sandbox = {
 				name = "Joker d'acier",
 				text = {
-					"SPÉCIALISTE DE LA REDONDANCE ACIER",
-					"chaque ALLIAGE JOUÉ est",
-					"VÉRIFIÉ DEUX FOIS !!!!",
+					"{C:attention}Déclenche à nouveau{}",
+					"les cartes Acier jouées",
 				},
 			},
 			j_mp_satellite_sandbox = {
@@ -310,6 +328,33 @@ return {
 					"L'INFRASTRUCTURE SE DÉGRADE LENTEMENT",
 					"SANS MISES À JOUR PLANÉTAIRES CONSTANTES !!!!",
 					"{C:inactive}(Actuellement {C:money}$#1#{C:inactive})",
+				},
+			},
+			j_mp_idol_sandbox_bw = {
+				name = "L'idole fanatique",
+				text = {
+					"Chaque {C:attention}#1#{} joué",
+					"octroie Multi {X:mult,C:white}X#2#{}",
+					"en marquant des points",
+					"{s:0.8}La carte change à chaque manche",
+				},
+			},
+			j_mp_idol_sandbox_color = {
+				name = "L'idole de la colère",
+				text = {
+					"AUTOCUISEUR À PRESSION DÉVOTIONNEL",
+					"accumulant de la VAPEUR pendant {C:attention}#1#{} à {V:1}#3#{}",
+					"jusqu'à la LIBÉRATION EXPLOSIVE !!!!",
+					"{C:inactive}(Actuellement Multi {X:mult,C:white} X#2# {C:inactive})",
+				},
+			},
+			j_mp_idol_sandbox_fantom = {
+				name = "Le meta-idole",
+				text = {
+					"La carte la plus commune octroie",
+					"Multi {X:mult,C:white}X#3#{} en marquant des points",
+					"({X:mult,C:white}+X#4#{} par copie dans le deck)",
+					"{C:inactive}(Actuellement {C:attention}#1#{} de {V:1}#2#{})",
 				},
 			},
 			j_mp_error_sandbox = {
@@ -356,7 +401,7 @@ return {
 			m_mp_glass = {
 				name = "Carte Verre",
 				text = {
-					"{X:mult,C:white} X#1# {} Multi",
+					"Multi {X:mult,C:white} X#1# {}",
 					"{C:green}#2# chance sur #3#{} de",
 					"détruire la carte",
 				},
@@ -458,17 +503,18 @@ return {
 			stake_mp_planet = {
 				name = "Mise planète",
 				text = {
-					"La sœur aînée plus cool de la {C:attention}Mise orange{}",
-					"qui vous a gentiment rendu votre",
-					"{C:red}défausse de soutien émotionnel{} car",
-					"même elle n'est pas aussi cruelle",
+					"Applique les effets de la {C:black}Mise noire{}, plus :",
+					"Les magasins peuvent posséder des Jokers {C:money}périssables{}",
+					"{C:inactive,s:0.8}(Affaiblis après 5 manches)",
+					"Le score requis augmente plus",
+					"rapidement pour chaque {C:attention}mise initiale",
 				},
 			},
 			stake_mp_spectral = {
 				name = "Mise spectrale",
 				text = {
 					"Applique les effets de la {C:planet}Mise planète{}, plus :",
-					"Les Jokers {C:money}location{} peuvent apparaître dans le magasin",
+					"Les magasins peuvent posséder des Jokers {C:money}location{}",
 					"Le score requis augmente plus",
 					"rapidement pour chaque {C:attention}mise initiale",
 				},
@@ -479,6 +525,25 @@ return {
 					"Applique les effets de la  {C:planet}Mise spectrale{}, plus :",
 					"Le score requis augmente encore plus",
 					"rapidement pour chaque {C:attention}mise initiale",
+				},
+			},
+		},
+		Spectral = {
+			c_mp_ouija_sandbox = {
+				name = "Ouija",
+				text = {
+					"Détruit {C:attention}#1#{} cartes aléatoires,",
+					"puis convertit toutes les cartes",
+					"restantes en une unique {C:attention}Valeur{} aléatoire",
+				},
+			},
+			c_mp_ectoplasm_sandbox = {
+				name = "Ectoplasme",
+				text = {
+					"Ajoute {C:dark_edition}Négatif{}",
+					"à un {C:attention}Joker aléatoire{},",
+					"Applique aléatoirement soit :",
+					"{C:red}-1{} main, {C:red}-1{} défausse ou taille de la main {C:red}-1{}",
 				},
 			},
 		},
@@ -566,6 +631,7 @@ return {
 			k_lives = "Vies",
 			k_lost_life = "A perdu une vie",
 			k_total_lives_lost = " Total de vies perdues ($4 chacune)",
+			k_comeback_money_sandbox = " Argent de retour ($3 × mise initiale complétée)",
 			k_attrition_name = "Érosion",
 			k_enter_lobby_code = "Entrer le code du salon",
 			k_paste = "Coller depuis le presse-papiers",
@@ -611,12 +677,12 @@ return {
 			k_bl_life = "Vie",
 			k_bl_or = "ou",
 			k_bl_death = "Mort",
-			k_bl_mostchips = "Le plus de jetons l'emporte",
+			k_bl_mostchips = "Le plus de Jetons l'emporte",
 			k_current_seed = "Seed actuelle : ",
 			k_random = "Aléatoire",
 			k_standard = "Standard",
 			k_sandbox = "Bac à sable",
-			k_sandbox_description = "Comme en mode normal sauf que quelqu'un a donné du café aux cartes\net elles sont d'humeur bavarde.",
+			k_sandbox_description = "Trois idoles jalouses s'affrontent désormais pour votre partie !\nDouze jokers remplacés par des troubles de la personnalité.\nLe Ouija détruit des cartes au lieu de la taille de la main.\nAperçu du score désactivé. Pas d'organigrammes.\nTout ce que vous saviez d'autre ? Allez voir le wiki !",
 			k_vanilla = "Vanilla",
 			k_vanilla_description = "Ce mode de jeu supprime tout le contenu multijoueur,\nvous permettant de jouer comme prévu à l'origine.\n\nIl conserve les fonctionnalités multijoueur, comme le minuteur.\n\n(Désactivable dans les options du salon)",
 			k_blitz = "Standard",
