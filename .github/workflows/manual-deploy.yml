@@ -40,4 +40,4 @@ jobs:
             git pull origin main
 
             # Build and start container
-            docker compose up --build --remove-orphans -d
+            docker compose up --build --force-recreate --remove-orphans -d
