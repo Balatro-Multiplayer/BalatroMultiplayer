@@ -31,8 +31,10 @@ jobs:
             # CD to correct dir
             cd /root/server
 
-            # Pull changes
-            git pull
+            # Ensure we are on the main branch
+            git checkout main
+            # Pull changes from main
+            git pull origin main
 
             # Build and start container
             docker compose up --build --remove-orphans -d
