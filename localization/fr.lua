@@ -1,13 +1,14 @@
--- Localization by @ninoleplot & @EDM115
+-- Localization by @ninoleplot, @EDM115
+-- Traduction par @ninoleplot, @EDM115
 return {
 	descriptions = {
 		Tag = {
 			tag_mp_gambling_sandbox = {
-				name = "Badge jeu de hasard",
+				name = "Badge de jeu de hasard",
 				text = {
 					"{C:green}#1# chance sur #2#{}",
-					"que le Magasin ait un",
-					"{C:red}Joker Rare{} gratuit",
+					"que le magasin ait un",
+					"{C:red}Joker rare{} gratuit",
 				},
 			},
 			tag_mp_juggle_sandbox = {
@@ -21,7 +22,7 @@ return {
 				name = "Badge d'investissement",
 				text = {
 					"Après avoir battu la",
-					"blinde Boss, obtient :",
+					"blinde Boss, obtenez :",
 					"{C:money}$#1#{} + {C:money}$#2#{} par mise initiale",
 					"{C:inactive}(Actuellement {C:money}$#3#{C:inactive})",
 				},
@@ -42,7 +43,7 @@ return {
 					"{C:chips}+#1#{} Jetons par {C:red,E:1}vie{}",
 					"de moins que votre {X:purple,C:white}Némésis{}",
 					"{C:inactive}(Actuellement {C:chips}+#2#{C:inactive} Jetons)",
-					"{C:inactive}(Dependent de la mise)",
+					"{C:inactive}(Dépend de la mise)",
 				},
 			},
 			j_mp_skip_off = {
@@ -84,7 +85,7 @@ return {
 			j_mp_penny_pincher = {
 				name = "Grippe-sou",
 				text = {
-					"A la fin d'une manche, obtenez {C:money}$#1#{}",
+					"À la fin d'une manche, obtenez {C:money}$#1#{}",
 					"par {C:money}$#2#{} dépensés par votre {X:purple,C:white}Némésis{}",
 					"dans le magasin correspondant",
 					"de la {C:attention}dernière mise initiale{}",
@@ -120,7 +121,7 @@ return {
 			j_mp_hanging_chad = {
 				name = "Carte de vote",
 				text = {
-					"Déclenche à nouveau {C:attention}#1#{} fois supplémentaire",
+					"Déclenche {C:attention}#1#{} fois supplémentaire",
 					"la {C:attention}première{} et {C:attention}seconde{}",
 					"carte jouée marquant des points",
 				},
@@ -131,14 +132,14 @@ return {
 					"{C:green}#1# chance sur #2#{}",
 					"pour que les cartes jouées avec une",
 					"couleur {C:hearts}coeur{} octroient",
-					"Multi {X:mult,C:white} X#3# {} en marquant",
+					"Multi {X:mult,C:white} X#3# {} en marquant des points",
 				},
 			},
 			j_mp_magnet_sandbox = {
 				name = "Aimant",
 				text = {
 					"Après {C:attention}#1#{} manches,",
-					"vendez cette carte pour {C:attention}Copier{}",
+					"vendez cette carte pour {C:attention}copier{}",
 					"le {C:attention}Joker{} à la plus haute ",
 					"valeur de vente de votre {X:purple,C:white}Némésis{}",
 					"Polarité inversée après {C:attention}#3#{} manches",
@@ -159,7 +160,7 @@ return {
 				name = "Porte-bonheur",
 				text = {
 					"OPÉRATEUR DE PIPELINE FORTUNE-VERS-FRAGILITÉ",
-					"les chats chanceux deviennent des CHATS DE VERRE",
+					"les porte-bonheur deviennent des CHATS DE VERRE",
 					"avec un POUVOIR EXPONENTIEL !!!!",
 					"{C:inactive}(Actuellement Multi {X:mult,C:white} X#2# {C:inactive})",
 				},
@@ -167,7 +168,7 @@ return {
 			j_mp_constellation_sandbox = {
 				name = "Constellation",
 				text = {
-					"Anxiété liée à l'entretien de la planète",
+					"Anxiété liée à l'entretien des planètes",
 					"IL FAUT NOURRIR LE TAMAGOCHI",
 					"sinon il DISPARAÎT !!!!",
 					"{C:inactive}(Actuellement Multi {X:mult,C:white} X#1# {C:inactive})",
@@ -187,7 +188,7 @@ return {
 				text = {
 					"PERFECTIONNISTE DE LA TAILLE DES MAINS",
 					"qui doit garder TOUTES LES CARTES",
-					"en l'air EN PERMANANCE !!!!",
+					"en l'air EN PERMANENCE !!!!",
 					"{C:inactive}(Actuellement {C:attention}+#1#{C:inactive} à la taille de la main)",
 				},
 			},
@@ -196,7 +197,7 @@ return {
 				text = {
 					"Obtenez {C:money}$#1#{} pour chaque",
 					"{C:attention}#2#{} défaussé",
-					"{s:0.8}La carte ne change jamais",
+					"{s:0.8}La valeur ne change jamais",
 				},
 			},
 			j_mp_hit_the_road_sandbox = {
@@ -238,7 +239,7 @@ return {
 				name = "L'Ordre",
 				text = {
 					"Multi {X:mult,C:white}X3{} si la main jouée contient une {C:attention}Suite{}",
-					"Obtient Multi {X:mult,C:white}X#1#{} pour chaque {C:attention}Suite{} consécutive jouée",
+					"Octroie Multi {X:mult,C:white}X#1#{} pour chaque {C:attention}Suite{} consécutive jouée",
 					"Se réinitialise quand une autre main est jouée",
 					"{C:inactive}(Actuellement Multi {X:mult,C:white}X#2#{C:inactive})",
 				},
@@ -247,7 +248,7 @@ return {
 				name = "Photographie",
 				text = {
 					"PHOTOGRAPHE SPÉCIALISÉ DANS LES CLICHÉS UNIQUES",
-					"qui obtient UNE SEULE PHOTO PARFAITE PAR MAIN !!!!",
+					"qui octroie UNE SEULE PHOTO PARFAITE PAR MAIN !!!!",
 				},
 			},
 			j_mp_ride_the_bus_sandbox = {
@@ -292,7 +293,7 @@ return {
 					"Multi de base {X:mult,C:white}X#2#{} pour chaque",
 					"{C:attention}blinde{} passée durant cette partie",
 					"Multi {X:mult,C:white}X#3#{} à la prochaine blinde après l'avoir passée",
-					"Perds Multi {X:mult,C:white}X#4#{} lorsque la blinde n'est pas passée",
+					"Perd Multi {X:mult,C:white}X#4#{} lorsque la blinde n'est pas passée",
 					"{C:inactive}(Actuellement Multi {X:mult,C:white} X#1# {C:inactive})",
 				},
 			},
@@ -309,7 +310,7 @@ return {
 			j_mp_baseball_sandbox = {
 				name = "Carte de baseball",
 				text = {
-					"Les Jokers {C:green}Peu communs{}",
+					"Les Jokers {C:green}peu communs{}",
 					"octroient chacun",
 					"Multi {X:mult,C:white}X#1#{}",
 				},
@@ -326,7 +327,7 @@ return {
 				text = {
 					"anxiété liée à la dégradation chronique des satellites",
 					"L'INFRASTRUCTURE SE DÉGRADE LENTEMENT",
-					"SANS MISES À JOUR PLANÉTAIRES CONSTANTES !!!!",
+					"SANS AMÉLIORATIONS PLANÉTAIRES CONSTANTES !!!!",
 					"{C:inactive}(Actuellement {C:money}$#1#{C:inactive})",
 				},
 			},
@@ -343,7 +344,7 @@ return {
 				name = "L'idole de la colère",
 				text = {
 					"AUTOCUISEUR À PRESSION DÉVOTIONNEL",
-					"accumulant de la VAPEUR pendant {C:attention}#1#{} à {V:1}#3#{}",
+					"accumulant de la VAPEUR pour {C:attention}#1#{} de {V:1}#3#{}",
 					"jusqu'à la LIBÉRATION EXPLOSIVE !!!!",
 					"{C:inactive}(Actuellement Multi {X:mult,C:white} X#2# {C:inactive})",
 				},
@@ -353,17 +354,17 @@ return {
 				text = {
 					"La carte la plus commune octroie",
 					"Multi {X:mult,C:white}X#3#{} en marquant des points",
-					"({X:mult,C:white}+X#4#{} par copie dans le deck)",
+					"({X:mult,C:white}+X#4#{} par copie dans le jeu)",
 					"{C:inactive}(Actuellement {C:attention}#1#{} de {V:1}#2#{})",
 				},
 			},
 			j_mp_error_sandbox = {
 				name = "????",
 				text = {
-					-- "PRÉVISUALSATION DÉSACTIVÉE",
+					-- "PRÉVISUALISATION DÉSACTIVÉE",
 					"{X:purple,C:white,s:0.85}quelque chose{} {X:purple,C:white,s:0.85}ne va pas",
-					-- "PRÉVISUALSATION DÉSACTIVÉE",
-					-- "PRÉVISUALSATION DÉSACTIVÉE",
+					-- "PRÉVISUALISATION DÉSACTIVÉE",
+					-- "PRÉVISUALISATION DÉSACTIVÉE",
 					-- "{C:inactive}(Actuellement {C:money}$7{C:inactive})",
 				},
 			},
@@ -375,7 +376,7 @@ return {
 					"Retire #1# niveau à",
 					"la {C:legendary,E:1}main de poker{}",
 					"la plus améliorée de votre {X:purple,C:white}Némésis{}",
-					"au début de la prochaine {C:attention}blinde JcJ{}",
+					"au début de la {C:attention}blinde JcJ{}",
 				},
 			},
 		},
@@ -420,8 +421,8 @@ return {
 				name = "Jeu dégradé",
 				text = {
 					"Les cartes sont aussi considérées",
-					"un rang {C:attention}supérieur{} et {C:attention}inférieur",
-					"pour tous les effets des {C:attention}Joker{}",
+					"un rang {C:attention}supérieur{} ou {C:attention}inférieur",
+					"pour tous les effets des {C:attention}Jokers{}",
 				},
 			},
 			b_mp_heidelberg = {
@@ -445,9 +446,9 @@ return {
 				name = "Jeu oracle",
 				text = {
 					"Démarre la partie avec",
-					"{C:spectral,T:c_medium}Médium et {C:attention,T:v_clearance_sale}Destockage",
+					"{C:spectral,T:c_medium}Médium et {C:attention,T:v_clearance_sale}Déstockage",
 					"L'argent est limité à {C:money}$50{}",
-					"+ {C:attention}la limite actuelle d'intérêts{}",
+					"+ {C:attention}la limite actuelle des intérêts{}",
 				},
 			},
 			b_mp_orange = {
@@ -469,7 +470,7 @@ return {
 			b_mp_white = {
 				name = "Jeu blanc",
 				text = {
-					"Consultez le deck actuel de votre",
+					"Consultez le jeu actuel de votre",
 					"{X:purple,C:white}Némésis{} et ses Jokers",
 					"{C:inactive}(S'actualise à la blinde JcJ){}",
 				},
@@ -534,7 +535,7 @@ return {
 				text = {
 					"Détruit {C:attention}#1#{} cartes aléatoires,",
 					"puis convertit toutes les cartes",
-					"restantes en une unique {C:attention}Valeur{} aléatoire",
+					"restantes en une unique {C:attention}valeur{} aléatoire",
 				},
 			},
 			c_mp_ectoplasm_sandbox = {
@@ -542,7 +543,7 @@ return {
 				text = {
 					"Ajoute {C:dark_edition}Négatif{}",
 					"à un {C:attention}Joker aléatoire{},",
-					"Applique aléatoirement soit :",
+					"applique aléatoirement l'un des effets suivants :",
 					"{C:red}-1{} main, {C:red}-1{} défausse ou taille de la main {C:red}-1{}",
 				},
 			},
@@ -567,11 +568,11 @@ return {
 			b_return_lobby = "Retourner au salon",
 			b_reconnect = "Se reconnecter",
 			b_create_lobby = "Créer un salon",
-			b_start_lobby = "Créer le salon",
+			b_start_lobby = "Lancer la partie",
 			b_ready = "Prêt",
 			b_unready = "Pas prêt",
 			b_leave_lobby = "Quitter le salon",
-			b_mp_discord = "Serveur Discord Balatro Multiplayer",
+			b_mp_discord = "Serveur Discord Balatro Multijoueur",
 			b_start = "COMMENCER",
 			b_wait_for_host_start = { "EN ATTENTE DE", "L'HÔTE POUR COMMENCER" },
 			b_wait_for_players = { "EN ATTENTE DES", "JOUEURS" },
@@ -599,14 +600,14 @@ return {
 			b_mp_kofi_button = "Me soutenir sur Ko-fi",
 			b_unstuck = "Se décoincer",
 			b_unstuck_blind = "Coincé en dehors du JcJ",
-			b_misprint_display = "Afficher la prochaine carte du deck",
+			b_misprint_display = "Afficher la prochaine carte du jeu",
 			b_players = "Joueurs",
 			b_lobby_info = "Infos du salon",
 			b_continue_singleplayer = "Continuer en solo",
 			b_the_order_integration = "Activer l'intégration de The Order",
 			b_preview_integration = "Activer l'aperçu du score",
-			b_view_nemesis_deck = "Voir le deck adverse",
-			b_toggle_jokers = "Activer/Désactiver les Jokers",
+			b_view_nemesis_deck = "Voir les decks",
+			b_toggle_jokers = "Activer / Désactiver les Jokers",
 			b_skip_tutorial = "Passer le tutoriel",
 			k_yes = "Oui",
 			k_no = "Non",
@@ -631,24 +632,24 @@ return {
 			k_lives = "Vies",
 			k_lost_life = "A perdu une vie",
 			k_total_lives_lost = " Total de vies perdues ($4 chacune)",
-			k_comeback_money_sandbox = " Argent de retour ($3 × mise initiale complétée)",
+			k_comeback_money_sandbox = " Compensation financière ($3 × mise initiale complétée)",
 			k_attrition_name = "Érosion",
 			k_enter_lobby_code = "Entrer le code du salon",
 			k_paste = "Coller depuis le presse-papiers",
 			k_username = "Pseudo :",
 			k_enter_username = "Entrer un pseudo",
-			k_customize_preview = "Customiser le texte de l'aperçu :",
+			k_customize_preview = "Personnaliser le texte de l'aperçu :",
 			k_join_discord = "Rejoindre le ",
 			k_discord_msg = "Vous pourrez y signaler des bugs et trouver des joueurs avec qui jouer",
-			k_enter_to_save = "Appuyer sur Entrée pour sauvegarder",
+			k_enter_to_save = "Appuyez sur Entrée pour sauvegarder",
 			k_in_lobby = "Dans le salon",
 			k_connected = "Connecté aux services",
 			k_warn_service = "ATTENTION : Impossible de trouver le service multijoueur",
 			k_set_name = "Entrez votre pseudo dans le menu ! (Mods > Multiplayer > Config)",
-			k_mod_hash_warning = "Des joueurs n'ont pas les même mods/versions de mods ! Cela peut causer des problèmes !",
+			k_mod_hash_warning = "Des joueurs n'ont pas les même mods / versions de mods ! Cela peut causer des problèmes !",
 			k_steamodded_warning = "Des joueurs possèdent différentes versions de Steamodded installées. Cela peut causer des seeds différentes.",
-			k_warning_unlock_profile = "Le profil actuel n'a pas tout le contenu débloqué. Si cette partie est classée/un tournoi, veuillez créer un nouveau profil et cliquer sur tout débloquer dans les paramètres du profil.",
-			k_warning_nemesis_unlock = "Votre adversaire joue sur un profil qui n'a pas tout débloqué. Indiquez lui d'appuyer sur tout débloquer dans les paramètres de son profil.",
+			k_warning_unlock_profile = "Le profil actuel n'a pas tout le contenu débloqué. Si cette partie est classée / un tournoi, veuillez créer un nouveau profil et cliquer sur tout débloquer dans les paramètres du profil.",
+			k_warning_nemesis_unlock = "Votre adversaire joue sur un profil qui n'a pas tout débloqué. Indiquez-lui d'appuyer sur tout débloquer dans les paramètres de son profil.",
 			k_warning_no_order = "Un joueur a activé l'intégration de The Order mais l'autre non. Les seeds seront peut-être différentes.",
 			k_warning_cheating1 = "Si vous lisez ceci, il se peut que votre adversaire triche.",
 			k_warning_cheating2 = "Si cette partie est classée, envoyez le message '%s' et ouvrez un ticket de support dans #support.",
@@ -696,15 +697,15 @@ return {
 			k_ranked = "Classé",
 			k_ranked_description = "Voici le règlement officiel pour jouer à Balatro Multijoueur classé.\n\nCe mode de jeu est identique au Standard à quelques exceptions près :\n- L'intégration de The Order est activée\n- Vous devez être sur la version recommandée de Steamodded",
 			k_badlatro = "Badlatro",
-			k_badlatro_description = "Des règles hebdomadaires écrites par @dr_monty_the_snek sur le serveur discord\nqui ont été ajoutées au mod de façon permanente.\n\nCe mode de jeu bannis 48 jokers, consommables, badges, ...",
+			k_badlatro_description = "Des règles hebdomadaires écrites par @dr_monty_the_snek sur le serveur discord\nqui ont été ajoutées au mod de façon permanente.\n\nCe mode de jeu bannit 48 jokers, consommables, badges, ...",
 			k_attrition = "Érosion",
 			k_attrition_description = "Après la première mise initiale, toutes les blindes Boss sont JcJ. Pas le temps de se préparer. Ce mode force à être prêt au combat dès le début.",
 			k_showdown = "Confrontation",
-			k_showdown_description = "Après les 2 premières mises initiales, toutes les blindes Boss sont JcJ. Ce mode laisse le temps de se préparer avant le combat.",
+			k_showdown_description = "Après les 2 premières mises initiales, toutes les blindes sont JcJ. Ce mode laisse le temps de se préparer avant le combat.",
 			k_survival = "Survie",
 			k_survival_description = "Pas de blindes JcJ, le joueur allant le plus loin dans la partie gagne. Ce mode permet de tester vos capacités à accumuler progressivement les meilleures mains dans le jeu Vanilla.",
 			k_weekly = "Hebdo",
-			k_weekly_description = "Des règles spéciales qui changent toutes les semaines/deux semaines. Essayez par vous-même ! Actuellement : ",
+			k_weekly_description = "Des règles spéciales qui changent toutes les une ou deux semaines. Essayez par vous-même ! Actuellement : ",
 			k_smallworld = "Petit monde",
 			k_smallworld_description = "Un mode de jeu très expérimental, où les 3/4 du jeu sont bannis aléatoirement sans raison particulière",
 			k_destabilized = "Déstabilisé",
@@ -716,10 +717,10 @@ return {
 			k_mods_list = "Liste des mods",
 			k_enemy_jokers = "Jokers adverses",
 			k_your_jokers = "Vos Jokers",
-			k_nemesis_deck = "Deck adverse",
-			k_your_deck = "Votre deck",
+			k_nemesis_deck = "Jeu adverse",
+			k_your_deck = "Votre jeu",
 			k_the_order_credit = "*Crédit à @MathIsFun_",
-			k_the_order_integration_desc = "La création de carte sera modifiée pour ne pas être basée sur la mise initiale et pour utiliser un seul pool pour chaque type/rareté",
+			k_the_order_integration_desc = "La création de carte sera modifiée pour ne pas être basée sur la mise initiale et pour utiliser un seul pool pour chaque type / rareté",
 			k_preview_credit = "*Crédit à @Fantom, @Divvy",
 			k_preview_integration_desc = "Active l'aperçu du score avant de jouer une main",
 			k_requires_restart = "*Nécessite un redémarrage pour s'appliquer",
@@ -733,12 +734,12 @@ return {
 			k_ruleset_disabled_the_order_banned = "The Order est banni",
 			k_ruleset_not_found = "Règles inconnues",
 			k_tutorial_not_complete = "Vous devez terminer le tutoriel avant de pouvoir jouer en multijoueur",
-			k_created_by = "Crée par",
+			k_created_by = "Créé par",
 			k_major_contributors = "Contributions majeures par",
 			ml_enemy_loc = { "Position", "ennemie" },
 			ml_mp_kofi_message = {
-				"Ce mod et serveur de jeu est",
-				"développé et maintenu par ",
+				"Ce mod et ce serveur de jeu sont",
+				"développés et maintenus par ",
 				"une seule personne, si",
 				"vous l'aimez, n'hésitez pas à",
 			},
@@ -767,7 +768,7 @@ return {
 			k_credits_list = "#1# et bien plus !", -- #1# est remplacé par une liste de noms
 		},
 		v_text = {
-			ch_c_hanging_chad_rework = { "{C:attention}Carte de vote{} est {C:dark_edition}modifié" },
+			ch_c_hanging_chad_rework = { "{C:attention}Carte de vote{} est {C:dark_edition}modifiée" },
 			ch_c_glass_cards_rework = { "{C:attention}Les cartes Verre{} sont {C:dark_edition}modifiées" },
 			ch_c_mp_score_instability = { "Le score déséquilibré l'est {C:purple}encore plus{} :" },
 			ch_c_mp_score_instability_EXAMPLE = {
@@ -777,9 +778,9 @@ return {
 			ch_c_mp_score_instability_LOC2 = { "  {C:inactive}Minimum de {C:attention}0 {C:chips}Jetons" },
 			ch_c_mp_ante_scaling = { "Taille de la blinde de base {C:red}X#1#{}" },
 			ch_c_mp_no_shop_planets = {
-				"Les cartes {C:planet}planète{} n'apparaîssent plus dans le {C:attention}magasin",
+				"Les cartes {C:planet}planète{} n'apparaissent plus dans le {C:attention}magasin",
 			},
-			ch_c_mp_only_medium = { "Toutes les cartes {C:spectral}spectrales{} sont le {C:spectral}Médium{}" },
+			ch_c_mp_only_medium = { "Toutes les cartes {C:spectral}spectrales{} sont des {C:spectral}Médium{}" },
 			ch_c_mp_only_purple_seals = { "Tous les {C:attention}sceaux{} sont des {C:purple}sceaux violets{}" },
 			ch_c_mp_sibyl_CREDITS = { "{C:inactive}(Art par {C:attention}Ganpan14O{C:inactive})" },
 			ch_c_mp_polymorph_spam = {
