@@ -34,6 +34,7 @@ jobs:
 
             # Ensure we are on the main branch
             git checkout main
+            
             # Pull changes from main
             git pull origin main
 
