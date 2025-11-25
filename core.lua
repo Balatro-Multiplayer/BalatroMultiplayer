@@ -44,7 +44,7 @@ MP.PREVIEW = {
 }
 
 -- Flag to switch between old and new networking implementation
-MP.USE_NEW_NETWORKING = false
+MP.USE_NEW_NETWORKING = true
 
 G.C.MULTIPLAYER = HEX("AC3232")
 
