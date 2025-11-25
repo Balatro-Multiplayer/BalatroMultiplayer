@@ -1,5 +1,5 @@
--- Localization by @ninoleplot, @EDM115
--- Traduction par @ninoleplot, @EDM115
+-- Localization by @sagevalorant, @ninoleplot, @EDM115
+-- Traduction par @sagevalorant, @ninoleplot, @EDM115
 return {
 	descriptions = {
 		Tag = {
@@ -153,7 +153,7 @@ return {
 					"FERMIER DE NOMBRES MONOCULTURE",
 					"convertissant votre DECK VARIÉ en une",
 					"PLANTATION RENTABLE DE NEUF !!!!",
-					"{C:inactive}({C:green}#1# chance sur #2#{} {C:inactive}, actuellement {C:money}$#3#{}{C:inactive})",
+					"{C:inactive}({C:green}#1# chance sur #2#{}{C:inactive}, actuellement {C:money}$#3#{}{C:inactive})",
 				},
 			},
 			j_mp_lucky_cat_sandbox = {
@@ -180,7 +180,7 @@ return {
 					"{V:1}SYNDROME DE RÉGRESSION DES MISES À JOUR",
 					"retour au TRAUMATISME DU JOUR DE LANCEMENT",
 					"pour des PICS DE PUISSANCE {X:mult,C:white}X#3#{} NOSTALGIQUES !!!!",
-					"{C:inactive}({C:green}#1# chance sur #2#{} {C:inactive})",
+					"{C:inactive}({C:green}#1# chance sur #2#{}{C:inactive})",
 				},
 			},
 			j_mp_juggler_sandbox = {
