@@ -10,7 +10,6 @@ if SMODS.Mods["HotPotato"] and SMODS.Mods["HotPotato"].can_load then
 
 	MP.DECK.ban_card("j_hpot_goblin_tinkerer") -- too easy to infinite
 
-
 	-- essentially we're just hooking a bunch of functions to separate and normalise rng
 	-- i was gonna hook more but it ended up only being 2 so whatever
 
@@ -67,7 +66,7 @@ if SMODS.Mods["HotPotato"] and SMODS.Mods["HotPotato"].can_load then
 		-- this range encompasses an entire wheel spin, making every endpos equally likely
 		local min = 0.486225001705432
 		local max = 0.502020498677871
-		Wheel.starting_accel = ( pseudorandom("hpot_wheel_starting_accel") * (max-min) ) + min
+		Wheel.starting_accel = (pseudorandom("hpot_wheel_starting_accel") * (max - min)) + min
 
 		-- nullify any vval (idk what this does exactly but it's annoying)
 		G.GAME.vval = 0
@@ -103,7 +102,10 @@ if SMODS.Mods["HotPotato"] and SMODS.Mods["HotPotato"].can_load then
 	local set_ability_ref = Card.set_ability
 	function Card:set_ability(center, initial, delay_sprites)
 		if not G.OVERLAY_MENU then
-			if (center.mp_include and type(center.mp_include) == 'function' and not center:mp_include()) or G.GAME.banned_keys[center.key] then
+			if
+				(center.mp_include and type(center.mp_include) == "function" and not center:mp_include())
+				or G.GAME.banned_keys[center.key]
+			then
 				local swap = false
 				local done = false
 				while not done do
@@ -111,9 +113,7 @@ if SMODS.Mods["HotPotato"] and SMODS.Mods["HotPotato"].can_load then
 						if swap then
 							return self:set_ability(v, initial, delay_sprites) -- do not return ref
 						end
-						if v == center then
-							swap = true
-						end
+						if v == center then swap = true end
 					end
 				end
 			end

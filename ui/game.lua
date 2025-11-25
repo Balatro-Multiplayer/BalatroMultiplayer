@@ -1544,7 +1544,7 @@ function ease_ante(mod)
 	if MP.LOBBY.code and not MP.LOBBY.config.disable_live_and_timer_hud then
 		-- Prevents easing multiple times at once
 		if MP.GAME.antes_keyed[MP.GAME.ante_key] then return end
-	
+
 		-- pizza: remove discards
 		if MP.GAME.pizza_discards > 0 then
 			G.GAME.round_resets.discards = G.GAME.round_resets.discards - MP.GAME.pizza_discards
