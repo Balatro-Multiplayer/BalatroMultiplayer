@@ -130,6 +130,9 @@ payload = '''
 if v.mp_include and type(v.mp_include) == 'function' then
 	if not v:mp_include() then
 		table.remove(_pool) -- remove whatever was just done
+		if add and not G.GAME.banned_keys[v.key] then
+			_pool_size = _pool_size - 1
+		end
 	end
 end
 '''

@@ -140,3 +140,19 @@ end
 '''
 match_indent = true
 times = 1
+
+# ease_ante event suppression for compatibility
+[[patches]]
+[patches.pattern]
+target = "functions/common_events.lua"
+pattern = '''
+function ease_ante(mod)
+'''
+position = 'after'
+payload = '''
+if MP.LOBBY.code and not MP.LOBBY.config.disable_live_and_timer_hud then
+	MP.suppress_next_event = true
+end
+'''
+match_indent = true
+times = 1

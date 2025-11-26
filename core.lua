@@ -43,6 +43,9 @@ MP.PREVIEW = {
 	button = SMODS.Mods["Multiplayer"].config.preview.button,
 }
 
+-- Flag to switch between old and new networking implementation
+MP.USE_NEW_NETWORKING = true
+
 G.C.MULTIPLAYER = HEX("AC3232")
 
 MP.SMODS_VERSION = "1.0.0~BETA-1016c"
@@ -216,7 +219,8 @@ SMODS.Atlas({
 
 MP.load_mp_dir("compatibility")
 
-MP.load_mp_file("networking/action_handlers.lua")
+local networking_dir = MP.USE_NEW_NETWORKING and "networking" or "networking-old"
+MP.load_mp_file(networking_dir .. "/action_handlers.lua")
 
 MP.load_mp_dir("ui/components") -- Gamemodes and rulesets need these
 
@@ -245,7 +249,7 @@ MP.load_mp_dir("ui")
 MP.load_mp_file("misc/disable_restart.lua")
 MP.load_mp_file("misc/mod_hash.lua")
 
-local SOCKET = MP.load_mp_file("networking/socket.lua")
+local SOCKET = MP.load_mp_file(networking_dir .. "/socket.lua")
 MP.NETWORKING_THREAD = love.thread.newThread(SOCKET)
 MP.NETWORKING_THREAD:start(SMODS.Mods["Multiplayer"].config.server_url, SMODS.Mods["Multiplayer"].config.server_port)
 MP.ACTIONS.connect()

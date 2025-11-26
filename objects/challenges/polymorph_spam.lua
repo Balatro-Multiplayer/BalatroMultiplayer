@@ -49,7 +49,7 @@ local function included(key)
 	if G.GAME.banned_keys[key] then
 		return false
 	elseif G.P_CENTERS[key].mp_include and type(G.P_CENTERS[key].mp_include) == "function" then
-		return G.P_CENTERS[key].mp_include()
+		return G.P_CENTERS[key]:mp_include()
 	end
 	return true
 end
