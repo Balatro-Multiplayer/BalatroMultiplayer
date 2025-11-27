@@ -389,6 +389,21 @@ SMODS.Mods.Multiplayer.config_tab = function()
 					}),
 				},
 			},
+			{
+				n = G.UIT.R,
+				config = {
+					padding = 0,
+					align = "cm",
+				},
+				nodes = {
+					create_toggle({
+						id = "disable_timer_sounds_toggle",
+						label = "Disable Timer Sound Effect*",
+						ref_table = SMODS.Mods["Multiplayer"].config,
+						ref_value = "disable_timer_sounds",
+					}),
+				},
+			}
 		},
 	}
 	return ret
