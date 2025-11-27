@@ -131,16 +131,24 @@ function Back:change_to(new_back)
 	return change_to_ref(self, new_back)
 end
 
+local function is_cocktail_select(card)
+	if Galdur then
+		return Galdur.run_setup
+			and card.area == Galdur.run_setup.selected_deck_area
+			and card.config.center.key == "b_mp_cocktail"
+	else
+		return G.GAME.viewed_back
+			and G.GAME.viewed_back.effect
+			and G.GAME.viewed_back.effect.center.key == "b_mp_cocktail"
+			and card.facing == "back"
+	end
+end
+
 local click_ref = Card.click
 function Card:click() -- i'd rather deal with the cardarea but this is fine i suppose
 	click_ref(self)
 	if G.STAGE == G.STAGES.MAIN_MENU then
-		if
-			G.GAME.viewed_back
-			and G.GAME.viewed_back.effect
-			and G.GAME.viewed_back.effect.center.key == "b_mp_cocktail"
-			and self.facing == "back"
-		then
+		if is_cocktail_select(self) then
 			-- boilerplate robbed from cryptid's decaying corpse
 			if G.cocktail_select then
 				for i = 1, #G.cocktail_select do
@@ -170,7 +178,7 @@ function Card:click() -- i'd rather deal with the cardarea but this is fine i su
 					G.CARD_H,
 					pseudorandom_element(G.P_CARDS),
 					G.P_CENTERS.c_base,
-					{ playing_card = i, viewed_back = true }
+					{ playing_card = i, bypass_back = G.P_CENTERS[v].pos }
 				)
 				G.cocktail_select[row]:emplace(card)
 				card.sprite_facing = "back"
@@ -209,7 +217,6 @@ function Card:click() -- i'd rather deal with the cardarea but this is fine i su
 								ref_table = MP,
 								ref_value = "show_cocktail_decks",
 								callback = function(bool)
-									print(bool)
 									MP.cocktail_cfg_edit(bool, "show")
 								end,
 							}),
@@ -320,11 +327,7 @@ function Card:draw(layer)
 			})
 			self.children.view_deck.states.collide.can = false
 		end
-		local bool = self.states.hover.is
-			and G.GAME.viewed_back
-			and G.GAME.viewed_back.effect
-			and G.GAME.viewed_back.effect.center.key == "b_mp_cocktail"
-			and self.facing == "back"
+		local bool = self.states.hover.is and is_cocktail_select(self)
 		self.children.view_deck.states.visible = bool
 	end
 end
