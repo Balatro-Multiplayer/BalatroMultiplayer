@@ -712,8 +712,10 @@ local function action_start_ante_timer(time)
 			trigger = "after",
 			delay = G.SETTINGS.GAMESPEED * wait_time,
 			func = function()
-				play_sound("timpani", 0.55 + 0.25 * i, 0.7)
-				play_sound("generic1", 0.75 + 0.25 * i, 0.7)
+				if not SMODS.Mods["Multiplayer"].config["disable_timer_sounds"] then
+					play_sound("timpani", 0.55 + 0.25 * i, 0.7)
+					play_sound("generic1", 0.75 + 0.25 * i, 0.7)
+				end
 				return true
 			end,
 		}))
