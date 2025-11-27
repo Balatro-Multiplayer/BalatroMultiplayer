@@ -1,3 +1,34 @@
+SMODS.Joker:take_ownership("hanging_chad", {
+	loc_vars = function(self, info_queue, card) -- This is dumb but there's no original loc_vars to override, if i knew how to fix that i would
+		return { vars = { card.ability.extra } }
+	end,
+}, true)
+
+MP.ReworkCenter({
+	key = "j_hanging_chad",
+	ruleset = MP.UTILS.get_standard_rulesets(),
+	config = { extra = 1 },
+	loc_vars = function(self, info_queue, card)
+		return {
+			key = self.key.."_mp_standard",
+			vars = { card.ability.extra },
+		}
+	end,
+	calculate = function(self, card, context)
+		if context.cardarea == G.play and context.repetition then
+			if context.other_card == context.scoring_hand[1]
+			or context.other_card == context.scoring_hand[2] then
+				return {
+					message = localize("k_again_ex"),
+					repetitions = card.ability.extra,
+					card = card,
+				}
+			end
+		end
+	end,
+})
+
+--[[
 SMODS.Joker({
 	key = "hanging_chad",
 	no_collection = true,
@@ -37,3 +68,4 @@ SMODS.Joker({
 		return (MP.UTILS.is_standard_ruleset() or MP.LOBBY.config.ruleset == "ruleset_mp_sandbox") and MP.LOBBY.code
 	end,
 })
+]]

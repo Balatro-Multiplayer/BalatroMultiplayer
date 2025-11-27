@@ -1,6 +1,16 @@
+MP.ReworkCenter({
+	key = "m_glass",
+	ruleset = MP.UTILS.get_standard_rulesets(),
+	config = { Xmult = 1.5, extra = 4 },
+})
+
 -- Behold! A humble config table, first of its kind, a seed of dreams
 -- Perhaps one day it shall bloom into a grand centralized configuration system
 -- where all game mechanics dance in harmonious unity... but today, we start here
+
+-- ^^ very inspiring but i killed it
+
+--[[
 local configs = {
 	vanilla = { x_mult = 2, break_chance = 4 },
 	standard = { x_mult = 1.5, break_chance = 4 }, -- hack for now
@@ -34,3 +44,4 @@ SMODS.Enhancement:take_ownership("glass", {
 		if config.break_chance then card.ability.extra = config.break_chance end
 	end,
 }, true)
+]]
