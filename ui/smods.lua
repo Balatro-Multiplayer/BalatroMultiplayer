@@ -398,7 +398,7 @@ SMODS.Mods.Multiplayer.config_tab = function()
 				nodes = {
 					create_toggle({
 						id = "disable_timer_sounds_toggle",
-						label = "Disable Timer Sound Effect*",
+						label = "Disable Timer Sound Effects",
 						ref_table = SMODS.Mods["Multiplayer"].config,
 						ref_value = "disable_timer_sounds",
 					}),
