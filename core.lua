@@ -35,7 +35,6 @@ MP.GAME = {}
 MP.UI = {}
 MP.ACTIONS = {}
 MP.INTEGRATIONS = {
-	TheOrder = SMODS.Mods["Multiplayer"].config.integrations.TheOrder,
 	Preview = SMODS.Mods["Multiplayer"].config.integrations.Preview,
 }
 
@@ -44,9 +43,12 @@ MP.PREVIEW = {
 	button = SMODS.Mods["Multiplayer"].config.preview.button,
 }
 
+-- Flag to switch between old and new networking implementation
+MP.USE_NEW_NETWORKING = true
+
 G.C.MULTIPLAYER = HEX("AC3232")
 
-MP.SMODS_VERSION = "1.0.0~BETA-0711a"
+MP.SMODS_VERSION = "1.0.0~BETA-1016c"
 
 function MP.should_use_the_order()
 	return MP.LOBBY and MP.LOBBY.config and MP.LOBBY.config.the_order and MP.LOBBY.code
@@ -89,6 +91,7 @@ end
 
 MP.load_mp_file("misc/utils.lua")
 MP.load_mp_file("misc/insane_int.lua")
+MP.load_mp_file("misc/hide_content.lua")
 
 function MP.reset_lobby_config(persist_ruleset_and_gamemode)
 	sendDebugMessage("Resetting lobby options", "MULTIPLAYER")
@@ -113,6 +116,7 @@ function MP.reset_lobby_config(persist_ruleset_and_gamemode)
 		sleeve = "sleeve_casl_none",
 		stake = 1,
 		challenge = "",
+		cocktail = "",
 		multiplayer_jokers = true,
 		timer = true,
 		timer_forgiveness = 0,
@@ -215,7 +219,8 @@ SMODS.Atlas({
 
 MP.load_mp_dir("compatibility")
 
-MP.load_mp_file("networking/action_handlers.lua")
+local networking_dir = MP.USE_NEW_NETWORKING and "networking" or "networking-old"
+MP.load_mp_file(networking_dir .. "/action_handlers.lua")
 
 MP.load_mp_dir("ui/components") -- Gamemodes and rulesets need these
 
@@ -235,6 +240,7 @@ MP.load_mp_dir("objects/jokers/sandbox")
 MP.load_mp_dir("objects/stakes")
 MP.load_mp_dir("objects/tags")
 MP.load_mp_dir("objects/consumables")
+MP.load_mp_dir("objects/consumables/sandbox")
 MP.load_mp_dir("objects/boosters")
 MP.load_mp_dir("objects/challenges")
 
@@ -243,7 +249,7 @@ MP.load_mp_dir("ui")
 MP.load_mp_file("misc/disable_restart.lua")
 MP.load_mp_file("misc/mod_hash.lua")
 
-local SOCKET = MP.load_mp_file("networking/socket.lua")
+local SOCKET = MP.load_mp_file(networking_dir .. "/socket.lua")
 MP.NETWORKING_THREAD = love.thread.newThread(SOCKET)
 MP.NETWORKING_THREAD:start(SMODS.Mods["Multiplayer"].config.server_url, SMODS.Mods["Multiplayer"].config.server_port)
 MP.ACTIONS.connect()

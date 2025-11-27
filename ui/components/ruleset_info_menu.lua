@@ -1,11 +1,11 @@
 function MP.UI.CreateRulesetInfoMenu(config)
 	local has_mp_content = config.multiplayer_content and "k_yes" or "k_no"
 	local has_mp_color = config.multiplayer_content and G.C.GREEN or G.C.RED
-	local forces_lobby = config.forced_lobby_options and "k_yes" or "k_no" 
+	local forces_lobby = config.forced_lobby_options and "k_yes" or "k_no"
 	local forces_lobby_color = config.forced_lobby_options and G.C.GREEN or G.C.RED
 	local forces_gamemode_text = config.forced_gamemode_text or "k_no"
 	local forces_gamemode_color = config.forced_gamemode_text and G.C.GREEN or G.C.RED
-	
+
 	return {
 		{
 			n = G.UIT.R,

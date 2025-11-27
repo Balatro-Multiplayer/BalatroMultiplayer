@@ -42,7 +42,7 @@ SMODS.Joker({
 	calc_dollar_bonus = function(self, card)
 		return card.ability.extra.dollars > 0 and card.ability.extra.dollars or nil
 	end,
-	in_pool = function(self)
-		return MP.LOBBY.config.ruleset == "ruleset_mp_sandbox" and MP.LOBBY.code
+	mp_include = function(self)
+		return MP.SANDBOX.is_joker_allowed(self.key)
 	end,
 })

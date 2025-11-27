@@ -324,6 +324,7 @@ end
 
 function G.FUNCS.copy_host_deck()
 	MP.LOBBY.deck.back = MP.LOBBY.config.back
+	MP.LOBBY.deck.cocktail = MP.LOBBY.config.cocktail
 	MP.LOBBY.deck.sleeve = MP.LOBBY.config.sleeve
 	MP.LOBBY.deck.stake = MP.LOBBY.config.stake
 	MP.LOBBY.deck.challenge = MP.LOBBY.config.challenge
@@ -536,7 +537,7 @@ end
 
 function G.FUNCS.reconnect(e)
 	MP.ACTIONS.connect()
-	G.FUNCS:exit_overlay_menu()
+	G.FUNCS.exit_overlay_menu()
 end
 
 function MP.update_player_usernames()

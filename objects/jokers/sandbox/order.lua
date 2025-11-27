@@ -14,23 +14,35 @@ SMODS.Joker({
 	rarity = 3,
 	cost = 8,
 	atlas = "order_sandbox",
-	config = { extra = { Xmult = 5, type = "Straight" }, mp_sticker_balanced = true },
+	config = { extra = { Xmult = 3, Xmult_mod = 0.5, type = "Straight" }, mp_sticker_balanced = true },
 	loc_vars = function(self, info_queue, card)
-		return { vars = { card.ability.extra.Xmult, localize(card.ability.extra.type, "poker_hands") } }
+		return { vars = { card.ability.extra.Xmult_mod, card.ability.extra.Xmult } }
 	end,
 	calculate = function(self, card, context)
-		if context.joker_main and next(context.poker_hands[card.ability.extra.type]) then
-			-- Check if any of the cards in the hand are face cards
-			for i = 1, #context.scoring_hand do
-				local scoring_card = context.scoring_hand[i]
-				if scoring_card:is_face() then return end
+		if context.before and context.main_eval and not context.blueprint then
+			if next(context.poker_hands[card.ability.extra.type]) then
+				-- Played a Straight - increase Xmult
+				card.ability.extra.Xmult = card.ability.extra.Xmult + card.ability.extra.Xmult_mod
+				return {
+					message = localize("k_upgrade_ex"),
+					colour = G.C.RED,
+				}
+			else
+				-- Didn't play a Straight - reset to base value
+				card.ability.extra.Xmult = 3
+				return {
+					message = localize("k_reset"),
+					colour = G.C.RED,
+				}
 			end
+		end
+		if context.joker_main and next(context.poker_hands[card.ability.extra.type]) then
 			return {
 				xmult = card.ability.extra.Xmult,
 			}
 		end
 	end,
-	in_pool = function(self)
-		return MP.LOBBY.config.ruleset == "ruleset_mp_sandbox" and MP.LOBBY.code
+	mp_include = function(self)
+		return MP.SANDBOX.is_joker_allowed(self.key)
 	end,
 })

@@ -71,19 +71,19 @@ end
 function FN.SIM.add_chips(exact, min, max)
 	FN.SIM.adjust_field_with_range(function(x, y)
 		return x + y
-	end, "chips", mod_chips, exact, min, max)
+	end, "chips", FN.SIM.mod_chips, exact, min, max)
 end
 
 function FN.SIM.add_mult(exact, min, max)
 	FN.SIM.adjust_field_with_range(function(x, y)
 		return x + y
-	end, "mult", mod_mult, exact, min, max)
+	end, "mult", FN.SIM.mod_mult, exact, min, max)
 end
 
 function FN.SIM.x_mult(exact, min, max)
 	FN.SIM.adjust_field_with_range(function(x, y)
 		return x * y
-	end, "mult", mod_mult, exact, min, max)
+	end, "mult", FN.SIM.mod_mult, exact, min, max)
 end
 
 function FN.SIM.add_dollars(exact, min, max)
@@ -194,7 +194,7 @@ function FN.SIM.set_ability(card_data, center)
 		order = center.order or nil,
 		forced_selection = card_data.ability and card_data.ability.forced_selection or nil,
 		perma_bonus = card_data.ability and card_data.ability.perma_bonus or 0,
-		bonus = (card_data.ability and card_data.ability.bonus or 0) + (center.config.bonus or 0),
+		bonus = center.config.bonus or 0,
 	}
 end
 
@@ -231,4 +231,12 @@ function FN.SIM.is_deck(deck)
 		end
 	end
 	return false
+end
+
+function FN.SIM.mod_chips(_chips)
+	return _chips
+end
+
+function FN.SIM.mod_mult(_mult)
+	return _mult
 end

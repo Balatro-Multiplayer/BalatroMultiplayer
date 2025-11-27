@@ -16,9 +16,13 @@ function create_UIBox_HUD()
 	local calculate_score_button_wrap =
 		{ n = G.UIT.R, config = { id = "fn_calculate_score_button_wrap", align = "cm", padding = 0.1 }, nodes = {} }
 	table.insert(calculate_score_button_wrap.nodes, FN.PRE.get_calculate_score_button())
+	local score_wrap = {
+		n = G.UIT.R,
+		config = { id = "fn_real_wrap", align = "cm", padding = 0.0 },
+		nodes = { score_node_wrap, calculate_score_button_wrap },
+	}
 
-	table.insert(contents.nodes[1].nodes[1].nodes[4].nodes[1].nodes, score_node_wrap)
-	table.insert(contents.nodes[1].nodes[1].nodes[4].nodes[1].nodes, calculate_score_button_wrap)
+	table.insert(contents.nodes[1].nodes[1].nodes[4].nodes[1].nodes, score_wrap) -- you can only do one so we have to wrap both of them. do not ask. i have no idea why
 
 	return contents
 end

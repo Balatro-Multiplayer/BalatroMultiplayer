@@ -20,7 +20,7 @@ SMODS.Joker({
 		MP.UTILS.add_nemesis_info(info_queue)
 		return { vars = { card.ability.extra.x_mult_gain, card.ability.extra.max_x_mult, card.ability.extra.x_mult } }
 	end,
-	in_pool = function(self)
+	mp_include = function(self)
 		return MP.LOBBY.code and MP.LOBBY.config.multiplayer_jokers and MP.LOBBY.config.ruleset ~= "ruleset_mp_sandbox"
 	end,
 	add_to_deck = function(self, card, from_debuffed)

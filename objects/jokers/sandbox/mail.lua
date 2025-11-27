@@ -9,7 +9,6 @@ SMODS.Atlas({
 SMODS.Joker({
 	key = "mail_sandbox",
 	no_collection = MP.sandbox_no_collection,
-
 	unlocked = true,
 	discovered = true,
 	blueprint_compat = true,
@@ -53,7 +52,7 @@ SMODS.Joker({
 			}
 		end
 	end,
-	in_pool = function(self)
-		return MP.LOBBY.config.ruleset == "ruleset_mp_sandbox" and MP.LOBBY.code
+	mp_include = function(self)
+		return MP.SANDBOX.is_joker_allowed(self.key)
 	end,
 })

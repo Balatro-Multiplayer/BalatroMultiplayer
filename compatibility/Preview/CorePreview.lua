@@ -33,7 +33,9 @@ function FN.PRE.add_update_event(trigger)
 		FN.PRE.data = FN.PRE.simulate()
 		return true
 	end
-	if FN.PRE.enabled() then G.E_MANAGER:add_event(Event({ trigger = trigger, func = sim_func })) end
+	if FN.PRE.enabled() then
+		G.E_MANAGER:add_event(Event({ trigger = trigger, blockable = false, blocking = false, func = sim_func }))
+	end
 end
 
 -- Update simulation after a consumable (eg. Tarot, Planet) is used:

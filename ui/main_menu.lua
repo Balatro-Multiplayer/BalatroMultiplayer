@@ -1204,6 +1204,8 @@ function G.FUNCS.start_lobby(e)
 	end
 	MP.LOBBY.config.gamemode = gamemode_check and MP.LOBBY.config.gamemode or "gamemode_mp_attrition"
 
+	MP.LOBBY.config.cocktail = SMODS.Mods["Multiplayer"].config.cocktail
+
 	MP.ACTIONS.create_lobby(string.sub(MP.LOBBY.config.gamemode, 13))
 	G.FUNCS.exit_overlay_menu()
 end

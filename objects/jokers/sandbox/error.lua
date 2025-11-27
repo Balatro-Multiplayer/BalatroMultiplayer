@@ -91,19 +91,6 @@ for i = 1, 21 do
 								"¢",
 								"₿",
 								"◊",
-								-- loc_mult,
-								-- loc_mult,
-								-- loc_mult,
-								-- loc_mult,
-								-- loc_mult,
-								-- loc_mult,
-								-- loc_mult,
-								-- loc_mult,
-								-- loc_mult,
-								-- loc_mult,
-								-- loc_mult,
-								-- loc_mult,
-								-- loc_mult,
 							},
 							colours = { G.C.UI.TEXT_DARK },
 							pop_in_rate = 1,
@@ -127,7 +114,7 @@ for i = 1, 21 do
 		no_collection = MP.sandbox_no_collection,
 		unlocked = true,
 		discovered = true,
-		in_pool = function(self)
+		mp_include = function(self)
 			return false
 		end,
 		mp_credits = { art = { "aura?" } },

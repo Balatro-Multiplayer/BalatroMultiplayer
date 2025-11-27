@@ -8,7 +8,7 @@ Let's build something that would make Jimbo proud.
 
 ## Quick Start
 
-**Prerequisites**: Install [Steamodded 1.0.0~BETA-0711a](https://github.com/Steamodded/smods/releases/tag/1.0.0-beta-0711a) and [Lovely Injector](https://github.com/ethangreen-dev/lovely-injector) (>=0.8)
+**Prerequisites**: Install [Steamodded 1.0.0~BETA-1016c](https://github.com/Steamodded/smods/releases/tag/1.0.0-beta-1016c) and [Lovely Injector](https://github.com/ethangreen-dev/lovely-injector) (>=0.8)
 
 ```bash
 # 1. Fork on GitHub, then clone

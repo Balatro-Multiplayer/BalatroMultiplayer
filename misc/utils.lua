@@ -262,7 +262,7 @@ end
 local create_mod_badges_ref = SMODS.create_mod_badges
 function SMODS.create_mod_badges(obj, badges)
 	create_mod_badges_ref(obj, badges)
-	if obj and obj.mp_credits then
+	if not SMODS.config.no_mod_badges and obj and obj.mp_credits then
 		obj.mp_credits.art = obj.mp_credits.art or {}
 		obj.mp_credits.idea = obj.mp_credits.idea or {}
 		obj.mp_credits.code = obj.mp_credits.code or {}

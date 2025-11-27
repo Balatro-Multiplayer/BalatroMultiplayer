@@ -467,8 +467,8 @@ return {
 				name = "Gói Tiêu Chuẩn Cực Đại",
 				text = {
 					"Chọn {C:attention}#1#{} trong tối đa",
-                    "{C:attention}#2#{C:attention} lá bài {C:attention}Thường{}",
-                    "để thêm vào bộ bài",
+					"{C:attention}#2#{C:attention} lá bài {C:attention}Thường{}",
+					"để thêm vào bộ bài",
 					"{C:attention}Không thể bỏ qua{}",
 				},
 			},

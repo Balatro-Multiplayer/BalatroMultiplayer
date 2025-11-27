@@ -348,7 +348,7 @@ end
 function G.FUNCS.mp_timer_button(e)
 	if MP.LOBBY.config.timer then
 		if MP.GAME.ready_blind then
-			if not MP.GAME.timer_started then
+			if not MP.GAME.timer_started and MP.GAME.timer > 0 then
 				MP.ACTIONS.start_ante_timer()
 			else
 				MP.ACTIONS.pause_ante_timer()
@@ -426,9 +426,23 @@ function MP.UI.start_pvp_countdown(callback)
 	end
 	MP.GAME.pvp_countdown = seconds
 
+	G.CONTROLLER.locks.enter_pvp = true
+
 	local function show_next()
 		if MP.GAME.pvp_countdown <= 0 then
 			if callback then callback() end
+			G.E_MANAGER:add_event(Event({
+				no_delete = true,
+				trigger = "after",
+				blocking = false,
+				blockable = false,
+				delay = 1,
+				timer = "TOTAL",
+				func = function()
+					G.CONTROLLER.locks.enter_pvp = nil
+					return true
+				end,
+			}))
 			return true
 		end
 

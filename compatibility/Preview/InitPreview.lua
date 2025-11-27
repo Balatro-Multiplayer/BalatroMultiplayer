@@ -19,6 +19,27 @@ FN.PRE = {
 	five_second_coroutine = nil,
 }
 
+-- this coroutine nonsense is pissing me off so i'm doing events instead
+-- it's fine because a calc takes close to no computing time
+-- function name is the same, can't be bothered
+
+function FN.PRE.start_new_coroutine()
+	FN.PRE.lock_updates = true
+	FN.PRE.show_preview = true
+	FN.PRE.add_update_event("immediate") -- Force UI refresh
+	local delay = 0
+	if MP.LOBBY.code and not MP.is_pvp_boss() then delay = 5 * G.SETTINGS.GAMESPEED end
+	local func = function()
+		FN.PRE.simulate()
+		FN.PRE.lock_updates = false
+		FN.PRE.show_preview = true
+		FN.PRE.add_update_event("immediate") -- Refresh UI again
+		return true
+	end
+	G.E_MANAGER:add_event(Event({ trigger = "after", blockable = false, blocking = false, delay = delay, func = func }))
+end
+
+--[[
 function FN.PRE.start_new_coroutine()
 	if FN.PRE.five_second_coroutine and coroutine.status(FN.PRE.five_second_coroutine) ~= "dead" then
 		FN.PRE.five_second_coroutine = nil -- Reset the coroutine
@@ -47,6 +68,7 @@ function FN.PRE.start_new_coroutine()
 
 	coroutine.resume(FN.PRE.five_second_coroutine) -- Start it immediately
 end
+]]
 
 FN.PRE._start_up = Game.start_up
 function Game:start_up()

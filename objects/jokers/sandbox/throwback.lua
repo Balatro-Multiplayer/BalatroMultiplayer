@@ -60,6 +60,9 @@ SMODS.Joker({
 		return {
 			vars = {
 				calculate_total_mult(card),
+				card.ability.extra.base_mult,
+				card.ability.extra.skip_bonus,
+				card.ability.extra.round_penalty,
 			},
 		}
 	end,
@@ -82,7 +85,7 @@ SMODS.Joker({
 			}
 		end
 	end,
-	in_pool = function(self)
-		return MP.LOBBY.config.ruleset == "ruleset_mp_sandbox" and MP.LOBBY.code
+	mp_include = function(self)
+		return MP.SANDBOX.is_joker_allowed(self.key)
 	end,
 })

@@ -18,7 +18,7 @@ MP.Ruleset({
 			multiplayer_content = false,
 			forced_lobby_options = true,
 			forced_gamemode_text = "k_attrition",
-			description_key = "k_majorleague_description"
+			description_key = "k_majorleague_description",
 		})
 	end,
 	forced_gamemode = "gamemode_mp_attrition",

@@ -70,7 +70,7 @@ MP.Ruleset({
 		return MP.UI.CreateRulesetInfoMenu({
 			multiplayer_content = true,
 			forced_lobby_options = false,
-			description_key = "k_badlatro_description"
+			description_key = "k_badlatro_description",
 		})
 	end,
 }):inject()

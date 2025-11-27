@@ -3,7 +3,7 @@ function MP.UI.create_gameplay_options_tab()
 		n = G.UIT.ROOT,
 		config = {
 			emboss = 0.05,
-			minh = 6,
+			minh = 3,
 			r = 0.1,
 			minw = 10,
 			align = "tm",
@@ -18,9 +18,7 @@ function MP.UI.create_gameplay_options_tab()
 				"no_gold_on_round_loss"
 			),
 			create_lobby_option_toggle("death_on_round_loss_toggle", "b_opts_death_on_loss", "death_on_round_loss"),
-			create_lobby_option_toggle("different_decks_toggle", "b_opts_player_diff_deck", "different_decks"),
 			create_lobby_option_toggle("timer_toggle", "b_opts_timer", "timer"),
-			create_lobby_option_toggle("normal_bosses_toggle", "b_opts_normal_bosses", "normal_bosses"),
 		},
 	}
 end

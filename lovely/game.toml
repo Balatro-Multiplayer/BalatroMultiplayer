@@ -5,14 +5,6 @@ priority = 2147483600
 
 [[patches]]
 [patches.regex]
-target = "functions/state_events.lua"
-pattern = '''function end_round\(\)(?<pre>[\s\S]+?)func = function\(\)'''
-position = 'at'
-payload = "function end_round()$pre func = MP.LOBBY.code and MP.end_round or function()"
-times = 1
-
-[[patches]]
-[patches.regex]
 target = "game.lua"
 pattern = '''function Game:update_round_eval\(dt\)(?<pre>[\s\S]+?)if not G.STATE_COMPLETE then'''
 position = 'at'
@@ -29,13 +21,21 @@ position = 'after'
 payload = '''
   if not MP.GAME.comeback_bonus_given then
 		MP.GAME.comeback_bonus_given = true
+		local comeback_bonus
+
+		if MP.LOBBY.config.ruleset == "ruleset_mp_sandbox" then
+		    comeback_bonus = 3 * (G.GAME.round_resets.ante - 1)
+		else
+		    comeback_bonus = 4 * MP.GAME.comeback_bonus
+		end
+
 		add_round_eval_row({
 			bonus = true,
 			name = "comeback",
 			pitch = pitch,
-			dollars = 4 * MP.GAME.comeback_bonus,
+			dollars = comeback_bonus,
 		})
-		dollars = dollars + 4 * MP.GAME.comeback_bonus
+		dollars = dollars + comeback_bonus
 	end'''
 match_indent = false
 times = 1
@@ -46,22 +46,30 @@ target = "functions/common_events.lua"
 pattern = '''elseif config.name == 'hands' then'''
 position = 'before'
 payload = '''elseif config.name == "comeback" then
+  local bonus
+  if MP.LOBBY.config.ruleset == "ruleset_mp_sandbox" then
+	bonus = G.GAME.round_resets.ante - 1
+  else
+	bonus = MP.GAME.comeback_bonus
+  end
   table.insert(left_text, {
     n = G.UIT.T,
     config = {
-      text = MP.GAME.comeback_bonus,
+      text = bonus,
       scale = 0.8 * scale,
       colour = G.C.PURPLE,
       shadow = true,
       juice = true,
     },
   })
+
+  local comeback_money_key = MP.LOBBY.config.ruleset == "ruleset_mp_sandbox" and "k_comeback_money_sandbox" or "k_total_lives_lost"
   table.insert(left_text, {
     n = G.UIT.O,
     config = {
       object = DynaText({
         string = {
-          localize("k_total_lives_lost"),
+          localize(comeback_money_key),
         },
         colours = { G.C.UI.TEXT_LIGHT },
         shadow = true,
@@ -130,13 +138,11 @@ times = 1
 [[patches]]
 [patches.pattern]
 target = 'functions/state_events.lua'
-pattern = '''local dollars = 0
-
-if G.GAME.chips - G.GAME.blind.chips >= 0 then'''
+pattern = '''if G.GAME.chips - G.GAME.blind.chips >= 0 then
+add_round_eval_row({dollars = G.GAME.blind.dollars, name='blind1', pitch = pitch})'''
 position = 'at'
-payload = '''local dollars = 0
-
-if G.GAME.chips - G.GAME.blind.chips >= 0 or MP.is_pvp_boss() then'''
+payload = '''if G.GAME.chips - G.GAME.blind.chips >= 0 or MP.is_pvp_boss() then
+add_round_eval_row({dollars = G.GAME.blind.dollars, name='blind1', pitch = pitch})'''
 match_indent = true
 times = 1
 
@@ -169,3 +175,17 @@ for i, v in ipairs(MP.UTILS.get_culled_pool("Enhanced")) do
 '''
 match_indent = true
 times = 3
+
+# Stop game from replacing the multiplayer "ready up" button with "select blind" button
+[[patches]]
+[patches.pattern]
+target = '''functions/button_callbacks.lua'''
+pattern = """_top_button.config.button = 'select_blind'"""
+position = "at"
+payload = '''
+if _top_button.config.button ~= "mp_toggle_ready" then
+	_top_button.config.button = "select_blind"
+end
+'''
+match_indent = true
+times = 1

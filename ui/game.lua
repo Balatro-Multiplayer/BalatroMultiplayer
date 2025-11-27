@@ -572,129 +572,6 @@ function add_round_eval_row(config) -- if i could post a skull emoji i would, wt
 	end
 end
 
-G.FUNCS.blind_choice_handler = function(e)
-	if
-		not e.config.ref_table.run_info
-		and G.blind_select
-		and G.blind_select.VT.y < 10
-		and e.config.id
-		and G.blind_select_opts[string.lower(e.config.id)]
-	then
-		if e.UIBox.role.xy_bond ~= "Weak" then e.UIBox:set_role({ xy_bond = "Weak" }) end
-		if
-			(e.config.ref_table.deck ~= "on" and e.config.id == G.GAME.blind_on_deck)
-			or (e.config.ref_table.deck ~= "off" and e.config.id ~= G.GAME.blind_on_deck)
-		then
-			local _blind_choice = G.blind_select_opts[string.lower(e.config.id)]
-			local _top_button = e.UIBox:get_UIE_by_ID("select_blind_button")
-			local _border = e.UIBox.UIRoot.children[1].children[1]
-			local _tag = e.UIBox:get_UIE_by_ID("tag_" .. e.config.id)
-			local _tag_container = e.UIBox:get_UIE_by_ID("tag_container")
-			if
-				_tag_container
-				and not G.SETTINGS.tutorial_complete
-				and not G.SETTINGS.tutorial_progress.completed_parts["shop_1"]
-			then
-				_tag_container.states.visible = false
-			elseif _tag_container then
-				_tag_container.states.visible = true
-			end
-			if e.config.id == G.GAME.blind_on_deck then
-				e.config.ref_table.deck = "on"
-				e.config.draw_after = false
-				e.config.colour = G.C.CLEAR
-				_border.parent.config.outline = 2
-				_border.parent.config.outline_colour = G.C.UI.TRANSPARENT_DARK
-				_border.config.outline_colour = _border.config.outline and _border.config.outline_colour
-					or get_blind_main_colour(e.config.id)
-				_border.config.outline = 1.5
-				_blind_choice.alignment.offset.y = -0.9
-				if _tag and _tag_container then
-					_tag_container.children[2].config.draw_after = false
-					_tag_container.children[2].config.colour = G.C.BLACK
-					_tag.children[2].config.button = "skip_blind"
-					_tag.config.outline_colour = adjust_alpha(G.C.BLUE, 0.5)
-					_tag.children[2].config.hover = true
-					_tag.children[2].config.colour = G.C.RED
-					_tag.children[2].children[1].config.colour = G.C.UI.TEXT_LIGHT
-					local _sprite = _tag.config.ref_table
-					_sprite.config.force_focus = nil
-				end
-				if _top_button then
-					G.E_MANAGER:add_event(Event({
-						func = function()
-							G.CONTROLLER:snap_to({ node = _top_button })
-							return true
-						end,
-					}))
-					if _top_button.config.button ~= "mp_toggle_ready" then
-						_top_button.config.button = "select_blind"
-					end
-					_top_button.config.colour = G.C.FILTER
-					_top_button.config.hover = true
-					_top_button.children[1].config.colour = G.C.WHITE
-				end
-			elseif e.config.id ~= G.GAME.blind_on_deck then
-				e.config.ref_table.deck = "off"
-				e.config.draw_after = true
-				e.config.colour = adjust_alpha(
-					G.GAME.round_resets.blind_states[e.config.id] == "Skipped"
-							and mix_colours(G.C.BLUE, G.C.L_BLACK, 0.1)
-						or G.C.L_BLACK,
-					0.5
-				)
-				_border.parent.config.outline = nil
-				_border.parent.config.outline_colour = nil
-				_border.config.outline_colour = nil
-				_border.config.outline = nil
-				_blind_choice.alignment.offset.y = -0.2
-				if _tag and _tag_container then
-					if
-						G.GAME.round_resets.blind_states[e.config.id] == "Skipped"
-						or G.GAME.round_resets.blind_states[e.config.id] == "Defeated"
-					then
-						_tag_container.children[2]:set_role({ xy_bond = "Weak" })
-						_tag_container.children[2]:align(0, 10)
-						_tag_container.children[1]:set_role({ xy_bond = "Weak" })
-						_tag_container.children[1]:align(0, 10)
-					end
-					if G.GAME.round_resets.blind_states[e.config.id] == "Skipped" then
-						_blind_choice.children.alert = UIBox({
-							definition = create_UIBox_card_alert({
-								text_rot = -0.35,
-								no_bg = true,
-								text = localize("k_skipped_cap"),
-								bump_amount = 1,
-								scale = 0.9,
-								maxw = 3.4,
-							}),
-							config = {
-								align = "tmi",
-								offset = { x = 0, y = 2.2 },
-								major = _blind_choice,
-								parent = _blind_choice,
-							},
-						})
-					end
-					_tag.children[2].config.button = nil
-					_tag.config.outline_colour = G.C.UI.BACKGROUND_INACTIVE
-					_tag.children[2].config.hover = false
-					_tag.children[2].config.colour = G.C.UI.BACKGROUND_INACTIVE
-					_tag.children[2].children[1].config.colour = G.C.UI.TEXT_INACTIVE
-					local _sprite = _tag.config.ref_table
-					_sprite.config.force_focus = true
-				end
-				if _top_button then
-					_top_button.config.colour = G.C.UI.BACKGROUND_INACTIVE
-					_top_button.config.button = nil
-					_top_button.config.hover = false
-					_top_button.children[1].config.colour = G.C.UI.TEXT_INACTIVE
-				end
-			end
-		end
-	end
-end
-
 G.FUNCS.pvp_ready_button = function(e)
 	if e.children[1].config.ref_table[e.children[1].config.ref_value] == localize("Select", "blind_states") then
 		e.config.button = "mp_toggle_ready"
@@ -1123,156 +1000,34 @@ function Game:update_new_round(dt)
 	update_new_round_ref(self, dt)
 end
 
-function MP.end_round()
-	-- This prevents duplicate execution during certain cases. e.g. Full deck discard before playing any hands.
-	if MP.GAME.round_ended then
-		if not MP.GAME.duplicate_end then
-			MP.GAME.duplicate_end = true
-			sendDebugMessage("Duplicate end_round calls prevented.", "MULTIPLAYER")
-		end
-		return true
-	end
-
-	MP.GAME.round_ended = true
-
-	G.GAME.blind.in_blind = false
-	local game_over = false
-	local game_won = false
-	G.RESET_BLIND_STATES = true
-	G.RESET_JIGGLES = true
-	-- context.end_of_round calculations
-	SMODS.saved = false
-	SMODS.calculate_context({ end_of_round = true, game_over = false })
-
-	G.GAME.unused_discards = (G.GAME.unused_discards or 0) + G.GAME.current_round.discards_left
-	if G.GAME.blind and G.GAME.blind.config.blind then discover_card(G.GAME.blind.config.blind) end
-
-	if G.GAME.blind:get_type() == "Boss" then
-		local _handname, _played, _order = "High Card", -1, 100
-		for k, v in pairs(G.GAME.hands) do
-			if v.played > _played or (v.played == _played and _order > v.order) then
-				_played = v.played
-				_handname = k
-			end
-		end
-		G.GAME.current_round.most_played_poker_hand = _handname
-	end
-
-	if G.GAME.blind:get_type() == "Boss" and not G.GAME.seeded and not G.GAME.challenge then
-		G.GAME.current_boss_streak = G.GAME.current_boss_streak + 1
-		check_and_set_high_score("boss_streak", G.GAME.current_boss_streak)
-	end
-
-	if G.GAME.current_round.hands_played == 1 then
-		inc_career_stat("c_single_hand_round_streak", 1)
-	else
-		if not G.GAME.seeded and not G.GAME.challenge then
-			G.PROFILES[G.SETTINGS.profile].career_stats.c_single_hand_round_streak = 0
-			G:save_settings()
-		end
-	end
-
-	check_for_unlock({ type = "round_win" })
-	set_joker_usage()
-	for _, v in ipairs(SMODS.get_card_areas("playing_cards", "end_of_round")) do
-		SMODS.calculate_end_of_round_effects({ cardarea = v, end_of_round = true })
-	end
-
-	G.FUNCS.draw_from_hand_to_discard()
-	if G.GAME.blind:get_type() == "Boss" then
-		G.GAME.voucher_restock = nil
-		if G.GAME.modifiers.set_eternal_ante and (G.GAME.round_resets.ante == G.GAME.modifiers.set_eternal_ante) then
-			for k, v in ipairs(G.jokers.cards) do
-				v:set_eternal(true)
-			end
-		end
-		if
-			G.GAME.modifiers.set_joker_slots_ante
-			and (G.GAME.round_resets.ante == G.GAME.modifiers.set_joker_slots_ante)
-		then
-			G.jokers.config.card_limit = 0
-		end
-		delay(0.4)
-		ease_ante(1)
-		delay(0.4)
-		check_for_unlock({ type = "ante_up", ante = G.GAME.round_resets.ante + 1 })
-	end
-	G.FUNCS.draw_from_discard_to_deck()
-
-	-- This handles an edge case where a player plays no hands, and discards the only cards in their deck.
-	-- Allows opponent to advance after playing anything, and eases a life from the person who discarded their deck.
-	if
-		G.GAME.current_round.hands_played == 0
-		and G.GAME.current_round.discards_used > 0
-		and MP.LOBBY.config.gamemode ~= "gamemode_mp_survival"
-	then
-		if MP.is_pvp_boss() then MP.ACTIONS.play_hand(0, 0) end
-
-		MP.ACTIONS.fail_round(1)
-	end
-
-	G.E_MANAGER:add_event(Event({
-		trigger = "after",
-		delay = 0.3,
-		func = function()
-			G.STATE = G.STATES.ROUND_EVAL
-			G.STATE_COMPLETE = false
-
-			local temp_furthest_blind = 0
-
-			if
-				G.GAME.round_resets.blind_states.Small ~= "Defeated"
-				and G.GAME.round_resets.blind_states.Small ~= "Skipped"
-			then
-				G.GAME.round_resets.blind_states.Small = "Defeated"
-				temp_furthest_blind = G.GAME.round_resets.ante * 10 + 1
-			elseif
-				G.GAME.round_resets.blind_states.Big ~= "Defeated"
-				and G.GAME.round_resets.blind_states.Big ~= "Skipped"
-			then
-				G.GAME.round_resets.blind_states.Big = "Defeated"
-				temp_furthest_blind = G.GAME.round_resets.ante * 10 + 2
-			else
-				G.GAME.current_round.voucher = SMODS.get_next_vouchers()
-				G.GAME.round_resets.blind_states.Boss = "Defeated"
-				temp_furthest_blind = (G.GAME.round_resets.ante - 1) * 10 + 3
-				for k, v in ipairs(G.playing_cards) do
-					v.ability.played_this_ante = nil
-				end
-			end
-
-			MP.GAME.furthest_blind = (temp_furthest_blind > MP.GAME.furthest_blind) and temp_furthest_blind
-				or MP.GAME.furthest_blind
-			MP.ACTIONS.set_furthest_blind(MP.GAME.furthest_blind)
-
-			MP.GAME.pincher_index = MP.GAME.pincher_index + 1
-
-			if G.GAME.round_resets.temp_handsize then
-				G.hand:change_size(-G.GAME.round_resets.temp_handsize)
-				G.GAME.round_resets.temp_handsize = nil
-			end
-			if G.GAME.round_resets.temp_reroll_cost then
-				G.GAME.round_resets.temp_reroll_cost = nil
-				calculate_reroll_cost(true)
-			end
-
-			reset_idol_card()
-			reset_mail_rank()
-			reset_ancient_card()
-			reset_castle_card()
-			for _, mod in ipairs(SMODS.mod_list) do
-				if mod.reset_game_globals and type(mod.reset_game_globals) == "function" then
-					mod.reset_game_globals(false)
-				end
-			end
-			for k, v in ipairs(G.playing_cards) do
-				v.ability.discarded = nil
-				v.ability.forced_selection = nil
+-- This prevents duplicate execution during certain cases. e.g. Full deck discard before playing any hands.
+function MP.handle_duplicate_end()
+	if MP.LOBBY.code then
+		if MP.GAME.round_ended then
+			if not MP.GAME.duplicate_end then
+				MP.GAME.duplicate_end = true
+				sendDebugMessage("Duplicate end_round calls prevented.", "MULTIPLAYER")
 			end
 			return true
-		end,
-	}))
-	return true
+		end
+	end
+	return false
+end
+
+-- This handles an edge case where a player plays no hands, and discards the only cards in their deck.
+-- Allows opponent to advance after playing anything, and eases a life from the person who discarded their deck.
+function MP.handle_deck_out()
+	if MP.LOBBY.code then
+		if
+			G.GAME.current_round.hands_played == 0
+			and G.GAME.current_round.discards_used > 0
+			and MP.LOBBY.config.gamemode ~= "gamemode_mp_survival"
+		then
+			if MP.is_pvp_boss() then MP.ACTIONS.play_hand(0, 0) end
+
+			MP.ACTIONS.fail_round(1)
+		end
+	end
 end
 
 local start_run_ref = Game.start_run
@@ -1786,27 +1541,39 @@ end
 
 local ease_ante_ref = ease_ante
 function ease_ante(mod)
-	if not MP.LOBBY.code or MP.LOBBY.config.disable_live_and_timer_hud then return ease_ante_ref(mod) end
-	-- Prevents easing multiple times at once
-	if MP.GAME.antes_keyed[MP.GAME.ante_key] then return end
+	if MP.LOBBY.code and not MP.LOBBY.config.disable_live_and_timer_hud then
+		-- Prevents easing multiple times at once
+		if MP.GAME.antes_keyed[MP.GAME.ante_key] then return end
 
-	-- pizza: remove discards
-	if MP.GAME.pizza_discards > 0 then
-		G.GAME.round_resets.discards = G.GAME.round_resets.discards - MP.GAME.pizza_discards
-		ease_discard(-MP.GAME.pizza_discards)
-		MP.GAME.pizza_discards = 0
+		-- pizza: remove discards
+		if MP.GAME.pizza_discards > 0 then
+			G.GAME.round_resets.discards = G.GAME.round_resets.discards - MP.GAME.pizza_discards
+			ease_discard(-MP.GAME.pizza_discards)
+			MP.GAME.pizza_discards = 0
+		end
+
+		MP.GAME.antes_keyed[MP.GAME.ante_key] = true
+		MP.ACTIONS.set_ante(G.GAME.round_resets.ante + mod)
+		G.E_MANAGER:add_event(Event({
+			trigger = "immediate",
+			func = function()
+				G.GAME.round_resets.ante = G.GAME.round_resets.ante + mod
+				check_and_set_high_score("furthest_ante", G.GAME.round_resets.ante)
+				return true
+			end,
+		}))
 	end
+	return ease_ante_ref(mod)
+end
 
-	MP.GAME.antes_keyed[MP.GAME.ante_key] = true
-	MP.ACTIONS.set_ante(G.GAME.round_resets.ante + mod)
-	G.E_MANAGER:add_event(Event({
-		trigger = "immediate",
-		func = function()
-			G.GAME.round_resets.ante = G.GAME.round_resets.ante + mod
-			check_and_set_high_score("furthest_ante", G.GAME.round_resets.ante)
-			return true
-		end,
-	}))
+-- added event suppression for a lovely patch for ease_ante
+local add_event_ref = EventManager.add_event
+function EventManager:add_event(event, queue, front)
+	if MP.suppress_next_event then
+		MP.suppress_next_event = false
+		return
+	end
+	return add_event_ref(self, event, queue, front)
 end
 
 function ease_lives(mod)

@@ -18,7 +18,7 @@ SMODS.Joker({
 	loc_vars = function(self, info_queue, card)
 		local numerator, denominator =
 			SMODS.get_probability_vars(card, 1, card.ability.extra.odds, "j_mp_bloodstone_sandbox")
-		return { vars = { numerator, denominator } }
+		return { vars = { numerator, denominator, card.ability.extra.Xmult, colours = { G.C.SUITS["Hearts"] } } }
 	end,
 	calculate = function(self, card, context)
 		if
@@ -33,7 +33,7 @@ SMODS.Joker({
 		end
 	end,
 	mp_credits = { idea = { "LocalThunk" } },
-	in_pool = function(self)
-		return MP.LOBBY.config.ruleset == "ruleset_mp_sandbox" and MP.LOBBY.code
+	mp_include = function(self)
+		return MP.SANDBOX.is_joker_allowed(self.key)
 	end,
 })

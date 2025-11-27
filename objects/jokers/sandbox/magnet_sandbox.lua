@@ -101,7 +101,7 @@ SMODS.Joker({
 		art = { "Ganpan140" },
 		code = { "Virtualized" },
 	},
-	in_pool = function(self)
-		return MP.LOBBY.code and MP.LOBBY.config.multiplayer_jokers and MP.LOBBY.config.ruleset == "ruleset_mp_sandbox"
+	mp_include = function(self)
+		return MP.SANDBOX.is_joker_allowed(self.key) and MP.LOBBY.config.multiplayer_jokers
 	end,
 })
