@@ -738,6 +738,11 @@ return {
 				"you like it consider",
 			},
 			ml_lobby_info = { "Lobby", "Info" },
+			ml_mp_timersfx_opt = {
+				"On",
+				"Once per Ante",
+				"Off",
+			},
 			loc_ready = "Ready for PvP",
 			loc_selecting = "Selecting a Blind",
 			loc_shop = "Shopping",

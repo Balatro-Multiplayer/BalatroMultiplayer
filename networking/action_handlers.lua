@@ -704,21 +704,25 @@ local function action_receive_nemesis_deck(deck_str)
 end
 
 local function action_start_ante_timer(time)
-	for i = 1, 3 do
-		local wait_time = (0.15 * (i - 1))
-		G.E_MANAGER:add_event(Event({
-			blocking = false,
-			blockable = false,
-			trigger = "after",
-			delay = G.SETTINGS.GAMESPEED * wait_time,
-			func = function()
-				if not SMODS.Mods["Multiplayer"].config["disable_timer_sounds"] then
+	local option = SMODS.Mods["Multiplayer"].config.timersfx or 1
+	local timersfx = (option == 1) or (option == 2 and G.timer_ante ~= G.GAME.round_resets.ante)
+	G.timer_ante = G.GAME.round_resets.ante
+	
+	if timersfx then
+		for i = 1, 3 do
+			local wait_time = (0.15 * (i - 1))
+			G.E_MANAGER:add_event(Event({
+				blocking = false,
+				blockable = false,
+				trigger = "after",
+				delay = G.SETTINGS.GAMESPEED * wait_time,
+				func = function()
 					play_sound("timpani", 0.55 + 0.25 * i, 0.7)
 					play_sound("generic1", 0.75 + 0.25 * i, 0.7)
-				end
-				return true
-			end,
-		}))
+					return true
+				end,
+			}))
+		end
 	end
 	if type(time) == "string" then time = tonumber(time) end
 	MP.GAME.timer = time

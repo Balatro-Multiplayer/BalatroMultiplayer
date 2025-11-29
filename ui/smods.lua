@@ -112,20 +112,6 @@ SMODS.Mods.Multiplayer.credits_tab = function()
 end
 
 SMODS.Mods.Multiplayer.config_tab = function()
-	local blind_anim = AnimatedSprite(
-		0,
-		0,
-		1.4,
-		1.4,
-		G.ANIMATION_ATLAS["mp_player_blind_col"],
-		G.P_BLINDS[MP.UTILS.blind_col_numtokey(MP.LOBBY.blind_col)].pos
-	)
-	blind_anim:define_draw_steps({
-		{ shader = "dissolve", shadow_height = 0.05 },
-		{ shader = "dissolve" },
-	})
-	MP.PREVIEW.text = SMODS.Mods["Multiplayer"].config.preview.text or ""
-	MP.PREVIEW.button = SMODS.Mods["Multiplayer"].config.preview.button or ""
 	local ret = {
 		n = G.UIT.ROOT,
 		config = {
@@ -191,6 +177,79 @@ SMODS.Mods.Multiplayer.config_tab = function()
 					},
 				},
 			},
+			{
+				n = G.UIT.R,
+				config = {
+					padding = 0,
+					align = "cm",
+					on_demand_tooltip = {
+						text = {
+							"*Applies in singleplayer and vanilla rulesets",
+						},
+					},
+				},
+				nodes = {
+					create_toggle({
+						id = "singleplayer_hide_content_toggle",
+						label = "Hide Multiplayer content*",
+						ref_table = SMODS.Mods["Multiplayer"].config,
+						ref_value = "hide_mp_content",
+					}),
+				},
+			},
+			{
+				n = G.UIT.R,
+				config = {
+					padding = 0.1,
+					align = "cm",
+				},
+				nodes = {
+					{
+						n = G.UIT.C,
+						config = { align = "cm" },
+						nodes = {
+							create_option_cycle({
+								label = "Timer Sound Effects", -- localize
+								w = 4,
+								scale = 0.8,
+								options = localize("ml_mp_timersfx_opt"),
+								opt_callback = "mp_change_timersfx",
+								current_option = SMODS.Mods["Multiplayer"].config.timersfx or 1,
+							}),
+						},
+					},
+				},
+			},
+		},
+	}
+	return ret
+end
+
+local function customization_tab() -- local scope is weird but whatever
+	local blind_anim = AnimatedSprite(
+		0,
+		0,
+		1.4,
+		1.4,
+		G.ANIMATION_ATLAS["mp_player_blind_col"],
+		G.P_BLINDS[MP.UTILS.blind_col_numtokey(MP.LOBBY.blind_col)].pos
+	)
+	blind_anim:define_draw_steps({
+		{ shader = "dissolve", shadow_height = 0.05 },
+		{ shader = "dissolve" },
+	})
+	MP.PREVIEW.text = SMODS.Mods["Multiplayer"].config.preview.text or ""
+	MP.PREVIEW.button = SMODS.Mods["Multiplayer"].config.preview.button or ""
+	local ret = {
+		n = G.UIT.ROOT,
+		config = {
+			r = 0.1,
+			minw = 5,
+			align = "cm",
+			padding = 0.2,
+			colour = G.C.BLACK,
+		},
+		nodes = {
 			MP.INTEGRATIONS.Preview and {
 				n = G.UIT.R,
 				config = {
@@ -369,44 +428,18 @@ SMODS.Mods.Multiplayer.config_tab = function()
 					},
 				},
 			},
-			{
-				n = G.UIT.R,
-				config = {
-					padding = 0,
-					align = "cm",
-					on_demand_tooltip = {
-						text = {
-							"*Applies in singleplayer and vanilla rulesets",
-						},
-					},
-				},
-				nodes = {
-					create_toggle({
-						id = "singleplayer_hide_content_toggle",
-						label = "Hide Multiplayer content*",
-						ref_table = SMODS.Mods["Multiplayer"].config,
-						ref_value = "hide_mp_content",
-					}),
-				},
-			},
-			{
-				n = G.UIT.R,
-				config = {
-					padding = 0,
-					align = "cm",
-				},
-				nodes = {
-					create_toggle({
-						id = "disable_timer_sounds_toggle",
-						label = "Disable Timer Sound Effects",
-						ref_table = SMODS.Mods["Multiplayer"].config,
-						ref_value = "disable_timer_sounds",
-					}),
-				},
-			}
 		},
 	}
 	return ret
+end
+
+SMODS.Mods.Multiplayer.extra_tabs = function()
+	return {
+		{
+			label = "Customization", -- localize
+			tab_definition_function = customization_tab
+		},
+	}
 end
 
 function G.FUNCS.bmp_discord(e)
@@ -439,4 +472,9 @@ function G.FUNCS.change_blind_col(args) -- all we're doing is just saving + rede
 	option.children[1].children[1].config.text =
 		localize({ type = "name_text", key = MP.UTILS.blind_col_numtokey(MP.LOBBY.blind_col), set = "Blind" })
 	option.UIBox:recalculate()
+end
+
+function G.FUNCS.mp_change_timersfx(args)
+	SMODS.Mods["Multiplayer"].config.timersfx = args.to_key
+	SMODS.save_mod_config(SMODS.Mods["Multiplayer"]) -- probably unnecessary?
 end
