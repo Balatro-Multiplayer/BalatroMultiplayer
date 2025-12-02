@@ -182,7 +182,7 @@ return {
 			b_mp_oracle = {
 				name = "Wyroczniowa talia",
 				text = {
-					"Rozpoczynacz podejście z"
+					"Rozpoczynacz podejście z",
 					"kartą {C:spectral,T:c_medium}Medium",
 					"i {C:attention,T:v_clearance_sale}Wyprzedarz",
 					"Limit pieniędzy to {C:money}$50",             
