@@ -801,6 +801,7 @@ return {
 			c_mp_balancing_act = "Balancing Act",
 			c_mp_salvaged_sibyl = "Salvaged Sibyl",
 			c_mp_polymorph_spam = "Polymorph Spam",
+			c_mp_all_must_go = "All Must Go"
 		},
 	},
 }
