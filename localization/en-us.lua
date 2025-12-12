@@ -316,6 +316,14 @@ return {
 					"are {C:attention}retriggered{}",
 				},
 			},
+			j_mp_golden_ticket_sandbox = {
+				name = "Golden Ticket",
+				text = {
+					"{C:green}#2# in #3#{} chance for",
+					"{C:attention}Gold{} cards to earn",
+					"{C:money}$#1#{} when played",
+				},
+			},
 			j_mp_satellite_sandbox = {
 				name = "Satellite",
 				text = {
