@@ -16,7 +16,6 @@ MP.SANDBOX.joker_mappings = {
 	{ sandbox = "j_mp_golden_ticket_sandbox", vanilla = "j_ticket", active = true },
 	-- Idol variants (all map to same vanilla joker)
 	{ sandbox = "j_mp_idol_sandbox_bw", vanilla = "j_idol", active = true },
-	-- { sandbox = "j_mp_idol_sandbox_color", vanilla = "j_idol", active = true },
 	{ sandbox = "j_mp_idol_sandbox_fantom", vanilla = "j_idol", active = true },
 
 	-- Out of rotation
@@ -132,7 +131,6 @@ MP.Ruleset({
 local function select_random_idol()
 	local idol_keys = {
 		"j_mp_idol_sandbox_bw",
-		--	"j_mp_idol_sandbox_color",
 		"j_mp_idol_sandbox_fantom",
 	}
 	table.sort(idol_keys)
