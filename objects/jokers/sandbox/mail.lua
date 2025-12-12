@@ -15,7 +15,7 @@ SMODS.Joker({
 	rarity = 1,
 	cost = 4,
 	atlas = "mail_sandbox",
-	config = { extra = { dollars = 8, rank = nil, card_id = nil }, mp_sticker_balanced = true },
+	config = { extra = { dollars = 5, rank = nil, card_id = nil }, mp_sticker_balanced = true },
 	loc_vars = function(self, info_queue, card)
 		local rank = card.ability.extra.rank or (G.GAME.current_round.mail_card or {}).rank or "Ace"
 		return {
