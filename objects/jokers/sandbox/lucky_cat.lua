@@ -42,6 +42,7 @@ SMODS.Joker({
 			xmult = card.ability.extra.Xmult,
 		} end
 	end,
+	mp_credits = { code = { "steph" } },
 	mp_include = function(self)
 		return MP.SANDBOX.is_joker_allowed(self.key)
 	end,

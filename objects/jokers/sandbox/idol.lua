@@ -35,6 +35,7 @@ SMODS.Joker({
 			}
 		end
 	end,
+	mp_credits = { code = { "steph" } },
 	mp_include = function(self)
 		return MP.SANDBOX.is_joker_allowed(self.key)
 	end,
@@ -92,6 +93,7 @@ SMODS.Joker({
 		end
 		-- TODO if end of round juice up and increase xmult
 	end,
+	mp_credits = { code = { "steph" } },
 	mp_include = function(self)
 		return MP.SANDBOX.is_joker_allowed(self.key)
 	end,
@@ -187,6 +189,7 @@ SMODS.Joker({
 			}
 		end
 	end,
+	mp_credits = { code = { "steph" } },
 	mp_include = function(self)
 		return MP.SANDBOX.is_joker_allowed(self.key)
 	end,

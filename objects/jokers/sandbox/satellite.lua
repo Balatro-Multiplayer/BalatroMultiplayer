@@ -42,6 +42,7 @@ SMODS.Joker({
 	calc_dollar_bonus = function(self, card)
 		return card.ability.extra.dollars > 0 and card.ability.extra.dollars or nil
 	end,
+	mp_credits = { code = { "steph" } },
 	mp_include = function(self)
 		return MP.SANDBOX.is_joker_allowed(self.key)
 	end,

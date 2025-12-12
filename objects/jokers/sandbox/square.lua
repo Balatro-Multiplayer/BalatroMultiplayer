@@ -33,7 +33,7 @@ SMODS.Joker({
 			chips = card.ability.extra.chips,
 		} end
 	end,
-	mp_credits = { idea = { "Owen" } },
+	mp_credits = { idea = { "Owen" }, code = { "steph" } },
 	mp_include = function(self)
 		return MP.SANDBOX.is_joker_allowed(self.key)
 	end,
