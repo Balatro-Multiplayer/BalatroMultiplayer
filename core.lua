@@ -123,6 +123,7 @@ function MP.reset_lobby_config(persist_ruleset_and_gamemode)
 		forced_config = false,
 		preview_disabled = false,
 		legacy_smallworld = false,
+		extra_credit = false,
 	}
 end
 MP.reset_lobby_config()
@@ -237,6 +238,7 @@ MP.load_mp_dir("objects/blinds")
 MP.load_mp_dir("objects/decks")
 MP.load_mp_dir("objects/jokers")
 MP.load_mp_dir("objects/jokers/sandbox")
+MP.load_mp_dir("objects/jokers/sandbox/extra-credit")
 MP.load_mp_dir("objects/stakes")
 MP.load_mp_dir("objects/tags")
 MP.load_mp_dir("objects/consumables")
