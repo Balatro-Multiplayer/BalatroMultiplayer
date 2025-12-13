@@ -1,0 +1,115 @@
+-- Extra Credit Utilities Module
+-- Shared utility functions for Extra Credit jokers ported to Sandbox
+-- This file is prefixed with underscore to ensure it loads before the joker files
+
+MP.EC = MP.EC or {}
+
+-- Talisman Compatibility (same as ExtraCredit)
+to_big = to_big or function(x)
+	return x
+end
+to_number = to_number or function(x)
+	return x
+end
+
+--- Generic table contains check
+--- @param table_ table The table to search
+--- @param value any The value to find
+--- @return boolean true if value found in table
+function MP.EC.contains(table_, value)
+	for _, v in pairs(table_) do
+		if v == value then
+			return true
+		end
+	end
+	return false
+end
+
+--- Calculate total hand levels for Eclipse joker
+--- @return number total_levels Sum of all hand levels
+--- @return number total_hands Count of hands with level >= 1
+function MP.EC.eclipse_sum_levels()
+	local total_hands = to_big(0)
+	local total_levels = to_big(0)
+
+	for hand, data in pairs(G.GAME.hands) do
+		-- Ignore hands which level is 0 or less for description consistency
+		if data.level >= to_big(1) then
+			total_hands = total_hands + to_big(1)
+			total_levels = total_levels + data.level
+		end
+	end
+	return total_levels, total_hands
+end
+
+--- Resets Tuxedo joker's selected suit for the round
+--- Randomly selects a suit different from the current one
+local function reset_tuxedo_card()
+	local tuxedo_suits = {}
+	G.GAME.current_round.tuxedo_card = G.GAME.current_round.tuxedo_card or {}
+	for k, suit in pairs(SMODS.Suits) do
+		if k ~= G.GAME.current_round.tuxedo_card.suit and (type(suit.in_pool) ~= "function" or suit:in_pool({ rank = "" })) then
+			tuxedo_suits[#tuxedo_suits + 1] = k
+		end
+	end
+	local tuxedo_card = pseudorandom_element(tuxedo_suits, pseudoseed("tux" .. G.GAME.round_resets.ante))
+	G.GAME.current_round.tuxedo_card.suit = tuxedo_card
+end
+
+--- Resets Farmer joker's selected suit for the round
+--- Randomly selects a suit different from the current one
+local function reset_farmer_card()
+	local farmer_suits = {}
+	G.GAME.current_round.farmer_card = G.GAME.current_round.farmer_card or {}
+	for k, suit in pairs(SMODS.Suits) do
+		if k ~= G.GAME.current_round.farmer_card.suit and (type(suit.in_pool) ~= "function" or suit:in_pool({ rank = "" })) then
+			farmer_suits[#farmer_suits + 1] = k
+		end
+	end
+	local farmer_card = pseudorandom_element(farmer_suits, pseudoseed("farm" .. G.GAME.round_resets.ante))
+	G.GAME.current_round.farmer_card.suit = farmer_card
+end
+
+--- Resets Go Fish joker's selected rank for the round
+--- Randomly selects a rank different from the current one
+local function reset_fish_rank()
+	local valid_fish_ranks = {}
+	G.GAME.current_round.fish_rank = G.GAME.current_round.fish_rank or {}
+	for k, rank in pairs(SMODS.Ranks) do
+		if k ~= G.GAME.current_round.fish_rank.rank and (type(rank.in_pool) ~= "function" or rank:in_pool({ suit = "" })) then
+			valid_fish_ranks[#valid_fish_ranks + 1] = k
+		end
+	end
+	local fish_pick = pseudorandom_element(valid_fish_ranks, pseudoseed("fish" .. G.GAME.round_resets.ante))
+	G.GAME.current_round.fish_rank.rank = fish_pick
+end
+
+--- Hook into game globals reset to initialize EC round state
+--- Called at start of each round
+local original_reset_game_globals = MP.reset_game_globals
+MP.reset_game_globals = function(run_start)
+	if original_reset_game_globals then
+		original_reset_game_globals(run_start)
+	end
+
+	-- Only initialize EC state when extra_credit is enabled
+	if MP.LOBBY.config and MP.LOBBY.config.extra_credit then
+		reset_tuxedo_card()
+		reset_farmer_card()
+		reset_fish_rank()
+	end
+end
+
+-- EC_ease_dollars context hook for Hoarder joker
+-- Wraps ease_dollars to trigger joker evaluation with EC_ease_dollars context
+local original_ease_dollars = ease_dollars
+function ease_dollars(mod, x)
+	original_ease_dollars(mod, x)
+
+	-- Only trigger EC context when extra_credit is enabled and jokers exist
+	if MP.LOBBY.config and MP.LOBBY.config.extra_credit and G.jokers and G.jokers.cards then
+		for i = 1, #G.jokers.cards do
+			eval_card(G.jokers.cards[i], { EC_ease_dollars = to_big(mod) })
+		end
+	end
+end
