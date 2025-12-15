@@ -342,17 +342,8 @@ return {
 					"{s:0.8}Card changes every round",
 				},
 			},
-			j_mp_idol_sandbox_color = {
-				name = "Tantrum Idol",
-				text = {
-					"DEVOTIONAL PRESSURE COOKER",
-					"building STEAM for {C:attention}#1#{} of {V:1}#3#{}",
-					"until EXPLOSIVE RELEASE!!!!",
-					"{C:inactive}(Currently {X:mult,C:white} X#2# {C:inactive} Mult)",
-				},
-			},
 			j_mp_idol_sandbox_fantom = {
-				name = "Meta Idol",
+				name = "Collector's Idol",
 				text = {
 					"Most common card gives",
 					"{X:mult,C:white}X#3#{} Mult when scored",
@@ -363,11 +354,7 @@ return {
 			j_mp_error_sandbox = {
 				name = "????",
 				text = {
-					-- "PREVIEW DISABLED",
 					"{X:purple,C:white,s:0.85}something's{} {X:purple,C:white,s:0.85}wrong",
-					-- "PREVIEW DISABLED",
-					-- "PREVIEW DISABLED",
-					-- "{C:inactive}(CURRENTLY {C:money}$7{C:inactive})",
 				},
 			},
 		},
@@ -809,7 +796,7 @@ return {
 			c_mp_balancing_act = "Balancing Act",
 			c_mp_salvaged_sibyl = "Salvaged Sibyl",
 			c_mp_polymorph_spam = "Polymorph Spam",
-			c_mp_all_must_go = "All Must Go"
+			c_mp_all_must_go = "All Must Go",
 		},
 	},
 }

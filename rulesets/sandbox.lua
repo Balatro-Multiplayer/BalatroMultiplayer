@@ -5,9 +5,7 @@ MP.SANDBOX = {}
 --- @param enabled boolean Whether to enable (true) or disable (false) the group
 function MP.SANDBOX.set_group_active(group_name, enabled)
 	for _, mapping in ipairs(MP.SANDBOX.joker_mappings) do
-		if mapping.group == group_name then
-			mapping.active = enabled
-		end
+		if mapping.group == group_name then mapping.active = enabled end
 	end
 end
 
@@ -45,7 +43,6 @@ MP.SANDBOX.joker_mappings = {
 	{ sandbox = "j_mp_satellite_sandbox", vanilla = "j_satellite", active = false },
 
 	-- Extra Credit jokers (group = "extra_credit", vanilla = nil since these are mod jokers)
-	-- Wave 1
 	{ sandbox = "j_mp_forklift_sandbox", vanilla = nil, active = false, group = "extra_credit" },
 	{ sandbox = "j_mp_doublerainbow_sandbox", vanilla = nil, active = false, group = "extra_credit" },
 	{ sandbox = "j_mp_starfruit_sandbox", vanilla = nil, active = false, group = "extra_credit" },
@@ -61,7 +58,6 @@ MP.SANDBOX.joker_mappings = {
 	{ sandbox = "j_mp_clowncollege_sandbox", vanilla = nil, active = false, group = "extra_credit" },
 	{ sandbox = "j_mp_handbook_sandbox", vanilla = nil, active = false, group = "extra_credit" },
 	{ sandbox = "j_mp_tengallon_sandbox", vanilla = nil, active = false, group = "extra_credit" },
-	-- Wave 2
 	{ sandbox = "j_mp_montehaul_sandbox", vanilla = nil, active = false, group = "extra_credit" },
 	{ sandbox = "j_mp_espresso_sandbox", vanilla = nil, active = false, group = "extra_credit" },
 	{ sandbox = "j_mp_trafficlight_sandbox", vanilla = nil, active = false, group = "extra_credit" },
@@ -77,7 +73,6 @@ MP.SANDBOX.joker_mappings = {
 	{ sandbox = "j_mp_shipoftheseus_sandbox", vanilla = nil, active = false, group = "extra_credit" },
 	{ sandbox = "j_mp_accretiondisk_sandbox", vanilla = nil, active = false, group = "extra_credit" },
 	{ sandbox = "j_mp_gofish_sandbox", vanilla = nil, active = false, group = "extra_credit" },
-	-- Wave 3
 	{ sandbox = "j_mp_plushie_sandbox", vanilla = nil, active = false, group = "extra_credit" },
 	{ sandbox = "j_mp_pyromancer_sandbox", vanilla = nil, active = false, group = "extra_credit" },
 	{ sandbox = "j_mp_bobby_sandbox", vanilla = nil, active = false, group = "extra_credit" },
@@ -181,6 +176,7 @@ MP.Ruleset({
 		MP.LOBBY.config.preview_disabled = true
 		MP.LOBBY.config.the_order = true
 		MP.LOBBY.config.starting_lives = 4
+		MP.LOBBY.config.extra_credit = true
 		return true
 	end,
 }):inject()
@@ -207,11 +203,6 @@ end
 
 local apply_bans_ref = MP.ApplyBans
 function MP.ApplyBans()
-	-- Enable/disable Extra Credit jokers based on config
-	if MP.LOBBY.code and MP.LOBBY.config.ruleset == "ruleset_mp_sandbox" then
-		MP.SANDBOX.set_group_active("extra_credit", MP.LOBBY.config.extra_credit or false)
-	end
-
 	local ret = apply_bans_ref()
 
 	-- Apply sandbox-specific idol selection when in sandbox ruleset
@@ -221,4 +212,4 @@ function MP.ApplyBans()
 end
 
 -- debugging hotswitch
-MP.sandbox_no_collection = true
+MP.sandbox_no_collection = false
