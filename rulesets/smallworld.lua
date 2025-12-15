@@ -72,6 +72,12 @@ function MP.ApplyBans()
 		for i, v in ipairs(requires) do
 			if G.GAME.banned_keys[G.P_CENTERS[v].requires[1]] then G.GAME.banned_keys[v] = true end
 		end
+
+		if G.GAME.banned_keys['j_gros_michel'] then
+			G.GAME.banned_keys['j_cavendish'] = true
+		else
+			G.GAME.banned_keys['j_cavendish'] = nil
+		end
 	end
 	return ret
 end
