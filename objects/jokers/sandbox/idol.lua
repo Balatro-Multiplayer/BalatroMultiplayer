@@ -48,15 +48,14 @@ SMODS.Atlas({
 	py = 95,
 })
 
--- Fantom's idol
+-- Collector's idol
 -- Gives 1x + (0.05x * card count) mult per card if you play
 -- specifically your most common rank+suit
--- TODO test implementation
 local function get_most_common_card()
 	local count_map = {}
 	local valid_idol_cards = {}
 
-	if G.playing_cards == nil then return { id = 14, rank = "Ace", suit = "Spades", count = 4 } end
+	if G.playing_cards == nil then return { id = 14, rank = "Ace", suit = "Spades", count = 1 } end
 
 	for _, v in ipairs(G.playing_cards) do
 		if v.ability.effect ~= "Stone Card" then
