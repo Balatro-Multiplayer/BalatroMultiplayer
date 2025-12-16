@@ -4,7 +4,7 @@
 
 MP.EC = MP.EC or {}
 
--- Talisman Compatibility (same as ExtraCredit)
+-- Talisman Compatibility wrapper
 to_big = to_big or function(x)
 	return x
 end
@@ -18,9 +18,7 @@ end
 --- @return boolean true if value found in table
 function MP.EC.contains(table_, value)
 	for _, v in pairs(table_) do
-		if v == value then
-			return true
-		end
+		if v == value then return true end
 	end
 	return false
 end
@@ -48,7 +46,10 @@ local function reset_tuxedo_card()
 	local tuxedo_suits = {}
 	G.GAME.current_round.tuxedo_card = G.GAME.current_round.tuxedo_card or {}
 	for k, suit in pairs(SMODS.Suits) do
-		if k ~= G.GAME.current_round.tuxedo_card.suit and (type(suit.in_pool) ~= "function" or suit:in_pool({ rank = "" })) then
+		if
+			k ~= G.GAME.current_round.tuxedo_card.suit
+			and (type(suit.in_pool) ~= "function" or suit:in_pool({ rank = "" }))
+		then
 			tuxedo_suits[#tuxedo_suits + 1] = k
 		end
 	end
@@ -62,7 +63,10 @@ local function reset_farmer_card()
 	local farmer_suits = {}
 	G.GAME.current_round.farmer_card = G.GAME.current_round.farmer_card or {}
 	for k, suit in pairs(SMODS.Suits) do
-		if k ~= G.GAME.current_round.farmer_card.suit and (type(suit.in_pool) ~= "function" or suit:in_pool({ rank = "" })) then
+		if
+			k ~= G.GAME.current_round.farmer_card.suit
+			and (type(suit.in_pool) ~= "function" or suit:in_pool({ rank = "" }))
+		then
 			farmer_suits[#farmer_suits + 1] = k
 		end
 	end
@@ -76,7 +80,10 @@ local function reset_fish_rank()
 	local valid_fish_ranks = {}
 	G.GAME.current_round.fish_rank = G.GAME.current_round.fish_rank or {}
 	for k, rank in pairs(SMODS.Ranks) do
-		if k ~= G.GAME.current_round.fish_rank.rank and (type(rank.in_pool) ~= "function" or rank:in_pool({ suit = "" })) then
+		if
+			k ~= G.GAME.current_round.fish_rank.rank
+			and (type(rank.in_pool) ~= "function" or rank:in_pool({ suit = "" }))
+		then
 			valid_fish_ranks[#valid_fish_ranks + 1] = k
 		end
 	end
@@ -88,9 +95,7 @@ end
 --- Called at start of each round
 local original_reset_game_globals = MP.reset_game_globals
 MP.reset_game_globals = function(run_start)
-	if original_reset_game_globals then
-		original_reset_game_globals(run_start)
-	end
+	if original_reset_game_globals then original_reset_game_globals(run_start) end
 
 	-- Only initialize EC state when extra_credit is enabled
 	if MP.LOBBY.config and MP.LOBBY.config.extra_credit then
