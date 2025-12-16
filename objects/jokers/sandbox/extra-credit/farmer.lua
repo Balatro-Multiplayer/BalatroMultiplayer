@@ -47,7 +47,7 @@ SMODS.Joker({
 	end,
 
 	mp_credits = {
-		code = { "extracredit" },
+		code = { "CampfireCollective" },
 		art = { "HonuKane" },
 	},
 	mp_include = function(self)

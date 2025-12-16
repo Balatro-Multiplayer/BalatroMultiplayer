@@ -39,22 +39,15 @@ SMODS.Joker({
 			-- todo port to proper smods style
 			mult = mod_mult(mult + card.ability.extra.mult)
 			update_hand_text({ delay = 0 }, { mult = mult })
-			card_eval_status_text(
-				card,
-				"jokers",
-				nil,
-				percent,
-				nil,
-				{
-					message = localize({ type = "variable", key = "a_mult", vars = { card.ability.extra.mult } }),
-					mult_mod = card.ability.extra.mult,
-				}
-			)
+			card_eval_status_text(card, "jokers", nil, percent, nil, {
+				message = localize({ type = "variable", key = "a_mult", vars = { card.ability.extra.mult } }),
+				mult_mod = card.ability.extra.mult,
+			})
 		end
 	end,
 
 	mp_credits = {
-		code = { "extracredit" },
+		code = { "CampfireCollective" },
 		art = { "R3venantR3mnant" },
 	},
 	mp_include = function(self)
