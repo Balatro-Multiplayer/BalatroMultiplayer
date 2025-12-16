@@ -52,7 +52,7 @@ SMODS.Joker({
 	end,
 
 	mp_credits = {
-		code = { "extracredit" },
+		code = { "CampfireCollective" },
 		art = { "bishopcorrigan", "splatter_proto" },
 	},
 	mp_include = function(self)

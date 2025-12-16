@@ -31,15 +31,12 @@ SMODS.Joker({
 					nil,
 					{ message = localize("k_level_up_ex") }
 				)
-				update_hand_text(
-					{ sound = "button", volume = 0.7, pitch = 0.8, delay = 0.3 },
-					{
-						handname = localize(text, "poker_hands"),
-						chips = G.GAME.hands[text].chips,
-						mult = G.GAME.hands[text].mult,
-						level = G.GAME.hands[text].level,
-					}
-				)
+				update_hand_text({ sound = "button", volume = 0.7, pitch = 0.8, delay = 0.3 }, {
+					handname = localize(text, "poker_hands"),
+					chips = G.GAME.hands[text].chips,
+					mult = G.GAME.hands[text].mult,
+					level = G.GAME.hands[text].level,
+				})
 				level_up_hand(context.blueprint_card or card, text, nil, 1)
 			end
 
@@ -76,7 +73,7 @@ SMODS.Joker({
 		end
 	end,
 
-	mp_credits = { code = { "extracredit" }, art = { "dottykitty" } },
+	mp_credits = { code = { "CampfireCollective" }, art = { "dottykitty" } },
 	mp_include = function(self)
 		return MP.SANDBOX.is_joker_allowed(self.key)
 	end,

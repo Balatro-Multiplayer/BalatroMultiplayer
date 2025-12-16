@@ -32,35 +32,19 @@ SMODS.Joker({
 					elseif G.GAME.current_round.hands_left == 2 then
 						ease_hands_played(-(card.ability.extra.hands / 2), true)
 						ease_discard((card.ability.extra.discards / 2), true, true)
-						card_eval_status_text(
-							context.blueprint_card or card,
-							"extra",
-							nil,
-							nil,
-							nil,
-							{
-								message = "+" .. tostring(card.ability.extra.discards / 2) .. " " .. localize(
-									"k_hud_discards"
-								),
-								colour = G.C.RED,
-							}
-						)
+						card_eval_status_text(context.blueprint_card or card, "extra", nil, nil, nil, {
+							message = "+" .. tostring(card.ability.extra.discards / 2) .. " " .. localize(
+								"k_hud_discards"
+							),
+							colour = G.C.RED,
+						})
 					elseif G.GAME.current_round.hands_left > 2 then
 						ease_hands_played(-card.ability.extra.hands, true)
 						ease_discard(card.ability.extra.discards, true, true)
-						card_eval_status_text(
-							context.blueprint_card or card,
-							"extra",
-							nil,
-							nil,
-							nil,
-							{
-								message = "+" .. tostring(card.ability.extra.discards) .. " " .. localize(
-									"k_hud_discards"
-								),
-								colour = G.C.RED,
-							}
-						)
+						card_eval_status_text(context.blueprint_card or card, "extra", nil, nil, nil, {
+							message = "+" .. tostring(card.ability.extra.discards) .. " " .. localize("k_hud_discards"),
+							colour = G.C.RED,
+						})
 					end
 					return true
 				end,
@@ -69,7 +53,7 @@ SMODS.Joker({
 	end,
 
 	mp_credits = {
-		code = { "extracredit" },
+		code = { "CampfireCollective" },
 		art = { "R3venantR3mnant" },
 	},
 	mp_include = function(self)

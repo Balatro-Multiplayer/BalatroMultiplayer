@@ -85,7 +85,7 @@ SMODS.Joker({
 		end
 	end,
 
-	mp_credits = { code = { "extracredit" }, art = { "dottykitty" } },
+	mp_credits = { code = { "CampfireCollective" }, art = { "dottykitty" } },
 	mp_include = function(self)
 		return MP.SANDBOX.is_joker_allowed(self.key)
 	end,
