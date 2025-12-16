@@ -16,7 +16,7 @@ SMODS.Joker({
 			lucky = false,
 			checked = false,
 		},
-		mp_sticker_balanced = true,
+
 		mp_sticker_extra_credit = true,
 	},
 

@@ -16,7 +16,7 @@ SMODS.Joker({
 			hands = 2,
 			discards = 4,
 		},
-		mp_sticker_balanced = true,
+
 		mp_sticker_extra_credit = true,
 	},
 

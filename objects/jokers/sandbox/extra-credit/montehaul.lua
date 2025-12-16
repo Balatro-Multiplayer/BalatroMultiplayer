@@ -17,7 +17,7 @@ SMODS.Joker({
 			monty_rounds = 0,
 			flavours = { "tag_foil", "tag_holo", "tag_polychrome", "tag_negative", "tag_uncommon", "tag_rare" },
 		},
-		mp_sticker_balanced = true,
+
 		mp_sticker_extra_credit = true,
 	},
 

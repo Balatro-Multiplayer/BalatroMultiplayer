@@ -18,7 +18,7 @@ SMODS.Joker({
 			Xmult_mod = 0.4,
 			tick = false,
 		},
-		mp_sticker_balanced = true,
+
 		mp_sticker_extra_credit = true,
 	},
 
@@ -61,17 +61,10 @@ SMODS.Joker({
 
 			if not context.blueprint and card.ability.extra.tick then
 				delay(0.3)
-				card_eval_status_text(
-					card,
-					"extra",
-					nil,
-					nil,
-					nil,
-					{
-						message = localize({ type = "variable", key = "a_xmult", vars = { card.ability.extra.Xmult } }),
-						colour = G.C.FILTER,
-					}
-				)
+				card_eval_status_text(card, "extra", nil, nil, nil, {
+					message = localize({ type = "variable", key = "a_xmult", vars = { card.ability.extra.Xmult } }),
+					colour = G.C.FILTER,
+				})
 			end
 		elseif context.remove_playing_cards then
 			card.ability.extra.tick = false
@@ -107,17 +100,10 @@ SMODS.Joker({
 
 			if not context.blueprint and card.ability.extra.tick then
 				delay(0.3)
-				card_eval_status_text(
-					card,
-					"extra",
-					nil,
-					nil,
-					nil,
-					{
-						message = localize({ type = "variable", key = "a_xmult", vars = { card.ability.extra.Xmult } }),
-						colour = G.C.FILTER,
-					}
-				)
+				card_eval_status_text(card, "extra", nil, nil, nil, {
+					message = localize({ type = "variable", key = "a_xmult", vars = { card.ability.extra.Xmult } }),
+					colour = G.C.FILTER,
+				})
 			end
 		elseif context.cardarea == G.jokers and context.joker_main and card.ability.extra.Xmult > 1 then
 			return {
