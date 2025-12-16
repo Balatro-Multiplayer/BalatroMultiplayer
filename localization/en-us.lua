@@ -475,6 +475,12 @@ return {
 			},
 		},
 		Other = {
+			mp_sticker_extra_credit = {
+				name = "Extra Credit",
+				text = {
+					"test123",
+				},
+			},
 			current_nemesis = {
 				name = "Nemesis",
 				text = {
@@ -550,6 +556,7 @@ return {
 	misc = {
 		labels = {
 			mp_phantom = "Phantom",
+			mp_sticker_extra_credit = "Extra Credit",
 		},
 		challenge_names = {
 			c_mp_standard = "Standard",

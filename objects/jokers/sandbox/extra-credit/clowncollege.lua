@@ -12,7 +12,7 @@ SMODS.Joker({
 	cost = 7,
 	atlas = "ec_jokers_sandbox",
 	pos = { x = 4, y = 1 },
-	config = { extra = {}, mp_sticker_balanced = true },
+	config = { extra = {}, mp_sticker_balanced = true, mp_sticker_extra_credit = true },
 
 	loc_vars = function(self, info_queue, card)
 		info_queue[#info_queue + 1] = { key = "c_fool", set = "Tarot" }
