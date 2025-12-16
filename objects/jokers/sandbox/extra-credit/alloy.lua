@@ -12,7 +12,7 @@ SMODS.Joker({
 	pos = { x = 4, y = 4 },
 
 	config = {
-		mp_sticker_balanced = true,
+
 		mp_sticker_extra_credit = true,
 	},
 

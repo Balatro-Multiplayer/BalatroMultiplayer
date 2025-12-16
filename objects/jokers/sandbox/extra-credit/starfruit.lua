@@ -12,7 +12,7 @@ SMODS.Joker({
 	cost = 6,
 	atlas = "ec_jokers_sandbox",
 	pos = { x = 2, y = 0 },
-	config = { extra = { uses = 5, odds = 2 }, mp_sticker_balanced = true, mp_sticker_extra_credit = true },
+	config = { extra = { uses = 5, odds = 2 }, mp_sticker_extra_credit = true },
 
 	loc_vars = function(self, info_queue, card)
 		local num, denom = SMODS.get_probability_vars(card, 1, card.ability.extra.odds, "j_mp_starfruit_sandbox")

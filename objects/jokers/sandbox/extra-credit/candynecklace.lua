@@ -17,7 +17,7 @@ SMODS.Joker({
 			candies = 5,
 			flavours = { "tag_buffoon", "tag_charm", "tag_meteor", "tag_standard", "tag_ethereal" },
 		},
-		mp_sticker_balanced = true,
+
 		mp_sticker_extra_credit = true,
 	},
 

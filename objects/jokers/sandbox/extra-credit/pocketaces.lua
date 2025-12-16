@@ -13,7 +13,7 @@ SMODS.Joker({
 	cost = 7,
 	atlas = "ec_jokers_sandbox",
 	pos = { x = 5, y = 0 },
-	config = { extra = { money = 0, m_gain = 2 }, mp_sticker_balanced = true, mp_sticker_extra_credit = true },
+	config = { extra = { money = 0, m_gain = 2 }, mp_sticker_extra_credit = true },
 
 	loc_vars = function(self, info_queue, card)
 		return { vars = { card.ability.extra.money, card.ability.extra.m_gain } }

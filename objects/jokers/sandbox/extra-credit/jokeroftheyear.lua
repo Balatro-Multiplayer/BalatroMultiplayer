@@ -15,7 +15,7 @@ SMODS.Joker({
 		extra = {
 			reps = 1,
 		},
-		mp_sticker_balanced = true,
+
 		mp_sticker_extra_credit = true,
 	},
 
