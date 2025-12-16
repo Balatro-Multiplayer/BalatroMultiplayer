@@ -8,3 +8,10 @@ SMODS.Atlas({
 	px = 71,
 	py = 95,
 })
+
+SMODS.Atlas({
+	key = "ec_other_sandbox",
+	path = "ec_other_sandbox.png",
+	px = 71,
+	py = 95,
+})
