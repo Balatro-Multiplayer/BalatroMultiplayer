@@ -1,14 +1,5 @@
 MP.SANDBOX = {}
 
---- Enables or disables all jokers in a specific group
---- @param group_name string The group name to toggle (e.g., "extra_credit")
---- @param enabled boolean Whether to enable (true) or disable (false) the group
-function MP.SANDBOX.set_group_active(group_name, enabled)
-	for _, mapping in ipairs(MP.SANDBOX.joker_mappings) do
-		if mapping.group == group_name then mapping.active = enabled end
-	end
-end
-
 -- Centralized joker mappings: defines sandbox variants, their vanilla counterparts, and rotation status
 MP.SANDBOX.joker_mappings = {
 	-- Active jokers in rotation
@@ -22,7 +13,7 @@ MP.SANDBOX.joker_mappings = {
 	{ sandbox = "j_mp_steel_joker_sandbox", vanilla = "j_steel_joker", active = true },
 	{ sandbox = "j_mp_baseball_sandbox", vanilla = "j_baseball", active = true },
 	{ sandbox = "j_mp_hit_the_road_sandbox", vanilla = "j_hit_the_road", active = true },
-	{ sandbox = "j_mp_golden_ticket_sandbox", vanilla = "j_ticket", active = true },
+	-- { sandbox = "j_mp_golden_ticket_sandbox", vanilla = "j_ticket", active = true },
 	-- Idol variants (all map to same vanilla joker)
 	{ sandbox = "j_mp_idol_sandbox_bw", vanilla = "j_idol", active = true },
 	{ sandbox = "j_mp_idol_sandbox_fantom", vanilla = "j_idol", active = true },
@@ -43,51 +34,33 @@ MP.SANDBOX.joker_mappings = {
 	{ sandbox = "j_mp_satellite_sandbox", vanilla = "j_satellite", active = false },
 
 	-- Extra Credit jokers (group = "extra_credit", vanilla = nil since these are mod jokers)
-	{ sandbox = "j_mp_forklift_sandbox", vanilla = nil, active = false, group = "extra_credit" },
-	{ sandbox = "j_mp_doublerainbow_sandbox", vanilla = nil, active = false, group = "extra_credit" },
-	{ sandbox = "j_mp_starfruit_sandbox", vanilla = nil, active = false, group = "extra_credit" },
-	{ sandbox = "j_mp_eclipse_sandbox", vanilla = nil, active = false, group = "extra_credit" },
-	{ sandbox = "j_mp_rubberducky_sandbox", vanilla = nil, active = false, group = "extra_credit" },
-	{ sandbox = "j_mp_pocketaces_sandbox", vanilla = nil, active = false, group = "extra_credit" },
-	{ sandbox = "j_mp_warlock_sandbox", vanilla = nil, active = false, group = "extra_credit" },
-	{ sandbox = "j_mp_purplejoker_sandbox", vanilla = nil, active = false, group = "extra_credit" },
-	{ sandbox = "j_mp_compost_sandbox", vanilla = nil, active = false, group = "extra_credit" },
-	{ sandbox = "j_mp_candynecklace_sandbox", vanilla = nil, active = false, group = "extra_credit" },
-	{ sandbox = "j_mp_yellowcard_sandbox", vanilla = nil, active = false, group = "extra_credit" },
-	{ sandbox = "j_mp_turtle_sandbox", vanilla = nil, active = false, group = "extra_credit" },
-	{ sandbox = "j_mp_clowncollege_sandbox", vanilla = nil, active = false, group = "extra_credit" },
-	{ sandbox = "j_mp_handbook_sandbox", vanilla = nil, active = false, group = "extra_credit" },
-	{ sandbox = "j_mp_tengallon_sandbox", vanilla = nil, active = false, group = "extra_credit" },
-	{ sandbox = "j_mp_montehaul_sandbox", vanilla = nil, active = false, group = "extra_credit" },
-	{ sandbox = "j_mp_espresso_sandbox", vanilla = nil, active = false, group = "extra_credit" },
-	{ sandbox = "j_mp_trafficlight_sandbox", vanilla = nil, active = false, group = "extra_credit" },
-	{ sandbox = "j_mp_holdyourbreath_sandbox", vanilla = nil, active = false, group = "extra_credit" },
-	{ sandbox = "j_mp_corgi_sandbox", vanilla = nil, active = false, group = "extra_credit" },
-	{ sandbox = "j_mp_werewolf_sandbox", vanilla = nil, active = false, group = "extra_credit" },
-	{ sandbox = "j_mp_permanentmarker_sandbox", vanilla = nil, active = false, group = "extra_credit" },
-	{ sandbox = "j_mp_pridefuljoker_sandbox", vanilla = nil, active = false, group = "extra_credit" },
-	{ sandbox = "j_mp_tuxedo_sandbox", vanilla = nil, active = false, group = "extra_credit" },
-	{ sandbox = "j_mp_farmer_sandbox", vanilla = nil, active = false, group = "extra_credit" },
-	{ sandbox = "j_mp_ambrosia_sandbox", vanilla = nil, active = false, group = "extra_credit" },
-	{ sandbox = "j_mp_clowncar_sandbox", vanilla = nil, active = false, group = "extra_credit" },
-	{ sandbox = "j_mp_shipoftheseus_sandbox", vanilla = nil, active = false, group = "extra_credit" },
-	{ sandbox = "j_mp_accretiondisk_sandbox", vanilla = nil, active = false, group = "extra_credit" },
-	{ sandbox = "j_mp_gofish_sandbox", vanilla = nil, active = false, group = "extra_credit" },
-	{ sandbox = "j_mp_plushie_sandbox", vanilla = nil, active = false, group = "extra_credit" },
-	{ sandbox = "j_mp_pyromancer_sandbox", vanilla = nil, active = false, group = "extra_credit" },
-	{ sandbox = "j_mp_bobby_sandbox", vanilla = nil, active = false, group = "extra_credit" },
-	{ sandbox = "j_mp_yinyang_sandbox", vanilla = nil, active = false, group = "extra_credit" },
-	{ sandbox = "j_mp_blackjack_sandbox", vanilla = nil, active = false, group = "extra_credit" },
-	{ sandbox = "j_mp_joty_sandbox", vanilla = nil, active = false, group = "extra_credit" },
-	{ sandbox = "j_mp_averagealice_sandbox", vanilla = nil, active = false, group = "extra_credit" },
-	{ sandbox = "j_mp_couponsheet_sandbox", vanilla = nil, active = false, group = "extra_credit" },
-	{ sandbox = "j_mp_hoarder_sandbox", vanilla = nil, active = false, group = "extra_credit" },
-	{ sandbox = "j_mp_chainlightning_sandbox", vanilla = nil, active = false, group = "extra_credit" },
-	{ sandbox = "j_mp_jokalisa_sandbox", vanilla = nil, active = false, group = "extra_credit" },
-	{ sandbox = "j_mp_badapple_sandbox", vanilla = nil, active = false, group = "extra_credit" },
-	{ sandbox = "j_mp_passport_sandbox", vanilla = nil, active = false, group = "extra_credit" },
-	{ sandbox = "j_mp_lucky7_sandbox", vanilla = nil, active = false, group = "extra_credit" },
-	{ sandbox = "j_mp_alloy_sandbox", vanilla = nil, active = false, group = "extra_credit" },
+	-- Master list of 26 jokers, all active
+	{ sandbox = "j_mp_alloy_sandbox", vanilla = nil, active = true, group = "extra_credit" },
+	{ sandbox = "j_mp_ambrosia_sandbox", vanilla = nil, active = true, group = "extra_credit" },
+	{ sandbox = "j_mp_bobby_sandbox", vanilla = nil, active = true, group = "extra_credit" },
+	{ sandbox = "j_mp_candynecklace_sandbox", vanilla = nil, active = true, group = "extra_credit" },
+	{ sandbox = "j_mp_chainlightning_sandbox", vanilla = nil, active = true, group = "extra_credit" },
+	{ sandbox = "j_mp_clowncar_sandbox", vanilla = nil, active = true, group = "extra_credit" },
+	{ sandbox = "j_mp_clowncollege_sandbox", vanilla = nil, active = true, group = "extra_credit" },
+	{ sandbox = "j_mp_couponsheet_sandbox", vanilla = nil, active = true, group = "extra_credit" },
+	{ sandbox = "j_mp_doublerainbow_sandbox", vanilla = nil, active = true, group = "extra_credit" },
+	{ sandbox = "j_mp_espresso_sandbox", vanilla = nil, active = true, group = "extra_credit" },
+	{ sandbox = "j_mp_farmer_sandbox", vanilla = nil, active = true, group = "extra_credit" },
+	{ sandbox = "j_mp_forklift_sandbox", vanilla = nil, active = true, group = "extra_credit" },
+	{ sandbox = "j_mp_gofish_sandbox", vanilla = nil, active = true, group = "extra_credit" },
+	{ sandbox = "j_mp_hoarder_sandbox", vanilla = nil, active = true, group = "extra_credit" },
+	{ sandbox = "j_mp_jokalisa_sandbox", vanilla = nil, active = true, group = "extra_credit" },
+	{ sandbox = "j_mp_jokeroftheyear_sandbox", vanilla = nil, active = true, group = "extra_credit" },
+	{ sandbox = "j_mp_lucky7_sandbox", vanilla = nil, active = true, group = "extra_credit" },
+	{ sandbox = "j_mp_montehaul_sandbox", vanilla = nil, active = true, group = "extra_credit" },
+	{ sandbox = "j_mp_pocketaces_sandbox", vanilla = nil, active = true, group = "extra_credit" },
+	{ sandbox = "j_mp_pyromancer_sandbox", vanilla = nil, active = true, group = "extra_credit" },
+	{ sandbox = "j_mp_shipoftheseus_sandbox", vanilla = nil, active = true, group = "extra_credit" },
+	{ sandbox = "j_mp_starfruit_sandbox", vanilla = nil, active = true, group = "extra_credit" },
+	{ sandbox = "j_mp_trafficlight_sandbox", vanilla = nil, active = true, group = "extra_credit" },
+	{ sandbox = "j_mp_tuxedo_sandbox", vanilla = nil, active = true, group = "extra_credit" },
+	{ sandbox = "j_mp_warlock_sandbox", vanilla = nil, active = true, group = "extra_credit" },
+	{ sandbox = "j_mp_werewolf_sandbox", vanilla = nil, active = true, group = "extra_credit" },
 }
 
 --- Returns list of active sandbox joker keys
@@ -144,15 +117,15 @@ MP.Ruleset({
 		local jokers = MP.SANDBOX.get_active_sandbox_jokers()
 
 		-- Add error jokers (for overview only, not in actual pool)
-		for i = 1, 14 do
-			table.insert(jokers, "j_mp_error_sandbox_" .. i)
-		end
+		-- for i = 1, 14 do
+		-- 	table.insert(jokers, "j_mp_error_sandbox_" .. i)
+		-- end
 
 		-- Fisher-Yates shuffle
-		for i = #jokers, 2, -1 do
-			local j = math.random(1, i)
-			jokers[i], jokers[j] = jokers[j], jokers[i]
-		end
+		-- for i = #jokers, 2, -1 do
+		-- 	local j = math.random(1, i)
+		-- 	jokers[i], jokers[j] = jokers[j], jokers[i]
+		-- end
 
 		return jokers
 	end)(),
