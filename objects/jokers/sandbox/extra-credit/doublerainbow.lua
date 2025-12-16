@@ -13,7 +13,7 @@ SMODS.Joker({
 	cost = 5,
 	atlas = "ec_jokers_sandbox",
 	pos = { x = 1, y = 0 },
-	config = { extra = 1, mp_sticker_balanced = true },
+	config = { extra = 1, mp_sticker_balanced = true, mp_sticker_extra_credit = true },
 
 	loc_vars = function(self, info_queue, card)
 		info_queue[#info_queue + 1] = G.P_CENTERS.m_lucky
@@ -21,13 +21,21 @@ SMODS.Joker({
 	end,
 
 	calculate = function(self, card, context)
-		if context.repetition and context.cardarea == G.play and SMODS.get_enhancements(context.other_card)["m_lucky"] == true then
+		if
+			context.repetition
+			and context.cardarea == G.play
+			and SMODS.get_enhancements(context.other_card)["m_lucky"] == true
+		then
 			return {
 				message = localize("k_again_ex"),
 				repetitions = 1,
 				card = card,
 			}
-		elseif context.repetition and context.cardarea == G.hand and SMODS.get_enhancements(context.other_card)["m_lucky"] == true then
+		elseif
+			context.repetition
+			and context.cardarea == G.hand
+			and SMODS.get_enhancements(context.other_card)["m_lucky"] == true
+		then
 			if next(context.card_effects[1]) or #context.card_effects > 1 then
 				return {
 					message = localize("k_again_ex"),
@@ -38,7 +46,7 @@ SMODS.Joker({
 		end
 	end,
 
-	mp_credits = { code = { "extracredit" } },
+	mp_credits = { code = { "extracredit" }, art = { "dottykitty" } },
 	mp_include = function(self)
 		return MP.SANDBOX.is_joker_allowed(self.key)
 	end,

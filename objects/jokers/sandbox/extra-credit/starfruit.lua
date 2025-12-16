@@ -12,7 +12,7 @@ SMODS.Joker({
 	cost = 6,
 	atlas = "ec_jokers_sandbox",
 	pos = { x = 2, y = 0 },
-	config = { extra = { uses = 5, odds = 2 }, mp_sticker_balanced = true },
+	config = { extra = { uses = 5, odds = 2 }, mp_sticker_balanced = true, mp_sticker_extra_credit = true },
 
 	loc_vars = function(self, info_queue, card)
 		local num, denom = SMODS.get_probability_vars(card, 1, card.ability.extra.odds, "j_mp_starfruit_sandbox")
@@ -23,10 +23,22 @@ SMODS.Joker({
 		if context.cardarea == G.jokers and G.GAME.current_round.hands_played == 0 and context.before then
 			if SMODS.pseudorandom_probability(card, "j_mp_starfruit_sandbox", 1, card.ability.extra.odds) then
 				local text = context.scoring_name
-				card_eval_status_text(context.blueprint_card or card, "extra", nil, nil, nil, { message = localize("k_level_up_ex") })
+				card_eval_status_text(
+					context.blueprint_card or card,
+					"extra",
+					nil,
+					nil,
+					nil,
+					{ message = localize("k_level_up_ex") }
+				)
 				update_hand_text(
 					{ sound = "button", volume = 0.7, pitch = 0.8, delay = 0.3 },
-					{ handname = localize(text, "poker_hands"), chips = G.GAME.hands[text].chips, mult = G.GAME.hands[text].mult, level = G.GAME.hands[text].level }
+					{
+						handname = localize(text, "poker_hands"),
+						chips = G.GAME.hands[text].chips,
+						mult = G.GAME.hands[text].mult,
+						level = G.GAME.hands[text].level,
+					}
 				)
 				level_up_hand(context.blueprint_card or card, text, nil, 1)
 			end
@@ -64,7 +76,7 @@ SMODS.Joker({
 		end
 	end,
 
-	mp_credits = { code = { "extracredit" } },
+	mp_credits = { code = { "extracredit" }, art = { "dottykitty" } },
 	mp_include = function(self)
 		return MP.SANDBOX.is_joker_allowed(self.key)
 	end,

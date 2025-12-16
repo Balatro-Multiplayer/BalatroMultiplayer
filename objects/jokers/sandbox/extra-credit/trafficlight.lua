@@ -12,7 +12,7 @@ SMODS.Joker({
 	cost = 5,
 	atlas = "ec_jokers_sandbox",
 	pos = { x = 7, y = 1 },
-	config = { extra = { Xmult = 2.5, Xmult_mod = 1 }, mp_sticker_balanced = true },
+	config = { extra = { Xmult = 2.5, Xmult_mod = 1 }, mp_sticker_balanced = true, mp_sticker_extra_credit = true },
 
 	loc_vars = function(self, info_queue, card)
 		return { vars = { card.ability.extra.Xmult, card.ability.extra.Xmult_mod } }
@@ -35,19 +35,27 @@ SMODS.Joker({
 				}
 			elseif card.ability.extra.Xmult == 1.5 then
 				return {
-					message = localize({ type = "variable", key = "a_xmult_minus", vars = { card.ability.extra.Xmult_mod } }),
+					message = localize({
+						type = "variable",
+						key = "a_xmult_minus",
+						vars = { card.ability.extra.Xmult_mod },
+					}),
 					colour = G.C.FILTER,
 				}
 			elseif card.ability.extra.Xmult == 0.5 then
 				return {
-					message = localize({ type = "variable", key = "a_xmult_minus", vars = { card.ability.extra.Xmult_mod } }),
+					message = localize({
+						type = "variable",
+						key = "a_xmult_minus",
+						vars = { card.ability.extra.Xmult_mod },
+					}),
 					colour = G.C.RED,
 				}
 			end
 		end
 	end,
 
-	mp_credits = { code = { "extracredit" } },
+	mp_credits = { code = { "extracredit" }, art = { "Wingcap" } },
 	mp_include = function(self)
 		return MP.SANDBOX.is_joker_allowed(self.key)
 	end,

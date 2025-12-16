@@ -13,7 +13,7 @@ SMODS.Joker({
 	cost = 7,
 	atlas = "ec_jokers_sandbox",
 	pos = { x = 6, y = 0 },
-	config = { extra = { odds = 7, succeed = false }, mp_sticker_balanced = true },
+	config = { extra = { odds = 7, succeed = false }, mp_sticker_balanced = true, mp_sticker_extra_credit = true },
 
 	loc_vars = function(self, info_queue, card)
 		info_queue[#info_queue + 1] = G.P_CENTERS.m_lucky
@@ -22,7 +22,11 @@ SMODS.Joker({
 	end,
 
 	calculate = function(self, card, context)
-		if context.cardarea == G.play and context.individual and SMODS.get_enhancements(context.other_card)["m_lucky"] == true then
+		if
+			context.cardarea == G.play
+			and context.individual
+			and SMODS.get_enhancements(context.other_card)["m_lucky"] == true
+		then
 			if SMODS.pseudorandom_probability(card, "j_mp_warlock_sandbox", 1, card.ability.extra.odds) then
 				card.ability.extra.succeed = true
 			end
@@ -35,9 +39,7 @@ SMODS.Joker({
 				-- Find and destroy a random lucky card from the played hand
 				local lucky_cards = {}
 				for _, played_card in ipairs(context.scoring_hand or {}) do
-					if SMODS.get_enhancements(played_card)["m_lucky"] then
-						table.insert(lucky_cards, played_card)
-					end
+					if SMODS.get_enhancements(played_card)["m_lucky"] then table.insert(lucky_cards, played_card) end
 				end
 
 				if #lucky_cards > 0 then
@@ -67,7 +69,8 @@ SMODS.Joker({
 						trigger = "after",
 						delay = 0.4,
 						func = function()
-							local spectral = pseudorandom_element(G.P_CENTER_POOLS.Spectral, pseudoseed("warlock_spectral"))
+							local spectral =
+								pseudorandom_element(G.P_CENTER_POOLS.Spectral, pseudoseed("warlock_spectral"))
 							SMODS.add_card({ set = "Spectral", key = spectral.key })
 							return true
 						end,
@@ -82,7 +85,7 @@ SMODS.Joker({
 		end
 	end,
 
-	mp_credits = { code = { "extracredit" } },
+	mp_credits = { code = { "extracredit" }, art = { "dottykitty" } },
 	mp_include = function(self)
 		return MP.SANDBOX.is_joker_allowed(self.key)
 	end,
