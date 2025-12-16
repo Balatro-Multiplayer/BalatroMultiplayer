@@ -20,7 +20,13 @@ SMODS.Joker({
 	end,
 
 	calculate = function(self, card, context)
-		if context.end_of_round and not context.repetition and not context.individual and G.GAME.blind.boss and not context.blueprint then
+		if
+			context.end_of_round
+			and not context.repetition
+			and not context.individual
+			and G.GAME.blind.boss
+			and not context.blueprint
+		then
 			for i = 1, G.consumeables.config.card_limit do
 				if #G.consumeables.cards + G.GAME.consumeable_buffer < G.consumeables.config.card_limit then
 					G.GAME.consumeable_buffer = G.GAME.consumeable_buffer + 1
@@ -36,13 +42,20 @@ SMODS.Joker({
 							return true
 						end,
 					}))
-					card_eval_status_text(context.blueprint_card or card, "extra", nil, nil, nil, { message = localize("k_plus_tarot"), colour = G.C.PURPLE })
+					card_eval_status_text(
+						context.blueprint_card or card,
+						"extra",
+						nil,
+						nil,
+						nil,
+						{ message = localize("k_plus_tarot"), colour = G.C.PURPLE }
+					)
 				end
 			end
 		end
 	end,
 
-	mp_credits = { code = { "extracredit" } },
+	mp_credits = { code = { "CampfireCollective" }, art = { "dottykitty" } },
 	mp_include = function(self)
 		return MP.SANDBOX.is_joker_allowed(self.key)
 	end,

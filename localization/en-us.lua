@@ -357,6 +357,15 @@ return {
 					"{X:purple,C:white,s:0.85}something's{} {X:purple,C:white,s:0.85}wrong",
 				},
 			},
+			j_mp_clowncollege_sandbox = {
+				name = "Clown College",
+				text = {
+					"{C:attention}Fill{} consumable slots with",
+					"{C:tarot}The Fool{} after",
+					"{C:attention}Boss Blind{} is defeated",
+					"{C:inactive}(Must have room)",
+				},
+			},
 		},
 		Planet = {
 			c_mp_asteroid = {
