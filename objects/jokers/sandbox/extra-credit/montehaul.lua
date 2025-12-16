@@ -18,6 +18,7 @@ SMODS.Joker({
 			flavours = { "tag_foil", "tag_holo", "tag_polychrome", "tag_negative", "tag_uncommon", "tag_rare" },
 		},
 		mp_sticker_balanced = true,
+		mp_sticker_extra_credit = true,
 	},
 
 	loc_vars = function(self, info_queue, card)
@@ -57,7 +58,7 @@ SMODS.Joker({
 		end
 	end,
 
-	mp_credits = { code = { "extracredit" } },
+	mp_credits = { code = { "extracredit" }, art = { "UselessReptile8" } },
 	mp_include = function(self)
 		return MP.SANDBOX.is_joker_allowed(self.key)
 	end,
