@@ -38,14 +38,15 @@ local function get_warnings()
 
 		if hostExtraCreditVersion ~= guestExtraCreditVersion then
 			table.insert(warnings, {
-				"One of the two players have Extra Credit, players will see different shops",
+				"Extra Credit mismatch - players may see different jokers",
 				SMODS.Gradients.warning_text,
 			})
 
 		-- Both players have Extra Credit with matching versions
+		-- TODO actually rewrite so we use that "current player" thingy I nixed earlier
 		elseif hostExtraCreditVersion ~= nil and hostExtraCreditVersion == guestExtraCreditVersion then
 			table.insert(warnings, {
-				"Extra Credit enabled - full joker pool will replace curated sandbox jokers",
+				"Extra Credit active - curated jokers replaced with full pool",
 				G.C.GREEN,
 				0.25,
 			})
