@@ -20,7 +20,33 @@ local function get_warnings()
 		})
 	end
 
-	local current_player = MP.LOBBY.is_host and MP.LOBBY.host or MP.LOBBY.guest
+	-- since `MP.LOBBY.ready_to_start` definition was rug pulled from me
+	-- i have to do this
+	local bothPlayersInLobby = MP.LOBBY.guest and MP.LOBBY.guest.config ~= nil
+
+	if bothPlayersInLobby then
+		local hostExtraCreditVersion = MP.LOBBY.host
+			and MP.LOBBY.host.config
+			and MP.LOBBY.host.config.Mods["extracredit"]
+		local guestExtraCreditVersion = MP.LOBBY.guest
+			and MP.LOBBY.guest.config
+			and MP.LOBBY.guest.config.Mods["extracredit"]
+
+		if hostExtraCreditVersion ~= guestExtraCreditVersion then
+			table.insert(warnings, {
+				"One of the two players have Extra Credit, players will see different shops",
+				SMODS.Gradients.warning_text,
+			})
+
+		-- Both players have Extra Credit with matching versions
+		elseif hostExtraCreditVersion ~= nil and hostExtraCreditVersion == guestExtraCreditVersion then
+			table.insert(warnings, {
+				"Extra Credit enabled - full joker pool will replace curated sandbox jokers",
+				G.C.GREEN,
+				0.25,
+			})
+		end
+	end
 
 	if MP.LOBBY.ready_to_start or not MP.LOBBY.is_host then
 		local hostSteamoddedVersion = MP.LOBBY.host and MP.LOBBY.host.config and MP.LOBBY.host.config.Mods["Steamodded"]
