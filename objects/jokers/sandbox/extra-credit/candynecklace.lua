@@ -61,11 +61,6 @@ SMODS.Joker({
 					}
 				end
 			end
-
-			return {
-				message = localize("k_tag"),
-				colour = G.C.FILTER,
-			}
 		end
 	end,
 
