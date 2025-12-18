@@ -49,21 +49,11 @@ SMODS.Joker({
 							play_sound("tarot1")
 							target.T.r = -0.2
 							target:juice_up(0.3, 0.4)
-							target.states.drag.is = true
-							target.children.center.pinch.x = true
-							G.E_MANAGER:add_event(Event({
-								trigger = "after",
-								delay = 0.3,
-								blockable = false,
-								func = function()
-									G.playing_cards[target.unique_val] = nil
-									target:remove()
-									return true
-								end,
-							}))
 							return true
 						end,
 					}))
+
+					SMODS.destroy_cards(target)
 
 					G.E_MANAGER:add_event(Event({
 						trigger = "after",
