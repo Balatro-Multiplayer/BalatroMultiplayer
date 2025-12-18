@@ -1,5 +1,8 @@
 MP = SMODS.current_mod
 
+-- I am so sorry
+MP.optional_features = { quantum_enhancements = true }
+
 MP.BANNED_MODS = {
 	["Incantation"] = true,
 	["Brainstorm"] = true,
