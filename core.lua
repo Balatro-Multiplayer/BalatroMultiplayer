@@ -123,7 +123,6 @@ function MP.reset_lobby_config(persist_ruleset_and_gamemode)
 		forced_config = false,
 		preview_disabled = false,
 		legacy_smallworld = false,
-		extra_credit = false,
 	}
 end
 MP.reset_lobby_config()
