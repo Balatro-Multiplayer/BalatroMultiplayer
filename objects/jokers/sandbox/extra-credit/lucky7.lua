@@ -26,7 +26,6 @@ SMODS.Joker({
 	end,
 
 	calculate = function(self, card, context)
-		-- Set gambling flag on cards when a 7 is present (missing from original source)
 		if context.before and not context.blueprint then
 			local has_seven = false
 			for i = 1, #context.scoring_hand do
@@ -36,9 +35,16 @@ SMODS.Joker({
 				end
 			end
 
+			-- absolute shenanigan center right here
+			-- i imagine this can be simplified
+			-- but why bother trying since we
+			-- got rid of the nasty code injection?
 			if has_seven then
-				for i = 1, #context.full_hand do
-					context.full_hand[i].gambling = true
+				for i = 1, #context.scoring_hand do
+					context.scoring_hand[i].gambling = true
+					if SMODS.enh_cache and SMODS.enh_cache.write then
+						SMODS.enh_cache:write(context.scoring_hand[i], nil)
+					end
 				end
 			end
 		end
