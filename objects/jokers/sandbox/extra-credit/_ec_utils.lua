@@ -12,34 +12,6 @@ to_number = to_number or function(x)
 	return x
 end
 
---- Generic table contains check
---- @param table_ table The table to search
---- @param value any The value to find
---- @return boolean true if value found in table
-function MP.EC.contains(table_, value)
-	for _, v in pairs(table_) do
-		if v == value then return true end
-	end
-	return false
-end
-
---- Calculate total hand levels for Eclipse joker
---- @return number total_levels Sum of all hand levels
---- @return number total_hands Count of hands with level >= 1
-function MP.EC.eclipse_sum_levels()
-	local total_hands = to_big(0)
-	local total_levels = to_big(0)
-
-	for hand, data in pairs(G.GAME.hands) do
-		-- Ignore hands which level is 0 or less for description consistency
-		if data.level >= to_big(1) then
-			total_hands = total_hands + to_big(1)
-			total_levels = total_levels + data.level
-		end
-	end
-	return total_levels, total_hands
-end
-
 --- Resets Tuxedo joker's selected suit for the round
 --- Randomly selects a suit different from the current one
 local function reset_tuxedo_card()
@@ -53,7 +25,10 @@ local function reset_tuxedo_card()
 			tuxedo_suits[#tuxedo_suits + 1] = k
 		end
 	end
-	local tuxedo_card = pseudorandom_element(tuxedo_suits, pseudoseed("tux" .. G.GAME.round_resets.ante))
+	local seed = "tux"
+	if MP.should_use_the_order() then seed = "tux" .. G.GAME.round_resets.ante end
+
+	local tuxedo_card = pseudorandom_element(tuxedo_suits, pseudoseed(seed))
 	G.GAME.current_round.tuxedo_card.suit = tuxedo_card
 end
 
@@ -70,7 +45,11 @@ local function reset_farmer_card()
 			farmer_suits[#farmer_suits + 1] = k
 		end
 	end
-	local farmer_card = pseudorandom_element(farmer_suits, pseudoseed("farm" .. G.GAME.round_resets.ante))
+
+	local seed = "farm"
+	if MP.should_use_the_order() then seed = "farm" .. G.GAME.round_resets.ante end
+
+	local farmer_card = pseudorandom_element(farmer_suits, seed)
 	G.GAME.current_round.farmer_card.suit = farmer_card
 end
 
@@ -87,12 +66,17 @@ local function reset_fish_rank()
 			valid_fish_ranks[#valid_fish_ranks + 1] = k
 		end
 	end
-	local fish_pick = pseudorandom_element(valid_fish_ranks, pseudoseed("fish" .. G.GAME.round_resets.ante))
+
+	local seed = "fish"
+	if MP.should_use_the_order() then seed = "fish" .. G.GAME.round_resets.ante end
+
+	local fish_pick = pseudorandom_element(valid_fish_ranks, pseudoseed(seed))
 	G.GAME.current_round.fish_rank.rank = fish_pick
 end
 
 --- Hook into game globals reset to initialize EC round state
 --- Called at start of each round
+--- TODO: Test if works
 local original_reset_game_globals = MP.reset_game_globals
 MP.reset_game_globals = function(run_start)
 	if original_reset_game_globals then original_reset_game_globals(run_start) end
