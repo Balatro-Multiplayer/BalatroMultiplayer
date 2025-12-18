@@ -24,6 +24,10 @@ local function get_warnings()
 	-- i have to do this
 	local bothPlayersInLobby = MP.LOBBY.guest and MP.LOBBY.guest.config ~= nil
 
+	-- This is made to solve the extra credit issue
+	-- but we could use a more robust check with a list of known content mods
+	-- to for example display the ready up button etc if players have mods
+	-- that are incompatible
 	if bothPlayersInLobby then
 		local hostExtraCreditVersion = MP.LOBBY.host
 			and MP.LOBBY.host.config

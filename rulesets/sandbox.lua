@@ -33,7 +33,7 @@ MP.SANDBOX.joker_mappings = {
 	{ sandbox = "j_mp_runner_sandbox", vanilla = "j_runner", active = false },
 	{ sandbox = "j_mp_satellite_sandbox", vanilla = "j_satellite", active = false },
 
-	-- Extra Credit jokers (group = "extra_credit", vanilla = nil since these are mod jokers)
+	-- Extra Credit jokers (group = "extra_credit")
 	-- Master list of 26 jokers, all active
 	{ sandbox = "j_mp_alloy_sandbox", vanilla = nil, active = true, group = "extra_credit" },
 	{ sandbox = "j_mp_ambrosia_sandbox", vanilla = nil, active = true, group = "extra_credit" },
@@ -116,16 +116,11 @@ MP.Ruleset({
 	reworked_jokers = (function()
 		local jokers = MP.SANDBOX.get_active_sandbox_jokers()
 
-		-- Add error jokers (for overview only, not in actual pool)
-		-- for i = 1, 14 do
-		-- 	table.insert(jokers, "j_mp_error_sandbox_" .. i)
-		-- end
-
 		-- Fisher-Yates shuffle
-		-- for i = #jokers, 2, -1 do
-		-- 	local j = math.random(1, i)
-		-- 	jokers[i], jokers[j] = jokers[j], jokers[i]
-		-- end
+		for i = #jokers, 2, -1 do
+			local j = math.random(1, i)
+			jokers[i], jokers[j] = jokers[j], jokers[i]
+		end
 
 		return jokers
 	end)(),
@@ -149,7 +144,6 @@ MP.Ruleset({
 		MP.LOBBY.config.preview_disabled = true
 		MP.LOBBY.config.the_order = true
 		MP.LOBBY.config.starting_lives = 4
-		MP.LOBBY.config.extra_credit = true
 		return true
 	end,
 }):inject()
@@ -179,7 +173,16 @@ function MP.ApplyBans()
 	local ret = apply_bans_ref()
 
 	-- Apply sandbox-specific idol selection when in sandbox ruleset
-	if MP.LOBBY.code and MP.LOBBY.config.ruleset == "ruleset_mp_sandbox" then select_random_idol() end
+	if MP.LOBBY.code and MP.LOBBY.config.ruleset == "ruleset_mp_sandbox" then
+		select_random_idol()
+
+		if SMODS.Mods["extracredit"] and SMODS.Mods["extracredit"].can_load then
+			print("Banning sandbox jokers")
+			for _, mapping in ipairs(MP.SANDBOX.joker_mappings) do
+				if mapping.group == "extra_credit" then G.GAME.banned_keys[mapping.sandbox] = true end
+			end
+		end
+	end
 
 	return ret
 end
