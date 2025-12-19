@@ -190,27 +190,27 @@ function G.UIDEF.ruleset_selection_options()
 
 	local ruleset_buttons_data = {
 		{
-			name = "k_competitive",
+			name = "k_matchmaking",
 			buttons = {
 				{ button_id = "ranked_ruleset_button", button_localize_key = "k_ranked" },
-				{ button_id = "majorleague_ruleset_button", button_localize_key = "k_majorleague" },
-				{ button_id = "minorleague_ruleset_button", button_localize_key = "k_minorleague" },
-			},
-		},
-		{
-			name = "k_standard",
-			buttons = {
-				{ button_id = "blitz_ruleset_button", button_localize_key = "k_blitz" },
-				{ button_id = "traditional_ruleset_button", button_localize_key = "k_traditional" },
-				{ button_id = "vanilla_ruleset_button", button_localize_key = "k_vanilla" },
-			},
-		},
-		{
-			name = "k_other",
-			buttons = {
-				{ button_id = "badlatro_ruleset_button", button_localize_key = "k_badlatro" },
 				{ button_id = "sandbox_ruleset_button", button_localize_key = "k_sandbox" },
 				{ button_id = "smallworld_ruleset_button", button_localize_key = "k_smallworld" },
+			},
+		},
+		{
+			name = "k_custom",
+			buttons = {
+				{ button_id = "vanilla_ruleset_button", button_localize_key = "k_vanilla" },
+				{ button_id = "blitz_ruleset_button", button_localize_key = "k_blitz" },
+				{ button_id = "traditional_ruleset_button", button_localize_key = "k_traditional" },
+				{ button_id = "badlatro_ruleset_button", button_localize_key = "k_badlatro" },
+			},
+		},
+		{
+			name = "k_league",
+			buttons = {
+				{ button_id = "majorleague_ruleset_button", button_localize_key = "k_majorleague" },
+				{ button_id = "minorleague_ruleset_button", button_localize_key = "k_minorleague" },
 			},
 		},
 	}
