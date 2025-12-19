@@ -1,0 +1,8 @@
+indent_type = "Tabs"
+
+# longer lines for localization files
+column_width = 500
+
+quote_style = "AutoPreferDouble"
+
+line_endings = "Unix"
