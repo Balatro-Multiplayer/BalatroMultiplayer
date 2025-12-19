@@ -184,14 +184,14 @@ SMODS.Mods.Multiplayer.config_tab = function()
 					align = "cm",
 					on_demand_tooltip = {
 						text = {
-							"*Applies in singleplayer and vanilla rulesets",
+							localize("k_applies_singleplayer_vanilla_rulesets"),
 						},
 					},
 				},
 				nodes = {
 					create_toggle({
 						id = "singleplayer_hide_content_toggle",
-						label = "Hide Multiplayer content*",
+						label = localize("k_hide_mp_content"),
 						ref_table = SMODS.Mods["Multiplayer"].config,
 						ref_value = "hide_mp_content",
 					}),
@@ -209,7 +209,7 @@ SMODS.Mods.Multiplayer.config_tab = function()
 						config = { align = "cm" },
 						nodes = {
 							create_option_cycle({
-								label = "Timer Sound Effects", -- localize
+								label = localize("k_timer_sfx"),
 								w = 4,
 								scale = 0.8,
 								options = localize("ml_mp_timersfx_opt"),
