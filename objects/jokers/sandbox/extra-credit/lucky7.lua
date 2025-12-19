@@ -35,10 +35,8 @@ SMODS.Joker({
 				end
 			end
 
-			-- absolute shenanigan center right here
-			-- i imagine this can be simplified
-			-- but why bother trying since we
-			-- got rid of the nasty code injection?
+			-- enh_cache abuse hours. it's fine. it's better than injection.
+			-- we're healing.
 			if has_seven then
 				for i = 1, #context.scoring_hand do
 					context.scoring_hand[i].gambling = true
@@ -63,7 +61,7 @@ SMODS.Joker({
 	end,
 
 	mp_credits = {
-		code = { "CampfireCollective" },
+		code = { "CampfireCollective", "steph" },
 		art = { "bishopcorrigan" },
 	},
 	mp_include = function(self)
