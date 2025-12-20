@@ -1,6 +1,6 @@
 SMODS.Atlas({
   key = "prophet",
-  path = "t_prophet.jpeg", -- Assign a single string value to match the expected type
+  path = "c_prophet.png", -- Assign a single string value to match the expected type
   px = 71,
   py = 95,
 })
@@ -25,7 +25,7 @@ SMODS.Consumable({
     return { vars = {} }
   end,
   in_pool = function(self)
-    return MP.LOBBY.code
+    return MP.LOBBY.code and MP.LOBBY.config.ruleset == "ruleset_mp_smallworld"
   end,
   can_use = function(self, card)
     return true
@@ -53,10 +53,32 @@ SMODS.Consumable({
   },
 })
 
+-- Function to map joker keys (handles replacements like hanging_chad -> mp_hanging_chad)
+local function map_joker_key(key)
+  local key_mappings = {
+    ["j_hanging_chad"] = "j_mp_hanging_chad"
+    -- Add more mappings here as needed
+  }
+  return key_mappings[key] or key
+end
+
 -- Function to create the prophet UI showing all jokers using collection-style UI
 function MP.create_prophet_ui()
-  -- Use SMODS collection system for jokers with custom behavior
-  local pool = SMODS.collection_pool(G.P_CENTER_POOLS.Joker)
+  -- Use SMODS collection pool, but filter and map keys
+  local raw_pool = SMODS.collection_pool(G.P_CENTER_POOLS.Joker)
+  local pool = {}
+  
+  -- Filter and map joker keys
+  for _, center in ipairs(raw_pool) do
+    local mapped_key = map_joker_key(center.key)
+    local mapped_center = G.P_CENTERS[mapped_key]
+    if mapped_center then
+      table.insert(pool, mapped_center)
+    else
+      table.insert(pool, center)  -- Keep original if mapping doesn't exist
+    end
+  end
+  
   local rows = {5, 5, 5} -- 5 jokers per row, 3 rows per page (15 total per page)
   
   -- Create card areas for the prophet collection
@@ -107,8 +129,9 @@ function MP.create_prophet_ui()
         -- Make the card clickable for Prophet functionality
         card.states.hover.can = true
         card.click = function()
-          -- Calculate and show position for this joker
-          MP.show_joker_position(center.key, center)
+          -- Calculate and show position for this joker (use mapped key)
+          local mapped_key = map_joker_key(center.key)
+          MP.show_joker_position(mapped_key, G.P_CENTERS[mapped_key] or center)
         end
         
         card:start_materialize(nil, i>1 or j>1)
@@ -231,14 +254,16 @@ end
 -- Function to close the prophet UI completely from detail view
 G.FUNCS.prophet_back_to_collection = function(e)
   G.FUNCS.exit_overlay_menu(e)
-  -- For debugging: reopen the prophet collection so you can check multiple jokers
-  MP.create_prophet_ui()
+
 end
 
 -- Function to calculate a specific joker's position in the seeded joker queue
 function MP.calculate_joker_position(joker_key)
+  -- Map the input key
+  local mapped_key = map_joker_key(joker_key)
+  
   -- Check if the joker exists
-  local joker_center = G.P_CENTERS[joker_key]
+  local joker_center = G.P_CENTERS[mapped_key]
   if not joker_center then
     return nil -- Joker doesn't exist
   end
@@ -262,9 +287,8 @@ function MP.calculate_joker_position(joker_key)
         test_card:remove()
       end
       
-      -- Check if this is our target joker
-      if selected_joker == joker_key or 
-               (joker_key == "hanging_chad" and selected_joker == "mp_hanging_chad") then
+      -- Check if this is our target joker (compare with mapped key)
+      if selected_joker == mapped_key then
         -- CRITICAL: Restore the ENTIRE pseudorandom state before returning
         G.GAME.pseudorandom = saved_pseudorandom
         return position
