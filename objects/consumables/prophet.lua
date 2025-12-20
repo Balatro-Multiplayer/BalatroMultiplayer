@@ -6,7 +6,7 @@ SMODS.Atlas({
 })
 
 SMODS.Consumable({
-  key = "prophet",
+  key = "mp_prophet",
   set = "Tarot",
   atlas = "prophet",
   cost = 3,
@@ -25,7 +25,7 @@ SMODS.Consumable({
     return { vars = {} }
   end,
   in_pool = function(self)
-    return MP.LOBBY.code and MP.LOBBY.config.ruleset == "ruleset_mp_smallworld"
+    return MP.LOBBY.code
   end,
   can_use = function(self, card)
     return true
@@ -121,7 +121,7 @@ function MP.create_prophet_ui()
   G.FUNCS.prophet_collection_page{ cycle_config = { current_option = 1 }}
   
   -- Create the UI
-  local ui_definition = MP.UIBox_generic_options({
+  local ui_definition = create_UIBox_generic_options({
     back_func = 'close_prophet_ui',
     contents = {
       {n = G.UIT.R, config = {align = "cm", padding = 0.1}, nodes = {
@@ -155,13 +155,15 @@ function MP.create_prophet_ui()
   })
   
   -- Show the overlay
-  G.FUNCS.overlay_menu(ui_definition)
+  G.FUNCS.overlay_menu({
+    definition = ui_definition,
+  })
 end
 
 -- Function to show a specific joker's position (called when clicking a joker)
 function MP.show_joker_position(joker_key, center)
   -- Calculate this joker's position in the queue
-  local max_rerolls = 5000 -- Same value used in calculation
+  local max_rerolls = 1000 -- Same value used in calculation
   local position = MP.calculate_joker_position(joker_key)
   
   local position_text, position_color, position_detail
