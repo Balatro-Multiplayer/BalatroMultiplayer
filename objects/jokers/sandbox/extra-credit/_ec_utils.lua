@@ -90,11 +90,11 @@ end
 
 -- EC_ease_dollars context hook for Hoarder joker
 -- Wraps ease_dollars to trigger joker evaluation with EC_ease_dollars context
+-- (i.e. send a callback to Hoarder each time we earn money)
 local original_ease_dollars = ease_dollars
 function ease_dollars(mod, x)
 	original_ease_dollars(mod, x)
 
-	-- Only trigger EC context when extra_credit is enabled and jokers exist
 	if MP.LOBBY.config and MP.LOBBY.config.extra_credit and G.jokers and G.jokers.cards then
 		for i = 1, #G.jokers.cards do
 			eval_card(G.jokers.cards[i], { EC_ease_dollars = to_big(mod) })
