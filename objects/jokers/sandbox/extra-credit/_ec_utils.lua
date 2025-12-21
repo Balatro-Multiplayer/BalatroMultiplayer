@@ -76,7 +76,6 @@ end
 
 --- Hook into game globals reset to initialize EC round state
 --- Called at start of each round
---- TODO: Test if works
 local original_reset_game_globals = MP.reset_game_globals
 MP.reset_game_globals = function(run_start)
 	if original_reset_game_globals then original_reset_game_globals(run_start) end
