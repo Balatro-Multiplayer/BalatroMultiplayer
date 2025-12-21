@@ -17,6 +17,7 @@ MP.SANDBOX.joker_mappings = {
 	-- Idol variants (all map to same vanilla joker)
 	{ sandbox = "j_mp_idol_sandbox_bw", vanilla = "j_idol", active = true },
 	{ sandbox = "j_mp_idol_sandbox_fantom", vanilla = "j_idol", active = true },
+	{ sandbox = "j_mp_seltzer_sandbox", vanilla = "j_selzer", active = true },
 
 	-- Out of rotation
 	{ sandbox = "j_mp_bloodstone_sandbox", vanilla = "j_bloodstone", active = false },
