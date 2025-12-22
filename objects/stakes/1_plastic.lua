@@ -1,3 +1,4 @@
+--[[
 SMODS.Stake({
 	mp_alt_stake = true,
 	name = "Plastic Stake",
@@ -63,3 +64,4 @@ SMODS.Voucher:take_ownership("money_tree", {
 		return { vars = { card.ability.extra / (5 / (G.GAME.modifiers and G.GAME.modifiers.mp_modified_interest_rate or 5)) } }
 	end,
 }, true)
+]]

@@ -40,7 +40,7 @@ return {
 				text = {
 					"Earn an extra {C:money}$#1#{} of",
 					"{C:attention}interest{} for every {C:money}$#2#{} you",
-					"have at end of round"
+					"have at end of round",
 				},
 			},
 			j_mp_defensive_joker = {
@@ -563,7 +563,7 @@ return {
 				text = {
 					"Earn {C:money}$1{} of interest per {C:money}$10{}",
 					"{C:inactive,s:0.8}(Max of {C:money,s:0.8}$50{C:inactive,s:0.8})",
-					"{s:0.8}Applies White Stake"
+					"{s:0.8}Applies White Stake",
 				},
 			},
 			stake_mp_pebble = {
@@ -571,7 +571,7 @@ return {
 				text = {
 					"Required score scales",
 					"faster for each {C:attention}Ante",
-					"{s:0.8}Applies Plastic Stake"
+					"{s:0.8}Applies Plastic Stake",
 				},
 			},
 			stake_mp_ferrite = {
@@ -579,7 +579,7 @@ return {
 				text = {
 					"Specific Jokers are {C:attention}Persistent",
 					"{C:inactive,s:0.8}(Can't be destroyed, increasing sell cost)",
-					"{s:0.8}Applies Pebble Stake"
+					"{s:0.8}Applies Pebble Stake",
 				},
 			},
 			stake_mp_pyrite = {
@@ -587,7 +587,7 @@ return {
 				text = {
 					"Reroll price increases",
 					"by {C:money}$2{} each reroll",
-					"{s:0.8}Applies Ferrite Stake"
+					"{s:0.8}Applies Ferrite Stake",
 				},
 			},
 			stake_mp_jade = {
@@ -595,7 +595,7 @@ return {
 				text = {
 					"Required score scales",
 					"faster for each {C:attention}Ante",
-					"{s:0.8}Applies Pyrite Stake"
+					"{s:0.8}Applies Pyrite Stake",
 				},
 			},
 			stake_mp_crystal = {
@@ -603,7 +603,7 @@ return {
 				text = {
 					"Specific Jokers are {C:attention}Unreliable",
 					"{C:inactive,s:0.8}(Doesn't trigger on {C:attention,s:0.8}final hand{C:inactive,s:0.8})",
-					"{s:0.8}Applies Jade Stake"
+					"{s:0.8}Applies Jade Stake",
 				},
 			},
 			stake_mp_antimatter = {
@@ -611,7 +611,7 @@ return {
 				text = {
 					"Specific Jokers are {C:attention}Draining",
 					"{C:inactive,s:0.8}({X:mult,C:white,s:0.8} X0.75 {C:inactive,s:0.8} Mult)",
-					"{s:0.8}Applies Crystal Stake"
+					"{s:0.8}Applies Crystal Stake",
 				},
 			},
 		},
@@ -789,6 +789,8 @@ return {
 			k_weekly_description = "A special ruleset that changes weekly or bi-weekly. I guess you'll have to find out what it is! Currently: ",
 			k_smallworld = "Small World",
 			k_smallworld_description = "A heavily experimental ruleset, where 3/4 of everything in the game\nis randomly banned for some reason",
+			k_speedlatro = "Speedlatro",
+			k_speedlatro_description = "Up the pace with an uncomfortably fast 147 second timer between\neach PvP blind. Good luck using Vagabond",
 			k_cost_up = "Cost Up",
 			k_destabilized = "Destabilized",
 			k_oops_ex = "Oops!",
@@ -801,6 +803,7 @@ return {
 			k_your_jokers = "Your Jokers",
 			k_nemesis_deck = "Nemesis Deck",
 			k_your_deck = "Your Deck",
+			k_customization = "Customization",
 			k_the_order_credit = "*Credit to @MathIsFun_",
 			k_the_order_integration_desc = "This will patch card creation to not be ante-based and use a single pool for every type/rarity",
 			k_preview_credit = "*Credit to @Fantom, @Divvy",
@@ -897,7 +900,7 @@ return {
 			c_mp_balancing_act = "Balancing Act",
 			c_mp_salvaged_sibyl = "Salvaged Sibyl",
 			c_mp_polymorph_spam = "Polymorph Spam",
-			c_mp_all_must_go = "All Must Go"
+			c_mp_all_must_go = "All Must Go",
 		},
 	},
 }

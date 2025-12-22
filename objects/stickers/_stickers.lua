@@ -8,9 +8,9 @@ SMODS.Atlas({
 local set_ability_ref = Card.set_ability
 function Card:set_ability(center, initial, delay_sprites)
 	set_ability_ref(self, center, initial, delay_sprites)
-	for _, v in ipairs({"persistent", "unreliable", "draining"}) do
-		if G.GAME.modifiers and G.GAME.modifiers["mp_enable_"..v.."_jokers"] then
-			SMODS.Stickers["mp_sticker_"..v]:apply(self, center["mp_forced_"..v])
+	for _, v in ipairs({ "persistent", "unreliable", "draining" }) do
+		if G.GAME.modifiers and G.GAME.modifiers["mp_enable_" .. v .. "_jokers"] then
+			SMODS.Stickers["mp_sticker_" .. v]:apply(self, center["mp_forced_" .. v])
 		end
 	end
 end
@@ -815,11 +815,14 @@ local sticker_tables = {
 }
 -- told you it was big
 
-G.E_MANAGER:add_event(Event({trigger = 'immediate',func = function()
-	for center, table in pairs(sticker_tables) do
-		for k, v in pairs(table) do
-			G.P_CENTERS[center]["mp_forced_"..k] = v
+G.E_MANAGER:add_event(Event({
+	trigger = "immediate",
+	func = function()
+		for center, table in pairs(sticker_tables) do
+			for k, v in pairs(table) do
+				G.P_CENTERS[center]["mp_forced_" .. k] = v
+			end
 		end
-	end
-	return true
-end}))
+		return true
+	end,
+}))

@@ -10,14 +10,13 @@ MP.ReworkCenter({
 	config = { extra = 1 },
 	loc_vars = function(self, info_queue, card)
 		return {
-			key = self.key.."_mp_standard",
+			key = self.key .. "_mp_standard",
 			vars = { card.ability.extra },
 		}
 	end,
 	calculate = function(self, card, context)
 		if context.cardarea == G.play and context.repetition then
-			if context.other_card == context.scoring_hand[1]
-			or context.other_card == context.scoring_hand[2] then
+			if context.other_card == context.scoring_hand[1] or context.other_card == context.scoring_hand[2] then
 				return {
 					message = localize("k_again_ex"),
 					repetitions = card.ability.extra,

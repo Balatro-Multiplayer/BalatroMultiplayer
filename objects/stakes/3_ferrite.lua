@@ -1,3 +1,4 @@
+--[[
 SMODS.Stake({
 	mp_alt_stake = true,
 	name = "Ferrite Stake",
@@ -14,3 +15,4 @@ SMODS.Stake({
 	colour = HEX("B2B2B2"),
 	-- shiny = true,
 })
+]]

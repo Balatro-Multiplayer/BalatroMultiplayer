@@ -436,8 +436,8 @@ end
 SMODS.Mods.Multiplayer.extra_tabs = function()
 	return {
 		{
-			label = "Customization", -- localize
-			tab_definition_function = customization_tab
+			label = localize("k_customization"),
+			tab_definition_function = customization_tab,
 		},
 	}
 end

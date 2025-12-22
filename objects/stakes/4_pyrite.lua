@@ -1,3 +1,4 @@
+--[[
 SMODS.Stake({
 	mp_alt_stake = true,
 	name = "Pyrite Stake",
@@ -25,3 +26,4 @@ function calculate_reroll_cost(skip_increment)
 		G.GAME.current_round.reroll_cost = (G.GAME.round_resets.temp_reroll_cost or G.GAME.round_resets.reroll_cost) + G.GAME.current_round.reroll_cost_increase
 	end
 end
+]]

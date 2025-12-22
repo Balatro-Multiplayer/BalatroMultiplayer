@@ -119,6 +119,11 @@ local function action_start_game(seed, stake_str)
 		seed = MP.LOBBY.config.custom_seed
 	end
 	G.FUNCS.lobby_start_run(nil, { seed = seed, stake = stake })
+	if MP.LOBBY.config.ruleset == "ruleset_mp_speedlatro" then
+		MP.LOBBY.config.timer_base_seconds = MP.LOBBY.config.timer_base_seconds - 3
+		MP.GAME.timer = MP.LOBBY.config.timer_base_seconds
+		MP.ACTIONS.start_ante_timer()
+	end
 	MP.LOBBY.ready_to_start = false
 end
 
@@ -225,6 +230,10 @@ local function action_end_pvp()
 	MP.GAME.end_pvp = true
 	MP.GAME.timer = MP.LOBBY.config.timer_base_seconds
 	MP.GAME.timer_started = false
+	if MP.LOBBY.config.ruleset == "ruleset_mp_speedlatro" then
+		MP.GAME.timer_started = true
+		MP.ACTIONS.start_ante_timer()
+	end
 end
 
 ---@param lives number
@@ -707,7 +716,7 @@ local function action_start_ante_timer(time)
 	local option = SMODS.Mods["Multiplayer"].config.timersfx or 1
 	local timersfx = (option == 1) or (option == 2 and G.timer_ante ~= G.GAME.round_resets.ante)
 	G.timer_ante = G.GAME.round_resets.ante
-	
+
 	if timersfx then
 		for i = 1, 3 do
 			local wait_time = (0.15 * (i - 1))

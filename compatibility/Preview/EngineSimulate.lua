@@ -229,6 +229,15 @@ if not FN.SIM.run then
 		end
 	end
 
+	function FN.SIM.simulate_joker_discard_effects(cards, card)
+		for _, joker in ipairs(FN.SIM.env.jokers) do
+			FN.SIM.simulate_joker(
+				joker,
+				FN.SIM.get_context(G.hand, { discard = true, cards = cards, other_card = card })
+			)
+		end
+	end
+
 	function FN.SIM.simulate_blind_effects()
 		if G.GAME.blind.disabled then return end
 
@@ -293,19 +302,17 @@ if not FN.SIM.run then
 			local n = #held
 			local combinations = {}
 
-			-- Generate all 0, 1, or 2 card discard combinations
-			for i = 0, math.min(2, n) do
-				if i == 0 then
-					table.insert(combinations, {})
-				elseif i == 1 then
-					for a = 1, n do
-						table.insert(combinations, { a })
-					end
-				elseif i == 2 then
-					for a = 1, n - 1 do
-						for b = a + 1, n do
-							table.insert(combinations, { a, b })
-						end
+			-- Generate all possible discard combinations
+			if n == 0 then
+				table.insert(combinations, {})
+			elseif n == 1 then
+				for a = 1, n do
+					table.insert(combinations, { a })
+				end
+			elseif n >= 2 then
+				for a = 1, n - 1 do
+					for b = a + 1, n do
+						table.insert(combinations, { a, b })
 					end
 				end
 			end
@@ -316,6 +323,7 @@ if not FN.SIM.run then
 			for _, discard_idxs in ipairs(combinations) do
 				-- Deep copy held cards
 				local held_copy = {}
+				local discarded = {}
 				for i, card in ipairs(held) do
 					held_copy[i] = copy_table(card)
 				end
@@ -325,17 +333,22 @@ if not FN.SIM.run then
 					return a > b
 				end)
 				for _, idx in ipairs(discard_idxs) do
-					table.remove(held_copy, idx)
+					discarded[#discarded + 1] = table.remove(held_copy, idx)
 				end
 
-				-- Backup and replace held cards temporarily
+				-- Backup and replace held cards and jokers temporarily
 				local backup_held = FN.SIM.env.held_cards
 				FN.SIM.env.held_cards = held_copy
+				local backup_jokers = copy_table(FN.SIM.env.jokers)
 
 				-- Reset sim state
 				FN.SIM.running.min = { chips = 0, mult = 0, dollars = 0 }
 				FN.SIM.running.exact = { chips = 0, mult = 0, dollars = 0 }
 				FN.SIM.running.max = { chips = 0, mult = 0, dollars = 0 }
+
+				for i = 1, #discarded do
+					FN.SIM.simulate_joker_discard_effects(discarded, discarded[i])
+				end
 
 				-- Simulate score
 				FN.SIM.simulate_joker_before_effects()
@@ -354,8 +367,9 @@ if not FN.SIM.run then
 				min_dollars = math.min(min_dollars, res.dollars.min)
 				max_dollars = math.max(max_dollars, res.dollars.max)
 
-				-- Restore original held cards
+				-- Restore original held cards and jokers
 				FN.SIM.env.held_cards = backup_held
+				FN.SIM.env.jokers = backup_jokers
 			end
 
 			-- Overwrite final min/max range based on permutations
