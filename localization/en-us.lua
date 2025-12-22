@@ -351,6 +351,15 @@ return {
 					"{C:inactive}(Currently {C:attention}#1#{} of {V:1}#2#{})",
 				},
 			},
+			j_mp_seltzer_sandbox = {
+				name = "Seltzer",
+				text = {
+					"Retrigger all",
+					"cards played for",
+					"the next {C:attention}#1#{} hands",
+					"{C:attention}(Disabled in PvP Blind){}",
+				},
+			},
 			j_mp_error_sandbox = {
 				name = "????",
 				text = {

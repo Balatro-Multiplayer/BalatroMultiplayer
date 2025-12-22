@@ -5,6 +5,8 @@ SMODS.Atlas({
 	py = 95,
 })
 
+-- TODO hold up this is dumb we don't calculate the ranks we just get the most common card's rank
+-- i need to fix this or else i die a horrible death
 SMODS.Joker({
 	key = "idol_sandbox_bw",
 	no_collection = MP.sandbox_no_collection,
