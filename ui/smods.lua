@@ -403,7 +403,7 @@ SMODS.Mods.Multiplayer.config_tab = function()
 						ref_value = "disable_timer_sounds",
 					}),
 				},
-			}
+			},
 		},
 	}
 	return ret

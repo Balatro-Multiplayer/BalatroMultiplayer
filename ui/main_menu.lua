@@ -964,7 +964,6 @@ function G.UIDEF.create_UIBox_join_lobby_button()
 									ref_table = MP.LOBBY,
 									ref_value = "temp_code",
 									extended_corpus = false,
-									keyboard_offset = 1,
 									keyboard_offset = 4,
 									minw = 5,
 									callback = function(val)
@@ -1177,8 +1176,10 @@ end
 
 function G.FUNCS.join_from_clipboard(e)
 	local paste = MP.UTILS.get_from_clipboard()
-	MP.LOBBY.temp_code = string.sub(string.upper(paste:gsub("[^%a]", "")), 1, 5) -- cursed
-	MP.ACTIONS.join_lobby(MP.LOBBY.temp_code)
+	if paste then
+		MP.LOBBY.temp_code = string.sub(string.upper(paste:gsub("[^%a]", "")), 1, 5) -- cursed
+		MP.ACTIONS.join_lobby(MP.LOBBY.temp_code)
+	end
 end
 
 function G.FUNCS.start_lobby(e)
