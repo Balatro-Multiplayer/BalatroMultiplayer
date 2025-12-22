@@ -180,8 +180,14 @@ return {
 			b_leave_lobby = "Verlaat de lobby",
 			b_mp_discord = "Balatro Multiplayer Discord Server",
 			b_start = "START",
-			b_wait_for_host_start = { "WACHTEN OP", "HOST OM TE STARTEN" },
-			b_wait_for_players = { "WACHTEN OP", "SPELERS" },
+			b_wait_for_host_start = {
+				"WACHTEN OP",
+				"HOST OM TE STARTEN",
+			},
+			b_wait_for_players = {
+				"WACHTEN OP",
+				"SPELERS",
+			},
 			b_lobby_options = "LOBBY OPTIES",
 			b_copy_clipboard = "Kopieer naar klembord",
 			b_view_code = "BEKIJK CODE",
@@ -294,34 +300,56 @@ return {
 			k_requires_restart = "*Vereist een restart om te werken",
 			k_bans = "Verboden",
 			k_reworks = "Toevoegingen/Herwerkingen",
-			ml_enemy_loc = { "Locatie", "Tegenstander" },
+			ml_enemy_loc = {
+				"Locatie",
+				"Tegenstander",
+			},
 			ml_mp_kofi_message = {
 				"Deze mod en spel server is",
 				"ontwikkeld en onderhouden door",
 				"één persoon, als",
 				"je het leuk vindt, overweeg",
 			},
-			ml_lobby_info = { "Lobby", "Informatie" },
+			ml_lobby_info = {
+				"Lobby",
+				"Informatie",
+			},
 			loc_ready = "Klaar voor PvP",
 			loc_selecting = "Blind aan het selecteren",
 			loc_shop = "Shoppen",
 			loc_playing = "Speelt ",
 		},
 		v_dictionary = {
-			a_mp_art = { "Kunst: #1#" },
-			a_mp_code = { "Code: #1#" },
-			a_mp_idea = { "Idee: #1#" },
-			a_mp_skips_ahead = { "#1# Skips Vooruit" },
-			a_mp_skips_behind = { "#1# Skips Achter" },
-			a_mp_skips_tied = { "Evenveel" },
+			a_mp_art = {
+				"Kunst: #1#",
+			},
+			a_mp_code = {
+				"Code: #1#",
+			},
+			a_mp_idea = {
+				"Idee: #1#",
+			},
+			a_mp_skips_ahead = {
+				"#1# Skips Vooruit",
+			},
+			a_mp_skips_behind = {
+				"#1# Skips Achter",
+			},
+			a_mp_skips_tied = {
+				"Evenveel",
+			},
 			k_banned_objs = "Verboden #1#",
 			k_no_banned_objs = "Niet Verboden #1#",
 			k_reworked_objs = "Toegevoegd/Herwerkt #1#",
 			k_no_reworked_objs = "Toegevoegd/Herwerkt #1#",
 		},
 		v_text = {
-			ch_c_hanging_chad_rework = { "{C:attention}Ongeldige Stem{} is {C:dark_edition}herwerkt" },
-			ch_c_glass_cards_rework = { "{C:attention}Glazen Kaarten{} zijn {C:dark_edition}herwerkt" },
+			ch_c_hanging_chad_rework = {
+				"{C:attention}Ongeldige Stem{} is {C:dark_edition}herwerkt",
+			},
+			ch_c_glass_cards_rework = {
+				"{C:attention}Glazen Kaarten{} zijn {C:dark_edition}herwerkt",
+			},
 		},
 		challenge_names = {
 			c_mp_misprint_deck = "Foutgedrukte Deck",

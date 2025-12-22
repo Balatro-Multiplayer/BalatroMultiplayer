@@ -205,9 +205,18 @@ return {
 			b_leave_lobby = "退出房间",
 			b_mp_discord = "Balatro Multiplayer的Discord服务器",
 			b_start = "开始",
-			b_wait_for_host_start = { "正在等待", "主机开始" },
-			b_wait_for_players = { "正在等待", "玩家" },
-			b_wait_for_guest_ready = { "正在等待", "访客" },
+			b_wait_for_host_start = {
+				"正在等待",
+				"主机开始",
+			},
+			b_wait_for_players = {
+				"正在等待",
+				"玩家",
+			},
+			b_wait_for_guest_ready = {
+				"正在等待",
+				"访客",
+			},
 			b_lobby_options = "房间设置",
 			b_copy_clipboard = "复制到剪贴板",
 			b_view_code = "查看房间号",
@@ -351,25 +360,43 @@ return {
 			k_tutorial_not_complete = "你必须完成教程之后才能进行多人游戏",
 			k_created_by = "创作者：",
 			k_major_contributors = "主要贡献由：",
-			ml_enemy_loc = { "敌方", "地点" },
+			ml_enemy_loc = {
+				"敌方",
+				"地点",
+			},
 			ml_mp_kofi_message = {
 				"次模组以及游戏服务器",
 				"由一个人开发并维护",
 				"如果您喜欢，请考虑",
 			},
-			ml_lobby_info = { "房间", "信息" },
+			ml_lobby_info = {
+				"房间",
+				"信息",
+			},
 			loc_ready = "准备对战",
 			loc_selecting = "选择盲注中",
 			loc_shop = "购物中",
 			loc_playing = "战斗", -- translates to "fighting" because the direct translation for playing sounds a bit funny in context
 		},
 		v_dictionary = {
-			a_mp_art = { "Art: #1#" },
-			a_mp_code = { "Code: #1#" },
-			a_mp_idea = { "Idea: #1#" },
-			a_mp_skips_ahead = { "领先#1#次跳过盲住" },
-			a_mp_skips_behind = { "落后#1#次跳过盲注" },
-			a_mp_skips_tied = { "跳过盲注次数相等" },
+			a_mp_art = {
+				"Art: #1#",
+			},
+			a_mp_code = {
+				"Code: #1#",
+			},
+			a_mp_idea = {
+				"Idea: #1#",
+			},
+			a_mp_skips_ahead = {
+				"领先#1#次跳过盲住",
+			},
+			a_mp_skips_behind = {
+				"落后#1#次跳过盲注",
+			},
+			a_mp_skips_tied = {
+				"跳过盲注次数相等",
+			},
 			k_banned_objs = "禁用 #1#",
 			k_no_banned_objs = "非禁用 #1#",
 			k_reworked_objs = "修改 #1#",
@@ -382,8 +409,12 @@ return {
 			k_credits_list = "#1# 以及更多的人!", -- #1# gets replaced with a list of names
 		},
 		v_text = {
-			ch_c_hanging_chad_rework = { "{C:attention}未断选票{}有{C:dark_edition}修改" },
-			ch_c_glass_cards_rework = { "{C:attention}玻璃牌{}有{C:dark_edition}修改" },
+			ch_c_hanging_chad_rework = {
+				"{C:attention}未断选票{}有{C:dark_edition}修改",
+			},
+			ch_c_glass_cards_rework = {
+				"{C:attention}玻璃牌{}有{C:dark_edition}修改",
+			},
 		},
 		challenge_names = {
 			c_mp_misprint_deck = "印错牌组",

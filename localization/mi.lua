@@ -176,8 +176,14 @@ return {
 			b_leave_lobby = "Wehe i te Rūma",
 			b_mp_discord = "Discord o Balatro Multiplayer",
 			b_start = "KŌKIRI",
-			b_wait_for_host_start = { "E TATARI ANA KI", "TE KAIWHAKAHAERE" },
-			b_wait_for_players = { "E TATARI ANA KI", "NGĀ KAITĀKARO" },
+			b_wait_for_host_start = {
+				"E TATARI ANA KI",
+				"TE KAIWHAKAHAERE",
+			},
+			b_wait_for_players = {
+				"E TATARI ANA KI",
+				"NGĀ KAITĀKARO",
+			},
 			b_lobby_options = "KŌWHIRINGA",
 			b_copy_clipboard = "Kape",
 			b_view_code = "KUPU HUNA",
@@ -248,30 +254,52 @@ return {
 			k_the_order_credit = "*He mea hanga e @MathIsFun_",
 			k_the_order_integration_desc = "Ka tīnihia te kōwhiringa o ngā Kāri kia kaua e whiri-ā-kōeke, ā, ka whakamahia te puna kotahi mō ia momo",
 			k_requires_restart = "*Me whakatūwhera anō i te kēmu kia tīnihia",
-			ml_enemy_loc = { "Te wāhi o", "tō Hoariri" },
+			ml_enemy_loc = {
+				"Te wāhi o",
+				"tō Hoariri",
+			},
 			ml_mp_kofi_message = {
 				"Kōtahi anake te tāngata e",
 				"whakahaere, e tuarā ana ",
 				"i te Balatro Multiplayer.",
 				"Mēnā e pīrangi ana,",
 			},
-			ml_lobby_info = { "Kōwhiringa", "Rūma" },
+			ml_lobby_info = {
+				"Kōwhiringa",
+				"Rūma",
+			},
 			loc_ready = "Kua rite",
 			loc_selecting = "E kōwhiiri Ārai ana",
 			loc_shop = "E hokohoko ana",
 			loc_playing = "Kei te ",
 		},
 		v_dictionary = {
-			a_mp_art = { "Pikitia: #1#" },
-			a_mp_code = { "Waehere: #1#" },
-			a_mp_idea = { "Whakaaro: #1#" },
-			a_mp_skips_ahead = { "#1# Mahue kei mua" },
-			a_mp_skips_behind = { "#1# Mahue kei muri" },
-			a_mp_skips_tied = { "Kua taurite" },
+			a_mp_art = {
+				"Pikitia: #1#",
+			},
+			a_mp_code = {
+				"Waehere: #1#",
+			},
+			a_mp_idea = {
+				"Whakaaro: #1#",
+			},
+			a_mp_skips_ahead = {
+				"#1# Mahue kei mua",
+			},
+			a_mp_skips_behind = {
+				"#1# Mahue kei muri",
+			},
+			a_mp_skips_tied = {
+				"Kua taurite",
+			},
 		},
 		v_text = {
-			ch_c_hanging_chad_rework = { "Kua {C:dark_edition}tīnihia{} te {C:attention}Mātngatanga{}" },
-			ch_c_glass_cards_rework = { "Kua {C:dark_edition}tīnihia{} ngā {C:attention}Kāri Karāhe" },
+			ch_c_hanging_chad_rework = {
+				"Kua {C:dark_edition}tīnihia{} te {C:attention}Mātngatanga{}",
+			},
+			ch_c_glass_cards_rework = {
+				"Kua {C:dark_edition}tīnihia{} ngā {C:attention}Kāri Karāhe",
+			},
 		},
 		challenge_names = {
 			c_mp_misprint_deck = "Putu Hapa",

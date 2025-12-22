@@ -177,8 +177,14 @@ return {
 			b_leave_lobby = "Выйти из лобби",
 			b_mp_discord = "Дискорд-серверу Balatro Multiplayer",
 			b_start = "НАЧАТЬ",
-			b_wait_for_host_start = { "ЖДЁМ", "НАЧАЛА ИГРЫ" },
-			b_wait_for_players = { "ЖДЁМ", "ИГРОКОВ" },
+			b_wait_for_host_start = {
+				"ЖДЁМ",
+				"НАЧАЛА ИГРЫ",
+			},
+			b_wait_for_players = {
+				"ЖДЁМ",
+				"ИГРОКОВ",
+			},
 			b_lobby_options = "ПАРАМЕТРЫ ЛОББИ",
 			b_copy_clipboard = "Скопировать",
 			b_view_code = "УВИДЕТЬ КОД",
@@ -244,7 +250,10 @@ return {
 			k_timer = "Таймер",
 			k_mods_list = "Список модов",
 			k_enemy_jokers = "Джокеры противника",
-			ml_enemy_loc = { "Статус", "противника" },
+			ml_enemy_loc = {
+				"Статус",
+				"противника",
+			},
 			ml_mp_kofi_message = {
 				"Данный мод и сервер для него",
 				"разработан и обслуживается",
@@ -257,15 +266,29 @@ return {
 			loc_playing = "Против ",
 		},
 		v_dictionary = {
-			a_mp_art = { "Дизайн: #1#" },
-			a_mp_code = { "Код: #1#" },
-			a_mp_idea = { "Идея: #1#" },
-			a_mp_skips_ahead = { "Впереди на #1# пропусков" },
-			a_mp_skips_behind = { "Позади на #1# пропусков" },
-			a_mp_skips_tied = { "Равны" },
+			a_mp_art = {
+				"Дизайн: #1#",
+			},
+			a_mp_code = {
+				"Код: #1#",
+			},
+			a_mp_idea = {
+				"Идея: #1#",
+			},
+			a_mp_skips_ahead = {
+				"Впереди на #1# пропусков",
+			},
+			a_mp_skips_behind = {
+				"Позади на #1# пропусков",
+			},
+			a_mp_skips_tied = {
+				"Равны",
+			},
 		},
 		v_text = {
-			ch_c_hanging_chad_rework = { "{C:attention}Ещё разок{} {C:dark_edition}переработан" },
+			ch_c_hanging_chad_rework = {
+				"{C:attention}Ещё разок{} {C:dark_edition}переработан",
+			},
 			ch_c_glass_cards_rework = {
 				"{C:attention}Стеклянные карты{} {C:dark_edition}переработаны",
 			},
