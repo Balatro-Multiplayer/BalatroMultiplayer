@@ -221,13 +221,6 @@ return {
 		labels = {
 			mp_phantom = "Fantasma",
 		},
-		challenge_names = {
-			c_mp_standard = "Padrão",
-			c_mp_badlatro = "Badlatro",
-			c_mp_tournament = "Torneio",
-			c_mp_weekly = "Semanal",
-			c_mp_vanilla = "Vanilla",
-		},
 		dictionary = {
 			b_singleplayer = "Um jogador",
 			b_join_lobby = "Entrar em uma Sala",
@@ -408,6 +401,11 @@ return {
 			},
 		},
 		challenge_names = {
+			c_mp_standard = "Padrão",
+			c_mp_badlatro = "Badlatro",
+			c_mp_tournament = "Torneio",
+			c_mp_weekly = "Semanal",
+			c_mp_vanilla = "Vanilla",
 			c_mp_misprint_deck = "Baralho de Impressão Errada",
 			c_mp_legendaries = "Lendários",
 			c_mp_psychosis = "Psicose",

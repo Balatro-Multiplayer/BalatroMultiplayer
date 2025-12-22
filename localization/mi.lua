@@ -157,13 +157,6 @@ return {
 		labels = {
 			mp_phantom = "Mariko",
 		},
-		challenge_names = {
-			c_mp_standard = "Takirua",
-			c_mp_badlatro = "Badlatro",
-			c_mp_tournament = "Tōnamana",
-			c_mp_weekly = "Kēmu-ā-Wiki",
-			c_mp_vanilla = "Kēmu Noa",
-		},
 		dictionary = {
 			b_singleplayer = "Takitahi",
 			b_join_lobby = "Kuhu i te Rūma",
@@ -302,6 +295,11 @@ return {
 			},
 		},
 		challenge_names = {
+			c_mp_standard = "Takirua",
+			c_mp_badlatro = "Badlatro",
+			c_mp_tournament = "Tōnamana",
+			c_mp_weekly = "Kēmu-ā-Wiki",
+			c_mp_vanilla = "Kēmu Noa",
 			c_mp_misprint_deck = "Putu Hapa",
 			c_mp_legendaries = "Te Kō a te Kōkako",
 			c_mp_psychosis = "Mate Ahotea",

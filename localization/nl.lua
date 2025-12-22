@@ -161,13 +161,6 @@ return {
 		labels = {
 			mp_phantom = "Spook",
 		},
-		challenge_names = {
-			c_mp_standard = "Standaard",
-			c_mp_badlatro = "Badlatro",
-			c_mp_tournament = "Tournament",
-			c_mp_weekly = "Weekelijks",
-			c_mp_vanilla = "Vanilla",
-		},
 		dictionary = {
 			b_singleplayer = "Singleplayer",
 			b_join_lobby = "Sluit je aan bij een lobby",
@@ -352,6 +345,11 @@ return {
 			},
 		},
 		challenge_names = {
+			c_mp_standard = "Standaard",
+			c_mp_badlatro = "Badlatro",
+			c_mp_tournament = "Tournament",
+			c_mp_weekly = "Weekelijks",
+			c_mp_vanilla = "Vanilla",
 			c_mp_misprint_deck = "Foutgedrukte Deck",
 			c_mp_legendaries = "Legendarische",
 			c_mp_psychosis = "Psychose",

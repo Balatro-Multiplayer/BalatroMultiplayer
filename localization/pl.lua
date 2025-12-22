@@ -257,13 +257,6 @@ return {
 		labels = {
 			mp_phantom = "Widmo",
 		},
-		challenge_names = {
-			c_mp_standard = "Standardowe",
-			c_mp_badlatro = "Badlatro",
-			c_mp_tournament = "Turnejowe",
-			c_mp_weekly = "Tygodniowe",
-			c_mp_vanilla = "Vanilla",
-		},
 		dictionary = {
 			b_singleplayer = "Tryb Jednoosobowy",
 			b_join_lobby = "Dołącz do Lobby",
@@ -402,6 +395,11 @@ return {
 			},
 		},
 		challenge_names = {
+			c_mp_standard = "Standardowe",
+			c_mp_badlatro = "Badlatro",
+			c_mp_tournament = "Turnejowe",
+			c_mp_weekly = "Tygodniowe",
+			c_mp_vanilla = "Vanilla",
 			c_mp_misprint_deck = "Talia - Błąd w druku",
 			c_mp_legendaries = "Jokery Legendarne",
 			c_mp_psychosis = "Psychoza",

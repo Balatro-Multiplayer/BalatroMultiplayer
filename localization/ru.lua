@@ -158,13 +158,6 @@ return {
 		labels = {
 			mp_phantom = "Фантомный",
 		},
-		challenge_names = {
-			c_mp_standard = "Стандартный режим",
-			c_mp_badlatro = "Плохлатро",
-			c_mp_tournament = "Турнирный режим",
-			c_mp_weekly = "Недельный режим",
-			c_mp_vanilla = "Ванилла",
-		},
 		dictionary = {
 			b_singleplayer = "Одиночная Игра",
 			b_join_lobby = "Подключиться к лобби",
@@ -294,6 +287,11 @@ return {
 			},
 		},
 		challenge_names = {
+			c_mp_standard = "Стандартный режим",
+			c_mp_badlatro = "Плохлатро",
+			c_mp_tournament = "Турнирный режим",
+			c_mp_weekly = "Недельный режим",
+			c_mp_vanilla = "Ванилла",
 			c_mp_misprint_deck = "Колода с опечаткой",
 			c_mp_legendaries = "Легендарки",
 			c_mp_psychosis = "Психоз",

@@ -159,13 +159,6 @@ return {
 		labels = {
 			mp_phantom = "Fantasma",
 		},
-		challenge_names = {
-			c_mp_standard = "Estándar",
-			c_mp_badlatro = "Badlatro",
-			c_mp_tournament = "Torneo",
-			c_mp_weekly = "Semanal",
-			c_mp_vanilla = "Vainilla",
-		},
 		dictionary = {
 			b_singleplayer = "Un jugador",
 			b_join_lobby = "Unirse a sala",
@@ -299,6 +292,11 @@ return {
 			},
 		},
 		challenge_names = {
+			c_mp_standard = "Estándar",
+			c_mp_badlatro = "Badlatro",
+			c_mp_tournament = "Torneo",
+			c_mp_weekly = "Semanal",
+			c_mp_vanilla = "Vainilla",
 			c_mp_misprint_deck = "Baraja mal impresa",
 			c_mp_legendaries = "Legendarios",
 			c_mp_psychosis = "Psicosis",
@@ -312,7 +310,6 @@ return {
 			c_mp_divination = "Divinidad",
 			c_mp_skip_off = "Avioncito",
 			c_mp_lets_go_gambling = "Let's Go Gambling",
-			c_mp_high_hand = "Mano más alta", -- ElTioRata: Repetida por algún motivo :P
 			c_mp_speed = "Velocidad",
 		},
 	},

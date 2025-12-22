@@ -494,14 +494,6 @@ return {
 		labels = {
 			mp_phantom = "ファントム",
 		},
-		challenge_names = {
-			c_mp_standard = "スタンダード",
-			c_mp_sandbox = "サンドボックス",
-			c_mp_badlatro = "Badlatro",
-			c_mp_tournament = "トーナメント",
-			c_mp_weekly = "ウィークリー",
-			c_mp_vanilla = "バニラ",
-		},
 		dictionary = {
 			b_singleplayer = "シングルプレイ",
 			b_join_lobby = "ロビーに参加",
@@ -758,6 +750,12 @@ return {
 			},
 		},
 		challenge_names = {
+			c_mp_standard = "スタンダード",
+			c_mp_sandbox = "サンドボックス",
+			c_mp_badlatro = "Badlatro",
+			c_mp_tournament = "トーナメント",
+			c_mp_weekly = "ウィークリー",
+			c_mp_vanilla = "バニラ",
 			c_mp_misprint_deck = "バグシードデッキ",
 			c_mp_legendaries = "レジェンドたち",
 			c_mp_psychosis = "精神病",

@@ -185,14 +185,6 @@ return {
 		labels = {
 			mp_phantom = "幻影",
 		},
-		challenge_names = {
-			c_mp_standard = "标准",
-			c_mp_sandbox = "沙盒",
-			c_mp_badlatro = "Badlatro",
-			c_mp_tournament = "竞赛",
-			c_mp_weekly = "每周挑战",
-			c_mp_vanilla = "香草",
-		},
 		dictionary = {
 			b_singleplayer = "单人游戏",
 			b_join_lobby = "加入房间",
@@ -417,6 +409,12 @@ return {
 			},
 		},
 		challenge_names = {
+			c_mp_standard = "标准",
+			c_mp_sandbox = "沙盒",
+			c_mp_badlatro = "Badlatro",
+			c_mp_tournament = "竞赛",
+			c_mp_weekly = "每周挑战",
+			c_mp_vanilla = "香草",
 			c_mp_misprint_deck = "印错牌组",
 			c_mp_legendaries = "传奇小丑",
 			c_mp_psychosis = "精神分裂", -- technically translates to "schizophrenia", but the accurate term for psychosis is also used as an insult

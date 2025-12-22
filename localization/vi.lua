@@ -506,14 +506,6 @@ return {
 		labels = {
 			mp_phantom = "Bóng Ma",
 		},
-		challenge_names = {
-			c_mp_standard = "Tiêu Chuẩn",
-			c_mp_sandbox = "Sandbox",
-			c_mp_badlatro = "Badlatro",
-			c_mp_tournament = "Giải Đấu",
-			c_mp_weekly = "Giải Tuần",
-			c_mp_vanilla = "Cơ Bản",
-		},
 		dictionary = {
 			b_singleplayer = "Chơi Đơn",
 			b_join_lobby = "Vào Phòng",
@@ -769,7 +761,13 @@ return {
 				"{C:red}X#1#{} điểm Blind sàn",
 			},
 		},
-		challenge_names = { -- vi.lua:180 ?????????
+		challenge_names = {
+			c_mp_standard = "Tiêu Chuẩn",
+			c_mp_sandbox = "Sandbox",
+			c_mp_badlatro = "Badlatro",
+			c_mp_tournament = "Giải Đấu",
+			c_mp_weekly = "Giải Tuần",
+			c_mp_vanilla = "Cơ Bản",
 			c_mp_misprint_deck = "Bộ Bài Lỗi In",
 			c_mp_legendaries = "Huyền Thoại",
 			c_mp_psychosis = "Rối Loạn Tâm Thần",
