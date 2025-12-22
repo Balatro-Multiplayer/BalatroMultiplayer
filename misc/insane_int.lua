@@ -76,20 +76,20 @@ MP.INSANE_INT.add = function(insane_int_display1, insane_int_display2)
 	local otherExponent = insane_int_display2.exponent
 
 	if myStartingECount > otherStartingECount then
-		otherExponent = (otherExponent / math.pow(10, (myStartingECount - otherStartingECount)))
+		otherExponent = (otherExponent / (10 ^ (myStartingECount - otherStartingECount)))
 		starting_e_count = myStartingECount
 	elseif myStartingECount < otherStartingECount then
-		myExponent = (myExponent / math.pow(10, (otherStartingECount - myStartingECount)))
+		myExponent = (myExponent / (10 ^ (otherStartingECount - myStartingECount)))
 		starting_e_count = otherStartingECount
 	else
 		starting_e_count = myStartingECount
 	end
 
 	if myExponent > otherExponent then
-		coeffiocient = (otherCoefficient / math.pow(10, (myExponent - otherExponent))) + myCoefficient
+		coeffiocient = (otherCoefficient / (10 ^ (myExponent - otherExponent))) + myCoefficient
 		exponent = myExponent
 	elseif myExponent < otherExponent then
-		coeffiocient = (myCoefficient / math.pow(10, (otherExponent - myExponent))) + otherCoefficient
+		coeffiocient = (myCoefficient / (10 ^ (otherExponent - myExponent))) + otherCoefficient
 		exponent = otherExponent
 	else
 		coeffiocient = myCoefficient + otherCoefficient
