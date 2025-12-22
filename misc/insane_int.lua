@@ -62,6 +62,11 @@ MP.INSANE_INT.greater_than = function(insane_int_display1, insane_int_display2)
 	return tonumber(insane_int_display1.coeffiocient) > tonumber(insane_int_display2.coeffiocient)
 end
 
+-- ignore deprected warning for math.pow
+-- math.pow is used instead of ^ to avoid conflicts with talisman's __pow override
+-- theoretically the talisman override only applies to their special big number types and using '^' would be fine,
+-- but we use math.pow just in case
+---@diagnostic disable: deprecated
 MP.INSANE_INT.add = function(insane_int_display1, insane_int_display2)
 	local starting_e_count
 	local coeffiocient
@@ -98,3 +103,4 @@ MP.INSANE_INT.add = function(insane_int_display1, insane_int_display2)
 
 	return MP.INSANE_INT.create(coeffiocient, exponent, starting_e_count)
 end
+---@diagnostic enable: deprecated
