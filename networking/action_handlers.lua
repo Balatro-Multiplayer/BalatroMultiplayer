@@ -108,7 +108,6 @@ local function action_disconnected()
 	MP.UI.update_connection_status()
 end
 
----@param deck string
 ---@param seed string
 ---@param stake_str string
 local function action_start_game(seed, stake_str)
@@ -558,6 +557,7 @@ function G.FUNCS.load_end_game_jokers()
 		-- Reset the card area if loading fails to avoid inconsistent state
 		MP.end_game_jokers:remove()
 		MP.end_game_jokers:init(
+			---@diagnostic disable-next-line: param-type-mismatch
 			0,
 			0,
 			5 * G.CARD_W,
@@ -856,6 +856,7 @@ function MP.ACTIONS.play_hand(score, hands_left)
 end
 
 function MP.ACTIONS.lobby_options()
+	---@type table<string, any>
 	local msg = {
 		action = "lobbyOptions",
 	}

@@ -506,14 +506,6 @@ return {
 		labels = {
 			mp_phantom = "Bóng Ma",
 		},
-		challenge_names = {
-			c_mp_standard = "Tiêu Chuẩn",
-			c_mp_sandbox = "Sandbox",
-			c_mp_badlatro = "Badlatro",
-			c_mp_tournament = "Giải Đấu",
-			c_mp_weekly = "Giải Tuần",
-			c_mp_vanilla = "Cơ Bản",
-		},
 		dictionary = {
 			b_singleplayer = "Chơi Đơn",
 			b_join_lobby = "Vào Phòng",
@@ -527,9 +519,18 @@ return {
 			b_leave_lobby = "Rời Phòng",
 			b_mp_discord = "Máy Chủ Discord Balatro Multiplayer",
 			b_start = "BẮT ĐẦU",
-			b_wait_for_host_start = { "ĐANG CHỜ CHỦ", "PHÒNG BẮT ĐẦU" },
-			b_wait_for_players = { "ĐANG CHỜ", "NGƯỜI CHƠI" },
-			b_wait_for_guest_ready = { "ĐANG CHỜ NGƯỜI CHƠI", "KHÁC SẴN SÀNG" },
+			b_wait_for_host_start = {
+				"ĐANG CHỜ CHỦ",
+				"PHÒNG BẮT ĐẦU",
+			},
+			b_wait_for_players = {
+				"ĐANG CHỜ",
+				"NGƯỜI CHƠI",
+			},
+			b_wait_for_guest_ready = {
+				"ĐANG CHỜ NGƯỜI CHƠI",
+				"KHÁC SẴN SÀNG",
+			},
 			b_lobby_options = "TUỲ CHỈNH PHÒNG",
 			b_copy_clipboard = "Sao chép vào bộ nhớ đệm",
 			b_view_code = "XEM MÃ",
@@ -688,26 +689,44 @@ return {
 			k_tutorial_not_complete = "Bạn phải hoàn thành màn hướng dẫn trước khi chơi Multiplayer",
 			k_created_by = "Tạo nởi",
 			k_major_contributors = "Đóng góp chính bởi",
-			ml_enemy_loc = { "Vị trí", "Đối Thủ" },
+			ml_enemy_loc = {
+				"Vị trí",
+				"Đối Thủ",
+			},
 			ml_mp_kofi_message = {
 				"Mod và máy chủ này được",
 				"lập trình và bảo trì bởi",
 				"một người, nếu bạn",
 				"thích nó, hãy",
 			},
-			ml_lobby_info = { "T.Tin", "Phòng" },
+			ml_lobby_info = {
+				"T.Tin",
+				"Phòng",
+			},
 			loc_ready = "Sẵn sàng Đối Đầu",
 			loc_selecting = "Đang chọn Blind",
 			loc_shop = "Đang đi chợ",
 			loc_playing = "Đang đánh ",
 		},
 		v_dictionary = {
-			a_mp_art = { "Người vẽ: #1#" },
-			a_mp_code = { "Người tạo: #1#" },
-			a_mp_idea = { "Ý tưởng: #1#" },
-			a_mp_skips_ahead = { "Hơn #1# lần Bỏ Qua" },
-			a_mp_skips_behind = { "Kém #1# lần Bỏ Qua" },
-			a_mp_skips_tied = { "Hoà" },
+			a_mp_art = {
+				"Người vẽ: #1#",
+			},
+			a_mp_code = {
+				"Người tạo: #1#",
+			},
+			a_mp_idea = {
+				"Ý tưởng: #1#",
+			},
+			a_mp_skips_ahead = {
+				"Hơn #1# lần Bỏ Qua",
+			},
+			a_mp_skips_behind = {
+				"Kém #1# lần Bỏ Qua",
+			},
+			a_mp_skips_tied = {
+				"Hoà",
+			},
 			k_banned_objs = "Đã Cấm #1#",
 			k_no_banned_objs = "Không Cấm #1#",
 			k_reworked_objs = "Đã Thêm/Sửa Lại #1#",
@@ -720,17 +739,35 @@ return {
 			k_credits_list = "#1# và nhiều người nữa!", -- #1# gets replaced with a list of names
 		},
 		v_text = {
-			ch_c_hanging_chad_rework = { "{C:attention}Phiếu Đục Lỗ{} được {C:dark_edition}làm lại" },
-			ch_c_glass_cards_rework = { "{C:attention}Lá Kính{} được {C:dark_edition}làm lại" },
-			ch_c_mp_score_instability = { "Điểm không cân bằng bị {C:purple}chêch lệch{} nhiều hơn:" },
+			ch_c_hanging_chad_rework = {
+				"{C:attention}Phiếu Đục Lỗ{} được {C:dark_edition}làm lại",
+			},
+			ch_c_glass_cards_rework = {
+				"{C:attention}Lá Kính{} được {C:dark_edition}làm lại",
+			},
+			ch_c_mp_score_instability = {
+				"Điểm không cân bằng bị {C:purple}chêch lệch{} nhiều hơn:",
+			},
 			ch_c_mp_score_instability_EXAMPLE = {
 				"  {C:inactive}(VD: {C:chips}30{C:inactive}x{C:mult}24{C:inactive} -> {C:chips}36{C:inactive}x{C:mult}18{C:inactive})",
 			},
-			ch_c_mp_score_instability_LOC1 = { "  {C:inactive}Tối thiểu {C:attention}1 {C:mult}Nhân" },
-			ch_c_mp_score_instability_LOC2 = { "  {C:inactive}Tối thiểu {C:attention}0 {C:chips}Chip" },
-			ch_c_mp_ante_scaling = { "{C:red}X#1#{} điểm Blind sàn" },
+			ch_c_mp_score_instability_LOC1 = {
+				"  {C:inactive}Tối thiểu {C:attention}1 {C:mult}Nhân",
+			},
+			ch_c_mp_score_instability_LOC2 = {
+				"  {C:inactive}Tối thiểu {C:attention}0 {C:chips}Chip",
+			},
+			ch_c_mp_ante_scaling = {
+				"{C:red}X#1#{} điểm Blind sàn",
+			},
 		},
-		challenge_names = { -- vi.lua:180 ?????????
+		challenge_names = {
+			c_mp_standard = "Tiêu Chuẩn",
+			c_mp_sandbox = "Sandbox",
+			c_mp_badlatro = "Badlatro",
+			c_mp_tournament = "Giải Đấu",
+			c_mp_weekly = "Giải Tuần",
+			c_mp_vanilla = "Cơ Bản",
 			c_mp_misprint_deck = "Bộ Bài Lỗi In",
 			c_mp_legendaries = "Huyền Thoại",
 			c_mp_psychosis = "Rối Loạn Tâm Thần",

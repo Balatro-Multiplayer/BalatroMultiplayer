@@ -159,13 +159,6 @@ return {
 		labels = {
 			mp_phantom = "Fantasma",
 		},
-		challenge_names = {
-			c_mp_standard = "Estándar",
-			c_mp_badlatro = "Badlatro",
-			c_mp_tournament = "Torneo",
-			c_mp_weekly = "Semanal",
-			c_mp_vanilla = "Vainilla",
-		},
 		dictionary = {
 			b_singleplayer = "Un jugador",
 			b_join_lobby = "Unirse a sala",
@@ -178,8 +171,14 @@ return {
 			b_leave_lobby = "Abandonar sala",
 			b_mp_discord = "Servidor de Discord del multijugador de Balatro",
 			b_start = "INICIAR",
-			b_wait_for_host_start = { "ESPERANDO AL", "ANFITRIÓN PARA INICIAR" },
-			b_wait_for_players = { "ESPERANDO", "JUGADORES" },
+			b_wait_for_host_start = {
+				"ESPERANDO AL",
+				"ANFITRIÓN PARA INICIAR",
+			},
+			b_wait_for_players = {
+				"ESPERANDO",
+				"JUGADORES",
+			},
 			b_lobby_options = "OPCIONES DE SALA",
 			b_copy_clipboard = "Copiar al portapapeles",
 			b_view_code = "VER CÓDIGO",
@@ -245,32 +244,59 @@ return {
 			k_timer = "Temporizador",
 			k_mods_list = "Lista de mods",
 			k_enemy_jokers = "Comodínes del enemigo",
-			ml_enemy_loc = { "Enemigo", "ubicación" },
+			ml_enemy_loc = {
+				"Enemigo",
+				"ubicación",
+			},
 			ml_mp_kofi_message = {
 				"Este mod y sus servidores son",
 				"desarrollados y mantenidos por ",
 				"una sola persona, si te gusta",
 				"puedes considerar",
 			},
-			ml_lobby_info = { "Sala", "Info" },
+			ml_lobby_info = {
+				"Sala",
+				"Info",
+			},
 			loc_ready = "Listo para JcJ",
 			loc_selecting = "Seleccionando ciega",
 			loc_shop = "En la tienda",
 			loc_playing = "Jugando ",
 		},
 		v_dictionary = {
-			a_mp_art = { "Arte: #1#" },
-			a_mp_code = { "Código: #1#" },
-			a_mp_idea = { "Idea: #1#" },
-			a_mp_skips_ahead = { "#1# omisiones por delante" },
-			a_mp_skips_behind = { "#1# omisiones por detrás" },
-			a_mp_skips_tied = { "empatadas" },
+			a_mp_art = {
+				"Arte: #1#",
+			},
+			a_mp_code = {
+				"Código: #1#",
+			},
+			a_mp_idea = {
+				"Idea: #1#",
+			},
+			a_mp_skips_ahead = {
+				"#1# omisiones por delante",
+			},
+			a_mp_skips_behind = {
+				"#1# omisiones por detrás",
+			},
+			a_mp_skips_tied = {
+				"empatadas",
+			},
 		},
 		v_text = {
-			ch_c_hanging_chad_rework = { "{C:attention}Papel perforado{} está {C:dark_edition}modificado" },
-			ch_c_glass_cards_rework = { "{C:attention}Cartas de vidrio{} están {C:dark_edition}modificadas" },
+			ch_c_hanging_chad_rework = {
+				"{C:attention}Papel perforado{} está {C:dark_edition}modificado",
+			},
+			ch_c_glass_cards_rework = {
+				"{C:attention}Cartas de vidrio{} están {C:dark_edition}modificadas",
+			},
 		},
 		challenge_names = {
+			c_mp_standard = "Estándar",
+			c_mp_badlatro = "Badlatro",
+			c_mp_tournament = "Torneo",
+			c_mp_weekly = "Semanal",
+			c_mp_vanilla = "Vainilla",
 			c_mp_misprint_deck = "Baraja mal impresa",
 			c_mp_legendaries = "Legendarios",
 			c_mp_psychosis = "Psicosis",
@@ -284,7 +310,6 @@ return {
 			c_mp_divination = "Divinidad",
 			c_mp_skip_off = "Avioncito",
 			c_mp_lets_go_gambling = "Let's Go Gambling",
-			c_mp_high_hand = "Mano más alta", -- ElTioRata: Repetida por algún motivo :P
 			c_mp_speed = "Velocidad",
 		},
 	},

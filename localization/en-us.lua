@@ -655,9 +655,18 @@ return {
 			b_leave_lobby = "Leave Lobby",
 			b_mp_discord = "Balatro Multiplayer Discord Server",
 			b_start = "START",
-			b_wait_for_host_start = { "WAITING FOR", "HOST TO START" },
-			b_wait_for_players = { "WAITING FOR", "PLAYERS" },
-			b_wait_for_guest_ready = { "WAITING FOR", "GUEST TO READY UP" },
+			b_wait_for_host_start = {
+				"WAITING FOR",
+				"HOST TO START",
+			},
+			b_wait_for_players = {
+				"WAITING FOR",
+				"PLAYERS",
+			},
+			b_wait_for_guest_ready = {
+				"WAITING FOR",
+				"GUEST TO READY UP",
+			},
 			b_lobby_options = "LOBBY OPTIONS",
 			b_copy_clipboard = "Copy to clipboard",
 			b_view_code = "VIEW CODE",
@@ -821,17 +830,23 @@ return {
 			k_tutorial_not_complete = "You must complete the tutorial before you can play Multiplayer",
 			k_created_by = "Created by",
 			k_major_contributors = "Major contributions by",
+			ml_enemy_loc = {
+				"Enemy",
+				"location",
+			},
 			k_hide_mp_content = "Hide Multiplayer content*",
 			k_applies_singleplayer_vanilla_rulesets = "*Applies in singleplayer and vanilla rulesets",
 			k_timer_sfx = "Timer Sound Effects",
-			ml_enemy_loc = { "Enemy", "location" },
 			ml_mp_kofi_message = {
 				"This mod and game server is",
 				"developed and maintained by ",
 				"one person, if",
 				"you like it consider",
 			},
-			ml_lobby_info = { "Lobby", "Info" },
+			ml_lobby_info = {
+				"Lobby",
+				"Info",
+			},
 			ml_mp_timersfx_opt = {
 				"On",
 				"Once per Ante",
@@ -843,12 +858,24 @@ return {
 			loc_playing = "Playing ",
 		},
 		v_dictionary = {
-			a_mp_art = { "Art: #1#" },
-			a_mp_code = { "Code: #1#" },
-			a_mp_idea = { "Idea: #1#" },
-			a_mp_skips_ahead = { "#1# Skips Ahead" },
-			a_mp_skips_behind = { "#1# Skips Behind" },
-			a_mp_skips_tied = { "Tied" },
+			a_mp_art = {
+				"Art: #1#",
+			},
+			a_mp_code = {
+				"Code: #1#",
+			},
+			a_mp_idea = {
+				"Idea: #1#",
+			},
+			a_mp_skips_ahead = {
+				"#1# Skips Ahead",
+			},
+			a_mp_skips_behind = {
+				"#1# Skips Behind",
+			},
+			a_mp_skips_tied = {
+				"Tied",
+			},
 			k_banned_objs = "Banned #1#",
 			k_no_banned_objs = "No Banned #1#",
 			k_reworked_objs = "Reworked #1#",
@@ -861,28 +888,56 @@ return {
 			k_credits_list = "#1# and many more!", -- #1# gets replaced with a list of names
 		},
 		v_text = {
-			ch_c_hanging_chad_rework = { "{C:attention}Hanging Chad{} is {C:dark_edition}reworked" },
-			ch_c_glass_cards_rework = { "{C:attention}Glass Cards{} are {C:dark_edition}reworked" },
-			ch_c_mp_score_instability = { "Unbalanced score is {C:purple}destabilized{} further:" },
+			ch_c_hanging_chad_rework = {
+				"{C:attention}Hanging Chad{} is {C:dark_edition}reworked",
+			},
+			ch_c_glass_cards_rework = {
+				"{C:attention}Glass Cards{} are {C:dark_edition}reworked",
+			},
+			ch_c_mp_score_instability = {
+				"Unbalanced score is {C:purple}destabilized{} further:",
+			},
 			ch_c_mp_score_instability_EXAMPLE = {
 				"  {C:inactive}(ex: {C:chips}30{C:inactive}x{C:mult}24{C:inactive} -> {C:chips}36{C:inactive}x{C:mult}18{C:inactive})",
 			},
-			ch_c_mp_score_instability_LOC1 = { "  {C:inactive}Minimum of {C:attention}1 {C:mult}Mult" },
-			ch_c_mp_score_instability_LOC2 = { "  {C:inactive}Minimum of {C:attention}0 {C:chips}Chips" },
-			ch_c_mp_ante_scaling = { "{C:red}X#1#{} base Blind size" },
-			ch_c_mp_no_shop_planets = { "{C:planet}Planets{} no longer appear in the {C:attention}shop" },
-			ch_c_mp_only_medium = { "All {C:spectral}Spectral{} cards are {C:spectral}Mediums{}" },
-			ch_c_mp_only_purple_seals = { "All {C:attention}seals{} are {C:purple}Purple Seals{}" },
-			ch_c_mp_sibyl_CREDITS = { "{C:inactive}(Art by {C:attention}Ganpan14O{C:inactive})" },
+			ch_c_mp_score_instability_LOC1 = {
+				"  {C:inactive}Minimum of {C:attention}1 {C:mult}Mult",
+			},
+			ch_c_mp_score_instability_LOC2 = {
+				"  {C:inactive}Minimum of {C:attention}0 {C:chips}Chips",
+			},
+			ch_c_mp_ante_scaling = {
+				"{C:red}X#1#{} base Blind size",
+			},
+			ch_c_mp_no_shop_planets = {
+				"{C:planet}Planets{} no longer appear in the {C:attention}shop",
+			},
+			ch_c_mp_only_medium = {
+				"All {C:spectral}Spectral{} cards are {C:spectral}Mediums{}",
+			},
+			ch_c_mp_only_purple_seals = {
+				"All {C:attention}seals{} are {C:purple}Purple Seals{}",
+			},
+			ch_c_mp_sibyl_CREDITS = {
+				"{C:inactive}(Art by {C:attention}Ganpan14O{C:inactive})",
+			},
 			ch_c_mp_polymorph_spam = {
 				"On selecting blind, all held {C:attention}Jokers{} and {C:attention}Consumables{}",
 			},
 			ch_c_mp_polymorph_spam_EXTENDED1 = {
 				"are transmuted into the {C:attention}N{}th next card in their collection,",
 			},
-			ch_c_mp_polymorph_spam_EXTENDED2 = { "where {C:attention}N{} is its current position in slots" },
+			ch_c_mp_polymorph_spam_EXTENDED2 = {
+				"where {C:attention}N{} is its current position in slots",
+			},
 		},
 		challenge_names = {
+			c_mp_standard = "Standard",
+			c_mp_sandbox = "Sandbox",
+			c_mp_badlatro = "Badlatro",
+			c_mp_tournament = "Tournament",
+			c_mp_weekly = "Weekly",
+			c_mp_vanilla = "Vanilla",
 			c_mp_misprint_deck = "Misprint Deck",
 			c_mp_legendaries = "Legendaries",
 			c_mp_psychosis = "Psychosis",

@@ -257,13 +257,6 @@ return {
 		labels = {
 			mp_phantom = "Widmo",
 		},
-		challenge_names = {
-			c_mp_standard = "Standardowe",
-			c_mp_badlatro = "Badlatro",
-			c_mp_tournament = "Turnejowe",
-			c_mp_weekly = "Tygodniowe",
-			c_mp_vanilla = "Vanilla",
-		},
 		dictionary = {
 			b_singleplayer = "Tryb Jednoosobowy",
 			b_join_lobby = "Dołącz do Lobby",
@@ -276,8 +269,14 @@ return {
 			b_leave_lobby = "Opuść Lobby",
 			b_mp_discord = "Serwera Discord Balatro Multiplayer",
 			b_start = "START",
-			b_wait_for_host_start = { "CZEKANIE NA", "ROZPOCZĘCZIE GRY" },
-			b_wait_for_players = { "CZEKANIE NA", "GRACZY" },
+			b_wait_for_host_start = {
+				"CZEKANIE NA",
+				"ROZPOCZĘCZIE GRY",
+			},
+			b_wait_for_players = {
+				"CZEKANIE NA",
+				"GRACZY",
+			},
 			b_lobby_options = "OPCJE GRY",
 			b_copy_clipboard = "Skopiuj do schowka",
 			b_view_code = "POKAŻ KOD",
@@ -348,32 +347,59 @@ return {
 			k_the_order_credit = "*Twórca: @MathIsFun_",
 			k_the_order_integration_desc = "Ten mod sprawi, że kreacja kart nie będzie zależna od wstępu i wybór kart będzie ten sam dla wszystkich graczy.",
 			k_requires_restart = "*Wymaga ponownego uruchomienia gry",
-			ml_enemy_loc = { "Lokacja", "prezeciwnika" },
+			ml_enemy_loc = {
+				"Lokacja",
+				"prezeciwnika",
+			},
 			ml_mp_kofi_message = {
 				"Ten mod był zaprogramowany",
 				"i jest utrzymywany przez",
 				"jedną osobę, jeżeli tobie się",
 				"spodobał,",
 			},
-			ml_lobby_info = { "Informacje", "o Lobby" },
+			ml_lobby_info = {
+				"Informacje",
+				"o Lobby",
+			},
 			loc_ready = "Gotowość do PVP",
 			loc_selecting = "Wybiera Przeszkadzajkę",
 			loc_shop = "W Sklepie",
 			loc_playing = "Gra w ",
 		},
 		v_dictionary = {
-			a_mp_art = { "Zasoby: #1#" },
-			a_mp_code = { "Programowanie: #1#" },
-			a_mp_idea = { "Pomysł: #1#" },
-			a_mp_skips_ahead = { "#1# Pominięć w Przód" },
-			a_mp_skips_behind = { "#1# Pominięć w Tył" },
-			a_mp_skips_tied = { "Remis" },
+			a_mp_art = {
+				"Zasoby: #1#",
+			},
+			a_mp_code = {
+				"Programowanie: #1#",
+			},
+			a_mp_idea = {
+				"Pomysł: #1#",
+			},
+			a_mp_skips_ahead = {
+				"#1# Pominięć w Przód",
+			},
+			a_mp_skips_behind = {
+				"#1# Pominięć w Tył",
+			},
+			a_mp_skips_tied = {
+				"Remis",
+			},
 		},
 		v_text = {
-			ch_c_hanging_chad_rework = { "Joker {C:attention}Na włosku{} został {C:dark_edition}przerobiony" },
-			ch_c_glass_cards_rework = { "{C:attention}Karty Szklane{} zostały {C:dark_edition}przerobione" },
+			ch_c_hanging_chad_rework = {
+				"Joker {C:attention}Na włosku{} został {C:dark_edition}przerobiony",
+			},
+			ch_c_glass_cards_rework = {
+				"{C:attention}Karty Szklane{} zostały {C:dark_edition}przerobione",
+			},
 		},
 		challenge_names = {
+			c_mp_standard = "Standardowe",
+			c_mp_badlatro = "Badlatro",
+			c_mp_tournament = "Turnejowe",
+			c_mp_weekly = "Tygodniowe",
+			c_mp_vanilla = "Vanilla",
 			c_mp_misprint_deck = "Talia - Błąd w druku",
 			c_mp_legendaries = "Jokery Legendarne",
 			c_mp_psychosis = "Psychoza",

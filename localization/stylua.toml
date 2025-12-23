@@ -1,7 +1,7 @@
 indent_type = "Tabs"
 
 # longer lines for localization files
-column_width = 500
+column_width = 0
 
 quote_style = "AutoPreferDouble"
 
