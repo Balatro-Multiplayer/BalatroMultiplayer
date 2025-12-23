@@ -563,12 +563,16 @@ end
 
 local localize_ref = localize
 function localize(args, misc_cat)
-	local ret = localize_ref(args, misc_cat)
-	local key = args.key or args.node and args.node.config.center.key or "NULL"
-	if args.type == "name_text" and key == "b_mp_cocktail" then
-		if MP.cocktail_check_edited() then return ret .. "*" end
+	if args and type(args) == "table" and args.key then
+		local ret = localize_ref(args, misc_cat)
+		local key = args.key or args.node and args.node.config.center.key or "NULL"
+		if args.type == "name_text" and key == "b_mp_cocktail" then
+			if MP.cocktail_check_edited() then return ret .. "*" end
+		end
+		return ret
+	else
+		return localize_ref(args, misc_cat)
 	end
-	return ret
 end
 
 SMODS.Atlas({

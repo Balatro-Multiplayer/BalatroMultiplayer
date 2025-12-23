@@ -9,11 +9,20 @@ end
 
 local hidden_tbl = { "Stake", "Back" } -- Challenges are at bottom of file
 
-for _, hidden in ipairs(hidden_tbl) do
-	G.P_CENTER_POOLS[hidden .. "_non_mp"] = {}
-	for i, v in ipairs(G.P_CENTER_POOLS[hidden]) do
-		if not v.mod or v.mod ~= "Multiplayer" then table.insert(G.P_CENTER_POOLS[hidden .. "_non_mp"], v) end
+local inject_ref = SMODS.injectItems
+function SMODS.injectItems()
+	local ret = inject_ref()
+	for _, hidden in ipairs(hidden_tbl) do
+		G.P_CENTER_POOLS[hidden .. "_non_mp"] = {}
+		for i, v in ipairs(G.P_CENTER_POOLS[hidden]) do
+			if not v.mod or v.mod.id ~= "Multiplayer" then table.insert(G.P_CENTER_POOLS[hidden .. "_non_mp"], v) end
+		end
 	end
+	for i, v in ipairs(G.CHALLENGES) do
+		G.CHALLENGES_non_mp = {}
+		if not v.mod or v.mod.id ~= "Multiplayer" then table.insert(G.CHALLENGES_non_mp, v) end
+	end
+	return ret
 end
 
 local function hook(orig, type)
@@ -31,9 +40,12 @@ local hooks = {
 		{ tbl = G.UIDEF, str = "deck_stake_column" },
 		{ tbl = G.UIDEF, str = "current_stake" },
 		{ tbl = G.UIDEF, str = "stake_option" },
+		{ tbl = G.UIDEF, str = "run_setup_option" },
 	},
 	Back = {
 		{ tbl = G.UIDEF, str = "run_setup_option" },
+		{ tbl = G.FUNCS, str = "change_viewed_back" },
+		{ tbl = G.FUNCS, str = "change_selected_back" },
 	},
 }
 
@@ -46,14 +58,10 @@ end
 
 -- slightly modified exception code for challenges
 
-G.CHALLENGES_non_mp = {}
-for i, v in ipairs(G.CHALLENGES) do
-	if not v.mod or v.mod ~= "Multiplayer" then table.insert(G.CHALLENGES_non_mp, v) end
-end
-
 local ch_hooks = {
 	{ tbl = G.UIDEF, str = "challenges" },
 	{ tbl = G.UIDEF, str = "challenge_list" },
+	{ tbl = G.UIDEF, str = "challenge_list_page" },
 }
 
 local function ch_hook(orig)

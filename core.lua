@@ -48,7 +48,7 @@ MP.USE_NEW_NETWORKING = true
 
 G.C.MULTIPLAYER = HEX("AC3232")
 
-MP.SMODS_VERSION = "1.0.0~BETA-1016c"
+MP.SMODS_VERSION = "1.0.0~BETA-1221a"
 
 function MP.should_use_the_order()
 	return MP.LOBBY and MP.LOBBY.config and MP.LOBBY.config.the_order and MP.LOBBY.code

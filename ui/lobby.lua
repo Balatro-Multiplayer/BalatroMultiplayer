@@ -322,6 +322,25 @@ function G.FUNCS.lobby_start_run(e, args)
 	})
 end
 
+local back_generate_ui_ref = Back.generate_UI
+function Back:generate_UI(other, ui_scale, min_dims, challenge)
+	local name = other and other.name or self.name
+	if not challenge and name == "Challenge Deck" and MP.LOBBY.code then
+		challenge = MP.LOBBY.deck.challenge -- very generous assumption
+		local ret = back_generate_ui_ref(self, other, ui_scale, min_dims, challenge)
+
+		-- essentially the button opens the correct challenge menu
+		-- exiting this challenge menu results in a crash that's difficult to figure out
+		-- (some sort of jank when removing the ui elements)
+		-- hacky fallback to ensure that doesn't happen, but ideally one day this gets fixed
+
+		ret.nodes[1].nodes[1].config.button = "exit_overlay_menu"
+
+		return ret
+	end
+	return back_generate_ui_ref(self, other, ui_scale, min_dims, challenge)
+end
+
 function G.FUNCS.copy_host_deck()
 	MP.LOBBY.deck.back = MP.LOBBY.config.back
 	MP.LOBBY.deck.cocktail = MP.LOBBY.config.cocktail
