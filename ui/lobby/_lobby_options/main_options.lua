@@ -4,52 +4,37 @@ local function create_main_lobby_options_title(info_area_id)
 
 	if info_area_id == "ruleset_area" then
 		title_colour = mix_colours(G.C.BLUE, G.C.BLACK, 0.6)
-		title = localize("k_rulesets")
+		title = localize("k_rulesets") or "ERROR"
 	end
 
 	if info_area_id == "gamemode_area" then
 		title_colour = mix_colours(G.C.ORANGE, G.C.BLACK, 0.6)
-		title = localize("k_gamemodes")
+		title = localize("k_gamemodes") or "ERROR"
 	end
 
 	if title == "ERROR" then return nil end
 
-	return {
-		n = G.UIT.R,
-		config = { id = "ruleset_name", align = "cm", padding = 0.07 },
-		nodes = {
-			{
-				n = G.UIT.R,
-				config = {
-					align = "cm",
-					r = 0.1,
-					outline = 1,
-					outline_colour = title_colour,
-					colour = darken(title_colour, 0.3),
-					minw = 2.9,
-					emboss = 0.1,
-					padding = 0.07,
-					line_emboss = 1,
-				},
-				nodes = {
-					{
-						n = G.UIT.O,
-						config = {
-							object = DynaText({
-								string = title,
-								colours = { G.C.WHITE },
-								shadow = true,
-								float = true,
-								y_offset = -4,
-								scale = 0.45,
-								maxw = 2.8,
-							}),
-						},
-					},
-				},
-			},
-		},
-	}
+	return MP.UI.UTILS.create_row({ id = "ruleset_name", align = "cm", padding = 0.07 }, {
+		MP.UI.UTILS.create_row({
+			align = "cm",
+			r = 0.1,
+			outline = 1,
+			outline_colour = title_colour,
+			colour = darken(title_colour, 0.3),
+			minw = 2.9,
+			emboss = 0.1,
+			padding = 0.07,
+			line_emboss = 1,
+		}, {
+			MP.UI.UTILS.create_object_node(MP.UI.UTILS.create_dynatext(title, {
+				colours = { G.C.WHITE },
+				float = true,
+				y_offset = -4,
+				scale = 0.45,
+				maxw = 2.8,
+			})),
+		}),
+	})
 end
 
 function MP.UI.Main_Lobby_Options(info_area_id, default_info_area, button_func, buttons_data)
@@ -76,7 +61,7 @@ function MP.UI.Main_Lobby_Options(info_area_id, default_info_area, button_func, 
 				scale = 0.4,
 				minh = 0.6,
 			})
-			buttons[#buttons + 1] = { n = G.UIT.R, config = { align = "cm", padding = 0.05 }, nodes = { button } }
+			buttons[#buttons + 1] = MP.UI.UTILS.create_row({ align = "cm", padding = 0.05 }, { button })
 		end
 		categories[#categories + 1] = MP.UI.BackgroundGrouping(localize(category.name), buttons)
 	end
@@ -123,4 +108,11 @@ function MP.UI.Change_Main_Lobby_Options(e, info_area_id, info_area_func, defaul
 	info_area.config.object:recalculate()
 
 	info_area.config.prev_chosen = e
+end
+
+function MP.UI.update_lobby_option_toggle(option_key)
+	if G.OVERLAY_MENU then
+		local config_uie = G.OVERLAY_MENU:get_UIE_by_ID(option_key .. "_toggle")
+		if config_uie then G.FUNCS.toggle(config_uie) end
+	end
 end
