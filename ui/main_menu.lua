@@ -193,6 +193,7 @@ function G.UIDEF.ruleset_selection_options()
 			name = "k_matchmaking",
 			buttons = {
 				{ button_id = "ranked_ruleset_button", button_localize_key = "k_ranked" },
+				{ button_id = "vanilla_ruleset_button", button_localize_key = "k_vanilla" },
 				{ button_id = "sandbox_ruleset_button", button_localize_key = "k_sandbox" },
 				{ button_id = "smallworld_ruleset_button", button_localize_key = "k_smallworld" },
 			},
@@ -200,7 +201,6 @@ function G.UIDEF.ruleset_selection_options()
 		{
 			name = "k_custom",
 			buttons = {
-				{ button_id = "vanilla_ruleset_button", button_localize_key = "k_vanilla" },
 				{ button_id = "blitz_ruleset_button", button_localize_key = "k_blitz" },
 				{ button_id = "traditional_ruleset_button", button_localize_key = "k_traditional" },
 				{ button_id = "badlatro_ruleset_button", button_localize_key = "k_badlatro" },
