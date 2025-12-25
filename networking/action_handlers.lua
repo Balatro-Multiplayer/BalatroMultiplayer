@@ -211,10 +211,7 @@ local function action_enemy_info(score_str, hands_left_str, skips_str, lives_str
 	MP.GAME.enemy.hands = hands_left
 	MP.GAME.enemy.skips = skips
 	MP.GAME.enemy.lives = lives
-	if MP.is_pvp_boss() then
-		G.HUD_blind:get_UIE_by_ID("HUD_blind_count"):juice_up()
-		G.HUD_blind:get_UIE_by_ID("dollars_to_be_earned"):juice_up()
-	end
+	if MP.UI.juice_up_pvp_hud then MP.UI.juice_up_pvp_hud() end
 end
 
 local function action_stop_game()
@@ -317,10 +314,7 @@ local function action_lobby_options(options)
 		end
 
 		MP.LOBBY.config[k] = parsed_v
-		if G.OVERLAY_MENU then
-			local config_uie = G.OVERLAY_MENU:get_UIE_by_ID(k .. "_toggle")
-			if config_uie then G.FUNCS.toggle(config_uie) end
-		end
+		if MP.UI.update_lobby_option_toggle then MP.UI.update_lobby_option_toggle(k) end
 		::continue::
 	end
 	if different_decks_before ~= MP.LOBBY.config.different_decks then
@@ -418,45 +412,7 @@ end
 
 local action_asteroid = action_asteroid
 	or function()
-		local hand_priority = {
-			["Flush Five"] = 1,
-			["Flush House"] = 2,
-			["Five of a Kind"] = 3,
-			["Straight Flush"] = 4,
-			["Four of a Kind"] = 5,
-			["Full House"] = 6,
-			["Flush"] = 7,
-			["Straight"] = 8,
-			["Three of a Kind"] = 9,
-			["Two Pair"] = 11,
-			["Pair"] = 12,
-			["High Card"] = 13,
-		}
-		local hand_type = "High Card"
-		local max_level = 0
-
-		for k, v in pairs(G.GAME.hands) do
-			if SMODS.is_poker_hand_visible(k) then
-				if
-					to_big(v.level) > to_big(max_level)
-					or (to_big(v.level) == to_big(max_level) and hand_priority[k] < hand_priority[hand_type])
-				then
-					hand_type = k
-					max_level = v.level
-				end
-			end
-		end
-		update_hand_text({ sound = "button", volume = 0.7, pitch = 0.8, delay = 0.3 }, {
-			handname = localize(hand_type, "poker_hands"),
-			chips = G.GAME.hands[hand_type].chips,
-			mult = G.GAME.hands[hand_type].mult,
-			level = G.GAME.hands[hand_type].level,
-		})
-		level_up_hand(nil, hand_type, false, -1)
-		update_hand_text(
-			{ sound = "button", volume = 0.7, pitch = 1.1, delay = 0 },
-			{ mult = 0, chips = 0, handname = "", level = "" }
-		)
+		if MP.UI.show_asteroid_hand_level_up then MP.UI.show_asteroid_hand_level_up() end
 	end
 
 local function action_sold_joker()
