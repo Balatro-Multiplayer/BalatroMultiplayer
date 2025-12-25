@@ -1,6 +1,8 @@
 -- common, 5 bucks, debuffed in pvp
 SMODS.Joker({
 	key = "seltzer_sandbox",
+	unlocked = true,
+	discovered = true,
 	blueprint_compat = true,
 	eternal_compat = false,
 	rarity = 1,
@@ -36,9 +38,6 @@ SMODS.Joker({
 					colour = G.C.FILTER,
 				}
 			end
-		end
-		if context.end_of_round then
-			-- stop jiggling
 		end
 	end,
 	mp_include = function(self)
