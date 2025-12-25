@@ -5,7 +5,6 @@ SMODS.Joker({
 	discovered = true,
 	blueprint_compat = false,
 	eternal_compat = true,
-
 	rarity = 2,
 	cost = 6,
 	atlas = "ec_jokers_sandbox",

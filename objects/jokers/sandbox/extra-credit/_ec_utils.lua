@@ -26,7 +26,6 @@ local function reset_tuxedo_card()
 		end
 	end
 	local seed = "tux"
-	if MP.should_use_the_order() then seed = "tux" .. G.GAME.round_resets.ante end
 
 	local tuxedo_card = pseudorandom_element(tuxedo_suits, pseudoseed(seed))
 	G.GAME.current_round.tuxedo_card.suit = tuxedo_card
@@ -47,7 +46,6 @@ local function reset_farmer_card()
 	end
 
 	local seed = "farm"
-	if MP.should_use_the_order() then seed = "farm" .. G.GAME.round_resets.ante end
 
 	local farmer_card = pseudorandom_element(farmer_suits, seed)
 	G.GAME.current_round.farmer_card.suit = farmer_card
@@ -68,7 +66,6 @@ local function reset_fish_rank()
 	end
 
 	local seed = "fish"
-	if MP.should_use_the_order() then seed = "fish" .. G.GAME.round_resets.ante end
 
 	local fish_pick = pseudorandom_element(valid_fish_ranks, pseudoseed(seed))
 	G.GAME.current_round.fish_rank.rank = fish_pick
