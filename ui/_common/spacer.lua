@@ -1,5 +1,3 @@
--- Utility functions for UI components
-
 function MP.UI.create_spacer(size, row)
 	size = size or 0.2
 

@@ -69,23 +69,29 @@ function MP.load_mp_file(file)
 	return nil
 end
 
-function MP.load_mp_dir(directory)
-	local files = NFS.getDirectoryItems(MP.path .. "/" .. directory)
-	local regular_files = {}
-
-	for _, filename in ipairs(files) do
-		local file_path = directory .. "/" .. filename
-		if file_path:match(".lua$") then
-			if filename:match("^_") then
-				MP.load_mp_file(file_path)
-			else
-				table.insert(regular_files, file_path)
-			end
-		end
+function MP.load_mp_dir(directory, recursive)
+	recursive = recursive or false
+	local function has_prefix(name)
+		return name:match("^_") ~= nil
 	end
 
-	for _, file_path in ipairs(regular_files) do
-		MP.load_mp_file(file_path)
+	local dir_path = MP.path .. "/" .. directory
+	local items = NFS.getDirectoryItemsInfo(dir_path)
+	-- sort by prefix like { _file, _dir, file, dir }
+	table.sort(items, function(a, b)
+		if has_prefix(a.name) ~= has_prefix(b.name) then return has_prefix(a.name) end
+		return (a.type == "directory") ~= (b.type == "directory") and a.type ~= "directory" or false
+	end)
+
+	-- load sorted files/dirs
+	for _, item in ipairs(items) do
+		local path = directory .. "/" .. item.name
+		sendDebugMessage("Loading item: " .. path, "MULTIPLAYER")
+		if item.type ~= "directory" then
+			MP.load_mp_file(path)
+		elseif recursive then
+			MP.load_mp_dir(path, recursive)
+		end
 	end
 end
 
@@ -197,7 +203,7 @@ if not SMODS.current_mod.lovely then
 		blocking = false,
 		func = function()
 			if G.MAIN_MENU_UI then
-				MP.UTILS.overlay_message(
+				MP.UI.UTILS.overlay_message(
 					MP.UTILS.wrapText(
 						"Your Multiplayer Mod is not loaded correctly, make sure the Multiplayer folder does not have an extra Multiplayer folder around it.",
 						50
@@ -222,13 +228,13 @@ MP.load_mp_dir("compatibility")
 local networking_dir = MP.USE_NEW_NETWORKING and "networking" or "networking-old"
 MP.load_mp_file(networking_dir .. "/action_handlers.lua")
 
-MP.load_mp_dir("ui/components") -- Gamemodes and rulesets need these
+MP.load_mp_dir("ui", true) -- Gamemodes and rulesets need these
 
+MP.load_mp_dir("gamemodes")
 MP.load_mp_dir("rulesets")
 if MP.LOBBY.config.weekly then -- this could be a function but why bother
 	MP.load_mp_file("rulesets/weeklies/" .. MP.LOBBY.config.weekly .. ".lua")
 end
-MP.load_mp_dir("gamemodes")
 
 MP.load_mp_dir("objects/editions")
 MP.load_mp_dir("objects/enhancements")
@@ -243,8 +249,6 @@ MP.load_mp_dir("objects/consumables")
 MP.load_mp_dir("objects/consumables/sandbox")
 MP.load_mp_dir("objects/boosters")
 MP.load_mp_dir("objects/challenges")
-
-MP.load_mp_dir("ui")
 
 MP.load_mp_file("misc/disable_restart.lua")
 MP.load_mp_file("misc/mod_hash.lua")

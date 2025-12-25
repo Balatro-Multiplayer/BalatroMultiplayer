@@ -93,7 +93,7 @@ end
 local function action_error(message)
 	sendWarnMessage(message, "MULTIPLAYER")
 
-	MP.UTILS.overlay_message(message)
+	MP.UI.UTILS.overlay_message(message)
 end
 
 local function action_keep_alive()
@@ -242,7 +242,7 @@ local function action_player_info(lives)
 			MP.GAME.comeback_bonus_given = false
 			MP.GAME.comeback_bonus = MP.GAME.comeback_bonus + 1
 		end
-		ease_lives(lives - MP.GAME.lives)
+		MP.UI.ease_lives(lives - MP.GAME.lives)
 		if MP.LOBBY.config.no_gold_on_round_loss and (G.GAME.blind and G.GAME.blind.dollars) then
 			G.GAME.blind.dollars = 0
 		end
@@ -274,7 +274,7 @@ local function action_lobby_options(options)
 		if k == "ruleset" then
 			if not MP.Rulesets[v] then
 				G.FUNCS.lobby_leave(nil)
-				MP.UTILS.overlay_message(localize({
+				MP.UI.UTILS.overlay_message(localize({
 					type = "variable",
 					key = "k_failed_to_join_lobby",
 					vars = { localize("k_ruleset_not_found") },
@@ -284,7 +284,7 @@ local function action_lobby_options(options)
 			local disabled = MP.Rulesets[v].is_disabled()
 			if disabled then
 				G.FUNCS.lobby_leave(nil)
-				MP.UTILS.overlay_message(
+				MP.UI.UTILS.overlay_message(
 					localize({ type = "variable", key = "k_failed_to_join_lobby", vars = { disabled } })
 				)
 				return

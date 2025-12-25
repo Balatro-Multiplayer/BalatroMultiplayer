@@ -1,7 +1,3 @@
-local Disableable_Button = MP.UI.Disableable_Button
-local Disableable_Toggle = MP.UI.Disableable_Toggle
-local Disableable_Option_Cycle = MP.UI.Disableable_Option_Cycle
-
 -- This needs to have a parameter because its a callback for inputs
 local function send_lobby_options(value)
 	MP.ACTIONS.lobby_options()
@@ -18,16 +14,12 @@ function G.UIDEF.get_connection_status_ui()
 				colour = G.C.UI.TRANSPARENT_DARK,
 			},
 			nodes = {
-				{
-					n = G.UIT.T,
-					config = {
-						scale = 0.3,
-						text = (MP.LOBBY.code and localize("k_in_lobby")) or (MP.LOBBY.connected and localize(
-							"k_connected"
-						)) or localize("k_warn_service"),
-						colour = G.C.UI.TEXT_LIGHT,
-					},
-				},
+				MP.UI.UTILS.create_text_node((MP.LOBBY.code and localize("k_in_lobby")) or (MP.LOBBY.connected and localize(
+					"k_connected"
+				)) or localize("k_warn_service"), {
+					scale = 0.3,
+					colour = G.C.UI.TEXT_LIGHT,
+				}),
 			},
 		},
 		config = {
@@ -98,16 +90,7 @@ function G.UIDEF.create_UIBox_lobby_menu()
 									MP.UI.create_lobby_code_buttons(text_scale),
 								},
 							},
-							UIBox_button({
-								id = "lobby_menu_leave",
-								button = "lobby_leave",
-								colour = G.C.RED,
-								minw = 3.65,
-								minh = 1.55,
-								label = { localize("b_leave") },
-								scale = text_scale * 1.5,
-								col = true,
-							}),
+							MP.UI.create_lobby_leave_button(text_scale),
 						},
 					},
 				},
@@ -127,24 +110,12 @@ function G.UIDEF.create_UIBox_lobby_options()
 					align = "cm",
 				},
 				nodes = {
-					not MP.LOBBY.is_host and {
-						n = G.UIT.R,
-						config = {
-							padding = 0.3,
-							align = "cm",
-						},
-						nodes = {
-							{
-								n = G.UIT.T,
-								config = {
-									scale = 0.6,
-									shadow = true,
-									text = localize("k_opts_only_host"),
-									colour = G.C.UI.TEXT_LIGHT,
-								},
-							},
-						},
-					} or nil,
+					not MP.LOBBY.is_host and MP.UI.UTILS.create_row({ align = "cm", padding = 0.3 }, {
+						MP.UI.UTILS.create_text_node(localize("k_opts_only_host"), {
+							scale = 0.6,
+							colour = G.C.UI.TEXT_LIGHT,
+						}),
+					}) or nil,
 					create_tabs({
 						snap_to_nav = true,
 						colour = G.C.BOOSTER,
@@ -186,42 +157,27 @@ function G.UIDEF.create_UIBox_custom_seed_overlay()
 	return create_UIBox_generic_options({
 		back_func = "lobby_options",
 		contents = {
-			{
-				n = G.UIT.R,
-				config = { align = "cm", colour = G.C.CLEAR },
-				nodes = {
-					{
-						n = G.UIT.C,
-						config = { align = "cm", minw = 0.1 },
-						nodes = {
-							create_text_input({
-								max_length = 8,
-								all_caps = true,
-								ref_table = MP.LOBBY,
-								ref_value = "temp_seed",
-								prompt_text = localize("k_enter_seed"),
-								keyboard_offset = 4,
-								callback = function(val)
-									MP.LOBBY.config.custom_seed = MP.LOBBY.temp_seed
-									send_lobby_options()
-								end,
-							}),
-							{
-								n = G.UIT.B,
-								config = { w = 0.1, h = 0.1 },
-							},
-							{
-								n = G.UIT.T,
-								config = {
-									scale = 0.3,
-									text = localize("k_enter_to_save"),
-									colour = G.C.UI.TEXT_LIGHT,
-								},
-							},
-						},
-					},
-				},
-			},
+			MP.UI.UTILS.create_row({ align = "cm", colour = G.C.CLEAR }, {
+				MP.UI.UTILS.create_column({ align = "cm", minw = 0.1 }, {
+					create_text_input({
+						max_length = 8,
+						all_caps = true,
+						ref_table = MP.LOBBY,
+						ref_value = "temp_seed",
+						prompt_text = localize("k_enter_seed"),
+						keyboard_offset = 4,
+						callback = function(val)
+							MP.LOBBY.config.custom_seed = MP.LOBBY.temp_seed
+							send_lobby_options()
+						end,
+					}),
+					MP.UI.UTILS.create_blank(0.1, 0.1),
+					MP.UI.UTILS.create_text_node(localize("k_enter_to_save"), {
+						scale = 0.3,
+						colour = G.C.UI.TEXT_LIGHT,
+					}),
+				}),
+			}),
 		},
 	})
 end
@@ -230,17 +186,10 @@ function G.UIDEF.create_UIBox_view_hash(type)
 	return (
 		create_UIBox_generic_options({
 			contents = {
-				{
-					n = G.UIT.C,
-					config = {
-						padding = 0.07,
-						align = "cm",
-					},
-					nodes = MP.UI.modlist_to_view(
-						type == "host" and MP.LOBBY.host.config.Mods or MP.LOBBY.guest.config.Mods,
-						G.C.UI.TEXT_LIGHT
-					),
-				},
+				MP.UI.UTILS.create_column({ padding = 0.07, align = "cm" }, MP.UI.modlist_to_view(
+					type == "host" and MP.LOBBY.host.config.Mods or MP.LOBBY.guest.config.Mods,
+					G.C.UI.TEXT_LIGHT
+				)),
 			},
 		})
 	)
@@ -413,7 +362,7 @@ G.FUNCS.start_run = function(e, args)
 			G.FUNCS.exit_overlay_menu()
 			local chosen_stake = args.stake
 			if MP.DECK.MAX_STAKE > 0 and chosen_stake > MP.DECK.MAX_STAKE then
-				MP.UTILS.overlay_message(
+				MP.UI.UTILS.overlay_message(
 					"Selected stake is incompatible with Multiplayer, stake set to "
 						.. SMODS.stake_from_index(MP.DECK.MAX_STAKE)
 				)
