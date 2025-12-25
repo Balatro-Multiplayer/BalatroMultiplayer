@@ -1,4 +1,3 @@
--- Clown College - Extra Credit Joker ported to Sandbox
 -- Fill consumable slots with The Fool cards after Boss Blind is defeated
 
 SMODS.Joker({

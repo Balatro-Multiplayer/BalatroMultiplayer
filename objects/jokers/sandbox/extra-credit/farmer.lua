@@ -11,13 +11,7 @@ SMODS.Joker({
 	atlas = "ec_jokers_sandbox",
 	pos = { x = 9, y = 1 },
 
-	config = {
-		extra = {
-			dollars = 2,
-		},
-
-		mp_sticker_extra_credit = true,
-	},
+	config = { extra = { dollars = 2 }, mp_sticker_extra_credit = true },
 
 	loc_vars = function(self, info_queue, card)
 		local current_suit = G.GAME.current_round.farmer_card and G.GAME.current_round.farmer_card.suit or "Spades"

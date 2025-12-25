@@ -901,7 +901,7 @@ return {
 			k_random = "Random",
 			k_standard = "Standard",
 			k_sandbox = "Sandbox 3.0",
-			k_sandbox_description = "Two jealous gods. Twenty-six visitors from Extra Credit.\nNo score preview. Ticking clocks.\nThe meta's wide open.\nCome see what you find.",
+			k_sandbox_description = "We split Idol into two jealous gods. You pick one, the other's gone.\nWe brought in 26 jokers from Extra Credit. The meta's wide open again.\nNew Spectrals. Comeback gold reworked. No score preview.\nBuilt with friends at Balatro University.\n",
 			k_vanilla = "Vanilla",
 			k_vanilla_description = "This ruleset removes all Multiplayer content,\nallowing you to play the game as originally designed.\n\nThis ruleset still includes Multiplayer features like the timer.\n\n(Disableable in Lobby Options)",
 			k_blitz = "Standard",

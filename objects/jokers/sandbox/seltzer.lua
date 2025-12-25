@@ -1,4 +1,4 @@
--- rare, 5 bucks, debuffed in pvp
+-- common, 5 bucks, debuffed in pvp
 SMODS.Joker({
 	key = "seltzer_sandbox",
 	blueprint_compat = true,
