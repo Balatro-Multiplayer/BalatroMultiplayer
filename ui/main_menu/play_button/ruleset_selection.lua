@@ -1,4 +1,3 @@
--- mode: "sp" for singleplayer, "mp" for multiplayer (default)
 function G.UIDEF.ruleset_selection_options(mode)
 	mode = mode or "mp"
 	MP.LOBBY.fetched_weekly = "smallworld" -- temp
@@ -65,7 +64,6 @@ function G.UIDEF.ruleset_selection_options(mode)
 		}
 	end
 
-	-- Store mode for callback to use
 	MP.UI.ruleset_selection_mode = mode
 
 	return MP.UI.Main_Lobby_Options(
@@ -89,7 +87,9 @@ function G.FUNCS.change_ruleset_selection(e)
 	MP.UI.Change_Main_Lobby_Options(
 		e,
 		"ruleset_area",
-		function(ruleset_name) return G.UIDEF.ruleset_info(ruleset_name, mode) end,
+		function(ruleset_name)
+			return G.UIDEF.ruleset_info(ruleset_name, mode)
+		end,
 		default_button,
 		function(ruleset_name)
 			if mode == "sp" then
@@ -121,7 +121,7 @@ function G.UIDEF.ruleset_info(ruleset_name, mode)
 		button_config = {
 			id = "start_sp_button",
 			button = "start_sp_run",
-			label = { localize("b_play") },
+			label = { localize("b_play_cap") },
 			colour = G.C.GREEN,
 		}
 	else
@@ -644,4 +644,3 @@ function G.UIDEF.ruleset_cardarea_definition(args)
 		}
 	end
 end
-

@@ -17,6 +17,13 @@ function G.FUNCS.start_sp_run(e)
 	G.FUNCS.setup_run(e)
 end
 
+function G.FUNCS.start_vanilla_sp(e)
+	MP.LOBBY.config.ruleset = nil
+	MP.LOBBY.config.gamemode = nil
+	MP.SP.ruleset = nil
+	G.FUNCS.setup_run(e)
+end
+
 function G.FUNCS.play_options(e)
 	G.SETTINGS.paused = true
 
