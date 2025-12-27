@@ -37,6 +37,25 @@ MP.Ruleset = SMODS.GameObject:extend({
 	end,
 })
 
+function MP.is_ruleset_active(ruleset_name)
+	local key = "ruleset_mp_" .. ruleset_name
+	if MP.LOBBY.code then
+		return MP.LOBBY.config.ruleset == key
+	elseif MP.SP and MP.SP.ruleset then
+		return MP.SP.ruleset == key
+	end
+	return false
+end
+
+function MP.get_active_ruleset()
+	if MP.LOBBY.code then
+		return MP.LOBBY.config.ruleset
+	elseif MP.SP and MP.SP.ruleset then
+		return MP.SP.ruleset
+	end
+	return nil
+end
+
 function MP.ApplyBans()
 	local ruleset_key = nil
 	local gamemode = nil

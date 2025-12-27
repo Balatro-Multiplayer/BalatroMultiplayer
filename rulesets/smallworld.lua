@@ -33,7 +33,7 @@ MP.Ruleset({
 local apply_bans_ref = MP.ApplyBans
 function MP.ApplyBans()
 	local ret = apply_bans_ref()
-	if MP.LOBBY.code and MP.LOBBY.config.ruleset == "ruleset_mp_smallworld" then
+	if MP.is_ruleset_active("smallworld") then
 		local tables = {}
 		local requires = {}
 		for k, v in pairs(G.P_CENTERS) do
@@ -86,7 +86,7 @@ end
 
 local showman_ref = SMODS.showman
 function SMODS.showman(card_key)
-	if MP.LOBBY.code and MP.LOBBY.config.ruleset == "ruleset_mp_smallworld" then return true end
+	if MP.is_ruleset_active("smallworld") then return true end
 	return showman_ref(card_key)
 end
 
@@ -95,7 +95,7 @@ local tag_init_ref = Tag.init
 function Tag:init(_tag, for_collection, _blind_type)
 	local orbital = false
 	local old = G.orbital_hand -- i think this is always nil here but just to be safe
-	if MP.LOBBY.code and MP.LOBBY.config.ruleset == "ruleset_mp_smallworld" and not MP.legacy_smallworld() then
+	if MP.is_ruleset_active("smallworld") and not MP.legacy_smallworld() then
 		if G.GAME.banned_keys[_tag] and not G.OVERLAY_MENU then
 			local a = G.GAME.round_resets.ante
 
@@ -114,9 +114,7 @@ end
 
 local apply_to_run_ref = Back.apply_to_run
 function Back:apply_to_run()
-	if MP.LOBBY.code and MP.LOBBY.config.ruleset == "ruleset_mp_smallworld" and not MP.legacy_smallworld() then
-		MP.apply_fake_back_vouchers(self)
-	end
+	if MP.is_ruleset_active("smallworld") and not MP.legacy_smallworld() then MP.apply_fake_back_vouchers(self) end
 	return apply_to_run_ref(self)
 end
 
@@ -148,7 +146,7 @@ end
 
 local add_joker_ref = add_joker
 function add_joker(joker, edition, silent, eternal)
-	if MP.LOBBY.code and MP.LOBBY.config.ruleset == "ruleset_mp_smallworld" and G.GAME.banned_keys[joker] then
+	if MP.is_ruleset_active("smallworld") and G.GAME.banned_keys[joker] then
 		local _pool = nil
 		local _pool_key = nil
 		local rarities = { [1] = 0, [2] = 0.9, [3] = 1, [4] = 1 }
@@ -177,7 +175,7 @@ end
 
 local card_apply_to_run_ref = Card.apply_to_run
 function Card:apply_to_run(center)
-	if MP.LOBBY.code and MP.LOBBY.config.ruleset == "ruleset_mp_smallworld" then
+	if MP.is_ruleset_active("smallworld") then
 		if not self and center and G.GAME.banned_keys[center.key] then
 			G.GAME.used_vouchers[center.key] = nil
 			center = G.P_CENTERS[get_next_voucher_key()]

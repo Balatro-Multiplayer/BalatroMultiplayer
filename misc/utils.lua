@@ -776,9 +776,10 @@ function MP.UTILS.get_standard_rulesets(add)
 end
 
 function MP.UTILS.is_standard_ruleset()
-	if MP.LOBBY.config.ruleset == nil then return false end
+	local active = MP.get_active_ruleset()
+	if active == nil then return false end
 	for _, ruleset in ipairs(MP.UTILS.get_standard_rulesets()) do
-		if MP.LOBBY.config.ruleset == "ruleset_mp_" .. ruleset then return true end
+		if active == "ruleset_mp_" .. ruleset then return true end
 	end
 	return false
 end
