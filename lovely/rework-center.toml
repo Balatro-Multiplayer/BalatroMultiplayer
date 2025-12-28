@@ -1,0 +1,43 @@
+# so here's the deal: when we rework vanilla jokers with MP.ReworkCenter,
+# some vanilla behavior still exists on the center. for `calculate`, we can just
+# do an early return to prevent the vanilla logic from running (see bloodstone.lua
+# for an example - it returns `nil, true` to signal "don't run vanilla logic").
+#
+# BUT for `add_to_deck` and `remove_from_deck`, there's no such early return
+# mechanism in smods. the vanilla function just runs after ours no matter what.
+#
+# so we do this slightly cursed thing: we target smods's card.lua patch to wrap the
+# add_to_deck/remove_from_deck calls in an `if` check. if our reworked function
+# returns true, it bails out early and skips the vanilla behavior. if it returns
+# nil/false (or if there's no rework), vanilla runs as normal.
+#
+# priority is set high so we patch after smods does its thing.
+
+[manifest]
+version = "1.0"
+dump_lua = true
+priority = 1333337
+
+[[patches]]
+[patches.pattern]
+target = "card.lua"
+pattern = "obj:add_to_deck(self, from_debuff)"
+position = "at"
+payload = '''
+if obj:add_to_deck(self, from_debuff) then
+    return
+end
+'''
+match_indent = true
+
+[[patches]]
+[patches.pattern]
+target = "card.lua"
+pattern = "obj:remove_from_deck(self, from_debuff)"
+position = "at"
+payload = '''
+if obj:remove_from_deck(self, from_debuff) then
+    return
+end
+'''
+match_indent = true

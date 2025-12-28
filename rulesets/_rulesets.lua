@@ -98,23 +98,26 @@ end
 
 -- Rework a center for specific ruleset(s). Use MP.LoadReworks() to swap in the active ruleset.
 ---@param key string e.g. "j_hanging_chad"
----@param ruleset string|string[] e.g. "standard" or {"standard", "sandbox"}
----@param loc_key string|nil alternate localization key, or nil to keep original
----@param args table center properties (config, calculate, loc_vars, etc.) + silent = true to hide from UI
-function MP.ReworkCenter(key, ruleset, loc_key, args)
+---@param opts table { rulesets, loc_key?, silent?, ...center properties }
+function MP.ReworkCenter(key, opts)
 	local center = G.P_CENTERS[key]
-	args = args or {}
+	opts = opts or {}
+
+	-- Meta keys (not center properties)
+	local reserved = { rulesets = true, loc_key = true, silent = true }
+	local rulesets = opts.rulesets
+	local loc_key = opts.loc_key
+	local silent = opts.silent
 
 	-- Convert single ruleset to list
-	local rulesets = ruleset
 	if type(rulesets) == "string" then rulesets = { rulesets } end
 
 	-- Wrap loc_vars to inject loc_key if provided
 	if loc_key then
-		local user_loc_vars = args.loc_vars or function()
+		local user_loc_vars = opts.loc_vars or function()
 			return {}
 		end
-		args.loc_vars = function(self, info_queue, card)
+		opts.loc_vars = function(self, info_queue, card)
 			local result = user_loc_vars(self, info_queue, card)
 			result.key = loc_key
 			return result
@@ -122,8 +125,8 @@ function MP.ReworkCenter(key, ruleset, loc_key, args)
 	end
 
 	-- do we need to inject generate_ui for loc_vars to work?
-	local needs_generate_ui = args.loc_vars
-		and not args.generate_ui
+	local needs_generate_ui = opts.loc_vars
+		and not opts.generate_ui
 		and not (center.generate_ui and type(center.generate_ui) == "function")
 
 	-- Apply changes to all specified rulesets
@@ -131,8 +134,8 @@ function MP.ReworkCenter(key, ruleset, loc_key, args)
 		local prefix = "mp_" .. rs .. "_"
 
 		-- Store all reworked properties
-		for k, v in pairs(args) do
-			if k ~= "silent" then
+		for k, v in pairs(opts) do
+			if not reserved[k] then
 				center[prefix .. k] = v
 				if not center["mp_vanilla_" .. k] then center["mp_vanilla_" .. k] = center[k] or "NULL" end
 			end
@@ -150,7 +153,7 @@ function MP.ReworkCenter(key, ruleset, loc_key, args)
 		center.mp_reworks["vanilla"] = true
 
 		center.mp_silent = center.mp_silent or {}
-		center.mp_silent[rs] = args.silent
+		center.mp_silent[rs] = silent
 	end
 end
 

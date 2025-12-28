@@ -13,6 +13,10 @@ MP.Ruleset({
 	banned_blinds = {},
 	reworked_jokers = {
 		"j_hanging_chad",
+		"j_idol",
+		"j_ticket",
+		"j_selzer",
+		"j_turtle_bean",
 	},
 	reworked_consumables = {},
 	reworked_vouchers = {},

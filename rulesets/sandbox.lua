@@ -101,7 +101,7 @@ MP.Ruleset({
 
 		return jokers
 	end)(),
-	reworked_consumables = { "c_mp_ouija_sandbox", "c_mp_ectoplasm_sandbox" },
+	reworked_consumables = { "c_mp_ouija_standard", "c_mp_ectoplasm_sandbox" },
 	reworked_vouchers = {},
 	reworked_enhancements = { "m_glass" },
 	reworked_blinds = {},
