@@ -38,7 +38,10 @@ end
 -- yes i know this is a buff
 SMODS.Joker:take_ownership("to_the_moon", {
 	loc_vars = function(self, info_queue, card)
-		return { vars = { card.ability.extra, G.GAME.modifiers and G.GAME.modifiers.mp_modified_interest_rate or 5 } }
+		return {
+			vars = { card.ability.extra, G.GAME.modifiers and G.GAME.modifiers.mp_modified_interest_rate or 5 },
+			key = self.key.."_mp"
+		}
 	end,
 }, true)
 

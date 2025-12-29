@@ -35,7 +35,7 @@ return {
 					"version of a mod you are using.",
 				},
 			},
-			j_to_the_moon = {
+			j_to_the_moon_mp = {
 				name = "To the Moon",
 				text = {
 					"Earn an extra {C:money}$#1#{} of",
