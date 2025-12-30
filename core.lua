@@ -99,6 +99,7 @@ function MP.load_mp_dir(directory, recursive)
 end
 
 MP.load_mp_dir("lib")
+MP.load_mp_dir("overrides")
 
 function MP.reset_lobby_config(persist_ruleset_and_gamemode)
 	sendDebugMessage("Resetting lobby options", "MULTIPLAYER")
