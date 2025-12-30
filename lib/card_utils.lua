@@ -84,16 +84,6 @@ function MP.UTILS.run_for_each_phantom_joker(key, func)
 	end
 end
 
-function MP.UTILS.add_nemesis_info(info_queue)
-	if MP.LOBBY.code then
-		info_queue[#info_queue + 1] = {
-			set = "Other",
-			key = "current_nemesis",
-			vars = { MP.LOBBY.is_host and MP.LOBBY.guest.username or MP.LOBBY.host.username },
-		}
-	end
-end
-
 function MP.UTILS.get_deck_key_from_name(_name)
 	for k, v in pairs(G.P_CENTERS) do
 		if v.name == _name then return k end
