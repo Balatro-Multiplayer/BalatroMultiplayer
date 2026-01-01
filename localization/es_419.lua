@@ -37,7 +37,7 @@ return {
 					"de un mod que estás usando.",
 				},
 			},
-			j_to_the_moon = {
+			j_to_the_moon_mp = {
 				name = "A la Luna",
 				text = {
 					"Gana {C:money}$#1#{} extra de",
@@ -105,16 +105,7 @@ return {
 					"{C:inactive}(Actualmente {C:mult}+#2#{C:inactive} multi)",
 				},
 			},
-			j_mp_magnet = {
-				name = "Imán",
-				text = {
-					"Después de {C:attention}#1#{} rondas,",
-					"vende esta carta para {C:attention}copiar{}",
-					"el {C:attention}comodín{} con mayor valor de venta",
-					"que tenga tu {X:purple,C:white}némesis{}",
-					"{C:inactive}(Actualmente {C:attention}#2#{C:inactive}/#3# rondas)",
-				},
-			},
+
 			j_mp_pizza = {
 				name = "Pizza", -- themike_71: Sí, esta carta es una referencia a Breaking Bad
 				text = {
@@ -132,14 +123,7 @@ return {
 					"estés en una {C:attention}ciega JcJ{}",
 				},
 			},
-			j_mp_hanging_chad = {
-				name = "Papel perforado",
-				text = {
-					"Reactiva la {C:attention}primera{} y {C:attention}segunda{}",
-					"carta jugada al anotar",
-					"{C:attention}#1#{} veces adicionales",
-				},
-			},
+
 			j_hanging_chad_mp_standard = {
 				name = "Papel perforado",
 				text = {
@@ -708,7 +692,6 @@ return {
 			b_set_custom_seed = "Agregar semilla personalizada",
 			b_mp_kofi_button = "Donar en Ko-fi",
 			b_unstuck = "Desatascar", -- themike_71: No sé que quiere decir realmente "Unstuck", sé que es como "Desatascar/Destrabar" pero lo dejaré así por ahora
-			b_unstuck_arcana = "Atascado en paquete potenciadores",
 			b_unstuck_blind = "Atascado fuera de JcJ",
 			b_misprint_display = "Muestra la siguiente carta de la baraja",
 			b_players = "Jugadores",
@@ -797,8 +780,6 @@ return {
 			k_vanilla_description = "Reglas del modo vainilla, sin cartas del multijugador y no modifica nada del juego base.",
 			k_weekly = "Semanal",
 			k_weekly_description = "Reglas especiales que cambian semanal o quincenalmente. ¡Supongo que tendrás que descubrirlo por tu cuenta! Actualmente: ",
-			k_tournament = "Torneo",
-			k_tournament_description = "Reglas de torneo, igual que las reglas del modo estándar pero no se permite cambiar las opciones de sala.",
 			k_badlatro = "Badlatro",
 			k_badlatro_description = "Reglas semanales diseñadas por @dr_monty_the_snek en nuestro servidor de Discord que se agregaron de forma permanente.",
 			k_blitz = "Estándar",
