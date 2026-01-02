@@ -4,6 +4,12 @@ MP.ReworkCenter({
 	config = { Xmult = 1.5, extra = 4 },
 })
 
+MP.ReworkCenter({
+	key = "m_glass",
+	ruleset = "sandbox",
+	config = { Xmult = 1.5, extra = 3 },
+})
+
 -- Behold! A humble config table, first of its kind, a seed of dreams
 -- Perhaps one day it shall bloom into a grand centralized configuration system
 -- where all game mechanics dance in harmonious unity... but today, we start here
