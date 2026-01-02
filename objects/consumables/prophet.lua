@@ -12,11 +12,11 @@ SMODS.Consumable({
   cost = 3,
   unlocked = true,
   discovered = true,
-  loc_txt = {
+	loc_txt = {
 		name = "The Prophet",
 		text = {
-			"View all {C:attention}Jokers{} and",
-			"see their position in",
+			"Pick a {C:attention}Joker{} and",
+			"see its position in",
 			"your seeded {C:attention}shop queue{}"
 		}
 	},
@@ -186,27 +186,7 @@ end
 -- Function to show a specific joker's position (called when clicking a joker)
 function MP.show_joker_position(joker_key, center)
   -- Calculate this joker's position in the queue
-  local max_rerolls = 1000 -- Same value used in calculation
   local position = MP.calculate_joker_position(joker_key)
-  
-  local position_text, position_color, position_detail
-  if position then
-    position_text = "Position #" .. position .. " in joker queue"
-    position_color = position <= 20 and G.C.GREEN or 
-            position <= 100 and G.C.ORANGE or G.C.WHITE
-    
-    if position <= 20 then
-      position_detail = "Very close! Only " .. (position - 1) .. " joker" .. (position == 2 and "" or "s") .. " ahead of it."
-    elseif position <= 100 then
-      position_detail = "Moderately far. " .. (position - 1) .. " jokers ahead of it."
-    else
-      position_detail = "Far away. " .. (position - 1) .. " jokers ahead of it."
-    end
-  else
-    position_text = "Not found in next " .. max_rerolls .. " shop rerolls"
-    position_color = G.C.RED
-    position_detail = "This joker may be banned, not available in the current pool, or appears beyond " .. max_rerolls .. " rerolls."
-  end
   
   -- Create detailed info UI
   local info_ui = create_UIBox_generic_options({
@@ -221,25 +201,9 @@ function MP.show_joker_position(joker_key, center)
       }},
       {n = G.UIT.R, config = {align = "cm", padding = 0.1}, nodes = {
         {n = G.UIT.T, config = {
-          text = position_text, 
+          text = position and ("Position #" .. position .. " in queue") or "Not found in next 1000 jokers", 
           scale = 0.45, 
-          colour = position_color
-        }}
-      }},
-      {n = G.UIT.R, config = {align = "cm", padding = 0.1}, nodes = {
-        {n = G.UIT.T, config = {
-          text = position_detail, 
-          scale = 0.35, 
-          colour = G.C.UI.TEXT_LIGHT
-        }}
-      }},
-      {n = G.UIT.R, config = {align = "cm", padding = 0.1}, nodes = {
-        {n = G.UIT.T, config = {
-          text = "Rarity: " .. (center.rarity == 1 and "Common" or 
-                     center.rarity == 2 and "Uncommon" or 
-                     center.rarity == 3 and "Rare" or "Legendary"), 
-          scale = 0.3, 
-          colour = G.C.UI.TEXT_LIGHT
+          colour = position and (position <= 20 and G.C.GREEN or position <= 100 and G.C.ORANGE or G.C.WHITE) or G.C.RED
         }}
       }},
     }
@@ -254,11 +218,12 @@ end
 -- Function to close the prophet UI completely from detail view
 G.FUNCS.prophet_back_to_collection = function(e)
   G.FUNCS.exit_overlay_menu(e)
-
 end
 
 -- Function to calculate a specific joker's position in the seeded joker queue
 function MP.calculate_joker_position(joker_key)
+  local MAX_QUEUE_CHECK = 1000 -- Check next 1000 jokers in the queue
+  
   -- Map the input key
   local mapped_key = map_joker_key(joker_key)
   
@@ -271,11 +236,9 @@ function MP.calculate_joker_position(joker_key)
   -- CRITICAL: Save the ENTIRE pseudorandom state before simulation
   local saved_pseudorandom = copy_table(G.GAME.pseudorandom)
   
-  -- Simple approach: use the same key_append as the shop ('sho')
+  -- Use the same key_append as the shop ('sho')
   -- Let the RNG state advance naturally with each create_card call
-  local max_jokers = 1000 -- Check next 1000 jokers in the queue
-  
-  for position = 1, max_jokers do
+  for position = 1, MAX_QUEUE_CHECK do
     -- Create a joker using the same key_append as the shop
     local test_card = create_card('Joker', nil, nil, nil, nil, nil, nil, 'sho')
     
