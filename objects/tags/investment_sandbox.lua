@@ -31,6 +31,6 @@ SMODS.Tag({
 	discovered = true,
 	no_collection = MP.sandbox_no_collection,
 	in_pool = function(self)
-		return MP.LOBBY.config.ruleset == "ruleset_mp_sandbox" and MP.LOBBY.code
+		return MP.is_ruleset_active("sandbox")
 	end,
 })

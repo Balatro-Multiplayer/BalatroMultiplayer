@@ -1,60 +1,79 @@
-function G.UIDEF.ruleset_selection_options()
+function G.UIDEF.ruleset_selection_options(mode)
+	mode = mode or "mp"
 	MP.LOBBY.fetched_weekly = "smallworld" -- temp
-	MP.LOBBY.config.ruleset = "ruleset_mp_ranked"
-	MP.LoadReworks("ranked")
+
+	-- SP defaults to vanilla, MP defaults to ranked
+	local default_ruleset = "ranked"
+	local default_button = default_ruleset .. "_ruleset_button"
+	local ruleset_name = "ruleset_mp_" .. default_ruleset
+
+	MP.LoadReworks(default_ruleset)
 
 	local default_ruleset_area = UIBox({
-		definition = G.UIDEF.ruleset_info("ranked"),
+		definition = G.UIDEF.ruleset_info(default_ruleset, mode),
 		config = { align = "cm" },
 	})
 
 	local ruleset_buttons_data = {
 		{
-			name = "k_competitive",
+			name = "k_matchmaking",
 			buttons = {
 				{ button_id = "ranked_ruleset_button", button_localize_key = "k_ranked" },
+				{ button_id = "vanilla_ruleset_button", button_localize_key = "k_vanilla" },
+				{ button_id = "sandbox_ruleset_button", button_localize_key = "k_sandbox" },
+				{ button_id = "smallworld_ruleset_button", button_localize_key = "k_smallworld" },
+			},
+		},
+		{
+			name = "k_custom",
+			buttons = {
+				{ button_id = "blitz_ruleset_button", button_localize_key = "k_blitz" },
+				{ button_id = "traditional_ruleset_button", button_localize_key = "k_traditional" },
+				{ button_id = "badlatro_ruleset_button", button_localize_key = "k_badlatro" },
+			},
+		},
+		{
+			name = "k_tournament",
+			buttons = {
 				{ button_id = "majorleague_ruleset_button", button_localize_key = "k_majorleague" },
 				{ button_id = "minorleague_ruleset_button", button_localize_key = "k_minorleague" },
 			},
 		},
-		{
-			name = "k_standard",
-			buttons = {
-				{ button_id = "blitz_ruleset_button", button_localize_key = "k_blitz" },
-				{ button_id = "traditional_ruleset_button", button_localize_key = "k_traditional" },
-				{ button_id = "vanilla_ruleset_button", button_localize_key = "k_vanilla" },
-			},
-		},
-		{
-			name = "k_other",
-			buttons = {
-				{ button_id = "badlatro_ruleset_button", button_localize_key = "k_badlatro" },
-				{ button_id = "sandbox_ruleset_button", button_localize_key = "k_sandbox" },
-				{ button_id = "smallworld_ruleset_button", button_localize_key = "k_smallworld" },
-				{ button_id = "speedlatro_ruleset_button", button_localize_key = "k_speedlatro" },
-			},
-		},
 	}
+
+	MP.UI.ruleset_selection_mode = mode
 
 	return MP.UI.Main_Lobby_Options(
 		"ruleset_area",
 		default_ruleset_area,
 		"change_ruleset_selection",
-		ruleset_buttons_data
+		ruleset_buttons_data,
+		default_button
 	)
 end
 
 function G.FUNCS.change_ruleset_selection(e)
+	local mode = MP.UI.ruleset_selection_mode or "mp"
+
 	if e.config.id == "weekly_ruleset_button" then
 		if G.FUNCS.weekly_interrupt(e) then return end
 	end
+
+	local default_button = mode == "sp" and "vanilla_ruleset_button" or "ranked_ruleset_button"
+
 	MP.UI.Change_Main_Lobby_Options(
 		e,
 		"ruleset_area",
-		G.UIDEF.ruleset_info,
-		"ranked_ruleset_button",
 		function(ruleset_name)
-			MP.LOBBY.config.ruleset = "ruleset_mp_" .. ruleset_name
+			return G.UIDEF.ruleset_info(ruleset_name, mode)
+		end,
+		default_button,
+		function(ruleset_name)
+			if mode == "sp" then
+				MP.SP.ruleset = "ruleset_mp_" .. ruleset_name
+			else
+				MP.LOBBY.config.ruleset = "ruleset_mp_" .. ruleset_name
+			end
 			MP.LoadReworks(ruleset_name)
 		end
 	)
@@ -62,7 +81,8 @@ function G.FUNCS.change_ruleset_selection(e)
 	MP.LOBBY.ruleset_preview = false
 end
 
-function G.UIDEF.ruleset_info(ruleset_name)
+function G.UIDEF.ruleset_info(ruleset_name, mode)
+	mode = mode or "mp"
 	local ruleset = MP.Rulesets["ruleset_mp_" .. ruleset_name]
 
 	local ruleset_info_banned_rework_tabs = UIBox({
@@ -71,6 +91,24 @@ function G.UIDEF.ruleset_info(ruleset_name)
 	})
 
 	local ruleset_disabled = ruleset.is_disabled()
+
+	-- Different button config for SP vs MP
+	local button_config
+	if mode == "sp" then
+		button_config = {
+			id = "start_sp_button",
+			button = "start_sp_run",
+			label = { localize("b_play_cap") },
+			colour = G.C.GREEN,
+		}
+	else
+		button_config = {
+			id = "select_gamemode_button",
+			button = ruleset.forced_gamemode and "force_" .. ruleset.forced_gamemode or "select_gamemode",
+			label = { ruleset.forced_gamemode and localize("b_create_lobby") or localize("b_next") },
+			colour = G.C.BLUE,
+		}
+	end
 
 	return {
 		n = G.UIT.ROOT,
@@ -92,18 +130,17 @@ function G.UIDEF.ruleset_info(ruleset_name)
 						config = { align = "cm" },
 						nodes = {
 							MP.UI.Disableable_Button({
-								id = "select_gamemode_button",
-								button = ruleset.forced_gamemode and "force_" .. ruleset.forced_gamemode
-									or "select_gamemode",
+								id = button_config.id,
+								button = button_config.button,
 								align = "cm",
 								padding = 0.05,
 								r = 0.1,
 								minw = 8,
 								minh = 0.8,
-								colour = G.C.BLUE,
+								colour = button_config.colour,
 								hover = true,
 								shadow = true,
-								label = { ruleset.forced_gamemode and localize("b_create_lobby") or localize("b_next") },
+								label = button_config.label,
 								scale = 0.5,
 								enabled_ref_table = { val = not ruleset_disabled },
 								enabled_ref_value = "val",
@@ -584,4 +621,3 @@ function G.UIDEF.ruleset_cardarea_definition(args)
 		}
 	end
 end
-

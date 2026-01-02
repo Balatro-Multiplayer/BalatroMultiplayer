@@ -21,7 +21,7 @@ SMODS.Joker({
 		return { vars = { card.ability.extra.x_mult_gain, card.ability.extra.max_x_mult, card.ability.extra.x_mult } }
 	end,
 	mp_include = function(self)
-		return MP.LOBBY.code and MP.LOBBY.config.multiplayer_jokers and MP.LOBBY.config.ruleset ~= "ruleset_mp_sandbox"
+		return MP.LOBBY.code and MP.LOBBY.config.multiplayer_jokers and not MP.is_ruleset_active("sandbox")
 	end,
 	add_to_deck = function(self, card, from_debuffed)
 		if not from_debuffed and (not card.edition or card.edition.type ~= "mp_phantom") then

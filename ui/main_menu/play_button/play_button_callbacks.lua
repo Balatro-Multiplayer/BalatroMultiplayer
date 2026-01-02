@@ -1,7 +1,26 @@
+-- Singleplayer ruleset state (parallels MP.LOBBY.config.ruleset for multiplayer)
+MP.SP = { ruleset = nil }
+
 function G.FUNCS.setup_run_singleplayer(e)
 	G.SETTINGS.paused = true
 	MP.LOBBY.config.ruleset = nil
 	MP.LOBBY.config.gamemode = nil
+	MP.SP.ruleset = nil
+
+	G.FUNCS.overlay_menu({
+		definition = G.UIDEF.ruleset_selection_options("sp"),
+	})
+end
+
+function G.FUNCS.start_sp_run(e)
+	G.FUNCS.exit_overlay_menu()
+	G.FUNCS.setup_run(e)
+end
+
+function G.FUNCS.start_vanilla_sp(e)
+	MP.LOBBY.config.ruleset = nil
+	MP.LOBBY.config.gamemode = nil
+	MP.SP.ruleset = nil
 	G.FUNCS.setup_run(e)
 end
 
@@ -17,7 +36,7 @@ function G.FUNCS.create_lobby(e)
 	G.SETTINGS.paused = true
 
 	G.FUNCS.overlay_menu({
-		definition = G.UIDEF.ruleset_selection_options(),
+		definition = G.UIDEF.ruleset_selection_options("mp"),
 	})
 end
 

@@ -341,7 +341,8 @@ end
 
 local start_run_ref = Game.start_run
 function Game:start_run(args)
-	MP.LoadReworks(MP.LOBBY.config.ruleset)
+	-- Use MP ruleset if in lobby, otherwise use SP ruleset (if selected)
+	MP.LoadReworks(MP.LOBBY.config.ruleset or MP.SP.ruleset)
 
 	start_run_ref(self, args)
 

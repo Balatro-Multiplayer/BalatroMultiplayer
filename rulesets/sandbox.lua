@@ -62,8 +62,7 @@ end
 --- @param joker_key string The key of the joker to check (e.g., "j_mp_mail_sandbox")
 --- @return boolean true if the joker is allowed in the sandbox ruleset and in a multiplayer lobby
 function MP.SANDBOX.is_joker_allowed(joker_key)
-	if not MP.LOBBY.code then return false end
-	if MP.LOBBY.config.ruleset ~= "ruleset_mp_sandbox" then return false end
+	if not MP.is_ruleset_active("sandbox") then return false end
 
 	for _, mapping in ipairs(MP.SANDBOX.joker_mappings) do
 		if mapping.active and mapping.sandbox == joker_key then return true end
@@ -102,7 +101,7 @@ MP.Ruleset({
 	end)(),
 	reworked_consumables = { "c_mp_ouija_sandbox", "c_mp_ectoplasm_sandbox" },
 	reworked_vouchers = {},
-	reworked_enhancements = {},
+	reworked_enhancements = { "m_glass" },
 	reworked_blinds = {},
 	reworked_tags = { "tag_mp_gambling_sandbox", "tag_mp_juggle_sandbox", "tag_mp_investment_sandbox" },
 
@@ -150,7 +149,7 @@ function MP.ApplyBans()
 	local ret = apply_bans_ref()
 
 	-- Apply sandbox-specific idol selection when in sandbox ruleset
-	if MP.LOBBY.code and MP.LOBBY.config.ruleset == "ruleset_mp_sandbox" then select_random_idol() end
+	if MP.is_ruleset_active("sandbox") then select_random_idol() end
 
 	return ret
 end
