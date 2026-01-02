@@ -3,14 +3,10 @@ function G.UIDEF.ruleset_selection_options(mode)
 	MP.LOBBY.fetched_weekly = "smallworld" -- temp
 
 	-- SP defaults to vanilla, MP defaults to ranked
-	local default_ruleset = mode == "sp" and "vanilla" or "ranked"
+	local default_ruleset = "ranked"
 	local default_button = default_ruleset .. "_ruleset_button"
+	local ruleset_name = "ruleset_mp_" .. default_ruleset
 
-	if mode == "sp" then
-		MP.SP.ruleset = "ruleset_mp_" .. default_ruleset
-	else
-		MP.LOBBY.config.ruleset = "ruleset_mp_" .. default_ruleset
-	end
 	MP.LoadReworks(default_ruleset)
 
 	local default_ruleset_area = UIBox({
@@ -18,51 +14,32 @@ function G.UIDEF.ruleset_selection_options(mode)
 		config = { align = "cm" },
 	})
 
-	local ruleset_buttons_data
-	if mode == "sp" then
-		-- Singleplayer: show all rulesets in one category
-		ruleset_buttons_data = {
-			{
-				name = "k_rulesets",
-				buttons = {
-					{ button_id = "vanilla_ruleset_button", button_localize_key = "k_vanilla" },
-					{ button_id = "ranked_ruleset_button", button_localize_key = "k_ranked" },
-					{ button_id = "badlatro_ruleset_button", button_localize_key = "k_badlatro" },
-					{ button_id = "sandbox_ruleset_button", button_localize_key = "k_sandbox" },
-					{ button_id = "smallworld_ruleset_button", button_localize_key = "k_smallworld" },
-				},
+	local ruleset_buttons_data = {
+		{
+			name = "k_matchmaking",
+			buttons = {
+				{ button_id = "ranked_ruleset_button", button_localize_key = "k_ranked" },
+				{ button_id = "vanilla_ruleset_button", button_localize_key = "k_vanilla" },
+				{ button_id = "sandbox_ruleset_button", button_localize_key = "k_sandbox" },
+				{ button_id = "smallworld_ruleset_button", button_localize_key = "k_smallworld" },
 			},
-		}
-	else
-		-- Multiplayer: categorized rulesets
-		ruleset_buttons_data = {
-			{
-				name = "k_competitive",
-				buttons = {
-					{ button_id = "ranked_ruleset_button", button_localize_key = "k_ranked" },
-					{ button_id = "majorleague_ruleset_button", button_localize_key = "k_majorleague" },
-					{ button_id = "minorleague_ruleset_button", button_localize_key = "k_minorleague" },
-				},
+		},
+		{
+			name = "k_custom",
+			buttons = {
+				{ button_id = "blitz_ruleset_button", button_localize_key = "k_blitz" },
+				{ button_id = "traditional_ruleset_button", button_localize_key = "k_traditional" },
+				{ button_id = "badlatro_ruleset_button", button_localize_key = "k_badlatro" },
 			},
-			{
-				name = "k_standard",
-				buttons = {
-					{ button_id = "blitz_ruleset_button", button_localize_key = "k_blitz" },
-					{ button_id = "traditional_ruleset_button", button_localize_key = "k_traditional" },
-					{ button_id = "vanilla_ruleset_button", button_localize_key = "k_vanilla" },
-				},
+		},
+		{
+			name = "k_tournament",
+			buttons = {
+				{ button_id = "majorleague_ruleset_button", button_localize_key = "k_majorleague" },
+				{ button_id = "minorleague_ruleset_button", button_localize_key = "k_minorleague" },
 			},
-			{
-				name = "k_other",
-				buttons = {
-					{ button_id = "badlatro_ruleset_button", button_localize_key = "k_badlatro" },
-					{ button_id = "sandbox_ruleset_button", button_localize_key = "k_sandbox" },
-					{ button_id = "smallworld_ruleset_button", button_localize_key = "k_smallworld" },
-					{ button_id = "speedlatro_ruleset_button", button_localize_key = "k_speedlatro" },
-				},
-			},
-		}
-	end
+		},
+	}
 
 	MP.UI.ruleset_selection_mode = mode
 
