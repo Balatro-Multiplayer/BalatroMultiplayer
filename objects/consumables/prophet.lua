@@ -1,6 +1,6 @@
 SMODS.Atlas({
   key = "prophet",
-  path = "c_prophet.png", -- Assign a single string value to match the expected type
+  path = "c_prophet.png",
   px = 71,
   py = 95,
 })
@@ -20,18 +20,16 @@ SMODS.Consumable({
 			"your seeded {C:attention}shop queue{}"
 		}
 	},
-  loc_vars = function(self, info_queue, card)
-    MP.UTILS.add_nemesis_info(info_queue)
+  loc_vars = function(self, _info_queue, _card)
     return { vars = {} }
   end,
   in_pool = function(self)
     return MP.LOBBY.code and MP.LOBBY.config.ruleset == "ruleset_mp_smallworld"
   end,
-  can_use = function(self, card)
+  can_use = function(self, _card)
     return true
   end,
-  use = function(self, card, area, copier)
-    local _card = copier or card
+  use = function(self, card, _area, _copier)
     G.E_MANAGER:add_event(Event({
       trigger = "after",
       delay = 0.4,
@@ -53,13 +51,22 @@ SMODS.Consumable({
   },
 })
 
--- Function to map joker keys (handles replacements like hanging_chad -> mp_hanging_chad)
+-- Function to map joker keys (handles reworked jokers like hanging_chad -> mp_hanging_chad)
 local function map_joker_key(key)
-  local key_mappings = {
-    ["j_hanging_chad"] = "j_mp_hanging_chad"
-    -- Add more mappings here as needed
-  }
-  return key_mappings[key] or key
+  -- Check if this joker has a reworked version in the current ruleset
+  if MP.LOBBY.config and MP.LOBBY.config.ruleset then
+    local ruleset = SMODS.get_ruleset(MP.LOBBY.config.ruleset)
+    if ruleset and ruleset.reworked_jokers then
+      -- Check if there's a reworked version (indicated by j_mp_ prefix)
+      local mp_key = "j_mp_" .. key:sub(3)  -- Convert j_hanging_chad to j_mp_hanging_chad
+      for _, reworked_key in ipairs(ruleset.reworked_jokers) do
+        if reworked_key == mp_key then
+          return mp_key
+        end
+      end
+    end
+  end
+  return key
 end
 
 -- Function to create the prophet UI showing all jokers using collection-style UI
@@ -104,9 +111,10 @@ function MP.create_prophet_ui()
   end
   
   -- Create pagination options
+  local total_pages = math.ceil(#pool/cards_per_page)
   local options = {}
-  for i = 1, math.ceil(#pool/cards_per_page) do
-    table.insert(options, localize('k_page')..' '..tostring(i)..'/'..tostring(math.ceil(#pool/cards_per_page)))
+  for i = 1, total_pages do
+    table.insert(options, localize('k_page')..' '..tostring(i)..'/'..tostring(total_pages))
   end
   
   -- Function to handle page changes
@@ -122,7 +130,8 @@ function MP.create_prophet_ui()
     
     for j = 1, #rows do
       for i = 1, rows[j] do
-        local center = pool[i+row_totals[j] + (cards_per_page*(e.cycle_config.current_option - 1))]
+        local page_offset = (e.cycle_config.current_option - 1) * cards_per_page
+        local center = pool[i + row_totals[j] + page_offset]
         if not center then break end
         local card = Card(G.prophet_collection[j].T.x + G.prophet_collection[j].T.w/2, G.prophet_collection[j].T.y, G.CARD_W, G.CARD_H, G.P_CARDS.empty, center)
         
@@ -162,7 +171,7 @@ function MP.create_prophet_ui()
         }}
       }},
       {n = G.UIT.R, config = {align = "cm", r = 0.1, colour = G.C.BLACK, emboss = 0.05}, nodes = deck_tables}, 
-      (cards_per_page < #pool) and {n = G.UIT.R, config = {align = "cm"}, nodes = {
+      (total_pages > 1) and {n = G.UIT.R, config = {align = "cm"}, nodes = {
         create_option_cycle({
           options = options, 
           w = 4.5, 
