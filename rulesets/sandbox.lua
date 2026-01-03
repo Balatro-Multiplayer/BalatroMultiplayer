@@ -155,4 +155,4 @@ function MP.ApplyBans()
 end
 
 -- debugging hotswitch
-MP.sandbox_no_collection = true
+MP.sandbox_no_collection = not MP.EXPERIMENTAL.show_sandbox_collection

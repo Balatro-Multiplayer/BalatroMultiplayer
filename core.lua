@@ -43,8 +43,11 @@ MP.PREVIEW = {
 	button = SMODS.Mods["Multiplayer"].config.preview.button,
 }
 
--- Flag to switch between old and new networking implementation
-MP.USE_NEW_NETWORKING = true
+MP.EXPERIMENTAL = {
+	use_new_networking = true,
+	show_sandbox_collection = false,
+	alt_stakes = false,
+}
 
 G.C.MULTIPLAYER = HEX("AC3232")
 
@@ -225,7 +228,7 @@ SMODS.Atlas({
 
 MP.load_mp_dir("compatibility")
 
-local networking_dir = MP.USE_NEW_NETWORKING and "networking" or "networking-old"
+local networking_dir = MP.EXPERIMENTAL.use_new_networking and "networking" or "networking-old"
 MP.load_mp_file(networking_dir .. "/action_handlers.lua")
 
 MP.load_mp_dir("ui", true) -- Gamemodes and rulesets need these
