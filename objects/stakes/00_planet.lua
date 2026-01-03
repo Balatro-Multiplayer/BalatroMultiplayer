@@ -19,5 +19,4 @@ SMODS.Stake({
 		G.GAME.modifiers.enable_perishables_in_shop = true -- orange
 	end,
 	colour = G.C.Planet,
-	-- shiny = true,
 })

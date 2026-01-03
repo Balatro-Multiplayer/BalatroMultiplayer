@@ -11,5 +11,6 @@ SMODS.Stake({
 		G.GAME.modifiers.scaling = (G.GAME.modifiers.scaling or 1) + 1 -- yeehaw
 	end,
 	colour = HEX("000000"),
+	above_stake = "planet",
 	-- shiny = true,
 })

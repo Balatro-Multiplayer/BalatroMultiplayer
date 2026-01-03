@@ -11,4 +11,5 @@ SMODS.Stake({
 	end,
 	colour = HEX("000000"),
 	shiny = true,
+	above_stake = "spectral",
 })
