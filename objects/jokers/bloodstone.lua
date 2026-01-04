@@ -1,8 +1,6 @@
 -- this is kinda strange but we can just override the logic for pvp only rather than re-implementing it again, bc if we don't return anything, it'll run the normal logic
 
-MP.ReworkCenter({
-	key = "j_bloodstone",
-	ruleset = MP.UTILS.get_standard_rulesets({ "minorleague" }),
+MP.ReworkCenter("j_bloodstone", MP.UTILS.get_standard_rulesets({ "minorleague" }), nil, {
 	silent = true,
 	calculate = function(self, card, context)
 		if MP.is_pvp_boss() and MP.should_use_the_order() then

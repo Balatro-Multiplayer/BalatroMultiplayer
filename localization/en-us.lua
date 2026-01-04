@@ -121,7 +121,7 @@ return {
 					"not in a {C:attention}PvP Blind{}",
 				},
 			},
-			j_hanging_chad_mp_standard = {
+			j_mp_hanging_chad_standard = {
 				name = "Hanging Chad",
 				text = {
 					"Retrigger {C:attention}first{} and {C:attention}second{}",
