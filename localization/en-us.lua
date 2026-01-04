@@ -644,7 +644,7 @@ return {
 		},
 		dictionary = {
 			b_singleplayer = "Singleplayer",
-			b_sp_with_ruleset = "SP with Ruleset",
+			b_sp_with_ruleset = "Practice Mode",
 			b_join_lobby = "Join Lobby",
 			b_join_lobby_clipboard = "Join From Clipboard",
 			b_return_lobby = "Return to Lobby",
