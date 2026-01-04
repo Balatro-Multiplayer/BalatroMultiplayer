@@ -109,9 +109,21 @@ function MP.ReworkCenter(args)
 	for _, ruleset in ipairs(rulesets) do
 		local ruleset_ = "mp_" .. ruleset .. "_"
 		for k, v in pairs(args) do
-			if k ~= "key" and k ~= "ruleset" and k ~= "silent" then
+			local is_reserved = k == "key" or k == "ruleset" or k == "silent"
+
+			if not is_reserved then
+				-- Store the reworked property
 				center[ruleset_ .. k] = v
 				if not center["mp_vanilla_" .. k] then center["mp_vanilla_" .. k] = center[k] or "NULL" end
+			end
+
+			-- Auto-inject generate_ui when adding loc_vars to vanilla centers
+			if k == "loc_vars" then
+				local center_has_generate_ui = center.generate_ui and type(center.generate_ui) == "function"
+				if not center_has_generate_ui and not args.generate_ui then
+					center[ruleset_ .. "generate_ui"] = SMODS.Center.generate_ui
+					center.mp_vanilla_generate_ui = center.generate_ui or "NULL"
+				end
 			end
 		end
 		center.mp_reworks = center.mp_reworks or {}

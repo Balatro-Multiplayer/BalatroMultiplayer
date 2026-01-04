@@ -1,9 +1,3 @@
-SMODS.Joker:take_ownership("hanging_chad", {
-	loc_vars = function(self, info_queue, card) -- This is dumb but there's no original loc_vars to override, if i knew how to fix that i would
-		return { vars = { card.ability.extra } }
-	end,
-}, true)
-
 MP.ReworkCenter({
 	key = "j_hanging_chad",
 	ruleset = MP.UTILS.get_standard_rulesets(),
