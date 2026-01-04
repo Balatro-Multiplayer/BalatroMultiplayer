@@ -3,7 +3,6 @@ MP.SANDBOX = {}
 -- Centralized joker mappings: defines sandbox variants, their vanilla counterparts, and rotation status
 MP.SANDBOX.joker_mappings = {
 	-- Active jokers in rotation
-	{ sandbox = "j_mp_hanging_chad", vanilla = "j_hanging_chad", active = true },
 	{ sandbox = "j_mp_misprint_sandbox", vanilla = "j_misprint", active = true },
 	{ sandbox = "j_mp_castle_sandbox", vanilla = "j_castle", active = true },
 	{ sandbox = "j_mp_mail_sandbox", vanilla = "j_mail", active = true },
@@ -90,6 +89,9 @@ MP.Ruleset({
 		for i = 1, 14 do
 			table.insert(jokers, "j_mp_error_sandbox_" .. i)
 		end
+
+		-- final vanilla stuff
+		table.insert(jokers, "j_hanging_chad")
 
 		-- Fisher-Yates shuffle
 		for i = #jokers, 2, -1 do

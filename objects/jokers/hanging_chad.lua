@@ -1,4 +1,4 @@
-MP.ReworkCenter("j_hanging_chad", MP.UTILS.get_standard_rulesets(), "j_mp_hanging_chad_standard", {
+MP.ReworkCenter("j_hanging_chad", MP.UTILS.get_standard_rulesets("sandbox"), "j_mp_hanging_chad_standard", {
 	config = { extra = 1 },
 	loc_vars = function(self, info_queue, card)
 		return {
