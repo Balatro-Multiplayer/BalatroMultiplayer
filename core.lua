@@ -98,9 +98,8 @@ function MP.load_mp_dir(directory, recursive)
 	end
 end
 
-MP.load_mp_file("misc/utils.lua")
-MP.load_mp_file("misc/insane_int.lua")
-MP.load_mp_file("misc/hide_content.lua")
+MP.load_mp_dir("lib")
+MP.load_mp_dir("overrides")
 
 function MP.reset_lobby_config(persist_ruleset_and_gamemode)
 	sendDebugMessage("Resetting lobby options", "MULTIPLAYER")
@@ -233,7 +232,7 @@ MP.load_mp_file(networking_dir .. "/action_handlers.lua")
 
 MP.load_mp_dir("gamemodes")
 MP.load_mp_dir("rulesets")
-MP.load_mp_dir("ui", true) -- Gamemodes and rulesets need these
+MP.load_mp_dir("ui", true)
 
 if MP.LOBBY.config.weekly then -- this could be a function but why bother
 	MP.load_mp_file("rulesets/weeklies/" .. MP.LOBBY.config.weekly .. ".lua")
@@ -252,9 +251,6 @@ MP.load_mp_dir("objects/consumables")
 MP.load_mp_dir("objects/consumables/sandbox")
 MP.load_mp_dir("objects/boosters")
 MP.load_mp_dir("objects/challenges")
-
-MP.load_mp_file("misc/disable_restart.lua")
-MP.load_mp_file("misc/mod_hash.lua")
 
 local SOCKET = MP.load_mp_file(networking_dir .. "/socket.lua")
 MP.NETWORKING_THREAD = love.thread.newThread(SOCKET)
