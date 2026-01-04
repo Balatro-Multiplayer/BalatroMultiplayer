@@ -232,7 +232,7 @@ MP.load_mp_file(networking_dir .. "/action_handlers.lua")
 
 MP.load_mp_dir("gamemodes")
 MP.load_mp_dir("rulesets")
-MP.load_mp_dir("ui", true) -- Gamemodes and rulesets need these
+MP.load_mp_dir("ui", true)
 
 if MP.LOBBY.config.weekly then -- this could be a function but why bother
 	MP.load_mp_file("rulesets/weeklies/" .. MP.LOBBY.config.weekly .. ".lua")
