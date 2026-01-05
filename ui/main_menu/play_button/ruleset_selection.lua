@@ -20,8 +20,8 @@ function G.UIDEF.ruleset_selection_options(mode)
 			buttons = {
 				{ button_id = "ranked_ruleset_button", button_localize_key = "k_ranked" },
 				{ button_id = "vanilla_ruleset_button", button_localize_key = "k_vanilla" },
-				{ button_id = "sandbox_ruleset_button", button_localize_key = "k_sandbox" },
 				{ button_id = "smallworld_ruleset_button", button_localize_key = "k_smallworld" },
+				{ button_id = "sandbox_ruleset_button", button_localize_key = "k_sandbox" },
 			},
 		},
 		{
