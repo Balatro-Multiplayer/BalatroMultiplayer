@@ -53,20 +53,11 @@ SMODS.Consumable({
 
 -- Function to map joker keys (handles reworked jokers like hanging_chad -> mp_hanging_chad)
 local function map_joker_key(key)
-  -- Check if this joker has a reworked version in the current ruleset
-  if MP.LOBBY.config and MP.LOBBY.config.ruleset then
-    local ruleset = SMODS.get_ruleset(MP.LOBBY.config.ruleset)
-    if ruleset and ruleset.reworked_jokers then
-      -- Check if there's a reworked version (indicated by j_mp_ prefix)
-      local mp_key = "j_mp_" .. key:sub(3)  -- Convert j_hanging_chad to j_mp_hanging_chad
-      for _, reworked_key in ipairs(ruleset.reworked_jokers) do
-        if reworked_key == mp_key then
-          return mp_key
-        end
-      end
-    end
-  end
-  return key
+  -- Hardcoded mapping for reworked jokers (only hanging_chad is reworked in Small World)
+  local key_mappings = {
+    ["j_hanging_chad"] = "j_mp_hanging_chad"
+  }
+  return key_mappings[key] or key
 end
 
 -- Function to create the prophet UI showing all jokers using collection-style UI
