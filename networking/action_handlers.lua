@@ -253,6 +253,7 @@ local function action_win_game()
 	MP.end_game_jokers_received = false
 	MP.nemesis_deck_received = false
 	MP.GAME.won = true
+	MP.STATS.record_match(true)
 	win_game()
 end
 
@@ -261,6 +262,7 @@ local function action_lose_game()
 	MP.nemesis_deck_string = ""
 	MP.end_game_jokers_received = false
 	MP.nemesis_deck_received = false
+	MP.STATS.record_match(false)
 	G.STATE_COMPLETE = false
 	G.STATE = G.STATES.GAME_OVER
 end
