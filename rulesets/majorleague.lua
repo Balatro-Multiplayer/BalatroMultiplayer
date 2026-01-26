@@ -30,6 +30,7 @@ MP.Ruleset({
 		MP.LOBBY.config.timer_base_seconds = 180
 		MP.LOBBY.config.timer_forgiveness = 1
 		MP.LOBBY.config.the_order = false
+		MP.LOBBY.config.preview_disabled = true
 		return true
 	end,
 }):inject()
