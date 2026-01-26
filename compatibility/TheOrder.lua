@@ -233,7 +233,7 @@ end
 
 local nextvouchers = SMODS.get_next_vouchers
 function SMODS.get_next_vouchers(vouchers)
-	if MP.should_use_the_order() then
+	if MP.should_use_the_order() or MP.is_major_league_ruleset() then
 		vouchers = vouchers or { spawn = {} }
 		local _pool = get_current_pool("Voucher")
 		local culled = get_culled(_pool)
@@ -257,7 +257,7 @@ end
 
 local nextvoucherkey = get_next_voucher_key
 function get_next_voucher_key(_from_tag)
-	if MP.should_use_the_order() then
+	if MP.should_use_the_order() or MP.is_major_league_ruleset() then
 		local _pool = get_current_pool("Voucher")
 		local culled = get_culled(_pool)
 		local center = pseudorandom_element(culled, pseudoseed("Voucher0"))
