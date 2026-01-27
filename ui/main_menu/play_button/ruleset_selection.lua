@@ -47,8 +47,7 @@ function G.UIDEF.ruleset_selection_options(mode)
 		"ruleset_area",
 		default_ruleset_area,
 		"change_ruleset_selection",
-		ruleset_buttons_data,
-		default_button
+		ruleset_buttons_data
 	)
 end
 
