@@ -54,7 +54,7 @@ function G.FUNCS.join_lobby(e)
 	G.FUNCS.overlay_menu({
 		definition = G.UIDEF.create_UIBox_join_lobby_button(),
 	})
-	local text_input = G.OVERLAY_MENU:get_UIE_by_ID("text_input")
+	local text_input = G.OVERLAY_MENU:get_UIE_by_ID("text_input") ---@diagnostic disable-line: undefined-field
 	G.FUNCS.select_text_input(text_input)
 end
 

@@ -1,3 +1,4 @@
+Handy = Handy or nil
 if Handy then
 	-- In this version all checks included in mod, but since I care about older versions, keep all patches
 	if not (Handy.meta and Handy.meta["1.5.1a_multiplayer_check"]) then

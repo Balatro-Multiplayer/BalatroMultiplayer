@@ -225,7 +225,7 @@ function G.FUNCS.attention_text_realtime(args)
 			args.AT.attention_text = true
 
 			args.text = args.AT.UIRoot.children[1].config.object
-			args.text:pulse(0.5)
+			args.text:pulse(0.5) ---@diagnostic disable-line: undefined-field
 
 			if args.cover then
 				Particles(args.pos.x, args.pos.y, 0, 0, {
@@ -268,7 +268,7 @@ function G.FUNCS.attention_text_realtime(args)
 		func = function()
 			if not args.start_time then
 				args.start_time = G.TIMERS.TOTAL
-				args.text:pop_out(3)
+				args.text:pop_out(3) ---@diagnostic disable-line: undefined-field
 			else
 				args.fade = math.max(0, 1 - 3 * (G.TIMERS.TOTAL - args.start_time))
 				if args.cover_colour then args.cover_colour[4] = math.min(args.cover_colour[4], 2 * args.fade) end
@@ -295,16 +295,15 @@ function G.FUNCS.overlay_endgame_menu()
 		delay = 2.5,
 		blocking = false,
 		func = function()
-			if G.OVERLAY_MENU and G.OVERLAY_MENU:get_UIE_by_ID("jimbo_spot") then
-				local Jimbo = Card_Character({ x = 0, y = 5 })
-				local spot = G.OVERLAY_MENU:get_UIE_by_ID("jimbo_spot")
-				spot.config.object:remove()
-				spot.config.object = Jimbo
-				Jimbo.ui_object_updated = true
-				local jimbo_words = MP.GAME.won and "wq_" .. math.random(1, 7) or "lq_" .. math.random(1, 10)
-				Jimbo:add_speech_bubble(jimbo_words, nil, { quip = true })
-				Jimbo:say_stuff(5)
-			end
+			if not G.OVERLAY_MENU then return true end
+			local spot = G.OVERLAY_MENU:get_UIE_by_ID("jimbo_spot") ---@diagnostic disable-line: undefined-field
+			local Jimbo = Card_Character({ x = 0, y = 5 })
+			spot.config.object:remove()
+			spot.config.object = Jimbo
+			Jimbo.ui_object_updated = true
+			local jimbo_words = MP.GAME.won and "wq_" .. math.random(1, 7) or "lq_" .. math.random(1, 10)
+			Jimbo:add_speech_bubble(jimbo_words, nil, { quip = true })
+			Jimbo:say_stuff(5)
 			return true
 		end,
 	}))

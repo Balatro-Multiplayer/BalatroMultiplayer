@@ -86,7 +86,7 @@ SMODS.Back({
 			back:change_to(G.P_CENTERS[G.GAME.modifiers.mp_cocktail[i]])
 			local ret1, ret2 = back:trigger_effect(context)
 			back:change_to(G.P_CENTERS["b_mp_cocktail"])
-			if ret1 or ret2 then return ret1, ret2 end
+			if ret1 or ret2 then return ret1, ret2 end ---@diagnostic disable-line: return-type-mismatch
 		end
 	end,
 	mp_credits = { art = { "aura!", "shai1n" }, code = { "Toneblock" } },
@@ -426,6 +426,7 @@ end
 
 local highlight_ref = Card.highlight
 function Card:highlight(is_highlighted)
+	self.mp_cocktail_select = self.mp_cocktail_select or nil
 	if self.mp_cocktail_select then
 		local shift = G.CONTROLLER.held_keys["lshift"] or G.CONTROLLER.held_keys["rshift"]
 		if shift and self.mp_cocktail_forced then
@@ -484,6 +485,7 @@ G.E_MANAGER:add_event(Event({
 	func = function()
 		local decks = MP.get_cocktail_decks()
 		local cfg = SMODS.Mods["Multiplayer"].config
+		if not cfg then return true end
 		if (not cfg.cocktail) or #decks + 1 ~= #cfg.cocktail then
 			local string = ""
 			for i = 1, #decks do
@@ -500,6 +502,7 @@ G.E_MANAGER:add_event(Event({
 function MP.cocktail_cfg_edit(bool, deck) -- strings are easier to send, and it's just ones and zeroes
 	local decks = MP.get_cocktail_decks()
 	local cfg = SMODS.Mods["Multiplayer"].config
+	if not cfg then return end
 	local num = (bool == 2) and "2" or (bool and "1" or "0")
 	if not deck then
 		local string = ""
@@ -528,6 +531,7 @@ end
 function MP.cocktail_cfg_readpos(pos, construct)
 	local decks = MP.get_cocktail_decks() -- copypasted code. unsure how to make this less messy without making it more messy
 	local cfg = SMODS.Mods["Multiplayer"].config
+	if not cfg then return end
 	if pos == "show" then pos = #cfg.cocktail end
 	if construct then return MP.cocktail_cfg_get():sub(pos, pos) end
 	return cfg.cocktail:sub(pos, pos)

@@ -45,12 +45,12 @@ function reset_idol_card()
 		if #valid_idol_cards == 0 then return end
 
 		local value_order = {}
-		for i, rank in ipairs(SMODS.Rank.obj_buffer) do
+		for i, rank in ipairs(SMODS.Rank.obj_buffer) do ---@diagnostic disable-line: param-type-mismatch
 			value_order[rank] = i
 		end
 
 		local suit_order = {}
-		for i, suit in ipairs(SMODS.Suit.obj_buffer) do
+		for i, suit in ipairs(SMODS.Suit.obj_buffer) do ---@diagnostic disable-line: param-type-mismatch
 			suit_order[suit] = i
 		end
 
@@ -111,7 +111,7 @@ function reset_mail_rank()
 		local count_map = {}
 		local total_weight = 0
 		local value_order = {}
-		for i, rank in ipairs(SMODS.Rank.obj_buffer) do
+		for i, rank in ipairs(SMODS.Rank.obj_buffer) do ---@diagnostic disable-line: param-type-mismatch
 			value_order[rank] = i
 		end
 

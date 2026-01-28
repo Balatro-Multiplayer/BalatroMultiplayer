@@ -13,9 +13,9 @@ function SMODS.create_mod_badges(obj, badges)
 			local calced_text_width = 0
 			-- Math reproduced from DynaText:update_text
 			for _, c in utf8.chars(text) do
-				local tx = font.FONT:getWidth(c) * (0.33 * size) * G.TILESCALE * font.FONTSCALE
-					+ 2.7 * 1 * G.TILESCALE * font.FONTSCALE
-				calced_text_width = calced_text_width + tx / (G.TILESIZE * G.TILESCALE)
+				local scale = G.TILESCALE * font.FONTSCALE ---@diagnostic disable-line: undefined-field
+				local tx = scale * (font.FONT:getWidth(c) * 0.33 * size + 2.7) ---@diagnostic disable-line: undefined-field
+				calced_text_width = calced_text_width + (tx / (G.TILESIZE * G.TILESCALE))
 			end
 			local scale_fac = calced_text_width > max_text_width and max_text_width / calced_text_width or 1
 			return scale_fac

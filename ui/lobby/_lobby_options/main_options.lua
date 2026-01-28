@@ -83,15 +83,14 @@ end
 
 function MP.UI.Change_Main_Lobby_Options(e, info_area_id, info_area_func, default_button_id, update_lobby_config_func)
 	if not G.OVERLAY_MENU then return end
-
-	local info_area = G.OVERLAY_MENU:get_UIE_by_ID(info_area_id)
+	local info_area = G.OVERLAY_MENU:get_UIE_by_ID(info_area_id) ---@diagnostic disable-line: undefined-field
 	if not info_area then return end
 
 	-- Switch 'chosen' status from the previously-chosen button to this one:
 	if info_area.config.prev_chosen then
 		info_area.config.prev_chosen.config.chosen = nil
 	else -- The previously-chosen button should be the default one here:
-		local default_button = G.OVERLAY_MENU:get_UIE_by_ID(default_button_id)
+		local default_button = G.OVERLAY_MENU:get_UIE_by_ID(default_button_id) ---@diagnostic disable-line: undefined-field
 		if default_button then default_button.config.chosen = nil end
 	end
 	e.config.chosen = "vert" -- Special setting to show 'chosen' indicator on the side
@@ -112,7 +111,7 @@ end
 
 function MP.UI.update_lobby_option_toggle(option_key)
 	if G.OVERLAY_MENU then
-		local config_uie = G.OVERLAY_MENU:get_UIE_by_ID(option_key .. "_toggle")
+		local config_uie = G.OVERLAY_MENU:get_UIE_by_ID(option_key .. "_toggle") ---@diagnostic disable-line: undefined-field
 		if config_uie then G.FUNCS.toggle(config_uie) end
 	end
 end

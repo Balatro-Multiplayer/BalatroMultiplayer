@@ -16,7 +16,7 @@ function FN.PRE.format_number(num)
 	-- Start using e-notation earlier to reduce number length, if showing min and max for preview:
 	if true and num >= 1e7 then
 		local x = string.format("%.4g", num)
-		local fac = math.floor(math.log(tonumber(x), 10))
+		local fac = math.floor(math.log(tonumber(x) or 1, 10))
 		return string.format("%.2f", x / (10 ^ fac)) .. "e" .. fac
 	end
 	return number_format(num) -- Default Balatro function.

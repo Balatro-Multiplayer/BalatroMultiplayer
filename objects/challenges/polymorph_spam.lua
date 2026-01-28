@@ -8,7 +8,7 @@ SMODS.Challenge({
 		},
 	},
 	restrictions = {
-		banned_cards = function()
+		banned_cards = function() ---@diagnostic disable-line: assign-type-mismatch
 			local ret = {}
 			local add = {
 				j_campfire = true,
@@ -39,6 +39,7 @@ end
 
 local function get_pos(card)
 	local area = get_area(card)
+	if not area then return nil end
 	for i, v in ipairs(area.cards) do
 		if card == v then return i end
 	end
@@ -59,6 +60,7 @@ local function get_transmutations_loc(card)
 	local done = false
 	local num = 0
 	local area = get_area(card)
+	if not area then return nil end
 	local limit = area.config.card_limit
 	local pos = get_pos(card) or nil
 	local ret = {}
@@ -104,7 +106,8 @@ local function mass_polymorph(area)
 						break
 					end
 					if v == card.config.center then
-						swap = get_pos(card)
+						local pos = get_pos(card)
+						if pos then swap = pos end
 					else
 						swap = math.max(swap - 1, 0)
 					end
@@ -159,8 +162,10 @@ function localize(args, misc_cat)
 			table.remove(loc_target, 2)
 		end
 		local list = get_transmutations_loc(transmute_card)
-		for i = 1, #list do
-			loc_target[#loc_target + 1] = { list[i] }
+		if list then
+			for i = 1, #list do
+				loc_target[#loc_target + 1] = { list[i] }
+			end
 		end
 	end
 	return localize_ref(args, misc_cat)

@@ -14,6 +14,7 @@ end
 
 function MP.STATS.record_match(won)
 	local config = SMODS.Mods["Multiplayer"].config
+	if not config then return end
 	config.joker_stats = config.joker_stats or {}
 	config.match_history = config.match_history or {}
 
@@ -40,5 +41,5 @@ end
 
 function MP.STATS.get_joker_wins(joker_key)
 	local config = SMODS.Mods["Multiplayer"].config
-	return config.joker_stats and config.joker_stats[joker_key] or 0
+	return config and config.joker_stats[joker_key] or 0
 end

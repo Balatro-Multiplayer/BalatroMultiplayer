@@ -140,7 +140,7 @@ function MP.ReworkCenter(key, ruleset, loc_key, args)
 
 		-- Auto-inject generate_ui when adding loc_vars to vanilla centers
 		if needs_generate_ui then
-			center[prefix .. "generate_ui"] = SMODS.Center.generate_ui
+			center[prefix .. "generate_ui"] = SMODS.Center.generate_ui ---@diagnostic disable-line: assign-type-mismatch
 			if not center.mp_vanilla_generate_ui then center.mp_vanilla_generate_ui = center.generate_ui or "NULL" end
 		end
 
