@@ -10,7 +10,10 @@ local function get_warnings()
 		table.insert(warnings, { localize("k_warning_cheating1"), SMODS.Gradients.warning_text, 0.4 })
 		table.insert(
 			warnings,
-			{ string.format(localize("k_warning_cheating2"), MP.UTILS.random_message()), SMODS.Gradients.warning_text }
+			{
+				string.format(localize("k_warning_cheating2") or "", MP.UTILS.random_message()),
+				SMODS.Gradients.warning_text,
+			}
 		)
 	end
 

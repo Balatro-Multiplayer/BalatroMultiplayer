@@ -7,8 +7,10 @@ if SMODS.Mods["HotPotato"] and SMODS.Mods["HotPotato"].can_load then
 	MP.DECK.ban_card("j_joker")
 	MP.DECK.ban_card("j_hpot_lotus")
 	MP.DECK.ban_card("j_hpot_c_sharp")
-
 	MP.DECK.ban_card("j_hpot_goblin_tinkerer") -- too easy to infinite
+
+	Wheel = Wheel or nil
+	if not Wheel then return end
 
 	-- essentially we're just hooking a bunch of functions to separate and normalise rng
 	-- i was gonna hook more but it ended up only being 2 so whatever

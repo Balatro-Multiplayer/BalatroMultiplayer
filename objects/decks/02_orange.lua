@@ -7,7 +7,7 @@ SMODS.Back({
 	apply = function(self)
 		stop_use()
 		local lock = self.key
-		G.CONTROLLER.locks[lock] = true
+		G.CONTROLLER.locks[lock] = true ---@diagnostic disable-line: need-check-nil
 		-- "yeah just triple layer the event surely that works...WHAT THE SHIT"
 		G.E_MANAGER:add_event(Event({
 			func = function()
@@ -30,7 +30,7 @@ SMODS.Back({
 								delay(0.2)
 								G.FUNCS.use_card({ config = { ref_table = card } })
 								card:start_materialize()
-								G.CONTROLLER.locks[lock] = nil
+								G.CONTROLLER.locks[lock] = nil ---@diagnostic disable-line: need-check-nil
 								return true
 							end,
 						}))

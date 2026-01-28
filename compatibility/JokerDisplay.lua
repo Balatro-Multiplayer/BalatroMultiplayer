@@ -1,4 +1,5 @@
 if SMODS.Mods["JokerDisplay"] and SMODS.Mods["JokerDisplay"].can_load then
+	JokerDisplay = JokerDisplay or nil
 	if JokerDisplay then
 		local jd_def = JokerDisplay.Definitions
 		jd_def["j_mp_conjoined_joker"] = {

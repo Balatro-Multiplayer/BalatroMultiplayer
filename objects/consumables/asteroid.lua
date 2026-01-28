@@ -1,6 +1,6 @@
 SMODS.Atlas({
 	key = "asteroid",
-	path = {
+	path = { ---@diagnostic disable-line: assign-type-mismatch
 		["default"] = "c_asteroid.png",
 		["ru"] = "c_asteroid_ru.png",
 	},

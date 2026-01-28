@@ -15,7 +15,7 @@ end
 function G.FUNCS.change_blind_col(args) -- all we're doing is just saving + redefining the ui elements here
 	MP.UTILS.save_blind_col(args.to_val)
 	MP.LOBBY.blind_col = args.to_val
-	local sprite = G.OVERLAY_MENU:get_UIE_by_ID("blind_col_changer_sprite")
+	local sprite = G.OVERLAY_MENU:get_UIE_by_ID("blind_col_changer_sprite") ---@diagnostic disable-line: undefined-field
 	sprite.config.object:remove()
 	sprite.config.object = AnimatedSprite(
 		0,
@@ -30,7 +30,7 @@ function G.FUNCS.change_blind_col(args) -- all we're doing is just saving + rede
 		{ shader = "dissolve" },
 	})
 	sprite.UIBox:recalculate()
-	local option = G.OVERLAY_MENU:get_UIE_by_ID("blind_col_changer_option")
+	local option = G.OVERLAY_MENU:get_UIE_by_ID("blind_col_changer_option") ---@diagnostic disable-line: undefined-field
 	option.children[1].children[1].config.text =
 		localize({ type = "name_text", key = MP.UTILS.blind_col_numtokey(MP.LOBBY.blind_col), set = "Blind" })
 	option.UIBox:recalculate()

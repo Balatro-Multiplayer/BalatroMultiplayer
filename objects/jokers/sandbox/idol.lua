@@ -122,12 +122,12 @@ local function get_most_common_card()
 
 	-- Sort by count descending first, then by suit/value for consistency
 	local value_order = {}
-	for i, rank in ipairs(SMODS.Rank.obj_buffer) do
+	for i, rank in ipairs(SMODS.Rank.obj_buffer) do ---@diagnostic disable-line: param-type-mismatch
 		value_order[rank] = i
 	end
 
 	local suit_order = {}
-	for i, suit in ipairs(SMODS.Suit.obj_buffer) do
+	for i, suit in ipairs(SMODS.Suit.obj_buffer) do ---@diagnostic disable-line: param-type-mismatch
 		suit_order[suit] = i
 	end
 

@@ -133,7 +133,7 @@ function MP.apply_fake_back_vouchers(back)
 				for i, v in ipairs(fake_back.effect.config.vouchers) do
 					local voucher = v
 					if G.GAME.banned_keys[v] or G.GAME.used_vouchers[v] then voucher = get_next_voucher_key() end
-					G.GAME.used_vouchers[voucher] = true
+					G.GAME.used_vouchers[voucher] = true ---@diagnostic disable-line: need-check-nil
 					fake_back.effect.config.vouchers[i] = voucher
 				end
 				G.GAME.current_round.voucher = SMODS.get_next_vouchers() -- the extreme jank doesn't matter as long as it's synced ig

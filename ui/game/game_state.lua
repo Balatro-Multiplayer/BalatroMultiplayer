@@ -91,7 +91,7 @@ end
 local function eval_hand_and_jokers()
 	for i = 1, #G.hand.cards do
 		--Check for hand doubling
-		local reps = { 1 }
+		local reps = { 1 } ---@type (number|table)[]
 		local j = 1
 		while j <= #reps do
 			local percent = (i - 0.999) / (#G.hand.cards - 0.998) + (j - 1) * 0.1
@@ -179,8 +179,7 @@ local function eval_hand_and_jokers()
 end
 
 local update_hand_played_ref = Game.update_hand_played
----@diagnostic disable-next-line: duplicate-set-field
-function Game:update_hand_played(dt)
+function Game:update_hand_played(dt) ---@diagnostic disable-line: duplicate-set-field
 	-- Ignore for singleplayer or regular blinds
 	if not MP.LOBBY.connected or not MP.LOBBY.code or not MP.is_pvp_boss() then
 		update_hand_played_ref(self, dt)
@@ -317,9 +316,7 @@ function Game:update_shop(dt)
 		updated_location = true
 		MP.ACTIONS.set_location("loc_shop")
 		MP.GAME.spent_before_shop = to_big(MP.GAME.spent_total) + to_big(0)
-		if MP.UI.show_enemy_location then
-			MP.UI.show_enemy_location()
-		end
+		if MP.UI.show_enemy_location then MP.UI.show_enemy_location() end
 	end
 	if G.STATE_COMPLETE and updated_location then updated_location = false end
 	update_shop_ref(self, dt)
@@ -331,9 +328,7 @@ function Game:update_blind_select(dt)
 	if MP.LOBBY.code and not G.STATE_COMPLETE and not updated_location then
 		updated_location = true
 		MP.ACTIONS.set_location("loc_selecting")
-		if MP.UI.show_enemy_location then
-			MP.UI.show_enemy_location()
-		end
+		if MP.UI.show_enemy_location then MP.UI.show_enemy_location() end
 	end
 	if G.STATE_COMPLETE and updated_location then updated_location = false end
 	update_blind_select_ref(self, dt)
@@ -350,8 +345,9 @@ function Game:start_run(args)
 
 	local scale = 0.4
 	local hud_ante = G.HUD:get_UIE_by_ID("hud_ante")
-	hud_ante.children[1].children[1].config.text = localize("k_lives")
+	if not hud_ante then return end
 
+	hud_ante.children[1].children[1].config.text = localize("k_lives")
 	-- Set lives number
 	hud_ante.children[2].children[1].config.object = DynaText({
 		string = { { ref_table = MP.GAME, ref_value = "lives" } },
@@ -398,4 +394,3 @@ function MP.handle_deck_out()
 		end
 	end
 end
-

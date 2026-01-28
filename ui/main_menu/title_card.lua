@@ -27,6 +27,8 @@ end
 
 function Juice_up(thing, a, b)
 	if SMODS.Mods["Talisman"] and SMODS.Mods["Talisman"].can_load then
+		Talisman = Talisman or nil
+		if not Talisman then return end
 		local disable_anims = Talisman.config_file.disable_anims
 		Talisman.config_file.disable_anims = false
 		thing:juice_up(a, b)

@@ -3,7 +3,7 @@
 
 function FN.PRE.simulate()
 	-- Guard against simulating in redundant places:
-	if FN.PRE.five_second_coroutine and coroutine.status(FN.PRE.five_second_coroutine) == "suspended" then
+	if FN.PRE.five_second_coroutine and (coroutine.status(FN.PRE.five_second_coroutine) == "suspended") then
 		coroutine.resume(FN.PRE.five_second_coroutine)
 	end
 	if
@@ -52,7 +52,7 @@ function CardArea:parse_highlighted()
 	orig_hl(self)
 	if not MP.INTEGRATIONS.Preview then return end
 
-	if not FN.PRE.lock_updates and FN.PRE.show_preview then FN.PRE.show_preview = false end
+	if (not FN.PRE.lock_updates) and FN.PRE.show_preview then FN.PRE.show_preview = false end
 	FN.PRE.add_update_event("immediate")
 end
 
@@ -89,7 +89,7 @@ function FN.PRE.update_on_card_order_change(cardarea)
 	if G.STATE == G.STATES.HAND_PLAYED then return end
 
 	local prev_order = nil
-	if cardarea.config.type == "joker" and cardarea.cards[1].ability.set == "Joker" then
+	if (cardarea.config.type == "joker") and (cardarea.cards[1].ability.set == "Joker") then
 		if cardarea.cards[1].edition and cardarea.cards[1].edition.mp_phantom then return end
 		-- Note that the consumables cardarea also has type 'joker' so must verify by checking first card.
 		prev_order = FN.PRE.joker_order
@@ -102,9 +102,9 @@ function FN.PRE.update_on_card_order_change(cardarea)
 	-- Go through stored card IDs and check against current card IDs, in-order.
 	-- If any mismatch occurs, toggle flag and update name for next time.
 	local should_update = false
-	if #cardarea.cards ~= #prev_order then prev_order = {} end
+	if (not prev_order) or (#cardarea.cards ~= #prev_order) then prev_order = {} end
 	for i, c in ipairs(cardarea.cards) do
-		if c.sort_id ~= prev_order[i] then
+		if c and (c.sort_id ~= prev_order[i]) then
 			prev_order[i] = c.sort_id
 			should_update = true
 		end

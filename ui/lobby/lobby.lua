@@ -14,12 +14,15 @@ function G.UIDEF.get_connection_status_ui()
 				colour = G.C.UI.TRANSPARENT_DARK,
 			},
 			nodes = {
-				MP.UI.UTILS.create_text_node((MP.LOBBY.code and localize("k_in_lobby")) or (MP.LOBBY.connected and localize(
-					"k_connected"
-				)) or localize("k_warn_service"), {
-					scale = 0.3,
-					colour = G.C.UI.TEXT_LIGHT,
-				}),
+				MP.UI.UTILS.create_text_node(
+					(MP.LOBBY.code and localize("k_in_lobby"))
+						or (MP.LOBBY.connected and localize("k_connected"))
+						or localize("k_warn_service"),
+					{
+						scale = 0.3,
+						colour = G.C.UI.TEXT_LIGHT,
+					}
+				),
 			},
 		},
 		config = {
@@ -186,10 +189,13 @@ function G.UIDEF.create_UIBox_view_hash(type)
 	return (
 		create_UIBox_generic_options({
 			contents = {
-				MP.UI.UTILS.create_column({ padding = 0.07, align = "cm" }, MP.UI.modlist_to_view(
-					type == "host" and MP.LOBBY.host.config.Mods or MP.LOBBY.guest.config.Mods,
-					G.C.UI.TEXT_LIGHT
-				)),
+				MP.UI.UTILS.create_column(
+					{ padding = 0.07, align = "cm" },
+					MP.UI.modlist_to_view(
+						type == "host" and MP.LOBBY.host.config.Mods or MP.LOBBY.guest.config.Mods,
+						G.C.UI.TEXT_LIGHT
+					)
+				),
 			},
 		})
 	)
@@ -352,7 +358,7 @@ end
 
 function G.FUNCS.lobby_choose_deck(e)
 	G.FUNCS.setup_run(e)
-	if G.OVERLAY_MENU then G.OVERLAY_MENU:get_UIE_by_ID("run_setup_seed"):remove() end
+	if G.OVERLAY_MENU then G.OVERLAY_MENU:get_UIE_by_ID("run_setup_seed"):remove() end ---@diagnostic disable-line: undefined-field
 end
 
 local start_run_ref = G.FUNCS.start_run
@@ -422,8 +428,7 @@ function G.FUNCS.custom_seed_reset(e)
 end
 
 local set_main_menu_UI_ref = set_main_menu_UI
----@diagnostic disable-next-line: lowercase-global
-function set_main_menu_UI()
+function set_main_menu_UI() ---@diagnostic disable-line: lowercase-global
 	if MP.LOBBY.code then
 		if G.MAIN_MENU_UI then G.MAIN_MENU_UI:remove() end
 		if G.STAGE == G.STAGES.MAIN_MENU then G.FUNCS.display_lobby_main_menu_UI() end
@@ -434,8 +439,7 @@ end
 
 local in_lobby = false
 local gameUpdateRef = Game.update
----@diagnostic disable-next-line: duplicate-set-field
-function Game:update(dt)
+function Game:update(dt) ---@diagnostic disable-line: duplicate-set-field
 	-- Track lobby state transitions
 	if (MP.LOBBY.code and not in_lobby) or (not MP.LOBBY.code and in_lobby) then
 		in_lobby = not in_lobby
@@ -493,8 +497,7 @@ function MP.UI.update_connection_status()
 end
 
 local gameMainMenuRef = Game.main_menu
----@diagnostic disable-next-line: duplicate-set-field
-function Game:main_menu(change_context)
+function Game:main_menu(change_context) ---@diagnostic disable-line: duplicate-set-field
 	MP.UI.update_connection_status()
 	gameMainMenuRef(self, change_context)
 end

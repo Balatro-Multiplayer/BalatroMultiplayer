@@ -1,3 +1,7 @@
+FN.SIM = FN.SIM or nil
+FNSJ = FNSJ or nil
+if not FN.SIM or not FNSJ then return end
+
 FNSJ.simulate_mp_defensive_joker = function(joker_obj, context)
 	if context.cardarea == G.jokers and context.global then FN.SIM.add_chips(joker_obj.ability.t_chips) end
 end

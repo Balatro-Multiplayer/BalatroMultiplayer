@@ -74,7 +74,7 @@ function MP.UI.timer_hud()
 end
 
 function MP.UI.start_pvp_countdown(callback)
-	local seconds = countdown_seconds
+	local seconds = 3
 	local tick_delay = 1
 	if MP.LOBBY and MP.LOBBY.config and MP.LOBBY.config.pvp_countdown_seconds then
 		seconds = MP.LOBBY.config.pvp_countdown_seconds
@@ -175,4 +175,3 @@ MP.timer_event = Event({
 		MP.timer_event.start_timer = false
 	end,
 })
-
