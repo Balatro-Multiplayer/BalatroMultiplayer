@@ -236,7 +236,7 @@ end
 local function action_player_info(lives)
 	if MP.GAME.lives ~= lives then
 		if MP.GAME.lives ~= 0 and MP.LOBBY.config.gold_on_life_loss then
-			if MP.is_pvp_boss() then
+			if MP.is_pvp_boss() or MP.is_major_league_ruleset() then
 				MP.GAME.comeback_bonus_given = false
 				MP.GAME.comeback_bonus = MP.GAME.comeback_bonus + 1
 			end
