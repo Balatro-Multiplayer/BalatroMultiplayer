@@ -58,7 +58,7 @@ function MP.should_use_the_order()
 end
 
 function MP.is_major_league_ruleset()
-	return MP.LOBBY and MP.LOBBY.config and MP.LOBBY.config.ruleset == "majorleague" and MP.LOBBY.code
+	return MP.LOBBY and MP.LOBBY.config and MP.LOBBY.config.ruleset == "ruleset_mp_majorleague" and MP.LOBBY.code
 end
 
 function MP.load_mp_file(file)
