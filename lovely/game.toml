@@ -26,10 +26,14 @@ payload = '''
 		if MP.LOBBY.config.ruleset == "ruleset_mp_sandbox" then
 		    comeback_bonus = 3 * (G.GAME.round_resets.ante - 1)
 		else
-			if G.GAME.stake >= 6 then
-				comeback_bonus = 2
+			if MP.is_major_league_ruleset() then 
+				comeback_bonus = 4 * MP.GAME.comeback_bonus
 			else
-		    	comeback_bonus = 4
+				if G.GAME.stake >= 6 then
+					comeback_bonus = 2
+				else
+			    	comeback_bonus = 4
+				end
 			end
 		end
 
@@ -193,5 +197,6 @@ end
 '''
 match_indent = true
 times = 1
+
 
 
