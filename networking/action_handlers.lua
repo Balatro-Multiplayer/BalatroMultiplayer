@@ -236,8 +236,10 @@ end
 local function action_player_info(lives)
 	if MP.GAME.lives ~= lives then
 		if MP.GAME.lives ~= 0 and MP.LOBBY.config.gold_on_life_loss then
-			MP.GAME.comeback_bonus_given = false
-			MP.GAME.comeback_bonus = MP.GAME.comeback_bonus + 1
+			if MP.is_pvp_boss() then
+				MP.GAME.comeback_bonus_given = false
+				MP.GAME.comeback_bonus = MP.GAME.comeback_bonus + 1
+			end
 		end
 		MP.UI.ease_lives(lives - MP.GAME.lives)
 		if MP.LOBBY.config.no_gold_on_round_loss and (G.GAME.blind and G.GAME.blind.dollars) then
