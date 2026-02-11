@@ -219,6 +219,7 @@ local function action_end_pvp()
 	MP.GAME.end_pvp = true
 	MP.GAME.timer = MP.LOBBY.config.timer_base_seconds
 	MP.GAME.timer_started = false
+	MP.GAME.ready_blind = false
 end
 
 ---@param lives number
