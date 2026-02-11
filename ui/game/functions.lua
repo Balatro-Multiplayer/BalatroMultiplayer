@@ -21,6 +21,7 @@ function G.FUNCS.mp_toggle_ready(e)
 		MP.ACTIONS.ready_blind(e)
 	else
 		MP.ACTIONS.set_location("loc_selecting")
+		MP.ACTIONS.pause_ante_timer()
 		MP.ACTIONS.unready_blind()
 	end
 end
