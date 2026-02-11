@@ -3,7 +3,9 @@
 function G.FUNCS.mp_timer_button(e)
 	if MP.LOBBY.config.timer then
 		if MP.GAME.ready_blind then
-			if not MP.GAME.timer_started and MP.GAME.timer > 0 then
+			if MP.GAME.timer <= 0 then
+				return
+			elseif not MP.GAME.timer_started then
 				MP.ACTIONS.start_ante_timer()
 			else
 				MP.ACTIONS.pause_ante_timer()
