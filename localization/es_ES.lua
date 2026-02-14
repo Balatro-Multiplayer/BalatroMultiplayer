@@ -158,13 +158,6 @@ return {
 		labels = {
 			mp_phantom = "Fantasma",
 		},
-		challenge_names = {
-			c_mp_standard = "Estándar",
-			c_mp_badlatro = "Badlatro",
-			c_mp_tournament = "Torneo",
-			c_mp_weekly = "Semanal",
-			c_mp_vanilla = "Vanilla",
-		},
 		dictionary = {
 			b_singleplayer = "Un jugador",
 			b_join_lobby = "Unirse a la Sala",
@@ -177,8 +170,14 @@ return {
 			b_leave_lobby = "Salir de la Sala",
 			b_mp_discord = "Servidor de Discord de Balatro Multiplayer",
 			b_start = "INICIAR",
-			b_wait_for_host_start = { "ESPERANDO A", "QUE EL ANFITRIÓN INICIE" },
-			b_wait_for_players = { "ESPERANDO A", "JUGADORES" },
+			b_wait_for_host_start = {
+				"ESPERANDO A",
+				"QUE EL ANFITRIÓN INICIE",
+			},
+			b_wait_for_players = {
+				"ESPERANDO A",
+				"JUGADORES",
+			},
 			b_lobby_options = "OPCIONES DE LA SALA",
 			b_copy_clipboard = "Copiar al portapapeles",
 			b_view_code = "VER CÓDIGO",
@@ -266,26 +265,44 @@ return {
 			k_the_order_credit = "*Crédito a @MathIsFun_",
 			k_the_order_integration_desc = "Esto parcheará la aparición de cartas para que no sea basada en las apuestas iniciales y use un solo grupo para cada tipo/rareza",
 			k_requires_restart = "*Requiere reiniciar para que tome efecto",
-			ml_enemy_loc = { "Ubicación del", "enemigo" },
+			ml_enemy_loc = {
+				"Ubicación del",
+				"enemigo",
+			},
 			ml_mp_kofi_message = {
 				"Este mod y servidor es",
 				"desarrollado y mantenido por ",
 				"una persona, sí",
 				"te gusta, considera",
 			},
-			ml_lobby_info = { "Info de", "la sala" },
+			ml_lobby_info = {
+				"Info de",
+				"la sala",
+			},
 			loc_ready = "Listo para el PvP",
 			loc_selecting = "Seleccionando ciega",
 			loc_shop = "Comprando",
 			loc_playing = "Jugando ",
 		},
 		v_dictionary = {
-			a_mp_art = { "Arte: #1#" },
-			a_mp_code = { "Código: #1#" },
-			a_mp_idea = { "Idea: #1#" },
-			a_mp_skips_ahead = { "#1# Ciegas por delante" },
-			a_mp_skips_behind = { "#1# Ciegas por detrás" },
-			a_mp_skips_tied = { "Empatado" },
+			a_mp_art = {
+				"Arte: #1#",
+			},
+			a_mp_code = {
+				"Código: #1#",
+			},
+			a_mp_idea = {
+				"Idea: #1#",
+			},
+			a_mp_skips_ahead = {
+				"#1# Ciegas por delante",
+			},
+			a_mp_skips_behind = {
+				"#1# Ciegas por detrás",
+			},
+			a_mp_skips_tied = {
+				"Empatado",
+			},
 			--
 			k_banned_objs = "#1# Prohi",
 			k_no_banned_objs = "No hay #1# prohibidos",
@@ -294,10 +311,19 @@ return {
 			--
 		},
 		v_text = {
-			ch_c_hanging_chad_rework = { "El {C:attention}Papel perforado{} está {C:dark_edition}modificado" },
-			ch_c_glass_cards_rework = { "Las {C:attention}Cartas de vidrio{} están {C:dark_edition}modificadas" },
+			ch_c_hanging_chad_rework = {
+				"El {C:attention}Papel perforado{} está {C:dark_edition}modificado",
+			},
+			ch_c_glass_cards_rework = {
+				"Las {C:attention}Cartas de vidrio{} están {C:dark_edition}modificadas",
+			},
 		},
 		challenge_names = {
+			c_mp_standard = "Estándar",
+			c_mp_badlatro = "Badlatro",
+			c_mp_tournament = "Torneo",
+			c_mp_weekly = "Semanal",
+			c_mp_vanilla = "Vanilla",
 			c_mp_misprint_deck = "Mazo con errores de imprenta",
 			c_mp_legendaries = "Legendarios",
 			c_mp_psychosis = "Psicosis",

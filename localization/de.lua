@@ -177,8 +177,14 @@ return {
 			b_leave_lobby = "Lobby Verlassen",
 			b_mp_discord = "Balatro Mehrspieler Discord Server",
 			b_start = "START",
-			b_wait_for_host_start = { "WARTEN AUF DEN", "HOST ZUM STARTEN" },
-			b_wait_for_players = { "WARTEN AUF", "SPIELER" },
+			b_wait_for_host_start = {
+				"WARTEN AUF DEN",
+				"HOST ZUM STARTEN",
+			},
+			b_wait_for_players = {
+				"WARTEN AUF",
+				"SPIELER",
+			},
 			b_lobby_options = "LOBBY OPTIONEN",
 			b_copy_clipboard = "Kopier zur Zwischenablage",
 			b_view_code = "CODE ZEIGEN",
@@ -238,7 +244,10 @@ return {
 			k_badlatro = "Badlatro",
 			k_badlatro_description = "Ein wöchentlicher Regelsatz  designed bei @dr_monty_the_snek Auf dem Discord Server dee permanent zur mod hinzufügt wurde.",
 			k_oops_ex = "Ups!",
-			ml_enemy_loc = { "Gegner", "Standort" },
+			ml_enemy_loc = {
+				"Gegner",
+				"Standort",
+			},
 			ml_mp_kofi_message = {
 				"Diese mod und der Spiel Server ist",
 				"Programmiert und beibehalten",
@@ -251,16 +260,32 @@ return {
 			loc_playing = "Am Spielen ",
 		},
 		v_dictionary = {
-			a_mp_art = { "Design: #1#" },
-			a_mp_code = { "Code: #1#" },
-			a_mp_idea = { "Idee: #1#" },
-			a_mp_skips_ahead = { "#1# Runden voraus" },
-			a_mp_skips_behind = { "#1# Runden hinter dir" },
-			a_mp_skips_tied = { "Unentschieden" },
+			a_mp_art = {
+				"Design: #1#",
+			},
+			a_mp_code = {
+				"Code: #1#",
+			},
+			a_mp_idea = {
+				"Idee: #1#",
+			},
+			a_mp_skips_ahead = {
+				"#1# Runden voraus",
+			},
+			a_mp_skips_behind = {
+				"#1# Runden hinter dir",
+			},
+			a_mp_skips_tied = {
+				"Unentschieden",
+			},
 		},
 		v_text = {
-			ch_c_hanging_chad_rework = { "{C:attention}Stanzrest{} ist {C:dark_edition} Verändert" },
-			ch_c_glass_cards_rework = { "{C:attention}Glass Karten{} sind {C:dark_edition} Verändert" },
+			ch_c_hanging_chad_rework = {
+				"{C:attention}Stanzrest{} ist {C:dark_edition} Verändert",
+			},
+			ch_c_glass_cards_rework = {
+				"{C:attention}Glass Karten{} sind {C:dark_edition} Verändert",
+			},
 		},
 	},
 }

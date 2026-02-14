@@ -43,12 +43,15 @@ MP.PREVIEW = {
 	button = SMODS.Mods["Multiplayer"].config.preview.button,
 }
 
--- Flag to switch between old and new networking implementation
-MP.USE_NEW_NETWORKING = true
+MP.EXPERIMENTAL = {
+	use_new_networking = true,
+	show_sandbox_collection = false,
+	alt_stakes = false,
+}
 
 G.C.MULTIPLAYER = HEX("AC3232")
 
-MP.SMODS_VERSION = "1.0.0~BETA-1016c"
+MP.SMODS_VERSION = "1.0.0~BETA-1221a"
 
 function MP.should_use_the_order()
 	return MP.LOBBY and MP.LOBBY.config and MP.LOBBY.config.the_order and MP.LOBBY.code
@@ -69,29 +72,34 @@ function MP.load_mp_file(file)
 	return nil
 end
 
-function MP.load_mp_dir(directory)
-	local files = NFS.getDirectoryItems(MP.path .. "/" .. directory)
-	local regular_files = {}
-
-	for _, filename in ipairs(files) do
-		local file_path = directory .. "/" .. filename
-		if file_path:match(".lua$") then
-			if filename:match("^_") then
-				MP.load_mp_file(file_path)
-			else
-				table.insert(regular_files, file_path)
-			end
-		end
+function MP.load_mp_dir(directory, recursive)
+	recursive = recursive or false
+	local function has_prefix(name)
+		return name:match("^_") ~= nil
 	end
 
-	for _, file_path in ipairs(regular_files) do
-		MP.load_mp_file(file_path)
+	local dir_path = MP.path .. "/" .. directory
+	local items = NFS.getDirectoryItemsInfo(dir_path)
+	-- sort by prefix like { _file, _dir, file, dir }
+	table.sort(items, function(a, b)
+		if has_prefix(a.name) ~= has_prefix(b.name) then return has_prefix(a.name) end
+		return (a.type == "directory") ~= (b.type == "directory") and a.type ~= "directory" or false
+	end)
+
+	-- load sorted files/dirs
+	for _, item in ipairs(items) do
+		local path = directory .. "/" .. item.name
+		sendDebugMessage("Loading item: " .. path, "MULTIPLAYER")
+		if item.type ~= "directory" then
+			MP.load_mp_file(path)
+		elseif recursive then
+			MP.load_mp_dir(path, recursive)
+		end
 	end
 end
 
-MP.load_mp_file("misc/utils.lua")
-MP.load_mp_file("misc/insane_int.lua")
-MP.load_mp_file("misc/hide_content.lua")
+MP.load_mp_dir("lib")
+MP.load_mp_dir("overrides")
 
 function MP.reset_lobby_config(persist_ruleset_and_gamemode)
 	sendDebugMessage("Resetting lobby options", "MULTIPLAYER")
@@ -197,7 +205,7 @@ if not SMODS.current_mod.lovely then
 		blocking = false,
 		func = function()
 			if G.MAIN_MENU_UI then
-				MP.UTILS.overlay_message(
+				MP.UI.UTILS.overlay_message(
 					MP.UTILS.wrapText(
 						"Your Multiplayer Mod is not loaded correctly, make sure the Multiplayer folder does not have an extra Multiplayer folder around it.",
 						50
@@ -219,16 +227,16 @@ SMODS.Atlas({
 
 MP.load_mp_dir("compatibility")
 
-local networking_dir = MP.USE_NEW_NETWORKING and "networking" or "networking-old"
+local networking_dir = MP.EXPERIMENTAL.use_new_networking and "networking" or "networking-old"
 MP.load_mp_file(networking_dir .. "/action_handlers.lua")
 
-MP.load_mp_dir("ui/components") -- Gamemodes and rulesets need these
-
+MP.load_mp_dir("gamemodes")
 MP.load_mp_dir("rulesets")
+MP.load_mp_dir("ui", true)
+
 if MP.LOBBY.config.weekly then -- this could be a function but why bother
 	MP.load_mp_file("rulesets/weeklies/" .. MP.LOBBY.config.weekly .. ".lua")
 end
-MP.load_mp_dir("gamemodes")
 
 MP.load_mp_dir("objects/editions")
 MP.load_mp_dir("objects/enhancements")
@@ -244,11 +252,6 @@ MP.load_mp_dir("objects/consumables")
 MP.load_mp_dir("objects/consumables/sandbox")
 MP.load_mp_dir("objects/boosters")
 MP.load_mp_dir("objects/challenges")
-
-MP.load_mp_dir("ui")
-
-MP.load_mp_file("misc/disable_restart.lua")
-MP.load_mp_file("misc/mod_hash.lua")
 
 local SOCKET = MP.load_mp_file(networking_dir .. "/socket.lua")
 MP.NETWORKING_THREAD = love.thread.newThread(SOCKET)

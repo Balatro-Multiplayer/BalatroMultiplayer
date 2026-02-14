@@ -11,4 +11,6 @@ return {
 	},
 	["unlocked"] = true,
 	["preview"] = {},
+	["joker_stats"] = {},
+	["match_history"] = {},
 }

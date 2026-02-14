@@ -3,7 +3,6 @@ MP.SANDBOX = {}
 -- Centralized joker mappings: defines sandbox variants, their vanilla counterparts, and rotation status
 MP.SANDBOX.joker_mappings = {
 	-- Active jokers in rotation
-	{ sandbox = "j_mp_hanging_chad", vanilla = "j_hanging_chad", active = true },
 	{ sandbox = "j_mp_misprint_sandbox", vanilla = "j_misprint", active = true },
 	{ sandbox = "j_mp_castle_sandbox", vanilla = "j_castle", active = true },
 	{ sandbox = "j_mp_mail_sandbox", vanilla = "j_mail", active = true },
@@ -92,8 +91,7 @@ end
 --- @param joker_key string The key of the joker to check (e.g., "j_mp_mail_sandbox")
 --- @return boolean true if the joker is allowed in the sandbox ruleset and in a multiplayer lobby
 function MP.SANDBOX.is_joker_allowed(joker_key)
-	if not MP.LOBBY.code then return false end
-	if MP.LOBBY.config.ruleset ~= "ruleset_mp_sandbox" then return false end
+	if not MP.is_ruleset_active("sandbox") then return false end
 
 	for _, mapping in ipairs(MP.SANDBOX.joker_mappings) do
 		if mapping.active and mapping.sandbox == joker_key then return true end
@@ -135,6 +133,9 @@ MP.Ruleset({
 			table.insert(jokers, "j_mp_error_sandbox_" .. i)
 		end
 
+		-- final vanilla stuff
+		table.insert(jokers, "j_hanging_chad")
+
 		-- Fisher-Yates shuffle
 		for i = #jokers, 2, -1 do
 			local j = math.random(1, i)
@@ -151,7 +152,7 @@ MP.Ruleset({
 	end)(),
 	reworked_consumables = { "c_mp_ouija_sandbox", "c_mp_ectoplasm_sandbox" },
 	reworked_vouchers = {},
-	reworked_enhancements = {},
+	reworked_enhancements = { "m_glass" },
 	reworked_blinds = {},
 	reworked_tags = { "tag_mp_gambling_sandbox", "tag_mp_juggle_sandbox", "tag_mp_investment_sandbox" },
 
@@ -198,7 +199,7 @@ function MP.ApplyBans()
 	local ret = apply_bans_ref()
 
 	-- Apply sandbox-specific idol selection when in sandbox ruleset
-	if MP.LOBBY.code and MP.LOBBY.config.ruleset == "ruleset_mp_sandbox" then
+	if MP.is_ruleset_active("sandbox") then
 		select_random_idol()
 
 		if SMODS.Mods["extracredit"] and SMODS.Mods["extracredit"].can_load then
@@ -211,9 +212,10 @@ function MP.ApplyBans()
 		-- Enable Alloy etc.
 		MP.optional_features = { quantum_enhancements = true }
 	end
+	if MP.is_ruleset_active("sandbox") then select_random_idol() end
 
 	return ret
 end
 
 -- debugging hotswitch
-MP.sandbox_no_collection = false
+MP.sandbox_no_collection = not MP.EXPERIMENTAL.show_sandbox_collection

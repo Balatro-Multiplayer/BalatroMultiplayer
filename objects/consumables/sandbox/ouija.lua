@@ -5,7 +5,7 @@ SMODS.Consumable({
 	pos = { x = 7, y = 4 },
 	config = { extra = { destroy = 3 }, mp_sticker_balanced = true },
 	in_pool = function(self)
-		return MP.LOBBY.code and MP.LOBBY.config.ruleset == "ruleset_mp_sandbox"
+		return MP.is_ruleset_active("sandbox")
 	end,
 	loc_vars = function(self, info_queue, card)
 		return { vars = { card.ability.extra.destroy } }
