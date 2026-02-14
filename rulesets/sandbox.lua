@@ -27,7 +27,7 @@ MP.SANDBOX.joker_mappings = {
 	{ sandbox = "j_mp_juggler_sandbox", vanilla = "j_juggler", active = false },
 	{ sandbox = "j_mp_loyalty_card_sandbox", vanilla = "j_loyalty_card", active = false },
 	{ sandbox = "j_mp_lucky_cat_sandbox", vanilla = "j_lucky_cat", active = false },
-	{ sandbox = "j_mp_magnet_sandbox", vanilla = nil, active = false }, -- No vanilla equivalent
+	{ sandbox = "j_mp_magnet_sandbox", vanilla = nil, active = false },
 	{ sandbox = "j_mp_order_sandbox", vanilla = "j_order", active = false },
 	{ sandbox = "j_mp_photograph_sandbox", vanilla = "j_photograph", active = false },
 	{ sandbox = "j_mp_ride_the_bus_sandbox", vanilla = "j_ride_the_bus", active = false },
