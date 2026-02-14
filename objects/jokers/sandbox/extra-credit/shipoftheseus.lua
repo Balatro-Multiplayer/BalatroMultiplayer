@@ -27,46 +27,7 @@ SMODS.Joker({
 	end,
 
 	calculate = function(self, card, context)
-		if context.cards_destroyed then
-			card.ability.extra.tick = false
-			for k, val in ipairs(context.glass_shattered) do
-				if not context.blueprint then
-					card.ability.extra.Xmult = card.ability.extra.Xmult + card.ability.extra.Xmult_mod
-					card.ability.extra.tick = true
-				end
-				G.playing_card = (G.playing_card and G.playing_card + 1) or 1
-				local _card = copy_card(val, nil, nil, G.playing_card)
-				_card:add_to_deck()
-				G.deck.config.card_limit = G.deck.config.card_limit + 1
-				G.deck:emplace(_card)
-				table.insert(G.playing_cards, _card)
-				playing_card_joker_effects({ true })
-
-				G.E_MANAGER:add_event(Event({
-					func = function()
-						_card:start_materialize()
-
-						return true
-					end,
-				}))
-				card_eval_status_text(
-					context.blueprint_card or card,
-					"extra",
-					nil,
-					nil,
-					nil,
-					{ message = localize("k_copied_ex"), colour = G.C.FILTER }
-				)
-			end
-
-			if not context.blueprint and card.ability.extra.tick then
-				delay(0.3)
-				card_eval_status_text(card, "extra", nil, nil, nil, {
-					message = localize({ type = "variable", key = "a_xmult", vars = { card.ability.extra.Xmult } }),
-					colour = G.C.FILTER,
-				})
-			end
-		elseif context.remove_playing_cards then
+		if context.remove_playing_cards then
 			card.ability.extra.tick = false
 			for k, val in ipairs(context.removed) do
 				if not context.blueprint then
@@ -75,7 +36,7 @@ SMODS.Joker({
 				end
 				G.playing_card = (G.playing_card and G.playing_card + 1) or 1
 				local _card = copy_card(val, nil, nil, G.playing_card)
-				card:add_to_deck()
+				_card:add_to_deck()
 				G.deck.config.card_limit = G.deck.config.card_limit + 1
 				G.deck:emplace(_card)
 				table.insert(G.playing_cards, _card)
@@ -114,7 +75,7 @@ SMODS.Joker({
 	end,
 
 	mp_credits = {
-		code = { "CampfireCollective" },
+		code = { "CampfireCollective", "steph" },
 		art = { "neatoqueen" },
 	},
 	mp_include = function(self)
