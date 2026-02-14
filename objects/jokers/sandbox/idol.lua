@@ -5,8 +5,60 @@ SMODS.Atlas({
 	py = 95,
 })
 
--- TODO hold up this is dumb we don't calculate the ranks we just get the most common card's rank
--- i need to fix this or else i die a horrible death
+-- Override reset_idol_card to do weighted rank selection for Zealot Idol
+-- Runs globally for all players so the pseudorandom queue stays in sync
+local original_reset_idol_card = reset_idol_card
+function reset_idol_card()
+	original_reset_idol_card()
+
+	G.GAME.current_round.zealot_idol = { id = 14, rank = "Ace" }
+
+	if G.playing_cards == nil then return end
+
+	local count_map = {}
+	local valid_ranks = {}
+
+	for _, v in ipairs(G.playing_cards) do
+		if v.ability.effect ~= "Stone Card" then
+			local val = v.base.value
+			if not count_map[val] then
+				count_map[val] = { count = 0, card = v }
+				table.insert(valid_ranks, count_map[val])
+			end
+			count_map[val].count = count_map[val].count + 1
+		end
+	end
+
+	if #valid_ranks == 0 then return end
+
+	local value_order = {}
+	for i, rank in ipairs(SMODS.Rank.obj_buffer) do
+		value_order[rank] = i
+	end
+
+	table.sort(valid_ranks, function(a, b)
+		if a.count ~= b.count then return a.count > b.count end
+		return value_order[a.card.base.value] < value_order[b.card.base.value]
+	end)
+
+	local total_weight = 0
+	for _, entry in ipairs(valid_ranks) do
+		total_weight = total_weight + entry.count
+	end
+
+	local raw_random = pseudorandom("zealot_idol" .. G.GAME.round_resets.ante)
+	local threshold = 0
+	for _, entry in ipairs(valid_ranks) do
+		threshold = threshold + (entry.count / total_weight)
+		if raw_random < threshold then
+			G.GAME.current_round.zealot_idol = { id = entry.card.base.id, rank = entry.card.base.value }
+			return
+		end
+	end
+
+	G.GAME.current_round.zealot_idol = { id = valid_ranks[1].card.base.id, rank = valid_ranks[1].card.base.value }
+end
+
 SMODS.Joker({
 	key = "idol_sandbox_bw",
 	no_collection = MP.sandbox_no_collection,
@@ -18,19 +70,21 @@ SMODS.Joker({
 	atlas = "idol_sandbox_bw",
 	config = { extra = { xmult = 1.5 }, mp_sticker_balanced = true },
 	loc_vars = function(self, info_queue, card)
-		local idol_card = G.GAME.current_round.idol_card or { rank = "Ace" }
+		local zealot = G.GAME.current_round.zealot_idol or { rank = "Ace" }
 		return {
 			vars = {
-				localize(idol_card.rank, "ranks"),
+				localize(zealot.rank, "ranks"),
 				card.ability.extra.xmult,
 			},
 		}
 	end,
 	calculate = function(self, card, context)
+		local zealot = G.GAME.current_round.zealot_idol
 		if
-			context.individual
+			zealot
+			and context.individual
 			and context.cardarea == G.play
-			and context.other_card:get_id() == G.GAME.current_round.idol_card.id
+			and context.other_card:get_id() == zealot.id
 		then
 			return {
 				xmult = card.ability.extra.xmult,
@@ -50,9 +104,6 @@ SMODS.Atlas({
 	py = 95,
 })
 
--- Collector's idol
--- Gives 1x + (0.05x * card count) mult per card if you play
--- specifically your most common rank+suit
 local function get_most_common_card()
 	local count_map = {}
 	local valid_idol_cards = {}
