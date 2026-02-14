@@ -690,7 +690,8 @@ return {
 			mp_sticker_extra_credit = {
 				name = "Extra Credit",
 				text = {
-					"test123",
+					"Made with friends from",
+					"Balatro University!",
 				},
 			},
 			current_nemesis = {
