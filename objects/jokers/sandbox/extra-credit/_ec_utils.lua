@@ -47,7 +47,7 @@ local function reset_farmer_card()
 
 	local seed = "farm"
 
-	local farmer_card = pseudorandom_element(farmer_suits, seed)
+	local farmer_card = pseudorandom_element(farmer_suits, pseudoseed(seed))
 	G.GAME.current_round.farmer_card.suit = farmer_card
 end
 
