@@ -82,8 +82,18 @@ end
 ```
 
 **UI Components**:
-- Follow the existing component pattern in `ui/components/`
-- Use consistent naming: `lobby_*`, `game_*`, etc.
+|  |  |
+|------|-------------|
+| [`ui/_common/`](ui/_common/) | Shared components. Config toggles, spacers, etc. |
+| [`ui/utils.lua`](ui/utils.lua) | Home of `MP.UI.UTILS`. Utils for creating UI nodes |
+| [`ui/game/`](ui/game/) | UI inside the pvp match |
+| [`ui/lobby/`](ui/lobby/) | Lobby UI |
+| [`ui/main_menu/`](ui/main_menu/) | Main menu UI |
+| [`ui/smods_menu/`](ui/smods_menu/) | SMODS settings menu entry |
+
+**Mod Injection**:
+- The entrypoint is in [`core.lua`](core.lua)
+- Files/dirs prefixed with `_` are loaded first in [`MP.load_mp_dir`](core.lua#L72)
 
 ## Contribution Guidelines
 

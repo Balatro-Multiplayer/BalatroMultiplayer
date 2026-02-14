@@ -153,7 +153,7 @@ end
 -- thanks to the advancements of my ancestors, i don't have to worry about it
 local localize_ref = localize
 function localize(args, misc_cat)
-	if args.key == "mp_transmutations" then
+	if args and type(args) == "table" and args.key and args.key == "mp_transmutations" then -- really safe get
 		local loc_target = G.localization.descriptions.Other.mp_transmutations.text_parsed
 		for i = 2, #loc_target do
 			table.remove(loc_target, 2)

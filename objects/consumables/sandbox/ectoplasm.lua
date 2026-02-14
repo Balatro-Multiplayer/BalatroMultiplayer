@@ -8,7 +8,7 @@ SMODS.Consumable({
 		return { vars = { G.GAME.ecto_minus or 1 } }
 	end,
 	in_pool = function(self)
-		return MP.LOBBY.code and MP.LOBBY.config.ruleset == "ruleset_mp_sandbox"
+		return MP.is_ruleset_active("sandbox")
 	end,
 	use = function(self, card, area, copier)
 		local editionless_jokers = SMODS.Edition:get_edition_cards(G.jokers, true)

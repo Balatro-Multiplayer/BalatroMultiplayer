@@ -2,7 +2,7 @@ MP.Ruleset({
 	key = "blitz",
 	multiplayer_content = true,
 	standard = true,
-	banned_silent = { "j_bloodstone", "j_hanging_chad" },
+	banned_silent = {},
 	banned_jokers = {},
 	banned_consumables = {
 		"c_justice",
@@ -12,12 +12,12 @@ MP.Ruleset({
 	banned_tags = {},
 	banned_blinds = {},
 	reworked_jokers = {
-		"j_mp_hanging_chad",
+		"j_hanging_chad",
 	},
 	reworked_consumables = {},
 	reworked_vouchers = {},
 	reworked_enhancements = {
-		-- "m_glass",
+		"m_glass",
 	},
 	reworked_tags = {},
 	reworked_blinds = {},

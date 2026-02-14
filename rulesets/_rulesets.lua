@@ -37,10 +37,38 @@ MP.Ruleset = SMODS.GameObject:extend({
 	end,
 })
 
+function MP.is_ruleset_active(ruleset_name)
+	local key = "ruleset_mp_" .. ruleset_name
+	if MP.LOBBY.code then
+		return MP.LOBBY.config.ruleset == key
+	elseif MP.SP and MP.SP.ruleset then
+		return MP.SP.ruleset == key
+	end
+	return false
+end
+
+function MP.get_active_ruleset()
+	if MP.LOBBY.code then
+		return MP.LOBBY.config.ruleset
+	elseif MP.SP and MP.SP.ruleset then
+		return MP.SP.ruleset
+	end
+	return nil
+end
+
 function MP.ApplyBans()
+	local ruleset_key = nil
+	local gamemode = nil
+
 	if MP.LOBBY.code and MP.LOBBY.config.ruleset then
-		local ruleset = MP.Rulesets[MP.LOBBY.config.ruleset]
-		local gamemode = MP.Gamemodes["gamemode_mp_" .. MP.LOBBY.type]
+		ruleset_key = MP.LOBBY.config.ruleset
+		gamemode = MP.Gamemodes["gamemode_mp_" .. MP.LOBBY.type]
+	elseif MP.SP and MP.SP.ruleset then
+		ruleset_key = MP.SP.ruleset
+	end
+
+	if ruleset_key then
+		local ruleset = MP.Rulesets[ruleset_key]
 		local banned_tables = {
 			"jokers",
 			"consumables",
@@ -53,8 +81,10 @@ function MP.ApplyBans()
 			for _, v in ipairs(ruleset["banned_" .. table]) do
 				G.GAME.banned_keys[v] = true
 			end
-			for _, v in ipairs(gamemode["banned_" .. table]) do
-				G.GAME.banned_keys[v] = true
+			if gamemode then
+				for _, v in ipairs(gamemode["banned_" .. table]) do
+					G.GAME.banned_keys[v] = true
+				end
 			end
 			for k, v in pairs(MP.DECK["BANNED_" .. string.upper(table)]) do
 				G.GAME.banned_keys[k] = true
@@ -66,30 +96,61 @@ function MP.ApplyBans()
 	end
 end
 
--- This function writes any center rework data to G.P_CENTERS, where they will be used later in its specified ruleset
--- Example usage in rulesets/standard.lua
-function MP.ReworkCenter(args)
-	local center = G.P_CENTERS[args.key]
+-- Rework a center for specific ruleset(s). Use MP.LoadReworks() to swap in the active ruleset.
+---@param key string e.g. "j_hanging_chad"
+---@param ruleset string|string[] e.g. "standard" or {"standard", "sandbox"}
+---@param loc_key string|nil alternate localization key, or nil to keep original
+---@param args table center properties (config, calculate, loc_vars, etc.) + silent = true to hide from UI
+function MP.ReworkCenter(key, ruleset, loc_key, args)
+	local center = G.P_CENTERS[key]
+	args = args or {}
 
-	-- Convert single ruleset to list for backward compatibility
-	local rulesets = args.ruleset
+	-- Convert single ruleset to list
+	local rulesets = ruleset
 	if type(rulesets) == "string" then rulesets = { rulesets } end
 
+	-- Wrap loc_vars to inject loc_key if provided
+	if loc_key then
+		local user_loc_vars = args.loc_vars or function()
+			return {}
+		end
+		args.loc_vars = function(self, info_queue, card)
+			local result = user_loc_vars(self, info_queue, card)
+			result.key = loc_key
+			return result
+		end
+	end
+
+	-- do we need to inject generate_ui for loc_vars to work?
+	local needs_generate_ui = args.loc_vars
+		and not args.generate_ui
+		and not (center.generate_ui and type(center.generate_ui) == "function")
+
 	-- Apply changes to all specified rulesets
-	for _, ruleset in ipairs(rulesets) do
-		local ruleset_ = "mp_" .. ruleset .. "_"
+	for _, rs in ipairs(rulesets) do
+		local prefix = "mp_" .. rs .. "_"
+
+		-- Store all reworked properties
 		for k, v in pairs(args) do
-			if k ~= "key" and k ~= "ruleset" and k ~= "silent" then
-				center[ruleset_ .. k] = v
+			if k ~= "silent" then
+				center[prefix .. k] = v
 				if not center["mp_vanilla_" .. k] then center["mp_vanilla_" .. k] = center[k] or "NULL" end
 			end
 		end
+
+		-- Auto-inject generate_ui when adding loc_vars to vanilla centers
+		if needs_generate_ui then
+			center[prefix .. "generate_ui"] = SMODS.Center.generate_ui
+			if not center.mp_vanilla_generate_ui then center.mp_vanilla_generate_ui = center.generate_ui or "NULL" end
+		end
+
+		-- Mark this center as having reworks
 		center.mp_reworks = center.mp_reworks or {}
-		center.mp_reworks[ruleset] = true -- Caching this for better load times since we're gonna be inefficiently looping through all centers probably
+		center.mp_reworks[rs] = true
 		center.mp_reworks["vanilla"] = true
 
 		center.mp_silent = center.mp_silent or {}
-		center.mp_silent[ruleset] = args.silent
+		center.mp_silent[rs] = args.silent
 	end
 end
 

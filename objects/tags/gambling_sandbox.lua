@@ -14,7 +14,7 @@ SMODS.Tag({
 		items = {},
 	},
 	in_pool = function(self)
-		return MP.LOBBY.config.ruleset == "ruleset_mp_sandbox" and MP.LOBBY.code
+		return MP.is_ruleset_active("sandbox")
 	end,
 	name = "Gambling Tag",
 	discovered = true,

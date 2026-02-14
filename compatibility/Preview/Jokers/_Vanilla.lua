@@ -304,6 +304,14 @@ FNSJ.simulate_green_joker = function(joker_obj, context)
 	if context.cardarea == G.jokers and context.before and not context.blueprint then
 		joker_obj.ability.mult = joker_obj.ability.mult + joker_obj.ability.extra.hand_add
 	end
+	if
+		context.cardarea == G.hand
+		and context.discard
+		and context.other_card == context.cards[1]
+		and not context.blueprint
+	then
+		joker_obj.ability.mult = math.max(0, joker_obj.ability.mult - joker_obj.ability.extra.discard_sub)
+	end
 	if context.cardarea == G.jokers and context.global then FN.SIM.add_mult(joker_obj.ability.mult) end
 end
 FNSJ.simulate_superposition = function(joker_obj, context)
@@ -839,7 +847,7 @@ FNSJ.simulate_matador = function(joker_obj, context)
 end
 FNSJ.simulate_hit_the_road = function(joker_obj, context)
 	if context.cardarea == G.hand and context.discard and not context.blueprint then
-		if context.other_card.id == 11 and not context.other_card.debuff then
+		if FN.SIM.is_rank(context.other_card, 11) and not context.other_card.debuff then
 			joker_obj.ability.x_mult = joker_obj.ability.x_mult + joker_obj.ability.extra
 		end
 	end

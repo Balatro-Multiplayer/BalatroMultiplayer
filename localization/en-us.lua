@@ -35,6 +35,14 @@ return {
 					"version of a mod you are using.",
 				},
 			},
+			j_to_the_moon_mp = {
+				name = "To the Moon",
+				text = {
+					"Earn an extra {C:money}$#1#{} of",
+					"{C:attention}interest{} for every {C:money}$#2#{} you",
+					"have at end of round",
+				},
+			},
 			j_mp_defensive_joker = {
 				name = "Defensive Joker",
 				text = {
@@ -113,7 +121,7 @@ return {
 					"not in a {C:attention}PvP Blind{}",
 				},
 			},
-			j_mp_hanging_chad = {
+			j_mp_hanging_chad_standard = {
 				name = "Hanging Chad",
 				text = {
 					"Retrigger {C:attention}first{} and {C:attention}second{}",
@@ -716,6 +724,34 @@ return {
 					"{C:purple,s:1.1}Will transmute into:",
 				},
 			},
+			mp_internal_sell_value = {
+				name = "Sell Value",
+				text = {
+					"{C:money,s:1.3}$#1#",
+				},
+			},
+			mp_sticker_persistent = {
+				name = "Persistent",
+				text = {
+					"Can't be destroyed",
+					"Costs {C:red}${} to sell",
+					"Cost increases by",
+					"{C:red}$3{} at end of round",
+				},
+			},
+			mp_sticker_unreliable = {
+				name = "Unreliable",
+				text = {
+					"Doesn't trigger on",
+					"{C:attention}final hand{}",
+				},
+			},
+			mp_sticker_draining = {
+				name = "Draining",
+				text = {
+					"{X:mult,C:white}X0.75{} Mult",
+				},
+			},
 		},
 		Stake = {
 			stake_mp_planet = {
@@ -745,6 +781,62 @@ return {
 					"even faster for each {C:attention}Ante",
 				},
 			},
+			stake_mp_plastic = {
+				name = "Plastic Stake",
+				text = {
+					"Earn {C:money}$1{} of interest per {C:money}$10{}",
+					"{C:inactive,s:0.8}(Max of {C:money,s:0.8}$50{C:inactive,s:0.8})",
+					"{s:0.8}Applies White Stake",
+				},
+			},
+			stake_mp_pebble = {
+				name = "Pebble Stake",
+				text = {
+					"Required score scales",
+					"faster for each {C:attention}Ante",
+					"{s:0.8}Applies Plastic Stake",
+				},
+			},
+			stake_mp_ferrite = {
+				name = "Ferrite Stake",
+				text = {
+					"Specific Jokers are {C:attention}Persistent",
+					"{C:inactive,s:0.8}(Can't be destroyed, increasing sell cost)",
+					"{s:0.8}Applies Pebble Stake",
+				},
+			},
+			stake_mp_pyrite = {
+				name = "Pyrite Stake",
+				text = {
+					"Reroll price increases",
+					"by {C:money}$2{} each reroll",
+					"{s:0.8}Applies Ferrite Stake",
+				},
+			},
+			stake_mp_jade = {
+				name = "Jade Stake",
+				text = {
+					"Required score scales",
+					"faster for each {C:attention}Ante",
+					"{s:0.8}Applies Pyrite Stake",
+				},
+			},
+			stake_mp_crystal = {
+				name = "Crystal Stake",
+				text = {
+					"Specific Jokers are {C:attention}Unreliable",
+					"{C:inactive,s:0.8}(Doesn't trigger on {C:attention,s:0.8}final hand{C:inactive,s:0.8})",
+					"{s:0.8}Applies Jade Stake",
+				},
+			},
+			stake_mp_antimatter = {
+				name = "Antimatter Stake",
+				text = {
+					"Specific Jokers are {C:attention}Draining",
+					"{C:inactive,s:0.8}({X:mult,C:white,s:0.8} X0.75 {C:inactive,s:0.8} Mult)",
+					"{s:0.8}Applies Crystal Stake",
+				},
+			},
 		},
 		Spectral = {
 			c_mp_ouija_sandbox = {
@@ -770,6 +862,9 @@ return {
 		labels = {
 			mp_phantom = "Phantom",
 			mp_sticker_extra_credit = "Extra Credit",
+			mp_sticker_persistent = "Persistent",
+			mp_sticker_unreliable = "Unreliable",
+			mp_sticker_draining = "Draining",
 		},
 		challenge_names = {
 			c_mp_standard = "Standard",
@@ -781,6 +876,7 @@ return {
 		},
 		dictionary = {
 			b_singleplayer = "Singleplayer",
+			b_sp_with_ruleset = "Practice Mode",
 			b_join_lobby = "Join Lobby",
 			b_join_lobby_clipboard = "Join From Clipboard",
 			b_return_lobby = "Return to Lobby",
@@ -792,9 +888,18 @@ return {
 			b_leave_lobby = "Leave Lobby",
 			b_mp_discord = "Balatro Multiplayer Discord Server",
 			b_start = "START",
-			b_wait_for_host_start = { "WAITING FOR", "HOST TO START" },
-			b_wait_for_players = { "WAITING FOR", "PLAYERS" },
-			b_wait_for_guest_ready = { "WAITING FOR", "GUEST TO READY UP" },
+			b_wait_for_host_start = {
+				"WAITING FOR",
+				"HOST TO START",
+			},
+			b_wait_for_players = {
+				"WAITING FOR",
+				"PLAYERS",
+			},
+			b_wait_for_guest_ready = {
+				"WAITING FOR",
+				"GUEST TO READY UP",
+			},
 			b_lobby_options = "LOBBY OPTIONS",
 			b_copy_clipboard = "Copy to clipboard",
 			b_view_code = "VIEW CODE",
@@ -837,8 +942,9 @@ return {
 			k_rulesets = "Rulesets",
 			k_gamemodes = "Gamemodes",
 			k_matchmaking = "Matchmaking",
+			k_tournament = "Tournament",
 			k_custom = "Custom",
-			k_league = "League",
+			k_other = "Other",
 			k_battle = "Battle",
 			k_challenge = "Challenge",
 			k_info = "Info",
@@ -904,17 +1010,17 @@ return {
 			k_sandbox = "Sandbox 3.0",
 			k_sandbox_description = "We split Idol into two jealous gods. You pick one, the other's gone.\nWe brought in 26 jokers from Extra Credit. The meta's wide open again.\nNew Spectrals. Comeback gold reworked. No score preview.\nBuilt with friends at Balatro University.\n",
 			k_vanilla = "Vanilla",
-			k_vanilla_description = "This ruleset removes all Multiplayer content,\nallowing you to play the game as originally designed.\n\nThis ruleset still includes Multiplayer features like the timer.\n\n(Disableable in Lobby Options)",
+			k_vanilla_description = "The original Balatro experience.\n\nNo Multiplayer jokers, no balance changes.\nJust the base game as it was designed.\n\nMultiplayer features like the timer are still available\nbut can be disabled in Lobby Options.",
 			k_blitz = "Standard",
-			k_blitz_description = "This ruleset includes cards and features that encourage fast play and\nusing time as a resource.\n\nSome cards are balanced in this ruleset to better fit the Multiplayer meta:\n- Hanging Chad is reworked\n- Justice is removed\n- Glass is reworked\n\n(See the bans and reworks tabs for more info)",
+			k_blitz_description = "The balanced Multiplayer ruleset.\n\nIncludes Multiplayer jokers and balance changes\nwith full control over your lobby settings.\n\nBalance changes:\n- Hanging Chad reworked\n- Glass reworked\n- Justice removed\n\n(See bans and reworks tabs for details)",
 			k_traditional = "Traditional",
-			k_traditional_description = "This ruleset removes the aspects of Multiplayer that use time as a resource.\n\nThis ruleset allows you to play with the Multiplayer content,\nwhile still allowing for a methodical game.\n\nSome cards are balanced in this ruleset to better fit the Multiplayer meta:\n- Hanging Chad is reworked\n- Justice is removed\n- Glass is reworked\n\n(See the bans and reworks tabs for more info)",
+			k_traditional_description = "Multiplayer content without time pressure.\n\nIncludes Multiplayer jokers and balance changes,\nbut removes time-based mechanics for methodical play.\n\nTime-based jokers are banned.\nTimer is disabled.\n\n(See bans and reworks tabs for details)",
 			k_majorleague = "Major League",
-			k_majorleague_description = "This is the official ruleset for Major League Balatro.\n\nThis ruleset is the same as the Vanilla ruleset with a few exceptions:\n- The Order Integration is disabled\n- The timer is set to 180 seconds\n- The first time the timer hits 0 seconds you will not lose a life",
+			k_majorleague_description = "Official Major League Balatro ruleset.\n\nVanilla cards with competitive settings:\n- 180 second timer\n- The Order disabled\n- First timeout forgiven\n- Attrition gamemode",
 			k_minorleague = "Minor League",
-			k_minorleague_description = "This is the official ruleset for Minor League Balatro.\n\nThis ruleset is the same as the Vanilla ruleset with a few exceptions:\n- The Order Integration is enabled\n- The timer is set to 180 seconds\n- The first time the timer hits 0 seconds you will not lose a life",
+			k_minorleague_description = "Official Minor League Balatro ruleset.\n\nVanilla cards with competitive settings:\n- 210 second timer\n- The Order enabled\n- First timeout forgiven\n- Attrition gamemode",
 			k_ranked = "Ranked",
-			k_ranked_description = "This is the official ruleset for playing Ranked Balatro Multiplayer.\n\nThis ruleset is the same as the Standard ruleset with a few exceptions:\n- The Order Integration is enabled\n- You must be on the recommended Steamodded version",
+			k_ranked_description = "The official competitive ruleset.\n\nStandard ruleset with locked settings:\n- Attrition gamemode\n- The Order enabled\n- Requires recommended Steamodded version",
 			k_badlatro = "Badlatro",
 			k_badlatro_description = "A weekly ruleset designed by @dr_monty_the_snek on the discord server\nthat has been added to the mod permanently.\n\nThis ruleset bans 48 jokers, consumables, tags, etc.",
 			k_attrition = "Attrition",
@@ -926,7 +1032,10 @@ return {
 			k_weekly = "Weekly",
 			k_weekly_description = "A special ruleset that changes weekly or bi-weekly. I guess you'll have to find out what it is! Currently: ",
 			k_smallworld = "Small World",
-			k_smallworld_description = "A heavily experimental ruleset, where 3/4 of everything in the game\nis randomly banned for some reason",
+			k_smallworld_description = "It's a small world after all.\n\n75% of jokers, consumables, vouchers, and tags\nare randomly banned each game.\n\nBanned items get replaced with what's available.\nDuplicates allowed.",
+			k_speedlatro = "Speedlatro",
+			k_speedlatro_description = "Up the pace with an uncomfortably fast 147 second timer between\neach PvP blind. Good luck using Vagabond",
+			k_cost_up = "Cost Up",
 			k_destabilized = "Destabilized",
 			k_oops_ex = "Oops!",
 			k_asteroids = "Asteroids",
@@ -938,6 +1047,7 @@ return {
 			k_your_jokers = "Your Jokers",
 			k_nemesis_deck = "Nemesis Deck",
 			k_your_deck = "Your Deck",
+			k_customization = "Customization",
 			k_the_order_credit = "*Credit to @MathIsFun_",
 			k_the_order_integration_desc = "This will patch card creation to not be ante-based and use a single pool for every type/rarity",
 			k_preview_credit = "*Credit to @Fantom, @Divvy",
@@ -955,26 +1065,52 @@ return {
 			k_tutorial_not_complete = "You must complete the tutorial before you can play Multiplayer",
 			k_created_by = "Created by",
 			k_major_contributors = "Major contributions by",
-			ml_enemy_loc = { "Enemy", "location" },
+			ml_enemy_loc = {
+				"Enemy",
+				"location",
+			},
+			k_hide_mp_content = "Hide Multiplayer content*",
+			k_applies_singleplayer_vanilla_rulesets = "*Applies in singleplayer and vanilla rulesets",
+			k_timer_sfx = "Timer Sound Effects",
 			ml_mp_kofi_message = {
 				"This mod and game server is",
 				"developed and maintained by ",
 				"one person, if",
 				"you like it consider",
 			},
-			ml_lobby_info = { "Lobby", "Info" },
+			ml_lobby_info = {
+				"Lobby",
+				"Info",
+			},
+			ml_mp_timersfx_opt = {
+				"On",
+				"Once per Ante",
+				"Off",
+			},
 			loc_ready = "Ready for PvP",
 			loc_selecting = "Selecting a Blind",
 			loc_shop = "Shopping",
 			loc_playing = "Playing ",
 		},
 		v_dictionary = {
-			a_mp_art = { "Art: #1#" },
-			a_mp_code = { "Code: #1#" },
-			a_mp_idea = { "Idea: #1#" },
-			a_mp_skips_ahead = { "#1# Skips Ahead" },
-			a_mp_skips_behind = { "#1# Skips Behind" },
-			a_mp_skips_tied = { "Tied" },
+			a_mp_art = {
+				"Art: #1#",
+			},
+			a_mp_code = {
+				"Code: #1#",
+			},
+			a_mp_idea = {
+				"Idea: #1#",
+			},
+			a_mp_skips_ahead = {
+				"#1# Skips Ahead",
+			},
+			a_mp_skips_behind = {
+				"#1# Skips Behind",
+			},
+			a_mp_skips_tied = {
+				"Tied",
+			},
 			k_banned_objs = "Banned #1#",
 			k_no_banned_objs = "No Banned #1#",
 			k_reworked_objs = "Reworked #1#",
@@ -987,28 +1123,56 @@ return {
 			k_credits_list = "#1# and many more!", -- #1# gets replaced with a list of names
 		},
 		v_text = {
-			ch_c_hanging_chad_rework = { "{C:attention}Hanging Chad{} is {C:dark_edition}reworked" },
-			ch_c_glass_cards_rework = { "{C:attention}Glass Cards{} are {C:dark_edition}reworked" },
-			ch_c_mp_score_instability = { "Unbalanced score is {C:purple}destabilized{} further:" },
+			ch_c_hanging_chad_rework = {
+				"{C:attention}Hanging Chad{} is {C:dark_edition}reworked",
+			},
+			ch_c_glass_cards_rework = {
+				"{C:attention}Glass Cards{} are {C:dark_edition}reworked",
+			},
+			ch_c_mp_score_instability = {
+				"Unbalanced score is {C:purple}destabilized{} further:",
+			},
 			ch_c_mp_score_instability_EXAMPLE = {
 				"  {C:inactive}(ex: {C:chips}30{C:inactive}x{C:mult}24{C:inactive} -> {C:chips}36{C:inactive}x{C:mult}18{C:inactive})",
 			},
-			ch_c_mp_score_instability_LOC1 = { "  {C:inactive}Minimum of {C:attention}1 {C:mult}Mult" },
-			ch_c_mp_score_instability_LOC2 = { "  {C:inactive}Minimum of {C:attention}0 {C:chips}Chips" },
-			ch_c_mp_ante_scaling = { "{C:red}X#1#{} base Blind size" },
-			ch_c_mp_no_shop_planets = { "{C:planet}Planets{} no longer appear in the {C:attention}shop" },
-			ch_c_mp_only_medium = { "All {C:spectral}Spectral{} cards are {C:spectral}Mediums{}" },
-			ch_c_mp_only_purple_seals = { "All {C:attention}seals{} are {C:purple}Purple Seals{}" },
-			ch_c_mp_sibyl_CREDITS = { "{C:inactive}(Art by {C:attention}Ganpan14O{C:inactive})" },
+			ch_c_mp_score_instability_LOC1 = {
+				"  {C:inactive}Minimum of {C:attention}1 {C:mult}Mult",
+			},
+			ch_c_mp_score_instability_LOC2 = {
+				"  {C:inactive}Minimum of {C:attention}0 {C:chips}Chips",
+			},
+			ch_c_mp_ante_scaling = {
+				"{C:red}X#1#{} base Blind size",
+			},
+			ch_c_mp_no_shop_planets = {
+				"{C:planet}Planets{} no longer appear in the {C:attention}shop",
+			},
+			ch_c_mp_only_medium = {
+				"All {C:spectral}Spectral{} cards are {C:spectral}Mediums{}",
+			},
+			ch_c_mp_only_purple_seals = {
+				"All {C:attention}seals{} are {C:purple}Purple Seals{}",
+			},
+			ch_c_mp_sibyl_CREDITS = {
+				"{C:inactive}(Art by {C:attention}Ganpan14O{C:inactive})",
+			},
 			ch_c_mp_polymorph_spam = {
 				"On selecting blind, all held {C:attention}Jokers{} and {C:attention}Consumables{}",
 			},
 			ch_c_mp_polymorph_spam_EXTENDED1 = {
 				"are transmuted into the {C:attention}N{}th next card in their collection,",
 			},
-			ch_c_mp_polymorph_spam_EXTENDED2 = { "where {C:attention}N{} is its current position in slots" },
+			ch_c_mp_polymorph_spam_EXTENDED2 = {
+				"where {C:attention}N{} is its current position in slots",
+			},
 		},
 		challenge_names = {
+			c_mp_standard = "Standard",
+			c_mp_sandbox = "Sandbox",
+			c_mp_badlatro = "Badlatro",
+			c_mp_tournament = "Tournament",
+			c_mp_weekly = "Weekly",
+			c_mp_vanilla = "Vanilla",
 			c_mp_misprint_deck = "Misprint Deck",
 			c_mp_legendaries = "Legendaries",
 			c_mp_psychosis = "Psychosis",

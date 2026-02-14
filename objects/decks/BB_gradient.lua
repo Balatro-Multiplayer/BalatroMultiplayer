@@ -112,7 +112,7 @@ local function passkey(joker)
 end
 local function blacklist(joker)
 	local key = get_bp(joker)
-	if key == "j_photograph" or key == "j_faceless" then return true end
+	if key == "j_photograph" or key == "j_faceless" or key == "j_ramen" then return true end
 	return false
 end
 

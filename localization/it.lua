@@ -479,14 +479,6 @@ return {
 		labels = {
 			mp_phantom = "Fantasma",
 		},
-		challenge_names = {
-			c_mp_standard = "Standard",
-			c_mp_sandbox = "Sandbox",
-			c_mp_badlatro = "Badlatro",
-			c_mp_tournament = "Torneo",
-			c_mp_weekly = "Settimanale",
-			c_mp_vanilla = "Vanilla",
-		},
 		dictionary = {
 			b_singleplayer = "Giocatore singolo",
 			b_join_lobby = "Unisciti ad una Lobby",
@@ -500,9 +492,18 @@ return {
 			b_leave_lobby = "Lascia Lobby",
 			b_mp_discord = "Server Discord di Balatro Multiplayer",
 			b_start = "START",
-			b_wait_for_host_start = { "IN ATTESA", "DELL'HOST" },
-			b_wait_for_players = { "IN ATTESA", "DI GIOCATORI" },
-			b_wait_for_guest_ready = { "IN ATTESA", "DEGLI OSPITI" },
+			b_wait_for_host_start = {
+				"IN ATTESA",
+				"DELL'HOST",
+			},
+			b_wait_for_players = {
+				"IN ATTESA",
+				"DI GIOCATORI",
+			},
+			b_wait_for_guest_ready = {
+				"IN ATTESA",
+				"DEGLI OSPITI",
+			},
 			b_lobby_options = "OPZIONI LOBBY",
 			b_copy_clipboard = "Copia negli Appunti",
 			b_view_code = "RIVELA IL CODICE",
@@ -660,26 +661,44 @@ return {
 			k_tutorial_not_complete = "Devi completare il tutorial prima di poter giocare il Multigiocatore",
 			k_created_by = "Creato da",
 			k_major_contributors = "Maggiori contribuzioni da",
-			ml_enemy_loc = { "Posizione", "nemico" },
+			ml_enemy_loc = {
+				"Posizione",
+				"nemico",
+			},
 			ml_mp_kofi_message = {
 				" ",
 				" ",
 				"Questa mod e server è sviluppata e mantenuta",
 				"da una persona, se ti è piaciuta considera",
 			},
-			ml_lobby_info = { "Info", "Lobby" },
+			ml_lobby_info = {
+				"Info",
+				"Lobby",
+			},
 			loc_ready = "Pronto per il PvP",
 			loc_selecting = "Selezionando un buio",
 			loc_shop = "Facendo acquisti",
 			loc_playing = "Giocando ",
 		},
 		v_dictionary = {
-			a_mp_art = { "Disegno: #1#" },
-			a_mp_code = { "Codice: #1#" },
-			a_mp_idea = { "Idea: #1#" },
-			a_mp_skips_ahead = { "#1# Bui Saltati Avanti" },
-			a_mp_skips_behind = { "#1# Bui Saltati Indietro" },
-			a_mp_skips_tied = { "Uguali" },
+			a_mp_art = {
+				"Disegno: #1#",
+			},
+			a_mp_code = {
+				"Codice: #1#",
+			},
+			a_mp_idea = {
+				"Idea: #1#",
+			},
+			a_mp_skips_ahead = {
+				"#1# Bui Saltati Avanti",
+			},
+			a_mp_skips_behind = {
+				"#1# Bui Saltati Indietro",
+			},
+			a_mp_skips_tied = {
+				"Uguali",
+			},
 			k_banned_objs = "#1# Banditi",
 			k_no_banned_objs = "Non ci sono #1# Banditi",
 			k_reworked_objs = "#1# Aggiunti/Modificati",
@@ -692,17 +711,35 @@ return {
 			k_credits_list = "#1# e altri ancora!", --#1# viene rimpiazzato con una lista di nomi
 		},
 		v_text = {
-			ch_c_hanging_chad_rework = { "{C:attention}Scheda non valida{} è {C:dark_edition}modificata" },
-			ch_c_glass_cards_rework = { "Le {C:attention}Carte di vetro{} sono {C:dark_edition}modificate" },
-			ch_c_mp_score_instability = { "Il punteggio sbilanciato è {C:purple}destabilizzato{} ulteriormente:" },
+			ch_c_hanging_chad_rework = {
+				"{C:attention}Scheda non valida{} è {C:dark_edition}modificata",
+			},
+			ch_c_glass_cards_rework = {
+				"Le {C:attention}Carte di vetro{} sono {C:dark_edition}modificate",
+			},
+			ch_c_mp_score_instability = {
+				"Il punteggio sbilanciato è {C:purple}destabilizzato{} ulteriormente:",
+			},
 			ch_c_mp_score_instability_EXAMPLE = {
 				"  {C:inactive}(ex: {C:chips}30{C:inactive}x{C:mult}24{C:inactive} -> {C:chips}36{C:inactive}x{C:mult}18{C:inactive})",
 			},
-			ch_c_mp_score_instability_LOC1 = { "  {C:inactive}Minimo di {C:attention}1 {C:mult}Molt" },
-			ch_c_mp_score_instability_LOC2 = { "  {C:inactive}Minimo di {C:attention}0 {C:chips}Fiche" },
-			ch_c_mp_ante_scaling = { "{C:red}X#1#{} dimensione base del Buio" },
+			ch_c_mp_score_instability_LOC1 = {
+				"  {C:inactive}Minimo di {C:attention}1 {C:mult}Molt",
+			},
+			ch_c_mp_score_instability_LOC2 = {
+				"  {C:inactive}Minimo di {C:attention}0 {C:chips}Fiche",
+			},
+			ch_c_mp_ante_scaling = {
+				"{C:red}X#1#{} dimensione base del Buio",
+			},
 		},
 		challenge_names = {
+			c_mp_standard = "Standard",
+			c_mp_sandbox = "Sandbox",
+			c_mp_badlatro = "Badlatro",
+			c_mp_tournament = "Torneo",
+			c_mp_weekly = "Settimanale",
+			c_mp_vanilla = "Vanilla",
 			c_mp_misprint_deck = "Mazzo con errori di stampa",
 			c_mp_legendaries = "Legendari",
 			c_mp_psychosis = "Psicosi",

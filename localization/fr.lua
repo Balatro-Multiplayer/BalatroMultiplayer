@@ -162,13 +162,6 @@ return {
 		labels = {
 			mp_phantom = "Fantôme",
 		},
-		challenge_names = {
-			c_mp_standard = "Standard",
-			c_mp_badlatro = "Badlatro",
-			c_mp_tournament = "Tournoi",
-			c_mp_weekly = "Hebdo",
-			c_mp_vanilla = "Vanilla",
-		},
 		dictionary = {
 			b_singleplayer = "Solo",
 			b_join_lobby = "Rejoindre un Lobby",
@@ -181,8 +174,14 @@ return {
 			b_leave_lobby = "Quitter le Lobby",
 			b_mp_discord = "Serveur Discord Balatro Multiplayer",
 			b_start = "COMMENCER",
-			b_wait_for_host_start = { "EN ATTENTE DE", "L'HÔTE POUR COMMENCER" },
-			b_wait_for_players = { "EN ATTENTE DES", "JOUEURS" },
+			b_wait_for_host_start = {
+				"EN ATTENTE DE",
+				"L'HÔTE POUR COMMENCER",
+			},
+			b_wait_for_players = {
+				"EN ATTENTE DES",
+				"JOUEURS",
+			},
 			b_lobby_options = "OPTIONS DE LOBBY",
 			b_copy_clipboard = "Copier vers le presse-papiers",
 			b_view_code = "VOIR LE CODE",
@@ -291,36 +290,63 @@ return {
 			k_requires_restart = "*Nécessite un redémarrage pour s'appliquer",
 			k_bans = "Bans",
 			k_reworks = "Ajouts/Refontes",
-			ml_enemy_loc = { "Position", "ennemie" },
+			ml_enemy_loc = {
+				"Position",
+				"ennemie",
+			},
 			ml_mp_kofi_message = {
 				"Ce mod et serveur de jeu est",
 				"développé et maintenu par ",
 				"une seule personne, si",
 				"vous l'aimez, n'hésitez pas à",
 			},
-			ml_lobby_info = { "Infos", "Lobby" },
+			ml_lobby_info = {
+				"Infos",
+				"Lobby",
+			},
 			loc_ready = "Prêt.e pour le PvP",
 			loc_selecting = "Sélectionne une Blinde",
 			loc_shop = "Dans le magasin",
 			loc_playing = "Joue ",
 		},
 		v_dictionary = {
-			a_mp_art = { "Art: #1#" },
-			a_mp_code = { "Code: #1#" },
-			a_mp_idea = { "Idée: #1#" },
-			a_mp_skips_ahead = { "#1# Blindes passées d'avance" },
-			a_mp_skips_behind = { "#1# Blindes passées de retard" },
-			a_mp_skips_tied = { "En Égalité" },
+			a_mp_art = {
+				"Art: #1#",
+			},
+			a_mp_code = {
+				"Code: #1#",
+			},
+			a_mp_idea = {
+				"Idée: #1#",
+			},
+			a_mp_skips_ahead = {
+				"#1# Blindes passées d'avance",
+			},
+			a_mp_skips_behind = {
+				"#1# Blindes passées de retard",
+			},
+			a_mp_skips_tied = {
+				"En Égalité",
+			},
 			k_banned_objs = "#1# Banni(e)s",
 			k_no_banned_objs = "Pas de #1# Banni(e)s",
 			k_reworked_objs = "#1# Ajouté(e)s/Modifié(e)s",
 			k_no_reworked_objs = "Pas de #1# Ajouté(e)s/Modifié(e)s ",
 		},
 		v_text = {
-			ch_c_hanging_chad_rework = { "{C:attention}Carte de Vote{} est {C:dark_edition}modifié" },
-			ch_c_glass_cards_rework = { "{C:attention}Les Cartes Verre{} sont {C:dark_edition}modifiées" },
+			ch_c_hanging_chad_rework = {
+				"{C:attention}Carte de Vote{} est {C:dark_edition}modifié",
+			},
+			ch_c_glass_cards_rework = {
+				"{C:attention}Les Cartes Verre{} sont {C:dark_edition}modifiées",
+			},
 		},
 		challenge_names = {
+			c_mp_standard = "Standard",
+			c_mp_badlatro = "Badlatro",
+			c_mp_tournament = "Tournoi",
+			c_mp_weekly = "Hebdo",
+			c_mp_vanilla = "Vanilla",
 			c_mp_misprint_deck = "Deck Erreur d'Impression",
 			c_mp_legendaries = "Légendaires",
 			c_mp_psychosis = "Psychose",

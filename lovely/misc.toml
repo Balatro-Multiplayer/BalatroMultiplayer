@@ -83,17 +83,6 @@ G._MP_SET_SEED = args.seed
 '''
 match_indent = true
 
-# there's no other way to do ante scaling in challenges other than patching lol
-[[patches]]
-[patches.pattern]
-target = "game.lua"
-pattern = '''elseif v.value then'''
-position = "before"
-payload = '''
-elseif v.id == 'mp_ante_scaling' then
-	self.GAME.starting_params.ante_scaling = v.value'''
-match_indent = true
-
 # relevant only for small world
 [[patches]]
 [patches.pattern]

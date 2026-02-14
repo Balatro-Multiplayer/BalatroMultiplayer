@@ -494,14 +494,6 @@ return {
 		labels = {
 			mp_phantom = "ファントム",
 		},
-		challenge_names = {
-			c_mp_standard = "スタンダード",
-			c_mp_sandbox = "サンドボックス",
-			c_mp_badlatro = "Badlatro",
-			c_mp_tournament = "トーナメント",
-			c_mp_weekly = "ウィークリー",
-			c_mp_vanilla = "バニラ",
-		},
 		dictionary = {
 			b_singleplayer = "シングルプレイ",
 			b_join_lobby = "ロビーに参加",
@@ -515,9 +507,18 @@ return {
 			b_leave_lobby = "タイトルへ戻る",
 			b_mp_discord = "公式Discordに参加",
 			b_start = "スタート",
-			b_wait_for_host_start = { "ホストが開始するまで", "お待ちください" },
-			b_wait_for_players = { "参加者を", "待っています..." },
-			b_wait_for_guest_ready = { "全員の準備完了まで", "お待ちください" },
+			b_wait_for_host_start = {
+				"ホストが開始するまで",
+				"お待ちください",
+			},
+			b_wait_for_players = {
+				"参加者を",
+				"待っています...",
+			},
+			b_wait_for_guest_ready = {
+				"全員の準備完了まで",
+				"お待ちください",
+			},
 			b_lobby_options = "ロビー設定",
 			b_copy_clipboard = "クリップボードにコピー",
 			b_view_code = "ロビーIDを表示",
@@ -675,26 +676,44 @@ return {
 			k_tutorial_not_complete = "マルチプレイヤーをプレイするためには、チュートリアルを完了させる必要があります",
 			k_created_by = "製作 ",
 			k_major_contributors = "協力 ",
-			ml_enemy_loc = { "相手の", "プレイ状況" },
+			ml_enemy_loc = {
+				"相手の",
+				"プレイ状況",
+			},
 			ml_mp_kofi_message = {
 				"このMODは個人製作で成り立っています。",
 				"気に入っていただけた方は、",
 				"こちらからサポートを",
 				"よろしくお願いします！",
 			},
-			ml_lobby_info = { "ロビー", "情報" },
+			ml_lobby_info = {
+				"ロビー",
+				"情報",
+			},
 			loc_ready = "準備OK！",
 			loc_selecting = "ブラインド選択",
 			loc_shop = "ショップ",
 			loc_playing = "",
 		},
 		v_dictionary = {
-			a_mp_art = { "イラスト #1#" },
-			a_mp_code = { "制作 #1#" },
-			a_mp_idea = { "考案 #1#" },
-			a_mp_skips_ahead = { "より#1#回多い" },
-			a_mp_skips_behind = { "より#1#回少ない" },
-			a_mp_skips_tied = { "と同数" },
+			a_mp_art = {
+				"イラスト #1#",
+			},
+			a_mp_code = {
+				"制作 #1#",
+			},
+			a_mp_idea = {
+				"考案 #1#",
+			},
+			a_mp_skips_ahead = {
+				"より#1#回多い",
+			},
+			a_mp_skips_behind = {
+				"より#1#回少ない",
+			},
+			a_mp_skips_tied = {
+				"と同数",
+			},
 			k_banned_objs = "出現しない#1#",
 			k_no_banned_objs = "出現しない#1#はありません",
 			k_reworked_objs = "追加､修正された#1#",
@@ -714,15 +733,29 @@ return {
 			ch_c_glass_cards_rework = {
 				"{C:attention}グラスカード{}は{C:dark_edition}マルチ用に改良されています。",
 			},
-			ch_c_mp_score_instability = { "チップと倍率が {C:purple}アンバランス{} になる" },
+			ch_c_mp_score_instability = {
+				"チップと倍率が {C:purple}アンバランス{} になる",
+			},
 			ch_c_mp_score_instability_EXAMPLE = {
 				"  {C:inactive}(例: {C:chips}30{C:inactive}x{C:mult}24{C:inactive} -> {C:chips}36{C:inactive}x{C:mult}18{C:inactive})",
 			},
-			ch_c_mp_score_instability_LOC1 = { "  {C:mult}倍率{} の最小値 {C:attention}1" },
-			ch_c_mp_score_instability_LOC2 = { "  {C:chips}チップ{} の最小値 {C:attention}0" },
-			ch_c_mp_ante_scaling = { "ノルマスコア {C:red}#1#倍{}" },
+			ch_c_mp_score_instability_LOC1 = {
+				"  {C:mult}倍率{} の最小値 {C:attention}1",
+			},
+			ch_c_mp_score_instability_LOC2 = {
+				"  {C:chips}チップ{} の最小値 {C:attention}0",
+			},
+			ch_c_mp_ante_scaling = {
+				"ノルマスコア {C:red}#1#倍{}",
+			},
 		},
 		challenge_names = {
+			c_mp_standard = "スタンダード",
+			c_mp_sandbox = "サンドボックス",
+			c_mp_badlatro = "Badlatro",
+			c_mp_tournament = "トーナメント",
+			c_mp_weekly = "ウィークリー",
+			c_mp_vanilla = "バニラ",
 			c_mp_misprint_deck = "バグシードデッキ",
 			c_mp_legendaries = "レジェンドたち",
 			c_mp_psychosis = "精神病",

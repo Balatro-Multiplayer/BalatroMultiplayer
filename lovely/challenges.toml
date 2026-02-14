@@ -18,3 +18,14 @@ pattern = "if v.pinned then _joker.pinned = true end"
 position = 'after'
 payload = "if v.rental then _joker:set_rental(true) end"
 match_indent = true
+
+# there's no other way to do ante scaling in challenges other than patching lol
+[[patches]]
+[patches.pattern]
+target = "game.lua"
+pattern = '''elseif v.value then'''
+position = "before"
+payload = '''
+elseif v.id == 'mp_ante_scaling' then
+	self.GAME.starting_params.ante_scaling = v.value'''
+match_indent = true
