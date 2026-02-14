@@ -13,7 +13,7 @@ MP.SANDBOX.joker_mappings = {
 	{ sandbox = "j_mp_steel_joker_sandbox", vanilla = "j_steel_joker", active = true },
 	{ sandbox = "j_mp_baseball_sandbox", vanilla = "j_baseball", active = true },
 	{ sandbox = "j_mp_hit_the_road_sandbox", vanilla = "j_hit_the_road", active = true },
-	-- { sandbox = "j_mp_golden_ticket_sandbox", vanilla = "j_ticket", active = true },
+	{ sandbox = "j_mp_golden_ticket_sandbox", vanilla = "j_ticket", active = true },
 	-- Idol variants (all map to same vanilla joker)
 	{ sandbox = "j_mp_idol_sandbox_bw", vanilla = "j_idol", active = true },
 	{ sandbox = "j_mp_idol_sandbox_fantom", vanilla = "j_idol", active = true },
@@ -207,10 +207,13 @@ function MP.ApplyBans()
 				if mapping.group == "extra_credit" then G.GAME.banned_keys[mapping.sandbox] = true end
 			end
 		end
+
+		-- Enable Alloy etc.
+		MP.optional_features = { quantum_enhancements = true }
 	end
 
 	return ret
 end
 
 -- debugging hotswitch
-MP.sandbox_no_collection = true
+MP.sandbox_no_collection = false
