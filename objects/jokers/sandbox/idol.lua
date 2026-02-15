@@ -69,6 +69,20 @@ SMODS.Joker({
 	cost = 6,
 	atlas = "idol_sandbox_bw",
 	config = { extra = { xmult = 1.5 }, mp_sticker_balanced = true },
+	add_to_deck = function(self, card, from_debuff)
+		G.GAME.banned_keys["j_mp_idol_sandbox_fantom"] = true
+		if G.shop_jokers and G.shop_jokers.cards then
+			for i = #G.shop_jokers.cards, 1, -1 do
+				local shop_card = G.shop_jokers.cards[i]
+				if shop_card.config.center.key == "j_mp_idol_sandbox_fantom" then
+					shop_card.T.r = -0.2
+					shop_card:juice_up(0.3, 0.4)
+					shop_card:start_dissolve()
+					break
+				end
+			end
+		end
+	end,
 	loc_vars = function(self, info_queue, card)
 		local zealot = G.GAME.current_round.zealot_idol or { rank = "Ace" }
 		return {
@@ -164,6 +178,20 @@ SMODS.Joker({
 	cost = 6,
 	atlas = "idol_sandbox_color",
 	config = { extra = { xmult = 1.0, xmult_per_card = 0.05 }, mp_sticker_balanced = true },
+	add_to_deck = function(self, card, from_debuff)
+		G.GAME.banned_keys["j_mp_idol_sandbox_bw"] = true
+		if G.shop_jokers and G.shop_jokers.cards then
+			for i = #G.shop_jokers.cards, 1, -1 do
+				local shop_card = G.shop_jokers.cards[i]
+				if shop_card.config.center.key == "j_mp_idol_sandbox_bw" then
+					shop_card.T.r = -0.2
+					shop_card:juice_up(0.3, 0.4)
+					shop_card:start_dissolve()
+					break
+				end
+			end
+		end
+	end,
 	loc_vars = function(self, info_queue, card)
 		local most_common_card = get_most_common_card()
 		local xmult = card.ability.extra.xmult + card.ability.extra.xmult_per_card * most_common_card.count
