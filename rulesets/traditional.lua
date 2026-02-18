@@ -8,6 +8,7 @@ MP.Ruleset({
 		"j_ticket",
 		"j_selzer",
 		"j_turtle_bean",
+		"j_bloodstone",
 	},
 	banned_jokers = {
 		"j_mp_speedrun",
