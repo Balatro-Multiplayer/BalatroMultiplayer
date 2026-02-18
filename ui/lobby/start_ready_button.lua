@@ -22,7 +22,38 @@ local function get_warnings()
 		})
 	end
 
-	local current_player = MP.LOBBY.is_host and MP.LOBBY.host or MP.LOBBY.guest
+	-- since `MP.LOBBY.ready_to_start` definition was rug pulled from me
+	-- i have to do this
+	local bothPlayersInLobby = MP.LOBBY.guest and MP.LOBBY.guest.config ~= nil
+
+	-- This is made to solve the extra credit issue
+	-- but we could use a more robust check with a list of known content mods
+	-- to for example display the ready up button etc if players have mods
+	-- that are incompatible
+	if bothPlayersInLobby then
+		local hostExtraCreditVersion = MP.LOBBY.host
+			and MP.LOBBY.host.config
+			and MP.LOBBY.host.config.Mods["extracredit"]
+		local guestExtraCreditVersion = MP.LOBBY.guest
+			and MP.LOBBY.guest.config
+			and MP.LOBBY.guest.config.Mods["extracredit"]
+
+		if hostExtraCreditVersion ~= guestExtraCreditVersion then
+			table.insert(warnings, {
+				"Extra Credit mismatch - players may see different jokers",
+				SMODS.Gradients.warning_text,
+			})
+
+		-- Both players have Extra Credit with matching versions
+		-- TODO actually rewrite so we use that "current player" thingy I nixed earlier
+		elseif hostExtraCreditVersion ~= nil and hostExtraCreditVersion == guestExtraCreditVersion then
+			table.insert(warnings, {
+				"Extra Credit active - curated jokers replaced with full pool",
+				G.C.GREEN,
+				0.25,
+			})
+		end
+	end
 
 	if MP.LOBBY.ready_to_start or not MP.LOBBY.is_host then
 		local hostSteamoddedVersion = MP.LOBBY.host and MP.LOBBY.host.config and MP.LOBBY.host.config.Mods["Steamodded"]

@@ -47,10 +47,12 @@ SMODS.Consumable({
 				trigger = "after",
 				delay = 0.1,
 				func = function()
-					destroy_card:start_dissolve()
+					destroy_card.T.r = -0.2
+					destroy_card:juice_up(0.3, 0.4)
 					return true
 				end,
 			}))
+			SMODS.destroy_cards(destroy_card)
 		end
 
 		-- Wait for destruction, then flip remaining cards

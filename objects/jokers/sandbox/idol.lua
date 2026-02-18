@@ -5,36 +5,107 @@ SMODS.Atlas({
 	py = 95,
 })
 
+-- Override reset_idol_card to do weighted rank selection for Zealot Idol
+-- Runs globally for all players so the pseudorandom queue stays in sync
+local original_reset_idol_card = reset_idol_card
+function reset_idol_card()
+	original_reset_idol_card()
+
+	G.GAME.current_round.zealot_idol = { id = 14, rank = "Ace" }
+
+	if G.playing_cards == nil then return end
+
+	local count_map = {}
+	local valid_ranks = {}
+
+	for _, v in ipairs(G.playing_cards) do
+		if v.ability.effect ~= "Stone Card" then
+			local val = v.base.value
+			if not count_map[val] then
+				count_map[val] = { count = 0, card = v }
+				table.insert(valid_ranks, count_map[val])
+			end
+			count_map[val].count = count_map[val].count + 1
+		end
+	end
+
+	if #valid_ranks == 0 then return end
+
+	local value_order = {}
+	for i, rank in ipairs(SMODS.Rank.obj_buffer) do
+		value_order[rank] = i
+	end
+
+	table.sort(valid_ranks, function(a, b)
+		if a.count ~= b.count then return a.count > b.count end
+		return value_order[a.card.base.value] < value_order[b.card.base.value]
+	end)
+
+	local total_weight = 0
+	for _, entry in ipairs(valid_ranks) do
+		total_weight = total_weight + entry.count
+	end
+
+	local raw_random = pseudorandom("zealot_idol" .. G.GAME.round_resets.ante)
+	local threshold = 0
+	for _, entry in ipairs(valid_ranks) do
+		threshold = threshold + (entry.count / total_weight)
+		if raw_random < threshold then
+			G.GAME.current_round.zealot_idol = { id = entry.card.base.id, rank = entry.card.base.value }
+			return
+		end
+	end
+
+	G.GAME.current_round.zealot_idol = { id = valid_ranks[1].card.base.id, rank = valid_ranks[1].card.base.value }
+end
+
 SMODS.Joker({
 	key = "idol_sandbox_bw",
 	no_collection = MP.sandbox_no_collection,
 	unlocked = true,
 	discovered = true,
-	blueprint_compat = false,
+	blueprint_compat = true,
 	rarity = 2,
 	cost = 6,
 	atlas = "idol_sandbox_bw",
 	config = { extra = { xmult = 1.5 }, mp_sticker_balanced = true },
+	add_to_deck = function(self, card, from_debuff)
+		G.GAME.banned_keys["j_mp_idol_sandbox_fantom"] = true
+		if G.shop_jokers and G.shop_jokers.cards then
+			for i = #G.shop_jokers.cards, 1, -1 do
+				local shop_card = G.shop_jokers.cards[i]
+				if shop_card.config.center.key == "j_mp_idol_sandbox_fantom" then
+					shop_card.T.r = -0.2
+					shop_card:juice_up(0.3, 0.4)
+					shop_card:start_dissolve()
+					break
+				end
+			end
+		end
+	end,
 	loc_vars = function(self, info_queue, card)
-		local idol_card = G.GAME.current_round.idol_card or { rank = "Ace" }
+		local zealot = G.GAME.current_round.zealot_idol or { rank = "Ace" }
 		return {
 			vars = {
-				localize(idol_card.rank, "ranks"),
+				localize(zealot.rank, "ranks"),
 				card.ability.extra.xmult,
 			},
 		}
 	end,
 	calculate = function(self, card, context)
+		local zealot = G.GAME.current_round.zealot_idol
 		if
-			context.individual
+			zealot
+			and context.individual
 			and context.cardarea == G.play
-			and context.other_card:get_id() == G.GAME.current_round.idol_card.id
+			and context.other_card:get_id() == zealot.id
 		then
 			return {
 				xmult = card.ability.extra.xmult,
 			}
 		end
 	end,
+	mp_credits = { code = { "steph" } },
 	mp_include = function(self)
 		return MP.SANDBOX.is_joker_allowed(self.key)
 	end,
@@ -47,65 +118,11 @@ SMODS.Atlas({
 	py = 95,
 })
 
-SMODS.Joker({
-	key = "idol_sandbox_color",
-	no_collection = MP.sandbox_no_collection,
-	unlocked = true,
-	discovered = true,
-	blueprint_compat = false,
-	rarity = 2,
-	cost = 6,
-	atlas = "idol_sandbox_color",
-	config = { extra = { xmult = 1.5, charge = 0.5 }, mp_sticker_balanced = true },
-	loc_vars = function(self, info_queue, card)
-		local idol_card = G.GAME.current_round.idol_card or { rank = "Ace", suit = "Spades" }
-		return {
-			vars = {
-				localize(idol_card.rank, "ranks"),
-				card.ability.extra.xmult,
-				localize(idol_card.suit, "suits_plural"),
-
-				colours = { G.C.SUITS[idol_card.suit] },
-				card.ability.extra.charge,
-			},
-		}
-	end,
-	calculate = function(self, card, context)
-		if
-			context.individual
-			and context.cardarea == G.play
-			and context.other_card:get_id() == G.GAME.current_round.idol_card.id
-			and context.other_card:is_suit(G.GAME.current_round.idol_card.suit)
-		then
-			-- todo apply and reset xmult
-			return {
-				xmult = card.ability.extra.xmult,
-			}
-			-- TODO reset to 1.5 and juice down
-		end
-		if context.end_of_round and context.game_over == false and context.main_eval and not context.blueprint then
-			card.ability.extra.xmult = card.ability.extra.xmult + card.ability.extra.charge
-			return {
-				message = localize("k_val_up"),
-				colour = G.C.MULT,
-			}
-		end
-		-- TODO if end of round juice up and increase xmult
-	end,
-	mp_include = function(self)
-		return MP.SANDBOX.is_joker_allowed(self.key)
-	end,
-})
-
--- Fantom's idol
--- Gives 1x + (0.05x * card count) mult per card if you play
--- specifically your most common rank+suit
--- TODO test implementation
 local function get_most_common_card()
 	local count_map = {}
 	local valid_idol_cards = {}
 
-	if G.playing_cards == nil then return { id = 14, rank = "Ace", suit = "Spades", count = 4 } end
+	if G.playing_cards == nil then return { id = 14, rank = "Ace", suit = "Spades", count = 1 } end
 
 	for _, v in ipairs(G.playing_cards) do
 		if v.ability.effect ~= "Stone Card" then
@@ -156,11 +173,25 @@ SMODS.Joker({
 	no_collection = MP.sandbox_no_collection,
 	unlocked = true,
 	discovered = true,
-	blueprint_compat = false,
+	blueprint_compat = true,
 	rarity = 2,
 	cost = 6,
-	atlas = "idol_sandbox_color", -- TODO create new sprite
+	atlas = "idol_sandbox_color",
 	config = { extra = { xmult = 1.0, xmult_per_card = 0.05 }, mp_sticker_balanced = true },
+	add_to_deck = function(self, card, from_debuff)
+		G.GAME.banned_keys["j_mp_idol_sandbox_bw"] = true
+		if G.shop_jokers and G.shop_jokers.cards then
+			for i = #G.shop_jokers.cards, 1, -1 do
+				local shop_card = G.shop_jokers.cards[i]
+				if shop_card.config.center.key == "j_mp_idol_sandbox_bw" then
+					shop_card.T.r = -0.2
+					shop_card:juice_up(0.3, 0.4)
+					shop_card:start_dissolve()
+					break
+				end
+			end
+		end
+	end,
 	loc_vars = function(self, info_queue, card)
 		local most_common_card = get_most_common_card()
 		local xmult = card.ability.extra.xmult + card.ability.extra.xmult_per_card * most_common_card.count
@@ -187,6 +218,7 @@ SMODS.Joker({
 			}
 		end
 	end,
+	mp_credits = { code = { "steph" }, idea = { "Fantom" } },
 	mp_include = function(self)
 		return MP.SANDBOX.is_joker_allowed(self.key)
 	end,
