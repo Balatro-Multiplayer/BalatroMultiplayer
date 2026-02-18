@@ -11,7 +11,7 @@
   "badge_text_colour": "FFFFFF",
   "version": "0.2.21~DEV",
   "dependencies": [
-    "Steamodded (>=1.0.0~BETA-1016c)",
+    "Steamodded (>=1.0.0~BETA-1221a)",
     "Lovely (>=0.8)",
     "Balatro (>=1.0.1o)"
   ],
