@@ -1,4 +1,3 @@
--- TODO: needs to be wired up to all rulesets and needs a name change
 SMODS.Consumable({
 	key = "ouija_standard",
 	set = "Spectral",
@@ -135,11 +134,4 @@ SMODS.Consumable({
 	can_use = function(self, card)
 		return G.hand and #G.hand.cards >= card.ability.extra.destroy
 	end,
-	-- draw = function(self, card, layer)
-	-- 	-- This is for the Spectral shader. You don't need this with `set = "Spectral"`
-	-- 	-- Also look into SMODS.DrawStep if you make multiple cards that need the same shader
-	-- 	if (layer == "card" or layer == "both") and card.sprite_facing == "front" then
-	-- 		card.children.center:draw_shader("booster", nil, card.ARGS.send_to_shader)
-	-- 	end
-	-- end,
 })
