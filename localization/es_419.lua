@@ -140,7 +140,7 @@ return {
 					"{C:attention}#1#{} veces adicionales",
 				},
 			},
-			j_mp_hanging_chad_standard = {
+			j_mp_hanging_chad = {
 				name = "Papel perforado",
 				text = {
 					"Reactiva la {C:attention}primera{} y {C:attention}segunda{}",
