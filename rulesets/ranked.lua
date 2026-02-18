@@ -18,7 +18,9 @@ MP.Ruleset({
 		"j_selzer",
 		"j_turtle_bean",
 	},
-	reworked_consumables = {},
+	reworked_consumables = {
+		"c_mp_ouija_standard",
+	},
 	reworked_vouchers = {},
 	reworked_enhancements = {
 		"m_glass",
