@@ -3,6 +3,9 @@ SMODS.Consumable({
 	key = "ouija_standard",
 	set = "Spectral",
 	pos = { x = 7, y = 4 },
+	no_collection = true,
+	unlocked = true,
+	discovered = true,
 	config = { extra = { destroy = 3 }, mp_sticker_balanced = true },
 	in_pool = function(self)
 		return MP.is_ruleset_active("sandbox") or MP.UTILS.is_standard_ruleset()

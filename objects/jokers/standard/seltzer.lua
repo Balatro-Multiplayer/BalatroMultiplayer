@@ -8,11 +8,10 @@ SMODS.Joker({
 	rarity = 1,
 	cost = 5,
 	pos = { x = 3, y = 15 },
-	config = { extra = { hands_left = 10 } },
+	config = { extra = { hands_left = 10 }, mp_sticker_balanced = true },
 	loc_vars = function(self, info_queue, card)
 		return { vars = { card.ability.extra.hands_left } }
 	end,
-	-- todo replace with new stuff from standard v2
 	calculate = function(self, card, context)
 		if context.first_hand_drawn then
 			if MP.is_pvp_boss() then card.ability.extra.effect_disabled = true end

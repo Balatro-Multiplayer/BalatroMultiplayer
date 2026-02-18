@@ -7,7 +7,7 @@ SMODS.Joker({
 	rarity = 2,
 	cost = 6,
 	pos = { x = 6, y = 7 },
-	config = { extra = { xmult = 1.5 } },
+	config = { extra = { xmult = 1.5 }, mp_sticker_balanced = true },
 	loc_vars = function(self, info_queue, card)
 		local idol_card = G.GAME.current_round.idol_card or { rank = "Ace", suit = "Spades" }
 		return {

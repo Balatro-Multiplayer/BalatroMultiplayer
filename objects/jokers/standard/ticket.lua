@@ -7,7 +7,7 @@ SMODS.Joker({
 	rarity = 2,
 	cost = 6,
 	pos = { x = 5, y = 3 },
-	config = { extra = { dollars = 4 } },
+	config = { extra = { dollars = 4 }, mp_sticker_balanced = true },
 	loc_vars = function(self, info_queue, card)
 		info_queue[#info_queue + 1] = G.P_CENTERS.m_gold
 		return { vars = { card.ability.extra.dollars } }
