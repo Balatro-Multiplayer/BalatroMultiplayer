@@ -82,13 +82,13 @@ function MP.load_mp_dir(directory, recursive)
 	local items = NFS.getDirectoryItemsInfo(dir_path)
 	-- sort by prefix like { _file, _dir, file, dir }
 	table.sort(items, function(a, b)
-		if has_prefix(a.name) ~= has_prefix(b.name) then return has_prefix(a.name) end
+		if has_prefix(a.name) ~= has_prefix(b.name) then return has_prefix(a.name) end ---@diagnostic disable-line: undefined-field
 		return (a.type == "directory") ~= (b.type == "directory") and a.type ~= "directory" or false
 	end)
 
 	-- load sorted files/dirs
 	for _, item in ipairs(items) do
-		local path = directory .. "/" .. item.name
+		local path = directory .. "/" .. item.name ---@diagnostic disable-line: undefined-field
 		sendDebugMessage("Loading item: " .. path, "MULTIPLAYER")
 		if item.type ~= "directory" then
 			MP.load_mp_file(path)

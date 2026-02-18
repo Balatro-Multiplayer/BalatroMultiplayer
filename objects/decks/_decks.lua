@@ -9,6 +9,7 @@ SMODS.DrawStep({
 	key = "back_multiplayer",
 	order = 11,
 	func = function(self)
+		Galdur = Galdur or nil
 		if not Galdur and G.GAME.viewed_back and G.GAME.viewed_back.effect and G.GAME.viewed_back.effect.center.mod then
 			if G.GAME.viewed_back.effect.center.mod.id == "Multiplayer" and G.STAGE == G.STAGES.MAIN_MENU then
 				G.shared_stickers["mp_sticker_balanced"].role.draw_major = self

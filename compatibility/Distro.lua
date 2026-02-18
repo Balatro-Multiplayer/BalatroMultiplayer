@@ -1,4 +1,7 @@
 if SMODS.Mods["Distro"] and SMODS.Mods["Distro"].can_load then
+	Distro = Distro or nil
+	DiscordIPC = DiscordIPC or nil
+	if not DiscordIPC or not Distro then return end
 	G.E_MANAGER:add_event(Event({
 		trigger = "immediate",
 		no_delete = true,

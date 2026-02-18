@@ -291,6 +291,7 @@ if not FN.SIM.run then
 
 	function FN.SIM.simulate_blind_debuffs()
 		local blind_obj = G.GAME.blind
+		if not blind_obj then return false end
 		if blind_obj.disabled then return false end
 
 		-- The following are part of Blind:press_play()

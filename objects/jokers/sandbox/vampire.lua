@@ -26,7 +26,7 @@ SMODS.Joker({
 			local stone_cards = {}
 			for _, scored_card in ipairs(context.scoring_hand) do
 				if
-					next(SMODS.get_enhancements(scored_card))
+					next(SMODS.get_enhancements(scored_card)) ---@diagnostic disable-line: param-type-mismatch
 					and not scored_card.debuff
 					and not scored_card.vampired
 					and not SMODS.has_enhancement(scored_card, "m_stone") -- todo like this - does it even work?

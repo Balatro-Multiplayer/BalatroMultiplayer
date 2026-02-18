@@ -121,7 +121,7 @@ function FN.get_preview_settings_page()
 			FN.PRE.data = FN.PRE.simulate()
 		else
 			-- Preview was just disabled, so remove preview node:
-			G.HUD:get_UIE_by_ID("fn_pre_score").parent:remove()
+			G.HUD:get_UIE_by_ID("fn_pre_score").parent:remove() ---@diagnostic disable-line: undefined-field
 		end
 		G.HUD:recalculate()
 	end
@@ -135,7 +135,7 @@ function FN.get_preview_settings_page()
 			FN.PRE.data = FN.PRE.simulate()
 		else
 			-- Preview was just disabled, so remove preview node:
-			G.HUD:get_UIE_by_ID("fn_pre_dollars").parent:remove()
+			G.HUD:get_UIE_by_ID("fn_pre_dollars").parent:remove() ---@diagnostic disable-line: undefined-field
 		end
 		G.HUD:recalculate()
 	end

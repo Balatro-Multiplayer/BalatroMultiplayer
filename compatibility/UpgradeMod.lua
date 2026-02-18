@@ -36,7 +36,9 @@ if SMODS.Mods["upgrademod"] and SMODS.Mods["upgrademod"].can_load then
 			level = G.GAME.hands[hand_type].level,
 		})
 
-		level_up_hand(nil, hand_type, false, -((asteroid_factor or 1) * (planet_level or 1)))
+		asteroid_factor = asteroid_factor or 1
+		planet_level = planet_level or 1
+		level_up_hand(nil, hand_type, false, -(asteroid_factor * planet_level))
 
 		update_hand_text(
 			{ sound = "button", volume = 0.7, pitch = 1.1, delay = 0 },
