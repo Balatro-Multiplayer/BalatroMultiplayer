@@ -6,6 +6,7 @@ MP.Ruleset({
 	banned_jokers = {},
 	banned_consumables = {
 		"c_justice",
+		"c_ouija",
 	},
 	banned_vouchers = {},
 	banned_enhancements = {},
