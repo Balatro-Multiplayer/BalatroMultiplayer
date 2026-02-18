@@ -969,6 +969,23 @@ function MP.ACTIONS.sync_client()
 	})
 end
 
+function MP.ACTIONS.modded(modId, modAction, params, target)
+	local msg = {
+		action = "moddedAction",
+		modId = modId,
+		modAction = modAction,
+	}
+	if params then
+		for k, v in pairs(params) do
+			msg[k] = v
+		end
+	end
+	if target then
+		msg.target = target
+	end
+	Client.send(msg)
+end
+
 -- #endregion Client to Server
 
 -- Utils
@@ -1112,6 +1129,11 @@ function Game:update(dt)
 				action_start_ante_timer(parsedAction.time)
 			elseif parsedAction.action == "pauseAnteTimer" then
 				action_pause_ante_timer(parsedAction.time)
+			elseif parsedAction.action == "moddedAction" then
+				local registry = MP.MOD_ACTIONS[parsedAction.modId]
+				if registry and registry[parsedAction.modAction] then
+					registry[parsedAction.modAction](parsedAction)
+				end
 			elseif parsedAction.action == "error" then
 				action_error(parsedAction.message)
 			elseif parsedAction.action == "keepAlive" then
