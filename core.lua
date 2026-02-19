@@ -67,6 +67,7 @@ MP.EXPERIMENTAL = {
 G.C.MULTIPLAYER = HEX("AC3232")
 
 MP.SMODS_VERSION = "1.0.0~BETA-1224a"
+MP.REQUIRED_LOVELY_VERSION = "0.9"
 
 function MP.should_use_the_order()
 	return MP.LOBBY and MP.LOBBY.config and MP.LOBBY.config.the_order and MP.LOBBY.code
