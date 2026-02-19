@@ -74,7 +74,7 @@ return {
 				name = "SPEEDRUN",
 				text = {
 					"If you reach a {C:attention}PvP Blind",
-					"before your {X:purple,C:white}Nemesis{},",
+					"within {C:attention}30s{} of your {X:purple,C:white}Nemesis{},",
 					"create a random {C:spectral}Spectral{} card",
 					"{C:inactive}(Must have room)",
 				},
