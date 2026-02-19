@@ -140,7 +140,7 @@ return {
 					"{C:attention}#1#{} veces adicionales",
 				},
 			},
-			j_mp_hanging_chad_standard = {
+			j_mp_hanging_chad = {
 				name = "Papel perforado",
 				text = {
 					"Reactiva la {C:attention}primera{} y {C:attention}segunda{}",
@@ -581,7 +581,7 @@ return {
 			},
 		},
 		Spectral = {
-			c_mp_ouija_sandbox = {
+			c_mp_ouija_standard = {
 				name = "Ouija",
 				text = {
 					"Destruye {C:attention}#1#{} cartas al azar,",

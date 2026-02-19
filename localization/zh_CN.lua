@@ -106,7 +106,7 @@ return {
 					"{X:mult,C:white}X#1#{}倍率",
 				},
 			},
-			j_mp_hanging_chad_standard = {
+			j_mp_hanging_chad = {
 				name = "未断选票",
 				text = {
 					"打出的牌中{C:attention}第一张{}和{C:attention}第二张{}",

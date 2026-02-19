@@ -27,6 +27,40 @@ return {
 			},
 		},
 		Joker = {
+			j_mp_seltzer = {
+				name = "Seltzer",
+				text = {
+					"Retrigger all",
+					"cards played for",
+					"the next {C:attention}#1#{} hands",
+					"Disabled in {C:attention}PvP Blind",
+				},
+			},
+			j_mp_turtle_bean = {
+				name = "Turtle Bean",
+				text = {
+					"{C:attention}+#1#{} hand size,",
+					"reduces by",
+					"{C:red}#2#{} every round",
+					"Disabled in {C:attention}PvP Blind",
+				},
+			},
+			j_mp_idol = {
+				name = "The Idol",
+				text = {
+					"Each played {C:attention}#2#",
+					"of {V:1}#3#{} gives",
+					"{X:mult,C:white} X#1# {} Mult when scored",
+					"{s:0.8}Card changes every round",
+				},
+			},
+			j_mp_ticket = {
+				name = "Golden Ticket",
+				text = {
+					"Played {C:attention}Gold{} cards",
+					"earn {C:money}$#1#{} when scored",
+				},
+			},
 			j_broken = {
 				name = "BROKEN",
 				text = {
@@ -121,7 +155,7 @@ return {
 					"not in a {C:attention}PvP Blind{}",
 				},
 			},
-			j_mp_hanging_chad_standard = {
+			j_mp_hanging_chad = {
 				name = "Hanging Chad",
 				text = {
 					"Retrigger {C:attention}first{} and {C:attention}second{}",
@@ -616,7 +650,7 @@ return {
 			},
 		},
 		Spectral = {
-			c_mp_ouija_sandbox = {
+			c_mp_ouija_standard = {
 				name = "Ouija",
 				text = {
 					"Destroy {C:attention}#1#{} random cards,",

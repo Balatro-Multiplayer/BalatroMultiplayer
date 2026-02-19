@@ -1,11 +1,13 @@
--- Ouija
 SMODS.Consumable({
-	key = "ouija_sandbox",
+	key = "ouija_standard",
 	set = "Spectral",
 	pos = { x = 7, y = 4 },
+	no_collection = true,
+	unlocked = true,
+	discovered = true,
 	config = { extra = { destroy = 3 }, mp_sticker_balanced = true },
 	in_pool = function(self)
-		return MP.is_ruleset_active("sandbox")
+		return MP.is_ruleset_active("sandbox") or MP.UTILS.is_standard_ruleset()
 	end,
 	loc_vars = function(self, info_queue, card)
 		return { vars = { card.ability.extra.destroy } }
@@ -47,10 +49,12 @@ SMODS.Consumable({
 				trigger = "after",
 				delay = 0.1,
 				func = function()
-					destroy_card:start_dissolve()
+					destroy_card.T.r = -0.2
+					destroy_card:juice_up(0.3, 0.4)
 					return true
 				end,
 			}))
+			SMODS.destroy_cards(destroy_card)
 		end
 
 		-- Wait for destruction, then flip remaining cards
@@ -130,11 +134,4 @@ SMODS.Consumable({
 	can_use = function(self, card)
 		return G.hand and #G.hand.cards >= card.ability.extra.destroy
 	end,
-	-- draw = function(self, card, layer)
-	-- 	-- This is for the Spectral shader. You don't need this with `set = "Spectral"`
-	-- 	-- Also look into SMODS.DrawStep if you make multiple cards that need the same shader
-	-- 	if (layer == "card" or layer == "both") and card.sprite_facing == "front" then
-	-- 		card.children.center:draw_shader("booster", nil, card.ARGS.send_to_shader)
-	-- 	end
-	-- end,
 })
