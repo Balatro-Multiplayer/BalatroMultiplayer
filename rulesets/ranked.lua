@@ -49,6 +49,14 @@ MP.Ruleset({
 		if SMODS.version ~= MP.SMODS_VERSION then
 			return localize({ type = "variable", key = "k_ruleset_disabled_smods_version", vars = { MP.SMODS_VERSION } })
 		end
+		local lovely_ver = lovely and lovely.version or ""
+		if not lovely_ver:match("^" .. MP.REQUIRED_LOVELY_VERSION:gsub("%.", "%%.")) then
+			return localize({
+				type = "variable",
+				key = "k_ruleset_disabled_lovely_version",
+				vars = { MP.REQUIRED_LOVELY_VERSION },
+			})
+		end
 		return false
 	end,
 	force_lobby_options = function(self)
