@@ -36,13 +36,15 @@ MP.UI = {}
 MP.ACTIONS = {}
 MP.MOD_ACTIONS = {}
 
-function MP.register_mod_action(modAction, callback)
-	local mod = SMODS.current_mod
-	if not mod then
-		sendWarnMessage("MP.register_mod_action called outside of mod init, SMODS.current_mod is nil", "MULTIPLAYER")
-		return
+function MP.register_mod_action(modAction, callback, modId)
+	if not modId then
+		local mod = SMODS.current_mod
+		if not mod then
+			sendWarnMessage("MP.register_mod_action called outside of mod init without a modId", "MULTIPLAYER")
+			return
+		end
+		modId = mod.id
 	end
-	local modId = mod.id
 	MP.MOD_ACTIONS[modId] = MP.MOD_ACTIONS[modId] or {}
 	MP.MOD_ACTIONS[modId][modAction] = callback
 end
