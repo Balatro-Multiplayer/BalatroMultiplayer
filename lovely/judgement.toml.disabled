@@ -4,7 +4,6 @@ dump_lua = true
 priority = 1
 
 # This file is for various patches required by the Judgement changes in Standard
-# ^ it's also disabled
 
 # define list as game variable
 [[patches]]
