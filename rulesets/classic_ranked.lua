@@ -1,19 +1,12 @@
 MP.Ruleset({
-	key = "standard_ranked",
-	multiplayer_content = true,
-	standard = true,
+	key = "classic_ranked",
+	multiplayer_content = false,
 	banned_silent = {
 		"j_hanging_chad",
-		"j_idol",
-		"j_ticket",
-		"j_selzer",
-		"j_turtle_bean",
-		"j_bloodstone",
 	},
 	banned_jokers = {},
 	banned_consumables = {
 		"c_justice",
-		"c_ouija",
 	},
 	banned_vouchers = {},
 	banned_enhancements = {},
@@ -21,26 +14,18 @@ MP.Ruleset({
 	banned_blinds = {},
 	reworked_jokers = {
 		"j_mp_hanging_chad",
-		"j_mp_idol",
-		"j_mp_ticket",
-		"j_mp_seltzer",
-		"j_mp_turtle_bean",
 	},
-	reworked_consumables = {
-		"c_mp_ouija_standard",
-	},
+	reworked_consumables = {},
 	reworked_vouchers = {},
-	reworked_enhancements = {
-		"m_glass",
-	},
+	reworked_enhancements = {},
 	reworked_tags = {},
 	reworked_blinds = {},
 	create_info_menu = function()
 		return MP.UI.CreateRulesetInfoMenu({
-			multiplayer_content = true,
+			multiplayer_content = false,
 			forced_lobby_options = true,
 			forced_gamemode_text = "k_attrition",
-			description_key = "k_standard_ranked_description",
+			description_key = "k_classic_ranked_description",
 		})
 	end,
 	forced_gamemode = "gamemode_mp_attrition",

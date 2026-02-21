@@ -34,6 +34,6 @@ SMODS.Joker({
 		end
 	end,
 	mp_include = function(self)
-		return (MP.UTILS.is_standard_ruleset() or MP.LOBBY.config.ruleset == "ruleset_mp_sandbox") and MP.LOBBY.code
+		return (MP.UTILS.is_standard_ruleset() or MP.LOBBY.config.ruleset == "ruleset_mp_sandbox" or MP.LOBBY.config.ruleset == "ruleset_mp_classic_ranked") and MP.LOBBY.code
 	end,
 })
