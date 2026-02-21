@@ -1,5 +1,5 @@
 MP.Ruleset({
-	key = "ranked",
+	key = "standard_ranked",
 	multiplayer_content = true,
 	standard = true,
 	banned_silent = {
@@ -40,7 +40,7 @@ MP.Ruleset({
 			multiplayer_content = true,
 			forced_lobby_options = true,
 			forced_gamemode_text = "k_attrition",
-			description_key = "k_ranked_description",
+			description_key = "k_standard_ranked_description",
 		})
 	end,
 	forced_gamemode = "gamemode_mp_attrition",

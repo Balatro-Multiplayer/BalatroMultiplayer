@@ -96,7 +96,7 @@ function MP.UI.Change_Main_Lobby_Options(e, info_area_id, info_area_func, defaul
 	end
 	e.config.chosen = "vert" -- Special setting to show 'chosen' indicator on the side
 
-	local info_obj_name = string.match(e.config.id, "([^_]+)")
+	local info_obj_name = string.match(e.config.id, "(.+)_%w+_button")
 	update_lobby_config_func(info_obj_name)
 
 	if info_area.config.object then info_area.config.object:remove() end
