@@ -651,7 +651,7 @@ return {
 		},
 		Spectral = {
 			c_mp_ouija_standard = {
-				name = "Ouija",
+				name = "Ouija 2.0",
 				text = {
 					"Destroy {C:attention}#1#{} random cards,",
 					"then convert all remaining",
@@ -659,7 +659,7 @@ return {
 				},
 			},
 			c_mp_ectoplasm_sandbox = {
-				name = "Ectoplasm",
+				name = "Ectoplasm 2.0",
 				text = {
 					"Add {C:dark_edition}Negative{} to",
 					"a random {C:attention}Joker,",

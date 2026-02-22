@@ -1,8 +1,15 @@
+SMODS.Atlas({
+	key = "ouija_2",
+	path = "c_ouija_2.png",
+	px = 71,
+	py = 95,
+})
+
 SMODS.Consumable({
 	key = "ouija_standard",
 	set = "Spectral",
-	pos = { x = 7, y = 4 },
-	no_collection = true,
+	atlas = "ouija_2",
+	pos = { x = 0, y = 0 },
 	unlocked = true,
 	discovered = true,
 	config = { extra = { destroy = 3 }, mp_sticker_balanced = true },
@@ -134,4 +141,8 @@ SMODS.Consumable({
 	can_use = function(self, card)
 		return G.hand and #G.hand.cards >= card.ability.extra.destroy
 	end,
+	mp_credits = {
+		art = { "aura!" },
+		code = { "steph" },
+	},
 })
