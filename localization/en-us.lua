@@ -834,7 +834,7 @@ return {
 			k_standard_ranked = "Standard Ranked",
 			k_standard_ranked_description = "The official competitive ruleset.\n\nStandard ruleset with locked settings:\n- Attrition gamemode\n- The Order enabled\n- Requires recommended Steamodded version",
 			k_legacy_ranked = "Legacy Ranked",
-			k_legacy_ranked_description = "A minimal competitive ruleset.\n\nNo Multiplayer cards or balance changes\nexcept Hanging Chad and Justice. Has locked settings:\n- Attrition gamemode\n- The Order enabled\n- Requires recommended Steamodded version",
+			k_legacy_ranked_description = "A minimal competitive ruleset.\n\nNo Multiplayer cards or balance changes\nexcept Hanging Chad and Glass. Has locked settings:\n- Attrition gamemode\n- The Order enabled\n- Requires recommended Steamodded version",
 			k_badlatro = "Badlatro",
 			k_badlatro_description = "A weekly ruleset designed by @dr_monty_the_snek on the discord server\nthat has been added to the mod permanently.\n\nThis ruleset bans 48 jokers, consumables, tags, etc.",
 			k_attrition = "Attrition",
