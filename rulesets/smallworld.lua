@@ -4,16 +4,15 @@ MP.Ruleset({
 	standard = true,
 	banned_silent = {
 		"j_hanging_chad",
-		"j_idol",
 		"j_ticket",
 		"j_selzer",
 		"j_turtle_bean",
 		"j_bloodstone",
+		"c_ouija",
 	},
 	banned_jokers = {},
 	banned_consumables = {
 		"c_justice",
-		"c_ouija",
 	},
 	banned_vouchers = {},
 	banned_enhancements = {},
@@ -21,7 +20,6 @@ MP.Ruleset({
 	banned_blinds = {},
 	reworked_jokers = {
 		"j_mp_hanging_chad",
-		"j_mp_idol",
 		"j_mp_ticket",
 		"j_mp_seltzer",
 		"j_mp_turtle_bean",
@@ -31,7 +29,7 @@ MP.Ruleset({
 	},
 	reworked_vouchers = {},
 	reworked_enhancements = {
-		"m_glass",
+		"m_mp_display_glass",
 	},
 	reworked_tags = {},
 	reworked_blinds = {},

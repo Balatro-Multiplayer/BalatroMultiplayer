@@ -431,7 +431,15 @@ return {
     },
 
     Enhanced = {
-      m_mp_glass = {
+      m_mp_display_glass = {
+        name = "글래스 카드",
+        text = {
+          "{X:mult,C:white}X#1#{} 배수",
+          "{C:green}#2# / #3#{} 확률로",
+          "카드 파괴",
+        },
+      },
+      m_mp_sandbox_display_glass = {
         name = "글래스 카드",
         text = {
           "{X:mult,C:white}X#1#{} 배수",

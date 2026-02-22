@@ -103,7 +103,7 @@ MP.Ruleset({
 	end)(),
 	reworked_consumables = { "c_mp_ouija_standard", "c_mp_ectoplasm_sandbox" },
 	reworked_vouchers = {},
-	reworked_enhancements = { "m_glass" },
+	reworked_enhancements = { "m_mp_sandbox_display_glass" },
 	reworked_blinds = {},
 	reworked_tags = { "tag_mp_gambling_sandbox", "tag_mp_juggle_sandbox", "tag_mp_investment_sandbox" },
 

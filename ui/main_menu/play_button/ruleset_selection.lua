@@ -19,7 +19,7 @@ function G.UIDEF.ruleset_selection_options(mode)
 			name = "k_matchmaking",
 			buttons = {
 				{ button_id = "standard_ranked_ruleset_button", button_localize_key = "k_standard_ranked" },
-				{ button_id = "classic_ranked_ruleset_button", button_localize_key = "k_classic_ranked" },
+				{ button_id = "legacy_ranked_ruleset_button", button_localize_key = "k_legacy_ranked" },
 				{ button_id = "vanilla_ruleset_button", button_localize_key = "k_vanilla" },
 				{ button_id = "smallworld_ruleset_button", button_localize_key = "k_smallworld" },
 				{ button_id = "sandbox_ruleset_button", button_localize_key = "k_sandbox" },

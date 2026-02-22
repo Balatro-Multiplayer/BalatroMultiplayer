@@ -1,13 +1,11 @@
 MP.Ruleset({
-	key = "classic_ranked",
+	key = "legacy_ranked",
 	multiplayer_content = false,
 	banned_silent = {
 		"j_hanging_chad",
 	},
 	banned_jokers = {},
-	banned_consumables = {
-		"c_justice",
-	},
+	banned_consumables = {},
 	banned_vouchers = {},
 	banned_enhancements = {},
 	banned_tags = {},
@@ -17,7 +15,9 @@ MP.Ruleset({
 	},
 	reworked_consumables = {},
 	reworked_vouchers = {},
-	reworked_enhancements = {},
+	reworked_enhancements = {
+		"m_mp_display_glass",
+	},
 	reworked_tags = {},
 	reworked_blinds = {},
 	create_info_menu = function()
@@ -25,7 +25,7 @@ MP.Ruleset({
 			multiplayer_content = false,
 			forced_lobby_options = true,
 			forced_gamemode_text = "k_attrition",
-			description_key = "k_classic_ranked_description",
+			description_key = "k_legacy_ranked_description",
 		})
 	end,
 	forced_gamemode = "gamemode_mp_attrition",

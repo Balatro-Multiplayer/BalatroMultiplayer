@@ -30,19 +30,20 @@ return {
 			j_mp_seltzer = {
 				name = "Seltzer",
 				text = {
-					"Retrigger all",
-					"cards played for",
-					"the next {C:attention}#1#{} hands",
-					"Disabled in {C:attention}PvP Blind",
+					"Retrigger first {C:attention}#1#{}",
+					"played card(s) used",
+					"in scoring, gains",
+					"{C:attention}+1{} every round",
+					"{C:inactive}(Max {C:attention}#2#{C:inactive})",
 				},
 			},
 			j_mp_turtle_bean = {
 				name = "Turtle Bean",
 				text = {
 					"{C:attention}+#1#{} hand size,",
-					"reduces by",
-					"{C:red}#2#{} every round",
-					"Disabled in {C:attention}PvP Blind",
+					"increases by",
+					"{C:green}#2#{} every round",
+					"{C:inactive}(Max {C:attention}+#3#{C:inactive})",
 				},
 			},
 			j_mp_idol = {
@@ -435,7 +436,15 @@ return {
 			},
 		},
 		Enhanced = {
-			m_mp_glass = {
+			m_mp_display_glass = {
+				name = "Glass Card",
+				text = {
+					"{X:mult,C:white} X#1# {} Mult",
+					"{C:green}#2# in #3#{} chance to",
+					"destroy card",
+				},
+			},
+			m_mp_sandbox_display_glass = {
 				name = "Glass Card",
 				text = {
 					"{X:mult,C:white} X#1# {} Mult",
@@ -499,8 +508,9 @@ return {
 				name = "Violet Deck",
 				text = {
 					"{C:attention}+1{} Voucher in shop",
-					"During Ante {C:attention}1{}, Vouchers",
-					"are {C:attention}50%{} off",
+					"Vouchers are {C:attention}50%{} off ",
+					"during Ante {C:attention}1{}, and {C:attention}30%{} off",
+					"during Ante {C:attention}2"
 				},
 			},
 			b_mp_white = {
@@ -823,8 +833,8 @@ return {
 			k_minorleague_description = "Official Minor League Balatro ruleset.\n\nVanilla cards with competitive settings:\n- 210 second timer\n- The Order enabled\n- First timeout forgiven\n- Attrition gamemode",
 			k_standard_ranked = "Standard Ranked",
 			k_standard_ranked_description = "The official competitive ruleset.\n\nStandard ruleset with locked settings:\n- Attrition gamemode\n- The Order enabled\n- Requires recommended Steamodded version",
-			k_classic_ranked = "Classic Ranked",
-			k_classic_ranked_description = "A minimal competitive ruleset.\n\nNo Multiplayer cards or balance changes\nexcept Hanging Chad and Justice. Has locked settings:\n- Attrition gamemode\n- The Order enabled\n- Requires recommended Steamodded version",
+			k_legacy_ranked = "Legacy Ranked",
+			k_legacy_ranked_description = "A minimal competitive ruleset.\n\nNo Multiplayer cards or balance changes\nexcept Hanging Chad and Justice. Has locked settings:\n- Attrition gamemode\n- The Order enabled\n- Requires recommended Steamodded version",
 			k_badlatro = "Badlatro",
 			k_badlatro_description = "A weekly ruleset designed by @dr_monty_the_snek on the discord server\nthat has been added to the mod permanently.\n\nThis ruleset bans 48 jokers, consumables, tags, etc.",
 			k_attrition = "Attrition",
