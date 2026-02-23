@@ -27,10 +27,7 @@ MP.Ruleset({
 	forced_gamemode = "gamemode_mp_attrition",
 	forced_lobby_options = true,
 	is_disabled = function(self)
-		if SMODS.version ~= MP.SMODS_VERSION then
-			return localize({ type = "variable", key = "k_ruleset_disabled_smods_version", vars = { MP.SMODS_VERSION } })
-		end
-		return false
+		return MP.UTILS.check_smods_version() or MP.UTILS.check_lovely_version()
 	end,
 	force_lobby_options = function(self)
 		MP.LOBBY.config.the_order = true
