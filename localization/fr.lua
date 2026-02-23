@@ -139,7 +139,15 @@ return {
 			},
 		},
 		Enhanced = {
-			m_mp_glass = {
+			m_mp_display_glass = {
+				name = "Carte Verre",
+				text = {
+					"{X:mult,C:white} X#1# {} Multi",
+					"{C:green}#2# chance(s) sur #3#{} de",
+					"détruire la carte",
+				},
+			},
+			m_mp_sandbox_display_glass = {
 				name = "Carte Verre",
 				text = {
 					"{X:mult,C:white} X#1# {} Multi",

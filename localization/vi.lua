@@ -387,7 +387,15 @@ return {
 			},
 		},
 		Enhanced = {
-			m_mp_glass = {
+			m_mp_display_glass = {
+				name = "Lá Kính",
+				text = {
+					"{X:mult,C:white} X#1# {} Nhân",
+					"Xác suất {C:green}#2# trên #3#{}",
+					"để phá huỷ lá bài",
+				},
+			},
+			m_mp_sandbox_display_glass = {
 				name = "Lá Kính",
 				text = {
 					"{X:mult,C:white} X#1# {} Nhân",

@@ -5,43 +5,39 @@ SMODS.Joker({
 	discovered = true,
 	blueprint_compat = true,
 	eternal_compat = false,
-	rarity = 1,
+	rarity = 2,
 	cost = 5,
 	pos = { x = 3, y = 15 },
-	config = { extra = { hands_left = 10 }, mp_sticker_balanced = true },
+	config = { extra = { retrigger_count = 1, retrigger_max = 5 }, mp_sticker_balanced = true },
 	loc_vars = function(self, info_queue, card)
-		return { vars = { card.ability.extra.hands_left } }
+		return { vars = { card.ability.extra.retrigger_count, card.ability.extra.retrigger_max } }
 	end,
 	calculate = function(self, card, context)
-		if context.first_hand_drawn then
-			if MP.is_pvp_boss() then card.ability.extra.effect_disabled = true end
-			local eval = function()
-				return not MP.is_pvp_boss()
+		if context.repetition and context.cardarea == G.play then
+			for i = 1, math.min(card.ability.extra.retrigger_count, #context.scoring_hand) do
+				if context.other_card == context.scoring_hand[i] then
+					return {
+						message = localize("k_again_ex"),
+						repetitions = 1,
+						card = card,
+					}
+				end
 			end
-			juice_card_until(card, eval, true)
 		end
-		if context.repetition and context.cardarea == G.play and not MP.is_pvp_boss() then
-			return {
-				repetitions = 1,
-			}
-		end
-		if context.after and not context.blueprint and not MP.is_pvp_boss() then
-			if card.ability.extra.hands_left - 1 <= 0 then
+		if context.end_of_round and context.game_over == false and context.main_eval and not context.blueprint then
+			if card.ability.extra.retrigger_count + 1 > card.ability.extra.retrigger_max then
 				SMODS.destroy_cards(card, nil, nil, true)
 				return {
 					message = localize("k_drank_ex"),
 					colour = G.C.FILTER,
 				}
 			else
-				card.ability.extra.hands_left = card.ability.extra.hands_left - 1
+				card.ability.extra.retrigger_count = card.ability.extra.retrigger_count + 1
 				return {
-					message = card.ability.extra.hands_left .. "",
+					message = card.ability.extra.retrigger_count .. "",
 					colour = G.C.FILTER,
 				}
 			end
-		end
-		if context.end_of_round and context.game_over == false and context.main_eval then
-			card.ability.extra.effect_disabled = false
 		end
 	end,
 	mp_include = function(self)

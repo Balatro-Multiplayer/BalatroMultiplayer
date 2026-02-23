@@ -5,53 +5,40 @@ SMODS.Joker({
 	discovered = true,
 	blueprint_compat = false,
 	eternal_compat = false,
-	rarity = 1,
+	rarity = 2,
 	cost = 5,
 	pos = { x = 4, y = 13 },
-	config = { extra = { h_size = 5, h_mod = 1 }, mp_sticker_balanced = true },
+	config = { extra = { h_size = 1, h_max = 5, h_mod = 1 }, mp_sticker_balanced = true },
 	loc_vars = function(self, info_queue, card)
-		return { vars = { card.ability.extra.h_size, card.ability.extra.h_mod } }
+		return { vars = { card.ability.extra.h_size, card.ability.extra.h_mod, card.ability.extra.h_max } }
 	end,
 	calculate = function(self, card, context)
-		if context.first_hand_drawn and MP.is_pvp_boss() and not context.blueprint then
-			G.hand:change_size(-card.ability.extra.h_size)
-			card.ability.extra.effect_disabled = true
-		end
 		if context.end_of_round and context.game_over == false and context.main_eval and not context.blueprint then
-			if MP.is_pvp_boss() then
-				G.hand:change_size(card.ability.extra.h_size)
-				card.ability.extra.effect_disabled = false
+			if card.ability.extra.h_size + card.ability.extra.h_mod > card.ability.extra.h_max then
+				SMODS.destroy_cards(card, nil, nil, true)
+				return {
+					message = localize("k_eaten_ex"),
+					colour = G.C.FILTER,
+				}
 			else
-				if card.ability.extra.h_size - card.ability.extra.h_mod <= 0 then
-					SMODS.destroy_cards(card, nil, nil, true)
-					return {
-						message = localize("k_eaten_ex"),
-						colour = G.C.FILTER,
-					}
-				else
-					card.ability.extra.h_size = card.ability.extra.h_size - card.ability.extra.h_mod
-					G.hand:change_size(-card.ability.extra.h_mod)
-					return {
-						message = localize({
-							type = "variable",
-							key = "a_handsize_minus",
-							vars = { card.ability.extra.h_mod },
-						}),
-						colour = G.C.FILTER,
-					}
-				end
+				card.ability.extra.h_size = card.ability.extra.h_size + card.ability.extra.h_mod
+				G.hand:change_size(card.ability.extra.h_mod)
+				return {
+					message = localize({
+						type = "variable",
+						key = "a_handsize",
+						vars = { card.ability.extra.h_mod },
+					}),
+					colour = G.C.FILTER,
+				}
 			end
 		end
 	end,
 	add_to_deck = function(self, card, from_debuff)
-		if not MP.is_pvp_boss() then
-			G.hand:change_size(card.ability.extra.h_size)
-		else
-			card.ability.extra.effect_disabled = true
-		end
+		G.hand:change_size(card.ability.extra.h_size)
 	end,
 	remove_from_deck = function(self, card, from_debuff)
-		if not card.ability.extra.effect_disabled then G.hand:change_size(-card.ability.extra.h_size) end
+		G.hand:change_size(-card.ability.extra.h_size)
 	end,
 	mp_include = function(self)
 		return MP.UTILS.is_standard_ruleset() and MP.LOBBY.code

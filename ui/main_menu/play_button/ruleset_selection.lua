@@ -3,7 +3,7 @@ function G.UIDEF.ruleset_selection_options(mode)
 	MP.LOBBY.fetched_weekly = "smallworld" -- temp
 
 	-- SP defaults to vanilla, MP defaults to ranked
-	local default_ruleset = "ranked"
+	local default_ruleset = "standard_ranked"
 	local default_button = default_ruleset .. "_ruleset_button"
 	local ruleset_name = "ruleset_mp_" .. default_ruleset
 
@@ -18,7 +18,8 @@ function G.UIDEF.ruleset_selection_options(mode)
 		{
 			name = "k_matchmaking",
 			buttons = {
-				{ button_id = "ranked_ruleset_button", button_localize_key = "k_ranked" },
+				{ button_id = "standard_ranked_ruleset_button", button_localize_key = "k_standard_ranked" },
+				{ button_id = "legacy_ranked_ruleset_button", button_localize_key = "k_legacy_ranked" },
 				{ button_id = "vanilla_ruleset_button", button_localize_key = "k_vanilla" },
 				{ button_id = "smallworld_ruleset_button", button_localize_key = "k_smallworld" },
 				{ button_id = "sandbox_ruleset_button", button_localize_key = "k_sandbox" },
@@ -58,7 +59,7 @@ function G.FUNCS.change_ruleset_selection(e)
 		if G.FUNCS.weekly_interrupt(e) then return end
 	end
 
-	local default_button = mode == "sp" and "vanilla_ruleset_button" or "ranked_ruleset_button"
+	local default_button = mode == "sp" and "vanilla_ruleset_button" or "standard_ranked_ruleset_button"
 
 	MP.UI.Change_Main_Lobby_Options(
 		e,
