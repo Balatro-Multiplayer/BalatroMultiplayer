@@ -1,18 +1,14 @@
 MP.Ruleset({
 	key = "legacy_ranked",
 	multiplayer_content = false,
-	banned_silent = {
-		"j_hanging_chad",
-	},
+	banned_silent = {},
 	banned_jokers = {},
 	banned_consumables = {},
 	banned_vouchers = {},
 	banned_enhancements = {},
 	banned_tags = {},
 	banned_blinds = {},
-	reworked_jokers = {
-		"j_mp_hanging_chad",
-	},
+	reworked_jokers = {},
 	reworked_consumables = {},
 	reworked_vouchers = {},
 	reworked_enhancements = {
