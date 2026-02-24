@@ -22,14 +22,9 @@ local function get_warnings()
 		})
 	end
 
-	-- since `MP.LOBBY.ready_to_start` definition was rug pulled from me
-	-- i have to do this
 	local bothPlayersInLobby = MP.LOBBY.guest and MP.LOBBY.guest.config ~= nil
 
-	-- This is made to solve the extra credit issue
-	-- but we could use a more robust check with a list of known content mods
-	-- to for example display the ready up button etc if players have mods
-	-- that are incompatible
+	-- Content mod compatibility warnings (currently Extra Credit only)
 	if bothPlayersInLobby then
 		local hostExtraCreditVersion = MP.LOBBY.host
 			and MP.LOBBY.host.config
@@ -44,8 +39,6 @@ local function get_warnings()
 				SMODS.Gradients.warning_text,
 			})
 
-		-- Both players have Extra Credit with matching versions
-		-- TODO actually rewrite so we use that "current player" thingy I nixed earlier
 		elseif hostExtraCreditVersion ~= nil and hostExtraCreditVersion == guestExtraCreditVersion then
 			table.insert(warnings, {
 				"Extra Credit active - curated jokers replaced with full pool",
@@ -95,7 +88,6 @@ local function get_warnings()
 		})
 	end
 
-	-- ???: What is this supposed to accomplish?
 	if MP.LOBBY.username == "Guest" then table.insert(warnings, {
 		localize("k_set_name"),
 		G.C.UI.TEXT_LIGHT,
