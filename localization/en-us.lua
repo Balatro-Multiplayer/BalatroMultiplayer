@@ -28,23 +28,20 @@ return {
 		},
 		Joker = {
 			j_mp_seltzer = {
-				name = "Seltzer",
-				text = {
-					"Retrigger first {C:attention}#1#{}",
-					"played card(s) used",
-					"in scoring, gains",
-					"{C:attention}+1{} every round",
-					"{C:inactive}(Max {C:attention}#2#{C:inactive})",
-				},
+				name="Seltzer",
+                text={
+                    "Retrigger all",
+                    "cards played for",
+                    "the next {C:attention}#1#{} hands",
+                },
 			},
 			j_mp_turtle_bean = {
-				name = "Turtle Bean",
-				text = {
-					"{C:attention}+#1#{} hand size,",
-					"increases by",
-					"{C:green}#2#{} every round",
-					"{C:inactive}(Max {C:attention}+#3#{C:inactive})",
-				},
+				name="Turtle Bean",
+                text={
+                    "{C:attention}+#1#{} hand size,",
+                    "reduces by",
+                    "{C:red}#2#{} every round",
+                },
 			},
 			j_mp_idol = {
 				name = "The Idol",

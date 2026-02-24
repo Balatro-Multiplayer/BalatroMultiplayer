@@ -8,33 +8,27 @@ SMODS.Joker({
 	rarity = 2,
 	cost = 5,
 	pos = { x = 3, y = 15 },
-	config = { extra = { retrigger_count = 1, retrigger_max = 5 }, mp_sticker_balanced = true },
+	config = { extra = { hands_left = 8 }, mp_sticker_balanced = true },
 	loc_vars = function(self, info_queue, card)
-		return { vars = { card.ability.extra.retrigger_count, card.ability.extra.retrigger_max } }
+		return { vars = { card.ability.extra.hands_left } }
 	end,
 	calculate = function(self, card, context)
 		if context.repetition and context.cardarea == G.play then
-			for i = 1, math.min(card.ability.extra.retrigger_count, #context.scoring_hand) do
-				if context.other_card == context.scoring_hand[i] then
-					return {
-						message = localize("k_again_ex"),
-						repetitions = 1,
-						card = card,
-					}
-				end
-			end
+			return {
+				repetitions = 1,
+			}
 		end
-		if context.end_of_round and context.game_over == false and context.main_eval and not context.blueprint then
-			if card.ability.extra.retrigger_count + 1 > card.ability.extra.retrigger_max then
+		if context.after and not context.blueprint then
+			if card.ability.extra.hands_left - 1 <= 0 then
 				SMODS.destroy_cards(card, nil, nil, true)
 				return {
 					message = localize("k_drank_ex"),
 					colour = G.C.FILTER,
 				}
 			else
-				card.ability.extra.retrigger_count = card.ability.extra.retrigger_count + 1
+				card.ability.extra.hands_left = card.ability.extra.hands_left - 1
 				return {
-					message = card.ability.extra.retrigger_count .. "",
+					message = card.ability.extra.hands_left .. "",
 					colour = G.C.FILTER,
 				}
 			end
