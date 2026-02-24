@@ -50,4 +50,8 @@ SMODS.Back({ --Echo Deck
 			G.GAME.starting_params.ante_scaling = G.GAME.starting_params.ante_scaling + 0.2
 		end
 	end,
+	mp_credits = {
+		code = { "CampfireCollective" },
+		art = { "neatoqueen" },
+	},
 })
