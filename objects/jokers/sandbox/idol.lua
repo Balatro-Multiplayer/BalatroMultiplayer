@@ -1,5 +1,5 @@
 SMODS.Atlas({
-	key = "idol_sandbox_bw",
+	key = "idol_sandbox_zealot",
 	path = "j_idol_sandbox_bw.png",
 	px = 71,
 	py = 95,
@@ -60,21 +60,21 @@ function reset_idol_card()
 end
 
 SMODS.Joker({
-	key = "idol_sandbox_bw",
+	key = "idol_sandbox_zealot",
 	no_collection = MP.sandbox_no_collection,
 	unlocked = true,
 	discovered = true,
 	blueprint_compat = true,
 	rarity = 2,
 	cost = 6,
-	atlas = "idol_sandbox_bw",
+	atlas = "idol_sandbox_zealot",
 	config = { extra = { xmult = 1.5 }, mp_sticker_balanced = true },
 	add_to_deck = function(self, card, from_debuff)
-		G.GAME.banned_keys["j_mp_idol_sandbox_fantom"] = true
+		G.GAME.banned_keys["j_mp_idol_sandbox_collector"] = true
 		if G.shop_jokers and G.shop_jokers.cards then
 			for i = #G.shop_jokers.cards, 1, -1 do
 				local shop_card = G.shop_jokers.cards[i]
-				if shop_card.config.center.key == "j_mp_idol_sandbox_fantom" then
+				if shop_card.config.center.key == "j_mp_idol_sandbox_collector" then
 					shop_card.T.r = -0.2
 					shop_card:juice_up(0.3, 0.4)
 					shop_card:start_dissolve()
@@ -112,7 +112,7 @@ SMODS.Joker({
 })
 
 SMODS.Atlas({
-	key = "idol_sandbox_color",
+	key = "idol_sandbox_collector",
 	path = "j_idol_sandbox_color.png",
 	px = 71,
 	py = 95,
@@ -169,21 +169,21 @@ local function get_most_common_card()
 end
 
 SMODS.Joker({
-	key = "idol_sandbox_fantom",
+	key = "idol_sandbox_collector",
 	no_collection = MP.sandbox_no_collection,
 	unlocked = true,
 	discovered = true,
 	blueprint_compat = true,
 	rarity = 2,
 	cost = 6,
-	atlas = "idol_sandbox_color",
+	atlas = "idol_sandbox_collector",
 	config = { extra = { xmult = 1.0, xmult_per_card = 0.05 }, mp_sticker_balanced = true },
 	add_to_deck = function(self, card, from_debuff)
-		G.GAME.banned_keys["j_mp_idol_sandbox_bw"] = true
+		G.GAME.banned_keys["j_mp_idol_sandbox_zealot"] = true
 		if G.shop_jokers and G.shop_jokers.cards then
 			for i = #G.shop_jokers.cards, 1, -1 do
 				local shop_card = G.shop_jokers.cards[i]
-				if shop_card.config.center.key == "j_mp_idol_sandbox_bw" then
+				if shop_card.config.center.key == "j_mp_idol_sandbox_zealot" then
 					shop_card.T.r = -0.2
 					shop_card:juice_up(0.3, 0.4)
 					shop_card:start_dissolve()

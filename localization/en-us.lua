@@ -376,7 +376,7 @@ return {
 					"{C:inactive}(Currently {C:money}$#1#{C:inactive})",
 				},
 			},
-			j_mp_idol_sandbox_bw = {
+			j_mp_idol_sandbox_zealot = {
 				name = "Zealot Idol",
 				text = {
 					"Each played {C:attention}#1#{}",
@@ -385,7 +385,7 @@ return {
 					"{s:0.8}Card changes every round",
 				},
 			},
-			j_mp_idol_sandbox_fantom = {
+			j_mp_idol_sandbox_collector = {
 				name = "Collector's Idol",
 				text = {
 					"Most common card gives",

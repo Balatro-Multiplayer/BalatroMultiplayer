@@ -14,8 +14,8 @@ MP.SANDBOX.joker_mappings = {
 	{ sandbox = "j_mp_hit_the_road_sandbox", vanilla = "j_hit_the_road", active = true },
 	{ sandbox = "j_mp_golden_ticket_sandbox", vanilla = "j_ticket", active = true },
 	-- Idol variants (all map to same vanilla joker)
-	{ sandbox = "j_mp_idol_sandbox_bw", vanilla = "j_idol", active = true },
-	{ sandbox = "j_mp_idol_sandbox_fantom", vanilla = "j_idol", active = true },
+	{ sandbox = "j_mp_idol_sandbox_zealot", vanilla = "j_idol", active = true },
+	{ sandbox = "j_mp_idol_sandbox_collector", vanilla = "j_idol", active = true },
 
 	-- Out of rotation
 	{ sandbox = "j_mp_bloodstone_sandbox", vanilla = "j_bloodstone", active = false },
@@ -32,8 +32,7 @@ MP.SANDBOX.joker_mappings = {
 	{ sandbox = "j_mp_runner_sandbox", vanilla = "j_runner", active = false },
 	{ sandbox = "j_mp_satellite_sandbox", vanilla = "j_satellite", active = false },
 
-	-- Extra Credit jokers (group = "extra_credit")
-	-- Master list of 26 jokers, all active
+	-- Extra Credit jokers
 	{ sandbox = "j_mp_alloy_sandbox", vanilla = nil, active = true, group = "extra_credit" },
 	{ sandbox = "j_mp_ambrosia_sandbox", vanilla = nil, active = true, group = "extra_credit" },
 	{ sandbox = "j_mp_bobby_sandbox", vanilla = nil, active = true, group = "extra_credit" },
@@ -179,8 +178,8 @@ MP.Ruleset({
 --- @return nil
 local function select_random_idol()
 	local idol_keys = {
-		"j_mp_idol_sandbox_bw",
-		"j_mp_idol_sandbox_fantom",
+		"j_mp_idol_sandbox_zealot",
+		"j_mp_idol_sandbox_collector",
 	}
 	table.sort(idol_keys)
 
