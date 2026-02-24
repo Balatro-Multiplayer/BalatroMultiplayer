@@ -36,7 +36,7 @@ MP.UI = {}
 MP.ACTIONS = {}
 MP.MOD_ACTIONS = {}
 
--- Enable Alloy etc.
+-- SMODS flag: lets cards count as multiple enhancements at once (required by Alloy)
 MP.optional_features = { quantum_enhancements = true }
 
 function MP.register_mod_action(modAction, callback, modId)
