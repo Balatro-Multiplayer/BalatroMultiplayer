@@ -22,7 +22,31 @@ local function get_warnings()
 		})
 	end
 
-	local current_player = MP.LOBBY.is_host and MP.LOBBY.host or MP.LOBBY.guest
+	local bothPlayersInLobby = MP.LOBBY.guest and MP.LOBBY.guest.config ~= nil
+
+	-- Content mod compatibility warnings (currently Extra Credit only)
+	if bothPlayersInLobby then
+		local hostExtraCreditVersion = MP.LOBBY.host
+			and MP.LOBBY.host.config
+			and MP.LOBBY.host.config.Mods["extracredit"]
+		local guestExtraCreditVersion = MP.LOBBY.guest
+			and MP.LOBBY.guest.config
+			and MP.LOBBY.guest.config.Mods["extracredit"]
+
+		if hostExtraCreditVersion ~= guestExtraCreditVersion then
+			table.insert(warnings, {
+				"Extra Credit mismatch - players may see different jokers",
+				SMODS.Gradients.warning_text,
+			})
+
+		elseif hostExtraCreditVersion ~= nil and hostExtraCreditVersion == guestExtraCreditVersion then
+			table.insert(warnings, {
+				"Extra Credit active - curated jokers replaced with full pool",
+				G.C.GREEN,
+				0.25,
+			})
+		end
+	end
 
 	if MP.LOBBY.ready_to_start or not MP.LOBBY.is_host then
 		local hostSteamoddedVersion = MP.LOBBY.host and MP.LOBBY.host.config and MP.LOBBY.host.config.Mods["Steamodded"]
@@ -64,7 +88,6 @@ local function get_warnings()
 		})
 	end
 
-	-- ???: What is this supposed to accomplish?
 	if MP.LOBBY.username == "Guest" then table.insert(warnings, {
 		localize("k_set_name"),
 		G.C.UI.TEXT_LIGHT,

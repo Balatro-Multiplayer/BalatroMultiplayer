@@ -12,10 +12,10 @@ MP.SANDBOX.joker_mappings = {
 	{ sandbox = "j_mp_steel_joker_sandbox", vanilla = "j_steel_joker", active = true },
 	{ sandbox = "j_mp_baseball_sandbox", vanilla = "j_baseball", active = true },
 	{ sandbox = "j_mp_hit_the_road_sandbox", vanilla = "j_hit_the_road", active = true },
+	{ sandbox = "j_mp_golden_ticket_sandbox", vanilla = "j_ticket", active = true },
 	-- Idol variants (all map to same vanilla joker)
-	{ sandbox = "j_mp_idol_sandbox_bw", vanilla = "j_idol", active = true },
-	-- { sandbox = "j_mp_idol_sandbox_color", vanilla = "j_idol", active = true },
-	{ sandbox = "j_mp_idol_sandbox_fantom", vanilla = "j_idol", active = true },
+	{ sandbox = "j_mp_idol_sandbox_zealot", vanilla = "j_idol", active = true },
+	{ sandbox = "j_mp_idol_sandbox_collector", vanilla = "j_idol", active = true },
 
 	-- Out of rotation
 	{ sandbox = "j_mp_bloodstone_sandbox", vanilla = "j_bloodstone", active = false },
@@ -25,12 +25,40 @@ MP.SANDBOX.joker_mappings = {
 	{ sandbox = "j_mp_juggler_sandbox", vanilla = "j_juggler", active = false },
 	{ sandbox = "j_mp_loyalty_card_sandbox", vanilla = "j_loyalty_card", active = false },
 	{ sandbox = "j_mp_lucky_cat_sandbox", vanilla = "j_lucky_cat", active = false },
-	{ sandbox = "j_mp_magnet_sandbox", vanilla = nil, active = false }, -- No vanilla equivalent
+	{ sandbox = "j_mp_magnet_sandbox", vanilla = nil, active = false },
 	{ sandbox = "j_mp_order_sandbox", vanilla = "j_order", active = false },
 	{ sandbox = "j_mp_photograph_sandbox", vanilla = "j_photograph", active = false },
 	{ sandbox = "j_mp_ride_the_bus_sandbox", vanilla = "j_ride_the_bus", active = false },
 	{ sandbox = "j_mp_runner_sandbox", vanilla = "j_runner", active = false },
 	{ sandbox = "j_mp_satellite_sandbox", vanilla = "j_satellite", active = false },
+
+	-- Extra Credit jokers
+	{ sandbox = "j_mp_alloy_sandbox", vanilla = nil, active = true, group = "extra_credit" },
+	{ sandbox = "j_mp_ambrosia_sandbox", vanilla = nil, active = true, group = "extra_credit" },
+	{ sandbox = "j_mp_bobby_sandbox", vanilla = nil, active = true, group = "extra_credit" },
+	{ sandbox = "j_mp_candynecklace_sandbox", vanilla = nil, active = true, group = "extra_credit" },
+	{ sandbox = "j_mp_chainlightning_sandbox", vanilla = nil, active = true, group = "extra_credit" },
+	{ sandbox = "j_mp_clowncar_sandbox", vanilla = nil, active = true, group = "extra_credit" },
+	{ sandbox = "j_mp_clowncollege_sandbox", vanilla = nil, active = true, group = "extra_credit" },
+	{ sandbox = "j_mp_couponsheet_sandbox", vanilla = nil, active = true, group = "extra_credit" },
+	{ sandbox = "j_mp_doublerainbow_sandbox", vanilla = nil, active = true, group = "extra_credit" },
+	{ sandbox = "j_mp_espresso_sandbox", vanilla = nil, active = true, group = "extra_credit" },
+	{ sandbox = "j_mp_farmer_sandbox", vanilla = nil, active = true, group = "extra_credit" },
+	{ sandbox = "j_mp_forklift_sandbox", vanilla = nil, active = true, group = "extra_credit" },
+	{ sandbox = "j_mp_gofish_sandbox", vanilla = nil, active = true, group = "extra_credit" },
+	{ sandbox = "j_mp_hoarder_sandbox", vanilla = nil, active = true, group = "extra_credit" },
+	{ sandbox = "j_mp_jokalisa_sandbox", vanilla = nil, active = true, group = "extra_credit" },
+	{ sandbox = "j_mp_jokeroftheyear_sandbox", vanilla = nil, active = true, group = "extra_credit" },
+	{ sandbox = "j_mp_lucky7_sandbox", vanilla = nil, active = true, group = "extra_credit" },
+	{ sandbox = "j_mp_montehaul_sandbox", vanilla = nil, active = true, group = "extra_credit" },
+	{ sandbox = "j_mp_pocketaces_sandbox", vanilla = nil, active = true, group = "extra_credit" },
+	{ sandbox = "j_mp_pyromancer_sandbox", vanilla = nil, active = true, group = "extra_credit" },
+	{ sandbox = "j_mp_shipoftheseus_sandbox", vanilla = nil, active = true, group = "extra_credit" },
+	{ sandbox = "j_mp_starfruit_sandbox", vanilla = nil, active = true, group = "extra_credit" },
+	{ sandbox = "j_mp_trafficlight_sandbox", vanilla = nil, active = true, group = "extra_credit" },
+	{ sandbox = "j_mp_tuxedo_sandbox", vanilla = nil, active = true, group = "extra_credit" },
+	{ sandbox = "j_mp_warlock_sandbox", vanilla = nil, active = true, group = "extra_credit" },
+	{ sandbox = "j_mp_werewolf_sandbox", vanilla = nil, active = true, group = "extra_credit" },
 }
 
 --- Returns list of active sandbox joker keys
@@ -82,8 +110,21 @@ MP.Ruleset({
 	banned_blinds = {},
 
 	-- Shuffle reworked jokers to randomize the overview panel order
+	-- Only show extra_credit jokers + idol jokers + error jokers in overview (hide other sandbox jokers)
 	reworked_jokers = (function()
-		local jokers = MP.SANDBOX.get_active_sandbox_jokers()
+		local jokers = {}
+		local idol_jokers = {}
+
+		-- Collect extra_credit and idol jokers separately
+		for _, mapping in ipairs(MP.SANDBOX.joker_mappings) do
+			if mapping.active then
+				if mapping.group == "extra_credit" then
+					table.insert(jokers, mapping.sandbox)
+				elseif mapping.sandbox:find("idol") then
+					table.insert(idol_jokers, mapping.sandbox)
+				end
+			end
+		end
 
 		-- Add error jokers (for overview only, not in actual pool)
 		for i = 1, 14 do
@@ -97,6 +138,12 @@ MP.Ruleset({
 		for i = #jokers, 2, -1 do
 			local j = math.random(1, i)
 			jokers[i], jokers[j] = jokers[j], jokers[i]
+		end
+
+		-- Insert idol jokers in the middle
+		local middle = math.floor(#jokers / 2) + 1
+		for i, idol in ipairs(idol_jokers) do
+			table.insert(jokers, middle + i - 1, idol)
 		end
 
 		return jokers
@@ -131,9 +178,8 @@ MP.Ruleset({
 --- @return nil
 local function select_random_idol()
 	local idol_keys = {
-		"j_mp_idol_sandbox_bw",
-		--	"j_mp_idol_sandbox_color",
-		"j_mp_idol_sandbox_fantom",
+		"j_mp_idol_sandbox_zealot",
+		"j_mp_idol_sandbox_collector",
 	}
 	table.sort(idol_keys)
 
@@ -151,7 +197,16 @@ function MP.ApplyBans()
 	local ret = apply_bans_ref()
 
 	-- Apply sandbox-specific idol selection when in sandbox ruleset
-	if MP.is_ruleset_active("sandbox") then select_random_idol() end
+	if MP.is_ruleset_active("sandbox") then
+		select_random_idol()
+
+		if SMODS.Mods["extracredit"] and SMODS.Mods["extracredit"].can_load then
+			print("Banning sandbox jokers")
+			for _, mapping in ipairs(MP.SANDBOX.joker_mappings) do
+				if mapping.group == "extra_credit" then G.GAME.banned_keys[mapping.sandbox] = true end
+			end
+		end
+	end
 
 	return ret
 end

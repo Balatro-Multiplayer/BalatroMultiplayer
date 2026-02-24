@@ -353,7 +353,7 @@ return {
 					"{C:inactive}(Actualmente {C:money}$#1#{C:inactive})",
 				},
 			},
-			j_mp_idol_sandbox_bw = {
+			j_mp_idol_sandbox_zealot = {
 				name = "Ídolo fanático",
 				text = {
 					"Cada {C:attention}#1#{} jugada",
@@ -362,16 +362,7 @@ return {
 					"{s:0.8}La carta cambia cada ronda",
 				},
 			},
-			j_mp_idol_sandbox_color = {
-				name = "Ídolo berrinche",
-				text = {
-					"OLLA DE PRESIÓN DEVOCIONAL",
-					"acumulando VAPOR para {C:attention}#1#{} de {V:1}#3#{}",
-					"hasta una LIBERACIÓN EXPLOSIVA!!!!",
-					"{C:inactive}(Actualmente {X:mult,C:white} X#2# {C:inactive} multi)",
-				},
-			},
-			j_mp_idol_sandbox_fantom = {
+			j_mp_idol_sandbox_collector = {
 				name = "Ídolo meta",
 				text = {
 					"La carta más común da",

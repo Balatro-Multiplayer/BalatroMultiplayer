@@ -36,6 +36,9 @@ MP.UI = {}
 MP.ACTIONS = {}
 MP.MOD_ACTIONS = {}
 
+-- SMODS flag: lets cards count as multiple enhancements at once (required by Alloy)
+MP.optional_features = { quantum_enhancements = true }
+
 function MP.register_mod_action(modAction, callback, modId)
 	if not modId then
 		local mod = SMODS.current_mod
@@ -60,7 +63,7 @@ MP.PREVIEW = {
 
 MP.EXPERIMENTAL = {
 	use_new_networking = true,
-	show_sandbox_collection = false,
+	show_sandbox_collection = true,
 	alt_stakes = false,
 }
 
@@ -265,6 +268,7 @@ MP.load_mp_dir("objects/blinds")
 MP.load_mp_dir("objects/decks")
 MP.load_mp_dir("objects/jokers")
 MP.load_mp_dir("objects/jokers/sandbox")
+MP.load_mp_dir("objects/jokers/sandbox/extra-credit")
 MP.load_mp_dir("objects/jokers/standard")
 MP.load_mp_dir("objects/stakes")
 MP.load_mp_dir("objects/tags")
