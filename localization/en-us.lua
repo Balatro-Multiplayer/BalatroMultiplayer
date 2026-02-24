@@ -359,6 +359,14 @@ return {
 					"are {C:attention}retriggered{}",
 				},
 			},
+			j_mp_golden_ticket_sandbox = {
+				name = "Golden Ticket",
+				text = {
+					"{C:green}#2# in #3#{} chance for",
+					"{C:attention}Gold{} cards to earn",
+					"{C:money}$#1#{} when played",
+				},
+			},
 			j_mp_satellite_sandbox = {
 				name = "Satellite",
 				text = {
@@ -377,17 +385,8 @@ return {
 					"{s:0.8}Card changes every round",
 				},
 			},
-			j_mp_idol_sandbox_color = {
-				name = "Tantrum Idol",
-				text = {
-					"DEVOTIONAL PRESSURE COOKER",
-					"building STEAM for {C:attention}#1#{} of {V:1}#3#{}",
-					"until EXPLOSIVE RELEASE!!!!",
-					"{C:inactive}(Currently {X:mult,C:white} X#2# {C:inactive} Mult)",
-				},
-			},
 			j_mp_idol_sandbox_fantom = {
-				name = "Meta Idol",
+				name = "Collector's Idol",
 				text = {
 					"Most common card gives",
 					"{X:mult,C:white}X#3#{} Mult when scored",
@@ -398,11 +397,228 @@ return {
 			j_mp_error_sandbox = {
 				name = "????",
 				text = {
-					-- "PREVIEW DISABLED",
 					"{X:purple,C:white,s:0.85}something's{} {X:purple,C:white,s:0.85}wrong",
-					-- "PREVIEW DISABLED",
-					-- "PREVIEW DISABLED",
-					-- "{C:inactive}(CURRENTLY {C:money}$7{C:inactive})",
+				},
+			},
+			j_mp_seltzer_sandbox = {
+				name = "Seltzer",
+				text = {
+					"Retrigger all",
+					"cards played for",
+					"the next {C:attention}#1#{} hands",
+					"{C:attention}(Disabled in PvP Blind){}",
+				},
+			},
+			j_mp_clowncollege_sandbox = {
+				name = "Clown College",
+				text = {
+					"{C:attention}Fill{} consumable slots with",
+					"{C:tarot}The Fool{} after",
+					"{C:attention}Boss Blind{} is defeated",
+					"{C:inactive}(Must have room)",
+				},
+			},
+			j_mp_alloy_sandbox = {
+				name = "Alloy",
+				text = {
+					"{C:attention}Gold Cards{} are also",
+					"considered {C:attention}Steel Cards{}",
+					"{C:attention}Steel Cards{} are also",
+					"considered {C:attention}Gold Cards{}",
+				},
+			},
+			j_mp_ambrosia_sandbox = {
+				name = "Ambrosia",
+				text = {
+					"{C:attention}Fill{} consumable slots with",
+					"{C:spectral}Spectral Cards{} whenever a",
+					"{C:attention}blind{} is {C:attention}skipped{}, destroyed",
+					"when any {C:spectral}Spectral Card{} is {C:attention}sold",
+					"{C:inactive}(Must have room)",
+				},
+			},
+			j_mp_bobby_sandbox = {
+				name = "Bobby",
+				text = {
+					"When {C:attention}Blind{} is selected,",
+					"lose {C:attention}#1#{} Hands and gain",
+					"{C:red}+#1#{} Discards for each Hand lost",
+				},
+			},
+			j_mp_candynecklace_sandbox = {
+				name = "Candy Necklace",
+				text = {
+					"At end of {C:attention}shop{}, create",
+					"a random {C:attention}Booster Pack Tag",
+					"{C:inactive}(#1# uses left){C:inactive}",
+				},
+			},
+			j_mp_chainlightning_sandbox = {
+				name = "Chain Lightning",
+				text = {
+					"Played {C:attention}Mult Cards{} give",
+					"{X:mult,C:white}X#1#{} Mult when scored,",
+					"then increase this by {X:mult,C:white}X#2#",
+					"{C:inactive}(Resets each hand)",
+				},
+			},
+			j_mp_clowncar_sandbox = {
+				name = "Clown Car",
+				text = {
+					"{C:mult}+#1#{} Mult and {C:money}-$#2#",
+					"{C:attention}before{} cards are scored",
+				},
+			},
+			j_mp_couponsheet_sandbox = {
+				name = "Coupon Sheet",
+				text = {
+					"Create a {C:attention}Coupon Tag",
+					"and a {C:attention}Voucher Tag",
+					"after {C:attention}Boss Blind{} is defeated",
+				},
+			},
+			j_mp_doublerainbow_sandbox = {
+				name = "Double Rainbow",
+				text = {
+					"{C:attention}Retrigger{} all {C:attention}Lucky Cards{}",
+				},
+			},
+			j_mp_espresso_sandbox = {
+				name = "Espresso",
+				text = {
+					"Gain {C:money}$#1#{} and destroy this",
+					"card when {C:attention}Blind{} is skipped",
+					"Decreases by {C:money}$#2#{} at end of round",
+				},
+			},
+			j_mp_farmer_sandbox = {
+				name = "Farmer",
+				text = {
+					"Cards with {V:1}#2#{} suit",
+					"held in hand give {C:money}$#1#",
+					"at end of round",
+					"{s:0.8}suit changes at end of round",
+				},
+			},
+			j_mp_forklift_sandbox = {
+				name = "Forklift",
+				text = {
+					"{C:attention}+#1#{} Consumable Slots",
+				},
+			},
+			j_mp_gofish_sandbox = {
+				name = "Go Fish",
+				text = {
+					"The {C:attention}first time{} that a",
+					"{C:attention}played hand{} contains any",
+					"scoring {C:attention}#1#s{}, destroy them",
+					"{s:0.8}rank changes at end of round",
+				},
+			},
+			j_mp_hoarder_sandbox = {
+				name = "Hoarder",
+				text = {
+					"This Joker gains {C:money}$#1#{} of sell value",
+					"whenever {C:money}money{} is earned",
+				},
+			},
+			j_mp_jokalisa_sandbox = {
+				name = "Joka Lisa",
+				text = {
+					"Gains {X:mult,C:white}X#2#{} Mult for",
+					"each {C:attention}unique enhancement",
+					"in scoring hand",
+					"{C:inactive}(Currently {X:mult,C:white}X#1#{C:inactive})",
+				},
+			},
+			j_mp_jokeroftheyear_sandbox = {
+				name = "Joker of the Year",
+				text = {
+					"If played hand has",
+					"{C:attention}5{} scoring cards,",
+					"{C:attention}retrigger{} played cards",
+				},
+			},
+			j_mp_lucky7_sandbox = {
+				name = "Lucky 7",
+				text = {
+					"If played hand contains",
+					"a scoring {C:attention}7{}, all played",
+					"cards count as {C:attention}Lucky Cards",
+				},
+			},
+			j_mp_montehaul_sandbox = {
+				name = "Monte Haul",
+				text = {
+					"After {C:attention}1 round{}, sell this card",
+					"to gain {C:attention}2{} random {C:attention}Joker Tags",
+					"{C:inactive}(Currently {C:attention}#1#{C:inactive} rounds)",
+				},
+			},
+			j_mp_pocketaces_sandbox = {
+				name = "Pocket Aces",
+				text = {
+					"Earn {C:money}$#1#{} at end of round",
+					"Played {C:attention}Aces{} increase payout",
+					"by {C:money}$#2#{}, resets each {C:attention}Ante",
+				},
+			},
+			j_mp_pyromancer_sandbox = {
+				name = "Pyromancer",
+				text = {
+					"{C:mult}+#1#{} Mult if",
+					"remaining {C:attention}Hands{} are less",
+					"than or equal to {C:attention}Discards",
+				},
+			},
+			j_mp_shipoftheseus_sandbox = {
+				name = "Ship of Theseus",
+				text = {
+					"Whenever a {C:attention}Playing Card{} is {C:attention}destroyed",
+					"add a {C:attention}copy{} of it to your {C:attention}deck",
+					"and this joker gains {X:mult,C:white}X#2#{} Mult",
+					"{C:inactive}(Currently {X:mult,C:white}X#1#{C:inactive} Mult)",
+				},
+			},
+			j_mp_starfruit_sandbox = {
+				name = "Starfruit",
+				text = {
+					"{C:attention}First played hand{} each round",
+					"has a {C:green}#2# in #3#{} chance",
+					"to gain {C:attention}1{} level",
+					"{C:inactive}({}{C:attention}#1#{}{C:inactive} rounds remaining)",
+				},
+			},
+			j_mp_trafficlight_sandbox = {
+				name = "Traffic Light",
+				text = {
+					"{X:mult,C:white}X#1#{} Mult",
+					"Decreases by {X:mult,C:white}X#2#{} after",
+					"each hand, resets after {X:mult,C:white}X0.5",
+				},
+			},
+			j_mp_tuxedo_sandbox = {
+				name = "Tuxedo",
+				text = {
+					"{C:attention}Retrigger{} all cards",
+					"with {V:1}#1#{} suit",
+					"{s:0.8}suit changes at end of round",
+				},
+			},
+			j_mp_warlock_sandbox = {
+				name = "Warlock",
+				text = {
+					"{C:green}#1# in #2#{} chance for played",
+					"{C:attention}Lucky Cards{} to be {C:red}destroyed",
+					"and spawn a {C:spectral}Spectral Card",
+					"{C:inactive}(Must have room)",
+				},
+			},
+			j_mp_werewolf_sandbox = {
+				name = "Werewolf",
+				text = {
+					"Played cards that are",
+					"{C:attention}enhanced{} become {C:attention}Wild Cards",
 				},
 			},
 		},
@@ -523,6 +739,13 @@ return {
 			},
 		},
 		Other = {
+			mp_sticker_extra_credit = {
+				name = "Extra Credit",
+				text = {
+					"Made with friends from",
+					"Balatro University!",
+				},
+			},
 			current_nemesis = {
 				name = "Nemesis",
 				text = {
@@ -682,6 +905,7 @@ return {
 	misc = {
 		labels = {
 			mp_phantom = "Phantom",
+			mp_sticker_extra_credit = "Extra Credit",
 			mp_sticker_persistent = "Persistent",
 			mp_sticker_unreliable = "Unreliable",
 			mp_sticker_draining = "Draining",
@@ -819,8 +1043,8 @@ return {
 			k_current_seed = "Current seed: ",
 			k_random = "Random",
 			k_standard = "Standard",
-			k_sandbox = "Sandbox",
-			k_sandbox_description = "Three jealous Idols now compete for your run!\nTwelve jokers replaced with personality disorders.\nOuija destroys cards instead of hand size.\nScore preview disabled. No flowcharts.\nEverything else you knew? Check the wiki!",
+			k_sandbox = "Sandbox: Extra Credit",
+			k_sandbox_description = "26 new jokers from Extra Credit join the roster.\nIdol splits into two: Zealot and Collector's. You pick one, the other's gone.\nNew Spectrals, reworked comeback gold, no score preview.\nThe meta's wide open. Built with friends at Balatro University.\n",
 			k_vanilla = "Vanilla",
 			k_vanilla_description = "The original Balatro experience.\n\nNo Multiplayer jokers, no balance changes.\nJust the base game as it was designed.\n\nMultiplayer features like the timer are still available\nbut can be disabled in Lobby Options.",
 			k_blitz = "Standard",

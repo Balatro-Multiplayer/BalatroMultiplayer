@@ -47,6 +47,7 @@ SMODS.Joker({
 	add_to_deck = function(self, card, from_debuff)
 		if card.ability.extra.suit == nil then card.ability.extra.suit = G.GAME.current_round.castle_card.suit end
 	end,
+	mp_credits = { code = { "steph" } },
 	mp_include = function(self)
 		return MP.SANDBOX.is_joker_allowed(self.key)
 	end,
