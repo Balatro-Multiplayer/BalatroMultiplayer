@@ -400,15 +400,6 @@ return {
 					"{X:purple,C:white,s:0.85}something's{} {X:purple,C:white,s:0.85}wrong",
 				},
 			},
-			j_mp_seltzer_sandbox = {
-				name = "Seltzer",
-				text = {
-					"Retrigger all",
-					"cards played for",
-					"the next {C:attention}#1#{} hands",
-					"{C:attention}(Disabled in PvP Blind){}",
-				},
-			},
 			j_mp_clowncollege_sandbox = {
 				name = "Clown College",
 				text = {
@@ -726,7 +717,7 @@ return {
 					"{C:attention}+1{} Voucher in shop",
 					"Vouchers are {C:attention}50%{} off ",
 					"during Ante {C:attention}1{}, and {C:attention}30%{} off",
-					"during Ante {C:attention}2"
+					"during Ante {C:attention}2",
 				},
 			},
 			b_mp_white = {

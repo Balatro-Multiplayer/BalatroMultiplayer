@@ -36,6 +36,9 @@ MP.UI = {}
 MP.ACTIONS = {}
 MP.MOD_ACTIONS = {}
 
+-- Enable Alloy etc.
+MP.optional_features = { quantum_enhancements = true }
+
 function MP.register_mod_action(modAction, callback, modId)
 	if not modId then
 		local mod = SMODS.current_mod
@@ -60,7 +63,7 @@ MP.PREVIEW = {
 
 MP.EXPERIMENTAL = {
 	use_new_networking = true,
-	show_sandbox_collection = false,
+	show_sandbox_collection = true,
 	alt_stakes = false,
 }
 
