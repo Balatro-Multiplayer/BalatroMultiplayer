@@ -59,7 +59,9 @@ function G.FUNCS.change_ruleset_selection(e)
 		if G.FUNCS.weekly_interrupt(e) then return end
 	end
 
-	local default_button = mode == "sp" and "vanilla_ruleset_button" or "standard_ranked_ruleset_button"
+	-- this currently doesn't work properly
+	-- local default_button = mode == "sp" and "vanilla_ruleset_button" or "standard_ranked_ruleset_button"
+	local default_button = "standard_ranked_ruleset_button"	
 
 	MP.UI.Change_Main_Lobby_Options(
 		e,
@@ -238,25 +240,12 @@ end
 local function create_bans_and_reworks_tabs(ruleset_or_gamemode, is_banned_tab, chosen_tab_idx)
 	local banned_cards_tabs = {}
 
-	local function copy_all_banned_ids(global_bans, ruleset_bans, gamemode_bans)
+	local function merge_lists(lists)
 		local seen = {}
 		local ret = {}
-		for v, _ in pairs(global_bans) do
-			if not seen[v] then
-				seen[v] = true
-				ret[#ret + 1] = v
-			end
-		end
-		if ruleset_bans then
-			for _, v in ipairs(ruleset_bans) do
-				if not seen[v] then
-					seen[v] = true
-					table.insert(ret, v)
-				end
-			end
-		end
-		if gamemode_bans then
-			for _, v in ipairs(gamemode_bans) do
+		for _, tbl in ipairs(lists) do
+			tbl = tbl or {}
+			for _, v in ipairs(tbl) do
 				if not seen[v] then
 					seen[v] = true
 					table.insert(ret, v)
@@ -266,100 +255,44 @@ local function create_bans_and_reworks_tabs(ruleset_or_gamemode, is_banned_tab, 
 		return ret
 	end
 
-	local function merge_lists(list1, list2)
-		local seen = {}
-		local ret = {}
-		if list1 then
-			for _, v in ipairs(list1) do
-				if not seen[v] then
-					seen[v] = true
-					table.insert(ret, v)
-				end
-			end
-		end
-		if list2 then
-			for _, v in ipairs(list2) do
-				if not seen[v] then
-					seen[v] = true
-					table.insert(ret, v)
-				end
-			end
-		end
-		return ret
-	end
-
-	local forced_gamemode = nil
+	local forced_gamemode = {}
 	if ruleset_or_gamemode.forced_gamemode then forced_gamemode = MP.Gamemodes[ruleset_or_gamemode.forced_gamemode] end
 
-	for k, v in ipairs({
-		{
-			type = localize("b_jokers"),
-			obj_ids = is_banned_tab
-					and copy_all_banned_ids(
-						MP.DECK.BANNED_JOKERS,
-						ruleset_or_gamemode.banned_jokers,
-						forced_gamemode and forced_gamemode.banned_jokers
-					)
-				or merge_lists(ruleset_or_gamemode.reworked_jokers, forced_gamemode and forced_gamemode.reworked_jokers),
-		},
-		{
-			type = localize("b_stat_consumables"),
-			obj_ids = is_banned_tab and copy_all_banned_ids(
-				MP.DECK.BANNED_CONSUMABLES,
-				ruleset_or_gamemode.banned_consumables,
-				forced_gamemode and forced_gamemode.banned_consumables
-			) or merge_lists(
-				ruleset_or_gamemode.reworked_consumables,
-				forced_gamemode and forced_gamemode.reworked_consumables
-			),
-		},
-		{
-			type = localize("b_vouchers"),
-			obj_ids = is_banned_tab and copy_all_banned_ids(
-				MP.DECK.BANNED_VOUCHERS,
-				ruleset_or_gamemode.banned_vouchers,
-				forced_gamemode and forced_gamemode.banned_vouchers
-			) or merge_lists(
-				ruleset_or_gamemode.reworked_vouchers,
-				forced_gamemode and forced_gamemode.reworked_vouchers
-			),
-		},
-		{
-			type = localize("b_enhanced_cards"),
-			obj_ids = is_banned_tab and copy_all_banned_ids(
-				MP.DECK.BANNED_ENHANCEMENTS,
-				ruleset_or_gamemode.banned_enhancements,
-				forced_gamemode and forced_gamemode.banned_enhancements
-			) or merge_lists(
-				ruleset_or_gamemode.reworked_enhancements,
-				forced_gamemode and forced_gamemode.reworked_enhancements
-			),
-		},
-		{
-			type = localize("k_other"),
-			obj_ids = is_banned_tab and {
-				tags = copy_all_banned_ids(
-					MP.DECK.BANNED_TAGS,
-					ruleset_or_gamemode.banned_tags,
-					forced_gamemode and forced_gamemode.banned_tags
-				),
-				blinds = copy_all_banned_ids(
-					MP.DECK.BANNED_BLINDS,
-					ruleset_or_gamemode.banned_blinds,
-					forced_gamemode and forced_gamemode.banned_blinds
-				),
-			} or {
-				tags = merge_lists(
-					ruleset_or_gamemode.reworked_tags or {},
-					forced_gamemode and forced_gamemode.reworked_tags
-				),
-				blinds = merge_lists(
-					ruleset_or_gamemode.reworked_blinds or {},
-					forced_gamemode and forced_gamemode.reworked_blinds
-				),
-			},
-		},
-	}) do
+	local tabs = {}
+	local loc_keys = {
+		jokers = "b_jokers",
+		consumables = "b_stat_consumables",
+		vouchers = "b_vouchers",
+		enhancements = "b_enhanced_cards",
+		other = "k_other",
+	}
+	local function copy_list(key)
+		if is_banned_tab then
+			return merge_lists({
+				MP.DECK["BANNED_"..string.upper(key)],
+				ruleset_or_gamemode["banned_"..key],
+				forced_gamemode["banned_"..key],
+			})
+		else
+			return merge_lists({ruleset_or_gamemode["reworked_"..key], forced_gamemode["reworked_"..key]})
+		end
+	end
+	for _, v in ipairs({"jokers", "consumables", "vouchers", "enhancements", "other"}) do
+		local entry = {type = localize(loc_keys[v])}
+		if v ~= "other" then
+			entry.obj_ids = copy_list(v)
+		else
+			entry.obj_ids = {
+				blinds = copy_list("blinds"),
+				tags = copy_list("tags")
+			}
+		end
+
+		tabs[#tabs+1] = entry
+	end
+	
+
+	for k, v in ipairs(tabs) do
 		v.idx = k
 		v.is_banned_tab = is_banned_tab
 		local tab_def = {

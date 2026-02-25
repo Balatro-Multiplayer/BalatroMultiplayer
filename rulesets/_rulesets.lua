@@ -86,8 +86,8 @@ function MP.ApplyBans()
 					G.GAME.banned_keys[v] = true
 				end
 			end
-			for k, v in pairs(MP.DECK["BANNED_" .. string.upper(table)]) do
-				G.GAME.banned_keys[k] = true
+			for _, v in pairs(MP.DECK["BANNED_" .. string.upper(table)]) do
+				G.GAME.banned_keys[v] = true
 			end
 		end
 		for _, v in ipairs(ruleset["banned_silent"] or {}) do
