@@ -243,7 +243,7 @@ local function create_bans_and_reworks_tabs(ruleset_or_gamemode, is_banned_tab, 
 	local function merge_lists(lists)
 		local seen = {}
 		local ret = {}
-		for _, tbl in ipairs(lists) do
+		for _, tbl in pairs(lists) do
 			tbl = tbl or {}
 			for _, v in ipairs(tbl) do
 				if not seen[v] then
