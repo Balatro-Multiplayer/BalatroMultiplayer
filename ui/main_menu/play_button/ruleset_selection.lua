@@ -5,8 +5,12 @@ function G.UIDEF.ruleset_selection_options(mode)
 	-- SP defaults to vanilla, MP defaults to ranked
 	local default_ruleset = "standard_ranked"
 	local default_button = default_ruleset .. "_ruleset_button"
-	local ruleset_name = "ruleset_mp_" .. default_ruleset
 
+	if mode == "sp" then
+		MP.SP.ruleset = "ruleset_mp_" .. default_ruleset
+	else
+		MP.LOBBY.config.ruleset = "ruleset_mp_" .. default_ruleset
+	end
 	MP.LoadReworks(default_ruleset)
 
 	local default_ruleset_area = UIBox({
