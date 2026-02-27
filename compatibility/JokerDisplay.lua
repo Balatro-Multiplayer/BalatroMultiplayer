@@ -252,8 +252,7 @@ if SMODS.Mods["JokerDisplay"] and SMODS.Mods["JokerDisplay"].can_load then
 				card.joker_display_values.count = count
 				local numerator, denominator = 1, card.ability.extra.odds
 				if SMODS then
-					numerator, denominator =
-						SMODS.get_probability_vars(card, numerator, denominator, "bloodstone")
+					numerator, denominator = SMODS.get_probability_vars(card, numerator, denominator, "bloodstone")
 				end
 				card.joker_display_values.odds = localize({
 					type = "variable",

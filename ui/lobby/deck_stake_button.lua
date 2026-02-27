@@ -43,4 +43,3 @@ function MP.UI.create_lobby_deck_button(text_scale, back, stake)
 		})
 	end
 end
-

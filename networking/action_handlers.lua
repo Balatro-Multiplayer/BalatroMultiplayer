@@ -54,9 +54,7 @@ local function action_joinedLobby(code, type, token)
 	MP.LOBBY.type = type
 	MP.LOBBY.ready_to_start = false
 	-- Store reconnect info for potential future reconnection
-	if token then
-		reconnectToken = token
-	end
+	if token then reconnectToken = token end
 	lastLobbyCode = code
 	MP.ACTIONS.sync_client()
 	MP.ACTIONS.lobby_info()
@@ -1026,9 +1024,7 @@ function MP.ACTIONS.modded(modId, modAction, params, target)
 			msg[k] = v
 		end
 	end
-	if target then
-		msg.target = target
-	end
+	if target then msg.target = target end
 	Client.send(msg)
 end
 
@@ -1183,9 +1179,7 @@ function Game:update(dt)
 				action_pause_ante_timer(parsedAction.time)
 			elseif parsedAction.action == "moddedAction" then
 				local registry = MP.MOD_ACTIONS[parsedAction.modId]
-				if registry and registry[parsedAction.modAction] then
-					registry[parsedAction.modAction](parsedAction)
-				end
+				if registry and registry[parsedAction.modAction] then registry[parsedAction.modAction](parsedAction) end
 			elseif parsedAction.action == "error" then
 				action_error(parsedAction.message)
 			elseif parsedAction.action == "keepAlive" then

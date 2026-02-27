@@ -65,7 +65,7 @@ function G.FUNCS.change_ruleset_selection(e)
 
 	-- this currently doesn't work properly
 	-- local default_button = mode == "sp" and "vanilla_ruleset_button" or "standard_ranked_ruleset_button"
-	local default_button = "standard_ranked_ruleset_button"	
+	local default_button = "standard_ranked_ruleset_button"
 
 	MP.UI.Change_Main_Lobby_Options(
 		e,
@@ -273,28 +273,27 @@ local function create_bans_and_reworks_tabs(ruleset_or_gamemode, is_banned_tab, 
 	local function copy_list(key)
 		if is_banned_tab then
 			return merge_lists({
-				MP.DECK["BANNED_"..string.upper(key)],
-				ruleset_or_gamemode["banned_"..key],
-				forced_gamemode["banned_"..key],
+				MP.DECK["BANNED_" .. string.upper(key)],
+				ruleset_or_gamemode["banned_" .. key],
+				forced_gamemode["banned_" .. key],
 			})
 		else
-			return merge_lists({ruleset_or_gamemode["reworked_"..key], forced_gamemode["reworked_"..key]})
+			return merge_lists({ ruleset_or_gamemode["reworked_" .. key], forced_gamemode["reworked_" .. key] })
 		end
 	end
-	for _, v in ipairs({"jokers", "consumables", "vouchers", "enhancements", "other"}) do
-		local entry = {type = localize(loc_keys[v])}
+	for _, v in ipairs({ "jokers", "consumables", "vouchers", "enhancements", "other" }) do
+		local entry = { type = localize(loc_keys[v]) }
 		if v ~= "other" then
 			entry.obj_ids = copy_list(v)
 		else
 			entry.obj_ids = {
 				blinds = copy_list("blinds"),
-				tags = copy_list("tags")
+				tags = copy_list("tags"),
 			}
 		end
 
-		tabs[#tabs+1] = entry
+		tabs[#tabs + 1] = entry
 	end
-	
 
 	for k, v in ipairs(tabs) do
 		v.idx = k

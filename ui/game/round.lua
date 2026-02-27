@@ -56,4 +56,3 @@ function EventManager:add_event(event, queue, front)
 	end
 	return add_event_ref(self, event, queue, front)
 end
-

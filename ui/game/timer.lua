@@ -177,4 +177,3 @@ MP.timer_event = Event({
 		MP.timer_event.start_timer = false
 	end,
 })
-

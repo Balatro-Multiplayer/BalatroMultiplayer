@@ -38,7 +38,6 @@ local function get_warnings()
 				"Extra Credit mismatch - players may see different jokers",
 				SMODS.Gradients.warning_text,
 			})
-
 		elseif hostExtraCreditVersion ~= nil and hostExtraCreditVersion == guestExtraCreditVersion then
 			table.insert(warnings, {
 				"Extra Credit active - curated jokers replaced with full pool",

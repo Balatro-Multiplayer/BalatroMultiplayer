@@ -447,5 +447,3 @@ function G.UIDEF.multiplayer_deck()
 		false
 	)
 end
-
-
