@@ -24,7 +24,6 @@ function G.UIDEF.ruleset_selection_options(mode)
 			buttons = {
 				{ button_id = "standard_ranked_ruleset_button", button_localize_key = "k_standard_ranked" },
 				{ button_id = "legacy_ranked_ruleset_button", button_localize_key = "k_legacy_ranked" },
-				{ button_id = "vanilla_ruleset_button", button_localize_key = "k_vanilla" },
 				{ button_id = "smallworld_ruleset_button", button_localize_key = "k_smallworld" },
 				{ button_id = "sandbox_ruleset_button", button_localize_key = "k_sandbox" },
 			},
@@ -34,6 +33,7 @@ function G.UIDEF.ruleset_selection_options(mode)
 			buttons = {
 				{ button_id = "blitz_ruleset_button", button_localize_key = "k_blitz" },
 				{ button_id = "traditional_ruleset_button", button_localize_key = "k_traditional" },
+				{ button_id = "vanilla_ruleset_button", button_localize_key = "k_vanilla" },
 				{ button_id = "badlatro_ruleset_button", button_localize_key = "k_badlatro" },
 			},
 		},
