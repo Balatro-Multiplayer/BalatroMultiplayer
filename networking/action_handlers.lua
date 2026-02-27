@@ -26,6 +26,10 @@ function MP.ACTIONS.set_blind_col(num)
 	MP.LOBBY.blind_col = num or 1
 end
 
+-- Reconnection state (persists across connections)
+local reconnectToken = nil
+local lastLobbyCode = nil
+
 local function action_connected()
 	MP.LOBBY.connected = true
 	MP.UI.update_connection_status()
@@ -34,15 +38,51 @@ local function action_connected()
 		username = MP.LOBBY.username .. "~" .. MP.LOBBY.blind_col,
 		modHash = MP.MOD_STRING,
 	})
+
+	-- If we have reconnect info, attempt to rejoin the lobby
+	if reconnectToken and lastLobbyCode then
+		Client.send({
+			action = "rejoinLobby",
+			code = lastLobbyCode,
+			reconnectToken = reconnectToken,
+		})
+	end
 end
 
-local function action_joinedLobby(code, type)
+local function action_joinedLobby(code, type, token)
 	MP.LOBBY.code = code
 	MP.LOBBY.type = type
 	MP.LOBBY.ready_to_start = false
+	-- Store reconnect info for potential future reconnection
+	if token then
+		reconnectToken = token
+	end
+	lastLobbyCode = code
 	MP.ACTIONS.sync_client()
 	MP.ACTIONS.lobby_info()
 	MP.UI.update_connection_status()
+end
+
+local function action_rejoinedLobby(code, type, token)
+	MP.LOBBY.code = code
+	MP.LOBBY.type = type
+	-- Update reconnect token
+	reconnectToken = token
+	lastLobbyCode = code
+	MP.ACTIONS.sync_client()
+	MP.ACTIONS.lobby_info()
+	MP.UI.update_connection_status()
+end
+
+local function action_enemyDisconnected()
+	sendWarnMessage("Opponent disconnected, waiting for reconnection...", "MULTIPLAYER")
+	MP.UI.UTILS.overlay_message("Opponent disconnected,\nwaiting for reconnection...", true)
+end
+
+local function action_enemyReconnected()
+	sendWarnMessage("Opponent reconnected!", "MULTIPLAYER")
+	G.FUNCS.exit_overlay_menu()
+	MP.UI.UTILS.overlay_message("Opponent reconnected!")
 end
 
 local function action_lobbyInfo(host, hostHash, hostCached, guest, guestHash, guestCached, guestReady, is_host)
@@ -105,6 +145,9 @@ end
 local function action_disconnected()
 	MP.LOBBY.connected = false
 	if MP.LOBBY.code then MP.LOBBY.code = nil end
+	-- Clear reconnect state since all reconnection attempts failed
+	reconnectToken = nil
+	lastLobbyCode = nil
 	MP.UI.update_connection_status()
 end
 
@@ -740,6 +783,9 @@ function MP.ACTIONS.lobby_info()
 end
 
 function MP.ACTIONS.leave_lobby()
+	-- Clear reconnect state on voluntary leave
+	reconnectToken = nil
+	lastLobbyCode = nil
 	Client.send({
 		action = "leaveLobby",
 	})
@@ -1061,7 +1107,13 @@ function Game:update(dt)
 			elseif parsedAction.action == "disconnected" then
 				action_disconnected()
 			elseif parsedAction.action == "joinedLobby" then
-				action_joinedLobby(parsedAction.code, parsedAction.type)
+				action_joinedLobby(parsedAction.code, parsedAction.type, parsedAction.reconnectToken)
+			elseif parsedAction.action == "rejoinedLobby" then
+				action_rejoinedLobby(parsedAction.code, parsedAction.type, parsedAction.reconnectToken)
+			elseif parsedAction.action == "enemyDisconnected" then
+				action_enemyDisconnected()
+			elseif parsedAction.action == "enemyReconnected" then
+				action_enemyReconnected()
 			elseif parsedAction.action == "lobbyInfo" then
 				action_lobbyInfo(
 					parsedAction.host,

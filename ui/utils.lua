@@ -39,7 +39,7 @@ function MP.UI.UTILS.create_object_node(object, config)
 end
 
 -- Overlay message function (moved from misc/utils.lua)
-function MP.UI.UTILS.overlay_message(message)
+function MP.UI.UTILS.overlay_message(message, no_back)
 	G.SETTINGS.paused = true
 	local message_table = MP.UTILS.string_split(message, "\n")
 	local message_ui = {
@@ -65,6 +65,8 @@ function MP.UI.UTILS.overlay_message(message)
 
 	G.FUNCS.overlay_menu({
 		definition = create_UIBox_generic_options({
+			no_back = no_back,
+			no_esc = no_back,
 			contents = {
 				MP.UI.UTILS.create_column({ align = "cm", padding = 0.2 }, message_ui),
 			},
