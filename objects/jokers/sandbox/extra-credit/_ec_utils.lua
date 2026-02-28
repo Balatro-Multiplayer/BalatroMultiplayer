@@ -77,8 +77,8 @@ local original_reset_game_globals = MP.reset_game_globals
 MP.reset_game_globals = function(run_start)
 	if original_reset_game_globals then original_reset_game_globals(run_start) end
 
-	-- Only initialize EC state when extra_credit is enabled
-	if MP.LOBBY.config and MP.LOBBY.config.extra_credit then
+	-- Only initialize EC state when sandbox ruleset is active
+	if MP.is_ruleset_active("sandbox") then
 		reset_tuxedo_card()
 		reset_farmer_card()
 		reset_fish_rank()
@@ -92,7 +92,7 @@ local original_ease_dollars = ease_dollars
 function ease_dollars(mod, x)
 	original_ease_dollars(mod, x)
 
-	if MP.LOBBY.config and MP.LOBBY.config.extra_credit and G.jokers and G.jokers.cards then
+	if MP.is_ruleset_active("sandbox") and G.jokers and G.jokers.cards then
 		for i = 1, #G.jokers.cards do
 			eval_card(G.jokers.cards[i], { EC_ease_dollars = to_big(mod) })
 		end
