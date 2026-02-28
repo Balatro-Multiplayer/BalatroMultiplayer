@@ -112,6 +112,7 @@ end
 ---@param stake_str string
 local function action_start_game(seed, stake_str)
 	MP.reset_game_states()
+	MP.STATS.reset_lifecycle()
 	local stake = tonumber(stake_str)
 	MP.ACTIONS.set_ante(0)
 	if not MP.LOBBY.config.different_seeds and MP.LOBBY.config.custom_seed ~= "random" then
@@ -932,6 +933,19 @@ function MP.ACTIONS.send_game_stats()
 		action = "sendGameStats",
 	})
 	action_send_game_stats()
+end
+
+function MP.ACTIONS.match_joker_report(won, joker_report)
+	Client.send({
+		action = "matchJokerReport",
+		won = won,
+		stake = MP.LOBBY.config.stake or 1,
+		deck = MP.LOBBY.config.back or "Red Deck",
+		gamemode = MP.LOBBY.config.gamemode or "gamemode_mp_attrition",
+		ruleset = MP.LOBBY.config.ruleset or "ruleset_mp_blitz",
+		ante_reached = G.GAME.round_resets and G.GAME.round_resets.ante or 1,
+		jokers = joker_report,
+	})
 end
 
 function MP.ACTIONS.request_nemesis_stats()
