@@ -54,31 +54,6 @@ function G.FUNCS.buy_from_shop(e)
 	return buy_from_shop_ref(e)
 end
 
--- Track joker acquisitions from non-shop sources (boosters, tags, etc.)
-local add_to_deck_ref = Card.add_to_deck
-function Card:add_to_deck(from_debuff)
-	if self.config and self.config.center and self.config.center.set == "Joker" then
-		if not (self.edition and self.edition.type == "mp_phantom") then
-			-- Check if this exact card was already tracked via shop purchase
-			local already_tracked = false
-			for i = #MP.STATS.joker_lifecycle, 1, -1 do
-				local entry = MP.STATS.joker_lifecycle[i]
-				if entry.card_ref == self and entry.ante_removed == nil then
-					already_tracked = true
-					break
-				end
-			end
-			if not already_tracked then
-				local key = self.config.center.key
-				local edition = (self.edition and self.edition.type) or "none"
-				local seal = self.seal or "none"
-				MP.STATS.on_joker_acquired(self, key, edition, seal, 0, "other")
-			end
-		end
-	end
-	return add_to_deck_ref(self, from_debuff)
-end
-
 local use_card_ref = G.FUNCS.use_card
 function G.FUNCS.use_card(e, mute, nosave)
 	if e.config and e.config.ref_table and e.config.ref_table.ability and e.config.ref_table.ability.name then

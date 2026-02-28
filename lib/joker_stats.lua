@@ -78,7 +78,7 @@ end
 --- Call when a joker is removed from the player's deck.
 --- Matches by card object reference first, falls back to key match.
 --- @param card table       -- the Card object being removed
---- @param reason string    -- "sold", "destroyed", "perishable", "traded"
+--- @param reason string    -- "sold", "destroyed", "perishable"
 function MP.STATS.on_joker_removed(card, reason)
 	if not MP.LOBBY.code then return end
 	-- First try exact card reference match
