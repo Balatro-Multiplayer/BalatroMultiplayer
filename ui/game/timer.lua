@@ -60,7 +60,7 @@ function MP.UI.timer_hud()
 							n = G.UIT.O,
 							config = {
 								object = DynaText({
-									string = { { ref_table = MP.GAME, ref_value = "timer" } },
+									string = MP.is_ruleset_active("speedlatro") and ">>" or { { ref_table = MP.GAME, ref_value = "timer" } }, -- sorry
 									colours = { G.C.UI.TEXT_DARK },
 									shadow = true,
 									scale = 0.8,

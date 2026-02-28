@@ -159,11 +159,6 @@ local function action_start_game(seed, stake_str)
 		seed = MP.LOBBY.config.custom_seed
 	end
 	G.FUNCS.lobby_start_run(nil, { seed = seed, stake = stake })
-	if MP.LOBBY.config.ruleset == "ruleset_mp_speedlatro" then
-		MP.LOBBY.config.timer_base_seconds = MP.LOBBY.config.timer_base_seconds - 3
-		MP.GAME.timer = MP.LOBBY.config.timer_base_seconds
-		MP.ACTIONS.start_ante_timer()
-	end
 	MP.LOBBY.ready_to_start = false
 end
 
@@ -268,10 +263,6 @@ local function action_end_pvp()
 	MP.GAME.timer = MP.LOBBY.config.timer_base_seconds
 	MP.GAME.timer_started = false
 	MP.GAME.ready_blind = false
-	if MP.LOBBY.config.ruleset == "ruleset_mp_speedlatro" then
-		MP.GAME.timer_started = true
-		MP.ACTIONS.start_ante_timer()
-	end
 end
 
 ---@param lives number
@@ -738,7 +729,9 @@ local function action_start_ante_timer(time)
 	if type(time) == "string" then time = tonumber(time) end
 	MP.GAME.timer = time
 	MP.GAME.timer_started = true
-	G.E_MANAGER:add_event(MP.timer_event)
+	if not MP.is_ruleset_active("speedlatro") then
+		G.E_MANAGER:add_event(MP.timer_event)
+	end
 end
 
 local function action_pause_ante_timer(time)
