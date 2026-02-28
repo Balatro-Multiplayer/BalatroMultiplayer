@@ -13,8 +13,7 @@ function Card:sell_card()
 		)
 		-- Track joker removals for telemetry
 		if self.config and self.config.center and self.config.center.set == "Joker" then
-			local key = self.config.center.key
-			MP.STATS.on_joker_removed(key, "sold")
+			MP.STATS.on_joker_removed(self, "sold")
 		end
 	end
 	return sell_card_ref(self)
@@ -49,7 +48,7 @@ function G.FUNCS.buy_from_shop(e)
 			local key = c1.config.center.key
 			local edition = (c1.edition and c1.edition.type) or "none"
 			local seal = c1.seal or "none"
-			MP.STATS.on_joker_acquired(key, edition, seal, c1.cost, "shop")
+			MP.STATS.on_joker_acquired(c1, key, edition, seal, c1.cost, "shop")
 		end
 	end
 	return buy_from_shop_ref(e)
@@ -60,20 +59,20 @@ local add_to_deck_ref = Card.add_to_deck
 function Card:add_to_deck(from_debuff)
 	if self.config and self.config.center and self.config.center.set == "Joker" then
 		if not (self.edition and self.edition.type == "mp_phantom") then
-			local key = self.config.center.key
-			-- Check if this joker was already tracked via shop purchase
+			-- Check if this exact card was already tracked via shop purchase
 			local already_tracked = false
 			for i = #MP.STATS.joker_lifecycle, 1, -1 do
 				local entry = MP.STATS.joker_lifecycle[i]
-				if entry.key == key and entry.ante_removed == nil and entry.source == "shop" then
+				if entry.card_ref == self and entry.ante_removed == nil then
 					already_tracked = true
 					break
 				end
 			end
 			if not already_tracked then
+				local key = self.config.center.key
 				local edition = (self.edition and self.edition.type) or "none"
 				local seal = self.seal or "none"
-				MP.STATS.on_joker_acquired(key, edition, seal, 0, "other")
+				MP.STATS.on_joker_acquired(self, key, edition, seal, 0, "other")
 			end
 		end
 	end
