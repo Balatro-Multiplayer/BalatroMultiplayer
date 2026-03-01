@@ -101,7 +101,7 @@ end
 MP.Ruleset({
 	key = "sandbox",
 	multiplayer_content = true,
-	banned_jokers = {},
+	banned_jokers = { "j_hanging_chad" },
 	banned_silent = MP.SANDBOX.get_vanilla_bans(),
 	banned_consumables = { "c_ouija", "c_ectoplasm" },
 	banned_vouchers = {},
@@ -132,7 +132,7 @@ MP.Ruleset({
 		end
 
 		-- final vanilla stuff
-		table.insert(jokers, "j_hanging_chad")
+		table.insert(jokers, "j_mp_hanging_chad")
 
 		-- Fisher-Yates shuffle
 		for i = #jokers, 2, -1 do
