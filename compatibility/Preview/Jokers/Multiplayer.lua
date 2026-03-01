@@ -42,6 +42,10 @@ FNSJ.simulate_mp_lets_go_gambling = function(joker_obj, context)
 	end
 end
 
+FNSJ.simulate_mp_seltzer = function(joker_obj, context)
+	if context.cardarea == G.play and context.repetition then FN.SIM.add_reps(1) end
+end
+
 FNSJ.simulate_mp_bloodstone = function(joker_obj, context)
 	if context.cardarea == G.play and context.individual then
 		if FN.SIM.is_suit(context.other_card, "Hearts") and not context.other_card.debuff then
