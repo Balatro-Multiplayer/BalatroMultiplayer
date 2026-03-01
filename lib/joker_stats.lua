@@ -60,7 +60,7 @@ MP.STATS.joker_lifecycle = {}
 --- @param seal string      -- e.g. "eternal", "perishable", "none"
 --- @param cost number      -- gold spent (0 if free)
 --- @param source string    -- "shop", "booster", "tag", "other"
-function MP.STATS.on_joker_acquired(card, key, edition, seal, cost, source)
+function MP.STATS.on_joker_acquired(card, key, edition, cost, source)
 	if not MP.LOBBY.code then return end -- only track in multiplayer
 	table.insert(MP.STATS.joker_lifecycle, {
 		card_ref = card,
@@ -113,7 +113,6 @@ function MP.STATS.build_joker_report(won)
 		table.insert(report, {
 			key = entry.key,
 			edition = entry.edition,
-			seal = entry.seal,
 			cost = entry.cost,
 			source = entry.source,
 			ante_acquired = entry.ante_acquired,

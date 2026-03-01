@@ -47,8 +47,7 @@ function G.FUNCS.buy_from_shop(e)
 		if c1.config and c1.config.center and c1.config.center.set == "Joker" then
 			local key = c1.config.center.key
 			local edition = (c1.edition and c1.edition.type) or "none"
-			local seal = c1.seal or "none"
-			MP.STATS.on_joker_acquired(c1, key, edition, seal, c1.cost, "shop")
+			MP.STATS.on_joker_acquired(c1, key, edition, c1.cost, "shop")
 		end
 	end
 	return buy_from_shop_ref(e)
