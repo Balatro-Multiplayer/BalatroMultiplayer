@@ -11,6 +11,10 @@ function Card:sell_card()
 			string.format("Client sent message: action:soldCard,card:%s", self.ability.name),
 			"MULTIPLAYER"
 		)
+		-- Track joker removals for telemetry
+		if self.config and self.config.center and self.config.center.set == "Joker" then
+			MP.STATS.on_joker_removed(self, "sold")
+		end
 	end
 	return sell_card_ref(self)
 end
@@ -39,6 +43,12 @@ function G.FUNCS.buy_from_shop(e)
 			string.format("Client sent message: action:boughtCardFromShop,card:%s,cost:%s", c1.ability.name, c1.cost),
 			"MULTIPLAYER"
 		)
+		-- Track joker acquisitions for telemetry
+		if c1.config and c1.config.center and c1.config.center.set == "Joker" then
+			local key = c1.config.center.key
+			local edition = (c1.edition and c1.edition.type) or "none"
+			MP.STATS.on_joker_acquired(c1, key, edition, c1.cost, "shop")
+		end
 	end
 	return buy_from_shop_ref(e)
 end
