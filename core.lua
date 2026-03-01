@@ -63,7 +63,7 @@ MP.PREVIEW = {
 
 MP.EXPERIMENTAL = {
 	use_new_networking = true,
-	show_sandbox_collection = true,
+	show_sandbox_collection = false,
 	alt_stakes = false,
 }
 
