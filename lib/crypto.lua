@@ -50,13 +50,14 @@ function MP.UTILS.server_connection_ID()
 		local ok = ffi.C.GetVolumeInformationA("C:\\", nil, 0, serial_ptr, nil, nil, nil, 0)
 		if ok ~= 0 then raw_id = tostring(serial_ptr[0]) end
 	elseif os_name == "OS X" then
-        local cmd = [[ioreg -rd1 -c IOPlatformExpertDevice | awk '/IOPlatformUUID/ { split($0, line, "\""); printf("%s\n", line[4]); }']]
-        local handle = io.popen(cmd)
-        local result = handle:read("*a")
-        if handle then handle:close() end
-        print(result)
-        raw_id = tostring(result)
-    end
+		local cmd =
+			[[ioreg -rd1 -c IOPlatformExpertDevice | awk '/IOPlatformUUID/ { split($0, line, "\""); printf("%s\n", line[4]); }']]
+		local handle = io.popen(cmd)
+		local result = handle:read("*a")
+		if handle then handle:close() end
+		print(result)
+		raw_id = tostring(result)
+	end
 
 	if not raw_id then raw_id = os.getenv("USER") or os.getenv("USERNAME") or os_name end
 

@@ -28,20 +28,20 @@ return {
 		},
 		Joker = {
 			j_mp_seltzer = {
-				name="Seltzer",
-                text={
-                    "Retrigger all",
-                    "cards played for",
-                    "the next {C:attention}#1#{} hands",
-                },
+				name = "Seltzer",
+				text = {
+					"Retrigger all",
+					"cards played for",
+					"the next {C:attention}#1#{} hands",
+				},
 			},
 			j_mp_turtle_bean = {
-				name="Turtle Bean",
-                text={
-                    "{C:attention}+#1#{} hand size,",
-                    "reduces by",
-                    "{C:red}#2#{} every round",
-                },
+				name = "Turtle Bean",
+				text = {
+					"{C:attention}+#1#{} hand size,",
+					"reduces by",
+					"{C:red}#2#{} every round",
+				},
 			},
 			j_mp_idol = {
 				name = "The Idol",
@@ -1192,6 +1192,9 @@ return {
 			ch_c_mp_polymorph_spam_EXTENDED2 = {
 				"where {C:attention}N{} is its current position in slots",
 			},
+			ch_c_mp_vantablack_CREDITS = {
+				"{C:inactive}(Art by {C:attention}aura!{C:inactive})",
+			},
 		},
 		challenge_names = {
 			c_mp_standard = "Standard",
@@ -1218,6 +1221,7 @@ return {
 			c_mp_salvaged_sibyl = "Salvaged Sibyl",
 			c_mp_polymorph_spam = "Polymorph Spam",
 			c_mp_all_must_go = "All Must Go",
+			c_mp_vantablack = "Vantablack",
 		},
 	},
 }

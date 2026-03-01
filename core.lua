@@ -69,7 +69,7 @@ MP.EXPERIMENTAL = {
 
 G.C.MULTIPLAYER = HEX("AC3232")
 
-MP.SMODS_VERSION = "1.0.0~BETA-1224a"
+MP.SMODS_VERSION = "1.0.0~BETA-1501a"
 MP.REQUIRED_LOVELY_VERSION = "0.9"
 
 function MP.should_use_the_order()
@@ -105,8 +105,15 @@ function MP.load_mp_dir(directory, recursive)
 	local items = NFS.getDirectoryItemsInfo(dir_path)
 	-- sort by prefix like { _file, _dir, file, dir }
 	table.sort(items, function(a, b)
-		if has_prefix(a.name) ~= has_prefix(b.name) then return has_prefix(a.name) end
-		return (a.type == "directory") ~= (b.type == "directory") and a.type ~= "directory" or false
+		local ac, bc = 0, 0
+		if has_prefix(a.name) then ac = ac + 100 end
+		if has_prefix(b.name) then bc = bc + 100 end
+		if (a.type == "directory") then ac = ac + 10 end
+		if (b.type == "directory") then bc = bc + 10 end
+		if ac ~= bc then
+			return ac > bc
+		end
+		return string.lower(a.name) < string.lower(b.name)
 	end)
 
 	-- load sorted files/dirs

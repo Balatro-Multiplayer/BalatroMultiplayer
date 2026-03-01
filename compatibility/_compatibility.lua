@@ -14,20 +14,20 @@ MP.DECK.BANNED_BLINDS = {}
 
 function MP.DECK.ban_card(card_id)
 	if card_id:sub(1, 1) == "j" then
-		MP.DECK.BANNED_JOKERS[#MP.DECK.BANNED_JOKERS+1] = card_id
+		MP.DECK.BANNED_JOKERS[#MP.DECK.BANNED_JOKERS + 1] = card_id
 	elseif card_id:sub(1, 1) == "v" then
-		MP.DECK.BANNED_VOUCHERS[#MP.DECK.BANNED_VOUCHERS+1] = card_id
+		MP.DECK.BANNED_VOUCHERS[#MP.DECK.BANNED_VOUCHERS + 1] = card_id
 	elseif card_id:sub(1, 1) == "m" then
-		MP.DECK.BANNED_ENHANCEMENTS[#MP.DECK.BANNED_ENHANCEMENTS+1] = card_id
+		MP.DECK.BANNED_ENHANCEMENTS[#MP.DECK.BANNED_ENHANCEMENTS + 1] = card_id
 	end
 end
 
 function MP.DECK.ban_tag(tag_id)
-	MP.DECK.BANNED_TAGS[#MP.DECK.BANNED_TAGS+1] = tag_id
+	MP.DECK.BANNED_TAGS[#MP.DECK.BANNED_TAGS + 1] = tag_id
 end
 
 function MP.DECK.ban_blind(blind_id)
-	MP.DECK.BANNED_BLINDS[#MP.DECK.BANNED_BLINDS+1] = blind_id
+	MP.DECK.BANNED_BLINDS[#MP.DECK.BANNED_BLINDS + 1] = blind_id
 end
 
 local j_broken = {

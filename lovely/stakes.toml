@@ -3,15 +3,6 @@ version = "1.0.0"
 dump_lua = true
 priority = 2147483600
 
-[[patches]]
-[patches.pattern]
-target = '''=[SMODS _ "src/utils.lua"]'''
-pattern = " "
-position = 'at'
-payload = " "
-match_indent = true
-times = 1
-
 ## Plastic Stake - handle reduced interest rate
 
 # if anyone breaks this pattern i'm gonna scream

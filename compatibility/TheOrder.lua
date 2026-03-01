@@ -12,9 +12,9 @@ function create_card(_type, area, legendary, _rarity, skip_materialize, soulable
 				key_append = _type
 			end
 		elseif not (_type == "Base" or _type == "Enhanced") then
-			--if not (key_append == "jud" and G.GAME.stake >= 7) then
-			key_append = _rarity -- _rarity replacing key_append can be entirely removed to normalise skip tags and riff raff with shop rarity queues
-			--end
+			if not (key_append == "jud" and G.GAME.stake >= 7) then
+				key_append = _rarity -- _rarity replacing key_append can be entirely removed to normalise rarity-specific skip tags, riff raff, and wraith with shop rarity queues
+			end
 		end
 		local c = cc(_type, area, legendary, _rarity, skip_materialize, soulable, forced_key, key_append)
 		G.GAME.round_resets.ante = a

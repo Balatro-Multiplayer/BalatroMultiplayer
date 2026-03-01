@@ -18,8 +18,8 @@ function SMODS.injectItems()
 			if not v.mod or v.mod.id ~= "Multiplayer" then table.insert(G.P_CENTER_POOLS[hidden .. "_non_mp"], v) end
 		end
 	end
+	G.CHALLENGES_non_mp = {}
 	for i, v in ipairs(G.CHALLENGES) do
-		G.CHALLENGES_non_mp = {}
 		if not v.mod or v.mod.id ~= "Multiplayer" then table.insert(G.CHALLENGES_non_mp, v) end
 	end
 	return ret

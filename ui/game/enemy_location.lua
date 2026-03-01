@@ -146,4 +146,3 @@ function MP.UI.hide_enemy_location()
 		}, row_dollars_chips)
 	end
 end
-

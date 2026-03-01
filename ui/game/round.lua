@@ -47,6 +47,16 @@ function reset_blinds()
 	end
 end
 
+-- necessary for showdown mode to ensure rounds progress properly, only affects nemesis blind to avoid possible incompatibilities (though i know many mods like to do this exact hook)
+local blind_get_type = Blind.get_type
+function Blind:get_type()
+	if self.name == "bl_mp_nemesis" then
+		return G.GAME.blind_on_deck
+	else
+		return blind_get_type(self)
+	end
+end
+
 -- added event suppression for a lovely patch for ease_ante
 local add_event_ref = EventManager.add_event
 function EventManager:add_event(event, queue, front)
@@ -56,4 +66,3 @@ function EventManager:add_event(event, queue, front)
 	end
 	return add_event_ref(self, event, queue, front)
 end
-

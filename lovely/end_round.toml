@@ -156,3 +156,86 @@ end
 '''
 match_indent = true
 times = 1
+
+## showdown mode thing
+
+# spoof nemesis blind so it works fine with the condition later
+# this is bad but uhhhhh it's fine
+[[patches]]
+[patches.pattern]
+target = "functions/state_events.lua"
+pattern = '''
+G.STATE = G.STATES.ROUND_EVAL
+G.STATE_COMPLETE = false
+'''
+position = 'after'
+payload = '''
+local mp_nemesis_spoof = false
+if G.GAME.round_resets.blind == G.P_BLINDS.bl_mp_nemesis then
+	mp_nemesis_spoof = true
+	if G.GAME.blind_on_deck == "Small" then
+		G.GAME.round_resets.blind = G.P_BLINDS.bl_small
+	elseif G.GAME.blind_on_deck == "Big" then
+		G.GAME.round_resets.blind = G.P_BLINDS.bl_big
+	else
+		mp_nemesis_spoof = false
+	end
+end
+'''
+match_indent = true
+times = 1
+
+# back to normal
+[[patches]]
+[patches.pattern]
+target = "functions/state_events.lua"
+pattern = '''
+if G.GAME.round_resets.temp_handsize then G.hand:change_size(-G.GAME.round_resets.temp_handsize); G.GAME.round_resets.temp_handsize = nil end
+'''
+position = 'before'
+payload = '''
+if mp_nemesis_spoof then
+	G.GAME.round_resets.blind = G.P_BLINDS.bl_mp_nemesis
+end
+'''
+match_indent = true
+times = 1
+
+# same patches but for a different part of the code (new_round)
+[[patches]]
+[patches.pattern]
+target = "functions/state_events.lua"
+pattern = '''
+G.GAME.round_bonus.discards = 0
+'''
+position = 'after'
+payload = '''
+local mp_nemesis_spoof = false
+if G.GAME.round_resets.blind == G.P_BLINDS.bl_mp_nemesis then
+	mp_nemesis_spoof = true
+	if G.GAME.blind_on_deck == "Small" then
+		G.GAME.round_resets.blind = G.P_BLINDS.bl_small
+	elseif G.GAME.blind_on_deck == "Big" then
+		G.GAME.round_resets.blind = G.P_BLINDS.bl_big
+	else
+		mp_nemesis_spoof = false
+	end
+end
+'''
+match_indent = true
+times = 1
+
+[[patches]]
+[patches.pattern]
+target = "functions/state_events.lua"
+pattern = '''
+G.GAME.blind:set_blind(G.GAME.round_resets.blind)
+'''
+position = 'before'
+payload = '''
+if mp_nemesis_spoof then
+	G.GAME.round_resets.blind = G.P_BLINDS.bl_mp_nemesis
+end
+'''
+match_indent = true
+times = 1

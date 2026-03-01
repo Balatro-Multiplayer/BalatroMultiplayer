@@ -54,9 +54,7 @@ local function action_joinedLobby(code, type, token)
 	MP.LOBBY.type = type
 	MP.LOBBY.ready_to_start = false
 	-- Store reconnect info for potential future reconnection
-	if token then
-		reconnectToken = token
-	end
+	if token then reconnectToken = token end
 	lastLobbyCode = code
 	MP.ACTIONS.sync_client()
 	MP.ACTIONS.lobby_info()
@@ -161,11 +159,6 @@ local function action_start_game(seed, stake_str)
 		seed = MP.LOBBY.config.custom_seed
 	end
 	G.FUNCS.lobby_start_run(nil, { seed = seed, stake = stake })
-	if MP.LOBBY.config.ruleset == "ruleset_mp_speedlatro" then
-		MP.LOBBY.config.timer_base_seconds = MP.LOBBY.config.timer_base_seconds - 3
-		MP.GAME.timer = MP.LOBBY.config.timer_base_seconds
-		MP.ACTIONS.start_ante_timer()
-	end
 	MP.LOBBY.ready_to_start = false
 end
 
@@ -270,10 +263,6 @@ local function action_end_pvp()
 	MP.GAME.timer = MP.LOBBY.config.timer_base_seconds
 	MP.GAME.timer_started = false
 	MP.GAME.ready_blind = false
-	if MP.LOBBY.config.ruleset == "ruleset_mp_speedlatro" then
-		MP.GAME.timer_started = true
-		MP.ACTIONS.start_ante_timer()
-	end
 end
 
 ---@param lives number
@@ -740,7 +729,9 @@ local function action_start_ante_timer(time)
 	if type(time) == "string" then time = tonumber(time) end
 	MP.GAME.timer = time
 	MP.GAME.timer_started = true
-	G.E_MANAGER:add_event(MP.timer_event)
+	if not MP.is_ruleset_active("speedlatro") then
+		G.E_MANAGER:add_event(MP.timer_event)
+	end
 end
 
 local function action_pause_ante_timer(time)
@@ -1026,9 +1017,7 @@ function MP.ACTIONS.modded(modId, modAction, params, target)
 			msg[k] = v
 		end
 	end
-	if target then
-		msg.target = target
-	end
+	if target then msg.target = target end
 	Client.send(msg)
 end
 
@@ -1183,9 +1172,7 @@ function Game:update(dt)
 				action_pause_ante_timer(parsedAction.time)
 			elseif parsedAction.action == "moddedAction" then
 				local registry = MP.MOD_ACTIONS[parsedAction.modId]
-				if registry and registry[parsedAction.modAction] then
-					registry[parsedAction.modAction](parsedAction)
-				end
+				if registry and registry[parsedAction.modAction] then registry[parsedAction.modAction](parsedAction) end
 			elseif parsedAction.action == "error" then
 				action_error(parsedAction.message)
 			elseif parsedAction.action == "keepAlive" then

@@ -26,4 +26,3 @@ function MP.UI.create_lobby_code_buttons(text_scale)
 		},
 	}
 end
-

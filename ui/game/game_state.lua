@@ -320,9 +320,7 @@ function Game:update_shop(dt)
 		updated_location = true
 		MP.ACTIONS.set_location("loc_shop")
 		MP.GAME.spent_before_shop = to_big(MP.GAME.spent_total) + to_big(0)
-		if MP.UI.show_enemy_location then
-			MP.UI.show_enemy_location()
-		end
+		if MP.UI.show_enemy_location then MP.UI.show_enemy_location() end
 	end
 	if G.STATE_COMPLETE and updated_location then updated_location = false end
 	update_shop_ref(self, dt)
@@ -334,9 +332,7 @@ function Game:update_blind_select(dt)
 	if MP.LOBBY.code and not G.STATE_COMPLETE and not updated_location then
 		updated_location = true
 		MP.ACTIONS.set_location("loc_selecting")
-		if MP.UI.show_enemy_location then
-			MP.UI.show_enemy_location()
-		end
+		if MP.UI.show_enemy_location then MP.UI.show_enemy_location() end
 	end
 	if G.STATE_COMPLETE and updated_location then updated_location = false end
 	update_blind_select_ref(self, dt)
@@ -401,4 +397,3 @@ function MP.handle_deck_out()
 		end
 	end
 end
-
