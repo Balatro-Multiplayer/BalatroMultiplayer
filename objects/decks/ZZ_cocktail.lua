@@ -92,11 +92,38 @@ SMODS.Back({
 	mp_credits = { art = { "aura!", "shai1n" }, code = { "Toneblock" } },
 })
 
+-- honestly this could have been a list
+-- whatever
+local sticker_x_pos = {
+	b_red = 0,
+	b_blue = 1,
+	b_yellow = 2,
+	b_green = 3,
+	b_black = 4,
+	b_magic = 5,
+	b_nebula = 6,
+	b_ghost = 7,
+	b_abandoned = 8,
+	b_checkered = 9,
+	b_zodiac = 10,
+	b_painted = 11,
+	b_anaglyph = 12,
+	b_plasma = 13,
+	b_erratic = 14,
+	b_mp_orange = 15,
+	b_mp_indigo = 16,
+	b_mp_violet = 17,
+	b_mp_white = 18,
+	b_mp_oracle = 19,
+	b_mp_gradient = 20,
+	b_mp_heidelberg = 21,
+}
+
 function MP.get_cocktail_decks(cull)
 	local ret = {}
 	local forced = {}
 	for k, v in pairs(G.P_CENTERS) do
-		if v.set == "Back" and k ~= "b_challenge" and k ~= "b_mp_cocktail" then
+		if v.set == "Back" and k ~= "b_challenge" and k ~= "b_mp_cocktail" and sticker_x_pos[k] then
 			if not (v.mod and not G.P_CENTERS["b_mp_cocktail"].mod_whitelist[v.mod.id]) then ret[#ret + 1] = k end
 		end
 	end
@@ -579,33 +606,6 @@ SMODS.Atlas({
 	px = 71,
 	py = 95,
 })
-
--- honestly this could have been a list
--- whatever
-local sticker_x_pos = {
-	b_red = 0,
-	b_blue = 1,
-	b_yellow = 2,
-	b_green = 3,
-	b_black = 4,
-	b_magic = 5,
-	b_nebula = 6,
-	b_ghost = 7,
-	b_abandoned = 8,
-	b_checkered = 9,
-	b_zodiac = 10,
-	b_painted = 11,
-	b_anaglyph = 12,
-	b_plasma = 13,
-	b_erratic = 14,
-	b_mp_orange = 15,
-	b_mp_indigo = 16,
-	b_mp_violet = 17,
-	b_mp_white = 18,
-	b_mp_oracle = 19,
-	b_mp_gradient = 20,
-	b_mp_heidelberg = 21,
-}
 
 SMODS.DrawStep({
 	key = "back_cocktail",
