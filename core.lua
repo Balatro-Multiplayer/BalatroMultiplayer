@@ -67,6 +67,28 @@ MP.EXPERIMENTAL = {
 	alt_stakes = false,
 }
 
+-- Override experimental flags from .env file if present
+local env_path = MP.path .. "/.env"
+local env_info = NFS.getInfo(env_path)
+if env_info then
+	local content = NFS.read(env_path)
+	if content then
+		for line in content:gmatch("[^\r\n]+") do
+			line = line:match("^%s*(.-)%s*$") -- trim
+			if line ~= "" and not line:match("^#") then
+				local key, val = line:match("^([%w_]+)%s*=%s*(.+)$")
+				if key and MP.EXPERIMENTAL[key] ~= nil then
+					if val == "true" then val = true
+					elseif val == "false" then val = false
+					end
+					MP.EXPERIMENTAL[key] = val
+				end
+			end
+		end
+		sendDebugMessage("Loaded .env overrides for MP.EXPERIMENTAL", "MULTIPLAYER")
+	end
+end
+
 G.C.MULTIPLAYER = HEX("AC3232")
 
 MP.SMODS_VERSION = "1.0.0~BETA-1224a"
