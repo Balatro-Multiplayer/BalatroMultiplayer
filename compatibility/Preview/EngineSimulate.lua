@@ -284,6 +284,8 @@ if not FN.SIM.run then
 			unplasma(FN.SIM.running.min)
 			unplasma(FN.SIM.running.exact)
 			unplasma(FN.SIM.running.max)
+		elseif FN.SIM.is_deck("b_mp_echodeck") then
+			-- Do something?
 		else
 			-- Other decks do not impact scoring; refer to Back:trigger_effect(..)
 		end
@@ -426,6 +428,7 @@ if not FN.SIM.run then
 		-- Reset and collect repetitions:
 		FN.SIM.running.reps = 1
 		if card.seal == "Red" then FN.SIM.add_reps(1) end
+		if FN.SIM.is_deck("b_mp_echodeck") then FN.SIM.add_reps(1) end -- I guess this works?
 		FN.SIM.simulate_all_jokers(cardarea, { other_card = card, repetition = true })
 
 		-- Apply effects:
