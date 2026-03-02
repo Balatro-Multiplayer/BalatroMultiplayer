@@ -174,8 +174,7 @@ if SMODS.Mods["JokerDisplay"] and SMODS.Mods["JokerDisplay"].can_load then
 				{ text = ")" },
 			},
 			calc_function = function(card)
-				card.joker_display_values.start_count = card.joker_display_values.start_count
-					or card.ability.extra.hands_left
+				card.joker_display_values.start_count = card.joker_display_values.start_count or card.ability.extra.hands_left
 			end,
 			style_function = function(card, text, reminder_text, extra)
 				local children = reminder_text and reminder_text.children
@@ -188,8 +187,7 @@ if SMODS.Mods["JokerDisplay"] and SMODS.Mods["JokerDisplay"].can_load then
 			end,
 			retrigger_function = function(playing_card, scoring_hand, held_in_hand, joker_card)
 				if held_in_hand then return 0 end
-				return JokerDisplay.in_scoring(playing_card, scoring_hand)
-					and JokerDisplay.calculate_joker_triggers(joker_card)
+				return JokerDisplay.in_scoring(playing_card, scoring_hand) and JokerDisplay.calculate_joker_triggers(joker_card)
 			end,
 		}
 		jd_def["j_mp_turtle_bean"] = {
@@ -202,8 +200,7 @@ if SMODS.Mods["JokerDisplay"] and SMODS.Mods["JokerDisplay"].can_load then
 			},
 			reminder_text_config = { scale = 0.35 },
 			calc_function = function(card)
-				card.joker_display_values.start_count = card.joker_display_values.start_count
-					or card.ability.extra.h_size
+				card.joker_display_values.start_count = card.joker_display_values.start_count or card.ability.extra.h_size
 			end,
 			style_function = function(card, text, reminder_text, extra)
 				local children = reminder_text and reminder_text.children
