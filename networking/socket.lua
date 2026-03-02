@@ -6,6 +6,7 @@ return [[
 local CONFIG_URL, CONFIG_PORT = ...
 
 require("love.filesystem")
+local json = require("json")
 local socket = require("socket")
 
 local DEBUGGING = false
