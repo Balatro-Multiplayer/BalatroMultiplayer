@@ -117,6 +117,7 @@ local sticker_x_pos = {
 	b_mp_oracle = 19,
 	b_mp_gradient = 20,
 	b_mp_heidelberg = 21,
+	b_mp_echodeck = 22,
 }
 
 function MP.get_cocktail_decks(cull)
