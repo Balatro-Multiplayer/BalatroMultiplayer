@@ -13,11 +13,9 @@ SMODS.Joker({
 		return { vars = { card.ability.extra.hands_left } }
 	end,
 	calculate = function(self, card, context)
-		if context.repetition and context.cardarea == G.play then
-			return {
-				repetitions = 1,
-			}
-		end
+		if context.repetition and context.cardarea == G.play then return {
+			repetitions = 1,
+		} end
 		if context.after and not context.blueprint then
 			if card.ability.extra.hands_left - 1 <= 0 then
 				SMODS.destroy_cards(card, nil, nil, true)

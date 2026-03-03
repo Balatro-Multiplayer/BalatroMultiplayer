@@ -14,12 +14,15 @@ function G.UIDEF.get_connection_status_ui()
 				colour = G.C.UI.TRANSPARENT_DARK,
 			},
 			nodes = {
-				MP.UI.UTILS.create_text_node((MP.LOBBY.code and localize("k_in_lobby")) or (MP.LOBBY.connected and localize(
-					"k_connected"
-				)) or localize("k_warn_service"), {
-					scale = 0.3,
-					colour = G.C.UI.TEXT_LIGHT,
-				}),
+				MP.UI.UTILS.create_text_node(
+					(MP.LOBBY.code and localize("k_in_lobby"))
+						or (MP.LOBBY.connected and localize("k_connected"))
+						or localize("k_warn_service"),
+					{
+						scale = 0.3,
+						colour = G.C.UI.TEXT_LIGHT,
+					}
+				),
 			},
 		},
 		config = {
@@ -186,10 +189,13 @@ function G.UIDEF.create_UIBox_view_hash(type)
 	return (
 		create_UIBox_generic_options({
 			contents = {
-				MP.UI.UTILS.create_column({ padding = 0.07, align = "cm" }, MP.UI.modlist_to_view(
-					type == "host" and MP.LOBBY.host.config.Mods or MP.LOBBY.guest.config.Mods,
-					G.C.UI.TEXT_LIGHT
-				)),
+				MP.UI.UTILS.create_column(
+					{ padding = 0.07, align = "cm" },
+					MP.UI.modlist_to_view(
+						type == "host" and MP.LOBBY.host.config.Mods or MP.LOBBY.guest.config.Mods,
+						G.C.UI.TEXT_LIGHT
+					)
+				),
 			},
 		})
 	)

@@ -169,4 +169,3 @@ function G.FUNCS.gamemode_switch_tabs(args)
 
 	tabs_wrap.UIBox:recalculate()
 end
-
