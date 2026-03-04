@@ -13,4 +13,5 @@ return {
 	["preview"] = {},
 	["joker_stats"] = {},
 	["match_history"] = {},
+	["ghost_replays"] = {},
 }

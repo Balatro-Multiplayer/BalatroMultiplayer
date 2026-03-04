@@ -6,7 +6,7 @@ function G.UIDEF.ruleset_selection_options(mode)
 	local default_ruleset = "standard_ranked"
 	local default_button = default_ruleset .. "_ruleset_button"
 
-	if mode == "sp" then
+	if mode == "sp" or mode == "practice" then
 		MP.SP.ruleset = "ruleset_mp_" .. default_ruleset
 	else
 		MP.LOBBY.config.ruleset = "ruleset_mp_" .. default_ruleset
@@ -76,7 +76,7 @@ function G.FUNCS.change_ruleset_selection(e)
 		end,
 		default_button,
 		function(ruleset_name)
-			if mode == "sp" then
+			if mode == "sp" or mode == "practice" then
 				MP.SP.ruleset = "ruleset_mp_" .. ruleset_name
 			else
 				MP.LOBBY.config.ruleset = "ruleset_mp_" .. ruleset_name
@@ -99,12 +99,19 @@ function G.UIDEF.ruleset_info(ruleset_name, mode)
 
 	local ruleset_disabled = ruleset.is_disabled()
 
-	-- Different button config for SP vs MP
+	-- Different button config for SP vs MP vs Practice
 	local button_config
 	if mode == "sp" then
 		button_config = {
 			id = "start_sp_button",
 			button = "start_sp_run",
+			label = { localize("b_play_cap") },
+			colour = G.C.GREEN,
+		}
+	elseif mode == "practice" then
+		button_config = {
+			id = "start_practice_button",
+			button = "start_practice_run",
 			label = { localize("b_play_cap") },
 			colour = G.C.GREEN,
 		}
@@ -117,6 +124,55 @@ function G.UIDEF.ruleset_info(ruleset_name, mode)
 		}
 	end
 
+	local content_nodes = {
+		{
+			n = G.UIT.R,
+			config = { align = "cm" },
+			nodes = {
+				{ n = G.UIT.O, config = { object = ruleset_info_banned_rework_tabs } },
+			},
+		},
+	}
+
+	if mode == "practice" then
+		content_nodes[#content_nodes + 1] = {
+			n = G.UIT.R,
+			config = { align = "cm", padding = 0.05 },
+			nodes = {
+				create_toggle({
+					id = "unlimited_slots_toggle",
+					label = localize("k_unlimited_slots"),
+					ref_table = MP.SP,
+					ref_value = "unlimited_slots",
+				}),
+			},
+		}
+	end
+
+	content_nodes[#content_nodes + 1] = {
+		n = G.UIT.R,
+		config = { align = "cm" },
+		nodes = {
+			MP.UI.Disableable_Button({
+				id = button_config.id,
+				button = button_config.button,
+				align = "cm",
+				padding = 0.05,
+				r = 0.1,
+				minw = 8,
+				minh = 0.8,
+				colour = button_config.colour,
+				hover = true,
+				shadow = true,
+				label = button_config.label,
+				scale = 0.5,
+				enabled_ref_table = { val = not ruleset_disabled },
+				enabled_ref_value = "val",
+				disabled_text = { ruleset_disabled },
+			}),
+		},
+	}
+
 	return {
 		n = G.UIT.ROOT,
 		config = { align = "tm", minh = 8, maxh = 8, minw = 11, maxw = 11, colour = G.C.CLEAR },
@@ -124,38 +180,7 @@ function G.UIDEF.ruleset_info(ruleset_name, mode)
 			{
 				n = G.UIT.C,
 				config = { align = "tm", padding = 0.2, r = 0.1, colour = G.C.BLACK },
-				nodes = {
-					{
-						n = G.UIT.R,
-						config = { align = "cm" },
-						nodes = {
-							{ n = G.UIT.O, config = { object = ruleset_info_banned_rework_tabs } },
-						},
-					},
-					{
-						n = G.UIT.R,
-						config = { align = "cm" },
-						nodes = {
-							MP.UI.Disableable_Button({
-								id = button_config.id,
-								button = button_config.button,
-								align = "cm",
-								padding = 0.05,
-								r = 0.1,
-								minw = 8,
-								minh = 0.8,
-								colour = button_config.colour,
-								hover = true,
-								shadow = true,
-								label = button_config.label,
-								scale = 0.5,
-								enabled_ref_table = { val = not ruleset_disabled },
-								enabled_ref_value = "val",
-								disabled_text = { ruleset_disabled },
-							}),
-						},
-					},
-				},
+				nodes = content_nodes,
 			},
 		},
 	}
