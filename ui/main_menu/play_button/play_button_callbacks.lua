@@ -1,11 +1,16 @@
 -- Singleplayer ruleset state (parallels MP.LOBBY.config.ruleset for multiplayer)
-MP.SP = { ruleset = nil }
+MP.SP = { ruleset = nil, practice = false, unlimited_slots = false }
+
+function MP.is_practice_mode()
+	return MP.SP.practice == true
+end
 
 function G.FUNCS.setup_run_singleplayer(e)
 	G.SETTINGS.paused = true
 	MP.LOBBY.config.ruleset = nil
 	MP.LOBBY.config.gamemode = nil
 	MP.SP.ruleset = nil
+	MP.SP.practice = false
 
 	G.FUNCS.overlay_menu({
 		definition = G.UIDEF.ruleset_selection_options("sp"),
@@ -21,7 +26,30 @@ function G.FUNCS.start_vanilla_sp(e)
 	MP.LOBBY.config.ruleset = nil
 	MP.LOBBY.config.gamemode = nil
 	MP.SP.ruleset = nil
+	MP.SP.practice = false
 	G.FUNCS.setup_run(e)
+end
+
+function G.FUNCS.setup_practice_mode(e)
+	G.SETTINGS.paused = true
+	MP.LOBBY.config.ruleset = nil
+	MP.LOBBY.config.gamemode = nil
+	MP.SP.ruleset = nil
+	MP.SP.practice = true
+	MP.SP.unlimited_slots = false
+
+	G.FUNCS.overlay_menu({
+		definition = G.UIDEF.ruleset_selection_options("practice"),
+	})
+end
+
+function G.FUNCS.start_practice_run(e)
+	G.FUNCS.exit_overlay_menu()
+	G.FUNCS.setup_run(e)
+end
+
+function G.FUNCS.toggle_unlimited_slots(e)
+	MP.SP.unlimited_slots = not MP.SP.unlimited_slots
 end
 
 function G.FUNCS.play_options(e)

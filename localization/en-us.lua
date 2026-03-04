@@ -901,6 +901,9 @@ return {
 		dictionary = {
 			b_singleplayer = "Singleplayer",
 			b_sp_with_ruleset = "Practice Mode",
+			b_practice = "Practice",
+			k_unlimited_slots = "Unlimited Slots",
+			k_practice_give_hint = "Press 3 on a card in Collection to give it to yourself",
 			b_join_lobby = "Join Lobby",
 			b_join_lobby_clipboard = "Join From Clipboard",
 			b_return_lobby = "Return to Lobby",
