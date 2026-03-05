@@ -85,16 +85,23 @@ MP.reset_game_globals = function(run_start)
 	end
 end
 
--- EC_ease_dollars context hook for Hoarder joker
--- Wraps ease_dollars to trigger joker evaluation with EC_ease_dollars context
--- (i.e. send a callback to Hoarder each time we earn money)
+-- Hoarder joker: gain sell value each time we earn money
 local original_ease_dollars = ease_dollars
 function ease_dollars(mod, x)
 	original_ease_dollars(mod, x)
 
-	if MP.is_ruleset_active("sandbox") and G.jokers and G.jokers.cards then
+	if MP.is_ruleset_active("sandbox") and to_big(mod) > to_big(0) and G.jokers and G.jokers.cards then
 		for i = 1, #G.jokers.cards do
-			eval_card(G.jokers.cards[i], { EC_ease_dollars = to_big(mod) })
+			local card = G.jokers.cards[i]
+			if card.config.center.key == "j_mp_hoarder_sandbox" and not card.debuffed then
+				card.ability.extra_value = card.ability.extra_value + card.ability.extra
+				card:set_cost()
+				card_eval_status_text(card, "extra", nil, nil, nil, {
+					message = localize("k_val_up"),
+					colour = G.C.MONEY,
+					card = card,
+				})
+			end
 		end
 	end
 end

@@ -82,4 +82,3 @@ function G.UIDEF.override_main_menu_play_button()
 		})
 	)
 end
-

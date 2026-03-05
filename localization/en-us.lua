@@ -28,20 +28,20 @@ return {
 		},
 		Joker = {
 			j_mp_seltzer = {
-				name="Seltzer",
-                text={
-                    "Retrigger all",
-                    "cards played for",
-                    "the next {C:attention}#1#{} hands",
-                },
+				name = "Seltzer",
+				text = {
+					"Retrigger all",
+					"cards played for",
+					"the next {C:attention}#1#{} hands",
+				},
 			},
 			j_mp_turtle_bean = {
-				name="Turtle Bean",
-                text={
-                    "{C:attention}+#1#{} hand size,",
-                    "reduces by",
-                    "{C:red}#2#{} every round",
-                },
+				name = "Turtle Bean",
+				text = {
+					"{C:attention}+#1#{} hand size,",
+					"reduces by",
+					"{C:red}#2#{} every round",
+				},
 			},
 			j_mp_idol = {
 				name = "The Idol",
@@ -980,7 +980,7 @@ return {
 			k_wait_enemy_reach_this_blind = "Waiting for enemy to reach this blind...",
 			k_lives = "Lives",
 			k_lost_life = "Lost a life",
-			k_total_lives_lost = " Total Lives Lost ($4 each)",
+			k_total_lives_lost = " Total Lives Lost",
 			k_comeback_money_sandbox = " Comeback Money ($3 × ante cleared)",
 			k_attrition_name = "Attrition",
 			k_enter_lobby_code = "Enter Lobby Code",
@@ -1192,6 +1192,9 @@ return {
 			ch_c_mp_polymorph_spam_EXTENDED2 = {
 				"where {C:attention}N{} is its current position in slots",
 			},
+			ch_c_mp_vantablack_CREDITS = {
+				"{C:inactive}(Art by {C:attention}aura!{C:inactive})",
+			},
 		},
 		challenge_names = {
 			c_mp_standard = "Standard",
@@ -1218,6 +1221,7 @@ return {
 			c_mp_salvaged_sibyl = "Salvaged Sibyl",
 			c_mp_polymorph_spam = "Polymorph Spam",
 			c_mp_all_must_go = "All Must Go",
+			c_mp_vantablack = "Vantablack",
 		},
 	},
 }

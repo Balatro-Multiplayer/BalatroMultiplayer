@@ -4,3 +4,4 @@
 .lovelyignore
 .vs
 .DS_Store
+.env

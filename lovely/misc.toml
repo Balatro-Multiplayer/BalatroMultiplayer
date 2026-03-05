@@ -126,3 +126,34 @@ if v.mp_include and type(v.mp_include) == 'function' then
 end
 '''
 match_indent = true
+
+# STEAMODDED BUG - hackfix for deck flashing in incorrect position for one frame when switching (caused due to set_sprites drawing jank)
+[[patches]]
+[patches.pattern]
+target = "functions/button_callbacks.lua"
+pattern = "val:set_ability(val.config.center, true)"
+position = 'at'
+payload = '''
+local temp_x, temp_y = val.T.x, val.T.y
+val:set_ability(val.config.center, true)
+val.children.back.VT.x, val.children.back.VT.y = temp_x, temp_y
+val.children.center.VT.x, val.children.center.VT.y = temp_x, temp_y
+'''
+match_indent = true
+times = 1
+
+# STEAMODDED BUG - fix crash due to G.F_NO_SAVING disrespect
+[[patches]]
+[patches.pattern]
+target = '''=[SMODS _ "src/utils.lua"]'''
+pattern = '''
+smods_hook_save_run()
+if SMODS.last_hand then
+'''
+position = 'at'
+payload = '''
+smods_hook_save_run()
+if SMODS.last_hand and not G.F_NO_SAVING then
+'''
+match_indent = true
+times = 1

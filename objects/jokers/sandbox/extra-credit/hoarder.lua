@@ -21,22 +21,8 @@ SMODS.Joker({
 		return { vars = { card.ability.extra } }
 	end,
 
-	calculate = function(self, card, context)
-		if context.EC_ease_dollars and not context.blueprint then
-			if context.EC_ease_dollars > to_big(0) then
-				card.ability.extra_value = card.ability.extra_value + card.ability.extra
-				card:set_cost()
-				card_eval_status_text(card, "extra", nil, nil, nil, {
-					message = localize("k_val_up"),
-					colour = G.C.MONEY,
-					card = card,
-				})
-			end
-		end
-	end,
-
 	mp_credits = {
-		code = { "CampfireCollective" },
+		code = { "CampfireCollective", "steph" },
 		art = { "neatoqueen" },
 	},
 	mp_include = function(self)
