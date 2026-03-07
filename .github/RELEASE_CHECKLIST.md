@@ -6,6 +6,11 @@
 2. Uncompress the source code and open `Multiplayer.json` to remove "~DEV" from the version tag.
 3. Recompress the source code, ensuring to recomopress from the files instead of the outer folder, and name it exactly "BalatroMultiplayer.zip".
 4. Upload `BalatroMultiplayer.zip` with the release.
+5. Upload `BalatroMultiplayer.zip` to [balatromp.com's releases page](https://balatromp.com/admin/releases)
+    - Ensure that the Steamodded version is set to the intended Steamodded version for ranked
+    - Ensure that the Lovely version is set to the intended Lovely version for ranked
+    - Ensure that the Branch is set to main
+    - Ensure the Version matches exactly the version in Multiplayer.json
 
 ## Uploading the server files
 *(We upload the server files for each OS with every release so that people don't have to go digging for these files)*
