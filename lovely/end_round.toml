@@ -18,7 +18,6 @@ if MP.LOBBY.code then
 	MP.GAME.round_ended = true
 end
 '''
-match_indent = true
 times = 1
 
 # water is wet
