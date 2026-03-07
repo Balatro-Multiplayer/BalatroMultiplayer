@@ -4,6 +4,14 @@ function ease_dollars(mod, instant)
 	return ease_dollars_ref(mod, instant)
 end
 
+-- Certain Steamodded builds still call save_run while saving is disabled
+-- In multiplayer runs this can crash when SMODS serializes transient hand data
+local save_run_ref = save_run
+function save_run(...)
+	if G and G.F_NO_SAVING then return end
+	return save_run_ref(...)
+end
+
 local sell_card_ref = Card.sell_card
 function Card:sell_card()
 	if self.ability and self.ability.name then
