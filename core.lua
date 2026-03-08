@@ -78,8 +78,10 @@ if env_info then
 			if line ~= "" and not line:match("^#") then
 				local key, val = line:match("^([%w_]+)%s*=%s*(.+)$")
 				if key and MP.EXPERIMENTAL[key] ~= nil then
-					if val == "true" then val = true
-					elseif val == "false" then val = false
+					if val == "true" then
+						val = true
+					elseif val == "false" then
+						val = false
 					end
 					MP.EXPERIMENTAL[key] = val
 				end
@@ -91,7 +93,7 @@ end
 
 G.C.MULTIPLAYER = HEX("AC3232")
 
-MP.SMODS_VERSION = "1.0.0~BETA-1501a"
+MP.SMODS_VERSION = "1.0.0~BETA-1503a"
 MP.REQUIRED_LOVELY_VERSION = "0.9"
 
 function MP.should_use_the_order()
@@ -130,11 +132,9 @@ function MP.load_mp_dir(directory, recursive)
 		local ac, bc = 0, 0
 		if has_prefix(a.name) then ac = ac + 100 end
 		if has_prefix(b.name) then bc = bc + 100 end
-		if (a.type == "directory") then ac = ac + 10 end
-		if (b.type == "directory") then bc = bc + 10 end
-		if ac ~= bc then
-			return ac > bc
-		end
+		if a.type == "directory" then ac = ac + 10 end
+		if b.type == "directory" then bc = bc + 10 end
+		if ac ~= bc then return ac > bc end
 		return string.lower(a.name) < string.lower(b.name)
 	end)
 

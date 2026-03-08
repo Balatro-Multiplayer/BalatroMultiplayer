@@ -502,6 +502,41 @@ local function action_magnet()
 	end
 end
 
+local function action_jimbo_appear(pos, text)
+	pos = tonumber(pos)
+	if not pos or pos < 1 or pos > 4 then
+		sendDebugMessage("jimboAppear: invalid pos: " .. tostring(pos), "MULTIPLAYER")
+		return
+	end
+	if text and type(text) ~= "string" then
+		sendDebugMessage("jimboAppear: invalid text type: " .. type(text), "MULTIPLAYER")
+		return
+	end
+	MP.UI.create_jimbo(pos)
+	if text and text ~= "" then MP.UI.jimbo_say(text) end
+end
+
+local function action_jimbo_talk(text)
+	if not text or type(text) ~= "string" or text == "" then
+		sendDebugMessage("jimboTalk: invalid or empty text", "MULTIPLAYER")
+		return
+	end
+	MP.UI.jimbo_say(text)
+end
+
+local function action_jimbo_move(pos)
+	pos = tonumber(pos)
+	if not pos or pos < 1 or pos > 4 then
+		sendDebugMessage("jimboMove: invalid pos: " .. tostring(pos), "MULTIPLAYER")
+		return
+	end
+	MP.UI.move_jimbo(pos)
+end
+
+local function action_jimbo_remove()
+	MP.UI.remove_jimbo()
+end
+
 local function action_magnet_response(key)
 	local card_save, success, err
 
@@ -729,9 +764,7 @@ local function action_start_ante_timer(time)
 	if type(time) == "string" then time = tonumber(time) end
 	MP.GAME.timer = time
 	MP.GAME.timer_started = true
-	if not MP.is_ruleset_active("speedlatro") then
-		G.E_MANAGER:add_event(MP.timer_event)
-	end
+	if not MP.is_ruleset_active("speedlatro") then G.E_MANAGER:add_event(MP.timer_event) end
 end
 
 local function action_pause_ante_timer(time)
@@ -1170,6 +1203,14 @@ function Game:update(dt)
 				action_start_ante_timer(parsedAction.time)
 			elseif parsedAction.action == "pauseAnteTimer" then
 				action_pause_ante_timer(parsedAction.time)
+			elseif parsedAction.action == "jimboAppear" then
+				action_jimbo_appear(parsedAction.pos, parsedAction.text)
+			elseif parsedAction.action == "jimboTalk" then
+				action_jimbo_talk(parsedAction.text)
+			elseif parsedAction.action == "jimboMove" then
+				action_jimbo_move(parsedAction.pos)
+			elseif parsedAction.action == "jimboRemove" then
+				action_jimbo_remove()
 			elseif parsedAction.action == "moddedAction" then
 				local registry = MP.MOD_ACTIONS[parsedAction.modId]
 				if registry and registry[parsedAction.modAction] then registry[parsedAction.modAction](parsedAction) end
