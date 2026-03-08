@@ -22,6 +22,7 @@
     "SystemClock (<<1.6.3)",
     "Cryptid (<<0.5.4)",
     "Talisman (<=2.0.2)",
-    "VirtualizedMultiplayer"
+    "VirtualizedMultiplayer",
+    "JokerDisplay (<<1.9.6)"
   ]
 }
