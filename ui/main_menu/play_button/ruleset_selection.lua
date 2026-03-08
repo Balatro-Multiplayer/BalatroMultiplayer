@@ -135,17 +135,25 @@ function G.UIDEF.ruleset_info(ruleset_name, mode)
 	}
 
 	if mode == "practice" then
+		local practice_toggles = {
+			{ id = "unlimited_slots_toggle", label = "k_unlimited_slots", ref_value = "unlimited_slots" },
+			{ id = "unlimited_money_toggle", label = "k_unlimited_money", ref_value = "unlimited_money" },
+			{ id = "free_rerolls_toggle", label = "k_free_rerolls", ref_value = "free_rerolls" },
+			{ id = "edition_cycling_toggle", label = "k_edition_cycling", ref_value = "edition_cycling" },
+		}
+		local toggle_nodes = {}
+		for _, t in ipairs(practice_toggles) do
+			toggle_nodes[#toggle_nodes + 1] = create_toggle({
+				id = t.id,
+				label = localize(t.label),
+				ref_table = MP.SP,
+				ref_value = t.ref_value,
+			})
+		end
 		content_nodes[#content_nodes + 1] = {
 			n = G.UIT.R,
 			config = { align = "cm", padding = 0.05 },
-			nodes = {
-				create_toggle({
-					id = "unlimited_slots_toggle",
-					label = localize("k_unlimited_slots"),
-					ref_table = MP.SP,
-					ref_value = "unlimited_slots",
-				}),
-			},
+			nodes = toggle_nodes,
 		}
 	end
 
