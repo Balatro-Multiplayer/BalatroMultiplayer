@@ -49,12 +49,6 @@ function G.UIDEF.override_main_menu_play_button()
 				UIBox_button({
 					label = { localize("b_sp_with_ruleset") },
 					colour = G.C.ORANGE,
-					button = "setup_run_singleplayer",
-					minw = 5,
-				}),
-				UIBox_button({
-					label = { localize("b_practice") },
-					colour = G.C.SECONDARY_SET.Planet,
 					button = "setup_practice_mode",
 					minw = 5,
 				}),

@@ -36,7 +36,14 @@ function G.FUNCS.reroll_shop(e)
 		MP.GAME.stats.reroll_cost_total = MP.GAME.stats.reroll_cost_total + G.GAME.current_round.reroll_cost
 	end
 
-	return reroll_shop_ref(e)
+	local result = reroll_shop_ref(e)
+
+	-- Practice mode: keep rerolls free after each reroll
+	if MP.is_practice_mode() and MP.SP.free_rerolls and not MP.LOBBY.code then
+		G.GAME.current_round.reroll_cost = 0
+	end
+
+	return result
 end
 
 local buy_from_shop_ref = G.FUNCS.buy_from_shop
