@@ -38,11 +38,6 @@ function G.FUNCS.reroll_shop(e)
 
 	local result = reroll_shop_ref(e)
 
-	-- Practice mode: keep rerolls free after each reroll
-	if MP.is_practice_mode() and MP.SP.free_rerolls and not MP.LOBBY.code then
-		G.GAME.current_round.reroll_cost = 0
-	end
-
 	return result
 end
 
