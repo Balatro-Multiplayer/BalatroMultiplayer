@@ -41,7 +41,7 @@ function MP.is_ruleset_active(ruleset_name)
 	local key = "ruleset_mp_" .. ruleset_name
 	if MP.LOBBY.code then
 		return MP.LOBBY.config.ruleset == key
-	elseif MP.SP and MP.SP.ruleset then
+	elseif MP.is_practice_mode() then
 		return MP.SP.ruleset == key
 	end
 	return false
@@ -50,7 +50,7 @@ end
 function MP.get_active_ruleset()
 	if MP.LOBBY.code then
 		return MP.LOBBY.config.ruleset
-	elseif MP.SP and MP.SP.ruleset then
+	elseif MP.is_practice_mode() then
 		return MP.SP.ruleset
 	end
 	return nil
@@ -59,10 +59,9 @@ end
 function MP.get_active_gamemode()
 	if MP.LOBBY.code then
 		return MP.LOBBY.config.gamemode
-	end
-	local ruleset_key = MP.SP and MP.SP.ruleset
-	if ruleset_key and MP.Rulesets[ruleset_key] then
-		return MP.Rulesets[ruleset_key].forced_gamemode
+	elseif MP.is_practice_mode() then
+		local ruleset_key = MP.SP and MP.SP.ruleset
+		if ruleset_key and MP.Rulesets[ruleset_key] then return MP.Rulesets[ruleset_key].forced_gamemode end
 	end
 	return nil
 end
