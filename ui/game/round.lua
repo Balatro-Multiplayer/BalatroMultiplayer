@@ -38,9 +38,11 @@ local reset_blinds_ref = reset_blinds
 function reset_blinds()
 	reset_blinds_ref()
 	G.GAME.round_resets.pvp_blind_choices = {}
-	if MP.LOBBY.code then
+
+	local gamemode_key = MP.get_active_gamemode()
+	if gamemode_key and MP.Gamemodes[gamemode_key] then
 		local mp_small_choice, mp_big_choice, mp_boss_choice =
-			MP.Gamemodes[MP.LOBBY.config.gamemode]:get_blinds_by_ante(G.GAME.round_resets.ante)
+			MP.Gamemodes[gamemode_key]:get_blinds_by_ante(G.GAME.round_resets.ante)
 		G.GAME.round_resets.blind_choices.Small = mp_small_choice or G.GAME.round_resets.blind_choices.Small
 		G.GAME.round_resets.blind_choices.Big = mp_big_choice or G.GAME.round_resets.blind_choices.Big
 		G.GAME.round_resets.blind_choices.Boss = mp_boss_choice or G.GAME.round_resets.blind_choices.Boss
