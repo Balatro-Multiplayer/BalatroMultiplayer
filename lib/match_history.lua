@@ -1,5 +1,15 @@
--- Ghost Replay data foundation (data capture only, no replay UI)
--- Captures per-ante snapshots for future ghost replay feature.
+-- Ghost Replay data capture
+--
+-- Records every match you play: seed, ruleset, gamemode, deck, stake, and
+-- per-ante snapshots of both players' scores and lives. Persisted to config
+-- so the data survives between sessions (last 20 matches kept).
+--
+-- What this enables:
+--   - Replay any seed you already played in practice mode,
+--     with your opponent's scores as ghost data
+--   - Practice mode can load a ghost replay and use the recorded enemy scores
+--     as the PvP blind target, so you're "playing against" a past opponent
+--   - Match history / post-game review: see how scores diverged ante by ante
 
 MP.MATCH_RECORD = {
 	seed = nil,
