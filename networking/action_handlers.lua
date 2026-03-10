@@ -67,17 +67,72 @@ local function action_rejoinedLobby(code, type, token)
 	-- Update reconnect token
 	reconnectToken = token
 	lastLobbyCode = code
+	MP.self_reconnect_countdown = nil
 	MP.ACTIONS.sync_client()
 	MP.ACTIONS.lobby_info()
 	MP.UI.update_connection_status()
+	sendWarnMessage("Reconnected to lobby!", "MULTIPLAYER")
+	G.FUNCS.exit_overlay_menu()
+	MP.UI.UTILS.overlay_message("Reconnected to lobby!")
 end
 
-local function action_enemyDisconnected()
+-- Countdown state for disconnect overlays
+MP.enemy_disconnect_countdown = nil
+MP.self_reconnect_countdown = nil
+
+-- Shared timeout handler for both countdowns
+local function handle_reconnect_timeout(message)
+	G.FUNCS.exit_overlay_menu()
+	MP.LOBBY.connected = false
+	if MP.LOBBY.code then MP.LOBBY.code = nil end
+	reconnectToken = nil
+	lastLobbyCode = nil
+	MP.UI.update_connection_status()
+	if G.STAGE ~= G.STAGES.MAIN_MENU then
+		MP.reset_game_states()
+		G.FUNCS.go_to_menu()
+	end
+	MP.UI.UTILS.overlay_message(message)
+end
+
+-- Hook into Game.update to tick countdown displays
+local _disconnect_gupdate = Game.update
+function Game:update(dt)
+	if MP.enemy_disconnect_countdown then
+		local remaining = math.max(0, math.ceil(MP.enemy_disconnect_countdown.end_time - love.timer.getTime()))
+		MP.enemy_disconnect_countdown.display = remaining .. "s remaining"
+		-- No client-side timeout needed: the server sends stopGame
+		-- when the grace period expires, which handles the cleanup
+	end
+	if MP.self_reconnect_countdown then
+		local remaining = math.max(0, math.ceil(MP.self_reconnect_countdown.end_time - love.timer.getTime()))
+		MP.self_reconnect_countdown.display = remaining .. "s remaining"
+		if remaining <= 0 then
+			MP.self_reconnect_countdown = nil
+			handle_reconnect_timeout("Reconnection failed.\nReturning to main menu.")
+		end
+	end
+	return _disconnect_gupdate(self, dt)
+end
+
+local function action_enemyDisconnected(timeout)
+	timeout = timeout or 60
 	sendWarnMessage("Opponent disconnected, waiting for reconnection...", "MULTIPLAYER")
-	MP.UI.UTILS.overlay_message("Opponent disconnected,\nwaiting for reconnection...", true)
+
+	MP.enemy_disconnect_countdown = {
+		end_time = love.timer.getTime() + timeout,
+		display = timeout .. "s remaining",
+	}
+
+	MP.UI.UTILS.overlay_message_countdown(
+		"Opponent disconnected,\nwaiting for reconnection...",
+		MP.enemy_disconnect_countdown,
+		true
+	)
 end
 
 local function action_enemyReconnected()
+	MP.enemy_disconnect_countdown = nil
 	sendWarnMessage("Opponent reconnected!", "MULTIPLAYER")
 	G.FUNCS.exit_overlay_menu()
 	MP.UI.UTILS.overlay_message("Opponent reconnected!")
@@ -142,11 +197,32 @@ end
 
 local function action_disconnected()
 	MP.LOBBY.connected = false
+	MP.self_reconnect_countdown = nil
 	if MP.LOBBY.code then MP.LOBBY.code = nil end
 	-- Clear reconnect state since all reconnection attempts failed
 	reconnectToken = nil
 	lastLobbyCode = nil
 	MP.UI.update_connection_status()
+end
+
+local function action_reconnecting()
+	-- Only show if we were in a lobby and don't already have a countdown running
+	if reconnectToken and lastLobbyCode and not MP.self_reconnect_countdown then
+		MP.LOBBY.connected = false
+		MP.UI.update_connection_status()
+		sendWarnMessage("Connection lost, attempting to reconnect...", "MULTIPLAYER")
+
+		MP.self_reconnect_countdown = {
+			end_time = love.timer.getTime() + 60,
+			display = "60s remaining",
+		}
+
+		MP.UI.UTILS.overlay_message_countdown(
+			"Connection lost,\nattempting to reconnect...",
+			MP.self_reconnect_countdown,
+			true
+		)
+	end
 end
 
 ---@param seed string
@@ -251,6 +327,7 @@ local function action_enemy_info(score_str, hands_left_str, skips_str, lives_str
 end
 
 local function action_stop_game()
+	MP.enemy_disconnect_countdown = nil
 	if G.STAGE ~= G.STAGES.MAIN_MENU then
 		G.FUNCS.go_to_menu()
 		MP.UI.update_connection_status()
@@ -1128,12 +1205,14 @@ function Game:update(dt)
 				action_version()
 			elseif parsedAction.action == "disconnected" then
 				action_disconnected()
+			elseif parsedAction.action == "reconnecting" then
+				action_reconnecting()
 			elseif parsedAction.action == "joinedLobby" then
 				action_joinedLobby(parsedAction.code, parsedAction.type, parsedAction.reconnectToken)
 			elseif parsedAction.action == "rejoinedLobby" then
 				action_rejoinedLobby(parsedAction.code, parsedAction.type, parsedAction.reconnectToken)
 			elseif parsedAction.action == "enemyDisconnected" then
-				action_enemyDisconnected()
+				action_enemyDisconnected(parsedAction.timeout)
 			elseif parsedAction.action == "enemyReconnected" then
 				action_enemyReconnected()
 			elseif parsedAction.action == "lobbyInfo" then

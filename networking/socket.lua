@@ -31,6 +31,7 @@ end
 
 Networking = {}
 local isSocketClosed = true
+local hasGivenUp = false -- true after all reconnect attempts failed
 local networkToUiChannel = love.thread.getChannel("networkToUi")
 local uiToNetworkChannel = love.thread.getChannel("uiToNetwork")
 
@@ -62,6 +63,7 @@ function Networking.connect()
 		return false
 	else
 		isSocketClosed = false
+		hasGivenUp = false
 	end
 
 	Networking.Client:settimeout(0)
@@ -98,6 +100,7 @@ local mainThreadMessageQueue = function()
 			local msg = uiToNetworkChannel:pop()
 			if msg then
 				if msg == "{\"action\":\"connect\"}" then
+					hasGivenUp = false
 					Networking.connect()
 				else
 					Networking.Client:send(msg .. "\n")
@@ -135,7 +138,7 @@ local retryCount = 0
 local networkPacketQueue = function()
 	local packetsPerCycle = 25
 	while true do
-		if Networking.Client then
+		if Networking.Client and not hasGivenUp then
 			-- Tries to fetch a packet a max of packetsPerCycle times
 			-- and then yields
 			for _ = 1, packetsPerCycle do
@@ -162,9 +165,12 @@ local networkPacketQueue = function()
 					isRetry = false
 					timerCoroutine = coroutine.create(timer)
 
+					networkToUiChannel:push("{\"action\":\"reconnecting\"}")
 					if not Networking.tryReconnect() then
+						hasGivenUp = true
 						networkToUiChannel:push("{\"action\":\"disconnected\"}")
 					end
+					break
 				else
 					-- If there are no more packets, yield
 					coroutine.yield()
@@ -203,7 +209,9 @@ while true do
 			isRetry = false
 			timerCoroutine = coroutine.create(timer)
 
+			networkToUiChannel:push("{\"action\":\"reconnecting\"}")
 			if not Networking.tryReconnect() then
+				hasGivenUp = true
 				networkToUiChannel:push("{\"action\":\"disconnected\"}")
 			end
 		end
