@@ -85,31 +85,3 @@ payload = '''
 '''
 match_indent = true
 times = 1
-
-# Unlimited money: refill dollars at start of each round
-[[patches]]
-[patches.pattern]
-target = "functions/state_events.lua"
-pattern = '''G.STATE = G.STATES.SELECTING_HAND'''
-position = 'after'
-payload = '''
-if MP and MP.is_practice_mode() and MP.SP.unlimited_money and not MP.LOBBY.code then
-    G.GAME.dollars = math.max(G.GAME.dollars, 999)
-end
-'''
-match_indent = true
-times = 1
-
-# Free rerolls: zero out reroll cost each time shop is entered
-[[patches]]
-[patches.pattern]
-target = "functions/state_events.lua"
-pattern = '''G.STATE = G.STATES.SHOP'''
-position = 'after'
-payload = '''
-if MP and MP.is_practice_mode() and MP.SP.free_rerolls and not MP.LOBBY.code then
-    G.GAME.current_round.reroll_cost = 0
-end
-'''
-match_indent = true
-times = 1

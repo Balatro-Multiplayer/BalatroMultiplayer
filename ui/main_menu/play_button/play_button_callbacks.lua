@@ -1,5 +1,5 @@
 -- Singleplayer ruleset state (parallels MP.LOBBY.config.ruleset for multiplayer)
-MP.SP = { ruleset = nil, practice = false, unlimited_slots = false, unlimited_money = false, free_rerolls = false, edition_cycling = false }
+MP.SP = { ruleset = nil, practice = false, unlimited_slots = false, edition_cycling = false }
 
 function MP.is_practice_mode()
 	return MP.SP.practice == true
@@ -37,8 +37,6 @@ function G.FUNCS.setup_practice_mode(e)
 	MP.SP.ruleset = nil
 	MP.SP.practice = true
 	MP.SP.unlimited_slots = false
-	MP.SP.unlimited_money = false
-	MP.SP.free_rerolls = false
 	MP.SP.edition_cycling = false
 
 	G.FUNCS.overlay_menu({

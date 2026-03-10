@@ -137,8 +137,6 @@ function G.UIDEF.ruleset_info(ruleset_name, mode)
 	if mode == "practice" then
 		local practice_toggles = {
 			{ id = "unlimited_slots_toggle", label = "k_unlimited_slots", ref_value = "unlimited_slots" },
-			{ id = "unlimited_money_toggle", label = "k_unlimited_money", ref_value = "unlimited_money" },
-			{ id = "free_rerolls_toggle", label = "k_free_rerolls", ref_value = "free_rerolls" },
 			{ id = "edition_cycling_toggle", label = "k_edition_cycling", ref_value = "edition_cycling" },
 		}
 		local toggle_nodes = {}

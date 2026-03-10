@@ -903,8 +903,6 @@ return {
 			b_sp_with_ruleset = "Practice Mode",
 			b_practice = "Practice",
 			k_unlimited_slots = "Unlimited Slots",
-			k_unlimited_money = "Unlimited Money",
-			k_free_rerolls = "Free Rerolls",
 			k_edition_cycling = "Edition Cycling (Q)",
 			b_join_lobby = "Join Lobby",
 			b_join_lobby_clipboard = "Join From Clipboard",
