@@ -1,9 +1,13 @@
 -- Contains function overrides (monkey-patches) for game state management
 -- Overrides Game methods like update_draw_to_hand, update_hand_played, update_new_round, etc.
 
+local function is_mp_or_ghost()
+	return MP.LOBBY.code or MP.GHOST.is_active()
+end
+
 local update_draw_to_hand_ref = Game.update_draw_to_hand
 function Game:update_draw_to_hand(dt)
-	if MP.LOBBY.code then
+	if is_mp_or_ghost() then
 		if
 			not G.STATE_COMPLETE
 			and G.GAME.current_round.hands_played == 0
@@ -28,12 +32,18 @@ function Game:update_draw_to_hand(dt)
 							delay = 0.45,
 							blockable = false,
 							func = function()
-								G.HUD_blind:get_UIE_by_ID("HUD_blind_name").config.object.config.string = {
-									{
-										ref_table = MP.LOBBY.is_host and MP.LOBBY.guest or MP.LOBBY.host,
-										ref_value = "username",
-									},
-								}
+								local blind_name_string
+								if MP.GHOST.is_active() then
+									blind_name_string = { { string = localize("k_ghost") } }
+								else
+									blind_name_string = {
+										{
+											ref_table = MP.LOBBY.is_host and MP.LOBBY.guest or MP.LOBBY.host,
+											ref_value = "username",
+										},
+									}
+								end
+								G.HUD_blind:get_UIE_by_ID("HUD_blind_name").config.object.config.string = blind_name_string
 								G.HUD_blind:get_UIE_by_ID("HUD_blind_name").config.object:update_text()
 								G.HUD_blind:get_UIE_by_ID("HUD_blind_name").config.object:pop_in(0)
 								return true
@@ -69,8 +79,10 @@ function Game:update_draw_to_hand(dt)
 					end
 					G.E_MANAGER:add_event(Event({
 						func = function()
-							for i = 1, MP.GAME.asteroids do
-								MP.ACTIONS.asteroid()
+							if not MP.GHOST.is_active() then
+								for i = 1, MP.GAME.asteroids do
+									MP.ACTIONS.asteroid()
+								end
 							end
 							MP.GAME.asteroids = 0
 							return true
@@ -182,7 +194,8 @@ local update_hand_played_ref = Game.update_hand_played
 ---@diagnostic disable-next-line: duplicate-set-field
 function Game:update_hand_played(dt)
 	-- Ignore for singleplayer or regular blinds
-	if not MP.LOBBY.connected or not MP.LOBBY.code or not MP.is_pvp_boss() then
+	local ghost = MP.GHOST.is_active()
+	if (not ghost and (not MP.LOBBY.connected or not MP.LOBBY.code)) or not MP.is_pvp_boss() then
 		update_hand_played_ref(self, dt)
 		return
 	end
@@ -201,17 +214,43 @@ function Game:update_hand_played(dt)
 		G.E_MANAGER:add_event(Event({
 			trigger = "immediate",
 			func = function()
-				MP.ACTIONS.play_hand(G.GAME.chips, G.GAME.current_round.hands_left)
+				if not ghost then
+					MP.ACTIONS.play_hand(G.GAME.chips, G.GAME.current_round.hands_left)
+				end
 				-- For now, never advance to next round
 				if G.GAME.current_round.hands_left < 1 then
-					attention_text({
-						scale = 0.8,
-						text = localize("k_wait_enemy"),
-						hold = 5,
-						align = "cm",
-						offset = { x = 0, y = -1.5 },
-						major = G.play,
-					})
+					if ghost then
+						-- Auto-resolve PvP round locally
+						local beat_ghost = to_big(G.GAME.chips) >= to_big(G.GAME.blind.chips)
+						if beat_ghost then
+							MP.GAME.enemy.lives = MP.GAME.enemy.lives - 1
+							if MP.GAME.enemy.lives <= 0 then
+								MP.GAME.won = true
+								MP.MATCH_RECORD.finalize(true)
+								win_game()
+								return true
+							end
+						else
+							MP.GAME.lives = MP.GAME.lives - 1
+							MP.UI.ease_lives(-1)
+							if MP.GAME.lives <= 0 then
+								MP.MATCH_RECORD.finalize(false)
+								G.STATE = G.STATES.GAME_OVER
+								G.STATE_COMPLETE = false
+								return true
+							end
+						end
+						MP.GAME.end_pvp = true
+					else
+						attention_text({
+							scale = 0.8,
+							text = localize("k_wait_enemy"),
+							hold = 5,
+							align = "cm",
+							offset = { x = 0, y = -1.5 },
+							major = G.play,
+						})
+					end
 					if G.hand.cards[1] and G.STATE == G.STATES.HAND_PLAYED then
 						eval_hand_and_jokers()
 						G.FUNCS.draw_from_hand_to_discard()
@@ -242,19 +281,22 @@ function Game:update_new_round(dt)
 		G.STATE = G.STATES.NEW_ROUND
 		MP.GAME.end_pvp = false
 	end
-	if MP.LOBBY.code and not G.STATE_COMPLETE then
+	if is_mp_or_ghost() and not G.STATE_COMPLETE then
+		local ghost = MP.GHOST.is_active()
 		-- Prevent player from losing
 		if to_big(G.GAME.chips) < to_big(G.GAME.blind.chips) and not MP.is_pvp_boss() then
 			G.GAME.blind.chips = -1
-			MP.GAME.wait_for_enemys_furthest_blind = (MP.LOBBY.config.gamemode == "gamemode_mp_survival")
-				and (tonumber(MP.GAME.lives) == 1) -- In Survival Mode, if this is the last live, wait for the enemy.
-			MP.ACTIONS.fail_round(G.GAME.current_round.hands_played)
+			if not ghost then
+				MP.GAME.wait_for_enemys_furthest_blind = (MP.LOBBY.config.gamemode == "gamemode_mp_survival")
+					and (tonumber(MP.GAME.lives) == 1)
+				MP.ACTIONS.fail_round(G.GAME.current_round.hands_played)
+			end
 		end
 
 		-- Prevent player from winning
 		G.GAME.win_ante = 999
 
-		if MP.LOBBY.config.gamemode == "gamemode_mp_survival" and MP.GAME.wait_for_enemys_furthest_blind then
+		if not ghost and MP.LOBBY.config.gamemode == "gamemode_mp_survival" and MP.GAME.wait_for_enemys_furthest_blind then
 			G.STATE_COMPLETE = true
 			G.FUNCS.draw_from_hand_to_discard()
 			attention_text({
@@ -283,14 +325,16 @@ function Game:update_selecting_hand(dt)
 		and #G.hand.cards < 1
 		and #G.deck.cards < 1
 		and #G.play.cards < 1
-		and MP.LOBBY.code
+		and is_mp_or_ghost()
 	then
 		G.GAME.current_round.hands_left = 0
 		if not MP.is_pvp_boss() then
 			G.STATE_COMPLETE = false
 			G.STATE = G.STATES.NEW_ROUND
 		else
-			MP.ACTIONS.play_hand(G.GAME.chips, 0)
+			if not MP.GHOST.is_active() then
+				MP.ACTIONS.play_hand(G.GAME.chips, 0)
+			end
 			G.STATE_COMPLETE = false
 			G.STATE = G.STATES.HAND_PLAYED
 		end
@@ -298,7 +342,7 @@ function Game:update_selecting_hand(dt)
 	end
 	update_selecting_hand_ref(self, dt)
 
-	if MP.GAME.end_pvp and MP.is_pvp_boss() then
+	if MP.GAME.end_pvp and MP.is_pvp_boss() and is_mp_or_ghost() then
 		G.hand:unhighlight_all()
 		G.STATE_COMPLETE = false
 		G.STATE = G.STATES.NEW_ROUND
@@ -345,7 +389,8 @@ function Game:start_run(args)
 
 	start_run_ref(self, args)
 
-	if not MP.LOBBY.connected or not MP.LOBBY.code or MP.LOBBY.config.disable_live_and_timer_hud then return end
+	local show_lives_hud = (MP.LOBBY.connected and MP.LOBBY.code) or MP.GHOST.is_active()
+	if not show_lives_hud or MP.LOBBY.config.disable_live_and_timer_hud then return end
 
 	local scale = 0.4
 	local hud_ante = G.HUD:get_UIE_by_ID("hud_ante")
@@ -370,7 +415,7 @@ end
 
 -- This prevents duplicate execution during certain cases. e.g. Full deck discard before playing any hands.
 function MP.handle_duplicate_end()
-	if MP.LOBBY.code then
+	if MP.LOBBY.code or MP.GHOST.is_active() then
 		if MP.GAME.round_ended then
 			if not MP.GAME.duplicate_end then
 				MP.GAME.duplicate_end = true
@@ -385,15 +430,16 @@ end
 -- This handles an edge case where a player plays no hands, and discards the only cards in their deck.
 -- Allows opponent to advance after playing anything, and eases a life from the person who discarded their deck.
 function MP.handle_deck_out()
-	if MP.LOBBY.code then
+	if MP.LOBBY.code or MP.GHOST.is_active() then
 		if
 			G.GAME.current_round.hands_played == 0
 			and G.GAME.current_round.discards_used > 0
 			and MP.LOBBY.config.gamemode ~= "gamemode_mp_survival"
 		then
-			if MP.is_pvp_boss() then MP.ACTIONS.play_hand(0, 0) end
-
-			MP.ACTIONS.fail_round(1)
+			if not MP.GHOST.is_active() then
+				if MP.is_pvp_boss() then MP.ACTIONS.play_hand(0, 0) end
+				MP.ACTIONS.fail_round(1)
+			end
 		end
 	end
 end
