@@ -21,12 +21,13 @@ function MP.MATCH_RECORD.reset()
 	MP.MATCH_RECORD.final_ante = nil
 end
 
-function MP.MATCH_RECORD.init(seed, ruleset, gamemode, deck)
+function MP.MATCH_RECORD.init(seed, ruleset, gamemode, deck, stake)
 	MP.MATCH_RECORD.reset()
 	MP.MATCH_RECORD.seed = seed
 	MP.MATCH_RECORD.ruleset = ruleset
 	MP.MATCH_RECORD.gamemode = gamemode
 	MP.MATCH_RECORD.deck = deck
+	MP.MATCH_RECORD.stake = stake
 end
 
 function MP.MATCH_RECORD.snapshot_ante(ante, data)
