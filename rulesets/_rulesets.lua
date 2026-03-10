@@ -56,16 +56,21 @@ function MP.get_active_ruleset()
 	return nil
 end
 
-function MP.ApplyBans()
-	local ruleset_key = nil
-	local gamemode = nil
-
-	if MP.LOBBY.code and MP.LOBBY.config.ruleset then
-		ruleset_key = MP.LOBBY.config.ruleset
-		gamemode = MP.Gamemodes["gamemode_mp_" .. MP.LOBBY.type]
-	elseif MP.SP and MP.SP.ruleset then
-		ruleset_key = MP.SP.ruleset
+function MP.get_active_gamemode()
+	if MP.LOBBY.code then
+		return MP.LOBBY.config.gamemode
 	end
+	local ruleset_key = MP.SP and MP.SP.ruleset
+	if ruleset_key and MP.Rulesets[ruleset_key] then
+		return MP.Rulesets[ruleset_key].forced_gamemode
+	end
+	return nil
+end
+
+function MP.ApplyBans()
+	local ruleset_key = MP.get_active_ruleset()
+	local gamemode_key = MP.get_active_gamemode()
+	local gamemode = gamemode_key and MP.Gamemodes[gamemode_key] or nil
 
 	if ruleset_key then
 		local ruleset = MP.Rulesets[ruleset_key]
