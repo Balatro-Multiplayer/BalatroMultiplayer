@@ -4,7 +4,7 @@ dump_lua = true
 priority = 2147483600
 
 # Practice mode: give cards from collection via key "3" or left-click.
-# Also: unlimited money, free rerolls, edition cycling.
+# Also: edition cycling.
 
 # Shared helper function for giving a hovered card to the player
 [[patches]]
