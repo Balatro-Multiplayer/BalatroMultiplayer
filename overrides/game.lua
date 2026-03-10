@@ -36,9 +36,7 @@ function G.FUNCS.reroll_shop(e)
 		MP.GAME.stats.reroll_cost_total = MP.GAME.stats.reroll_cost_total + G.GAME.current_round.reroll_cost
 	end
 
-	local result = reroll_shop_ref(e)
-
-	return result
+	return reroll_shop_ref(e)
 end
 
 local buy_from_shop_ref = G.FUNCS.buy_from_shop

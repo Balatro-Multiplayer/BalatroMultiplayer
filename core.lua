@@ -99,7 +99,7 @@ MP.REQUIRED_LOVELY_VERSION = "0.9"
 function MP.should_use_the_order()
 	if MP.LOBBY and MP.LOBBY.config and MP.LOBBY.config.the_order and MP.LOBBY.code then
 		return true
-	elseif MP.is_practice_mode() then
+	elseif MP.is_practice_mode() then -- should actually check the ruleset but okay for now
 		return true
 	end
 	return false
