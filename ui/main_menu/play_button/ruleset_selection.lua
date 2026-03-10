@@ -153,6 +153,29 @@ function G.UIDEF.ruleset_info(ruleset_name, mode)
 			config = { align = "cm", padding = 0.05 },
 			nodes = toggle_nodes,
 		}
+
+		-- Ghost replay picker button
+		local ghost_label = localize("k_ghost_replays")
+		if MP.GHOST.is_active() then
+			ghost_label = ghost_label .. " (Active)"
+		end
+		content_nodes[#content_nodes + 1] = {
+			n = G.UIT.R,
+			config = { align = "cm", padding = 0.05 },
+			nodes = {
+				UIBox_button({
+					id = "ghost_replay_button",
+					button = "open_ghost_replay_picker",
+					label = { ghost_label },
+					minw = 4,
+					minh = 0.6,
+					scale = 0.4,
+					colour = MP.GHOST.is_active() and G.C.GREEN or G.C.BLUE,
+					hover = true,
+					shadow = true,
+				}),
+			},
+		}
 	end
 
 	content_nodes[#content_nodes + 1] = {
