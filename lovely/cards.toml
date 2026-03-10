@@ -75,3 +75,36 @@ position = 'after'
 payload = '''if context.other_joker.edition and context.other_joker.edition.type == 'mp_phantom' then return end'''
 match_indent = true
 times = 1
+
+# STEAMODDED BUG - move this thing again???
+[[patches]]
+[patches.pattern]
+target = "functions/common_events.lua"
+pattern = '''    for k, v in pairs(other.ability) do
+        if type(v) == 'table' then 
+            new_card.ability[k] = copy_table(v)
+        else
+            new_card.ability[k] = v
+        end
+    end'''
+position = 'at'
+payload = ''' '''
+match_indent = true
+times = 1
+
+# STEAMODDED BUG - move this thing again???
+[[patches]]
+[patches.pattern]
+target = "functions/common_events.lua"
+pattern = '''if other.params then'''
+position = 'before'
+payload = '''
+    for k, v in pairs(other.ability) do
+        if type(v) == 'table' then 
+            new_card.ability[k] = copy_table(v)
+        else
+            new_card.ability[k] = v
+        end
+    end'''
+match_indent = true
+times = 1
