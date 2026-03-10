@@ -11,6 +11,7 @@ function G.FUNCS.setup_run_singleplayer(e)
 	MP.LOBBY.config.gamemode = nil
 	MP.SP.ruleset = nil
 	MP.SP.practice = false
+	MP.GHOST.clear()
 
 	G.FUNCS.overlay_menu({
 		definition = G.UIDEF.ruleset_selection_options("sp"),
@@ -27,6 +28,7 @@ function G.FUNCS.start_vanilla_sp(e)
 	MP.LOBBY.config.gamemode = nil
 	MP.SP.ruleset = nil
 	MP.SP.practice = false
+	MP.GHOST.clear()
 	G.FUNCS.setup_run(e)
 end
 
@@ -38,6 +40,7 @@ function G.FUNCS.setup_practice_mode(e)
 	MP.SP.practice = true
 	MP.SP.unlimited_slots = false
 	MP.SP.edition_cycling = false
+	MP.GHOST.clear()
 
 	G.FUNCS.overlay_menu({
 		definition = G.UIDEF.ruleset_selection_options("practice"),
@@ -46,7 +49,20 @@ end
 
 function G.FUNCS.start_practice_run(e)
 	G.FUNCS.exit_overlay_menu()
-	G.FUNCS.setup_run(e)
+	if MP.GHOST.is_active() then
+		local r = MP.GHOST.replay
+		MP.reset_game_states()
+		local starting_lives = MP.LOBBY.config.starting_lives or 4
+		MP.GAME.lives = starting_lives
+		MP.GAME.enemy.lives = starting_lives
+		local deck_key = MP.UTILS.get_deck_key_from_name(r.deck)
+		if deck_key then
+			G.GAME.viewed_back = G.P_CENTERS[deck_key]
+		end
+		G.FUNCS.start_run(e, { seed = r.seed, stake = r.stake or 1 })
+	else
+		G.FUNCS.setup_run(e)
+	end
 end
 
 function G.FUNCS.toggle_unlimited_slots(e)
