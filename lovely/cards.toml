@@ -108,3 +108,44 @@ payload = '''
     end'''
 match_indent = true
 times = 1
+
+# STEAMODDED BUG - add strip_edition check
+[[patches]]
+[patches.pattern]
+target = "functions/common_events.lua"
+pattern = '''if other.params then'''
+position = 'before'
+payload = '''
+    for k, v in pairs(other.ability) do
+        if type(v) == 'table' then 
+            new_card.ability[k] = copy_table(v)
+        else
+            new_card.ability[k] = v
+        end
+    end'''
+match_indent = true
+times = 1
+
+# STEAMODDED BUG - add check for this because perkeo
+[[patches]]
+[patches.pattern]
+target = "functions/common_events.lua"
+pattern = '''if other.edition then'''
+position = 'at'
+payload = '''if other.edition and strip_edition then'''
+match_indent = true
+times = 1
+
+# STEAMODDED BUG - disable this
+# feels weird but recent steamodded commit to dev version removes this
+# so it's correct i guess
+[[patches]]
+[patches.pattern]
+target = "functions/common_events.lua"
+pattern = '''if other.seal then
+	new_card.ability.card_limit = new_card.ability.card_limit - (other.ability.seal.card_limit or 0)'''
+position = 'at'
+payload = '''if false then
+	new_card.ability.card_limit = new_card.ability.card_limit - (other.ability.seal.card_limit or 0)'''
+match_indent = true
+times = 1
