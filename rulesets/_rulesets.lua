@@ -60,6 +60,10 @@ function MP.get_active_gamemode()
 	if MP.LOBBY.code then
 		return MP.LOBBY.config.gamemode
 	elseif MP.is_practice_mode() then
+		-- Ghost replay stores the gamemode directly
+		if MP.GHOST.is_active() and MP.LOBBY.config.gamemode then
+			return MP.LOBBY.config.gamemode
+		end
 		local ruleset_key = MP.SP and MP.SP.ruleset
 		if ruleset_key and MP.Rulesets[ruleset_key] then return MP.Rulesets[ruleset_key].forced_gamemode end
 	end

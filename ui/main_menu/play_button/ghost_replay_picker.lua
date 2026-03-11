@@ -2,24 +2,23 @@
 -- Shown in practice mode to select a past match replay for ghost PvP
 
 local function reopen_practice_menu()
-	G.FUNCS.exit_overlay_menu()
 	G.FUNCS.overlay_menu({
 		definition = G.UIDEF.ruleset_selection_options("practice"),
 	})
 end
 
 function G.FUNCS.open_ghost_replay_picker(e)
-	G.FUNCS.exit_overlay_menu()
 	G.FUNCS.overlay_menu({
 		definition = G.UIDEF.ghost_replay_picker(),
 	})
 end
 
 function G.FUNCS.select_ghost_replay(e)
-	local idx = e.config.ghost_replay_idx
+	local idx = tonumber(e.config.id:match("ghost_replay_(%d+)"))
 	local config = SMODS.Mods["Multiplayer"].config
 	local replays = config.ghost_replays or {}
 	local replay = replays[idx]
+
 	if not replay then return end
 
 	MP.GHOST.load(replay)
@@ -32,9 +31,7 @@ function G.FUNCS.select_ghost_replay(e)
 	end
 
 	-- Set gamemode from the replay
-	if replay.gamemode then
-		MP.LOBBY.config.gamemode = replay.gamemode
-	end
+	if replay.gamemode then MP.LOBBY.config.gamemode = replay.gamemode end
 
 	reopen_practice_menu()
 end
@@ -86,13 +83,15 @@ function G.UIDEF.ghost_replay_picker()
 			local ante_display = tostring(r.final_ante or "?")
 
 			local timestamp_display = ""
-			if r.timestamp then
-				timestamp_display = os.date("%m/%d %H:%M", r.timestamp)
-			end
+			if r.timestamp then timestamp_display = os.date("%m/%d %H:%M", r.timestamp) end
 
 			local label = string.format(
 				"%s | %s | %s | Ante %s | %s",
-				result_text, ruleset_display, deck_display, ante_display, timestamp_display
+				result_text,
+				ruleset_display,
+				deck_display,
+				ante_display,
+				timestamp_display
 			)
 
 			replay_nodes[#replay_nodes + 1] = {

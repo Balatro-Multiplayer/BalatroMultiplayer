@@ -100,11 +100,8 @@ end
 
 function MP.GHOST.get_enemy_score(ante)
 	if not MP.GHOST.replay or not MP.GHOST.replay.ante_snapshots then return nil end
-	local snapshot = MP.GHOST.replay.ante_snapshots[ante]
-		or MP.GHOST.replay.ante_snapshots[tostring(ante)]
-	if snapshot and snapshot.enemy_score then
-		return snapshot.enemy_score
-	end
+	local snapshot = MP.GHOST.replay.ante_snapshots[ante] or MP.GHOST.replay.ante_snapshots[tostring(ante)]
+	if snapshot and snapshot.enemy_score then return snapshot.enemy_score end
 	return nil
 end
 
@@ -131,10 +128,34 @@ function MP.GHOST.generate_test_replay()
 			[2] = { enemy_score = "8000", player_score = "5000", player_lives = 4, enemy_lives = 4, result = "win" },
 			[3] = { enemy_score = "45000", player_score = "30000", player_lives = 4, enemy_lives = 3, result = "loss" },
 			[4] = { enemy_score = "200000", player_score = "150000", player_lives = 3, enemy_lives = 3, result = "win" },
-			[5] = { enemy_score = "1200000", player_score = "800000", player_lives = 3, enemy_lives = 2, result = "loss" },
-			[6] = { enemy_score = "5000000", player_score = "3000000", player_lives = 2, enemy_lives = 2, result = "loss" },
-			[7] = { enemy_score = "25000000", player_score = "15000000", player_lives = 1, enemy_lives = 2, result = "loss" },
-			[8] = { enemy_score = "100000000", player_score = "50000000", player_lives = 1, enemy_lives = 2, result = "loss" },
+			[5] = {
+				enemy_score = "1200000",
+				player_score = "800000",
+				player_lives = 3,
+				enemy_lives = 2,
+				result = "loss",
+			},
+			[6] = {
+				enemy_score = "5000000",
+				player_score = "3000000",
+				player_lives = 2,
+				enemy_lives = 2,
+				result = "loss",
+			},
+			[7] = {
+				enemy_score = "25000000",
+				player_score = "15000000",
+				player_lives = 1,
+				enemy_lives = 2,
+				result = "loss",
+			},
+			[8] = {
+				enemy_score = "100000000",
+				player_score = "50000000",
+				player_lives = 1,
+				enemy_lives = 2,
+				result = "loss",
+			},
 		},
 	}
 

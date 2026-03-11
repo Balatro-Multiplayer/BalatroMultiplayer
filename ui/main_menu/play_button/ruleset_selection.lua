@@ -2,8 +2,13 @@ function G.UIDEF.ruleset_selection_options(mode)
 	mode = mode or "mp"
 	MP.LOBBY.fetched_weekly = "smallworld" -- temp
 
-	-- SP defaults to vanilla, MP defaults to ranked
-	local default_ruleset = "standard_ranked"
+	-- If ghost is active, preserve the replay's ruleset instead of resetting to default
+	local default_ruleset
+	if mode == "practice" and MP.GHOST.is_active() and MP.SP.ruleset then
+		default_ruleset = MP.SP.ruleset:gsub("^ruleset_mp_", "")
+	else
+		default_ruleset = "standard_ranked"
+	end
 	local default_button = default_ruleset .. "_ruleset_button"
 
 	if mode == "sp" or mode == "practice" then
