@@ -60,6 +60,18 @@ function G.FUNCS.start_practice_run(e)
 			G.GAME.viewed_back = G.P_CENTERS[deck_key]
 		end
 		G.FUNCS.start_run(e, { seed = r.seed, stake = r.stake or 1 })
+		sendDebugMessage(string.format(
+			"Practice run state: practice=%s, ghost=%s, ruleset=%s, gamemode=%s, deck_key=%s, lives=%s, enemy_lives=%s, seed=%s, stake=%s",
+			tostring(MP.is_practice_mode()),
+			tostring(MP.GHOST.is_active()),
+			tostring(MP.get_active_ruleset()),
+			tostring(MP.get_active_gamemode()),
+			tostring(deck_key),
+			tostring(MP.GAME.lives),
+			tostring(MP.GAME.enemy.lives),
+			tostring(G.GAME.pseudorandom and G.GAME.pseudorandom.seed or "?"),
+			tostring(G.GAME.stake or "?")
+		), "MULTIPLAYER")
 	else
 		G.FUNCS.setup_run(e)
 	end
