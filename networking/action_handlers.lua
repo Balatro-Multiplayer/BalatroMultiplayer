@@ -161,7 +161,9 @@ local function action_start_game(seed, stake_str)
 	G.FUNCS.lobby_start_run(nil, { seed = seed, stake = stake })
 	MP.LOBBY.ready_to_start = false
 
-	MP.MATCH_RECORD.init(seed, MP.LOBBY.config.ruleset, MP.LOBBY.config.gamemode, MP.LOBBY.config.back, stake_str)
+	local nemesis = MP.LOBBY.is_host and MP.LOBBY.guest or MP.LOBBY.host
+	local nemesis_name = nemesis and nemesis.username or "Unknown"
+	MP.MATCH_RECORD.init(seed, MP.LOBBY.config.ruleset, MP.LOBBY.config.gamemode, MP.LOBBY.config.back, stake_str, nemesis_name)
 end
 
 local function begin_pvp_blind()

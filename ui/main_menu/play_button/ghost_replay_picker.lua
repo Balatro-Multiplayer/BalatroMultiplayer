@@ -78,6 +78,7 @@ function G.UIDEF.ghost_replay_picker()
 			local r = replays[i]
 			local result_text = (r.winner == "player") and "W" or "L"
 
+			local nemesis_display = r.nemesis_name or "?"
 			local ruleset_display = r.ruleset and r.ruleset:gsub("^ruleset_mp_", "") or "?"
 			local deck_display = r.deck or "?"
 			local ante_display = tostring(r.final_ante or "?")
@@ -86,8 +87,9 @@ function G.UIDEF.ghost_replay_picker()
 			if r.timestamp then timestamp_display = os.date("%m/%d %H:%M", r.timestamp) end
 
 			local label = string.format(
-				"%s | %s | %s | Ante %s | %s",
+				"%s | vs %s | %s | %s | Ante %s | %s",
 				result_text,
+				nemesis_display,
 				ruleset_display,
 				deck_display,
 				ante_display,
