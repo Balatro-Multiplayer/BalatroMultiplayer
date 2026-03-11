@@ -28,7 +28,7 @@ target = "functions/state_events.lua"
 pattern = '''-- context.end_of_round calculations'''
 position = 'before'
 payload = '''
-if MP.LOBBY.code then
+if MP.LOBBY.code or MP.GHOST.is_active() then
 	game_over = false
 end
 '''
@@ -42,7 +42,7 @@ target = "functions/state_events.lua"
 pattern = '''if game_over then'''
 position = 'before'
 payload = '''
-if MP.LOBBY.code then
+if MP.LOBBY.code or MP.GHOST.is_active() then
 	game_won = nil
 	G.GAME.won = nil
 end
