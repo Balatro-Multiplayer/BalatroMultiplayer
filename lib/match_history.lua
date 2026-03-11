@@ -16,6 +16,7 @@ MP.MATCH_RECORD = {
 	ruleset = nil,
 	gamemode = nil,
 	deck = nil,
+	nemesis_name = nil,
 	ante_snapshots = {},
 	winner = nil,
 	final_ante = nil,
@@ -26,18 +27,20 @@ function MP.MATCH_RECORD.reset()
 	MP.MATCH_RECORD.ruleset = nil
 	MP.MATCH_RECORD.gamemode = nil
 	MP.MATCH_RECORD.deck = nil
+	MP.MATCH_RECORD.nemesis_name = nil
 	MP.MATCH_RECORD.ante_snapshots = {}
 	MP.MATCH_RECORD.winner = nil
 	MP.MATCH_RECORD.final_ante = nil
 end
 
-function MP.MATCH_RECORD.init(seed, ruleset, gamemode, deck, stake)
+function MP.MATCH_RECORD.init(seed, ruleset, gamemode, deck, stake, nemesis_name)
 	MP.MATCH_RECORD.reset()
 	MP.MATCH_RECORD.seed = seed
 	MP.MATCH_RECORD.ruleset = ruleset
 	MP.MATCH_RECORD.gamemode = gamemode
 	MP.MATCH_RECORD.deck = deck
 	MP.MATCH_RECORD.stake = stake
+	MP.MATCH_RECORD.nemesis_name = nemesis_name
 end
 
 function MP.MATCH_RECORD.snapshot_ante(ante, data)
@@ -66,6 +69,7 @@ function MP.MATCH_RECORD.finalize(won)
 		ruleset = MP.MATCH_RECORD.ruleset,
 		gamemode = MP.MATCH_RECORD.gamemode,
 		deck = MP.MATCH_RECORD.deck,
+		nemesis_name = MP.MATCH_RECORD.nemesis_name,
 		ante_snapshots = MP.MATCH_RECORD.ante_snapshots,
 		winner = MP.MATCH_RECORD.winner,
 		final_ante = MP.MATCH_RECORD.final_ante,
@@ -115,10 +119,11 @@ function MP.GHOST.generate_test_replay()
 	config.ghost_replays = config.ghost_replays or {}
 
 	local fake = {
-		seed = "TESTGHOST",
-		ruleset = "ruleset_mp_blitz",
+		seed = "ABCDE",
+		ruleset = "ruleset_mp_standard_ranked",
 		gamemode = "gamemode_mp_attrition",
-		deck = "Red Deck",
+		deck = "Abandoned Deck",
+		nemesis_name = "Zaino",
 		stake = 1,
 		winner = "nemesis",
 		final_ante = 6,
