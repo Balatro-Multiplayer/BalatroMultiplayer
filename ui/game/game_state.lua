@@ -221,7 +221,8 @@ function Game:update_hand_played(dt)
 				if G.GAME.current_round.hands_left < 1 then
 					if ghost then
 						-- Auto-resolve PvP round locally
-						local beat_ghost = to_big(G.GAME.chips) >= to_big(G.GAME.blind.chips)
+						local enemy_score = MP.GAME.enemy.score.coeffiocient * (10 ^ MP.GAME.enemy.score.exponent)
+						local beat_ghost = to_big(G.GAME.chips) >= to_big(enemy_score)
 						if beat_ghost then
 							MP.GAME.enemy.lives = MP.GAME.enemy.lives - 1
 							if MP.GAME.enemy.lives <= 0 then
