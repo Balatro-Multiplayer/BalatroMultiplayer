@@ -34,7 +34,7 @@ function Game:update_draw_to_hand(dt)
 							func = function()
 								local blind_name_string
 								if MP.GHOST.is_active() then
-									blind_name_string = { { string = localize("k_ghost") } }
+									blind_name_string = { { string = MP.GHOST.replay.nemesis_name or localize("k_ghost") } }
 								else
 									blind_name_string = {
 										{

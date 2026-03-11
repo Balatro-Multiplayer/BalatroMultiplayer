@@ -137,7 +137,7 @@ function create_UIBox_blind_choice(type, run_info)
 		local loc_name
 		if G.GAME.round_resets.blind_choices[type] == "bl_mp_nemesis" then
 			if MP.GHOST.is_active() then
-				loc_name = localize("k_ghost")
+				loc_name = MP.GHOST.replay.nemesis_name or localize("k_ghost")
 			else
 				loc_name = MP.LOBBY.is_host and MP.LOBBY.guest.username or MP.LOBBY.host.username
 			end
