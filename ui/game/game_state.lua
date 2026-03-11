@@ -231,8 +231,16 @@ function Game:update_hand_played(dt)
 								return true
 							end
 						else
+							-- Mirror action_player_info: comeback bonus + no gold on loss
+							if MP.LOBBY.config.gold_on_life_loss then
+								MP.GAME.comeback_bonus_given = false
+								MP.GAME.comeback_bonus = MP.GAME.comeback_bonus + 1
+							end
 							MP.GAME.lives = MP.GAME.lives - 1
 							MP.UI.ease_lives(-1)
+							if MP.LOBBY.config.no_gold_on_round_loss and G.GAME.blind and G.GAME.blind.dollars then
+								G.GAME.blind.dollars = 0
+							end
 							if MP.GAME.lives <= 0 then
 								MP.MATCH_RECORD.finalize(false)
 								G.STATE = G.STATES.GAME_OVER
