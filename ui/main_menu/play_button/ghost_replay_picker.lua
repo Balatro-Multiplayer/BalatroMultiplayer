@@ -13,11 +13,12 @@ function G.FUNCS.open_ghost_replay_picker(e)
 	})
 end
 
+-- Stashed merged replay list so select_ghost_replay can index into it
+local _picker_replays = {}
+
 function G.FUNCS.select_ghost_replay(e)
 	local idx = tonumber(e.config.id:match("ghost_replay_(%d+)"))
-	local config = SMODS.Mods["Multiplayer"].config
-	local replays = config.ghost_replays or {}
-	local replay = replays[idx]
+	local replay = _picker_replays[idx]
 
 	if not replay then return end
 
@@ -51,13 +52,54 @@ function G.FUNCS.generate_test_ghost_replay(e)
 	})
 end
 
+local function build_replay_label(r)
+	local result_text = (r.winner == "player") and "W" or "L"
+	local player_display = r.player_name or "?"
+	local nemesis_display = r.nemesis_name or "?"
+	local ruleset_display = r.ruleset and r.ruleset:gsub("^ruleset_mp_", "") or "?"
+	local deck_display = r.deck or "?"
+	local ante_display = tostring(r.final_ante or "?")
+
+	local timestamp_display = ""
+	if r.timestamp then timestamp_display = os.date("%m/%d %H:%M", r.timestamp) end
+
+	return string.format(
+		"%s | %s vs %s | %s | %s | Ante %s | %s",
+		result_text,
+		player_display,
+		nemesis_display,
+		ruleset_display,
+		deck_display,
+		ante_display,
+		timestamp_display
+	)
+end
+
 function G.UIDEF.ghost_replay_picker()
-	local config = SMODS.Mods["Multiplayer"].config
-	local replays = config.ghost_replays or {}
+	-- Merge config replays + folder replays into one list, sorted newest-first
+	local config_replays = SMODS.Mods["Multiplayer"].config.ghost_replays or {}
+	local folder_replays = MP.GHOST.load_folder_replays()
+
+	local all = {}
+	for _, r in ipairs(config_replays) do
+		r._source = r._source or "config"
+		all[#all + 1] = r
+	end
+	for _, r in ipairs(folder_replays) do
+		all[#all + 1] = r
+	end
+
+	-- Sort newest-first
+	table.sort(all, function(a, b)
+		return (a.timestamp or 0) > (b.timestamp or 0)
+	end)
+
+	-- Stash for select_ghost_replay to index into
+	_picker_replays = all
 
 	local replay_nodes = {}
 
-	if #replays == 0 then
+	if #all == 0 then
 		replay_nodes[#replay_nodes + 1] = {
 			n = G.UIT.R,
 			config = { align = "cm", padding = 0.2 },
@@ -73,28 +115,9 @@ function G.UIDEF.ghost_replay_picker()
 			},
 		}
 	else
-		-- Show replays newest-first
-		for i = #replays, 1, -1 do
-			local r = replays[i]
-			local result_text = (r.winner == "player") and "W" or "L"
-
-			local nemesis_display = r.nemesis_name or "?"
-			local ruleset_display = r.ruleset and r.ruleset:gsub("^ruleset_mp_", "") or "?"
-			local deck_display = r.deck or "?"
-			local ante_display = tostring(r.final_ante or "?")
-
-			local timestamp_display = ""
-			if r.timestamp then timestamp_display = os.date("%m/%d %H:%M", r.timestamp) end
-
-			local label = string.format(
-				"%s | vs %s | %s | %s | Ante %s | %s",
-				result_text,
-				nemesis_display,
-				ruleset_display,
-				deck_display,
-				ante_display,
-				timestamp_display
-			)
+		for i, r in ipairs(all) do
+			local label = build_replay_label(r)
+			local btn_colour = r._source == "file" and G.C.BLUE or G.C.GREY
 
 			replay_nodes[#replay_nodes + 1] = {
 				n = G.UIT.R,
@@ -107,10 +130,9 @@ function G.UIDEF.ghost_replay_picker()
 						minw = 7,
 						minh = 0.5,
 						scale = 0.35,
-						colour = G.C.GREY,
+						colour = btn_colour,
 						hover = true,
 						shadow = true,
-						ghost_replay_idx = i,
 					}),
 				},
 			}
