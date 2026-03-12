@@ -42,6 +42,14 @@ function G.FUNCS.clear_ghost_replay(e)
 	reopen_practice_menu()
 end
 
+function G.FUNCS.flip_ghost_perspective(e)
+	MP.GHOST.flip()
+	G.FUNCS.exit_overlay_menu()
+	G.FUNCS.overlay_menu({
+		definition = G.UIDEF.ghost_replay_picker(),
+	})
+end
+
 -- DEBUG: Generate a test ghost replay and refresh the picker
 function G.FUNCS.generate_test_ghost_replay(e)
 	MP.GHOST.generate_test_replay()
@@ -139,9 +147,24 @@ function G.UIDEF.ghost_replay_picker()
 		end
 	end
 
-	-- Clear ghost button if one is active
+	-- Clear ghost + flip perspective buttons if one is active
 	local clear_nodes = {}
 	if MP.GHOST.is_active() then
+		-- Show who you're playing as
+		local playing_as = MP.GHOST.flipped
+			and (MP.GHOST.replay.nemesis_name or "?")
+			or (MP.GHOST.replay.player_name or "?")
+		clear_nodes[#clear_nodes + 1] = UIBox_button({
+			id = "flip_ghost_perspective",
+			button = "flip_ghost_perspective",
+			label = { "Playing as: " .. playing_as },
+			minw = 3,
+			minh = 0.5,
+			scale = 0.35,
+			colour = G.C.GREEN,
+			hover = true,
+			shadow = true,
+		})
 		clear_nodes[#clear_nodes + 1] = UIBox_button({
 			id = "clear_ghost_replay",
 			button = "clear_ghost_replay",

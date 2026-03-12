@@ -94,23 +94,40 @@ end
 -- Loads a stored match record and provides enemy scores for PvP blinds
 -- so practice mode can simulate playing against a past opponent.
 
-MP.GHOST = { active = false, replay = nil }
+MP.GHOST = { active = false, replay = nil, flipped = false }
 
 function MP.GHOST.load(replay)
 	MP.GHOST.active = true
 	MP.GHOST.replay = replay
+	MP.GHOST.flipped = false
 end
 
 function MP.GHOST.clear()
 	MP.GHOST.active = false
 	MP.GHOST.replay = nil
+	MP.GHOST.flipped = false
+end
+
+function MP.GHOST.flip()
+	MP.GHOST.flipped = not MP.GHOST.flipped
 end
 
 function MP.GHOST.get_enemy_score(ante)
 	if not MP.GHOST.replay or not MP.GHOST.replay.ante_snapshots then return nil end
 	local snapshot = MP.GHOST.replay.ante_snapshots[ante] or MP.GHOST.replay.ante_snapshots[tostring(ante)]
-	if snapshot and snapshot.enemy_score then return snapshot.enemy_score end
-	return nil
+	if not snapshot then return nil end
+	-- When flipped, the original player's score becomes the ghost target
+	local key = MP.GHOST.flipped and "player_score" or "enemy_score"
+	return snapshot[key]
+end
+
+function MP.GHOST.get_nemesis_name()
+	if not MP.GHOST.replay then return nil end
+	if MP.GHOST.flipped then
+		return MP.GHOST.replay.player_name or localize("k_ghost")
+	else
+		return MP.GHOST.replay.nemesis_name or localize("k_ghost")
+	end
 end
 
 function MP.GHOST.is_active()
