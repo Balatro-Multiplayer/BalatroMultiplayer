@@ -231,8 +231,16 @@ local function action_start_game(seed, stake_str)
 	MP.reset_game_states()
 	local stake = tonumber(stake_str)
 	MP.ACTIONS.set_ante(0)
-	if not MP.LOBBY.config.different_seeds and MP.LOBBY.config.custom_seed ~= "random" then
+	if MP.REMATCH and MP.REMATCH.seed_override and MP.REMATCH.seed_override ~= "" then
+		seed = MP.REMATCH.seed_override
+	elseif not MP.LOBBY.config.different_seeds and MP.LOBBY.config.custom_seed ~= "random" then
 		seed = MP.LOBBY.config.custom_seed
+	end
+	if MP.REMATCH then
+		MP.REMATCH.pending_start = false
+		MP.REMATCH.commit_sent = false
+		MP.REMATCH.starting = false
+		MP.REMATCH.seed_override = nil
 	end
 	G.FUNCS.lobby_start_run(nil, { seed = seed, stake = stake })
 	MP.LOBBY.ready_to_start = false
@@ -332,6 +340,22 @@ local function action_stop_game()
 		G.FUNCS.go_to_menu()
 		MP.UI.update_connection_status()
 		MP.reset_game_states()
+	end
+	if
+		MP.LOBBY.code
+		and MP.LOBBY.is_host
+		and MP.REMATCH
+		and MP.REMATCH.pending_start
+		and not MP.REMATCH.starting
+	then
+		MP.REMATCH.starting = true
+		G.E_MANAGER:add_event(Event({
+			trigger = "immediate",
+			func = function()
+				MP.ACTIONS.start_game()
+				return true
+			end,
+		}))
 	end
 end
 
