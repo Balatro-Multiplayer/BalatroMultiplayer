@@ -1,4 +1,162 @@
+local function as_bool(value)
+	if type(value) == "boolean" then return value end
+	if type(value) == "string" then return value == "true" end
+	if type(value) == "number" then return value ~= 0 end
+	return false
+end
+
+local function rematch_sender_role()
+	return (MP.LOBBY and MP.LOBBY.is_host) and "host" or "guest"
+end
+
+local function get_current_run_seed()
+	if not G or not G.GAME then return nil end
+	local seed = nil
+	-- prefer canonical run seed before fallback RNG seed
+	if G.GAME.seed then
+		seed = G.GAME.seed
+	elseif G.GAME.pseudorandom and G.GAME.pseudorandom.seed then
+		seed = G.GAME.pseudorandom.seed
+	end
+	if seed == nil then return nil end
+	seed = tostring(seed)
+	if seed == "" then return nil end
+	return seed
+end
+
+local function update_rematch_ui_state()
+	if not MP.REMATCH then return end
+	local ready_count = (MP.REMATCH.self_ready and 1 or 0) + (MP.REMATCH.enemy_ready and 1 or 0)
+	MP.REMATCH.ready_count_text = "(" .. tostring(ready_count) .. "/2)"
+	MP.REMATCH.ready_count_label = string.format(localize("k_rematch_ready_count"), MP.REMATCH.ready_count_text)
+	MP.REMATCH.ready_button_text = MP.REMATCH.self_ready and localize("b_unready") or localize("b_rematch")
+	local same_seed_mode = MP.REMATCH.same_seed and localize("k_rematch_same_seed_on") or localize("k_rematch_same_seed_off")
+	MP.REMATCH.same_seed_text = localize("k_rematch_same_seed") .. ": " .. same_seed_mode
+end
+
+local function reset_rematch_state()
+	MP.REMATCH = {
+		self_ready = false,
+		enemy_ready = false,
+		same_seed = false,
+		ready_count_text = "(0/2)",
+		ready_count_label = "",
+		ready_button_text = localize("b_rematch"),
+		same_seed_text = "",
+		pending_start = false,
+		seed_override = nil,
+		commit_sent = false,
+		starting = false,
+	}
+	update_rematch_ui_state()
+end
+
+local function ensure_rematch_state()
+	if not MP.REMATCH then reset_rematch_state() end
+end
+
+local function try_commit_rematch()
+	if not MP.LOBBY.code or not MP.LOBBY.is_host then return end
+	ensure_rematch_state()
+	if MP.REMATCH.commit_sent or MP.REMATCH.pending_start or MP.REMATCH.starting then return end
+	if not (MP.REMATCH.self_ready and MP.REMATCH.enemy_ready) then return end
+
+	MP.REMATCH.commit_sent = true
+	MP.REMATCH.pending_start = true
+	MP.REMATCH.seed_override = MP.REMATCH.same_seed and get_current_run_seed() or nil
+
+	if MP.ACTIONS.modded then
+		MP.ACTIONS.modded("Multiplayer", "rematchCommit", {
+			sender_role = rematch_sender_role(),
+			sameSeed = MP.REMATCH.same_seed,
+			seed = MP.REMATCH.seed_override or "",
+		})
+	end
+	MP.ACTIONS.stop_game()
+end
+
+function G.FUNCS.mp_toggle_rematch_ready(e)
+	if not MP.LOBBY.code then return end
+	ensure_rematch_state()
+	MP.REMATCH.self_ready = not MP.REMATCH.self_ready
+	update_rematch_ui_state()
+	if MP.ACTIONS.modded then
+		MP.ACTIONS.modded("Multiplayer", "rematchReady", {
+			sender_role = rematch_sender_role(),
+			ready = MP.REMATCH.self_ready,
+		})
+	end
+	try_commit_rematch()
+end
+
+function G.FUNCS.mp_toggle_rematch_same_seed(e)
+	if not MP.LOBBY.code or not MP.LOBBY.is_host then return end
+	ensure_rematch_state()
+	MP.REMATCH.same_seed = not MP.REMATCH.same_seed
+	update_rematch_ui_state()
+	if MP.ACTIONS.modded then
+		MP.ACTIONS.modded("Multiplayer", "rematchSeedMode", {
+			sender_role = rematch_sender_role(),
+			sameSeed = MP.REMATCH.same_seed,
+		})
+	end
+end
+
+function G.FUNCS.mp_set_rematch_button_state(e)
+	if not MP.REMATCH then return end
+	e.config.colour = MP.REMATCH.self_ready and G.C.GREEN or G.C.RED
+end
+
+function G.FUNCS.mp_set_same_seed_button_state(e)
+	if not MP.REMATCH then return end
+	e.config.colour = MP.REMATCH.same_seed and G.C.GREEN or G.C.BLUE
+end
+
+MP.register_mod_action("rematchReady", function(parsedAction)
+	if not MP.LOBBY.code then return end
+	ensure_rematch_state()
+	local sender_role = tostring(parsedAction.sender_role or "")
+	local ready = as_bool(parsedAction.ready)
+	if sender_role == rematch_sender_role() then
+		MP.REMATCH.self_ready = ready
+	else
+		MP.REMATCH.enemy_ready = ready
+	end
+	update_rematch_ui_state()
+	try_commit_rematch()
+end, "Multiplayer")
+
+MP.register_mod_action("rematchSeedMode", function(parsedAction)
+	if not MP.LOBBY.code then return end
+	ensure_rematch_state()
+	if tostring(parsedAction.sender_role or "") ~= "host" then return end
+	MP.REMATCH.same_seed = as_bool(parsedAction.sameSeed)
+	update_rematch_ui_state()
+end, "Multiplayer")
+
+MP.register_mod_action("rematchCommit", function(parsedAction)
+	if not MP.LOBBY.code then return end
+	ensure_rematch_state()
+	if tostring(parsedAction.sender_role or "") ~= "host" then return end
+
+	MP.REMATCH.commit_sent = true
+	MP.REMATCH.pending_start = true
+	MP.REMATCH.same_seed = as_bool(parsedAction.sameSeed)
+	local seed = parsedAction.seed
+	if seed == nil or seed == "" then
+		MP.REMATCH.seed_override = nil
+	else
+		MP.REMATCH.seed_override = tostring(seed)
+	end
+
+	MP.REMATCH.self_ready = true
+	MP.REMATCH.enemy_ready = true
+	update_rematch_ui_state()
+end, "Multiplayer")
+
 function MP.UI.create_UIBox_mp_game_end(has_won)
+	reset_rematch_state()
+
 	MP.end_game_jokers = CardArea(
 		0,
 		0,
@@ -314,28 +472,130 @@ function MP.UI.create_UIBox_mp_game_end(has_won)
 												minw = 2.3,
 												minh = 0.4,
 											}),
-											{
-												n = G.UIT.R,
-												config = { align = "cm", minh = 0.4, minw = 0.1 },
-												nodes = {},
-											},
-											UIBox_button({
-												id = "from_game_won",
-												button = "mp_return_to_lobby",
-												label = { localize("b_return_lobby") },
-												minw = 2.5,
-												maxw = 2.5,
-												minh = 1,
-												focus_args = { nav = "wide", snap_to = true },
-											}),
-											UIBox_button({
-												button = "lobby_leave",
-												label = { localize("b_leave_lobby") },
-												minw = 2.5,
-												maxw = 2.5,
-												minh = 1,
-												focus_args = { nav = "wide" },
-											}),
+												{
+													n = G.UIT.R,
+													config = { align = "cm", minh = 0.4, minw = 0.1 },
+													nodes = {},
+												},
+												{
+													n = G.UIT.R,
+													config = { align = "cm", minw = 2.5, padding = 0.04 },
+													nodes = {
+														{
+															n = G.UIT.C,
+															config = {
+																id = "mp_rematch_button",
+																button = "mp_toggle_rematch_ready",
+																align = "cm",
+																padding = 0.08,
+																colour = G.C.RED,
+																minh = 0.8,
+																minw = 2.5,
+																maxw = 2.5,
+																r = 0.1,
+																shadow = true,
+																hover = true,
+																func = "mp_set_rematch_button_state",
+															},
+															nodes = {
+																{
+																	n = G.UIT.T,
+																	config = {
+																		ref_table = MP.REMATCH,
+																		ref_value = "ready_button_text",
+																		colour = G.C.UI.TEXT_LIGHT,
+																		scale = 0.42,
+																		shadow = true,
+																		col = true,
+																	},
+																},
+															},
+														},
+													},
+												},
+												{
+													n = G.UIT.R,
+													config = { align = "cm", minw = 2.5, padding = 0.04 },
+													nodes = {
+														{
+															n = G.UIT.T,
+															config = {
+																ref_table = MP.REMATCH,
+																ref_value = "ready_count_label",
+																colour = G.C.UI.TEXT_LIGHT,
+																scale = 0.35,
+																shadow = true,
+																maxw = 3.8,
+																col = true,
+															},
+														},
+													},
+												},
+												{
+													n = G.UIT.R,
+													config = { align = "cm", minw = 2.5, padding = 0.04 },
+													nodes = {
+														MP.LOBBY.is_host and {
+															n = G.UIT.C,
+															config = {
+																id = "mp_same_seed_button",
+																button = "mp_toggle_rematch_same_seed",
+																align = "cm",
+																padding = 0.08,
+																colour = G.C.BLUE,
+																minh = 0.8,
+																minw = 2.5,
+																maxw = 2.5,
+																r = 0.1,
+																shadow = true,
+																hover = true,
+																func = "mp_set_same_seed_button_state",
+															},
+															nodes = {
+																{
+																	n = G.UIT.T,
+																	config = {
+																		ref_table = MP.REMATCH,
+																		ref_value = "same_seed_text",
+																		colour = G.C.UI.TEXT_LIGHT,
+																		scale = 0.33,
+																		shadow = true,
+																		maxw = 3.6,
+																		col = true,
+																	},
+																},
+															},
+														} or {
+															n = G.UIT.T,
+															config = {
+																ref_table = MP.REMATCH,
+																ref_value = "same_seed_text",
+																colour = G.C.UI.TEXT_LIGHT,
+																scale = 0.35,
+																shadow = true,
+																maxw = 3.8,
+																col = true,
+															},
+														},
+													},
+												},
+												UIBox_button({
+													id = "from_game_won",
+													button = "mp_return_to_lobby",
+													label = { localize("b_return_lobby") },
+													minw = 2.5,
+													maxw = 2.5,
+													minh = 1,
+													focus_args = { nav = "wide", snap_to = true },
+												}),
+												UIBox_button({
+													button = "lobby_leave",
+													label = { localize("b_leave_lobby") },
+													minw = 2.5,
+													maxw = 2.5,
+													minh = 1,
+													focus_args = { nav = "wide" },
+												}),
 										},
 									},
 								},
