@@ -141,7 +141,6 @@ function MP.load_mp_dir(directory, recursive)
 	-- load sorted files/dirs
 	for _, item in ipairs(items) do
 		local path = directory .. "/" .. item.name
-		sendDebugMessage("Loading item: " .. path, "MULTIPLAYER")
 		if item.type ~= "directory" then
 			MP.load_mp_file(path)
 		elseif recursive then
