@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ghost Replay Generator</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'Segoe UI', system-ui, sans-serif; background: #1a1a2e; color: #e0e0e0; min-height: 100vh; display: flex; flex-direction: column; align-items: center; padding: 2rem; }
+h1 { color: #ac3232; margin-bottom: 0.25rem; font-size: 1.6rem; }
+.subtitle { color: #888; margin-bottom: 1.5rem; font-size: 0.9rem; }
+#drop-zone { width: 100%; max-width: 600px; border: 2px dashed #555; border-radius: 12px; padding: 3rem 2rem; text-align: center; cursor: pointer; transition: all 0.2s; background: #16213e; }
+#drop-zone:hover, #drop-zone.drag-over { border-color: #ac3232; background: #1a2744; }
+#drop-zone p { font-size: 1.1rem; color: #aaa; }
+#drop-zone .hint { font-size: 0.8rem; color: #666; margin-top: 0.5rem; }
+#file-input { display: none; }
+#result { width: 100%; max-width: 600px; margin-top: 1.5rem; display: none; }
+.summary { background: #16213e; border-radius: 8px; padding: 1rem 1.25rem; margin-bottom: 1rem; font-size: 0.85rem; line-height: 1.6; }
+.summary .label { color: #888; }
+.summary .val { color: #e0e0e0; font-weight: 600; }
+.summary .win { color: #5ba85b; }
+.summary .loss { color: #ac3232; }
+.ante-row { display: flex; justify-content: space-between; padding: 0.15rem 0; font-size: 0.8rem; border-bottom: 1px solid #222; }
+.ante-row:last-child { border-bottom: none; }
+.ante-row .ante-result { width: 3rem; text-align: center; font-weight: 700; }
+.btn { display: inline-block; padding: 0.6rem 1.5rem; border: none; border-radius: 6px; font-size: 0.95rem; font-weight: 600; cursor: pointer; transition: all 0.15s; }
+.btn-download { background: #ac3232; color: #fff; }
+.btn-download:hover { background: #c44; }
+.btn-copy { background: #333; color: #ccc; margin-left: 0.5rem; }
+.btn-copy:hover { background: #444; }
+.actions { display: flex; gap: 0.5rem; justify-content: center; }
+.error { background: #3a1a1a; border: 1px solid #ac3232; border-radius: 8px; padding: 1rem; color: #e88; font-size: 0.85rem; }
+</style>
+</head>
+<body>
+
+<h1>Ghost Replay Generator</h1>
+<p class="subtitle">Balatro Multiplayer &mdash; drop a Lovely log, get a ghost replay JSON</p>
+
+<div id="drop-zone">
+  <p>Drop your <code>lovely-*.log</code> here</p>
+  <p class="hint">or click to browse</p>
+</div>
+<input type="file" id="file-input" accept=".log,.txt">
+
+<div id="result"></div>
+
+<script>
+// --- Log parser (mirrors tools/log_to_ghost_replay.py) ---
+
+function parseClientSentJson(line) {
+  const m = line.match(/Client sent message: (\{.*\})\s*$/);
+  if (!m) return null;
+  try { return JSON.parse(m[1]); } catch { return null; }
+}
+
+function parseClientGotKv(line) {
+  const m = line.match(/Client got (\w+) message:\s*(.*?)\s*$/);
+  if (!m) return null;
+  const action = m[1];
+  const pairs = {};
+  const re = /\((\w+):\s*([^)]*)\)/g;
+  let km;
+  while ((km = re.exec(m[2])) !== null) {
+    let val = km[2].trim();
+    if (val === 'true') val = true;
+    else if (val === 'false') val = false;
+    else if (/^-?\d+$/.test(val)) val = parseInt(val, 10);
+    else if (/^-?\d+\.\d+$/.test(val)) val = parseFloat(val);
+    pairs[km[1]] = val;
+  }
+  return { action, kv: pairs };
+}
+
+function processLog(text) {
+  const game = {
+    seed: null, ruleset: null, gamemode: null, deck: null, stake: null,
+    playerName: null, nemesisName: null, startingLives: 4, isHost: null,
+    anteSnapshots: {}, winner: null, finalAnte: 1, currentAnte: 0,
+    playerLives: 4, enemyLives: 4,
+    pvpPlayerScore: '0', pvpEnemyScore: '0', inPvp: false,
+  };
+  let lastLobbyOptions = null;
+
+  for (const line of text.split('\n')) {
+    if (!line.includes('MULTIPLAYER')) continue;
+
+    // --- Sent messages ---
+    const sent = parseClientSentJson(line);
+    if (sent) {
+      const action = sent.action;
+      if (action === 'username') {
+        game.playerName = sent.username;
+      } else if (action === 'lobbyOptions') {
+        lastLobbyOptions = sent;
+      } else if (action === 'setAnte') {
+        game.currentAnte = sent.ante || 0;
+        if (game.currentAnte > game.finalAnte) game.finalAnte = game.currentAnte;
+      } else if (action === 'playHand') {
+        if (game.inPvp) game.pvpPlayerScore = String(sent.score || '0');
+      } else if (action === 'setLocation') {
+        if ((sent.location || '').includes('bl_mp_nemesis')) game.inPvp = true;
+      }
+      continue;
+    }
+
+    // --- Received messages ---
+    const parsed = parseClientGotKv(line);
+    if (!parsed) continue;
+    const { action, kv } = parsed;
+
+    if (action === 'lobbyInfo') {
+      if ('isHost' in kv) game.isHost = kv.isHost;
+      if (game.isHost === true && kv.guest) game.nemesisName = String(kv.guest);
+      else if (game.isHost === false && kv.host) game.nemesisName = String(kv.host);
+    } else if (action === 'startGame') {
+      if (lastLobbyOptions) {
+        game.ruleset = lastLobbyOptions.ruleset;
+        game.gamemode = lastLobbyOptions.gamemode;
+        game.deck = lastLobbyOptions.back || 'Red Deck';
+        game.stake = lastLobbyOptions.stake || 1;
+        game.startingLives = lastLobbyOptions.starting_lives || 4;
+        game.playerLives = game.startingLives;
+        game.enemyLives = game.startingLives;
+      }
+    } else if (action === 'playerInfo') {
+      if ('lives' in kv) game.playerLives = kv.lives;
+    } else if (action === 'enemyInfo') {
+      if ('lives' in kv) game.enemyLives = kv.lives;
+      if ('score' in kv) game.pvpEnemyScore = String(kv.score);
+    } else if (action === 'enemyLocation') {
+      if (String(kv.location || '').includes('bl_mp_nemesis')) game.inPvp = true;
+    } else if (action === 'endPvP') {
+      const result = kv.lost ? 'loss' : 'win';
+      game.anteSnapshots[game.currentAnte] = {
+        player_score: game.pvpPlayerScore,
+        enemy_score: game.pvpEnemyScore,
+        player_lives: game.playerLives,
+        enemy_lives: game.enemyLives,
+        result,
+      };
+      game.inPvp = false;
+      game.pvpPlayerScore = '0';
+      game.pvpEnemyScore = '0';
+    } else if (action === 'winGame') {
+      game.winner = 'player';
+    } else if (action === 'loseGame') {
+      game.winner = 'nemesis';
+    } else if (action === 'stopGame') {
+      if (kv.seed) game.seed = String(kv.seed);
+    }
+  }
+  return game;
+}
+
+function gameToJson(game) {
+  const snapshots = {};
+  for (const [ante, snap] of Object.entries(game.anteSnapshots)) {
+    snapshots[ante] = snap;
+  }
+  const obj = {
+    gamemode: game.gamemode || 'gamemode_mp_attrition',
+    final_ante: game.finalAnte,
+    ante_snapshots: snapshots,
+    winner: game.winner || 'unknown',
+    timestamp: Math.floor(Date.now() / 1000),
+    ruleset: game.ruleset || 'ruleset_mp_blitz',
+    seed: game.seed || 'UNKNOWN',
+    deck: game.deck || 'Red Deck',
+    stake: game.stake || 1,
+  };
+  if (game.playerName) obj.player_name = game.playerName;
+  if (game.nemesisName) obj.nemesis_name = game.nemesisName;
+  return obj;
+}
+
+function buildFilename(game) {
+  const seed = game.seed || 'unknown';
+  const player = (game.playerName || 'unknown').replace(/~/g, '-');
+  const nemesis = (game.nemesisName || 'unknown').replace(/~/g, '-');
+  return `${seed}_${player}_vs_${nemesis}.json`;
+}
+
+// --- UI ---
+
+const dropZone = document.getElementById('drop-zone');
+const fileInput = document.getElementById('file-input');
+const resultDiv = document.getElementById('result');
+let lastJsonStr = null;
+let lastFilename = null;
+
+dropZone.addEventListener('click', () => fileInput.click());
+dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('drag-over'); });
+dropZone.addEventListener('dragleave', () => dropZone.classList.remove('drag-over'));
+dropZone.addEventListener('drop', e => {
+  e.preventDefault();
+  dropZone.classList.remove('drag-over');
+  if (e.dataTransfer.files.length) handleFile(e.dataTransfer.files[0]);
+});
+fileInput.addEventListener('change', () => { if (fileInput.files.length) handleFile(fileInput.files[0]); });
+
+function handleFile(file) {
+  const reader = new FileReader();
+  reader.onload = () => {
+    try {
+      const game = processLog(reader.result);
+      const antes = Object.keys(game.anteSnapshots);
+      if (antes.length === 0) {
+        resultDiv.style.display = 'block';
+        resultDiv.innerHTML = '<div class="error">No PvP rounds found in this log. Make sure this is a Lovely log from a multiplayer match.</div>';
+        return;
+      }
+      const jsonObj = gameToJson(game);
+      lastJsonStr = JSON.stringify(jsonObj, null, 2);
+      lastFilename = buildFilename(game);
+      showResult(game);
+    } catch (err) {
+      resultDiv.style.display = 'block';
+      resultDiv.innerHTML = `<div class="error">Parse error: ${err.message}</div>`;
+    }
+  };
+  reader.readAsText(file);
+}
+
+function showResult(game) {
+  const winClass = game.winner === 'player' ? 'win' : 'loss';
+  const winText = game.winner === 'player' ? 'WIN' : 'LOSS';
+  const antes = Object.keys(game.anteSnapshots).sort((a, b) => a - b);
+
+  let anteRows = '';
+  for (const ante of antes) {
+    const s = game.anteSnapshots[ante];
+    const rc = s.result === 'win' ? 'win' : 'loss';
+    anteRows += `<div class="ante-row">
+      <span>Ante ${ante}</span>
+      <span class="ante-result ${rc}">${s.result.toUpperCase()}</span>
+      <span>You: ${Number(s.player_score).toLocaleString()} (${s.player_lives}hp)</span>
+      <span>Enemy: ${Number(s.enemy_score).toLocaleString()} (${s.enemy_lives}hp)</span>
+    </div>`;
+  }
+
+  resultDiv.style.display = 'block';
+  resultDiv.innerHTML = `
+    <div class="summary">
+      <div><span class="label">Seed:</span> <span class="val">${game.seed || '?'}</span></div>
+      <div><span class="label">Player:</span> <span class="val">${game.playerName || '?'}</span>
+           <span class="label" style="margin-left:1rem">vs</span>
+           <span class="val">${game.nemesisName || '?'}</span></div>
+      <div><span class="label">Ruleset:</span> <span class="val">${(game.ruleset || '?').replace('ruleset_mp_', '')}</span>
+           <span class="label" style="margin-left:1rem">Deck:</span> <span class="val">${game.deck || '?'}</span>
+           <span class="label" style="margin-left:1rem">Stake:</span> <span class="val">${game.stake || '?'}</span></div>
+      <div><span class="label">Result:</span> <span class="val ${winClass}">${winText}</span>
+           <span class="label" style="margin-left:1rem">Final Ante:</span> <span class="val">${game.finalAnte}</span></div>
+      <div style="margin-top:0.75rem">${anteRows}</div>
+    </div>
+    <div class="actions">
+      <button class="btn btn-download" onclick="downloadJson()">Download .json</button>
+      <button class="btn btn-copy" onclick="copyJson(this)">Copy to clipboard</button>
+    </div>
+    <p style="text-align:center; margin-top:0.75rem; font-size:0.75rem; color:#666">
+      Save the .json into your <code>Multiplayer/replays/</code> folder
+    </p>
+  `;
+}
+
+function downloadJson() {
+  const blob = new Blob([lastJsonStr + '\n'], { type: 'application/json' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = lastFilename;
+  a.click();
+  URL.revokeObjectURL(a.href);
+}
+
+function copyJson(btn) {
+  navigator.clipboard.writeText(lastJsonStr).then(() => {
+    const orig = btn.textContent;
+    btn.textContent = 'Copied!';
+    setTimeout(() => btn.textContent = orig, 1500);
+  });
+}
+</script>
+</body>
+</html>
