@@ -56,6 +56,7 @@ local function action_joinedLobby(code, type, token)
 	-- Store reconnect info for potential future reconnection
 	if token then reconnectToken = token end
 	lastLobbyCode = code
+	MP.fetch_current_cocktail() -- fire-and-forget background fetch
 	MP.ACTIONS.sync_client()
 	MP.ACTIONS.lobby_info()
 	MP.UI.update_connection_status()

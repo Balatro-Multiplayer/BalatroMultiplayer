@@ -14,14 +14,12 @@ SMODS.Back({
 		G.GAME.pseudorandom.seed = seed or generate_starting_seed()
 		G.GAME.modifiers.mp_cocktail = {}
 		G.GAME.modifiers.mp_cocktail_sticker = {}
-		local decks, forced = MP.get_cocktail_decks(true)
-		pseudoshuffle(decks, pseudoseed("mp_cocktail"))
 		local back = G.GAME.selected_back
 
 		local function add_deck(num, deck, sticker)
 			G.GAME.modifiers.mp_cocktail[num] = deck
 			if sticker then G.GAME.modifiers.mp_cocktail_sticker[num] = deck end
-			if deck == "b_checkered" then -- hardcoded because cringe
+			if deck == "b_checkered" then
 				G.E_MANAGER:add_event(Event({
 					func = function()
 						for k, v in pairs(G.playing_cards) do
@@ -34,11 +32,23 @@ SMODS.Back({
 			end
 		end
 
-		for i = 1, #forced do
-			add_deck(i, forced[i], true)
-		end
-		for i = 1 + #forced, math.min(3, #decks) do
-			add_deck(i, decks[i], MP.cocktail_cfg_readpos("show", true) ~= "H" and true or false)
+		MP.poll_cocktail_override() -- collect background fetch result if ready
+		if MP.LOBBY.cocktail_override then
+			-- API path: backs array from /cocktails/current, duplicates allowed
+			for i, v in ipairs(MP.LOBBY.cocktail_override) do
+				add_deck(i, v, true)
+			end
+		else
+			-- Local path: config string → get_cocktail_decks → shuffle → pick 3
+			local decks, forced = MP.get_cocktail_decks(true)
+			pseudoshuffle(decks, pseudoseed("mp_cocktail"))
+
+			for i = 1, #forced do
+				add_deck(i, forced[i], true)
+			end
+			for i = 1 + #forced, math.min(3, #decks) do
+				add_deck(i, decks[i], MP.cocktail_cfg_readpos("show", true) ~= "H" and true or false)
+			end
 		end
 		local function merge(t1, t2, safe)
 			local t3 = {}
