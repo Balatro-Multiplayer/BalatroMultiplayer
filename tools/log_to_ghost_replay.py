@@ -1,17 +1,16 @@
 #!/usr/bin/env python3
-"""Parse a Lovely log file and extract ghost replay data.
+"""Parse a Lovely log file and generate a ghost replay JSON.
 
-Produces a Lua table fragment matching the ghost_replays entry format
-in Multiplayer.jkr, suitable for pasting into the config or feeding
-into the ghost replay system.
+Writes a .json file into replays/ that the ghost replay picker loads
+automatically. Output defaults to JSON; use --lua for a Lua table.
 
 Usage:
-    python3 tools/log_to_ghost_replay.py <logfile>
-    python3 tools/log_to_ghost_replay.py <logfile> --lua    # output as Lua table (default)
-    python3 tools/log_to_ghost_replay.py <logfile> --json   # output as JSON
+    python3 tools/log_to_ghost_replay.py <logfile>              # writes to replays/
+    python3 tools/log_to_ghost_replay.py <logfile> --lua        # output Lua table to stdout
 """
 
 import json
+import os
 import re
 import sys
 import time
@@ -294,9 +293,9 @@ def main():
         sys.exit(1)
 
     filepath = sys.argv[1]
-    output_format = "lua"
-    if "--json" in sys.argv:
-        output_format = "json"
+    output_format = "json"
+    if "--lua" in sys.argv:
+        output_format = "lua"
 
     game = process_log(filepath)
 
@@ -319,10 +318,26 @@ def main():
         )
     print(file=sys.stderr)
 
-    if output_format == "json":
-        print(to_json(game))
-    else:
+    if output_format == "lua":
         print(to_lua_table(game))
+    else:
+        # Write JSON to replays/ folder
+        script_dir = os.path.dirname(os.path.abspath(__file__))
+        replays_dir = os.path.join(script_dir, "..", "replays")
+        os.makedirs(replays_dir, exist_ok=True)
+
+        # Build filename from game data
+        seed = game.seed or "unknown"
+        player = (game.player_name or "unknown").replace("~", "-")
+        nemesis = (game.nemesis_name or "unknown").replace("~", "-")
+        filename = f"{seed}_{player}_vs_{nemesis}.json"
+        out_path = os.path.join(replays_dir, filename)
+
+        with open(out_path, "w") as f:
+            f.write(to_json(game))
+            f.write("\n")
+
+        print(f"Wrote {out_path}", file=sys.stderr)
 
 
 if __name__ == "__main__":
