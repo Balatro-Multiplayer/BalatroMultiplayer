@@ -32,6 +32,7 @@ function MP.poll_cocktail_override()
 		MP.LOBBY.cocktail_override_name = nil
 		return false
 	end
+	local json = require("json")
 	local ok, decoded = pcall(json.decode, response)
 	if ok and decoded and decoded.backs and type(decoded.backs) == "table" and #decoded.backs >= 1 then
 		MP.LOBBY.cocktail_override = decoded.backs
