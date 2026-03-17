@@ -295,7 +295,21 @@ function Game:update_new_round(dt)
 		-- Prevent player from losing
 		if to_big(G.GAME.chips) < to_big(G.GAME.blind.chips) and not MP.is_pvp_boss() then
 			G.GAME.blind.chips = -1
-			if not ghost then
+			if ghost then
+				if MP.LOBBY.config.death_on_round_loss and G.GAME.current_round.hands_played > 0 then
+					MP.GAME.lives = MP.GAME.lives - 1
+					MP.UI.ease_lives(-1)
+					if MP.LOBBY.config.no_gold_on_round_loss and G.GAME.blind and G.GAME.blind.dollars then
+						G.GAME.blind.dollars = 0
+					end
+					if MP.GAME.lives <= 0 then
+						MP.MATCH_RECORD.finalize(false)
+						G.STATE = G.STATES.GAME_OVER
+						G.STATE_COMPLETE = false
+						return
+					end
+				end
+			else
 				MP.GAME.wait_for_enemys_furthest_blind = (MP.LOBBY.config.gamemode == "gamemode_mp_survival")
 					and (tonumber(MP.GAME.lives) == 1)
 				MP.ACTIONS.fail_round(G.GAME.current_round.hands_played)
