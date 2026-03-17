@@ -1,6 +1,6 @@
--- Ghost Replay Picker UI
+-- Match Replay Picker UI
 -- Shown in practice mode to select a past match replay for ghost PvP
--- Two-column layout: replay list (left) + stats detail panel (right)
+-- Two-column layout: replay list (left) + match details panel (right)
 
 local function reopen_practice_menu()
 	G.FUNCS.overlay_menu({
@@ -187,7 +187,7 @@ local function build_stats_panel(r)
 				{
 					n = G.UIT.T,
 					config = {
-						text = "Select a replay",
+						text = "Select a match",
 						scale = 0.35,
 						colour = G.C.UI.TEXT_INACTIVE,
 					},
@@ -357,7 +357,7 @@ local function build_stats_panel(r)
 			UIBox_button({
 				id = "load_previewed_ghost",
 				button = "load_previewed_ghost",
-				label = { "Load as Ghost" },
+				label = { "Play Match" },
 				minw = 4,
 				minh = 0.6,
 				scale = 0.35,
@@ -473,7 +473,7 @@ function G.UIDEF.ghost_replay_picker()
 				UIBox_button({
 					id = "flip_ghost_perspective",
 					button = "flip_ghost_perspective",
-					label = { "As: " .. playing_as },
+					label = { "Playing as: " .. playing_as },
 					minw = 2.5,
 					minh = 0.45,
 					scale = 0.3,
@@ -484,7 +484,7 @@ function G.UIDEF.ghost_replay_picker()
 				UIBox_button({
 					id = "clear_ghost_replay",
 					button = "clear_ghost_replay",
-					label = { "Clear" },
+					label = { "Clear Replay" },
 					minw = 2,
 					minh = 0.45,
 					scale = 0.3,
