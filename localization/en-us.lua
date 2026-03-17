@@ -1098,7 +1098,7 @@ return {
 				"Enemy",
 				"location",
 			},
-			k_ghost_replays = "Ghost Replays",
+			k_ghost_replays = "Match Replays",
 			k_no_ghost_replays = "No replays yet",
 			k_ghost = "Ghost",
 			k_hide_mp_content = "Hide Multiplayer content*",
