@@ -136,22 +136,42 @@ local function format_score(s)
 	return tostring(n)
 end
 
-local function joker_list_text(jokers)
-	if not jokers or #jokers == 0 then return "None" end
-	local names = {}
+local function build_joker_card_area(jokers, width)
+	if not jokers or #jokers == 0 then return nil end
+
+	width = width or 5.5
+	local card_size = math.max(0.3, 0.8 - 0.01 * #jokers)
+	local card_area = CardArea(0, 0, width, G.CARD_H * card_size, {
+		card_limit = nil,
+		type = "title_2",
+		view_deck = true,
+		highlight_limit = 0,
+		card_w = G.CARD_W * card_size,
+	})
+
 	for _, j in ipairs(jokers) do
 		local key = j.key or j
-		-- Try to get localized name
-		local name = key
-		if G.P_CENTERS and G.P_CENTERS[key] then
-			local loc = G.P_CENTERS[key].loc_txt
-			if loc and loc.name then name = loc.name end
+		local center = G.P_CENTERS[key]
+		if center then
+			local card = Card(
+				0, 0,
+				G.CARD_W * card_size,
+				G.CARD_H * card_size,
+				nil,
+				center,
+				{ bypass_discovery_center = true, bypass_discovery_ui = true }
+			)
+			card_area:emplace(card)
 		end
-		-- Clean up key prefix as fallback display
-		name = name:gsub("^j_mp_", ""):gsub("^j_", ""):gsub("_", " ")
-		names[#names + 1] = name
 	end
-	return table.concat(names, ", ")
+
+	return {
+		n = G.UIT.R,
+		config = { align = "cm", padding = 0.02 },
+		nodes = {
+			{ n = G.UIT.O, config = { object = card_area } },
+		},
+	}
 end
 
 -------------------------------------------------------------------------------
@@ -247,28 +267,16 @@ local function build_stats_panel(r)
 		end
 	end
 
-	-- Jokers
+	-- Jokers (rendered as actual cards)
 	if r.player_jokers then
 		nodes[#nodes + 1] = section_header("Your Jokers")
-		local jtext = joker_list_text(r.player_jokers)
-		nodes[#nodes + 1] = {
-			n = G.UIT.R,
-			config = { align = "cl", padding = 0.02, maxw = 5.5 },
-			nodes = {
-				{ n = G.UIT.T, config = { text = jtext, scale = 0.26, colour = G.C.WHITE } },
-			},
-		}
+		local joker_area = build_joker_card_area(r.player_jokers, 5.5)
+		if joker_area then nodes[#nodes + 1] = joker_area end
 	end
 	if r.nemesis_jokers then
 		nodes[#nodes + 1] = section_header("Opponent Jokers")
-		local jtext = joker_list_text(r.nemesis_jokers)
-		nodes[#nodes + 1] = {
-			n = G.UIT.R,
-			config = { align = "cl", padding = 0.02, maxw = 5.5 },
-			nodes = {
-				{ n = G.UIT.T, config = { text = jtext, scale = 0.26, colour = G.C.WHITE } },
-			},
-		}
+		local joker_area = build_joker_card_area(r.nemesis_jokers, 5.5)
+		if joker_area then nodes[#nodes + 1] = joker_area end
 	end
 
 	-- Player stats
