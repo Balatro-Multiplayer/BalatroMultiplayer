@@ -196,12 +196,12 @@ local function build_stats_panel(r)
 		}
 	end
 
-	local nodes = {}
+	-- Header row (spans both columns)
+	local header_nodes = {}
 
-	-- Match header
 	local result_str = (r.winner == "player") and "VICTORY" or "DEFEAT"
 	local result_colour = (r.winner == "player") and G.C.GREEN or G.C.RED
-	nodes[#nodes + 1] = {
+	header_nodes[#header_nodes + 1] = {
 		n = G.UIT.R,
 		config = { align = "cm", padding = 0.04 },
 		nodes = {
@@ -209,10 +209,9 @@ local function build_stats_panel(r)
 		},
 	}
 
-	-- Players
 	local player_display = r.player_name or "?"
 	local nemesis_display = r.nemesis_name or "?"
-	nodes[#nodes + 1] = {
+	header_nodes[#header_nodes + 1] = {
 		n = G.UIT.R,
 		config = { align = "cm", padding = 0.02 },
 		nodes = {
@@ -220,25 +219,27 @@ local function build_stats_panel(r)
 		},
 	}
 
-	-- Match info
-	nodes[#nodes + 1] = section_header("Match Info")
+	-- Left inner column: match info + ante breakdown + stats
+	local left_nodes = {}
+
+	left_nodes[#left_nodes + 1] = section_header("Match Info")
 	local ruleset_display = r.ruleset and r.ruleset:gsub("^ruleset_mp_", "") or "?"
 	local gamemode_display = r.gamemode and r.gamemode:gsub("^gamemode_mp_", "") or "?"
 	local deck_display = r.deck or "?"
-	nodes[#nodes + 1] = text_row("Ruleset:", ruleset_display)
-	nodes[#nodes + 1] = text_row("Gamemode:", gamemode_display)
-	nodes[#nodes + 1] = text_row("Deck:", deck_display)
-	if r.seed then nodes[#nodes + 1] = text_row("Seed:", r.seed) end
-	if r.stake then nodes[#nodes + 1] = text_row("Stake:", tostring(r.stake)) end
-	nodes[#nodes + 1] = text_row("Final Ante:", tostring(r.final_ante or "?"))
-	if r.duration then nodes[#nodes + 1] = text_row("Duration:", r.duration) end
+	left_nodes[#left_nodes + 1] = text_row("Ruleset:", ruleset_display)
+	left_nodes[#left_nodes + 1] = text_row("Gamemode:", gamemode_display)
+	left_nodes[#left_nodes + 1] = text_row("Deck:", deck_display)
+	if r.seed then left_nodes[#left_nodes + 1] = text_row("Seed:", r.seed) end
+	if r.stake then left_nodes[#left_nodes + 1] = text_row("Stake:", tostring(r.stake)) end
+	left_nodes[#left_nodes + 1] = text_row("Final Ante:", tostring(r.final_ante or "?"))
+	if r.duration then left_nodes[#left_nodes + 1] = text_row("Duration:", r.duration) end
 	if r.timestamp then
-		nodes[#nodes + 1] = text_row("Date:", os.date("%Y-%m-%d %H:%M", r.timestamp))
+		left_nodes[#left_nodes + 1] = text_row("Date:", os.date("%Y-%m-%d %H:%M", r.timestamp))
 	end
 
 	-- Ante breakdown
 	if r.ante_snapshots then
-		nodes[#nodes + 1] = section_header("Ante Breakdown")
+		left_nodes[#left_nodes + 1] = section_header("Ante Breakdown")
 		local antes = {}
 		for k in pairs(r.ante_snapshots) do antes[#antes + 1] = tonumber(k) end
 		table.sort(antes)
@@ -254,7 +255,7 @@ local function build_stats_panel(r)
 				if snap.player_lives and snap.enemy_lives then
 					lives_str = string.format("  [%d-%d]", snap.player_lives, snap.enemy_lives)
 				end
-				nodes[#nodes + 1] = {
+				left_nodes[#left_nodes + 1] = {
 					n = G.UIT.R,
 					config = { align = "cl", padding = 0.01 },
 					nodes = {
@@ -267,48 +268,48 @@ local function build_stats_panel(r)
 		end
 	end
 
-	-- Jokers (rendered as actual cards)
+	-- Player/opponent stats
+	local function add_stats(nodes, stats, label)
+		if not stats then return end
+		nodes[#nodes + 1] = section_header(label)
+		if stats.reroll_count then
+			nodes[#nodes + 1] = text_row("Rerolls:", tostring(stats.reroll_count), 0.28)
+		end
+		if stats.reroll_cost_total then
+			nodes[#nodes + 1] = text_row("Reroll $:", tostring(stats.reroll_cost_total), 0.28)
+		end
+		if stats.vouchers then
+			nodes[#nodes + 1] = text_row("Vouchers:", stats.vouchers:gsub("v_", ""):gsub("-", ", "):gsub("_", " "), 0.28)
+		end
+	end
+
+	add_stats(left_nodes, r.player_stats, "Your Stats")
+	add_stats(left_nodes, r.nemesis_stats, "Opponent Stats")
+
+	-- Failed rounds
+	if r.failed_rounds and #r.failed_rounds > 0 then
+		local fr_parts = {}
+		for _, a in ipairs(r.failed_rounds) do fr_parts[#fr_parts + 1] = "A" .. tostring(a) end
+		left_nodes[#left_nodes + 1] = text_row("Failed Rounds:", table.concat(fr_parts, ", "), 0.28, G.C.UI.TEXT_INACTIVE, G.C.RED)
+	end
+
+	-- Right inner column: jokers + shop spending
+	local right_nodes = {}
+
 	if r.player_jokers then
-		nodes[#nodes + 1] = section_header("Your Jokers")
-		local joker_area = build_joker_card_area(r.player_jokers, 5.5)
-		if joker_area then nodes[#nodes + 1] = joker_area end
+		right_nodes[#right_nodes + 1] = section_header("Your Jokers")
+		local joker_area = build_joker_card_area(r.player_jokers, 4)
+		if joker_area then right_nodes[#right_nodes + 1] = joker_area end
 	end
 	if r.nemesis_jokers then
-		nodes[#nodes + 1] = section_header("Opponent Jokers")
-		local joker_area = build_joker_card_area(r.nemesis_jokers, 5.5)
-		if joker_area then nodes[#nodes + 1] = joker_area end
-	end
-
-	-- Player stats
-	if r.player_stats then
-		nodes[#nodes + 1] = section_header("Your Stats")
-		if r.player_stats.reroll_count then
-			nodes[#nodes + 1] = text_row("Rerolls:", tostring(r.player_stats.reroll_count), 0.28)
-		end
-		if r.player_stats.reroll_cost_total then
-			nodes[#nodes + 1] = text_row("Reroll $:", tostring(r.player_stats.reroll_cost_total), 0.28)
-		end
-		if r.player_stats.vouchers then
-			nodes[#nodes + 1] = text_row("Vouchers:", r.player_stats.vouchers:gsub("v_", ""):gsub("-", ", "):gsub("_", " "), 0.28)
-		end
-	end
-
-	if r.nemesis_stats then
-		nodes[#nodes + 1] = section_header("Opponent Stats")
-		if r.nemesis_stats.reroll_count then
-			nodes[#nodes + 1] = text_row("Rerolls:", tostring(r.nemesis_stats.reroll_count), 0.28)
-		end
-		if r.nemesis_stats.reroll_cost_total then
-			nodes[#nodes + 1] = text_row("Reroll $:", tostring(r.nemesis_stats.reroll_cost_total), 0.28)
-		end
-		if r.nemesis_stats.vouchers then
-			nodes[#nodes + 1] = text_row("Vouchers:", r.nemesis_stats.vouchers:gsub("v_", ""):gsub("-", ", "):gsub("_", " "), 0.28)
-		end
+		right_nodes[#right_nodes + 1] = section_header("Opponent Jokers")
+		local joker_area = build_joker_card_area(r.nemesis_jokers, 4)
+		if joker_area then right_nodes[#right_nodes + 1] = joker_area end
 	end
 
 	-- Shop spending
 	if r.shop_spending then
-		nodes[#nodes + 1] = section_header("Shop Spending")
+		right_nodes[#right_nodes + 1] = section_header("Shop Spending")
 		local total = 0
 		local antes = {}
 		for k, v in pairs(r.shop_spending) do
@@ -320,25 +321,36 @@ local function build_stats_panel(r)
 		for _, a in ipairs(antes) do
 			parts[#parts + 1] = string.format("A%d:$%d", a, r.shop_spending[tostring(a)] or r.shop_spending[a])
 		end
-		nodes[#nodes + 1] = text_row("Total:", "$" .. tostring(total), 0.28)
-		nodes[#nodes + 1] = {
+		right_nodes[#right_nodes + 1] = text_row("Total:", "$" .. tostring(total), 0.28)
+		right_nodes[#right_nodes + 1] = {
 			n = G.UIT.R,
-			config = { align = "cl", padding = 0.02, maxw = 5.5 },
+			config = { align = "cl", padding = 0.02, maxw = 4 },
 			nodes = {
 				{ n = G.UIT.T, config = { text = table.concat(parts, "  "), scale = 0.24, colour = G.C.UI.TEXT_INACTIVE } },
 			},
 		}
 	end
 
-	-- Failed rounds
-	if r.failed_rounds and #r.failed_rounds > 0 then
-		local fr_parts = {}
-		for _, a in ipairs(r.failed_rounds) do fr_parts[#fr_parts + 1] = "A" .. tostring(a) end
-		nodes[#nodes + 1] = text_row("Failed Rounds:", table.concat(fr_parts, ", "), 0.28, G.C.UI.TEXT_INACTIVE, G.C.RED)
-	end
+	-- Assemble two-column body
+	local body_row = {
+		n = G.UIT.R,
+		config = { align = "tm", padding = 0.05 },
+		nodes = {
+			{
+				n = G.UIT.C,
+				config = { align = "tm", padding = 0.08, minw = 4 },
+				nodes = left_nodes,
+			},
+			{
+				n = G.UIT.C,
+				config = { align = "tm", padding = 0.08, minw = 4.5 },
+				nodes = right_nodes,
+			},
+		},
+	}
 
-	-- Load as ghost button
-	nodes[#nodes + 1] = {
+	-- Load as ghost button (spans full width)
+	local load_button = {
 		n = G.UIT.R,
 		config = { align = "cm", padding = 0.08 },
 		nodes = {
@@ -358,8 +370,15 @@ local function build_stats_panel(r)
 
 	return {
 		n = G.UIT.C,
-		config = { align = "tm", padding = 0.15, minw = 6, r = 0.1, colour = G.C.L_BLACK },
-		nodes = nodes,
+		config = { align = "tm", padding = 0.1, minw = 9, r = 0.1, colour = G.C.L_BLACK },
+		nodes = {
+			-- Header spanning both columns
+			{ n = G.UIT.R, config = { align = "cm" }, nodes = { { n = G.UIT.C, config = { align = "cm" }, nodes = header_nodes } } },
+			-- Two-column body
+			body_row,
+			-- Full-width button
+			load_button,
+		},
 	}
 end
 
