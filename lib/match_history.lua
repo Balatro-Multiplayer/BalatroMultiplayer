@@ -141,6 +141,7 @@ end
 
 function MP.GHOST.load_folder_replays()
 	local json = require("json")
+	local log_parser = MP.load_mp_file("lib/log_parser.lua")
 	local replays_dir = MP.path .. "/replays"
 	local dir_info = NFS.getInfo(replays_dir)
 	if not dir_info or dir_info.type ~= "directory" then return {} end
@@ -166,6 +167,24 @@ function MP.GHOST.load_folder_replays()
 					table.insert(results, replay)
 				else
 					sendWarnMessage("Failed to parse replay: " .. item.name, "MULTIPLAYER")
+				end
+			end
+		elseif item.type == "file" and item.name:match("%.log$") then
+			local filepath = replays_dir .. "/" .. item.name
+			local content = NFS.read(filepath)
+			if content and log_parser then
+				local ok, game_records = pcall(log_parser.process_log, content)
+				if ok and game_records then
+					for idx, game in ipairs(game_records) do
+						local ok2, replay = pcall(log_parser.to_replay, game)
+						if ok2 and replay and replay.ante_snapshots and next(replay.ante_snapshots) then
+							replay._source = "file"
+							replay._filename = item.name .. (idx > 1 and ("#" .. idx) or "")
+							table.insert(results, replay)
+						end
+					end
+				else
+					sendWarnMessage("Failed to parse log: " .. item.name, "MULTIPLAYER")
 				end
 			end
 		end
