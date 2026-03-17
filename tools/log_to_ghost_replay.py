@@ -532,7 +532,47 @@ def to_json(game: GameRecord) -> str:
     if game.cards_used:
         obj["cards_used"] = game.cards_used
 
-    return json.dumps(obj, indent=2)
+    return _compact_json(obj)
+
+
+def _compact_json(obj, indent=2) -> str:
+    """JSON with indent, but small objects/arrays collapsed to one line.
+
+    Any value that serialises to <= *threshold* chars is kept on a single line,
+    so arrays-of-small-dicts (hands, jokers, card activity) stay readable
+    without burning vertical space.
+    """
+    threshold = 120
+
+    def _fmt(value, level):
+        if isinstance(value, dict):
+            if not value:
+                return "{}"
+            # Try compact first
+            compact = json.dumps(value, separators=(", ", ": "))
+            if len(compact) <= threshold and "\n" not in compact:
+                return compact
+            # Expanded
+            pad = " " * (indent * (level + 1))
+            end_pad = " " * (indent * level)
+            items = []
+            for k, v in value.items():
+                items.append(f"{pad}{json.dumps(k)}: {_fmt(v, level + 1)}")
+            return "{\n" + ",\n".join(items) + "\n" + end_pad + "}"
+        elif isinstance(value, list):
+            if not value:
+                return "[]"
+            compact = json.dumps(value, separators=(", ", ": "))
+            if len(compact) <= threshold and "\n" not in compact:
+                return compact
+            pad = " " * (indent * (level + 1))
+            end_pad = " " * (indent * level)
+            items = [f"{pad}{_fmt(v, level + 1)}" for v in value]
+            return "[\n" + ",\n".join(items) + "\n" + end_pad + "]"
+        else:
+            return json.dumps(value)
+
+    return _fmt(obj, 0)
 
 
 def to_lua_table(game: GameRecord) -> str:
