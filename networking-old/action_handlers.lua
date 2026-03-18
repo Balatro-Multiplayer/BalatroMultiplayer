@@ -114,6 +114,10 @@ end
 ---@param seed string
 ---@param stake_str string
 local function action_start_game(seed, stake_str)
+	-- Clear any stale practice/ghost state so it can't leak into real MP
+	MP.SP.practice = false
+	MP.GHOST.clear()
+
 	MP.reset_game_states()
 	local stake = tonumber(stake_str)
 	MP.ACTIONS.set_ante(0)
