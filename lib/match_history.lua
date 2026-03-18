@@ -63,31 +63,6 @@ function MP.MATCH_RECORD.finalize(won)
 
 	MP.MATCH_RECORD.winner = won and "player" or "nemesis"
 	MP.MATCH_RECORD.final_ante = G.GAME.round_resets and G.GAME.round_resets.ante or 1
-
-	local config = SMODS.Mods["Multiplayer"].config
-	config.ghost_replays = config.ghost_replays or {}
-
-	local entry = {
-		seed = MP.MATCH_RECORD.seed,
-		ruleset = MP.MATCH_RECORD.ruleset,
-		gamemode = MP.MATCH_RECORD.gamemode,
-		deck = MP.MATCH_RECORD.deck,
-		player_name = MP.MATCH_RECORD.player_name,
-		nemesis_name = MP.MATCH_RECORD.nemesis_name,
-		ante_snapshots = MP.MATCH_RECORD.ante_snapshots,
-		winner = MP.MATCH_RECORD.winner,
-		final_ante = MP.MATCH_RECORD.final_ante,
-		timestamp = os.time(),
-	}
-
-	table.insert(config.ghost_replays, entry)
-
-	-- Keep only last 20 replays
-	while #config.ghost_replays > 20 do
-		table.remove(config.ghost_replays, 1)
-	end
-
-	SMODS.save_mod_config(SMODS.Mods["Multiplayer"])
 end
 
 -- Ghost Replay playback state
@@ -199,61 +174,4 @@ function MP.GHOST.load_folder_replays()
 	end)
 
 	return results
-end
-
--- DEBUG: Generate a fake ghost replay for testing. Remove before release.
-function MP.GHOST.generate_test_replay()
-	local config = SMODS.Mods["Multiplayer"].config
-	config.ghost_replays = config.ghost_replays or {}
-
-	local fake = {
-		seed = "ABCDE",
-		ruleset = "ruleset_mp_standard_ranked",
-		gamemode = "gamemode_mp_attrition",
-		deck = "Abandoned Deck",
-		player_name = MP.UI.get_username(),
-		nemesis_name = "Zaino",
-		stake = 1,
-		winner = "nemesis",
-		final_ante = 6,
-		timestamp = os.time(),
-		ante_snapshots = {
-			[1] = { enemy_score = "0", player_score = "0", player_lives = 4, enemy_lives = 4, result = "win" },
-			[2] = { enemy_score = "8000", player_score = "5000", player_lives = 4, enemy_lives = 4, result = "win" },
-			[3] = { enemy_score = "45000", player_score = "30000", player_lives = 4, enemy_lives = 3, result = "loss" },
-			[4] = { enemy_score = "200000", player_score = "150000", player_lives = 3, enemy_lives = 3, result = "win" },
-			[5] = {
-				enemy_score = "1200000",
-				player_score = "800000",
-				player_lives = 3,
-				enemy_lives = 2,
-				result = "loss",
-			},
-			[6] = {
-				enemy_score = "5000000",
-				player_score = "3000000",
-				player_lives = 2,
-				enemy_lives = 2,
-				result = "loss",
-			},
-			[7] = {
-				enemy_score = "25000000",
-				player_score = "15000000",
-				player_lives = 1,
-				enemy_lives = 2,
-				result = "loss",
-			},
-			[8] = {
-				enemy_score = "100000000",
-				player_score = "50000000",
-				player_lives = 1,
-				enemy_lives = 2,
-				result = "loss",
-			},
-		},
-	}
-
-	table.insert(config.ghost_replays, fake)
-	SMODS.save_mod_config(SMODS.Mods["Multiplayer"])
-	sendDebugMessage("Test ghost replay generated", "MULTIPLAYER")
 end
