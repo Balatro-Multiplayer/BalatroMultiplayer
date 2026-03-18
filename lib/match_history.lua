@@ -175,11 +175,14 @@ function MP.GHOST.load_folder_replays()
 			if content and log_parser then
 				local ok, game_records = pcall(log_parser.process_log, content)
 				if ok and game_records then
+					local total = #game_records
 					for idx, game in ipairs(game_records) do
 						local ok2, replay = pcall(log_parser.to_replay, game)
 						if ok2 and replay and replay.ante_snapshots and next(replay.ante_snapshots) then
 							replay._source = "file"
-							replay._filename = item.name .. (idx > 1 and ("#" .. idx) or "")
+							replay._filename = item.name
+							replay._game_index = idx
+							replay._game_count = total
 							table.insert(results, replay)
 						end
 					end
