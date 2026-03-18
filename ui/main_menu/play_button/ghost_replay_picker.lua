@@ -66,12 +66,6 @@ function G.FUNCS.flip_ghost_perspective(e)
 	refresh_picker()
 end
 
--- DEBUG: Generate a test ghost replay and refresh the picker
-function G.FUNCS.generate_test_ghost_replay(e)
-	MP.GHOST.generate_test_replay()
-	refresh_picker()
-end
-
 G.FUNCS.ghost_picker_back = function(e)
 	_preview_idx = nil
 	reopen_practice_menu()
@@ -160,7 +154,8 @@ local function build_joker_card_area(jokers, width)
 		local center = G.P_CENTERS[key]
 		if center then
 			local card = Card(
-				0, 0,
+				0,
+				0,
 				G.CARD_W * card_size,
 				G.CARD_H * card_size,
 				nil,
@@ -221,7 +216,10 @@ local function build_stats_panel(r)
 		n = G.UIT.R,
 		config = { align = "cm", padding = 0.02 },
 		nodes = {
-			{ n = G.UIT.T, config = { text = player_display .. "  vs  " .. nemesis_display, scale = 0.35, colour = G.C.WHITE } },
+			{
+				n = G.UIT.T,
+				config = { text = player_display .. "  vs  " .. nemesis_display, scale = 0.35, colour = G.C.WHITE },
+			},
 		},
 	}
 
@@ -246,15 +244,15 @@ local function build_stats_panel(r)
 	if r.stake then left_nodes[#left_nodes + 1] = text_row("Stake:", tostring(r.stake)) end
 	left_nodes[#left_nodes + 1] = text_row("Final Ante:", tostring(r.final_ante or "?"))
 	if r.duration then left_nodes[#left_nodes + 1] = text_row("Duration:", r.duration) end
-	if r.timestamp then
-		left_nodes[#left_nodes + 1] = text_row("Date:", os.date("%Y-%m-%d %H:%M", r.timestamp))
-	end
+	if r.timestamp then left_nodes[#left_nodes + 1] = text_row("Date:", os.date("%Y-%m-%d %H:%M", r.timestamp)) end
 
 	-- Ante breakdown
 	if r.ante_snapshots then
 		left_nodes[#left_nodes + 1] = section_header("Ante Breakdown")
 		local antes = {}
-		for k in pairs(r.ante_snapshots) do antes[#antes + 1] = tonumber(k) end
+		for k in pairs(r.ante_snapshots) do
+			antes[#antes + 1] = tonumber(k)
+		end
 		table.sort(antes)
 
 		for _, ante_num in ipairs(antes) do
@@ -272,9 +270,23 @@ local function build_stats_panel(r)
 					n = G.UIT.R,
 					config = { align = "cl", padding = 0.01 },
 					nodes = {
-						{ n = G.UIT.T, config = { text = string.format("A%d ", ante_num), scale = 0.28, colour = G.C.UI.TEXT_INACTIVE } },
+						{
+							n = G.UIT.T,
+							config = {
+								text = string.format("A%d ", ante_num),
+								scale = 0.28,
+								colour = G.C.UI.TEXT_INACTIVE,
+							},
+						},
 						{ n = G.UIT.T, config = { text = result_icon, scale = 0.28, colour = r_col } },
-						{ n = G.UIT.T, config = { text = string.format("  %s - %s%s", p_score, e_score, lives_str), scale = 0.28, colour = G.C.WHITE } },
+						{
+							n = G.UIT.T,
+							config = {
+								text = string.format("  %s - %s%s", p_score, e_score, lives_str),
+								scale = 0.28,
+								colour = G.C.WHITE,
+							},
+						},
 					},
 				}
 			end
@@ -285,14 +297,13 @@ local function build_stats_panel(r)
 	local function add_stats(nodes, stats, label)
 		if not stats then return end
 		nodes[#nodes + 1] = section_header(label)
-		if stats.reroll_count then
-			nodes[#nodes + 1] = text_row("Rerolls:", tostring(stats.reroll_count), 0.28)
-		end
+		if stats.reroll_count then nodes[#nodes + 1] = text_row("Rerolls:", tostring(stats.reroll_count), 0.28) end
 		if stats.reroll_cost_total then
 			nodes[#nodes + 1] = text_row("Reroll $:", tostring(stats.reroll_cost_total), 0.28)
 		end
 		if stats.vouchers then
-			nodes[#nodes + 1] = text_row("Vouchers:", stats.vouchers:gsub("v_", ""):gsub("-", ", "):gsub("_", " "), 0.28)
+			nodes[#nodes + 1] =
+				text_row("Vouchers:", stats.vouchers:gsub("v_", ""):gsub("-", ", "):gsub("_", " "), 0.28)
 		end
 	end
 
@@ -302,8 +313,11 @@ local function build_stats_panel(r)
 	-- Failed rounds
 	if r.failed_rounds and #r.failed_rounds > 0 then
 		local fr_parts = {}
-		for _, a in ipairs(r.failed_rounds) do fr_parts[#fr_parts + 1] = "A" .. tostring(a) end
-		left_nodes[#left_nodes + 1] = text_row("Failed Rounds:", table.concat(fr_parts, ", "), 0.28, G.C.UI.TEXT_INACTIVE, G.C.RED)
+		for _, a in ipairs(r.failed_rounds) do
+			fr_parts[#fr_parts + 1] = "A" .. tostring(a)
+		end
+		left_nodes[#left_nodes + 1] =
+			text_row("Failed Rounds:", table.concat(fr_parts, ", "), 0.28, G.C.UI.TEXT_INACTIVE, G.C.RED)
 	end
 
 	-- Right inner column: jokers + shop spending
@@ -339,7 +353,10 @@ local function build_stats_panel(r)
 			n = G.UIT.R,
 			config = { align = "cl", padding = 0.02, maxw = 4 },
 			nodes = {
-				{ n = G.UIT.T, config = { text = table.concat(parts, "  "), scale = 0.24, colour = G.C.UI.TEXT_INACTIVE } },
+				{
+					n = G.UIT.T,
+					config = { text = table.concat(parts, "  "), scale = 0.24, colour = G.C.UI.TEXT_INACTIVE },
+				},
 			},
 		}
 	end
@@ -386,7 +403,11 @@ local function build_stats_panel(r)
 		config = { align = "tm", padding = 0.1, minw = 9, r = 0.1, colour = G.C.L_BLACK },
 		nodes = {
 			-- Header spanning both columns
-			{ n = G.UIT.R, config = { align = "cm" }, nodes = { { n = G.UIT.C, config = { align = "cm" }, nodes = header_nodes } } },
+			{
+				n = G.UIT.R,
+				config = { align = "cm" },
+				nodes = { { n = G.UIT.C, config = { align = "cm" }, nodes = header_nodes } },
+			},
 			-- Two-column body
 			body_row,
 			-- Full-width button
@@ -400,18 +421,8 @@ end
 -------------------------------------------------------------------------------
 
 function G.UIDEF.ghost_replay_picker()
-	-- Merge config replays + folder replays into one list, sorted newest-first
-	local config_replays = SMODS.Mods["Multiplayer"].config.ghost_replays or {}
-	local folder_replays = MP.GHOST.load_folder_replays()
-
-	local all = {}
-	for _, r in ipairs(config_replays) do
-		r._source = r._source or "config"
-		all[#all + 1] = r
-	end
-	for _, r in ipairs(folder_replays) do
-		all[#all + 1] = r
-	end
+	-- Load replays from the replays/ folder, sorted newest-first
+	local all = MP.GHOST.load_folder_replays()
 
 	-- Sort newest-first
 	table.sort(all, function(a, b)
@@ -451,11 +462,14 @@ function G.UIDEF.ghost_replay_picker()
 						n = G.UIT.R,
 						config = { align = "cl", padding = 0.02 },
 						nodes = {
-							{ n = G.UIT.T, config = {
-								text = display_name .. " (" .. r._game_count .. " games)",
-								scale = 0.25,
-								colour = G.C.UI.TEXT_INACTIVE,
-							} },
+							{
+								n = G.UIT.T,
+								config = {
+									text = display_name .. " (" .. r._game_count .. " games)",
+									scale = 0.25,
+									colour = G.C.UI.TEXT_INACTIVE,
+								},
+							},
 						},
 					}
 				end
@@ -498,8 +512,7 @@ function G.UIDEF.ghost_replay_picker()
 	local control_nodes = {}
 
 	if MP.GHOST.is_active() then
-		local playing_as = MP.GHOST.flipped
-			and (MP.GHOST.replay.nemesis_name or "?")
+		local playing_as = MP.GHOST.flipped and (MP.GHOST.replay.nemesis_name or "?")
 			or (MP.GHOST.replay.player_name or "?")
 		control_nodes[#control_nodes + 1] = {
 			n = G.UIT.R,
@@ -530,25 +543,6 @@ function G.UIDEF.ghost_replay_picker()
 			},
 		}
 	end
-
-	-- DEBUG button
-	control_nodes[#control_nodes + 1] = {
-		n = G.UIT.R,
-		config = { align = "cm", padding = 0.03 },
-		nodes = {
-			UIBox_button({
-				id = "generate_test_ghost",
-				button = "generate_test_ghost_replay",
-				label = { "DEBUG: Gen Test" },
-				minw = 4,
-				minh = 0.4,
-				scale = 0.25,
-				colour = G.C.PURPLE,
-				hover = true,
-				shadow = true,
-			}),
-		},
-	}
 
 	-- Back button
 	control_nodes[#control_nodes + 1] = {
