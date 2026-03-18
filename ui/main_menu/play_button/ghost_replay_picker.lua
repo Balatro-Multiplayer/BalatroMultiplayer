@@ -450,6 +450,20 @@ function G.UIDEF.ghost_replay_picker()
 				},
 			},
 		}
+		replay_nodes[#replay_nodes + 1] = {
+			n = G.UIT.R,
+			config = { align = "cm", padding = 0.02 },
+			nodes = {
+				{
+					n = G.UIT.T,
+					config = {
+						text = "Place .log or .json files in the replays/ folder",
+						scale = 0.28,
+						colour = G.C.UI.TEXT_INACTIVE,
+					},
+				},
+			},
+		}
 	else
 		local last_filename = nil
 		for i, r in ipairs(all) do
