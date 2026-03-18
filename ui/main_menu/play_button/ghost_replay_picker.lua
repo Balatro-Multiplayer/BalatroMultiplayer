@@ -90,13 +90,19 @@ local function build_replay_label(r)
 	local timestamp_display = ""
 	if r.timestamp then timestamp_display = os.date("%m/%d", r.timestamp) end
 
+	local game_tag = ""
+	if r._game_index and r._game_count and r._game_count > 1 then
+		game_tag = string.format(" [%d/%d]", r._game_index, r._game_count)
+	end
+
 	return string.format(
-		"%s %s v %s A%s %s",
+		"%s %s v %s A%s %s%s",
 		result_text,
 		player_display,
 		nemesis_display,
 		ante_display,
-		timestamp_display
+		timestamp_display,
+		game_tag
 	)
 end
 
@@ -223,6 +229,13 @@ local function build_stats_panel(r)
 	local left_nodes = {}
 
 	left_nodes[#left_nodes + 1] = section_header("Match Info")
+	if r._filename then
+		local source_label = r._filename
+		if r._game_index and r._game_count and r._game_count > 1 then
+			source_label = source_label .. string.format(" (game %d of %d)", r._game_index, r._game_count)
+		end
+		left_nodes[#left_nodes + 1] = text_row("Source:", source_label, 0.25)
+	end
 	local ruleset_display = r.ruleset and r.ruleset:gsub("^ruleset_mp_", "") or "?"
 	local gamemode_display = r.gamemode and r.gamemode:gsub("^gamemode_mp_", "") or "?"
 	local deck_display = r.deck or "?"
@@ -427,7 +440,29 @@ function G.UIDEF.ghost_replay_picker()
 			},
 		}
 	else
+		local last_filename = nil
 		for i, r in ipairs(all) do
+			-- Show filename header when entering a new log file group with multiple games
+			if r._filename and r._game_count and r._game_count > 1 then
+				if r._filename ~= last_filename then
+					last_filename = r._filename
+					local display_name = r._filename:gsub("%.log$", "")
+					replay_nodes[#replay_nodes + 1] = {
+						n = G.UIT.R,
+						config = { align = "cl", padding = 0.02 },
+						nodes = {
+							{ n = G.UIT.T, config = {
+								text = display_name .. " (" .. r._game_count .. " games)",
+								scale = 0.25,
+								colour = G.C.UI.TEXT_INACTIVE,
+							} },
+						},
+					}
+				end
+			else
+				last_filename = nil
+			end
+
 			local label = build_replay_label(r)
 			local is_selected = (_preview_idx == i)
 			local btn_colour
