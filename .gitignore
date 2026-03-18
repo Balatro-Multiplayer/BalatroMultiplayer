@@ -5,3 +5,5 @@
 .vs
 .DS_Store
 .env
+replays/*
+!replays/.gitkeep

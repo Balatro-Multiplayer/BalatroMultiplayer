@@ -25,9 +25,14 @@ end
 local _picker_replays = {}
 -- Currently previewed replay (shown in right panel)
 local _preview_idx = nil
+-- Perspective flip for the previewed replay (before loading)
+local _preview_flipped = false
 
 function G.FUNCS.preview_ghost_replay(e)
 	local idx = tonumber(e.config.id:match("ghost_replay_(%d+)"))
+	if idx ~= _preview_idx then
+		_preview_flipped = false
+	end
 	_preview_idx = idx
 	refresh_picker()
 end
@@ -37,6 +42,7 @@ function G.FUNCS.load_previewed_ghost(e)
 	if not replay then return end
 
 	MP.GHOST.load(replay)
+	MP.GHOST.flipped = _preview_flipped
 
 	if replay.ruleset then
 		MP.SP.ruleset = replay.ruleset
@@ -47,6 +53,7 @@ function G.FUNCS.load_previewed_ghost(e)
 	if replay.gamemode then MP.LOBBY.config.gamemode = replay.gamemode end
 
 	_preview_idx = nil
+	_preview_flipped = false
 	reopen_practice_menu()
 end
 
@@ -58,16 +65,22 @@ end
 function G.FUNCS.clear_ghost_replay(e)
 	MP.GHOST.clear()
 	_preview_idx = nil
+	_preview_flipped = false
 	reopen_practice_menu()
 end
 
 function G.FUNCS.flip_ghost_perspective(e)
-	MP.GHOST.flip()
+	if _preview_idx then
+		_preview_flipped = not _preview_flipped
+	else
+		MP.GHOST.flip()
+	end
 	refresh_picker()
 end
 
 G.FUNCS.ghost_picker_back = function(e)
 	_preview_idx = nil
+	_preview_flipped = false
 	reopen_practice_menu()
 end
 
@@ -379,17 +392,31 @@ local function build_stats_panel(r)
 		},
 	}
 
-	-- Load as ghost button (spans full width)
+	-- Playing-as flip button + Load button (spans full width)
+	local playing_as = _preview_flipped
+		and (r.nemesis_name or "?")
+		or (r.player_name or "?")
 	local load_button = {
 		n = G.UIT.R,
 		config = { align = "cm", padding = 0.08 },
 		nodes = {
 			UIBox_button({
+				id = "flip_ghost_perspective",
+				button = "flip_ghost_perspective",
+				label = { "Playing as: " .. playing_as },
+				minw = 3.5,
+				minh = 0.5,
+				scale = 0.3,
+				colour = G.C.BLUE,
+				hover = true,
+				shadow = true,
+			}),
+			UIBox_button({
 				id = "load_previewed_ghost",
 				button = "load_previewed_ghost",
 				label = { "Play Match" },
-				minw = 4,
-				minh = 0.6,
+				minw = 3.5,
+				minh = 0.5,
 				scale = 0.35,
 				colour = G.C.GREEN,
 				hover = true,
@@ -526,28 +553,15 @@ function G.UIDEF.ghost_replay_picker()
 	local control_nodes = {}
 
 	if MP.GHOST.is_active() then
-		local playing_as = MP.GHOST.flipped and (MP.GHOST.replay.nemesis_name or "?")
-			or (MP.GHOST.replay.player_name or "?")
 		control_nodes[#control_nodes + 1] = {
 			n = G.UIT.R,
 			config = { align = "cm", padding = 0.03 },
 			nodes = {
 				UIBox_button({
-					id = "flip_ghost_perspective",
-					button = "flip_ghost_perspective",
-					label = { "Playing as: " .. playing_as },
-					minw = 2.5,
-					minh = 0.45,
-					scale = 0.3,
-					colour = G.C.GREEN,
-					hover = true,
-					shadow = true,
-				}),
-				UIBox_button({
 					id = "clear_ghost_replay",
 					button = "clear_ghost_replay",
 					label = { "Clear Replay" },
-					minw = 2,
+					minw = 3,
 					minh = 0.45,
 					scale = 0.3,
 					colour = G.C.RED,
