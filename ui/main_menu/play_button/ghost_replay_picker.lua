@@ -50,8 +50,6 @@ function G.FUNCS.load_previewed_ghost(e)
 		MP.LoadReworks(ruleset_name)
 	end
 
-	if replay.gamemode then MP.LOBBY.config.gamemode = replay.gamemode end
-
 	_preview_idx = nil
 	_preview_flipped = false
 	reopen_practice_menu()
