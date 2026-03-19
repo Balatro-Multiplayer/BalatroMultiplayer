@@ -65,35 +65,132 @@ function MP.MATCH_RECORD.finalize(won)
 	MP.MATCH_RECORD.final_ante = G.GAME.round_resets and G.GAME.round_resets.ante or 1
 end
 
--- Ghost Replay playback state
--- Loads a stored match record and provides enemy scores for PvP blinds
--- so practice mode can simulate playing against a past opponent.
+MP.GHOST = { active = false, replay = nil, flipped = false, gamemode = nil }
 
-MP.GHOST = { active = false, replay = nil, flipped = false }
+-- Per-ante playback state
+MP.GHOST._hands = {}
+MP.GHOST._hand_idx = 0
+MP.GHOST._advancing = false
 
 function MP.GHOST.load(replay)
 	MP.GHOST.active = true
 	MP.GHOST.replay = replay
 	MP.GHOST.flipped = false
+	MP.GHOST.gamemode = replay and replay.gamemode or nil
+	MP.GHOST._hands = {}
+	MP.GHOST._hand_idx = 0
+	MP.GHOST._advancing = false
 end
 
 function MP.GHOST.clear()
 	MP.GHOST.active = false
 	MP.GHOST.replay = nil
 	MP.GHOST.flipped = false
+	MP.GHOST.gamemode = nil
+	MP.GHOST._hands = {}
+	MP.GHOST._hand_idx = 0
+	MP.GHOST._advancing = false
 end
 
 function MP.GHOST.flip()
 	MP.GHOST.flipped = not MP.GHOST.flipped
 end
 
+function MP.GHOST.get_enemy_hands(ante)
+	if not MP.GHOST.replay or not MP.GHOST.replay.ante_snapshots then return {} end
+	local snapshot = MP.GHOST.replay.ante_snapshots[ante] or MP.GHOST.replay.ante_snapshots[tostring(ante)]
+	if not snapshot or not snapshot.hands then return {} end
+	local enemy_side = MP.GHOST.flipped and "player" or "enemy"
+	local out = {}
+	for _, h in ipairs(snapshot.hands) do
+		if h.side == enemy_side then
+			out[#out + 1] = h
+		end
+	end
+	return out
+end
+
+-- Fallback for replays without hand-level data
 function MP.GHOST.get_enemy_score(ante)
 	if not MP.GHOST.replay or not MP.GHOST.replay.ante_snapshots then return nil end
 	local snapshot = MP.GHOST.replay.ante_snapshots[ante] or MP.GHOST.replay.ante_snapshots[tostring(ante)]
 	if not snapshot then return nil end
-	-- When flipped, the original player's score becomes the ghost target
 	local key = MP.GHOST.flipped and "player_score" or "enemy_score"
 	return snapshot[key]
+end
+
+function MP.GHOST.init_playback(ante)
+	local hands = MP.GHOST.get_enemy_hands(ante)
+	MP.GHOST._hands = hands
+	MP.GHOST._hand_idx = 0
+	MP.GHOST._advancing = false
+	if #hands > 0 then
+		MP.GHOST._hand_idx = 1
+		local score = MP.INSANE_INT.from_string(hands[1].score)
+		MP.GAME.enemy.score = score
+		MP.GAME.enemy.score_text = MP.INSANE_INT.to_string(score)
+		MP.GAME.enemy.hands = hands[1].hands_left or 0
+		return true
+	else
+		local score_str = MP.GHOST.get_enemy_score(ante)
+		if score_str then
+			MP.GAME.enemy.score = MP.INSANE_INT.from_string(score_str)
+			MP.GAME.enemy.score_text = MP.INSANE_INT.to_string(MP.GAME.enemy.score)
+		end
+		return false
+	end
+end
+
+function MP.GHOST.advance_hand()
+	if MP.GHOST._hand_idx >= #MP.GHOST._hands then return false end
+	MP.GHOST._hand_idx = MP.GHOST._hand_idx + 1
+	local entry = MP.GHOST._hands[MP.GHOST._hand_idx]
+	local score = MP.INSANE_INT.from_string(entry.score)
+
+	G.E_MANAGER:add_event(Event({
+		blockable = false, blocking = false,
+		trigger = "ease", delay = 0.5,
+		ref_table = MP.GAME.enemy.score,
+		ref_value = "e_count",
+		ease_to = score.e_count,
+		func = function(t) return math.floor(t) end,
+	}))
+	G.E_MANAGER:add_event(Event({
+		blockable = false, blocking = false,
+		trigger = "ease", delay = 0.5,
+		ref_table = MP.GAME.enemy.score,
+		ref_value = "coeffiocient",
+		ease_to = score.coeffiocient,
+		func = function(t) return math.floor(t) end,
+	}))
+	G.E_MANAGER:add_event(Event({
+		blockable = false, blocking = false,
+		trigger = "ease", delay = 0.5,
+		ref_table = MP.GAME.enemy.score,
+		ref_value = "exponent",
+		ease_to = score.exponent,
+		func = function(t) return math.floor(t) end,
+	}))
+
+	MP.GAME.enemy.hands = entry.hands_left or 0
+	if MP.UI.juice_up_pvp_hud then MP.UI.juice_up_pvp_hud() end
+	return true
+end
+
+function MP.GHOST.playback_exhausted()
+	return #MP.GHOST._hands == 0 or MP.GHOST._hand_idx >= #MP.GHOST._hands
+end
+
+function MP.GHOST.has_hand_data()
+	return #MP.GHOST._hands > 0
+end
+
+-- Reads target from hands array directly, bypassing the eased score table.
+function MP.GHOST.current_target_big()
+	if MP.GHOST._hand_idx < 1 or MP.GHOST._hand_idx > #MP.GHOST._hands then return to_big(0) end
+	local entry = MP.GHOST._hands[MP.GHOST._hand_idx]
+	local score = MP.INSANE_INT.from_string(entry.score)
+	return to_big(score.coeffiocient * (10 ^ score.exponent))
 end
 
 function MP.GHOST.get_nemesis_name()

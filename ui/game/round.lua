@@ -50,13 +50,8 @@ function reset_blinds()
 		G.GAME.round_resets.blind_choices.Boss = mp_boss_choice or G.GAME.round_resets.blind_choices.Boss
 	end
 
-	-- Inject ghost enemy score for PvP blinds
 	if MP.GHOST.is_active() then
-		local ghost_score_str = MP.GHOST.get_enemy_score(G.GAME.round_resets.ante)
-		if ghost_score_str then
-			MP.GAME.enemy.score = MP.INSANE_INT.from_string(ghost_score_str)
-			MP.GAME.enemy.score_text = MP.INSANE_INT.to_string(MP.GAME.enemy.score)
-		end
+		MP.GHOST.init_playback(G.GAME.round_resets.ante)
 	end
 end
 

@@ -217,13 +217,20 @@ function Game:update_hand_played(dt)
 				if not ghost then
 					MP.ACTIONS.play_hand(G.GAME.chips, G.GAME.current_round.hands_left)
 				end
-				-- For now, never advance to next round
+
 				if G.GAME.current_round.hands_left < 1 then
 					if ghost then
-						-- Auto-resolve PvP round locally
-						local enemy_score = MP.GAME.enemy.score.coeffiocient * (10 ^ MP.GAME.enemy.score.exponent)
-						local beat_ghost = to_big(G.GAME.chips) >= to_big(enemy_score)
-						if beat_ghost then
+						local target
+						if MP.GHOST.has_hand_data() then
+							target = MP.GHOST.current_target_big()
+						else
+							local es = MP.GAME.enemy.score
+							target = to_big(es.coeffiocient * (10 ^ es.exponent))
+						end
+						local beat_current = to_big(G.GAME.chips) >= target
+						local all_exhausted = MP.GHOST.playback_exhausted()
+
+						if beat_current and all_exhausted then
 							MP.GAME.enemy.lives = MP.GAME.enemy.lives - 1
 							if MP.GAME.enemy.lives <= 0 then
 								MP.GAME.won = true
@@ -232,7 +239,6 @@ function Game:update_hand_played(dt)
 								return true
 							end
 						else
-							-- Mirror action_player_info: comeback bonus + no gold on loss
 							if MP.LOBBY.config.gold_on_life_loss then
 								MP.GAME.comeback_bonus_given = false
 								MP.GAME.comeback_bonus = MP.GAME.comeback_bonus + 1
@@ -263,6 +269,60 @@ function Game:update_hand_played(dt)
 					if G.hand.cards[1] and G.STATE == G.STATES.HAND_PLAYED then
 						eval_hand_and_jokers()
 						G.FUNCS.draw_from_hand_to_discard()
+					end
+				elseif ghost and MP.GHOST.has_hand_data() then
+					local beat_current = to_big(G.GAME.chips) >= MP.GHOST.current_target_big()
+
+					if beat_current and MP.GHOST.playback_exhausted() then
+						MP.GAME.enemy.lives = MP.GAME.enemy.lives - 1
+						if MP.GAME.enemy.lives <= 0 then
+							MP.GAME.won = true
+							MP.MATCH_RECORD.finalize(true)
+							win_game()
+							return true
+						end
+						MP.GAME.end_pvp = true
+					elseif beat_current and not MP.GHOST.playback_exhausted() and not MP.GHOST._advancing then
+						MP.GHOST._advancing = true
+						G.E_MANAGER:add_event(Event({
+							blockable = false,
+							blocking = false,
+							trigger = "after",
+							delay = 0.5,
+							func = function()
+								MP.GHOST.advance_hand()
+								G.E_MANAGER:add_event(Event({
+									blockable = false,
+									blocking = false,
+									trigger = "after",
+									delay = 0.6,
+									func = function()
+										while to_big(G.GAME.chips) >= MP.GHOST.current_target_big() and not MP.GHOST.playback_exhausted() do
+											MP.GHOST.advance_hand()
+										end
+										if to_big(G.GAME.chips) >= MP.GHOST.current_target_big() and MP.GHOST.playback_exhausted() then
+											MP.GAME.enemy.lives = MP.GAME.enemy.lives - 1
+											if MP.GAME.enemy.lives <= 0 then
+												MP.GAME.won = true
+												MP.MATCH_RECORD.finalize(true)
+												win_game()
+												MP.GHOST._advancing = false
+												return true
+											end
+											MP.GAME.end_pvp = true
+										end
+										MP.GHOST._advancing = false
+										return true
+									end,
+								}))
+								return true
+							end,
+						}))
+					end
+
+					if not MP.GAME.end_pvp and G.STATE == G.STATES.HAND_PLAYED then
+						G.STATE_COMPLETE = false
+						G.STATE = G.STATES.DRAW_TO_HAND
 					end
 				elseif not MP.GAME.end_pvp and G.STATE == G.STATES.HAND_PLAYED then
 					G.STATE_COMPLETE = false
