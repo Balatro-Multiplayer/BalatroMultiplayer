@@ -40,6 +40,7 @@ end
 function G.FUNCS.load_previewed_ghost(e)
 	local replay = _picker_replays[_preview_idx]
 	if not replay then return end
+	if not is_replay_ruleset_supported(replay) then return end
 
 	MP.GHOST.load(replay)
 	MP.GHOST.flipped = _preview_flipped
@@ -85,6 +86,11 @@ end
 -------------------------------------------------------------------------------
 -- Helpers
 -------------------------------------------------------------------------------
+
+local function is_replay_ruleset_supported(replay)
+	if not replay or not replay.ruleset then return true end
+	return MP.Rulesets[replay.ruleset] ~= nil
+end
 
 local function build_replay_label(r)
 	local result_text = (r.winner == "player") and "W" or "L"
@@ -394,33 +400,54 @@ local function build_stats_panel(r)
 	local playing_as = _preview_flipped
 		and (r.nemesis_name or "?")
 		or (r.player_name or "?")
+
+	local supported = is_replay_ruleset_supported(r)
+	local action_nodes = {}
+
+	if supported then
+		action_nodes[#action_nodes + 1] = UIBox_button({
+			id = "flip_ghost_perspective",
+			button = "flip_ghost_perspective",
+			label = { "Playing as: " .. playing_as },
+			minw = 3.5,
+			minh = 0.5,
+			scale = 0.3,
+			colour = G.C.BLUE,
+			hover = true,
+			shadow = true,
+		})
+		action_nodes[#action_nodes + 1] = UIBox_button({
+			id = "load_previewed_ghost",
+			button = "load_previewed_ghost",
+			label = { "Play Match" },
+			minw = 3.5,
+			minh = 0.5,
+			scale = 0.35,
+			colour = G.C.GREEN,
+			hover = true,
+			shadow = true,
+		})
+	else
+		action_nodes[#action_nodes + 1] = {
+			n = G.UIT.R,
+			config = { align = "cm", padding = 0.04 },
+			nodes = {
+				{
+					n = G.UIT.T,
+					config = {
+						text = "Unsupported ruleset — cannot play this replay",
+						scale = 0.3,
+						colour = G.C.RED,
+					},
+				},
+			},
+		}
+	end
+
 	local load_button = {
 		n = G.UIT.R,
 		config = { align = "cm", padding = 0.08 },
-		nodes = {
-			UIBox_button({
-				id = "flip_ghost_perspective",
-				button = "flip_ghost_perspective",
-				label = { "Playing as: " .. playing_as },
-				minw = 3.5,
-				minh = 0.5,
-				scale = 0.3,
-				colour = G.C.BLUE,
-				hover = true,
-				shadow = true,
-			}),
-			UIBox_button({
-				id = "load_previewed_ghost",
-				button = "load_previewed_ghost",
-				label = { "Play Match" },
-				minw = 3.5,
-				minh = 0.5,
-				scale = 0.35,
-				colour = G.C.GREEN,
-				hover = true,
-				shadow = true,
-			}),
-		},
+		nodes = action_nodes,
 	}
 
 	return {
