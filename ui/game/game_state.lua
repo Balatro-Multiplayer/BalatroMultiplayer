@@ -203,7 +203,7 @@ function Game:update_hand_played(dt)
 			func = function()
 				MP.ACTIONS.play_hand(G.GAME.chips, G.GAME.current_round.hands_left)
 				-- For now, never advance to next round
-				if G.GAME.current_round.hands_left < 1 then
+				if G.GAME.current_round.hands_left <= 0 then
 					attention_text({
 						scale = 0.8,
 						text = localize("k_wait_enemy"),

@@ -69,7 +69,7 @@ function Game:update(dt)
 		end
 		-- holy fucking conditional
 		if not (G.STATE == G.STATES.HAND_PLAYED 
-		and G.GAME.current_round.hands_left < 1 
+		and G.GAME.current_round.hands_left <= 0 
 		and G.STATE_COMPLETE 
 		and MP.LOBBY.connected 
 		and MP.LOBBY.code 
