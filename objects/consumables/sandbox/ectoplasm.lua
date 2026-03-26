@@ -1,6 +1,7 @@
 SMODS.Consumable({
 	key = "ectoplasm_sandbox",
 	set = "Spectral",
+	cost = 4,
 	pos = { x = 8, y = 4 },
 	config = { mp_sticker_balanced = true },
 	loc_vars = function(self, info_queue, card)
