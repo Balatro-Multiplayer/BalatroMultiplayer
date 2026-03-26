@@ -27,6 +27,15 @@ return {
 			},
 		},
 		Joker = {
+			j_mp_todo_list = {
+				name = "To Do List",
+				text = {
+					"Earn {C:money}$#1#{} if {C:attention}poker hand{}",
+					"is a {C:attention}#2#{},",
+					"poker hand changes",
+					"at end of round",
+				},
+			},
 			j_mp_seltzer = {
 				name = "Seltzer",
 				text = {
