@@ -9,6 +9,7 @@ SMODS.Consumable({
 	key = "ouija_standard",
 	set = "Spectral",
 	atlas = "ouija_2",
+	cost = 4,
 	pos = { x = 0, y = 0 },
 	unlocked = true,
 	discovered = true,
