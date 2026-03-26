@@ -743,6 +743,49 @@ return {
 					"Balatro University!",
 				},
 			},
+			mp_sticker_balanced = {
+				name = "Balanced",
+				text = {
+					"This card has been rebalanced",
+				},
+			},
+			mp_sticker_balanced_j_mp_hanging_chad = {
+				name = "Balanced",
+				text = {
+					"Retriggers first {C:attention}2{} cards",
+					"instead of first card twice",
+				},
+			},
+			mp_sticker_balanced_j_mp_seltzer = {
+				name = "Balanced",
+				text = {
+					"Lasts {C:attention}8{} hands",
+					"instead of {C:attention}10{}",
+				},
+			},
+			mp_sticker_balanced_j_mp_turtle_bean = {
+				name = "Balanced",
+				text = {
+					"{C:attention}+4{} hand size",
+					"instead of {C:attention}+5{}",
+				},
+			},
+			mp_sticker_balanced_c_mp_ouija_standard = {
+				name = "Balanced",
+				text = {
+					"Destroys {C:attention}3{} cards instead of",
+					"converting all cards and losing",
+					"{C:attention}-1{} hand size",
+				},
+			},
+			mp_sticker_balanced_j_mp_ticket = {
+				name = "Balanced",
+				text = {
+					"Earns {C:money}$3{} instead of {C:money}$4{}",
+					"No longer requires Gold cards in deck",
+					"Now {C:green}Uncommon{}",
+				},
+			},
 			current_nemesis = {
 				name = "Nemesis",
 				text = {
@@ -906,6 +949,7 @@ return {
 			mp_sticker_persistent = "Persistent",
 			mp_sticker_unreliable = "Unreliable",
 			mp_sticker_draining = "Draining",
+			mp_sticker_balanced = "Balanced",
 		},
 		dictionary = {
 			b_singleplayer = "Singleplayer",

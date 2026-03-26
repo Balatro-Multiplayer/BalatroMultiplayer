@@ -11,5 +11,12 @@ SMODS.Sticker({
 	badge_colour = G.C.MULTIPLAYER,
 	default_compat = false,
 	needs_enable_flag = true,
-	hide_badge = true,
+	hide_badge = false,
+	loc_vars = function(self, info_queue, card)
+		local key = "mp_sticker_balanced_" .. card.config.center_key
+		if G.localization.descriptions.Other[key] then
+			return { key = key }
+		end
+		return {}
+	end,
 })
