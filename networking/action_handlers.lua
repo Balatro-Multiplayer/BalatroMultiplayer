@@ -931,7 +931,6 @@ function MP.ACTIONS.start_game()
 	Client.send({
 		action = "startGame",
 	})
-	MP.GAME.active_timer = MP.GAME.timer
 end
 
 function MP.ACTIONS.ready_blind(e)
@@ -939,7 +938,6 @@ function MP.ACTIONS.ready_blind(e)
 	Client.send({
 		action = "readyBlind",
 	})
-	MP.GAME.active_timer = MP.GAME.timer
 end
 
 function MP.ACTIONS.unready_blind()
