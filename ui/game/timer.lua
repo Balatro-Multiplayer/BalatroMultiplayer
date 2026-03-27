@@ -1,17 +1,15 @@
 -- ease_round override moved to game/round.lua
 
 function G.FUNCS.mp_timer_button(e)
-	if MP.LOBBY.config.timer then
-		if MP.GAME.ready_blind then
-			if MP.GAME.timer <= 0 then
-				return
-			elseif not MP.GAME.timer_started then
-				MP.ACTIONS.start_ante_timer()
-			else
-				MP.ACTIONS.pause_ante_timer()
-			end
-		end
-	end
+    if not MP.LOBBY.config.timer then return end
+    if not MP.GAME.ready_blind then return end
+    if MP.GAME.timer <= 0 then return end
+
+    if not MP.GAME.timer_started then
+        MP.ACTIONS.start_ante_timer()
+    else
+        MP.ACTIONS.pause_ante_timer()
+    end
 end
 
 function MP.UI.timer_hud()
