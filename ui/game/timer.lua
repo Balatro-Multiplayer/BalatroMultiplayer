@@ -175,6 +175,7 @@ MP.timer_event = Event({
 	func = function()
 		if not MP.GAME.timer_started then return true end
 		MP.GAME.timer = MP.GAME.timer - 1
+		MP.GAME.active_timer = MP.GAME.timer
 		if MP.GAME.timer <= 0 then
 			MP.GAME.timer = 0
 			if not MP.GAME.ready_blind and not MP.is_pvp_boss() then
@@ -188,4 +189,26 @@ MP.timer_event = Event({
 		end
 		MP.timer_event.start_timer = false
 	end,
+})
+
+MP.pvp_timer_event = Event({
+    blockable = false,
+    blocking = false,
+    pause_force = true,
+    no_delete = true,
+    trigger = "after",
+    delay = 1,
+    timer = "UPTIME",
+    func = function()
+        if not MP.GAME.pvp_timer_started then return true end
+        MP.GAME.pvp_timer = MP.GAME.pvp_timer - 1
+        MP.GAME.active_timer = MP.GAME.pvp_timer
+        if MP.GAME.pvp_timer <= 0 then
+            MP.GAME.pvp_timer = 0
+            MP.GAME.active_timer = 0
+            MP.ACTIONS.fail_timer()
+            return true
+        end
+        MP.pvp_timer_event.start_timer = false
+    end,
 })
