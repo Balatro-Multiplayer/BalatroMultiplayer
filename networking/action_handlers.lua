@@ -250,6 +250,7 @@ local function action_start_blind()
 	MP.GAME.ready_blind = false
 	MP.GAME.timer_started = false
 	MP.GAME.timer = MP.LOBBY.config.timer_base_seconds
+	MP.GAME.pvp_timer = MP.LOBBY.config.timer_base_seconds
 	MP.UI.start_pvp_countdown(begin_pvp_blind)
 end
 
@@ -850,6 +851,39 @@ local function action_pause_ante_timer(time)
 	MP.GAME.timer_started = false
 end
 
+local function action_start_pvp_timer(time)
+	local option = SMODS.Mods["Multiplayer"].config.timersfx or 1
+	local timersfx = (option == 1) or (option == 2 and G.timer_ante ~= G.GAME.round_resets.ante)
+	G.timer_ante = G.GAME.round_resets.ante
+
+	if timersfx then
+		for i = 1, 3 do
+			local wait_time = (0.15 * (i - 1))
+			G.E_MANAGER:add_event(Event({
+				blocking = false,
+				blockable = false,
+				trigger = "after",
+				delay = G.SETTINGS.GAMESPEED * wait_time,
+				func = function()
+					play_sound("timpani", 0.55 + 0.25 * i, 0.7)
+					play_sound("generic1", 0.75 + 0.25 * i, 0.7)
+					return true
+				end,
+			}))
+		end
+	end
+	if type(time) == "string" then time = tonumber(time) end
+	MP.GAME.timer = time
+	MP.GAME.timer_started = true
+	if not MP.is_ruleset_active("speedlatro") then G.E_MANAGER:add_event(MP.timer_event) end
+end
+
+local function action_pause_pvp_timer(time)
+	if type(time) == "string" then time = tonumber(time) end
+	MP.GAME.timer = time
+	MP.GAME.timer_started = false
+end
+
 -- #region Client to Server
 function MP.ACTIONS.create_lobby(gamemode)
 	Client.send({
@@ -1101,6 +1135,22 @@ function MP.ACTIONS.pause_ante_timer()
 		time = MP.GAME.timer,
 	})
 	action_pause_ante_timer(MP.GAME.timer) -- TODO
+end
+
+function MP.ACTIONS.start_pvp_timer()
+	Client.send({
+		action = "startPvpTimer",
+		time = MP.GAME.pvp_timer,
+	})
+	action_start_pvp_timer(MP.GAME.pvp_timer)
+end
+
+function MP.ACTIONS.pause_pvp_timer()
+	Client.send({
+		action = "pausePvpTimer",
+		time = MP.GAME.pvp_timer,
+	})
+	action_pause_pvp_timer(MP.GAME.pvp_timer) -- TODO
 end
 
 function MP.ACTIONS.fail_timer()
