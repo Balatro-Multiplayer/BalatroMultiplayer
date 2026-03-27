@@ -1333,9 +1333,13 @@ function Game:update(dt)
 			elseif parsedAction.action == "nemesisEndGameStats" then
 				-- Handle receiving game stats (is only logged now, now shown in the ui)
 			elseif parsedAction.action == "startAnteTimer" then
-				action_start_ante_timer(parsedAction.time)
-			elseif parsedAction.action == "pauseAnteTimer" then
-				action_pause_ante_timer(parsedAction.time)
+                action_start_ante_timer(parsedAction.time)
+            elseif parsedAction.action == "pauseAnteTimer" then
+                action_pause_ante_timer(parsedAction.time)
+            elseif parsedAction.action == "startPvpTimer" then
+                action_start_pvp_timer(parsedAction.time)
+            elseif parsedAction.action == "pausePvpTimer" then
+                action_pause_pvp_timer(parsedAction.time)
 			elseif parsedAction.action == "jimboAppear" then
 				action_jimbo_appear(parsedAction.pos, parsedAction.text)
 			elseif parsedAction.action == "jimboTalk" then
