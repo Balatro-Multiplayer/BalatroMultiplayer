@@ -240,6 +240,7 @@ end
 
 local function begin_pvp_blind()
 	if MP.GAME.next_blind_context then
+	    MP.GAME.active_timer = MP.GAME.pvp_timer
 		G.FUNCS.select_blind(MP.GAME.next_blind_context)
 	else
 		sendErrorMessage("No next blind context", "MULTIPLAYER")
@@ -930,6 +931,7 @@ function MP.ACTIONS.start_game()
 	Client.send({
 		action = "startGame",
 	})
+	MP.GAME.active_timer = MP.GAME.timer
 end
 
 function MP.ACTIONS.ready_blind(e)
@@ -937,6 +939,7 @@ function MP.ACTIONS.ready_blind(e)
 	Client.send({
 		action = "readyBlind",
 	})
+	MP.GAME.active_timer = MP.GAME.timer
 end
 
 function MP.ACTIONS.unready_blind()

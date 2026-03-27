@@ -1,6 +1,5 @@
 -- ease_round override moved to game/round.lua
 
-MP.GAME.active_timer = MP.GAME.timer
 function G.FUNCS.mp_timer_button(e)
     if not MP.LOBBY.config.timer then return end
 
