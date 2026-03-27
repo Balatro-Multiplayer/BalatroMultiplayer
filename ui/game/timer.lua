@@ -2,6 +2,17 @@
 
 function G.FUNCS.mp_timer_button(e)
     if not MP.LOBBY.config.timer then return end
+
+    if MP.GAME.in_pvp_blind then
+        if MP.GAME.pvp_timer <= 0 then return end
+        if not MP.GAME.pvp_timer_started then
+            MP.ACTIONS.start_pvp_timer()
+        else
+            MP.ACTIONS.pause_pvp_timer()
+        end
+        return
+    end
+
     if not MP.GAME.ready_blind then return end
     if MP.GAME.timer <= 0 then return end
 
@@ -85,6 +96,7 @@ function MP.UI.start_pvp_countdown(callback)
 
 	local function show_next()
 		if MP.GAME.pvp_countdown <= 0 then
+		    MP.GAME.in_pvp_blind = true
 			if callback then callback() end
 			G.E_MANAGER:add_event(Event({
 				no_delete = true,
