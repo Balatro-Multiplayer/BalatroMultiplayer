@@ -1126,6 +1126,7 @@ function MP.ACTIONS.start_ante_timer()
 		action = "startAnteTimer",
 		time = MP.GAME.timer,
 	})
+	MP.GAME.active_timer = MP.GAME.timer
 	action_start_ante_timer(MP.GAME.timer)
 end
 
@@ -1142,6 +1143,7 @@ function MP.ACTIONS.start_pvp_timer()
 		action = "startPvpTimer",
 		time = MP.GAME.pvp_timer,
 	})
+	MP.GAME.active_timer = MP.GAME.pvp_timer
 	action_start_pvp_timer(MP.GAME.pvp_timer)
 end
 

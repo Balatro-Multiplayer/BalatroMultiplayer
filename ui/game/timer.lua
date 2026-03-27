@@ -1,5 +1,6 @@
 -- ease_round override moved to game/round.lua
 
+MP.GAME.active_timer = MP.GAME.timer
 function G.FUNCS.mp_timer_button(e)
     if not MP.LOBBY.config.timer then return end
 
@@ -69,7 +70,7 @@ function MP.UI.timer_hud()
 							n = G.UIT.O,
 							config = {
 								object = DynaText({
-									string = MP.is_ruleset_active("speedlatro") and ">>" or { { ref_table = MP.GAME, ref_value = "timer" } }, -- sorry
+									string = MP.is_ruleset_active("speedlatro") and ">>" or { { ref_table = MP.GAME, ref_value = "active_timer" } }, -- sorry x2
 									colours = { G.C.UI.TEXT_DARK },
 									shadow = true,
 									scale = 0.8,
@@ -146,20 +147,22 @@ function MP.UI.start_pvp_countdown(callback)
 end
 
 function G.FUNCS.set_timer_box(e)
-	if MP.LOBBY.config.timer then
-		if MP.GAME.timer_started then
-			e.config.colour = G.C.DYN_UI.BOSS_DARK
-			e.children[1].config.object.colours = { G.C.IMPORTANT }
-			return
-		end
-		if not MP.GAME.timer_started and MP.GAME.ready_blind then
-			e.config.colour = G.C.IMPORTANT
-			e.children[1].config.object.colours = { G.C.UI.TEXT_LIGHT }
-			return
-		end
-		e.config.colour = G.C.DYN_UI.BOSS_DARK
-		e.children[1].config.object.colours = { G.C.UI.TEXT_DARK }
-	end
+    if not MP.LOBBY.config.timer then return end
+
+    if MP.GAME.timer_started or MP.GAME.pvp_timer_started then
+        e.config.colour = G.C.DYN_UI.BOSS_DARK
+        e.children[1].config.object.colours = { G.C.IMPORTANT }
+        return
+    end
+
+    if MP.GAME.ready_blind or MP.GAME.in_pvp_blind then
+        e.config.colour = G.C.IMPORTANT
+        e.children[1].config.object.colours = { G.C.UI.TEXT_LIGHT }
+        return
+    end
+
+    e.config.colour = G.C.DYN_UI.BOSS_DARK
+    e.children[1].config.object.colours = { G.C.UI.TEXT_DARK }
 end
 
 MP.timer_event = Event({
