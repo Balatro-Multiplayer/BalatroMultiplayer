@@ -228,6 +228,10 @@ end
 ---@param seed string
 ---@param stake_str string
 local function action_start_game(seed, stake_str)
+	-- Clear any stale practice/ghost state so it can't leak into real MP
+	MP.SP.practice = false
+	MP.GHOST.clear()
+
 	MP.reset_game_states()
 	local stake = tonumber(stake_str)
 	MP.ACTIONS.set_ante(0)
@@ -236,6 +240,11 @@ local function action_start_game(seed, stake_str)
 	end
 	G.FUNCS.lobby_start_run(nil, { seed = seed, stake = stake })
 	MP.LOBBY.ready_to_start = false
+
+	local player_name = MP.UI.get_username()
+	local nemesis = MP.LOBBY.is_host and MP.LOBBY.guest or MP.LOBBY.host
+	local nemesis_name = nemesis and nemesis.username or "Unknown"
+	MP.MATCH_RECORD.init(seed, MP.LOBBY.config.ruleset, MP.LOBBY.config.gamemode, MP.LOBBY.config.back, stake_str, player_name, nemesis_name)
 end
 
 local function begin_pvp_blind()
@@ -340,6 +349,21 @@ local function action_end_pvp()
 	MP.GAME.timer = MP.LOBBY.config.timer_base_seconds
 	MP.GAME.timer_started = false
 	MP.GAME.ready_blind = false
+
+	-- needs a cleaner place than the networking layer but whatever
+	local ante = G.GAME.round_resets and G.GAME.round_resets.ante or 1
+	MP.MATCH_RECORD.snapshot_ante(ante, {
+		player_score = MP.GAME.highest_score and tostring(MP.GAME.highest_score) or "0",
+		enemy_score = MP.GAME.enemy.score_text or "0",
+		player_lives = MP.GAME.lives,
+		enemy_lives = MP.GAME.enemy.lives,
+		blind_key = G.GAME.blind
+				and G.GAME.blind.config
+				and G.GAME.blind.config.blind
+				and G.GAME.blind.config.blind.key
+			or nil,
+		result = nil,
+	})
 end
 
 ---@param lives number
@@ -366,6 +390,7 @@ local function action_win_game()
 	MP.nemesis_deck_received = false
 	MP.GAME.won = true
 	MP.STATS.record_match(true)
+	MP.MATCH_RECORD.finalize(true)
 	win_game()
 end
 
@@ -375,6 +400,7 @@ local function action_lose_game()
 	MP.end_game_jokers_received = false
 	MP.nemesis_deck_received = false
 	MP.STATS.record_match(false)
+	MP.MATCH_RECORD.finalize(false)
 	G.STATE_COMPLETE = false
 	G.STATE = G.STATES.GAME_OVER
 end
