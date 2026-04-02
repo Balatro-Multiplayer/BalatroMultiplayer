@@ -100,7 +100,7 @@ end
 ---@param key string e.g. "j_hanging_chad"
 ---@param opts table { rulesets, loc_key?, silent?, ...center properties }
 function MP.ReworkCenter(key, opts)
-	local center = G.P_CENTERS[key]
+	local center = G.P_CENTERS[key] or G.P_SEALS[key]
 	opts = opts or {}
 
 	-- Meta keys (not center properties)
@@ -163,7 +163,7 @@ function MP.LoadReworks(ruleset, key)
 	ruleset = ruleset or "vanilla"
 	if string.sub(ruleset, 1, 11) == "ruleset_mp_" then ruleset = string.sub(ruleset, 12, #ruleset) end
 	local function process(key_, ruleset_)
-		local center = G.P_CENTERS[key_]
+		local center = G.P_CENTERS[key_] or G.P_SEALS[key_]
 		for k, v in pairs(center) do
 			if string.sub(k, 1, #ruleset_) == ruleset_ then
 				local orig = string.sub(k, #ruleset_ + 1)
@@ -185,12 +185,14 @@ function MP.LoadReworks(ruleset, key)
 	if key then
 		process(key, "mp_" .. ruleset .. "_")
 	else
-		for k, v in pairs(G.P_CENTERS) do
-			if v.mp_reworks then
-				if v.mp_reworks[ruleset] then
-					process(k, "mp_" .. ruleset .. "_")
-				elseif v.mp_reworks["vanilla"] then -- Check vanilla separately to reset reworked jokers
-					process(k, "mp_vanilla_")
+		for _, pool in ipairs({ G.P_CENTERS, G.P_SEALS }) do
+			for k, v in pairs(pool) do
+				if v.mp_reworks then
+					if v.mp_reworks[ruleset] then
+						process(k, "mp_" .. ruleset .. "_")
+					elseif v.mp_reworks["vanilla"] then -- Check vanilla separately to reset reworked jokers
+						process(k, "mp_vanilla_")
+					end
 				end
 			end
 		end

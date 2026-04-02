@@ -33,6 +33,7 @@ MP.Ruleset({
 	reworked_vouchers = {},
 	reworked_enhancements = {
 		"m_mp_display_glass",
+		"m_mp_display_gold",
 	},
 	reworked_tags = {},
 	reworked_blinds = {},
