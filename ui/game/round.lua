@@ -3,7 +3,7 @@
 
 local ease_ante_ref = ease_ante
 function ease_ante(mod)
-	if MP.LOBBY.code and not MP.LOBBY.config.disable_live_and_timer_hud then
+	if MP.is_mp_or_ghost() and not MP.LOBBY.config.disable_live_and_timer_hud then
 		-- Prevents easing multiple times at once
 		if MP.GAME.antes_keyed[MP.GAME.ante_key] then return end
 
@@ -15,7 +15,9 @@ function ease_ante(mod)
 		end
 
 		MP.GAME.antes_keyed[MP.GAME.ante_key] = true
-		MP.ACTIONS.set_ante(G.GAME.round_resets.ante + mod)
+		if not MP.GHOST.is_active() then
+			MP.ACTIONS.set_ante(G.GAME.round_resets.ante + mod)
+		end
 		G.E_MANAGER:add_event(Event({
 			trigger = "immediate",
 			func = function()
@@ -30,7 +32,7 @@ end
 
 local ease_round_ref = ease_round
 function ease_round(mod)
-	if MP.LOBBY.code and not MP.LOBBY.config.disable_live_and_timer_hud and MP.LOBBY.config.timer then return end
+	if MP.is_mp_or_ghost() and not MP.LOBBY.config.disable_live_and_timer_hud and MP.LOBBY.config.timer then return end
 	ease_round_ref(mod)
 end
 
@@ -38,12 +40,18 @@ local reset_blinds_ref = reset_blinds
 function reset_blinds()
 	reset_blinds_ref()
 	G.GAME.round_resets.pvp_blind_choices = {}
-	if MP.LOBBY.code then
+
+	local gamemode_key = MP.get_active_gamemode()
+	if gamemode_key and MP.Gamemodes[gamemode_key] then
 		local mp_small_choice, mp_big_choice, mp_boss_choice =
-			MP.Gamemodes[MP.LOBBY.config.gamemode]:get_blinds_by_ante(G.GAME.round_resets.ante)
+			MP.Gamemodes[gamemode_key]:get_blinds_by_ante(G.GAME.round_resets.ante)
 		G.GAME.round_resets.blind_choices.Small = mp_small_choice or G.GAME.round_resets.blind_choices.Small
 		G.GAME.round_resets.blind_choices.Big = mp_big_choice or G.GAME.round_resets.blind_choices.Big
 		G.GAME.round_resets.blind_choices.Boss = mp_boss_choice or G.GAME.round_resets.blind_choices.Boss
+	end
+
+	if MP.GHOST.is_active() then
+		MP.GHOST.init_playback(G.GAME.round_resets.ante)
 	end
 end
 

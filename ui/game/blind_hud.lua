@@ -1,5 +1,5 @@
 function MP.UI.update_blind_HUD()
-	if MP.LOBBY.code then
+	if MP.is_mp_or_ghost() then
 		G.HUD_blind.alignment.offset.y = -10
 		G.E_MANAGER:add_event(Event({
 			trigger = "after",
@@ -29,7 +29,7 @@ function MP.UI.update_blind_HUD()
 end
 
 function MP.UI.reset_blind_HUD()
-	if MP.LOBBY.code then
+	if MP.is_mp_or_ghost() then
 		G.HUD_blind:get_UIE_by_ID("HUD_blind_name").config.object.config.string =
 			{ { ref_table = G.GAME.blind, ref_value = "loc_name" } }
 		G.HUD_blind:get_UIE_by_ID("HUD_blind_name").config.object:update_text()
@@ -122,7 +122,7 @@ end
 local blind_defeat_ref = Blind.defeat
 function Blind:defeat(silent)
 	blind_defeat_ref(self, silent)
-	if MP.LOBBY.code and MP.UI.reset_blind_HUD then MP.UI.reset_blind_HUD() end
+	if MP.is_mp_or_ghost() and MP.UI.reset_blind_HUD then MP.UI.reset_blind_HUD() end
 end
 
 local blind_disable_ref = Blind.disable
