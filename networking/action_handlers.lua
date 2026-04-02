@@ -335,6 +335,20 @@ local function action_stop_game()
 	end
 end
 
+
+-- Notifcation leaving opponent
+local function action_opponent_left()
+		attention_text({
+		text = "Opponent left the lobby",
+		scale = 0.6,
+		hold = 3,
+		align = "cm",
+		offset = { x = 0, y = -2 },
+		major = G.ROOM_ATTACH,
+	})
+end
+
+
 local function action_end_pvp()
 	MP.GAME.end_pvp = true
 	MP.GAME.timer = MP.LOBBY.config.timer_base_seconds
@@ -912,9 +926,8 @@ function MP.ACTIONS.unready_blind()
 end
 
 function MP.ACTIONS.stop_game()
-	Client.send({
-		action = "stopGame",
-	})
+	Client.send({action = "stopGame",
+	Client.send({ action = "opponentLeft" }) 
 end
 
 function MP.ACTIONS.fail_round(hands_used)
@@ -1234,6 +1247,8 @@ function Game:update(dt)
 				action_enemy_info(parsedAction.score, parsedAction.handsLeft, parsedAction.skips, parsedAction.lives)
 			elseif parsedAction.action == "stopGame" then
 				action_stop_game()
+			elseif parsedAction.action == "opponentLeft" then
+				action_opponent_left() 
 			elseif parsedAction.action == "endPvP" then
 				action_end_pvp()
 			elseif parsedAction.action == "playerInfo" then
