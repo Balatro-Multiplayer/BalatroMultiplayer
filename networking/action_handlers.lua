@@ -926,7 +926,7 @@ function MP.ACTIONS.unready_blind()
 end
 
 function MP.ACTIONS.stop_game()
-	Client.send({action = "stopGame",
+	Client.send({action = "stopGame"})
 	Client.send({ action = "opponentLeft" }) 
 end
 
