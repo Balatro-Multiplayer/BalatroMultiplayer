@@ -902,6 +902,7 @@ return {
 			b_singleplayer = "Singleplayer",
 			b_sp_with_ruleset = "Practice Mode",
 			b_practice = "Practice",
+			k_practice_collection_hint = "Click on any card to add it to your hand!",
 			k_unlimited_slots = "Unlimited Slots",
 			k_edition_cycling = "Edition Cycling (Q)",
 			b_join_lobby = "Join Lobby",
