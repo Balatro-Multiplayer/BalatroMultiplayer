@@ -8,7 +8,7 @@ priority = 2147483600
 target = "functions/UI_definitions.lua"
 pattern = '''contents\.buttons = \{(?<pre>[\s\S]*?)minh = 1\.75(?<between>[\s\S]*?)minh = 1\.75'''
 position = 'at'
-payload = '''contents.buttons = {$pre minh = MP.LOBBY.code and 1.2 or 1.75$between minh = MP.LOBBY.code and 1.2 or 1.75'''
+payload = '''contents.buttons = {$pre minh = (MP.LOBBY.code or (MP.is_practice_mode and MP.is_practice_mode())) and 1.2 or 1.75$between minh = (MP.LOBBY.code or (MP.is_practice_mode and MP.is_practice_mode())) and 1.2 or 1.75'''
 times = 1
 
 [[patches]]
@@ -47,7 +47,7 @@ pattern = '''{n=G.UIT.T, config={text = localize('b_options'), scale = scale, co
           }}'''
 position = 'after'
 payload = ''',
-(MP and MP.is_practice_mode and MP.is_practice_mode()) and {n=G.UIT.R, config={id = 'practice_collection_button', align = "cm", minh = 1.75, minw = 1.5, padding = 0.05, r = 0.1, hover = true, colour = G.C.SECONDARY_SET.Planet, button = "your_collection", shadow = true}, nodes={
+(MP and MP.is_practice_mode and MP.is_practice_mode()) and {n=G.UIT.R, config={id = 'practice_collection_button', align = "cm", minh = 1.2, minw = 1.5, padding = 0.05, r = 0.1, hover = true, colour = G.C.SECONDARY_SET.Planet, button = "your_collection", shadow = true}, nodes={
     {n=G.UIT.R, config={align = "cm", padding = 0, maxw = 1.4}, nodes={
         {n=G.UIT.T, config={text = localize("k_collection"), scale = 0.9*scale, colour = G.C.UI.TEXT_LIGHT, shadow = true}}
     }}
