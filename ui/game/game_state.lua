@@ -689,7 +689,7 @@ function G.FUNCS.your_collection(e)
 	your_collection_ref(e)
 	if MP.is_practice_mode() and not MP.LOBBY.code then
 		practice_collection_jimbo = true
-		MP.UI.create_jimbo(3, localize("k_practice_collection_hint"))
+		MP.UI.create_jimbo(2, localize("k_practice_collection_hint"))
 	end
 end
 
