@@ -368,6 +368,9 @@ function MP.UI.show_asteroid_hand_level_up()
 
 	for k, v in pairs(G.GAME.hands) do
 		if SMODS.is_poker_hand_visible(k) then
+			if hand_priority[k] == nil then
+				hand_priority[k] = 0 -- Safeguard for modded hands
+			end
 			if
 				to_big(v.level) > to_big(max_level)
 				or (to_big(v.level) == to_big(max_level) and hand_priority[k] < hand_priority[hand_type])
