@@ -681,6 +681,27 @@ function MP.UI.jimbo_say(text)
 	}))
 end
 
+-- Practice mode: spawn Jimbo when opening collection to hint at card spawning
+local practice_collection_jimbo = false
+
+local your_collection_ref = G.FUNCS.your_collection
+function G.FUNCS.your_collection(e)
+	your_collection_ref(e)
+	if MP.is_practice_mode() and not MP.LOBBY.code then
+		practice_collection_jimbo = true
+		MP.UI.create_jimbo(3, localize("k_practice_collection_hint"))
+	end
+end
+
+local exit_overlay_menu_ref_jimbo = G.FUNCS.exit_overlay_menu
+function G.FUNCS:exit_overlay_menu()
+	if practice_collection_jimbo then
+		practice_collection_jimbo = false
+		MP.UI.remove_jimbo()
+	end
+	exit_overlay_menu_ref_jimbo(self)
+end
+
 function MP.UI.remove_jimbo()
 	if not mp_jimbo then return end
 	local jimbo = mp_jimbo
