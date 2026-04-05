@@ -1,7 +1,7 @@
 -- Log Parser: parse Lovely log files into ghost replay tables.
 -- Lua port of tools/log_to_ghost_replay.py
 
-local M = {}
+local LOG_PARSER = {}
 
 -------------------------------------------------------------------------------
 -- Helpers
@@ -141,7 +141,7 @@ end
 -- Core parser
 -------------------------------------------------------------------------------
 
-function M.process_log(content)
+function LOG_PARSER.process_log(content)
 	local games = {}
 	local game = new_game()
 	local last_lobby_options = nil
@@ -377,7 +377,7 @@ end
 -- Convert a parsed game record to a replay table (same shape as JSON replays)
 -------------------------------------------------------------------------------
 
-function M.to_replay(game)
+function LOG_PARSER.to_replay(game)
 	local snapshots = {}
 	for ante, snap in pairs(game.ante_snapshots) do
 		local snap_t = {
@@ -433,4 +433,4 @@ function M.to_replay(game)
 	return replay
 end
 
-return M
+return LOG_PARSER
