@@ -1,5 +1,9 @@
 -- Ghost Replay: load and play back ghost replays from log files.
 
+function MP.is_mp_or_ghost()
+	return MP.LOBBY.code or MP.GHOST.is_active()
+end
+
 MP.GHOST = { active = false, replay = nil, flipped = false, gamemode = nil }
 
 -- Per-ante playback state
