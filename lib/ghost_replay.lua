@@ -49,15 +49,6 @@ function MP.GHOST.get_enemy_hands(ante)
 	return out
 end
 
--- Fallback for replays without hand-level data
-function MP.GHOST.get_enemy_score(ante)
-	if not MP.GHOST.replay or not MP.GHOST.replay.ante_snapshots then return nil end
-	local snapshot = MP.GHOST.replay.ante_snapshots[ante] or MP.GHOST.replay.ante_snapshots[tostring(ante)]
-	if not snapshot then return nil end
-	local key = MP.GHOST.flipped and "player_score" or "enemy_score"
-	return snapshot[key]
-end
-
 function MP.GHOST.init_playback(ante)
 	local hands = MP.GHOST.get_enemy_hands(ante)
 	MP.GHOST._hands = hands
@@ -70,14 +61,8 @@ function MP.GHOST.init_playback(ante)
 		MP.GAME.enemy.score_text = MP.INSANE_INT.to_string(score)
 		MP.GAME.enemy.hands = hands[1].hands_left or 0
 		return true
-	else
-		local score_str = MP.GHOST.get_enemy_score(ante)
-		if score_str then
-			MP.GAME.enemy.score = MP.INSANE_INT.from_string(score_str)
-			MP.GAME.enemy.score_text = MP.INSANE_INT.to_string(MP.GAME.enemy.score)
-		end
-		return false
 	end
+	return false
 end
 
 function MP.GHOST.advance_hand()
@@ -148,20 +133,10 @@ function MP.GHOST.get_blind_name_ui()
 	return { { string = MP.GHOST.get_nemesis_name() } }
 end
 
--- Compute the ghost's target score for the current ante.
--- Prefers per-hand data when available, falls back to aggregate enemy score.
-function MP.GHOST.current_target()
-	if MP.GHOST.has_hand_data() then
-		return MP.GHOST.current_target_big()
-	end
-	local es = MP.GAME.enemy.score
-	return to_big(es.coeffiocient * (10 ^ es.exponent))
-end
-
 -- Resolve the end of a PvP round when the player has no hands left.
 -- Returns "won", "game_over", or "continue".
 function MP.GHOST.resolve_pvp_hands_exhausted(chips)
-	local beat_current = to_big(chips) >= MP.GHOST.current_target()
+	local beat_current = to_big(chips) >= MP.GHOST.current_target_big()
 	local all_exhausted = MP.GHOST.playback_exhausted()
 
 	if beat_current and all_exhausted then
