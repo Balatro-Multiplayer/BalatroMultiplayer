@@ -189,8 +189,8 @@ local function create_shortcuts_ui(shortcuts)
 	return {
 		n = G.UIT.ROOT,
 		config = {
-			align = "cm",
-			colour = { 0, 0, 0, 0.85 },
+			align = "cl",
+			colour = { 0, 0, 0, 0.4 },
 			r = 0.15,
 			padding = 0.15,
 			minw = 5,
@@ -198,7 +198,7 @@ local function create_shortcuts_ui(shortcuts)
 		nodes = {
 			{
 				n = G.UIT.C,
-				config = { align = "cm", padding = 0.05 },
+				config = { align = "cl", padding = 0.05 },
 				nodes = rows,
 			},
 		},
@@ -225,7 +225,7 @@ function MP.SHORTCUTS.show()
 		definition = create_shortcuts_ui(shortcuts),
 		config = {
 			align = "cm",
-			offset = { x = 0, y = 0 },
+			offset = { x = -5, y = 0 },
 			major = G.ROOM_ATTACH,
 			bond = "Weak",
 		},
