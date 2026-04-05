@@ -28,9 +28,11 @@ function Game:update_draw_to_hand(dt)
 							delay = 0.45,
 							blockable = false,
 							func = function()
+								-- Ghost uses static { string = ... } (name is fixed for the run);
+								-- live MP uses { ref_table, ref_value } so the HUD reacts to name changes.
 								local blind_name_string
 								if MP.GHOST.is_active() then
-									blind_name_string = { { string = MP.GHOST.get_nemesis_name() } }
+									blind_name_string = MP.GHOST.get_blind_name_ui()
 								else
 									blind_name_string = {
 										{
@@ -216,40 +218,15 @@ function Game:update_hand_played(dt)
 
 				if G.GAME.current_round.hands_left < 1 then
 					if ghost then
-						local target
-						if MP.GHOST.has_hand_data() then
-							target = MP.GHOST.current_target_big()
-						else
-							local es = MP.GAME.enemy.score
-							target = to_big(es.coeffiocient * (10 ^ es.exponent))
+						local result = MP.GHOST.resolve_pvp_hands_exhausted(G.GAME.chips)
+						if result == "won" then
+							win_game()
+							return true
+						elseif result == "game_over" then
+							G.STATE = G.STATES.GAME_OVER
+							G.STATE_COMPLETE = false
+							return true
 						end
-						local beat_current = to_big(G.GAME.chips) >= target
-						local all_exhausted = MP.GHOST.playback_exhausted()
-
-						if beat_current and all_exhausted then
-							MP.GAME.enemy.lives = MP.GAME.enemy.lives - 1
-							if MP.GAME.enemy.lives <= 0 then
-								MP.GAME.won = true
-								win_game()
-								return true
-							end
-						else
-							if MP.LOBBY.config.gold_on_life_loss then
-								MP.GAME.comeback_bonus_given = false
-								MP.GAME.comeback_bonus = MP.GAME.comeback_bonus + 1
-							end
-							MP.GAME.lives = MP.GAME.lives - 1
-							MP.UI.ease_lives(-1)
-							if MP.LOBBY.config.no_gold_on_round_loss and G.GAME.blind and G.GAME.blind.dollars then
-								G.GAME.blind.dollars = 0
-							end
-							if MP.GAME.lives <= 0 then
-								G.STATE = G.STATES.GAME_OVER
-								G.STATE_COMPLETE = false
-								return true
-							end
-						end
-						MP.GAME.end_pvp = true
 					else
 						attention_text({
 							scale = 0.8,
@@ -265,56 +242,7 @@ function Game:update_hand_played(dt)
 						G.FUNCS.draw_from_hand_to_discard()
 					end
 				elseif ghost and MP.GHOST.has_hand_data() then
-					local beat_current = to_big(G.GAME.chips) >= MP.GHOST.current_target_big()
-
-					if beat_current and MP.GHOST.playback_exhausted() then
-						MP.GAME.enemy.lives = MP.GAME.enemy.lives - 1
-						if MP.GAME.enemy.lives <= 0 then
-							MP.GAME.won = true
-							win_game()
-							return true
-						end
-						MP.GAME.end_pvp = true
-					elseif beat_current and not MP.GHOST.playback_exhausted() and not MP.GHOST._advancing then
-						MP.GHOST._advancing = true
-						local function ghost_advance_step()
-							MP.GHOST.advance_hand()
-							G.E_MANAGER:add_event(Event({
-								blockable = false,
-								blocking = false,
-								trigger = "after",
-								delay = 0.6,
-								func = function()
-									if to_big(G.GAME.chips) >= MP.GHOST.current_target_big() and not MP.GHOST.playback_exhausted() then
-										ghost_advance_step()
-									else
-										if to_big(G.GAME.chips) >= MP.GHOST.current_target_big() and MP.GHOST.playback_exhausted() then
-											MP.GAME.enemy.lives = MP.GAME.enemy.lives - 1
-											if MP.GAME.enemy.lives <= 0 then
-												MP.GAME.won = true
-												win_game()
-												MP.GHOST._advancing = false
-												return true
-											end
-											MP.GAME.end_pvp = true
-										end
-										MP.GHOST._advancing = false
-									end
-									return true
-								end,
-							}))
-						end
-						G.E_MANAGER:add_event(Event({
-							blockable = false,
-							blocking = false,
-							trigger = "after",
-							delay = 0.5,
-							func = function()
-								ghost_advance_step()
-								return true
-							end,
-						}))
-					end
+					MP.GHOST.resolve_pvp_mid_hand(G.GAME.chips)
 
 					if not MP.GAME.end_pvp and G.STATE == G.STATES.HAND_PLAYED then
 						G.STATE_COMPLETE = false
@@ -352,17 +280,10 @@ function Game:update_new_round(dt)
 		if to_big(G.GAME.chips) < to_big(G.GAME.blind.chips) and not MP.is_pvp_boss() then
 			G.GAME.blind.chips = -1
 			if ghost then
-				if MP.LOBBY.config.death_on_round_loss and G.GAME.current_round.hands_played > 0 then
-					MP.GAME.lives = MP.GAME.lives - 1
-					MP.UI.ease_lives(-1)
-					if MP.LOBBY.config.no_gold_on_round_loss and G.GAME.blind and G.GAME.blind.dollars then
-						G.GAME.blind.dollars = 0
-					end
-					if MP.GAME.lives <= 0 then
-						G.STATE = G.STATES.GAME_OVER
-						G.STATE_COMPLETE = false
-						return
-					end
+				if MP.GHOST.resolve_round_fail() == "game_over" then
+					G.STATE = G.STATES.GAME_OVER
+					G.STATE_COMPLETE = false
+					return
 				end
 			else
 				MP.GAME.wait_for_enemys_furthest_blind = (MP.LOBBY.config.gamemode == "gamemode_mp_survival")
