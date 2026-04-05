@@ -40,7 +40,7 @@ end
 function G.FUNCS.load_previewed_ghost(e)
 	local replay = _picker_replays[_preview_idx]
 	if not replay then return end
-	if not is_replay_ruleset_supported(replay) then return end
+	if not MP.GHOST.is_ruleset_supported(replay) then return end
 
 	MP.GHOST.load(replay)
 	MP.GHOST.flipped = _preview_flipped
@@ -87,35 +87,6 @@ end
 -- Helpers
 -------------------------------------------------------------------------------
 
-local function is_replay_ruleset_supported(replay)
-	if not replay or not replay.ruleset then return true end
-	return MP.Rulesets[replay.ruleset] ~= nil
-end
-
-local function build_replay_label(r)
-	local result_text = (r.winner == "player") and "W" or "L"
-	local player_display = r.player_name or "?"
-	local nemesis_display = r.nemesis_name or "?"
-	local ante_display = tostring(r.final_ante or "?")
-
-	local timestamp_display = ""
-	if r.timestamp then timestamp_display = os.date("%m/%d", r.timestamp) end
-
-	local game_tag = ""
-	if r._game_index and r._game_count and r._game_count > 1 then
-		game_tag = string.format(" [%d/%d]", r._game_index, r._game_count)
-	end
-
-	return string.format(
-		"%s %s v %s A%s %s%s",
-		result_text,
-		player_display,
-		nemesis_display,
-		ante_display,
-		timestamp_display,
-		game_tag
-	)
-end
 
 local function text_row(label, value, scale, label_colour, value_colour)
 	scale = scale or 0.3
@@ -142,16 +113,6 @@ local function section_header(title, scale)
 	}
 end
 
-local function format_score(s)
-	local n = tonumber(s)
-	if not n then return tostring(s) end
-	if n >= 1000000 then
-		return string.format("%.1fM", n / 1000000)
-	elseif n >= 1000 then
-		return string.format("%.1fK", n / 1000)
-	end
-	return tostring(n)
-end
 
 local function build_joker_card_area(jokers, width)
 	if not jokers or #jokers == 0 then return nil end
@@ -277,8 +238,8 @@ local function build_stats_panel(r)
 			if snap then
 				local result_icon = snap.result == "win" and "W" or "L"
 				local r_col = snap.result == "win" and G.C.GREEN or G.C.RED
-				local p_score = format_score(snap.player_score or 0)
-				local e_score = format_score(snap.enemy_score or 0)
+				local p_score = MP.GHOST.format_score(snap.player_score or 0)
+				local e_score = MP.GHOST.format_score(snap.enemy_score or 0)
 				local lives_str = ""
 				if snap.player_lives and snap.enemy_lives then
 					lives_str = string.format("  [%d-%d]", snap.player_lives, snap.enemy_lives)
@@ -401,7 +362,7 @@ local function build_stats_panel(r)
 		and (r.nemesis_name or "?")
 		or (r.player_name or "?")
 
-	local supported = is_replay_ruleset_supported(r)
+	local supported = MP.GHOST.is_ruleset_supported(r)
 	local action_nodes = {}
 
 	if supported then
@@ -543,7 +504,7 @@ function G.UIDEF.ghost_replay_picker()
 				last_filename = nil
 			end
 
-			local label = build_replay_label(r)
+			local label = MP.GHOST.build_label(r)
 			local is_selected = (_preview_idx == i)
 			local btn_colour
 			if is_selected then

@@ -145,6 +145,47 @@ function MP.GHOST.is_active()
 	return MP.GHOST.active and MP.GHOST.replay ~= nil
 end
 
+function MP.GHOST.is_ruleset_supported(replay)
+	if not replay or not replay.ruleset then return true end
+	return MP.Rulesets[replay.ruleset] ~= nil
+end
+
+function MP.GHOST.format_score(s)
+	local n = tonumber(s)
+	if not n then return tostring(s) end
+	if n >= 1000000 then
+		return string.format("%.1fM", n / 1000000)
+	elseif n >= 1000 then
+		return string.format("%.1fK", n / 1000)
+	end
+	return tostring(n)
+end
+
+function MP.GHOST.build_label(r)
+	local result_text = (r.winner == "player") and "W" or "L"
+	local player_display = r.player_name or "?"
+	local nemesis_display = r.nemesis_name or "?"
+	local ante_display = tostring(r.final_ante or "?")
+
+	local timestamp_display = ""
+	if r.timestamp then timestamp_display = os.date("%m/%d", r.timestamp) end
+
+	local game_tag = ""
+	if r._game_index and r._game_count and r._game_count > 1 then
+		game_tag = string.format(" [%d/%d]", r._game_index, r._game_count)
+	end
+
+	return string.format(
+		"%s %s v %s A%s %s%s",
+		result_text,
+		player_display,
+		nemesis_display,
+		ante_display,
+		timestamp_display,
+		game_tag
+	)
+end
+
 -- Load ghost replays from .log and .json files in the replays/ folder.
 -- Files are read once when the picker is opened; drop a Lovely log or
 -- a .json file into replays/ and it shows up in the ghost replay picker.
