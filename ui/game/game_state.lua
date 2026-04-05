@@ -1,10 +1,6 @@
 -- Contains function overrides (monkey-patches) for game state management
 -- Overrides Game methods like update_draw_to_hand, update_hand_played, update_new_round, etc.
 
-function MP.is_mp_or_ghost()
-	return MP.LOBBY.code or MP.GHOST.is_active()
-end
-
 local update_draw_to_hand_ref = Game.update_draw_to_hand
 function Game:update_draw_to_hand(dt)
 	if MP.is_mp_or_ghost() then
