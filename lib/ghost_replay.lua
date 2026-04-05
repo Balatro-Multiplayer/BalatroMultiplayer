@@ -141,6 +141,136 @@ function MP.GHOST.get_nemesis_name()
 	end
 end
 
+-- Returns a UI string table for the PvP blind name.
+-- Uses a static { string = ... } entry (ghost name is fixed for the run),
+-- unlike live MP which uses { ref_table, ref_value } for reactive updates.
+function MP.GHOST.get_blind_name_ui()
+	return { { string = MP.GHOST.get_nemesis_name() } }
+end
+
+-- Compute the ghost's target score for the current ante.
+-- Prefers per-hand data when available, falls back to aggregate enemy score.
+function MP.GHOST.current_target()
+	if MP.GHOST.has_hand_data() then
+		return MP.GHOST.current_target_big()
+	end
+	local es = MP.GAME.enemy.score
+	return to_big(es.coeffiocient * (10 ^ es.exponent))
+end
+
+-- Resolve the end of a PvP round when the player has no hands left.
+-- Returns "won", "game_over", or "continue".
+function MP.GHOST.resolve_pvp_hands_exhausted(chips)
+	local beat_current = to_big(chips) >= MP.GHOST.current_target()
+	local all_exhausted = MP.GHOST.playback_exhausted()
+
+	if beat_current and all_exhausted then
+		MP.GAME.enemy.lives = MP.GAME.enemy.lives - 1
+		if MP.GAME.enemy.lives <= 0 then
+			MP.GAME.won = true
+			return "won"
+		end
+	else
+		if MP.LOBBY.config.gold_on_life_loss then
+			MP.GAME.comeback_bonus_given = false
+			MP.GAME.comeback_bonus = MP.GAME.comeback_bonus + 1
+		end
+		MP.GAME.lives = MP.GAME.lives - 1
+		MP.UI.ease_lives(-1)
+		if MP.LOBBY.config.no_gold_on_round_loss and G.GAME.blind and G.GAME.blind.dollars then
+			G.GAME.blind.dollars = 0
+		end
+		if MP.GAME.lives <= 0 then
+			return "game_over"
+		end
+	end
+	MP.GAME.end_pvp = true
+	return "continue"
+end
+
+-- Resolve mid-hand state when the player still has hands remaining.
+-- Checks whether the player has already beaten all ghost hands; if so, takes
+-- an enemy life. If the ghost has more hands, kicks off the advance animation.
+-- Returns true if the PvP round ended (win or end_pvp set).
+function MP.GHOST.resolve_pvp_mid_hand(chips)
+	if not MP.GHOST.has_hand_data() then return false end
+
+	local beat_current = to_big(chips) >= MP.GHOST.current_target_big()
+
+	if beat_current and MP.GHOST.playback_exhausted() then
+		MP.GAME.enemy.lives = MP.GAME.enemy.lives - 1
+		if MP.GAME.enemy.lives <= 0 then
+			MP.GAME.won = true
+			win_game()
+			return true
+		end
+		MP.GAME.end_pvp = true
+		return true
+	elseif beat_current and not MP.GHOST.playback_exhausted() and not MP.GHOST._advancing then
+		MP.GHOST._start_advance_sequence()
+	end
+	return false
+end
+
+-- Animate advancing through remaining ghost hands until the player's score
+-- no longer beats the ghost, or all ghost hands are exhausted.
+function MP.GHOST._start_advance_sequence()
+	MP.GHOST._advancing = true
+	local function step()
+		MP.GHOST.advance_hand()
+		G.E_MANAGER:add_event(Event({
+			blockable = false,
+			blocking = false,
+			trigger = "after",
+			delay = 0.6,
+			func = function()
+				if to_big(G.GAME.chips) >= MP.GHOST.current_target_big() and not MP.GHOST.playback_exhausted() then
+					step()
+				else
+					if to_big(G.GAME.chips) >= MP.GHOST.current_target_big() and MP.GHOST.playback_exhausted() then
+						MP.GAME.enemy.lives = MP.GAME.enemy.lives - 1
+						if MP.GAME.enemy.lives <= 0 then
+							MP.GAME.won = true
+							win_game()
+							MP.GHOST._advancing = false
+							return true
+						end
+						MP.GAME.end_pvp = true
+					end
+					MP.GHOST._advancing = false
+				end
+				return true
+			end,
+		}))
+	end
+	G.E_MANAGER:add_event(Event({
+		blockable = false,
+		blocking = false,
+		trigger = "after",
+		delay = 0.5,
+		func = function()
+			step()
+			return true
+		end,
+	}))
+end
+
+-- Handle life loss when the player fails a non-PvP round in ghost mode.
+-- Returns "game_over" or nil.
+function MP.GHOST.resolve_round_fail()
+	if MP.LOBBY.config.death_on_round_loss and G.GAME.current_round.hands_played > 0 then
+		MP.GAME.lives = MP.GAME.lives - 1
+		MP.UI.ease_lives(-1)
+		if MP.LOBBY.config.no_gold_on_round_loss and G.GAME.blind and G.GAME.blind.dollars then
+			G.GAME.blind.dollars = 0
+		end
+		if MP.GAME.lives <= 0 then
+			return "game_over"
+		end
+	end
+	return nil
+end
+
 function MP.GHOST.is_active()
 	return MP.GHOST.active and MP.GHOST.replay ~= nil
 end
