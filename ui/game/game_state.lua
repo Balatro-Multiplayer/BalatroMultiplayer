@@ -234,7 +234,6 @@ function Game:update_hand_played(dt)
 							MP.GAME.enemy.lives = MP.GAME.enemy.lives - 1
 							if MP.GAME.enemy.lives <= 0 then
 								MP.GAME.won = true
-								MP.MATCH_RECORD.finalize(true)
 								win_game()
 								return true
 							end
@@ -249,7 +248,6 @@ function Game:update_hand_played(dt)
 								G.GAME.blind.dollars = 0
 							end
 							if MP.GAME.lives <= 0 then
-								MP.MATCH_RECORD.finalize(false)
 								G.STATE = G.STATES.GAME_OVER
 								G.STATE_COMPLETE = false
 								return true
@@ -277,7 +275,6 @@ function Game:update_hand_played(dt)
 						MP.GAME.enemy.lives = MP.GAME.enemy.lives - 1
 						if MP.GAME.enemy.lives <= 0 then
 							MP.GAME.won = true
-							MP.MATCH_RECORD.finalize(true)
 							win_game()
 							return true
 						end
@@ -299,7 +296,6 @@ function Game:update_hand_played(dt)
 											MP.GAME.enemy.lives = MP.GAME.enemy.lives - 1
 											if MP.GAME.enemy.lives <= 0 then
 												MP.GAME.won = true
-												MP.MATCH_RECORD.finalize(true)
 												win_game()
 												MP.GHOST._advancing = false
 												return true
@@ -367,7 +363,6 @@ function Game:update_new_round(dt)
 						G.GAME.blind.dollars = 0
 					end
 					if MP.GAME.lives <= 0 then
-						MP.MATCH_RECORD.finalize(false)
 						G.STATE = G.STATES.GAME_OVER
 						G.STATE_COMPLETE = false
 						return
