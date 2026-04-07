@@ -14,7 +14,7 @@ SMODS.Joker({
 	mp_include = function(self)
 		return MP.UTILS.is_standard_ruleset() and MP.LOBBY.code
 	end,
-	config = { extra = { odds = 2, Xmult = 1.5 } },
+	config = { extra = { odds = 2, Xmult = 1.5 }, mp_sticker_balanced = true },
 	loc_vars = function(self, info_queue, card)
 		return {
 			key = "j_bloodstone",
