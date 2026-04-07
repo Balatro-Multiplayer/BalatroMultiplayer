@@ -35,7 +35,7 @@ local function get_shortcuts()
 					label = localize("b_sc_choose_deck"),
 					key = "D",
 					action = function()
-						G.FUNCS.lobby_choose_deck()
+						G.FUNCS.lobby_choose_deck({ config = {} })
 					end,
 				})
 			end
