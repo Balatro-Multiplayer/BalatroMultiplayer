@@ -17,21 +17,30 @@ local function get_shortcuts()
 	if in_menu then
 		if in_lobby then
 			table.insert(shortcuts, {
-				label = localize("b_sc_copy_code"),
+				label = localize("b_copy_code"),
 				key = "C",
 				action = function()
 					MP.UTILS.copy_to_clipboard(MP.LOBBY.code)
 				end,
 			})
 			table.insert(shortcuts, {
-				label = localize("b_sc_view_code"),
+				label = localize("b_view_code"),
 				key = "V",
 				action = function()
 					MP.UI.UTILS.overlay_message(MP.LOBBY.code)
 				end,
 			})
+			if MP.LOBBY.is_host or MP.LOBBY.config.different_decks then
+				table.insert(shortcuts, {
+					label = localize("b_sc_choose_deck"),
+					key = "D",
+					action = function()
+						G.FUNCS.lobby_choose_deck()
+					end,
+				})
+			end
 			table.insert(shortcuts, {
-				label = localize("b_sc_leave_lobby"),
+				label = localize("b_leave_lobby"),
 				key = "L",
 				action = function()
 					G.FUNCS.lobby_leave()
@@ -39,21 +48,21 @@ local function get_shortcuts()
 			})
 		elseif connected then
 			table.insert(shortcuts, {
-				label = localize("b_sc_join_clipboard"),
+				label = localize("b_join_lobby_clipboard"),
 				key = "V",
 				action = function()
 					G.FUNCS.join_from_clipboard()
 				end,
 			})
 			table.insert(shortcuts, {
-				label = localize("b_sc_join_lobby"),
+				label = localize("b_join_lobby"),
 				key = "J",
 				action = function()
 					G.FUNCS.join_lobby()
 				end,
 			})
 			table.insert(shortcuts, {
-				label = localize("b_sc_create_lobby"),
+				label = localize("b_create_lobby"),
 				key = "C",
 				action = function()
 					G.FUNCS.create_lobby()
@@ -61,7 +70,7 @@ local function get_shortcuts()
 			})
 		else
 			table.insert(shortcuts, {
-				label = localize("b_sc_reconnect"),
+				label = localize("b_reconnect"),
 				key = "R",
 				action = function()
 					G.FUNCS.reconnect()
@@ -72,14 +81,14 @@ local function get_shortcuts()
 
 	if in_game and in_lobby then
 		table.insert(shortcuts, {
-			label = localize("b_sc_copy_code"),
+			label = localize("b_copy_code"),
 			key = "C",
 			action = function()
 				MP.UTILS.copy_to_clipboard(MP.LOBBY.code)
 			end,
 		})
 		table.insert(shortcuts, {
-			label = localize("b_sc_lobby_info"),
+			label = localize("b_lobby_info"),
 			key = "I",
 			action = function()
 				G.FUNCS.lobby_info()
