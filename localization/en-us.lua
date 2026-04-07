@@ -649,6 +649,14 @@ return {
 			},
 		},
 		Enhanced = {
+			m_mp_display_gold = {
+				name = "Gold Card",
+				text = {
+					"{C:money}$#1#{} if this card is",
+					"held in hand at",
+					"end of round",
+				},
+			},
 			m_mp_display_glass = {
 				name = "Glass Card",
 				text = {
@@ -781,9 +789,27 @@ return {
 			mp_sticker_balanced_j_mp_ticket = {
 				name = "Balanced",
 				text = {
-					"Earns {C:money}$3{} instead of {C:money}$4{}",
 					"No longer requires Gold cards in deck",
 					"Now {C:green}Uncommon{}",
+				},
+			},
+			mp_sticker_balanced_j_mp_baron = {
+				name = "Balanced",
+				text = {
+					"Now {C:green}Uncommon{} instead of {C:red}Rare{}",
+				},
+			},
+			mp_sticker_balanced_j_mp_mime = {
+				name = "Balanced",
+				text = {
+					"Now {C:red}Rare{} instead of {C:green}Uncommon{}",
+				},
+			},
+			mp_sticker_balanced_j_mp_bloodstone = {
+				name = "Balanced",
+				text = {
+					"Triggers equal times for both",
+					"players on {C:attention}PvP{} rounds",
 				},
 			},
 			current_nemesis = {
