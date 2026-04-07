@@ -46,7 +46,7 @@ SMODS.Consumable({
 				if not already_marked then table.insert(remaining_cards, hand_card) end
 			end
 			if #remaining_cards > 0 then
-				local card_to_destroy = pseudorandom_element(remaining_cards, "ouija_destroy")
+				local card_to_destroy = pseudorandom_element(remaining_cards, pseudoseed("ouija_destroy"))
 				table.insert(cards_to_destroy, card_to_destroy)
 			end
 		end
@@ -90,7 +90,7 @@ SMODS.Consumable({
 		}))
 
 		-- Convert remaining cards to same rank
-		local _rank = pseudorandom_element(SMODS.Ranks, "ouija")
+		local _rank = pseudorandom_element(SMODS.Ranks, pseudoseed("ouija_rank"))
 		G.E_MANAGER:add_event(Event({
 			trigger = "after",
 			delay = 0.8,
