@@ -11,7 +11,6 @@ local function get_shortcuts()
 	local shortcuts = {}
 	local in_lobby = MP.LOBBY.code ~= nil
 	local connected = MP.LOBBY.connected
-	local in_game = G.STAGE == G.STAGES.RUN
 	local in_menu = G.STAGE == G.STAGES.MAIN_MENU
 
 	if in_menu then
@@ -77,23 +76,6 @@ local function get_shortcuts()
 				end,
 			})
 		end
-	end
-
-	if in_game and in_lobby then
-		table.insert(shortcuts, {
-			label = localize("b_copy_code"),
-			key = "C",
-			action = function()
-				MP.UTILS.copy_to_clipboard(MP.LOBBY.code)
-			end,
-		})
-		table.insert(shortcuts, {
-			label = localize("b_lobby_info"),
-			key = "I",
-			action = function()
-				G.FUNCS.lobby_info()
-			end,
-		})
 	end
 
 	return shortcuts
