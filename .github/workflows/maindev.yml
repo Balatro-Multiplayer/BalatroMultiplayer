@@ -2,7 +2,7 @@ name: Test Multiplayer Mod
 
 on:
   push:
-    branches: [ dev, issue147 ]
+    branches: [ dev, issue-#147 ]
   pull_request:
     branches: [ dev ]
 
