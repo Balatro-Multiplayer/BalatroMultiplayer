@@ -2,9 +2,9 @@ name: Test Multiplayer Mod
 
 on:
   push:
-    branches: [ main, dev, issue147 ]
+    branches: [ dev, issue147 ]
   pull_request:
-    branches: [ main, dev ]
+    branches: [ dev ]
 
 jobs:
   test:
@@ -25,4 +25,4 @@ jobs:
       run: luarocks install luacheck
     
     - name: Run LuaCheck
-      run: luacheck . --no-global
+      run: luacheck . --no-global --exclude-files .luarocks
