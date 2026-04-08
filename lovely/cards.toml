@@ -53,8 +53,10 @@ pattern = '''if center.consumeable then'''
 position = 'before'
 payload = '''
 if old_center ~= center or initial then
-	if MP.LOBBY.config.ruleset then
-		local ruleset = string.sub(MP.LOBBY.config.ruleset, 12, #MP.LOBBY.config.ruleset)
+	local ruleset = MP.LOBBY.config.ruleset or MP.SP.ruleset
+	self.ability.mp_sticker_balanced = false
+	if ruleset then
+		local ruleset = string.sub(ruleset, 12, #ruleset)
 		
 		if center.mp_reworks and center.mp_reworks[ruleset] and ruleset ~= 'vanilla' then
 			if not center.mp_silent[ruleset] then

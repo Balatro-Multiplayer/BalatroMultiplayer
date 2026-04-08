@@ -25,6 +25,48 @@ return {
 					"{C:inactive}(Currently {C:money}$#3#{C:inactive})",
 				},
 			},
+			tag_mp_uncommon_release = {
+				name = "Uncommon Tag",
+				text = {
+					"Shop has an",
+					"{C:green}Uncommon Joker",
+				},
+			},
+			tag_mp_rare_release = {
+				name = "Rare Tag",
+				text = {
+					"Shop has a",
+					"{C:red}Rare Joker",
+				},
+			},
+			tag_mp_foil_release = {
+				name = "Foil Tag",
+				text = {
+					"Next base edition shop",
+					"Joker becomes {C:dark_edition}Foil",
+				},
+			},
+			tag_mp_holo_release = {
+				name = "Holographic Tag",
+				text = {
+					"Next base edition shop",
+					"Joker becomes {C:dark_edition}Holographic",
+				},
+			},
+			tag_mp_poly_release = {
+				name = "Polychrome Tag",
+				text = {
+					"Next base edition shop",
+					"Joker becomes {C:dark_edition}Polychrome",
+				},
+			},
+			tag_mp_negative_release = {
+				name = "Negative Tag",
+				text = {
+					"Next base edition shop",
+					"Joker becomes {C:dark_edition}Negative",
+				},
+			},
 		},
 		Joker = {
 			j_mp_seltzer = {
@@ -609,6 +651,93 @@ return {
 					"{C:attention}enhanced{} become {C:attention}Wild Cards",
 				},
 			},
+			j_mp_8ball_release = {
+				name = "8 Ball",
+				text = {
+					"Create a {C:planet}Planet{} card",
+					"if played hand contains",
+					"{C:attenetion}#1#{} or more {C:attention}8s{}",
+					"{C:inactive}(Must have room)",
+				},
+			},
+			j_mp_todo_list_release = {
+				name = "To Do List",
+				text = {
+					"Earn {C:money}$#1#{} if {C:attention}poker hand{}",
+					"is a {C:attention}#2#{},",
+					"poker hand changes",
+					"on every payout",
+				},
+			},
+			j_mp_swashbuckler_release = {
+				name = "Swashbuckler",
+				text = {
+					"Adds the sell value of",
+					"all owned {C:attention}Jokers{} left",
+					"of this card to Mult",
+					"{C:inactive}(Currently {C:mult}+#1#{C:inactive} Mult)",
+				},
+			},
+			j_mp_hanging_chad_release = {
+				name = "Hanging Chad",
+				text = {
+					"Retrigger {C:attention}first{} played",
+					"card used in scoring",
+				},
+			},
+			j_mp_madness_release = {
+				name = "Madness",
+				text = {
+					"When {C:attention}Blind{} is selected,",
+					"gain {X:mult,C:white} X#1# {} Mult and",
+					"{C:attention}destroy{} a random Joker",
+					"{C:inactive}(Currently {X:mult,C:white} X#2# {} Mult)",
+				},
+			},
+			j_mp_vampire_release = {
+				name = "Vampire",
+				text = {
+					"This Joker gains {X:mult,C:white} X#1# {} Mult",
+					"per {C:attention}Enhanced card{} played,",
+					"removes card {C:attention}Enhancement",
+					"{C:inactive}(Currently {X:mult,C:white} X#2# {C:inactive} Mult)",
+				},
+			},
+			j_mp_midas_mask_release = {
+				name = "Midas Mask",
+				text = {
+					"All {C:attention}face{} cards",
+					"become {C:attention}Gold{} cards",
+					"when played",
+				},
+			},
+			j_mp_yorick_release = {
+				name = "Yorick",
+				text = {
+					"{X:mult,C:white} X#1# {} Mult only after",
+					"using {C:attention}#2#{} discards",
+					"{C:inactive}(Discards left: {C:attention}#3#{C:inactive})",
+				},
+			},
+			j_mp_flower_pot_release = {
+				name = "Flower Pot",
+				text = {
+					"{X:mult,C:white} X#1# {} Mult if played",
+					"hand has a scoring",
+					"{C:diamonds}Diamond{} card, {C:clubs}Club{} card,",
+					"{C:hearts}Heart{} card, and {C:spades}Spade{} card",
+				},
+			},
+		},
+		Tarot = {
+			c_mp_magician_release = {
+				name = "The Magician",
+				text = {
+					"Enhances {C:attention}#1#{} selected",
+					"card into a",
+					"{C:attention}#2#",
+				},
+			},
 		},
 		Planet = {
 			c_mp_asteroid = {
@@ -784,6 +913,14 @@ return {
 					"{X:mult,C:white}X0.75{} Mult",
 				},
 			},
+			mp_blue_seal_release = {
+				name = "Blue Seal",
+				text = {
+					"Creates a {C:planet}Planet{} card",
+					"if this card is {C:attention}held{} in",
+					"hand at end of round",
+				},
+			},
 		},
 		Stake = {
 			stake_mp_planet = {
@@ -867,6 +1004,21 @@ return {
 					"Specific Jokers are {C:attention}Draining",
 					"{C:inactive,s:0.8}({X:mult,C:white,s:0.8} X0.75 {C:inactive,s:0.8} Mult)",
 					"{s:0.8}Applies Crystal Stake",
+				},
+			},
+			stake_mp_orange_release = {
+				name = "Orange Stake",
+				text = {
+					"{C:attention}Booster Packs{} cost",
+					"{C:money}$1{} more per Ante",
+					"{s:0.8}Applies all previous Stakes",
+				},
+			},
+			stake_mp_gold_release = {
+				name = "Gold Stake",
+				text = {
+					"{C:red}-1{} hand size",
+					"{s:0.8}Applies all previous Stakes",
 				},
 			},
 		},
@@ -1061,6 +1213,8 @@ return {
 			k_smallworld_description = "It's a small world after all.\n\n75% of jokers, consumables, vouchers, and tags\nare randomly banned each game.\n\nBanned items get replaced with what's available.\nDuplicates allowed.",
 			k_speedlatro = "Speedlatro",
 			k_speedlatro_description = "Up the pace with an uncomfortably fast 147 second timer between\neach PvP blind. Good luck using Vagabond",
+			k_release = "Release Ver.",
+			k_release_description = "Allan please add details",
 			k_cost_up = "Cost Up",
 			k_destabilized = "Destabilized",
 			k_oops_ex = "Oops!",

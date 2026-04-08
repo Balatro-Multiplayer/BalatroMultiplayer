@@ -228,10 +228,7 @@ end
 ---@param seed string
 ---@param stake_str string
 local function action_start_game(seed, stake_str)
-	sendDebugMessage(
-		string.format("Game starting — %s", os.date("%Y-%m-%dT%H:%M:%S%z")),
-		"MULTIPLAYER"
-	)
+	sendDebugMessage(string.format("Game starting — %s", os.date("%Y-%m-%dT%H:%M:%S%z")), "MULTIPLAYER")
 	MP.reset_game_states()
 	local stake = tonumber(stake_str)
 	MP.ACTIONS.set_ante(0)
