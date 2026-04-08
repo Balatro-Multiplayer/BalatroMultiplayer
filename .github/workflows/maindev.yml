@@ -20,7 +20,7 @@ jobs:
     
     - name: Syntax of all Lua files
       run: |
-        for file in $(find . -name "*.lua" -not -path "./.git/*" -not -path "./.lua/*"); do
+        for file in $(find . -type f -name "*.lua" -not -path "./.git/*"); do
           echo "Checking $file"
           lua -e "assert(loadfile('$file'))"
         done
