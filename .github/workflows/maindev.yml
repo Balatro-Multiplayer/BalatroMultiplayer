@@ -22,5 +22,5 @@ jobs:
       run: |
         for file in $(find . -name "*.lua" -not -path "./.git/*"); do
           echo "Checking $file"
-          lua -p "$file"
+          lua -e "assert(loadfile('$file'))"
         done
