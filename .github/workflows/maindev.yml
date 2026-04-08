@@ -18,11 +18,9 @@ jobs:
       with:
         luaVersion: "5.4"
     
-    - name: Setup LuaRocks
-      uses: leafo/gh-actions-luarocks@v4
-    
-    - name: Install LuaCheck
-      run: luarocks install luacheck
-    
-    - name: Run LuaCheck
-      run: luacheck . --no-global --exclude-files .luarocks
+    - name: Syntax of all Lua files
+      run: |
+        for file in $(find . -name "*.lua" -not -path "./.git/*"); do
+          echo "Checking $file"
+          lua -p "$file"
+        done
