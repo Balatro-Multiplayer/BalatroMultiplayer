@@ -2,9 +2,8 @@ name: Test Multiplayer Mod
 
 on:
   push:
-    branches: [ dev, issue-#147 ]
   pull_request:
-    branches: [ dev ]
+  workflow_dispatch:
 
 jobs:
   test:
@@ -17,6 +16,16 @@ jobs:
       uses: leafo/gh-actions-lua@v10
       with:
         luaVersion: "5.4"
+
+    - name: Setup LuaRocks
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y luarocks lua5.4 liblua5.4-dev
+
+    - name: Install Busted
+      run: |
+        luarocks --lua-version=5.4 install --local busted
+        echo "$HOME/.luarocks/bin" >> "$GITHUB_PATH"
     
     - name: Syntax of all Lua files
       run: |
@@ -24,3 +33,6 @@ jobs:
           echo "Checking $file"
           lua -e "assert(loadfile('$file'))"
         done
+
+    - name: Run Busted tests
+      run: busted --pattern='_test%.lua$' tests

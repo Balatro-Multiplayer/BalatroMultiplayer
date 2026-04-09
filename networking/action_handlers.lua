@@ -328,11 +328,42 @@ end
 
 local function action_stop_game()
 	MP.enemy_disconnect_countdown = nil
-	if G.STAGE ~= G.STAGES.MAIN_MENU then
-		G.FUNCS.go_to_menu()
-		MP.UI.update_connection_status()
-		MP.reset_game_states()
-	end
+	
+	-- Show the notification
+	attention_text({
+		text = "Opponent left the lobby",
+		scale = 0.8,
+		hold = 2,
+		align = "cm",
+		offset = { x = 0, y = 0 },
+		major = G.ROOM_ATTACH,
+	})
+	
+	-- Event system for delay
+	G.E_MANAGER:add_event(Event({
+		trigger = "after",
+		delay = 2.0,
+		func = function()
+			-- Clear lobby state first
+			MP.LOBBY.code = nil
+			MP.LOBBY.connected = false
+			MP.LOBBY.in_game = false
+			
+			-- Force reset to main menu
+			G.STATE = G.STATES.MENU
+			G.STATE_COMPLETE = false
+			
+			-- Clear any remaining UI
+			if G.OVERLAY_MENU then
+				G.FUNCS.exit_overlay_menu()
+			end
+			
+			-- Refresh the main menu UI
+			set_main_menu_UI()
+			
+			return true
+		end,
+	}))
 end
 
 local function action_end_pvp()
