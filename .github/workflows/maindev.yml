@@ -24,7 +24,7 @@ jobs:
 
     - name: Install Busted
       run: |
-        luarocks --lua-version=5.4 install busted
+        luarocks --lua-version=5.4 install --local busted
         echo "$HOME/.luarocks/bin" >> "$GITHUB_PATH"
     
     - name: Syntax of all Lua files
