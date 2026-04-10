@@ -96,65 +96,80 @@ function MP.ApplyBans()
 	end
 end
 
+local LOADED_REWORKS = {}
 -- Rework a center for specific ruleset(s). Use MP.LoadReworks() to swap in the active ruleset.
 ---@param key string e.g. "j_hanging_chad"
 ---@param opts table { rulesets, loc_key?, silent?, ...center properties }
 function MP.ReworkCenter(key, opts)
-	local center = G.P_CENTERS[key]
-	opts = opts or {}
+	LOADED_REWORKS[key] = opts or {}
+end
 
-	-- Meta keys (not center properties)
-	local reserved = { rulesets = true, loc_key = true, silent = true }
-	local rulesets = opts.rulesets
-	local loc_key = opts.loc_key
-	local silent = opts.silent
+-- inject reworks properly
+local inject_ref = SMODS.injectItems
+function SMODS.injectItems()
+	local ret = inject_ref()
+	for key, opts in pairs(LOADED_REWORKS) do
+		local center_table = type(opts.center_table) == "table" and opts.center_table
+			or G[opts.center_table]
+			or G.P_CENTERS
+		local center = center_table[key]
 
-	-- Convert single ruleset to list
-	if type(rulesets) == "string" then rulesets = { rulesets } end
+		-- Meta keys (not center properties)
+		local reserved = { rulesets = true, loc_key = true, silent = true }
+		local rulesets = opts.rulesets
+		local loc_key = opts.loc_key
+		local silent = opts.silent
 
-	-- Wrap loc_vars to inject loc_key if provided
-	if loc_key then
-		local user_loc_vars = opts.loc_vars or function()
-			return {}
-		end
-		opts.loc_vars = function(self, info_queue, card)
-			local result = user_loc_vars(self, info_queue, card)
-			result.key = loc_key
-			return result
-		end
-	end
+		-- Convert single ruleset to list
+		if type(rulesets) == "string" then rulesets = { rulesets } end
 
-	-- do we need to inject generate_ui for loc_vars to work?
-	local needs_generate_ui = opts.loc_vars
-		and not opts.generate_ui
-		and not (center.generate_ui and type(center.generate_ui) == "function")
-
-	-- Apply changes to all specified rulesets
-	for _, rs in ipairs(rulesets) do
-		local prefix = "mp_" .. rs .. "_"
-
-		-- Store all reworked properties
-		for k, v in pairs(opts) do
-			if not reserved[k] then
-				center[prefix .. k] = v
-				if not center["mp_vanilla_" .. k] then center["mp_vanilla_" .. k] = center[k] or "NULL" end
+		-- Wrap loc_vars to inject loc_key if provided
+		if loc_key then
+			local user_loc_vars = opts.loc_vars or function()
+				return {}
+			end
+			opts.loc_vars = function(self, info_queue, card)
+				local result = user_loc_vars(self, info_queue, card)
+				result.key = loc_key
+				return result
 			end
 		end
 
-		-- Auto-inject generate_ui when adding loc_vars to vanilla centers
-		if needs_generate_ui then
-			center[prefix .. "generate_ui"] = SMODS.Center.generate_ui
-			if not center.mp_vanilla_generate_ui then center.mp_vanilla_generate_ui = center.generate_ui or "NULL" end
+		-- do we need to inject generate_ui for loc_vars to work?
+		local needs_generate_ui = opts.loc_vars
+			and not opts.generate_ui
+			and not (center.generate_ui and type(center.generate_ui) == "function")
+
+		-- Apply changes to all specified rulesets
+		for _, rs in ipairs(rulesets) do
+			local prefix = "mp_" .. rs .. "_"
+
+			-- Store all reworked properties
+			for k, v in pairs(opts) do
+				if not reserved[k] then
+					center[prefix .. k] = v
+					if not center["mp_vanilla_" .. k] then center["mp_vanilla_" .. k] = center[k] or "NULL" end
+				end
+			end
+
+			-- Auto-inject generate_ui when adding loc_vars to vanilla centers
+			if needs_generate_ui then
+				center[prefix .. "generate_ui"] = SMODS.Center.generate_ui
+				if not center.mp_vanilla_generate_ui then
+					center.mp_vanilla_generate_ui = center.generate_ui or "NULL"
+				end
+			end
+
+			-- Mark this center as having reworks
+			center.mp_reworks = center.mp_reworks or {}
+			center.mp_reworks[rs] = true
+			center.mp_reworks["vanilla"] = true
+
+			center.mp_silent = center.mp_silent or {}
+			center.mp_silent[rs] = silent
 		end
-
-		-- Mark this center as having reworks
-		center.mp_reworks = center.mp_reworks or {}
-		center.mp_reworks[rs] = true
-		center.mp_reworks["vanilla"] = true
-
-		center.mp_silent = center.mp_silent or {}
-		center.mp_silent[rs] = silent
 	end
+	return ret
 end
 
 -- You can call this function without a ruleset to set it to vanilla
@@ -162,8 +177,8 @@ end
 function MP.LoadReworks(ruleset, key)
 	ruleset = ruleset or "vanilla"
 	if string.sub(ruleset, 1, 11) == "ruleset_mp_" then ruleset = string.sub(ruleset, 12, #ruleset) end
-	local function process(key_, ruleset_)
-		local center = G.P_CENTERS[key_]
+	local function process(key_, ruleset_, tbl_)
+		local center = tbl_[key_]
 		for k, v in pairs(center) do
 			if string.sub(k, 1, #ruleset_) == ruleset_ then
 				local orig = string.sub(k, #ruleset_ + 1)
@@ -185,12 +200,21 @@ function MP.LoadReworks(ruleset, key)
 	if key then
 		process(key, "mp_" .. ruleset .. "_")
 	else
-		for k, v in pairs(G.P_CENTERS) do
-			if v.mp_reworks then
-				if v.mp_reworks[ruleset] then
-					process(k, "mp_" .. ruleset .. "_")
-				elseif v.mp_reworks["vanilla"] then -- Check vanilla separately to reset reworked jokers
-					process(k, "mp_vanilla_")
+		for _, tbl in ipairs({
+			G.P_CENTERS,
+			G.P_TAGS,
+			G.P_SEALS,
+			SMODS.PokerHands,
+			G.P_STAKES,
+			G.P_BLINDS,
+		}) do
+			for k, v in pairs(tbl) do
+				if v.mp_reworks then
+					if v.mp_reworks[ruleset] then
+						process(k, "mp_" .. ruleset .. "_", tbl)
+					elseif v.mp_reworks["vanilla"] then -- Check vanilla separately to reset reworked jokers
+						process(k, "mp_vanilla_", tbl)
+					end
 				end
 			end
 		end
