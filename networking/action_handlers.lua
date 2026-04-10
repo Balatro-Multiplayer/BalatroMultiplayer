@@ -498,7 +498,7 @@ local function enemyLocation(options)
 			table.insert(split, str)
 		end
 		location = split[1]
-		value = split[2]
+		value = split[2] or ""
 	end
 
 	local loc_location = G.localization.misc.dictionary[location]
@@ -512,7 +512,9 @@ local function enemyLocation(options)
 	end
 
 	MP.GAME.enemy.location = loc_location
-    MP.GAME.enemy.blind = value
+    MP.GAME.enemy.location_blind = value
+    MP.GAME.enemy.location_type = location
+    MP.GAME.enemy.location_full = location .. "-" .. value
     MP.UI.update_enemy_location_render()
 end
 
@@ -930,28 +932,33 @@ end
 
 function MP.ACTIONS.set_location(location, blind)
     local location_type = location
+    local location_blind = blind
     if string.find(location, "-") then
 		local split = {}
 		for str in string.gmatch(location, "([^-]+)") do
 			table.insert(split, str)
 		end
 		location_type = split[1]
+        location_blind = split[2] or ""
 	else
-        location = location_type..'-'..MP.UTILS.get_blind_to_display(blind)
+        location_blind = MP.UTILS.get_blind_to_display(blind) or ""
     end
+    location = location_type..'-'..location_blind
 
 	if MP.GAME.location == location then return end
 	MP.GAME.location = location
     MP.GAME.location_type = location_type
+    MP.GAME.location_blind = location_blind
+    MP.GAME.location_full = location
 	Client.send({
 		action = "setLocation",
 		location = location,
 	})
 end
 
-function MP.ACTIONS.update_location()
+function MP.ACTIONS.update_location(keep_blind)
     if MP.GAME.location_type then
-        MP.ACTIONS.set_location(MP.GAME.location_type)
+        MP.ACTIONS.set_location(MP.GAME.location_type, keep_blind and MP.GAME.location_blind or nil)
     end
 end
 

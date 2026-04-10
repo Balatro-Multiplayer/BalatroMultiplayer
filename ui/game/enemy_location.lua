@@ -1,5 +1,5 @@
 function MP.UI.enemy_location_blind_render()
-     local blind_key, blind_object = MP.GAME.enemy.blind, nil
+    local blind_key, blind_object = MP.GAME.enemy.location_blind, nil
     if blind_key then
         blind_object = G.P_BLINDS[blind_key]
     end
@@ -11,13 +11,15 @@ function MP.UI.enemy_location_blind_render()
             {shader = 'dissolve', shadow_height = 0.05 * 0.4 * 0.75},
             {shader = 'dissolve'},
         })
-    else
+    elseif blind_key and blind_key ~= "" then
         blind_object_render = DynaText({
             string = { blind_key or "Unknown" },
             colours = { G.C.WHITE },
             scale = 0.35,
             shadow = true,
         })
+    else
+        blind_object_render = Moveable()
     end
 
     return blind_object_render
