@@ -930,7 +930,16 @@ end
 
 function MP.ACTIONS.set_location(location, blind)
     local location_type = location
-    location = location..'-'..MP.UTILS.get_blind_to_display(blind)
+    if string.find(location, "-") then
+		local split = {}
+		for str in string.gmatch(location, "([^-]+)") do
+			table.insert(split, str)
+		end
+		location_type = split[1]
+	else
+        location = location_type..'-'..MP.UTILS.get_blind_to_display(blind)
+    end
+
 	if MP.GAME.location == location then return end
 	MP.GAME.location = location
     MP.GAME.location_type = location_type
