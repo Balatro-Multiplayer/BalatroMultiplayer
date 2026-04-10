@@ -26,6 +26,12 @@ function G.FUNCS.mp_toggle_ready(e)
 	end
 end
 
+local old_skip_blind = G.FUNCS.skip_blind
+function G.FUNCS.skip_blind(...)
+    old_skip_blind(...)
+    MP.ACTIONS.update_location()
+end
+
 local can_play_ref = G.FUNCS.can_play
 G.FUNCS.can_play = function(e)
 	if G.GAME.current_round.hands_left <= 0 then
@@ -55,7 +61,7 @@ function G.FUNCS.select_blind(e)
 		MP.GAME.ante_key = tostring(math.random())
 		MP.ACTIONS.play_hand(0, G.GAME.round_resets.hands)
 		MP.ACTIONS.new_round()
-		MP.ACTIONS.set_location("loc_playing-" .. (e.config.ref_table.key or e.config.ref_table.name))
+		MP.ACTIONS.set_location("loc_playing", (e.config.ref_table.key or e.config.ref_table.name))
 		if MP.UI.hide_enemy_location then MP.UI.hide_enemy_location() end
 	end
 end
