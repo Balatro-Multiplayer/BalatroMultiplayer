@@ -18,7 +18,7 @@ SMODS.Joker({
 	config = { extra = { hands = 0, discards = 0, extra_hands = 1, extra_discards = 1 } },
 	loc_vars = function(self, info_queue, card)
 		MP.UTILS.add_nemesis_info(info_queue)
-        if card.area and card.area.config.collection then
+        if card.area and card.area.config.type == "title" and MP.LOBBY.code then
             return {
                 vars = {
                     card.ability.extra.extra_hands,
