@@ -70,16 +70,14 @@ function MP.UI.UTILS.overlay_message_countdown(message, countdown_table, no_back
 	table.insert(
 		message_ui,
 		MP.UI.UTILS.create_row({ align = "cm", padding = 0.2 }, {
-			MP.UI.UTILS.create_object_node(
-				DynaText({
-					string = {{ ref_table = countdown_table, ref_value = "display" }},
-					colours = { G.C.UI.TEXT_LIGHT },
-					shadow = true,
-					silent = true,
-					scale = 0.7,
-					pop_in = 0,
-				})
-			),
+			MP.UI.UTILS.create_object_node(DynaText({
+				string = { { ref_table = countdown_table, ref_value = "display" } },
+				colours = { G.C.UI.TEXT_LIGHT },
+				shadow = true,
+				silent = true,
+				scale = 0.7,
+				pop_in = 0,
+			})),
 		})
 	)
 
