@@ -228,6 +228,7 @@ end
 ---@param seed string
 ---@param stake_str string
 local function action_start_game(seed, stake_str)
+	sendDebugMessage(string.format("Game starting — %s", os.date("%Y-%m-%dT%H:%M:%S%z")), "MULTIPLAYER")
 	MP.reset_game_states()
 	local stake = tonumber(stake_str)
 	MP.ACTIONS.set_ante(0)
@@ -497,17 +498,10 @@ local function enemyLocation(options)
 			table.insert(split, str)
 		end
 		location = split[1]
-		value = split[2]
+		value = split[2] or ""
 	end
 
-	loc_name = localize({ type = "name_text", key = value, set = "Blind" })
-	if loc_name ~= "ERROR" then
-		value = loc_name
-	else
-		value = (G.P_BLINDS[value] and G.P_BLINDS[value].name) or value
-	end
-
-	loc_location = G.localization.misc.dictionary[location]
+	local loc_location = G.localization.misc.dictionary[location]
 
 	if loc_location == nil then
 		if location ~= nil then
@@ -517,7 +511,11 @@ local function enemyLocation(options)
 		end
 	end
 
-	MP.GAME.enemy.location = loc_location .. value
+	MP.GAME.enemy.location = loc_location
+    MP.GAME.enemy.location_blind = value
+    MP.GAME.enemy.location_type = location
+    MP.GAME.enemy.location_full = location .. "-" .. value
+    MP.UI.update_enemy_location_render()
 end
 
 local function action_version()
@@ -932,13 +930,36 @@ function MP.ACTIONS.version()
 	})
 end
 
-function MP.ACTIONS.set_location(location)
+function MP.ACTIONS.set_location(location, blind)
+    local location_type = location
+    local location_blind = blind
+    if string.find(location, "-") then
+		local split = {}
+		for str in string.gmatch(location, "([^-]+)") do
+			table.insert(split, str)
+		end
+		location_type = split[1]
+        location_blind = split[2] or ""
+	else
+        location_blind = MP.UTILS.get_blind_to_display(blind) or ""
+    end
+    location = location_type..'-'..location_blind
+
 	if MP.GAME.location == location then return end
 	MP.GAME.location = location
+    MP.GAME.location_type = location_type
+    MP.GAME.location_blind = location_blind
+    MP.GAME.location_full = location
 	Client.send({
 		action = "setLocation",
 		location = location,
 	})
+end
+
+function MP.ACTIONS.update_location(keep_blind)
+    if MP.GAME.location_type then
+        MP.ACTIONS.set_location(MP.GAME.location_type, keep_blind and MP.GAME.location_blind or nil)
+    end
 end
 
 ---@param score number
