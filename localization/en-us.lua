@@ -1268,9 +1268,9 @@ return {
 				"Off",
 			},
 			loc_ready = "Ready for PvP",
-			loc_selecting = "Selecting a Blind",
-			loc_shop = "Shopping",
-			loc_playing = "Playing ",
+			loc_selecting = "Selecting",
+			loc_shop = "Shopping before",
+			loc_playing = "Playing",
 		},
 		v_dictionary = {
 			a_mp_art = {
