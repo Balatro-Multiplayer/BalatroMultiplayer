@@ -30,7 +30,7 @@ SMODS.Consumable({
 				end
 
 				-- positive effect: negative joker
-				if #editionless_jokers then
+				if #editionless_jokers > 0 then
 					local eligible_card = pseudorandom_element(editionless_jokers, "ectoplasm")
 					eligible_card:set_edition({ negative = true })
 				end
@@ -41,9 +41,7 @@ SMODS.Consumable({
 		}))
 	end,
 	can_use = function(self, card)
-		return true
-		-- return G.GAME.round_resets.hands >= 1 and G.GAME.round_resets.discards >= 0
-		-- return next(SMODS.Edition:get_edition_cards(G.jokers, true))
+		return next(SMODS.Edition:get_edition_cards(G.jokers, true))
 	end,
 	-- draw = function(self, card, layer)
 	-- 	-- This is for the Spectral shader. You don't need this with `set = "Spectral"`
