@@ -1,6 +1,6 @@
 MP.ReworkCenter("m_glass", {
 	rulesets = MP.UTILS.get_standard_rulesets(),
-	config = { Xmult = 2, extra = 4 },
+	config = { Xmult = 1.5, extra = 4 },
 })
 
 MP.ReworkCenter("m_glass", {
@@ -9,8 +9,8 @@ MP.ReworkCenter("m_glass", {
 })
 
 MP.ReworkCenter("m_glass", {
-	rulesets = "legacy_ranked",
-	config = { Xmult = 1.5, extra = 4 },
+	rulesets = "standard_ranked"
+	config = { Xmult = 2, extra = 4 },
 })
 
 -- Display glass for ruleset descriptions — shows the reworked x2 value
