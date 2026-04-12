@@ -64,6 +64,9 @@ if old_center ~= center or initial then
 			end
 		end
 	end
+	if center.config.mp_balanced then
+		self.ability.mp_sticker_balanced = true
+	end
 end'''
 match_indent = true
 times = 1

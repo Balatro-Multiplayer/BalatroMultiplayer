@@ -15,7 +15,7 @@ SMODS.Joker({
 	perishable_compat = false,
 	rarity = 2,
 	cost = 6,
-	config = { extra = { chips = 0, chip_mod = 10, suit = nil }, mp_sticker_balanced = true },
+	config = { extra = { chips = 0, chip_mod = 10, suit = nil }, mp_balanced = true },
 	loc_vars = function(self, info_queue, card)
 		local suit = card.ability.extra.suit or G.GAME.current_round.castle_card.suit or "Spades"
 		return {

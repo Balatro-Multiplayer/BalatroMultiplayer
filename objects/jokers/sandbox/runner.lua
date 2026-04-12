@@ -16,7 +16,7 @@ SMODS.Joker({
 	rarity = 1,
 	cost = 5,
 	atlas = "runner_sandbox",
-	config = { extra = { chips = 0, chip_mod = 50 }, mp_sticker_balanced = true },
+	config = { extra = { chips = 0, chip_mod = 50 }, mp_balanced = true },
 	loc_vars = function(self, info_queue, card)
 		return { vars = { card.ability.extra.chips } }
 	end,

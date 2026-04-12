@@ -16,7 +16,7 @@ SMODS.Joker({
 	rarity = 2,
 	cost = 6,
 	atlas = "constellation_sandbox",
-	config = { extra = { Xmult = 1, Xmult_mod = 0.2, Xmult_loss = 0.2 }, mp_sticker_balanced = true },
+	config = { extra = { Xmult = 1, Xmult_mod = 0.2, Xmult_loss = 0.2 }, mp_balanced = true },
 	loc_vars = function(self, info_queue, card)
 		return { vars = { card.ability.extra.Xmult } }
 	end,

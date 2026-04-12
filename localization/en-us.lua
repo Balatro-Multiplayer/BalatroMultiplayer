@@ -1349,6 +1349,15 @@ return {
 			ch_c_mp_vantablack_CREDITS = {
 				"{C:inactive}(Art by {C:attention}aura!{C:inactive})",
 			},
+			ch_c_mp_indigo = {
+				"Played on {C:attention}Indigo Deck{}",
+			},
+			ch_c_mp_shop_planets = { "{C:planet}Planet{} cards appear" },
+			ch_c_mp_shop_planets_EXTENDED = { "{C:attention}40X{} more frequently in the shop" },
+			ch_c_mp_planet_tycoon_CREDITS = { "{C:inactive}(Idea by {C:attention}BlockAttack{C:inactive})" },
+			ch_c_mp_eeeee = {
+				"Some randomly selected RNG queues are {C:attention}bugged{} each Ante",
+			},
 		},
 		challenge_names = {
 			c_mp_standard = "Standard",
@@ -1376,6 +1385,9 @@ return {
 			c_mp_polymorph_spam = "Polymorph Spam",
 			c_mp_all_must_go = "All Must Go",
 			c_mp_vantablack = "Vantablack",
+			c_mp_planet_tycoon = "Planet Tycoon",
+			c_mp_bacon = "Blue Ice",
+			c_mp_eeeee = "EEEEE",
 		},
 	},
 }

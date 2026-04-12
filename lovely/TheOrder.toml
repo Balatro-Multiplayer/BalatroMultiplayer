@@ -91,7 +91,12 @@ match_indent = true
 target = "functions/common_events.lua"
 pattern = '''center = pseudorandom_element(_pool, pseudoseed(_pool_key..'_resample'..it))'''
 position = "at"
-payload = '''center = pseudorandom_element(_pool, pseudoseed(_pool_key..(MP.should_use_the_order() and '' or ('_resample'..it)) ))'''
+payload = '''
+center = pseudorandom_element(_pool, pseudoseed(_pool_key..(MP.should_use_the_order() and '' or ('_resample'..it)) ))
+if MP.should_use_the_order() and it > 1000 then -- fallback
+	center = pseudorandom_element(_pool, pseudoseed(_pool_key..'_resample'..it))
+end
+'''
 match_indent = true
 
 # Patch joker editions/stickers to be dependent on individual jokers rather than queue

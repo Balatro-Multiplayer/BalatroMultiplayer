@@ -31,7 +31,7 @@ SMODS.Joker({
 	rarity = 2,
 	cost = 7,
 	atlas = "cloud_9_sandbox",
-	config = { extra = { money = 2, odds = 4 }, mp_sticker_balanced = true },
+	config = { extra = { money = 2, odds = 4 }, mp_balanced = true },
 	loc_vars = function(self, info_queue, card)
 		local numerator, denominator =
 			SMODS.get_probability_vars(card, 1, card.ability.extra.odds, "j_mp_cloud_9_sandbox")

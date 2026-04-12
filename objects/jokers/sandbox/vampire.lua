@@ -16,7 +16,7 @@ SMODS.Joker({
 	rarity = 2,
 	cost = 7,
 	atlas = "vampire_sandbox",
-	config = { extra = { Xmult_gain = 0.2, Xmult = 1, stone_money = 3 }, mp_sticker_balanced = true },
+	config = { extra = { Xmult_gain = 0.2, Xmult = 1, stone_money = 3 }, mp_balanced = true },
 	loc_vars = function(self, info_queue, card)
 		return { vars = { card.ability.extra.Xmult_gain, card.ability.extra.Xmult, card.ability.extra.stone_money } }
 	end,

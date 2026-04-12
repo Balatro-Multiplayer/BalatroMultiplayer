@@ -8,7 +8,7 @@ SMODS.Joker({
 	rarity = 2,
 	cost = 5,
 	pos = { x = 3, y = 15 },
-	config = { extra = { hands_left = 8 }, mp_sticker_balanced = true },
+	config = { extra = { hands_left = 8 }, mp_balanced = true },
 	loc_vars = function(self, info_queue, card)
 		return { vars = { card.ability.extra.hands_left } }
 	end,

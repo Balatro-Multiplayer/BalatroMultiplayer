@@ -5,6 +5,7 @@ function create_card(_type, area, legendary, _rarity, skip_materialize, soulable
 	if MP.should_use_the_order() then
 		local a = G.GAME.round_resets.ante
 		G.GAME.round_resets.ante = 0
+		G.GAME.round_resets.mp_real_ante = a
 		if _type == "Tarot" or _type == "Planet" or _type == "Spectral" then
 			if area == G.pack_cards then
 				key_append = _type .. "_pack"
@@ -18,6 +19,7 @@ function create_card(_type, area, legendary, _rarity, skip_materialize, soulable
 		end
 		local c = cc(_type, area, legendary, _rarity, skip_materialize, soulable, forced_key, key_append)
 		G.GAME.round_resets.ante = a
+		G.GAME.round_resets.mp_real_ante = nil
 		return c
 	end
 	return cc(_type, area, legendary, _rarity, skip_materialize, soulable, forced_key, key_append)
@@ -199,8 +201,10 @@ function SMODS.poll_seal(args)
 	if MP.should_use_the_order() then
 		local a = G.GAME.round_resets.ante
 		G.GAME.round_resets.ante = 0
+		G.GAME.round_resets.mp_real_ante = a
 		local ret = pollseal(args)
 		G.GAME.round_resets.ante = a
+		G.GAME.round_resets.mp_real_ante = nil
 		return ret
 	end
 	return pollseal(args)
@@ -248,6 +252,9 @@ function SMODS.get_next_vouchers(vouchers)
 			while center == "UNAVAILABLE" or vouchers.spawn[center] do
 				it = it + 1
 				center = pseudorandom_element(culled, pseudoseed("Voucher0"))
+				if it > 1000 then -- fallback
+					center = pseudorandom_element(culled, pseudoseed("Voucher0"..it))
+				end
 			end
 			vouchers[#vouchers + 1] = center
 			vouchers.spawn[center] = true
@@ -267,6 +274,9 @@ function get_next_voucher_key(_from_tag)
 		while center == "UNAVAILABLE" do
 			it = it + 1
 			center = pseudorandom_element(culled, pseudoseed("Voucher0"))
+			if it > 1000 then -- fallback
+				center = pseudorandom_element(culled, pseudoseed("Voucher0"..it))
+			end
 		end
 		return center
 	end
@@ -369,7 +379,9 @@ local function give_shufflevals(tbl, seed, joker)
 		end
 		local mega_seed = k .. true_seed
 		for i, card in ipairs(v) do
+			G._MP_UNSAVED_PRNG = true
 			card.mp_shuffleval = pseudorandom(mega_seed)
+			G._MP_UNSAVED_PRNG = false
 		end
 		G.GAME.pseudorandom[mega_seed] = nil -- just avoid flooding the table. we don't need to keep this
 	end
