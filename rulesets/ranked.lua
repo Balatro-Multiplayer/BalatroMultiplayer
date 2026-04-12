@@ -15,7 +15,7 @@ MP.Ruleset({
 		"c_justice",
 	},
 	banned_vouchers = {},
-	banned_enhancements = {},
+	banned_enhancements = { "m_glass" },
 	banned_tags = {},
 	banned_blinds = {},
 	reworked_jokers = {
@@ -29,7 +29,6 @@ MP.Ruleset({
 	},
 	reworked_vouchers = {},
 	reworked_enhancements = {
-		"m_mp_display_glass",
 		"m_mp_display_gold",
 	},
 	reworked_tags = {},
