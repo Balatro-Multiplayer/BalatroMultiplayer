@@ -101,10 +101,29 @@ function Game:update(dt)
 				and MP.is_pvp_boss()
 			)
 		then
-			if not (G.CONTROLLER.locks.enter_pvp or MP.GAME.ready_blind) then
-				local mult = 1
-				if MP.GAME.timer_started and not MP.is_pvp_boss() then mult = 2 end
-				MP.speedlatro_timer.real = MP.speedlatro_timer.real - dt * mult
+			if not (G.CONTROLLER.locks.enter_pvp or MP.GAME.ready_blind or MP.speedlatro_timer.wait) then
+				-- ok look
+				-- insaneint is only intended for ui purposes
+				-- so we don't actually have the score as much as we have a representation of it...
+				-- uhm
+				-- we're just forced to do this anyway
+				local enemy_score = MP.GAME.enemy.score
+
+				-- copypasted stuff from action_handlers
+				local fixed_score = tostring(to_big(G.GAME.chips))
+				if string.match(fixed_score, "[eE]") == nil and string.match(fixed_score, "[.]") then
+					-- Remove decimal from non-exponential numbers
+					fixed_score = string.sub(string.gsub(fixed_score, "%.", ","), 1, -3)
+				end
+				fixed_score = string.gsub(fixed_score, ",", "") -- Remove commas
+
+				local self_score = MP.INSANE_INT.from_string(fixed_score)
+	
+				if (not MP.is_pvp_boss()) or MP.INSANE_INT.greater_than(MP.GAME.enemy.score, self_score) then
+					local mult = 1
+					if MP.GAME.timer_started and not MP.is_pvp_boss() then mult = 2 end
+					MP.speedlatro_timer.real = MP.speedlatro_timer.real - dt * mult
+				end
 			end
 		end
 		if MP.speedlatro_timer.real <= 0 then
@@ -142,6 +161,19 @@ function new_round()
 			if G.GAME.round_resets.blind == G.P_BLINDS["bl_mp_nemesis"] then
 				MP.speedlatro_timer.real = base_timer / 2
 				MP.speedlatro_timer.failed = false
+				MP.speedlatro_timer.wait = true
+
+				-- held together by thin and wispy threads of what humans could describe as motivation. there may exist a stronger analogue yet
+				-- anyway if we don't do this you'll lose some time at the start of the pvp. would be fine if it wasn't inconsistent
+				G.E_MANAGER:add_event(Event({
+					blockable = false,
+					blocking = false,
+					trigger = "after",
+					delay = 4,
+					func = function()
+						MP.speedlatro_timer.wait = false
+					end,
+				}))
 			end
 		elseif
 			G.GAME.round_resets.blind ~= G.P_BLINDS["bl_small"]
@@ -167,3 +199,4 @@ function end_round()
 	end
 	return end_round_ref()
 end
+

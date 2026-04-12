@@ -296,10 +296,14 @@ local function action_enemy_info(score_str, hands_left_str, skips_str, lives_str
 		trigger = "ease",
 		delay = 3,
 		ref_table = MP.GAME.enemy.score,
-		ref_value = "coeffiocient",
+		ref_value = "coeffiocient", -- why is this misspelled
 		ease_to = score.coeffiocient,
 		func = function(t)
-			return math.floor(t)
+			local mult = 1
+			if score.exponent > 0 then
+				mult = 100
+			end
+			return math.floor(t*mult)/mult
 		end,
 	}))
 
