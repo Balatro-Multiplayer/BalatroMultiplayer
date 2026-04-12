@@ -118,7 +118,7 @@ function Game:update(dt)
 				fixed_score = string.gsub(fixed_score, ",", "") -- Remove commas
 
 				local self_score = MP.INSANE_INT.from_string(fixed_score)
-	
+
 				if (not MP.is_pvp_boss()) or MP.INSANE_INT.greater_than(MP.GAME.enemy.score, self_score) then
 					local mult = 1
 					if MP.GAME.timer_started and not MP.is_pvp_boss() then mult = 2 end
@@ -199,4 +199,3 @@ function end_round()
 	end
 	return end_round_ref()
 end
-

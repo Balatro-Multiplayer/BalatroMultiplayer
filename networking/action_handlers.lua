@@ -300,10 +300,8 @@ local function action_enemy_info(score_str, hands_left_str, skips_str, lives_str
 		ease_to = score.coeffiocient,
 		func = function(t)
 			local mult = 1
-			if score.exponent > 0 then
-				mult = 100
-			end
-			return math.floor(t*mult)/mult
+			if score.exponent > 0 then mult = 100 end
+			return math.floor(t * mult) / mult
 		end,
 	}))
 
@@ -516,10 +514,10 @@ local function enemyLocation(options)
 	end
 
 	MP.GAME.enemy.location = loc_location
-    MP.GAME.enemy.location_blind = value
-    MP.GAME.enemy.location_type = location
-    MP.GAME.enemy.location_full = location .. "-" .. value
-    MP.UI.update_enemy_location_render()
+	MP.GAME.enemy.location_blind = value
+	MP.GAME.enemy.location_type = location
+	MP.GAME.enemy.location_full = location .. "-" .. value
+	MP.UI.update_enemy_location_render()
 end
 
 local function action_version()
@@ -935,25 +933,25 @@ function MP.ACTIONS.version()
 end
 
 function MP.ACTIONS.set_location(location, blind)
-    local location_type = location
-    local location_blind = blind
-    if string.find(location, "-") then
+	local location_type = location
+	local location_blind = blind
+	if string.find(location, "-") then
 		local split = {}
 		for str in string.gmatch(location, "([^-]+)") do
 			table.insert(split, str)
 		end
 		location_type = split[1]
-        location_blind = split[2] or ""
+		location_blind = split[2] or ""
 	else
-        location_blind = MP.UTILS.get_blind_to_display(blind) or ""
-    end
-    location = location_type..'-'..location_blind
+		location_blind = MP.UTILS.get_blind_to_display(blind) or ""
+	end
+	location = location_type .. "-" .. location_blind
 
 	if MP.GAME.location == location then return end
 	MP.GAME.location = location
-    MP.GAME.location_type = location_type
-    MP.GAME.location_blind = location_blind
-    MP.GAME.location_full = location
+	MP.GAME.location_type = location_type
+	MP.GAME.location_blind = location_blind
+	MP.GAME.location_full = location
 	Client.send({
 		action = "setLocation",
 		location = location,
@@ -961,9 +959,9 @@ function MP.ACTIONS.set_location(location, blind)
 end
 
 function MP.ACTIONS.update_location(keep_blind)
-    if MP.GAME.location_type then
-        MP.ACTIONS.set_location(MP.GAME.location_type, keep_blind and MP.GAME.location_blind or nil)
-    end
+	if MP.GAME.location_type then
+		MP.ACTIONS.set_location(MP.GAME.location_type, keep_blind and MP.GAME.location_blind or nil)
+	end
 end
 
 ---@param score number

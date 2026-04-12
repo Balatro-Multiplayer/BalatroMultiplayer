@@ -307,97 +307,130 @@ function MP.sorted_hand_list(current_hand)
 	return _poker_hands
 end
 
--- Rework shuffle rng to be more similar between players
-local orig_shuffle = CardArea.shuffle
-function CardArea:shuffle(_seed)
-	if MP.should_use_the_order() and self == G.deck then
-		local centers =
-			{ -- these are roughly ordered in terms of current meta, doesn't matter toooo much? but they have to be ordered
-				c_base = 0,
-				m_stone = 106,
-				m_bonus = 107,
-				m_mult = 108,
-				m_wild = 109,
-				m_gold = 110,
-				m_lucky = 111,
-				m_steel = 112,
-				m_glass = 113,
-			}
-		local seals = {
-			Gold = 122,
-			Blue = 131,
-			Purple = 140,
-			Red = 149,
-		}
-		local editions = {
-			foil = 157,
-			holo = 192,
-			polychrome = 227,
-		}
-		-- no mod compat, but mods aren't too competitive, it won't matter much
+local stdval = {
+	centers = { -- these are roughly ordered in terms of current meta, doesn't matter toooo much? but they have to be ordered
+		c_base = 0,
+		m_stone = 106,
+		m_bonus = 107,
+		m_mult = 108,
+		m_wild = 109,
+		m_gold = 110,
+		m_lucky = 111,
+		m_steel = 112,
+		m_glass = 113,
+	},
+	seals = {
+		Gold = 122,
+		Blue = 131,
+		Purple = 140,
+		Red = 149,
+	},
+	editions = {
+		foil = 157,
+		holo = 192,
+		polychrome = 227,
+	},
+	-- no mod compat, but mods aren't too competitive, it won't matter much
+}
 
-		local tables = {}
+local function give_stdval(card) -- give each card a value based on current enhancement/seal/edition
+	card.mp_stdval = 0 + (stdval.centers[card.config.center_key] or 0)
+	card.mp_stdval = card.mp_stdval + (stdval.seals[card.seal or "nil"] or 0)
+	card.mp_stdval = card.mp_stdval + (stdval.editions[card.edition and card.edition.type or "nil"] or 0)
+end
 
-		for i, v in ipairs(self.cards) do -- give each card a value based on current enhancement/seal/edition
-			v.mp_stdval = 0 + (centers[v.config.center_key] or 0)
-			v.mp_stdval = v.mp_stdval + (seals[v.seal or "nil"] or 0)
-			v.mp_stdval = v.mp_stdval + (editions[v.edition and v.edition.type or "nil"] or 0)
-			local key = v.config.center_key == "m_stone" and "Stone" or v.base.suit .. v.base.id
-			tables[key] = tables[key] or {}
-			tables[key][#tables[key] + 1] = v
+local function give_shufflevals(tbl, seed, joker)
+	local tables = {}
+
+	for k, v in pairs(tbl) do
+		local key = nil
+		if joker then
+			key = v.config.center.key
+		else
+			give_stdval(v)
+			key = v.config.center.key == "m_stone" and "Stone" or v.base.suit .. v.base.id
 		end
+		tables[key] = tables[key] or {}
+		tables[key][#tables[key] + 1] = v
+	end
 
-		local true_seed = pseudorandom(_seed or "shuffle")
+	if seed and type(seed) == "string" then seed = pseudoseed(seed) end
+	local true_seed = pseudorandom(seed)
 
-		for k, v in pairs(tables) do
+	for k, v in pairs(tables) do
+		if joker then
+			table.sort(v, function(a, b)
+				return a.sort_id < b.sort_id
+			end) -- oldest joker (of specified key) first
+		else
 			table.sort(v, function(a, b)
 				return a.mp_stdval > b.mp_stdval
-			end) -- largest value first
-			local mega_seed = k .. true_seed
-			for i, card in ipairs(v) do
-				card.mp_shuffleval = pseudorandom(mega_seed)
-			end
+			end) -- highest value (of specified suit+rank) first
 		end
-		table.sort(self.cards, function(a, b)
-			return a.mp_shuffleval > b.mp_shuffleval
-		end)
-		self:set_ranks()
-	else
-		return orig_shuffle(self, _seed)
+		local mega_seed = k .. true_seed
+		for i, card in ipairs(v) do
+			card.mp_shuffleval = pseudorandom(mega_seed)
+		end
+		G.GAME.pseudorandom[mega_seed] = nil -- just avoid flooding the table. we don't need to keep this
 	end
 end
 
--- Make pseudorandom_element selecting a joker less chaotic
+-- Rework shuffle rng to be more similar between players
+-- This also affects immolate and other uses of pseudoshuffle
+local orig_pseudoshuffle = pseudoshuffle
+function pseudoshuffle(list, seed)
+	if MP.should_use_the_order() then
+		local is_p_card = true
+		for k, v in pairs(list) do
+			if
+				is_p_card
+				and not (
+					type(v) == "table"
+					and v.ability
+					and (v.ability.set == "Default" or v.ability.set == "Enhanced")
+				)
+			then
+				is_p_card = false
+			end
+		end
+		if is_p_card then
+			give_shufflevals(list, seed or math.random())
+			table.sort(list, function(a, b)
+				return a.mp_shuffleval > b.mp_shuffleval
+			end)
+			return
+		end
+	end
+	return orig_pseudoshuffle(list, seed)
+end
+
+-- Make pseudorandom_element selecting a joker/playing card less chaotic
 local orig_pseudorandom_element = pseudorandom_element
 function pseudorandom_element(_t, seed, args)
 	if MP.should_use_the_order() then
 		local is_joker = true
+		local is_p_card = true
 		for k, v in pairs(_t) do
-			if not (type(v) == "table" and v.ability and v.ability.set == "Joker") then
+			if is_joker and not (type(v) == "table" and v.ability and v.ability.set == "Joker") then
 				is_joker = false
-				break
+			end
+			if
+				is_p_card
+				and not (
+					type(v) == "table"
+					and v.ability
+					and (v.ability.set == "Default" or v.ability.set == "Enhanced")
+				)
+			then
+				is_p_card = false
 			end
 		end
-		if is_joker then
-			local tables = {}
+		if is_joker or is_p_card then
 			local keys = {}
 			for k, v in pairs(_t) do
 				keys[#keys + 1] = { k = k, v = v }
-				local key = v.config.center.key
-				tables[key] = tables[key] or {}
-				tables[key][#tables[key] + 1] = v
 			end
-			local true_seed = pseudorandom(seed or math.random())
-			for k, v in pairs(tables) do
-				table.sort(v, function(a, b)
-					return a.sort_id < b.sort_id
-				end) -- oldest joker (lowest sort_id) first
-				local mega_seed = k .. true_seed
-				for i, card in ipairs(v) do
-					card.mp_shuffleval = pseudorandom(mega_seed)
-				end
-			end
-
+			give_shufflevals(_t, seed or math.random(), is_joker)
 			table.sort(keys, function(a, b)
 				return a.v.mp_shuffleval > b.v.mp_shuffleval
 			end)

@@ -28,8 +28,8 @@ end
 
 local old_skip_blind = G.FUNCS.skip_blind
 function G.FUNCS.skip_blind(...)
-    old_skip_blind(...)
-    MP.ACTIONS.update_location()
+	old_skip_blind(...)
+	MP.ACTIONS.update_location()
 end
 
 local can_play_ref = G.FUNCS.can_play
