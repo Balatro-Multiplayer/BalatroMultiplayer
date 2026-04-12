@@ -296,7 +296,7 @@ return {
 			j_mp_castle_sandbox = {
 				name = "Castle",
 				text = {
-					"This Joker gains {C:chips}#3{} Chips",
+					"This Joker gains {C:chips}+#3#{} Chips",
 					"per discarded {V:1}#1#{}",
 					"Suit locked on purchase",
 					"{C:inactive}(Currently {C:chips}+#2#{C:inactive} Chips)",
