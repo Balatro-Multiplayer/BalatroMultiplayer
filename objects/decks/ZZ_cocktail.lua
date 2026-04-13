@@ -5,6 +5,14 @@ SMODS.Back({
 	pos = { x = 4, y = 0 },
 	mod_whitelist = {
 		Multiplayer = true,
+		Cryptid = true,
+		aikoyorisshenanigans = true,
+	},
+	deck_blacklist = {
+		b_challenge = true,
+		b_mp_cocktail = true,
+		b_cry_antimatter = true,
+		b_akyrs_hardcore_challenges = true,
 	},
 	apply = function(self)
 		-- we need to fucking generate the seed early this is infuriating
@@ -76,6 +84,14 @@ SMODS.Back({
 			end
 			local obj = G.P_CENTERS[G.GAME.modifiers.mp_cocktail[i]]
 			if obj.apply and type(obj.apply) == "function" then obj:apply(back) end
+
+			-- aikoshen exception because this code runs before apply_to_run orig (why?)
+			if back.effect.config.akyrs_starting_letters then
+				G.GAME.starting_params.akyrs_starting_letters = back.effect.config.akyrs_starting_letters
+			end
+			if back.effect.config.akyrs_letters_no_uppercase then
+				G.GAME.starting_params.akyrs_letters_no_uppercase = back.effect.config.akyrs_letters_no_uppercase
+			end
 		end
 		if MP.is_ruleset_active("smallworld") then MP.apply_fake_back_vouchers(back) end
 		back.effect.mp_cocktailed = true
@@ -124,12 +140,12 @@ function MP.get_cocktail_decks(cull)
 	local ret = {}
 	local forced = {}
 	for k, v in pairs(G.P_CENTERS) do
-		if v.set == "Back" and k ~= "b_challenge" and k ~= "b_mp_cocktail" and sticker_x_pos[k] then
+		if v.set == "Back" and not G.P_CENTERS["b_mp_cocktail"].deck_blacklist[k] then
 			if not (v.mod and not G.P_CENTERS["b_mp_cocktail"].mod_whitelist[v.mod.id]) then ret[#ret + 1] = k end
 		end
 	end
 	table.sort(ret, function(a, b)
-		return G.P_CENTERS[a].order < G.P_CENTERS[b].order
+		return G.P_CENTERS[a].order < G.P_CENTERS[b].order -- nil check to fix aikoshen crash?????????????????
 	end)
 	if cull then
 		local _ret = {}
@@ -624,7 +640,7 @@ SMODS.DrawStep({
 							G.CARD_W,
 							G.CARD_H,
 							G.ASSET_ATLAS["mp_cocktail_deck_stickers"],
-							{ x = sticker_x_pos[v], y = num - 1 }
+							{ x = sticker_x_pos[v] or 0, y = num - 1 }
 						)
 					end
 					G.shared_stickers[key].role.draw_major = self
