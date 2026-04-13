@@ -145,7 +145,7 @@ function MP.get_cocktail_decks(cull)
 		end
 	end
 	table.sort(ret, function(a, b)
-		return G.P_CENTERS[a].order < G.P_CENTERS[b].order -- nil check to fix aikoshen crash?????????????????
+		return G.P_CENTERS[a].order < G.P_CENTERS[b].order
 	end)
 	if cull then
 		local _ret = {}
