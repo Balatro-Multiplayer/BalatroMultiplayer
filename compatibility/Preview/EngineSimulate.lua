@@ -467,7 +467,7 @@ if not FN.SIM.run then
 			if card_data.ability.x_mult > 1 then FN.SIM.x_mult(card_data.ability.x_mult) end
 
 			-- Dollars:
-			if card_data.seal == "Gold" then FN.SIM.add_dollars(3) end
+			if card_data.seal == "Gold" then FN.SIM.add_dollars(card_data.ability.seal and card_data.ability.seal.extra and card_data.ability.seal.extra.p_dollars or 3) end
 			if card_data.ability.p_dollars > 0 then
 				if card_data.ability.effect == "Lucky Card" then
 					local exact_dollars, min_dollars, max_dollars = FN.SIM.get_probabilistic_extremes(

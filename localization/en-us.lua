@@ -744,6 +744,14 @@ return {
 			},
 		},
 		Other = {
+			mp_gold_seal = {
+				name = "Gold Seal",
+				text = {
+					"Earn {C:money}$#1#{} when this",
+					"card is played",
+					"and scores",
+				},
+			},
 			mp_sticker_extra_credit = {
 				name = "Extra Credit",
 				text = {
