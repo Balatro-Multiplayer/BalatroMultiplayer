@@ -154,14 +154,6 @@ MP.Ruleset({
 	reworked_blinds = {},
 	reworked_tags = { "tag_mp_gambling_sandbox", "tag_mp_juggle_sandbox", "tag_mp_investment_sandbox" },
 
-	create_info_menu = function()
-		return MP.UI.CreateRulesetInfoMenu({
-			multiplayer_content = true,
-			forced_lobby_options = true,
-			description_key = "k_sandbox_description",
-		})
-	end,
-
 	forced_lobby_options = true,
 
 	force_lobby_options = function(self)

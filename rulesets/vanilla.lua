@@ -13,11 +13,4 @@ MP.Ruleset({
 	reworked_enhancements = {},
 	reworked_tags = {},
 	reworked_blinds = {},
-	create_info_menu = function()
-		return MP.UI.CreateRulesetInfoMenu({
-			multiplayer_content = false,
-			forced_lobby_options = false,
-			description_key = "k_vanilla_description",
-		})
-	end,
 }):inject()
