@@ -398,7 +398,7 @@ function G.UIDEF.lobby_setup_tabs_definition(ruleset_or_gamemode, tab_type, chos
 			{
 				n = G.UIT.C,
 				config = { align = "tm", padding = 0.2, r = 0.1, minw = 10.7, maxw = 10.7, minh = 5.75, maxh = 5.75 },
-				nodes = ruleset_or_gamemode.create_info_menu(),
+				nodes = ruleset_or_gamemode:create_info_menu(),
 			},
 		},
 	}

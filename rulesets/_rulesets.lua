@@ -19,7 +19,6 @@ local RulesetBase = SMODS.GameObject:extend({
 		"reworked_enhancements",
 		"reworked_tags",
 		"reworked_blinds",
-		"create_info_menu",
 	},
 	class_prefix = "ruleset",
 	inject = function(self)
@@ -29,6 +28,20 @@ local RulesetBase = SMODS.GameObject:extend({
 	end,
 	process_loc_text = function(self)
 		SMODS.process_loc_text(G.localization.descriptions["Ruleset"], self.key, self.loc_txt)
+	end,
+	create_info_menu = function(self)
+		local gamemode_text = nil
+		if self.forced_gamemode then
+			gamemode_text = self.forced_gamemode_text
+				or ("k_" .. self.forced_gamemode:gsub("gamemode_mp_", ""))
+		end
+		local raw_key = self.key:gsub("^ruleset_mp_", "")
+		return MP.UI.CreateRulesetInfoMenu({
+			multiplayer_content = self.multiplayer_content,
+			forced_lobby_options = self.forced_lobby_options,
+			forced_gamemode_text = gamemode_text,
+			description_key = self.description_key or ("k_" .. raw_key .. "_description"),
+		})
 	end,
 	is_disabled = function(self)
 		return false

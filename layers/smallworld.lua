@@ -1,3 +1,5 @@
+MP.Layer("smallworld", {})
+
 local apply_bans_ref = MP.ApplyBans
 function MP.ApplyBans()
 	local ret = apply_bans_ref()
