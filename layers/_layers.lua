@@ -50,10 +50,25 @@ function MP.resolve_layers(init)
 			end
 		end
 	end
+	-- Preserve resolved layer names as a lookup set on the init table
+	local layer_set = {}
+	for _, layer_name in ipairs(init.layers) do
+		layer_set[layer_name] = true
+	end
+	init._layers = layer_set
 	init.layers = nil
 
 	for _, field in ipairs(MP._LAYER_ARRAY_FIELDS) do
 		if init[field] == nil then init[field] = {} end
 	end
 	return init
+end
+
+function MP.is_layer_active(layer_name)
+	local ruleset_key = MP.get_active_ruleset()
+	if not ruleset_key then return false end
+	-- Every ruleset is implicitly its own layer
+	if ruleset_key == "ruleset_mp_" .. layer_name then return true end
+	local ruleset = MP.Rulesets[ruleset_key]
+	return ruleset and ruleset._layers and ruleset._layers[layer_name] or false
 end

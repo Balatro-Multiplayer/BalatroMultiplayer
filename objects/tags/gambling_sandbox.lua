@@ -14,7 +14,7 @@ SMODS.Tag({
 		items = {},
 	},
 	in_pool = function(self)
-		return MP.is_ruleset_active("sandbox")
+		return MP.is_layer_active("sandbox")
 	end,
 	name = "Gambling Tag",
 	discovered = true,

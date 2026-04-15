@@ -78,7 +78,7 @@ MP.reset_game_globals = function(run_start)
 	if original_reset_game_globals then original_reset_game_globals(run_start) end
 
 	-- Only initialize EC state when sandbox ruleset is active
-	if MP.is_ruleset_active("sandbox") then
+	if MP.is_layer_active("sandbox") then
 		reset_tuxedo_card()
 		reset_farmer_card()
 		reset_fish_rank()
@@ -90,7 +90,7 @@ local original_ease_dollars = ease_dollars
 function ease_dollars(mod, x)
 	original_ease_dollars(mod, x)
 
-	if MP.is_ruleset_active("sandbox") and to_big(mod) > to_big(0) and G.jokers and G.jokers.cards then
+	if MP.is_layer_active("sandbox") and to_big(mod) > to_big(0) and G.jokers and G.jokers.cards then
 		for i = 1, #G.jokers.cards do
 			local card = G.jokers.cards[i]
 			if card.config.center.key == "j_mp_hoarder_sandbox" and not card.debuffed then
