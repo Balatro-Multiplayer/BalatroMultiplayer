@@ -287,6 +287,7 @@ local networking_dir = MP.EXPERIMENTAL.use_new_networking and "networking" or "n
 MP.load_mp_file(networking_dir .. "/action_handlers.lua")
 
 MP.load_mp_dir("gamemodes")
+MP.load_mp_dir("layers")
 MP.load_mp_dir("rulesets")
 MP.load_mp_dir("ui", true)
 

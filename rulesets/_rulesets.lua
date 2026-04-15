@@ -1,6 +1,7 @@
 G.P_CENTER_POOLS.Ruleset = {}
 MP.Rulesets = {}
-MP.Ruleset = SMODS.GameObject:extend({
+
+local RulesetBase = SMODS.GameObject:extend({
 	obj_table = {},
 	obj_buffer = {},
 	required_params = {
@@ -35,6 +36,14 @@ MP.Ruleset = SMODS.GameObject:extend({
 	force_lobby_options = function(self)
 		return false
 	end,
+})
+
+-- Wrap RulesetBase so layers are resolved before SMODS validates required_params
+MP.Ruleset = setmetatable({}, {
+	__call = function(_, init)
+		return RulesetBase(MP.resolve_layers(init))
+	end,
+	__index = RulesetBase,
 })
 
 function MP.is_ruleset_active(ruleset_name)
