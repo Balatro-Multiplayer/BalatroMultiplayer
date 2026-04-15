@@ -99,7 +99,7 @@ SMODS.Back({
 				G.GAME.modifiers.b_aij_patchwork = true
 			end
 		end
-		if MP.is_ruleset_active("smallworld") then MP.apply_fake_back_vouchers(back) end
+		if MP.is_layer_active("smallworld") then MP.apply_fake_back_vouchers(back) end
 		back.effect.mp_cocktailed = true
 		if MP.cocktail_check_edited() then G.GAME.seeded = true end
 	end,
