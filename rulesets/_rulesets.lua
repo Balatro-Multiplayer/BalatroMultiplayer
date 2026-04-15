@@ -41,7 +41,7 @@ function MP.is_ruleset_active(ruleset_name)
 	local key = "ruleset_mp_" .. ruleset_name
 	if MP.LOBBY.code then
 		return MP.LOBBY.config.ruleset == key
-	elseif MP.SP and MP.SP.ruleset then
+	elseif MP.is_practice_mode() then
 		return MP.SP.ruleset == key
 	end
 	return false
@@ -50,22 +50,30 @@ end
 function MP.get_active_ruleset()
 	if MP.LOBBY.code then
 		return MP.LOBBY.config.ruleset
-	elseif MP.SP and MP.SP.ruleset then
+	elseif MP.is_practice_mode() then
 		return MP.SP.ruleset
 	end
 	return nil
 end
 
-function MP.ApplyBans()
-	local ruleset_key = nil
-	local gamemode = nil
-
-	if MP.LOBBY.code and MP.LOBBY.config.ruleset then
-		ruleset_key = MP.LOBBY.config.ruleset
-		gamemode = MP.Gamemodes["gamemode_mp_" .. MP.LOBBY.type]
-	elseif MP.SP and MP.SP.ruleset then
-		ruleset_key = MP.SP.ruleset
+function MP.get_active_gamemode()
+	if MP.LOBBY.code then
+		return MP.LOBBY.config.gamemode
+	elseif MP.is_practice_mode() then
+		-- Ghost replay stores the gamemode directly
+		if MP.GHOST.is_active() and MP.GHOST.gamemode then
+			return MP.GHOST.gamemode
+		end
+		local ruleset_key = MP.SP and MP.SP.ruleset
+		if ruleset_key and MP.Rulesets[ruleset_key] then return MP.Rulesets[ruleset_key].forced_gamemode end
 	end
+	return nil
+end
+
+function MP.ApplyBans()
+	local ruleset_key = MP.get_active_ruleset()
+	local gamemode_key = MP.get_active_gamemode()
+	local gamemode = gamemode_key and MP.Gamemodes[gamemode_key] or nil
 
 	if ruleset_key then
 		local ruleset = MP.Rulesets[ruleset_key]

@@ -57,12 +57,14 @@ function G.FUNCS.select_blind(e)
 	MP.GAME.end_pvp = false
 	MP.GAME.prevent_eval = false
 	select_blind_ref(e)
-	if MP.LOBBY.code then
+	if MP.is_mp_or_ghost() then
 		MP.GAME.ante_key = tostring(math.random())
-		MP.ACTIONS.play_hand(0, G.GAME.round_resets.hands)
-		MP.ACTIONS.new_round()
-		MP.ACTIONS.set_location("loc_playing", (e.config.ref_table.key or e.config.ref_table.name))
-		if MP.UI.hide_enemy_location then MP.UI.hide_enemy_location() end
+		if not MP.GHOST.is_active() then
+			MP.ACTIONS.play_hand(0, G.GAME.round_resets.hands)
+			MP.ACTIONS.new_round()
+			MP.ACTIONS.set_location("loc_playing", (e.config.ref_table.key or e.config.ref_table.name))
+			if MP.UI.hide_enemy_location then MP.UI.hide_enemy_location() end
+		end
 	end
 end
 

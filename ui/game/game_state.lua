@@ -3,7 +3,7 @@
 
 local update_draw_to_hand_ref = Game.update_draw_to_hand
 function Game:update_draw_to_hand(dt)
-	if MP.LOBBY.code then
+	if MP.is_mp_or_ghost() then
 		if
 			not G.STATE_COMPLETE
 			and G.GAME.current_round.hands_played == 0
@@ -28,12 +28,20 @@ function Game:update_draw_to_hand(dt)
 							delay = 0.45,
 							blockable = false,
 							func = function()
-								G.HUD_blind:get_UIE_by_ID("HUD_blind_name").config.object.config.string = {
-									{
-										ref_table = MP.LOBBY.is_host and MP.LOBBY.guest or MP.LOBBY.host,
-										ref_value = "username",
-									},
-								}
+								-- Ghost uses static { string = ... } (name is fixed for the run);
+								-- live MP uses { ref_table, ref_value } so the HUD reacts to name changes.
+								local blind_name_string
+								if MP.GHOST.is_active() then
+									blind_name_string = MP.GHOST.get_blind_name_ui()
+								else
+									blind_name_string = {
+										{
+											ref_table = MP.LOBBY.is_host and MP.LOBBY.guest or MP.LOBBY.host,
+											ref_value = "username",
+										},
+									}
+								end
+								G.HUD_blind:get_UIE_by_ID("HUD_blind_name").config.object.config.string = blind_name_string
 								G.HUD_blind:get_UIE_by_ID("HUD_blind_name").config.object:update_text()
 								G.HUD_blind:get_UIE_by_ID("HUD_blind_name").config.object:pop_in(0)
 								return true
@@ -69,8 +77,10 @@ function Game:update_draw_to_hand(dt)
 					end
 					G.E_MANAGER:add_event(Event({
 						func = function()
-							for i = 1, MP.GAME.asteroids do
-								MP.ACTIONS.asteroid()
+							if not MP.GHOST.is_active() then
+								for i = 1, MP.GAME.asteroids do
+									MP.ACTIONS.asteroid()
+								end
 							end
 							MP.GAME.asteroids = 0
 							return true
@@ -182,7 +192,8 @@ local update_hand_played_ref = Game.update_hand_played
 ---@diagnostic disable-next-line: duplicate-set-field
 function Game:update_hand_played(dt)
 	-- Ignore for singleplayer or regular blinds
-	if not MP.LOBBY.connected or not MP.LOBBY.code or not MP.is_pvp_boss() then
+	local ghost = MP.GHOST.is_active()
+	if (not ghost and (not MP.LOBBY.connected or not MP.LOBBY.code)) or not MP.is_pvp_boss() then
 		update_hand_played_ref(self, dt)
 		return
 	end
@@ -201,22 +212,43 @@ function Game:update_hand_played(dt)
 		G.E_MANAGER:add_event(Event({
 			trigger = "immediate",
 			func = function()
-				MP.ACTIONS.play_hand(G.GAME.chips, G.GAME.current_round.hands_left)
-				-- For now, never advance to next round
+				if not ghost then
+					MP.ACTIONS.play_hand(G.GAME.chips, G.GAME.current_round.hands_left)
+				end
+
 				if G.GAME.current_round.hands_left < 1 then
-					attention_text({
-						scale = 0.8,
-						text = localize("k_wait_enemy"),
-						hold = 5,
-						align = "cm",
-						offset = { x = 0, y = -1.5 },
-						major = G.play,
-					})
-					MP.GAME.maintain_pvp_end_stop_use = true
-					stop_use()
+					if ghost then
+						local result = MP.GHOST.resolve_pvp_hands_exhausted(G.GAME.chips)
+						if result == "won" then
+							win_game()
+							return true
+						elseif result == "game_over" then
+							G.STATE = G.STATES.GAME_OVER
+							G.STATE_COMPLETE = false
+							return true
+						end
+					else
+						attention_text({
+							scale = 0.8,
+							text = localize("k_wait_enemy"),
+							hold = 5,
+							align = "cm",
+							offset = { x = 0, y = -1.5 },
+							major = G.play,
+						})
+						MP.GAME.maintain_pvp_end_stop_use = true
+						stop_use()
+					end
 					if G.hand.cards[1] and G.STATE == G.STATES.HAND_PLAYED then
 						eval_hand_and_jokers()
 						G.FUNCS.draw_from_hand_to_discard()
+					end
+				elseif ghost and MP.GHOST.has_hand_data() then
+					MP.GHOST.resolve_pvp_mid_hand(G.GAME.chips)
+
+					if not MP.GAME.end_pvp and G.STATE == G.STATES.HAND_PLAYED then
+						G.STATE_COMPLETE = false
+						G.STATE = G.STATES.DRAW_TO_HAND
 					end
 				elseif not MP.GAME.end_pvp and G.STATE == G.STATES.HAND_PLAYED then
 					G.STATE_COMPLETE = false
@@ -250,19 +282,28 @@ function Game:update_new_round(dt)
 		G.STATE = G.STATES.NEW_ROUND
 		MP.GAME.end_pvp = false
 	end
-	if MP.LOBBY.code and not G.STATE_COMPLETE then
+	if MP.is_mp_or_ghost() and not G.STATE_COMPLETE then
+		local ghost = MP.GHOST.is_active()
 		-- Prevent player from losing
 		if to_big(G.GAME.chips) < to_big(G.GAME.blind.chips) and not MP.is_pvp_boss() then
 			G.GAME.blind.chips = -1
-			MP.GAME.wait_for_enemys_furthest_blind = (MP.LOBBY.config.gamemode == "gamemode_mp_survival")
-				and (tonumber(MP.GAME.lives) == 1) -- In Survival Mode, if this is the last live, wait for the enemy.
-			MP.ACTIONS.fail_round(G.GAME.current_round.hands_played)
+			if ghost then
+				if MP.GHOST.resolve_round_fail() == "game_over" then
+					G.STATE = G.STATES.GAME_OVER
+					G.STATE_COMPLETE = false
+					return
+				end
+			else
+				MP.GAME.wait_for_enemys_furthest_blind = (MP.LOBBY.config.gamemode == "gamemode_mp_survival")
+					and (tonumber(MP.GAME.lives) == 1)
+				MP.ACTIONS.fail_round(G.GAME.current_round.hands_played)
+			end
 		end
 
 		-- Prevent player from winning
 		G.GAME.win_ante = 999
 
-		if MP.LOBBY.config.gamemode == "gamemode_mp_survival" and MP.GAME.wait_for_enemys_furthest_blind then
+		if not ghost and MP.LOBBY.config.gamemode == "gamemode_mp_survival" and MP.GAME.wait_for_enemys_furthest_blind then
 			G.STATE_COMPLETE = true
 			G.FUNCS.draw_from_hand_to_discard()
 			attention_text({
@@ -291,7 +332,7 @@ function Game:update_selecting_hand(dt)
 		and #G.hand.cards < 1
 		and #G.deck.cards < 1
 		and #G.play.cards < 1
-		and MP.LOBBY.code
+		and MP.is_mp_or_ghost()
 	then
 		G.GAME.current_round.hands_left = 0
 		if not MP.is_pvp_boss() then
@@ -299,7 +340,9 @@ function Game:update_selecting_hand(dt)
 			G.STATE = G.STATES.NEW_ROUND
 			stop_use()
 		else
-			MP.ACTIONS.play_hand(G.GAME.chips, 0)
+			if not MP.GHOST.is_active() then
+				MP.ACTIONS.play_hand(G.GAME.chips, 0)
+			end
 			G.STATE_COMPLETE = false
 			G.STATE = G.STATES.HAND_PLAYED
 			stop_use()
@@ -308,8 +351,7 @@ function Game:update_selecting_hand(dt)
 	end
 	update_selecting_hand_ref(self, dt)
 
-	if MP.GAME.end_pvp and MP.is_pvp_boss() then
-		stop_use()
+	if MP.GAME.end_pvp and MP.is_pvp_boss() and MP.is_mp_or_ghost() then
 		G.hand:unhighlight_all()
 		G.STATE_COMPLETE = false
 		G.STATE = G.STATES.NEW_ROUND
@@ -356,7 +398,8 @@ function Game:start_run(args)
 
 	start_run_ref(self, args)
 
-	if not MP.LOBBY.connected or not MP.LOBBY.code or MP.LOBBY.config.disable_live_and_timer_hud then return end
+	local show_lives_hud = (MP.LOBBY.connected and MP.LOBBY.code) or MP.GHOST.is_active()
+	if not show_lives_hud or MP.LOBBY.config.disable_live_and_timer_hud then return end
 
 	local scale = 0.4
 	local hud_ante = G.HUD:get_UIE_by_ID("hud_ante")
@@ -381,7 +424,7 @@ end
 
 -- This prevents duplicate execution during certain cases. e.g. Full deck discard before playing any hands.
 function MP.handle_duplicate_end()
-	if MP.LOBBY.code then
+	if MP.is_mp_or_ghost() then
 		if MP.GAME.round_ended then
 			if not MP.GAME.duplicate_end then
 				MP.GAME.duplicate_end = true
@@ -396,15 +439,16 @@ end
 -- This handles an edge case where a player plays no hands, and discards the only cards in their deck.
 -- Allows opponent to advance after playing anything, and eases a life from the person who discarded their deck.
 function MP.handle_deck_out()
-	if MP.LOBBY.code then
+	if MP.is_mp_or_ghost() then
 		if
 			G.GAME.current_round.hands_played == 0
 			and G.GAME.current_round.discards_used > 0
 			and MP.LOBBY.config.gamemode ~= "gamemode_mp_survival"
 		then
-			if MP.is_pvp_boss() then MP.ACTIONS.play_hand(0, 0) end
-
-			MP.ACTIONS.fail_round(1)
+			if not MP.GHOST.is_active() then
+				if MP.is_pvp_boss() then MP.ACTIONS.play_hand(0, 0) end
+				MP.ACTIONS.fail_round(1)
+			end
 		end
 	end
 end
@@ -557,6 +601,29 @@ function MP.UI.jimbo_say(text)
 			return true
 		end,
 	}))
+end
+
+-- Practice mode: spawn Jimbo when opening collection to hint at card spawning (once per boot)
+local practice_collection_jimbo = false
+local practice_collection_hint_shown = false
+
+local your_collection_ref = G.FUNCS.your_collection
+function G.FUNCS.your_collection(e)
+	your_collection_ref(e)
+	if MP.is_practice_mode() and not MP.LOBBY.code and not practice_collection_hint_shown then
+		practice_collection_hint_shown = true
+		practice_collection_jimbo = true
+		MP.UI.create_jimbo(2, localize("k_practice_collection_hint"))
+	end
+end
+
+local exit_overlay_menu_ref_jimbo = G.FUNCS.exit_overlay_menu
+function G.FUNCS:exit_overlay_menu()
+	if practice_collection_jimbo then
+		practice_collection_jimbo = false
+		MP.UI.remove_jimbo()
+	end
+	exit_overlay_menu_ref_jimbo(self)
 end
 
 function MP.UI.remove_jimbo()

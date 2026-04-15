@@ -1,7 +1,7 @@
 local create_UIBox_blind_choice_ref = create_UIBox_blind_choice
 ---@diagnostic disable-next-line: lowercase-global
 function create_UIBox_blind_choice(type, run_info)
-	if MP.LOBBY.code then
+	if MP.is_mp_or_ghost() then
 		if not G.GAME.blind_on_deck then G.GAME.blind_on_deck = "Small" end
 		if not run_info then G.GAME.round_resets.blind_states[G.GAME.blind_on_deck] = "Select" end
 
@@ -134,10 +134,16 @@ function create_UIBox_blind_choice(type, run_info)
 					or "",
 			},
 		})
-		local loc_name = (
-			G.GAME.round_resets.blind_choices[type] == "bl_mp_nemesis"
-			and (MP.LOBBY.is_host and MP.LOBBY.guest.username or MP.LOBBY.host.username)
-		) or localize({ type = "name_text", key = blind_choice.config.key, set = "Blind" })
+		local loc_name
+		if G.GAME.round_resets.blind_choices[type] == "bl_mp_nemesis" then
+			if MP.GHOST.is_active() then
+				loc_name = MP.GHOST.get_nemesis_name()
+			else
+				loc_name = MP.LOBBY.is_host and MP.LOBBY.guest.username or MP.LOBBY.host.username
+			end
+		else
+			loc_name = localize({ type = "name_text", key = blind_choice.config.key, set = "Blind" })
+		end
 
 		local blind_col = get_blind_main_colour(type)
 
@@ -213,8 +219,9 @@ function create_UIBox_blind_choice(type, run_info)
 										hover = true,
 										one_press = true,
 										func = (
-											G.GAME.round_resets.blind_choices[type] == "bl_mp_nemesis"
-											or G.GAME.round_resets.pvp_blind_choices[type]
+											not MP.GHOST.is_active()
+											and (G.GAME.round_resets.blind_choices[type] == "bl_mp_nemesis"
+												or G.GAME.round_resets.pvp_blind_choices[type])
 										)
 												and "pvp_ready_button"
 											or nil,
