@@ -7,6 +7,7 @@ SMODS.Back({
 		Multiplayer = true,
 		Cryptid = true,
 		aikoyorisshenanigans = true,
+		allinjest = true,
 	},
 	deck_blacklist = {
 		b_challenge = true,
@@ -91,6 +92,11 @@ SMODS.Back({
 			end
 			if back.effect.config.akyrs_letters_no_uppercase then
 				G.GAME.starting_params.akyrs_letters_no_uppercase = back.effect.config.akyrs_letters_no_uppercase
+			end
+
+			-- all in jest exception for patchwork deck
+			if G.GAME.modifiers.mp_cocktail[i] == "b_aij_patchwork" then
+				G.GAME.modifiers.b_aij_patchwork = true
 			end
 		end
 		if MP.is_ruleset_active("smallworld") then MP.apply_fake_back_vouchers(back) end
