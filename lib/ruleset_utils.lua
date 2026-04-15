@@ -12,14 +12,6 @@ function MP.UTILS.get_standard_rulesets(add)
 	return ret
 end
 
-function MP.UTILS.is_standard_ruleset()
-	local active = MP.get_active_ruleset()
-	if active == nil then return false end
-	for _, ruleset in ipairs(MP.UTILS.get_standard_rulesets()) do
-		if active == "ruleset_mp_" .. ruleset then return true end
-	end
-	return false
-end
 
 function MP.UTILS.get_weekly()
 	return SMODS.Mods["Multiplayer"].config.weekly
