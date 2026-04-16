@@ -1217,6 +1217,8 @@ return {
 			k_smallworld_description = "It's a small world after all.\n\n75% of jokers, consumables, vouchers, and tags\nare randomly banned each game.\n\nBanned items get replaced with what's available.\nDuplicates allowed.",
 			k_speedlatro = "Speedlatro",
 			k_speedlatro_description = "Up the pace with an uncomfortably fast 147 second timer between\neach PvP blind. Good luck using Vagabond",
+			k_chaos = "Chaos",
+			k_chaos_description = "Everything, everywhere, all at once.\n\nCombines Standard, Small World, Sandbox, and Speedlatro timer\ninto one ruleset. Good luck.",
 			k_release = "Release Ver.",
 			k_release_description = "Allan please add details",
 			k_cost_up = "Cost Up",
