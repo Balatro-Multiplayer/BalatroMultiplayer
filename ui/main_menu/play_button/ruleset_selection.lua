@@ -41,6 +41,7 @@ function G.UIDEF.ruleset_selection_options(mode)
 				{ button_id = "vanilla_ruleset_button", button_localize_key = "k_vanilla" },
 				{ button_id = "badlatro_ruleset_button", button_localize_key = "k_badlatro" },
 				{ button_id = "speedlatro_ruleset_button", button_localize_key = "k_speedlatro" },
+				{ button_id = "chaos_ruleset_button", button_localize_key = "k_chaos" },
 			},
 		},
 		{
