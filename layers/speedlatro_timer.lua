@@ -5,7 +5,7 @@ local base_timer = 147
 
 local gupdate = Game.update
 function Game:update(dt)
-	if MP.is_layer_active("speedlatro") and G.STAGE == G.STAGES.RUN then
+	if MP.is_layer_active("speedlatro_timer") and G.STAGE == G.STAGES.RUN then
 		if not MP.speedlatro_timer then
 			MP.speedlatro_timer = { real = base_timer, display = base_timer }
 			MP.speedlatro_timer.text = UIBox({
@@ -110,7 +110,7 @@ end
 
 local new_round_ref = new_round
 function new_round()
-	if MP.is_layer_active("speedlatro") then
+	if MP.is_layer_active("speedlatro_timer") then
 		if MP.LOBBY.code then
 			if G.GAME.round_resets.blind == G.P_BLINDS["bl_mp_nemesis"] then
 				MP.speedlatro_timer.real = base_timer / 2
@@ -141,7 +141,7 @@ end
 
 local end_round_ref = end_round
 function end_round()
-	if MP.is_layer_active("speedlatro") then
+	if MP.is_layer_active("speedlatro_timer") then
 		if MP.LOBBY.code then
 			if MP.is_pvp_boss() then
 				MP.speedlatro_timer.real = base_timer
