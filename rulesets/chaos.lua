@@ -1,4 +1,6 @@
 MP.Ruleset({
 	key = "chaos",
-	layers = { "standard", "smallworld", "sandbox", "speedlatro_timer" },
+	layers = { "standard", "sandbox", "smallworld",
+    -- "speedlatro_timer"
+    },
 }):inject()
