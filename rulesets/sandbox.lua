@@ -100,6 +100,7 @@ end
 
 MP.Ruleset({
 	key = "sandbox",
+	layers = { "sandbox" },
 	multiplayer_content = true,
 	banned_jokers = { "j_hanging_chad" },
 	banned_silent = MP.SANDBOX.get_vanilla_bans(),
