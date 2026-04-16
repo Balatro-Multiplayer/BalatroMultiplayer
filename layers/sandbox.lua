@@ -1,5 +1,3 @@
-MP.Layer("sandbox", {})
-
 MP.SANDBOX = {}
 
 -- Centralized joker mappings: defines sandbox variants, their vanilla counterparts, and rotation status
@@ -119,11 +117,8 @@ local function select_random_idol()
 	end
 end
 
-local apply_bans_ref = MP.ApplyBans
-function MP.ApplyBans()
-	local ret = apply_bans_ref()
-
-	if MP.is_layer_active("sandbox") then
+MP.Layer("sandbox", {
+	on_apply_bans = function()
 		select_random_idol()
 
 		if SMODS.Mods["extracredit"] and SMODS.Mods["extracredit"].can_load then
@@ -132,10 +127,8 @@ function MP.ApplyBans()
 				if mapping.group == "extra_credit" then G.GAME.banned_keys[mapping.sandbox] = true end
 			end
 		end
-	end
-
-	return ret
-end
+	end,
+})
 
 -- debugging hotswitch
 MP.sandbox_no_collection = not MP.EXPERIMENTAL.show_sandbox_collection

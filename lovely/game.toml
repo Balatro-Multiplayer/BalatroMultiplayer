@@ -164,6 +164,7 @@ position = "before"
 payload = '''
 if not saveTable then -- i am 99% sure this is unnecessary but i'm checking it anyway
 	MP.ApplyBans()
+	MP.RunLayerHooks("on_apply_bans")
 end
 '''
 match_indent = true
