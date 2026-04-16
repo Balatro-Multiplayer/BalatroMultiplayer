@@ -50,18 +50,35 @@ function MP.resolve_layers(init)
 			end
 		end
 	end
-	-- Preserve resolved layer names as a lookup set on the init table
+	-- Preserve resolved layer names (ordered list + lookup set)
 	local layer_set = {}
+	local layer_order = {}
 	for _, layer_name in ipairs(init.layers) do
 		layer_set[layer_name] = true
+		layer_order[#layer_order + 1] = layer_name
 	end
 	init._layers = layer_set
+	init._layer_order = layer_order
 	init.layers = nil
 
 	for _, field in ipairs(MP._LAYER_ARRAY_FIELDS) do
 		if init[field] == nil then init[field] = {} end
 	end
 	return init
+end
+
+-- Call a named hook on each active layer, in layer order
+function MP.RunLayerHooks(hook_name)
+	local ruleset_key = MP.get_active_ruleset()
+	if not ruleset_key then return end
+	local ruleset = MP.Rulesets[ruleset_key]
+	if not ruleset or not ruleset._layer_order then return end
+	for _, layer_name in ipairs(ruleset._layer_order) do
+		local layer = MP.Layers[layer_name]
+		if layer and layer[hook_name] then
+			layer[hook_name]()
+		end
+	end
 end
 
 function MP.is_layer_active(layer_name)

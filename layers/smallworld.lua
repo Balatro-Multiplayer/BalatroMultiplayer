@@ -1,9 +1,5 @@
-MP.Layer("smallworld", {})
-
-local apply_bans_ref = MP.ApplyBans
-function MP.ApplyBans()
-	local ret = apply_bans_ref()
-	if MP.is_layer_active("smallworld") then
+MP.Layer("smallworld", {
+	on_apply_bans = function()
 		local tables = {}
 		local requires = {}
 		for k, v in pairs(G.P_CENTERS) do
@@ -50,9 +46,8 @@ function MP.ApplyBans()
 			if G.GAME.banned_keys[G.P_CENTERS[v].requires[1]] then G.GAME.banned_keys[v] = true end
 		end
 		if G.GAME.banned_keys["j_gros_michel"] then G.GAME.banned_keys["j_cavendish"] = true end
-	end
-	return ret
-end
+	end,
+})
 
 local showman_ref = SMODS.showman
 function SMODS.showman(card_key)
