@@ -161,12 +161,12 @@ function G.FUNCS.fn_pre_score_UI_set(e)
 	else
 		if FN.PRE.data then
 			if FN.PRE.show_preview and (FN.PRE.data.score.min ~= FN.PRE.data.score.max) then
-				-- Format as 'X - Y' :
+				-- Two-row layout: 'Min: X' on top, 'Max: Y' below.
 				if e.config.id == "fn_pre_l" then
-					new_preview_text = FN.PRE.format_number(FN.PRE.data.score.min) .. " - "
+					new_preview_text = "Min: " .. FN.PRE.format_number(FN.PRE.data.score.min)
 					if FN.PRE.is_enough_to_win(FN.PRE.data.score.min) then should_juice = true end
 				elseif e.config.id == "fn_pre_r" then
-					new_preview_text = FN.PRE.format_number(FN.PRE.data.score.max)
+					new_preview_text = "Max: " .. FN.PRE.format_number(FN.PRE.data.score.max)
 					if FN.PRE.is_enough_to_win(FN.PRE.data.score.max) then should_juice = true end
 				end
 			else
