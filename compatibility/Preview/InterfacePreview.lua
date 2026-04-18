@@ -67,45 +67,37 @@ function FN.PRE.get_calculate_score_button()
 end
 
 function FN.PRE.get_score_node()
-	local text_scale = nil
-	if true then
-		text_scale = 0.5
-	else
-		text_scale = 0.75
+	local text_scale = 0.5
+
+	local function make_row(id, ref_value)
+		return {
+			n = G.UIT.R,
+			config = { align = "cm" },
+			nodes = {
+				{
+					n = G.UIT.O,
+					config = {
+						id = id,
+						func = "fn_pre_score_UI_set",
+						object = DynaText({
+							string = { { ref_table = FN.PRE.text.score, ref_value = ref_value } },
+							colours = { G.C.UI.TEXT_LIGHT },
+							shadow = true,
+							float = true,
+							scale = text_scale,
+						}),
+					},
+				},
+			},
+		}
 	end
 
 	return {
 		n = G.UIT.C,
 		config = { id = "fn_pre_score", align = "cm" },
 		nodes = {
-			{
-				n = G.UIT.O,
-				config = {
-					id = "fn_pre_l",
-					func = "fn_pre_score_UI_set",
-					object = DynaText({
-						string = { { ref_table = FN.PRE.text.score, ref_value = "l" } },
-						colours = { G.C.UI.TEXT_LIGHT },
-						shadow = true,
-						float = true,
-						scale = text_scale,
-					}),
-				},
-			},
-			{
-				n = G.UIT.O,
-				config = {
-					id = "fn_pre_r",
-					func = "fn_pre_score_UI_set",
-					object = DynaText({
-						string = { { ref_table = FN.PRE.text.score, ref_value = "r" } },
-						colours = { G.C.UI.TEXT_LIGHT },
-						shadow = true,
-						float = true,
-						scale = text_scale,
-					}),
-				},
-			},
+			make_row("fn_pre_l", "l"),
+			make_row("fn_pre_r", "r"),
 		},
 	}
 end

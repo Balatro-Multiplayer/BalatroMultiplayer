@@ -13,8 +13,7 @@ end
 
 function FN.PRE.format_number(num)
 	if not num or type(num) ~= "number" then return num or "" end
-	-- Start using e-notation earlier to reduce number length, if showing min and max for preview:
-	if true and num >= 1e7 then
+	if num >= 1e11 then
 		local x = string.format("%.4g", num)
 		local fac = math.floor(math.log(tonumber(x), 10))
 		return string.format("%.2f", x / (10 ^ fac)) .. "e" .. fac
