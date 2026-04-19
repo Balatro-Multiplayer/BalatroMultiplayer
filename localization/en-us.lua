@@ -1060,6 +1060,7 @@ return {
 			b_join_lobby = "Join Lobby",
 			b_join_lobby_clipboard = "Join From Clipboard",
 			b_return_lobby = "Return to Lobby",
+			b_resign = "Resign",
 			b_reconnect = "Reconnect",
 			b_create_lobby = "Create Lobby",
 			b_start_lobby = "Start Lobby",
