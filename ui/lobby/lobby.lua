@@ -416,6 +416,22 @@ function G.FUNCS.mp_return_to_lobby()
 	end)
 end
 
+function G.FUNCS.mp_resign_game()
+	G.FUNCS.confirm_selection(function()
+		-- v1: brute-force trigger natural death. Server decrements lives per failRound
+		-- via playerInfo and broadcasts winGame/loseGame when it hits 0. Dumb, but
+		-- avoids a server change.
+		for _ = 1, (MP.GAME.lives or 1) do
+			Client.send({ action = "failRound" })
+		end
+
+		-- TODO v2 (server change): replace the loop above with a dedicated action so
+		-- the opponent can see "Opponent resigned" and the replay can be tagged
+		-- winner_by = "resign" for the practice-mode list.
+		-- Client.send({ action = "resignGame" })
+	end)
+end
+
 function G.FUNCS.custom_seed_overlay(e)
 	G.FUNCS.overlay_menu({
 		definition = G.UIDEF.create_UIBox_custom_seed_overlay(),
