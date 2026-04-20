@@ -74,7 +74,14 @@ function MP.UI.create_lobby_options_tab()
 				"change_starting_lives"
 			),
 			create_lobby_option_toggle("multiplayer_jokers_toggle", "b_opts_multiplayer_jokers", "multiplayer_jokers"),
-			create_lobby_option_toggle("different_decks_toggle", "b_opts_player_diff_deck", "different_decks"),
+			create_lobby_option_toggle("different_decks_toggle", "b_opts_player_diff_deck", "different_decks", function()
+				send_lobby_options()
+				MP.ACTIONS.update_player_usernames()
+			end),
+			create_lobby_option_toggle("random_loadout_toggle", "b_opts_random_loadout", "random_loadout", function()
+				send_lobby_options()
+				MP.ACTIONS.update_player_usernames()
+			end),
 			create_lobby_option_toggle("normal_bosses_toggle", "b_opts_normal_bosses", "normal_bosses"),
 		},
 	}

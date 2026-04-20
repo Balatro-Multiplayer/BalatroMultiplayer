@@ -258,9 +258,49 @@ function G.FUNCS.get_lobby_main_menu_UI(e)
 	})
 end
 
+local function get_random_back_pool()
+	local names, seen = {}, {}
+	local cocktail_keys = MP.get_cocktail_decks(false)
+	for i = 1, #cocktail_keys do
+		local key = cocktail_keys[i]
+		if G.P_CENTERS[key] and not seen[key] then
+			seen[key] = true
+			names[#names + 1] = G.P_CENTERS[key].name
+		end
+	end
+	if G.P_CENTERS["b_mp_cocktail"] and not seen["b_mp_cocktail"] then
+		names[#names + 1] = G.P_CENTERS["b_mp_cocktail"].name
+	end
+	return names
+end
+
+local function scoped_random(seed, salt, max)
+	if seed then
+		math.randomseed(pseudohash(seed .. "_mp_random_" .. salt))
+	end
+	return math.random(1, max)
+end
+
+local function roll_random_back_name(seed, salt)
+	local names = get_random_back_pool()
+	if #names == 0 then return "Red Deck" end
+	return names[scoped_random(seed, "deck_" .. (salt or ""), #names)]
+end
+
+local function roll_random_stake(seed, salt)
+	local cap = MP.DECK.MAX_STAKE > 0 and MP.DECK.MAX_STAKE or 8
+	return scoped_random(seed, "stake_" .. (salt or ""), cap)
+end
+
 ---@type fun(e: table | nil, args: { deck: string, stake: number | nil, seed: string | nil })
 function G.FUNCS.lobby_start_run(e, args)
 	if MP.LOBBY.config.different_decks == false then G.FUNCS.copy_host_deck() end
+
+	if MP.LOBBY.config.different_decks and MP.LOBBY.config.random_loadout then
+		MP.LOBBY.deck.back = roll_random_back_name(args.seed, MP.LOBBY.username)
+		MP.LOBBY.deck.challenge = ""
+		MP.LOBBY.deck.stake = roll_random_stake(args.seed, MP.LOBBY.username)
+	end
 
 	local challenge = nil
 	if MP.LOBBY.deck.back == "Challenge Deck" then
@@ -305,6 +345,12 @@ function G.FUNCS.copy_host_deck()
 end
 
 function G.FUNCS.lobby_start_game(e)
+	if MP.LOBBY.config.random_loadout then
+		MP.LOBBY.config.back = roll_random_back_name()
+		MP.LOBBY.config.challenge = ""
+		MP.LOBBY.config.stake = roll_random_stake()
+		send_lobby_options()
+	end
 	MP.ACTIONS.start_game()
 end
 

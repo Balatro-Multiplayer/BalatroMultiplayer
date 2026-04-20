@@ -1093,6 +1093,7 @@ return {
 			b_opts_lives = "Lives",
 			b_opts_multiplayer_jokers = "Enable Multiplayer Cards",
 			b_opts_player_diff_deck = "Players have different decks",
+			b_opts_random_loadout = "Randomize deck & stake",
 			b_opts_normal_bosses = "Enable Boss Blind effects",
 			b_opts_timer = "Enable Timer",
 			b_opts_disable_preview = "Disable Score Preview",
