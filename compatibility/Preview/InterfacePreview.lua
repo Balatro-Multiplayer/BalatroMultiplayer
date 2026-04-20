@@ -7,7 +7,6 @@ function create_UIBox_HUD()
 
 	if not MP.INTEGRATIONS.Preview then return contents end
 
-	-- Check if preview is disabled in lobby options
 	if MP.LOBBY.config and MP.LOBBY.config.preview_disabled then return contents end
 
 	local score_node_wrap =
