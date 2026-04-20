@@ -51,7 +51,18 @@ local RulesetBase = SMODS.GameObject:extend({
 	end,
 })
 
--- Wrap RulesetBase so layers are resolved before SMODS validates required_params
+-- Why the wrapper: SMODS.GameObject validates `required_params` inside __call
+-- (the constructor), not during inject(). That means all the banned_*/reworked_*
+-- arrays need to exist on the init table BEFORE we hand it to RulesetBase().
+-- Layers provide these fields, but they're declared separately — so we need a
+-- pre-construction pass (resolve_layers) to merge them in. We can't do this
+-- inside inject() or any later hook because validation would already have failed.
+--
+-- The setmetatable trick gives us a callable that looks like RulesetBase to the
+-- rest of the codebase (__index falls through) but intercepts construction to
+-- run the layer merge first. It's a workaround for SMODS not having a
+-- pre-validation hook. If SMODS ever adds one, this can collapse back into a
+-- plain extend().
 MP.Ruleset = setmetatable({}, {
 	__call = function(_, init)
 		return RulesetBase(MP.resolve_layers(init))
