@@ -153,3 +153,16 @@ if (G.GAME.selected_back and G.GAME.selected_back.name == 'b_aij_patchwork') or 
 '''
 match_indent = true
 times = 1
+
+# fix magic trick suit+rank desync
+# this fix should become obsolete in a later steamodded version (currently 1620a)
+[[patches]]
+[patches.pattern]
+target = "functions/UI_definitions.lua"
+pattern = "local flags = SMODS.calculate_context({create_shop_card = true, set = v.type})"
+position = 'before'
+payload = '''
+args.front = false
+'''
+match_indent = true
+times = 1
