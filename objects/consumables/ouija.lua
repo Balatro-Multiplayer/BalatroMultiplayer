@@ -14,7 +14,7 @@ SMODS.Consumable({
 	discovered = true,
 	config = { extra = { destroy = 3 }, mp_sticker_balanced = true },
 	in_pool = function(self)
-		return MP.is_ruleset_active("sandbox") or MP.UTILS.is_standard_ruleset()
+		return MP.is_layer_active("sandbox") or MP.is_layer_active("standard")
 	end,
 	loc_vars = function(self, info_queue, card)
 		return { vars = { card.ability.extra.destroy } }

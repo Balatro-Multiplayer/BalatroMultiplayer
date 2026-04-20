@@ -847,7 +847,7 @@ local function action_start_ante_timer(time)
 	if type(time) == "string" then time = tonumber(time) end
 	MP.GAME.timer = time
 	MP.GAME.timer_started = true
-	if not MP.is_ruleset_active("speedlatro") then G.E_MANAGER:add_event(MP.timer_event) end
+	if not MP.is_layer_active("speedlatro_timer") then G.E_MANAGER:add_event(MP.timer_event) end
 end
 
 local function action_pause_ante_timer(time)

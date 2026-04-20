@@ -13,14 +13,6 @@ MP.Ruleset({
 	reworked_enhancements = {},
 	reworked_tags = {},
 	reworked_blinds = {},
-	create_info_menu = function()
-		return MP.UI.CreateRulesetInfoMenu({
-			multiplayer_content = false,
-			forced_lobby_options = true,
-			forced_gamemode_text = "k_attrition",
-			description_key = "k_majorleague_description",
-		})
-	end,
 	forced_gamemode = "gamemode_mp_attrition",
 	forced_lobby_options = true,
 	is_disabled = function(self)
