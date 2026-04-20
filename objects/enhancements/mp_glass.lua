@@ -1,15 +1,15 @@
 MP.ReworkCenter("m_glass", {
-	rulesets = MP.UTILS.get_standard_rulesets(),
+	layers = "standard",
 	config = { Xmult = 1.5, extra = 4 },
 })
 
 MP.ReworkCenter("m_glass", {
-	rulesets = "sandbox",
+	layers = "sandbox",
 	config = { Xmult = 1.5, extra = 3 },
 })
 
 MP.ReworkCenter("m_glass", {
-	rulesets = "legacy_ranked",
+	layers = "classic",
 	config = { Xmult = 1.5, extra = 4 },
 })
 

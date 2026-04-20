@@ -127,9 +127,9 @@ function MP.ApplyBans()
 end
 
 local LOADED_REWORKS = {}
--- Rework a center for specific ruleset(s). Use MP.LoadReworks() to swap in the active ruleset.
+-- Rework a center for specific layer(s). Use MP.LoadReworks() to swap in the active ruleset.
 ---@param key string e.g. "j_hanging_chad"
----@param opts table { rulesets, loc_key?, silent?, ...center properties }
+---@param opts table { layers, loc_key?, silent?, ...center properties }
 function MP.ReworkCenter(key, opts)
 	LOADED_REWORKS[key] = opts or {}
 end
@@ -145,13 +145,13 @@ function SMODS.injectItems()
 		local center = center_table[key]
 
 		-- Meta keys (not center properties)
-		local reserved = { rulesets = true, loc_key = true, silent = true }
-		local rulesets = opts.rulesets
+		local reserved = { layers = true, loc_key = true, silent = true }
+		local layers = opts.layers
 		local loc_key = opts.loc_key
 		local silent = opts.silent
 
-		-- Convert single ruleset to list
-		if type(rulesets) == "string" then rulesets = { rulesets } end
+		-- Convert single layer to list
+		if type(layers) == "string" then layers = { layers } end
 
 		-- Wrap loc_vars to inject loc_key if provided
 		if loc_key then
@@ -170,9 +170,9 @@ function SMODS.injectItems()
 			and not opts.generate_ui
 			and not (center.generate_ui and type(center.generate_ui) == "function")
 
-		-- Apply changes to all specified rulesets
-		for _, rs in ipairs(rulesets) do
-			local prefix = "mp_" .. rs .. "_"
+		-- Apply changes to all specified layers
+		for _, layer in ipairs(layers) do
+			local prefix = "mp_" .. layer .. "_"
 
 			-- Store all reworked properties
 			for k, v in pairs(opts) do
@@ -192,26 +192,27 @@ function SMODS.injectItems()
 
 			-- Mark this center as having reworks
 			center.mp_reworks = center.mp_reworks or {}
-			center.mp_reworks[rs] = true
+			center.mp_reworks[layer] = true
 			center.mp_reworks["vanilla"] = true
 
 			center.mp_silent = center.mp_silent or {}
-			center.mp_silent[rs] = silent
+			center.mp_silent[layer] = silent
 		end
 	end
 	return ret
 end
 
--- You can call this function without a ruleset to set it to vanilla
--- You can also call this function with a key to only affect that specific joker (might be useful)
+-- Load reworks for the active ruleset. Resolves via layer order then self-layer.
+-- You can also call this function with a key to only affect that specific center.
 function MP.LoadReworks(ruleset, key)
 	ruleset = ruleset or "vanilla"
 	if string.sub(ruleset, 1, 11) == "ruleset_mp_" then ruleset = string.sub(ruleset, 12, #ruleset) end
-	local function process(key_, ruleset_, tbl_)
+
+	local function process(key_, prefix_, tbl_)
 		local center = tbl_[key_]
 		for k, v in pairs(center) do
-			if string.sub(k, 1, #ruleset_) == ruleset_ then
-				local orig = string.sub(k, #ruleset_ + 1)
+			if string.sub(k, 1, #prefix_) == prefix_ then
+				local orig = string.sub(k, #prefix_ + 1)
 				if orig == "rarity" then
 					SMODS.remove_pool(G.P_JOKER_RARITY_POOLS[center[orig]], center.key)
 					table.insert(G.P_JOKER_RARITY_POOLS[center[k]], center)
@@ -227,8 +228,23 @@ function MP.LoadReworks(ruleset, key)
 			end
 		end
 	end
+
+	-- Build resolution order: vanilla → layers in order → self
+	local resolution = {}
+	local ruleset_obj = MP.Rulesets["ruleset_mp_" .. ruleset]
+	if ruleset_obj and ruleset_obj._layer_order then
+		for _, layer in ipairs(ruleset_obj._layer_order) do
+			resolution[#resolution + 1] = layer
+		end
+	end
+	-- Self-layer last (override escape hatch, also handles layerless rulesets like release)
+	resolution[#resolution + 1] = ruleset
+
 	if key then
-		process(key, "mp_" .. ruleset .. "_")
+		process(key, "mp_vanilla_")
+		for _, layer in ipairs(resolution) do
+			process(key, "mp_" .. layer .. "_")
+		end
 	else
 		for _, tbl in ipairs({
 			G.P_CENTERS,
@@ -240,10 +256,15 @@ function MP.LoadReworks(ruleset, key)
 		}) do
 			for k, v in pairs(tbl) do
 				if v.mp_reworks then
-					if v.mp_reworks[ruleset] then
-						process(k, "mp_" .. ruleset .. "_", tbl)
-					elseif v.mp_reworks["vanilla"] then -- Check vanilla separately to reset reworked jokers
+					-- Always reset to vanilla first
+					if v.mp_reworks["vanilla"] then
 						process(k, "mp_vanilla_", tbl)
+					end
+					-- Apply layers in order, then self
+					for _, layer in ipairs(resolution) do
+						if v.mp_reworks[layer] then
+							process(k, "mp_" .. layer .. "_", tbl)
+						end
 					end
 				end
 			end

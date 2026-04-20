@@ -1,18 +1,3 @@
-function MP.UTILS.get_standard_rulesets(add)
-	local ret = {}
-	for k, v in pairs(MP.Rulesets) do
-		if v.standard then ret[#ret + 1] = string.sub(v.key, 12, #v.key) end
-	end
-	if add then
-		if type(add) == "string" then add = { add } end
-		for i, v in ipairs(add) do
-			ret[#ret + 1] = v
-		end
-	end
-	return ret
-end
-
-
 function MP.UTILS.get_weekly()
 	return SMODS.Mods["Multiplayer"].config.weekly
 end
