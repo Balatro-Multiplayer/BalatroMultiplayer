@@ -176,6 +176,8 @@ function MP.reset_lobby_config(persist_ruleset_and_gamemode)
 		weekly = nil,
 		custom_seed = "random",
 		different_decks = false,
+		random_deck = false,
+		random_stake = false,
 		back = "Red Deck",
 		sleeve = "sleeve_casl_none",
 		stake = 1,
