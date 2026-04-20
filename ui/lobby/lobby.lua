@@ -274,33 +274,34 @@ local function get_random_back_pool()
 	return names
 end
 
-local function seeded_random(seed, salt, max)
-	math.randomseed(pseudohash((seed or "") .. "_mp_random_" .. salt))
+local function scoped_random(seed, salt, max)
+	if seed then
+		math.randomseed(pseudohash(seed .. "_mp_random_" .. salt))
+	end
 	return math.random(1, max)
 end
 
 local function roll_random_back_name(seed, salt)
 	local names = get_random_back_pool()
 	if #names == 0 then return "Red Deck" end
-	return names[seeded_random(seed, "deck_" .. salt, #names)]
+	return names[scoped_random(seed, "deck_" .. (salt or ""), #names)]
 end
 
 local function roll_random_stake(seed, salt)
 	local cap = MP.DECK.MAX_STAKE > 0 and MP.DECK.MAX_STAKE or 8
-	return seeded_random(seed, "stake_" .. salt, cap)
+	return scoped_random(seed, "stake_" .. (salt or ""), cap)
 end
 
 ---@type fun(e: table | nil, args: { deck: string, stake: number | nil, seed: string | nil })
 function G.FUNCS.lobby_start_run(e, args)
 	if MP.LOBBY.config.different_decks == false then G.FUNCS.copy_host_deck() end
 
-	local salt = MP.LOBBY.config.different_decks and MP.LOBBY.username or "shared"
-	if MP.LOBBY.config.random_deck then
-		MP.LOBBY.deck.back = roll_random_back_name(args.seed, salt)
+	if MP.LOBBY.config.different_decks and MP.LOBBY.config.random_deck then
+		MP.LOBBY.deck.back = roll_random_back_name(args.seed, MP.LOBBY.username)
 		MP.LOBBY.deck.challenge = ""
 	end
-	if MP.LOBBY.config.random_stake then
-		MP.LOBBY.deck.stake = roll_random_stake(args.seed, salt)
+	if MP.LOBBY.config.different_decks and MP.LOBBY.config.random_stake then
+		MP.LOBBY.deck.stake = roll_random_stake(args.seed, MP.LOBBY.username)
 	end
 
 	local challenge = nil
@@ -346,6 +347,16 @@ function G.FUNCS.copy_host_deck()
 end
 
 function G.FUNCS.lobby_start_game(e)
+	if MP.LOBBY.config.random_deck then
+		MP.LOBBY.config.back = roll_random_back_name()
+		MP.LOBBY.config.challenge = ""
+	end
+	if MP.LOBBY.config.random_stake then
+		MP.LOBBY.config.stake = roll_random_stake()
+	end
+	if MP.LOBBY.config.random_deck or MP.LOBBY.config.random_stake then
+		send_lobby_options()
+	end
 	MP.ACTIONS.start_game()
 end
 
