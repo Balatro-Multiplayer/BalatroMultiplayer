@@ -1,6 +1,8 @@
 -- speedlatro specific timer
 -- i can't be bothered to do run_start hooks and risk that being janky so it'll be initialized in gupdate
 
+MP.Layer("speedlatro_timer", {})
+
 local base_timer = 147
 
 local gupdate = Game.update
