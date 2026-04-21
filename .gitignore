@@ -5,5 +5,7 @@
 .vs
 .DS_Store
 .env
+.claude/
+CLAUDE.local.md
 replays/*
 !replays/.gitkeep
