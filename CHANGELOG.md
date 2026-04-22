@@ -19,7 +19,6 @@
 #### Economy & Enhancements
 
 - **Gold Card** (Enhancement) — Payout increased from $3 to $4.
-- **Gold Seal** — Payout increased from $3 to $4.
 
 #### Balanced Sticker
 
