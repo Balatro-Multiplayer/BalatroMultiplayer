@@ -12,13 +12,15 @@ MP.Layer("standard", {
 		"j_baron",
 		"j_mime",
 	},
+	banned_jokers = {
+		"j_mp_speedrun",
+	},
 	banned_consumables = {},
 	reworked_jokers = {
 		"j_mp_hanging_chad",
 		"j_mp_ticket",
 		"j_mp_seltzer",
 		"j_mp_turtle_bean",
-		-- NEW
 		"j_mp_baron",
 		"j_mp_mime",
 		"j_mp_todo_list",

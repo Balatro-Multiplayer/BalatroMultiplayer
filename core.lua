@@ -300,6 +300,7 @@ end
 
 MP.load_mp_dir("objects/editions")
 MP.load_mp_dir("objects/enhancements")
+MP.load_mp_dir("objects/seals")
 MP.load_mp_dir("objects/stickers")
 MP.load_mp_dir("objects/blinds")
 MP.load_mp_dir("objects/decks")
