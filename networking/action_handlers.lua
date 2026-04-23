@@ -256,6 +256,7 @@ local function action_start_blind()
 	MP.GAME.ready_blind = false
 	MP.GAME.timer_started = false
 	MP.GAME.timer = MP.LOBBY.config.timer_base_seconds
+    MP.GAME.timer_consumed = false
 	MP.UI.start_pvp_countdown(begin_pvp_blind)
 end
 
@@ -346,6 +347,7 @@ end
 local function action_end_pvp()
 	MP.GAME.end_pvp = true
 	MP.GAME.timer = MP.LOBBY.config.timer_base_seconds
+    MP.GAME.timer_consumed = false
 	MP.GAME.timer_started = false
 	MP.GAME.ready_blind = false
 
@@ -824,6 +826,10 @@ local function action_receive_nemesis_deck(deck_str)
 end
 
 local function action_start_ante_timer(time)
+    if true then
+        print("Clicking on a timer do nothing for now")
+        return
+    end
 	local option = SMODS.Mods["Multiplayer"].config.timersfx or 1
 	local timersfx = (option == 1) or (option == 2 and G.timer_ante ~= G.GAME.round_resets.ante)
 	G.timer_ante = G.GAME.round_resets.ante
@@ -847,10 +853,14 @@ local function action_start_ante_timer(time)
 	if type(time) == "string" then time = tonumber(time) end
 	MP.GAME.timer = time
 	MP.GAME.timer_started = true
-	if not MP.is_layer_active("speedlatro_timer") then G.E_MANAGER:add_event(MP.timer_event) end
+	-- if not MP.is_layer_active("speedlatro_timer") then G.E_MANAGER:add_event(MP.timer_event) end
 end
 
 local function action_pause_ante_timer(time)
+    if true then
+        print("Clicking on a timer do nothing for now")
+        return
+    end
 	if type(time) == "string" then time = tonumber(time) end
 	MP.GAME.timer = time
 	MP.GAME.timer_started = false
@@ -1117,6 +1127,9 @@ function MP.ACTIONS.request_nemesis_stats()
 end
 
 function MP.ACTIONS.start_ante_timer()
+    if true then
+        print("Clicking on a timer do nothing for now")
+    end
 	Client.send({
 		action = "startAnteTimer",
 		time = MP.GAME.timer,
@@ -1125,6 +1138,9 @@ function MP.ACTIONS.start_ante_timer()
 end
 
 function MP.ACTIONS.pause_ante_timer()
+    if true then
+        print("Clicking on a timer do nothing for now")
+    end
 	Client.send({
 		action = "pauseAnteTimer",
 		time = MP.GAME.timer,

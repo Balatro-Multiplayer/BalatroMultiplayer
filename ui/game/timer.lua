@@ -52,8 +52,8 @@ function MP.UI.timer_hud()
 						minw = 1.2,
 						colour = G.C.DYN_UI.BOSS_DARK,
 						id = "row_round_text",
-						func = "set_timer_box",
-						button = "mp_timer_button",
+						-- func = "set_timer_box",
+						-- button = "mp_timer_button",
 					},
 					nodes = {
 						{
@@ -61,8 +61,17 @@ function MP.UI.timer_hud()
 							config = {
 								object = DynaText({
 									string = MP.is_layer_active("speedlatro_timer") and ">>"
-										or { { ref_table = MP.GAME, ref_value = "timer" } }, -- sorry
-									colours = { G.C.UI.TEXT_DARK },
+										or { { ref_table = setmetatable({}, {
+                                            __index = function()
+                                                if not MP.GAME.timer then return 0 end
+                                                -- All numbers bigger then 10 - display as integer
+                                                -- Also accounting for rounding to prevent 10.0 to be displayed
+                                                if MP.GAME.timer > 9.95 then return string.format("%d", MP.GAME.timer) end
+                                                -- Less than 10 - display decimap part
+                                                return string.format("%.1f", MP.GAME.timer)
+                                            end,
+                                        }), ref_value = "timer" } }, -- sorry
+									colours = { G.C.IMPORTANT },
 									shadow = true,
 									scale = 0.8,
 								}),
@@ -149,32 +158,34 @@ function G.FUNCS.set_timer_box(e)
 			return
 		end
 		e.config.colour = G.C.DYN_UI.BOSS_DARK
-		e.children[1].config.object.colours = { G.C.UI.TEXT_DARK }
+		e.children[1].config.object.colours = { G.C.IMPORTANT }
 	end
 end
 
-MP.timer_event = Event({
-	blockable = false,
-	blocking = false,
-	pause_force = true,
-	no_delete = true,
-	trigger = "after",
-	delay = 1,
-	timer = "UPTIME",
-	func = function()
-		if not MP.GAME.timer_started then return true end
-		MP.GAME.timer = MP.GAME.timer - 1
-		if MP.GAME.timer <= 0 then
-			MP.GAME.timer = 0
-			if not MP.GAME.ready_blind and not MP.is_pvp_boss() then
-				if MP.GAME.timers_forgiven < MP.LOBBY.config.timer_forgiveness then
-					MP.GAME.timers_forgiven = MP.GAME.timers_forgiven + 1
-					return true
-				end
-				MP.ACTIONS.fail_timer()
-			end
-			return true
-		end
-		MP.timer_event.start_timer = false
-	end,
-})
+local gameUpdateRef = Game.update
+---@diagnostic disable-next-line: duplicate-set-field
+function Game:update(dt)
+    if MP.LOBBY.code and MP.GAME and not MP.GAME.timer_consumed and MP.GAME.timer and MP.GAME.timer > 0 then
+        -- Do not tick when no pvp or we're ready
+        if not MP.GAME.ready_blind and not MP.is_pvp_boss() then
+            -- Do tick when user can interact with a game
+            -- OR
+            -- Do tick when game is paused or any overlay menu opened
+            if not (G.CONTROLLER.locked or (G.GAME.STOP_USE or 0) > 0) or (G.SETTINGS.paused or G.OVERLAY_MENU) then
+                MP.GAME.timer = MP.GAME.timer - G.real_dt
+                if MP.GAME.timer <= 0 then
+                    MP.GAME.timer = 0
+                    MP.GAME.timer_consumed = true
+                    if not MP.GAME.ready_blind and not MP.is_pvp_boss() then
+                        if MP.GAME.timers_forgiven < MP.LOBBY.config.timer_forgiveness then
+                            MP.GAME.timers_forgiven = MP.GAME.timers_forgiven + 1
+                        else
+                            MP.ACTIONS.fail_timer()
+                        end
+                    end
+                end
+            end
+        end
+    end
+	gameUpdateRef(self, dt)
+end

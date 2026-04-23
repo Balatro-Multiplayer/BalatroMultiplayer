@@ -229,6 +229,7 @@ function MP.reset_game_states()
 		highest_score = MP.INSANE_INT.empty(),
 		timer = MP.LOBBY.config.timer_base_seconds,
 		timer_started = false,
+        timer_consumed = false,
 		pvp_countdown = 0,
 		real_money = 0,
 		ce_cache = false,
