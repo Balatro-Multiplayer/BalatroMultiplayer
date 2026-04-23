@@ -33,7 +33,18 @@ function MP:generate_hash()
 	local mod_string = table.concat(mod_data, ";")
 	MP.MOD_STRING = mod_string
 	MP.MOD_HASH = hash(mod_string) or "0000"
-	MP.ACTIONS.set_username(MP.LOBBY.username)
+    if MP.ACTIONS.set_username then
+        function MP.ACTIONS.set_username(username)
+            MP.LOBBY.username = username or "Guest"
+            if MP.LOBBY.connected then
+                Client.send({
+                    action = "username",
+                    username = MP.LOBBY.username .. "~" .. MP.LOBBY.blind_col,
+                    modHash = MP.MOD_STRING,
+                })
+            end
+        end
+    end
 end
 
 local hash_generated = false
