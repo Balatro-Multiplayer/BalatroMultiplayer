@@ -47,12 +47,40 @@ function MP.UTILS.blind_col_numtokey(num)
 	return "bl_" .. keys[num]
 end
 
-function MP.UTILS.get_nemesis_key() -- calling this function assumes the user is currently in a multiplayer game
-	local ret =
-		MP.UTILS.blind_col_numtokey((MP.LOBBY.is_host and MP.LOBBY.guest.blind_col or MP.LOBBY.host.blind_col) or 1)
+function MP.UTILS.get_nemesis_key(own) -- calling this function assumes the user is currently in a multiplayer game
+	local num = ((not own) ~= (not MP.LOBBY.is_host) and MP.LOBBY.guest.blind_col or MP.LOBBY.host.blind_col) or 1 -- cryptic xor fuckery
+	local ret = MP.UTILS.blind_col_numtokey(num)
 	if tonumber(MP.GAME.enemy.lives) <= 1 and tonumber(MP.GAME.lives) <= 1 then
 		if G.STATE ~= G.STATES.ROUND_EVAL then -- very messy fix that mostly works. breaks in a different way... but far harder to notice
-			ret = "bl_final_heart"
+			-- random ass showdown blind mapping because i can. surely one day this data will be organised better
+			ret = ({
+				"heart",
+				"bell",
+				"acorn",
+				"heart",
+				"heart",
+				"bell",
+				"vessel",
+				"leaf",
+				"vessel",
+				"leaf",
+				"bell",
+				"acorn",
+				"vessel",
+				"bell",
+				"acorn",
+				"heart",
+				"bell",
+				"vessel",
+				"leaf",
+				"leaf",
+				"acorn",
+				"leaf",
+				"vessel",
+				"acorn",
+				"heart",
+			})[num]
+			ret = "bl_final_" .. ret
 		end
 	end
 	return ret
