@@ -34,16 +34,7 @@ function MP:generate_hash()
 	MP.MOD_STRING = mod_string
 	MP.MOD_HASH = hash(mod_string) or "0000"
     if MP.ACTIONS.set_username then
-        function MP.ACTIONS.set_username(username)
-            MP.LOBBY.username = username or "Guest"
-            if MP.LOBBY.connected then
-                Client.send({
-                    action = "username",
-                    username = MP.LOBBY.username .. "~" .. MP.LOBBY.blind_col,
-                    modHash = MP.MOD_STRING,
-                })
-            end
-        end
+        MP.ACTIONS.set_username(MP.LOBBY.username)
     end
 end
 
