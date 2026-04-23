@@ -72,7 +72,7 @@ local skip_blind_ref = G.FUNCS.skip_blind
 G.FUNCS.skip_blind = function(e)
 	skip_blind_ref(e)
 	if MP.LOBBY.code then
-		if not MP.GAME.timer_started then MP.GAME.timer = MP.GAME.timer + MP.LOBBY.config.timer_increment_seconds end
+		-- if not MP.GAME.timer_started then MP.GAME.timer = MP.GAME.timer + MP.LOBBY.config.timer_increment_seconds end
 		MP.ACTIONS.skip(G.GAME.skips)
 
 		--Update the furthest blind
