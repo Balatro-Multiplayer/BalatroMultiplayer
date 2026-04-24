@@ -432,7 +432,6 @@ local function action_lobby_options(options)
 			k == "starting_lives"
 			or k == "pvp_start_round"
 			or k == "timer_base_seconds"
-			or k == "timer_increment_seconds"
 			or k == "showdown_starting_antes"
 			or k == "pvp_countdown_seconds"
 			or k == "timer_forgiveness"

@@ -168,7 +168,6 @@ function MP.reset_lobby_config(persist_ruleset_and_gamemode)
 		starting_lives = 4,
 		pvp_start_round = 2,
 		timer_base_seconds = 240,
-		timer_increment_seconds = 60,
 		pvp_countdown_seconds = 3,
 		showdown_starting_antes = 3,
 		ruleset = persist_ruleset_and_gamemode and MP.LOBBY.config.ruleset or "ruleset_mp_blitz",
