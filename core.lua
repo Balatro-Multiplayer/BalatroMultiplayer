@@ -167,7 +167,7 @@ function MP.reset_lobby_config(persist_ruleset_and_gamemode)
 		the_order = true,
 		starting_lives = 4,
 		pvp_start_round = 2,
-		timer_base_seconds = 150,
+		timer_base_seconds = 240,
 		timer_increment_seconds = 60,
 		pvp_countdown_seconds = 3,
 		showdown_starting_antes = 3,

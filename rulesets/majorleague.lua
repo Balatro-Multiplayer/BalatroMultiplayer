@@ -19,7 +19,7 @@ MP.Ruleset({
 		return false
 	end,
 	force_lobby_options = function(self)
-		MP.LOBBY.config.timer_base_seconds = 180
+		MP.LOBBY.config.timer_base_seconds = 300
 		MP.LOBBY.config.timer_forgiveness = 1
 		MP.LOBBY.config.the_order = false
 		MP.LOBBY.config.preview_disabled = true

@@ -853,6 +853,9 @@ local function action_start_ante_timer(time, from_nemesis)
     if from_nemesis then
         MP.GAME.nemesis_timer_started = true
         SMODS.Gradients.mp_timer_accelerated.mp_gradient_delay = MP.GAME.timer % 1
+        if MP.speedlatro_timer then
+            SMODS.Gradients.mp_timer_accelerated.speedlatro_timer_accelerated = MP.speedlatro_timer.real % 1
+        end
     else
         MP.GAME.timer_started = true
     end

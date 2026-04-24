@@ -22,6 +22,7 @@ function Game:update(dt)
 								{
 									n = G.UIT.O,
 									config = {
+                                        func = "mp_update_speedlatro_timer",
 										object = DynaText({
 											scale = 1.1,
 											string = { { ref_table = MP.speedlatro_timer, ref_value = "display" } },
@@ -77,7 +78,7 @@ function Game:update(dt)
 
 				if (not MP.is_pvp_boss()) or MP.INSANE_INT.greater_than(MP.GAME.enemy.score, self_score) then
 					local mult = 1
-					if MP.GAME.timer_started and not MP.is_pvp_boss() then mult = 2 end
+					if MP.GAME.nemesis_timer_started and not MP.is_pvp_boss() then mult = 2 end
 					MP.speedlatro_timer.real = MP.speedlatro_timer.real - dt * mult
 				end
 			end
@@ -154,4 +155,12 @@ function end_round()
 		end
 	end
 	return end_round_ref()
+end
+
+G.FUNCS.mp_update_speedlatro_timer = function(e)
+    if e.config.object then
+        e.config.object.colours[1] = (MP.GAME.nemesis_timer_started and not MP.is_pvp_boss() and MP.speedlatro_timer.real > 0)
+            and SMODS.Gradients["mp_speedlatro_timer_accelerated"]
+            or G.C.WHITE
+    end
 end

@@ -145,6 +145,22 @@ function MP.UI.start_pvp_countdown(callback)
 	}))
 end
 
+local gradient_with_offset_update = function(self, dt)
+    if #self.colours < 2 then return end
+    local timer = (G.TIMERS.REAL-(self.mp_gradient_delay or 0))%self.cycle
+    local start_index = math.ceil(timer*#self.colours/self.cycle)
+    local end_index = start_index == #self.colours and 1 or start_index+1
+    local start_colour, end_colour = self.colours[start_index], self.colours[end_index]
+    local partial_timer = (timer%(self.cycle/#self.colours))*#self.colours/self.cycle
+    for i = 1, 4 do
+        if self.interpolation == 'linear' then
+            self[i] = start_colour[i] + partial_timer*(end_colour[i]-start_colour[i])
+        elseif self.interpolation == 'trig' then
+            self[i] = start_colour[i] + 0.5*(1-math.cos(partial_timer*math.pi))*(end_colour[i]-start_colour[i])
+        end
+    end
+end
+
 SMODS.Gradient({
 	key = "timer_accelerated",
     cycle = 1,
@@ -155,21 +171,19 @@ SMODS.Gradient({
 		G.C.IMPORTANT,
 		G.C.IMPORTANT,
 	},
-    update = function(self, dt)
-        if #self.colours < 2 then return end
-        local timer = (G.TIMERS.REAL-(self.mp_gradient_delay or 0))%self.cycle
-        local start_index = math.ceil(timer*#self.colours/self.cycle)
-        local end_index = start_index == #self.colours and 1 or start_index+1
-        local start_colour, end_colour = self.colours[start_index], self.colours[end_index]
-        local partial_timer = (timer%(self.cycle/#self.colours))*#self.colours/self.cycle
-        for i = 1, 4 do
-            if self.interpolation == 'linear' then
-                self[i] = start_colour[i] + partial_timer*(end_colour[i]-start_colour[i])
-            elseif self.interpolation == 'trig' then
-                self[i] = start_colour[i] + 0.5*(1-math.cos(partial_timer*math.pi))*(end_colour[i]-start_colour[i])
-            end
-        end
-    end
+    update = gradient_with_offset_update
+})
+SMODS.Gradient({
+	key = "speedlatro_timer_accelerated",
+    cycle = 1,
+	colours = {
+        G.C.WHITE,
+		G.C.WHITE,
+		G.C.WHITE,
+		G.C.WHITE,
+		mix_colours(G.C.IMPORTANT, G.C.WHITE, 0.55),
+	},
+    update = gradient_with_offset_update
 })
 
 function G.FUNCS.set_timer_box(e)
@@ -192,10 +206,16 @@ end
 local gameUpdateRef = Game.update
 ---@diagnostic disable-next-line: duplicate-set-field
 function Game:update(dt)
+    -- os.clock() used specifically to prevent timer stalling when game window is grabbed
+    -- Secret tech, shhh
     local new_time = os.clock()
     local timer_dt = new_time - (MP.TIMER_CLOCK or new_time)
     MP.TIMER_CLOCK = new_time
-    if MP.LOBBY.code and MP.LOBBY.config.timer and not MP.GAME.timer_consumed and MP.GAME.timer and MP.GAME.timer > 0 then
+    if 
+        not MP.is_layer_active("speedlatro_timer") and MP.LOBBY.code
+        and MP.LOBBY.config.timer and not MP.GAME.timer_consumed
+        and MP.GAME.timer and MP.GAME.timer > 0
+    then
         -- Do not tick when no pvp or we're ready
         if not MP.GAME.ready_blind and not MP.is_pvp_boss() then
             -- Do tick when user can interact with a game
