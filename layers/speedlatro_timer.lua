@@ -1,7 +1,11 @@
 -- speedlatro specific timer
 -- i can't be bothered to do run_start hooks and risk that being janky so it'll be initialized in gupdate
 
-MP.Layer("speedlatro_timer", {})
+MP.Layer("speedlatro_timer", {
+    preview_calculate_delay = 5,
+    preview_calculate_cost  = 5,
+    timer_speedup_multiplier = 2,
+})
 
 local base_timer = 147
 
@@ -78,7 +82,9 @@ function Game:update(dt)
 
 				if (not MP.is_pvp_boss()) or MP.INSANE_INT.greater_than(MP.GAME.enemy.score, self_score) then
 					local mult = 1
-					if MP.GAME.nemesis_timer_started and not MP.is_pvp_boss() then mult = 2 end
+					if MP.GAME.nemesis_timer_started and not MP.is_pvp_boss() then
+                        mult = MP.LOBBY.config.timer_speedup_multiplier or MP.Rulesets[MP.LOBBY.config.ruleset].timer_speedup_multiplier or 2
+                    end
 					MP.speedlatro_timer.real = MP.speedlatro_timer.real - dt * mult
 				end
 			end

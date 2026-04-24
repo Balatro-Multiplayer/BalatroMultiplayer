@@ -23,12 +23,11 @@ FN.PRE = {
 
 
 function FN.PRE.start_new_coroutine()
-    local delay, calculate_cost = 0, 5
-	if MP.LOBBY.code and not MP.is_pvp_boss() then
-        delay = 1.5
-        if MP.is_layer_active("speedlatro_timer") then
-            delay = calculate_cost
-        end
+    local timer_delay, timer_cost = 0, 0
+    if MP.LOBBY and MP.LOBBY.code and not MP.is_pvp_boss() then
+        local ruleset = MP.Rulesets[MP.LOBBY.config.ruleset] or {}
+        timer_delay = MP.LOBBY.config.preview_calculate_delay or ruleset.preview_calculate_delay or 1.5
+        timer_cost  = MP.LOBBY.config.preview_calculate_cost or ruleset.preview_calculate_cost or 5
     end
 
     if not FN.PRE.calculate_request then
@@ -41,22 +40,18 @@ function FN.PRE.start_new_coroutine()
             FN.PRE.data = FN.PRE.simulate()
 
             -- Subtract cost from timer
-            if FN.PRE.data and not FN.PRE.data.empty and MP.LOBBY.code and not MP.is_pvp_boss() then
-                if MP.LOBBY.config.timer and (MP.GAME.timer or 0) > 10 then
-                    local decrement = (calculate_cost - delay)
-                    if decrement ~= 0 then                        
-                        MP.GAME.timer = MP.GAME.timer - decrement
-                        local timer_ui = G.HUD:get_UIE_by_ID("timer_UI_count")
-                        if timer_ui then
-                            timer_ui.config.object:juice_up()
-                        end
-                    end
-                end
+            -- Since it's event, we check everything all over again
+            if
+                FN.PRE.data and not FN.PRE.data.empty
+                and MP.LOBBY.code and not MP.is_pvp_boss()
+            then
+                -- Die due to timer consume all your time is lame, let's prevent this
+                MP.UI.consume_timer(timer_cost - timer_delay, nil, math.max(10, timer_cost))
             end
             return true
         end
         FN.PRE.calculate_request = Event({
-            trigger = "after", delay = delay, timer = "REAL",
+            trigger = "after", delay = timer_delay, timer = "REAL",
             blockable = false, blocking = false,
             func = func
         })

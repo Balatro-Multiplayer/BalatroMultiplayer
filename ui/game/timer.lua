@@ -235,7 +235,8 @@ function Game:update(dt)
     local menu_or_paused = G.SETTINGS.paused or G.OVERLAY_MENU
     if not (interactive or menu_or_paused) then return end
 
-    local mult = MP.GAME.nemesis_timer_started and 2 or 1
+    local mult_value = MP.LOBBY.config.timer_speedup_multiplier or MP.Rulesets[MP.LOBBY.config.ruleset].timer_speedup_multiplier or 2
+    local mult = MP.GAME.nemesis_timer_started and mult_value or 1
     MP.GAME.timer = math.max(0, MP.GAME.timer - timer_dt * mult)
 
     if MP.GAME.timer == 0 then
@@ -244,6 +245,23 @@ function Game:update(dt)
             MP.GAME.timers_forgiven = MP.GAME.timers_forgiven + 1
         else
             MP.ACTIONS.fail_timer()
+        end
+    end
+end
+
+function MP.UI.consume_timer(amount, silent, min_timer)
+    if
+        amount > 0
+        and MP.LOBBY.config.timer
+        and MP.GAME.timer
+        and MP.GAME.timer > (min_timer or 0)
+    then
+        MP.GAME.timer = math.max(0, MP.GAME.timer - amount)
+        if not silent then
+            local timer_ui = G.HUD:get_UIE_by_ID("timer_UI_count")
+            if timer_ui then
+                timer_ui.config.object:juice_up()
+            end
         end
     end
 end

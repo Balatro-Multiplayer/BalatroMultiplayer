@@ -329,7 +329,7 @@ function MP.UI.ease_lives(mod)
 			end
 
 			local lives_UI = G.hand_text_area.ante
-			if not lives_UI then return true end
+			if not lives_UI or not lives_UI.config.object then return true end
 
 			mod = mod or 0
 			local text = "+"

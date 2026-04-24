@@ -1,6 +1,9 @@
 MP.Layer("standard", {
 	multiplayer_content = true,
 	standard = true,
+    preview_calculate_delay = 1.5,
+    preview_calculate_cost  = 5,
+    timer_speedup_multiplier = 2,
 	banned_silent = {
 		"j_hanging_chad",
 		"j_ticket",
