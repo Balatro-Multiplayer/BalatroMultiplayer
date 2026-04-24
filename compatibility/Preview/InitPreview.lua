@@ -24,7 +24,12 @@ FN.PRE = {
 
 function FN.PRE.start_new_coroutine()
     local delay, calculate_cost = 0, 5
-	if MP.LOBBY.code and not MP.is_pvp_boss() then delay = 1.5 end
+	if MP.LOBBY.code and not MP.is_pvp_boss() then
+        delay = 1.5
+        if MP.is_layer_active("speedlatro_timer") then
+            delay = calculate_cost
+        end
+    end
 
     if not FN.PRE.calculate_request then
         FN.PRE.lock_updates = true
@@ -38,10 +43,13 @@ function FN.PRE.start_new_coroutine()
             -- Subtract cost from timer
             if FN.PRE.data and not FN.PRE.data.empty and MP.LOBBY.code and not MP.is_pvp_boss() then
                 if MP.LOBBY.config.timer and (MP.GAME.timer or 0) > 10 then
-                    MP.GAME.timer = MP.GAME.timer - (calculate_cost - delay)
-                    local timer_ui = G.HUD:get_UIE_by_ID("timer_UI_count")
-                    if timer_ui then
-                        timer_ui.config.object:juice_up()
+                    local decrement = (calculate_cost - delay)
+                    if decrement ~= 0 then                        
+                        MP.GAME.timer = MP.GAME.timer - decrement
+                        local timer_ui = G.HUD:get_UIE_by_ID("timer_UI_count")
+                        if timer_ui then
+                            timer_ui.config.object:juice_up()
+                        end
                     end
                 end
             end
