@@ -67,7 +67,7 @@ function MP.UI.timer_hud()
                                                 -- All numbers bigger then 10 - display as integer
                                                 -- Also accounting for rounding to prevent 10.0 to be displayed
                                                 if MP.GAME.timer > 9.95 then return string.format("%d", MP.GAME.timer) end
-                                                -- Less than 10 - display decimap part
+                                                -- Less than 10 - display decimal part
                                                 return string.format("%.1f", MP.GAME.timer)
                                             end,
                                         }), ref_value = "timer" } }, -- sorry
@@ -206,37 +206,44 @@ end
 local gameUpdateRef = Game.update
 ---@diagnostic disable-next-line: duplicate-set-field
 function Game:update(dt)
-    -- os.clock() used specifically to prevent timer stalling when game window is grabbed
-    -- Secret tech, shhh
-    local new_time = os.clock()
+    gameUpdateRef(self, dt)
+
+    -- If I let timer tick only when we're in MP context
+    -- then big jump of dt will happend between state changes.
+    -- So we need count time all the time. Sad!
+
+    -- Again, we cannot rely on any variant of dt since game does not
+    -- update at all while window is grabbed,
+    -- and when you release it dt does not reflect time wasted
+
+    -- This thing cost NOTHING im comparision to game drawing and UI updating
+    -- We can afford some inefficiencies.
+    local new_time = love.timer.getTime()
     local timer_dt = new_time - (MP.TIMER_CLOCK or new_time)
     MP.TIMER_CLOCK = new_time
-    if 
-        not MP.is_layer_active("speedlatro_timer") and MP.LOBBY.code
-        and MP.LOBBY.config.timer and not MP.GAME.timer_consumed
-        and MP.GAME.timer and MP.GAME.timer > 0
-    then
-        -- Do not tick when no pvp or we're ready
-        if not MP.GAME.ready_blind and not MP.is_pvp_boss() then
-            -- Do tick when user can interact with a game
-            -- OR
-            -- Do tick when game is paused or any overlay menu opened
-            if not (G.CONTROLLER.locked or (G.GAME.STOP_USE or 0) > 0) or (G.SETTINGS.paused or G.OVERLAY_MENU) then
-                local timer_mult = MP.GAME.nemesis_timer_started and 2 or 1
-                MP.GAME.timer = MP.GAME.timer - timer_dt * timer_mult
-                if MP.GAME.timer <= 0 then
-                    MP.GAME.timer = 0
-                    MP.GAME.timer_consumed = true
-                    if not MP.GAME.ready_blind and not MP.is_pvp_boss() then
-                        if MP.GAME.timers_forgiven < MP.LOBBY.config.timer_forgiveness then
-                            MP.GAME.timers_forgiven = MP.GAME.timers_forgiven + 1
-                        else
-                            MP.ACTIONS.fail_timer()
-                        end
-                    end
-                end
-            end
+
+    -- Bail fast: not an MP PvP-timer context
+    if not MP.LOBBY.code then return end
+    if not MP.LOBBY.config.timer then return end
+    if MP.GAME.timer_consumed then return end
+    if not MP.GAME.timer or MP.GAME.timer <= 0 then return end
+    if MP.is_layer_active("speedlatro_timer") then return end
+    if MP.GAME.ready_blind or MP.is_pvp_boss() then return end
+
+    -- Don't tick during animations, unless the user is paused or has a menu open
+    local interactive = not (G.CONTROLLER.locked or (G.GAME.STOP_USE or 0) > 0)
+    local menu_or_paused = G.SETTINGS.paused or G.OVERLAY_MENU
+    if not (interactive or menu_or_paused) then return end
+
+    local mult = MP.GAME.nemesis_timer_started and 2 or 1
+    MP.GAME.timer = math.max(0, MP.GAME.timer - timer_dt * mult)
+
+    if MP.GAME.timer == 0 then
+        MP.GAME.timer_consumed = true
+        if MP.GAME.timers_forgiven < MP.LOBBY.config.timer_forgiveness then
+            MP.GAME.timers_forgiven = MP.GAME.timers_forgiven + 1
+        else
+            MP.ACTIONS.fail_timer()
         end
     end
-	gameUpdateRef(self, dt)
 end
