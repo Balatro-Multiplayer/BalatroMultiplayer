@@ -52,8 +52,8 @@ function MP.UI.timer_hud()
 						minw = 1.2,
 						colour = G.C.DYN_UI.BOSS_DARK,
 						id = "row_round_text",
-						-- func = "set_timer_box",
-						-- button = "mp_timer_button",
+						func = "set_timer_box",
+						button = "mp_timer_button",
 					},
 					nodes = {
 						{
@@ -145,11 +145,38 @@ function MP.UI.start_pvp_countdown(callback)
 	}))
 end
 
+SMODS.Gradient({
+	key = "timer_accelerated",
+    cycle = 1,
+	colours = {
+		mix_colours(G.C.WHITE, G.C.IMPORTANT, 0.55),
+		G.C.IMPORTANT,
+		G.C.IMPORTANT,
+		G.C.IMPORTANT,
+		G.C.IMPORTANT,
+	},
+    update = function(self, dt)
+        if #self.colours < 2 then return end
+        local timer = (G.TIMERS.REAL-(self.mp_gradient_delay or 0))%self.cycle
+        local start_index = math.ceil(timer*#self.colours/self.cycle)
+        local end_index = start_index == #self.colours and 1 or start_index+1
+        local start_colour, end_colour = self.colours[start_index], self.colours[end_index]
+        local partial_timer = (timer%(self.cycle/#self.colours))*#self.colours/self.cycle
+        for i = 1, 4 do
+            if self.interpolation == 'linear' then
+                self[i] = start_colour[i] + partial_timer*(end_colour[i]-start_colour[i])
+            elseif self.interpolation == 'trig' then
+                self[i] = start_colour[i] + 0.5*(1-math.cos(partial_timer*math.pi))*(end_colour[i]-start_colour[i])
+            end
+        end
+    end
+})
+
 function G.FUNCS.set_timer_box(e)
 	if MP.LOBBY.config.timer then
-		if MP.GAME.timer_started then
+		if MP.GAME.timer_started or MP.GAME.nemesis_timer_started then
 			e.config.colour = G.C.DYN_UI.BOSS_DARK
-			e.children[1].config.object.colours = { G.C.IMPORTANT }
+			e.children[1].config.object.colours = { MP.GAME.timer > 0 and SMODS.Gradients["mp_timer_accelerated"] or G.C.IMPORTANT }
 			return
 		end
 		if not MP.GAME.timer_started and MP.GAME.ready_blind then
@@ -165,14 +192,15 @@ end
 local gameUpdateRef = Game.update
 ---@diagnostic disable-next-line: duplicate-set-field
 function Game:update(dt)
-    if MP.LOBBY.code and MP.GAME and not MP.GAME.timer_consumed and MP.GAME.timer and MP.GAME.timer > 0 then
+    if MP.LOBBY.code and MP.LOBBY.config.timer and not MP.GAME.timer_consumed and MP.GAME.timer and MP.GAME.timer > 0 then
         -- Do not tick when no pvp or we're ready
         if not MP.GAME.ready_blind and not MP.is_pvp_boss() then
             -- Do tick when user can interact with a game
             -- OR
             -- Do tick when game is paused or any overlay menu opened
             if not (G.CONTROLLER.locked or (G.GAME.STOP_USE or 0) > 0) or (G.SETTINGS.paused or G.OVERLAY_MENU) then
-                MP.GAME.timer = MP.GAME.timer - G.real_dt
+                local timer_mult = MP.GAME.nemesis_timer_started and 2 or 1
+                MP.GAME.timer = MP.GAME.timer - G.real_dt * timer_mult
                 if MP.GAME.timer <= 0 then
                     MP.GAME.timer = 0
                     MP.GAME.timer_consumed = true
