@@ -1,5 +1,10 @@
--- The functions responsible for running the simulation at appropriate times;
--- ie. whenever the player modifies card selection or card order.
+-- The functions responsible for running the simulation.
+-- Previously it was doing it after every game state change, which maybe makes sense on SP.
+-- But, since it's Multiplayer-specific version, it shows score only after "Calculate" button press and reset after state change.
+
+function FN.PRE.cleanup()
+    return { score = { min = 0, exact = 0, max = 0 }, dollars = { min = 0, exact = 0, max = 0 }, empty = true }
+end
 
 function FN.PRE.simulate()
 	-- Guard against simulating in redundant places:
@@ -9,7 +14,7 @@ function FN.PRE.simulate()
 	if
 		not (G.STATE == G.STATES.SELECTING_HAND or G.STATE == G.STATES.DRAW_TO_HAND or G.STATE == G.STATES.PLAY_TAROT)
 	then
-		return { score = { min = 0, exact = 0, max = 0 }, dollars = { min = 0, exact = 0, max = 0 } }
+		return FN.PRE.cleanup()
 	end
 
 	if G.SETTINGS.FN.hide_face_down then
@@ -28,55 +33,43 @@ end
 
 -- SIMULATION UPDATE ADVICE:
 
-function FN.PRE.add_update_event(trigger)
-	function sim_func()
-		FN.PRE.data = FN.PRE.simulate()
-		return true
-	end
-	if FN.PRE.enabled() then
-		G.E_MANAGER:add_event(Event({ trigger = trigger, blockable = false, blocking = false, func = sim_func }))
-	end
-end
-
 -- Update simulation after a consumable (eg. Tarot, Planet) is used:
 local orig_use = Card.use_consumeable
 function Card:use_consumeable(area, copier)
 	orig_use(self, area, copier)
-	if not MP.INTEGRATIONS.Preview then return end
-	FN.PRE.add_update_event("immediate")
+	FN.PRE.stop_current_coroutine()
 end
 
 -- Update simulation after card selection changed:
 local orig_hl = CardArea.parse_highlighted
 function CardArea:parse_highlighted()
 	orig_hl(self)
-	if not MP.INTEGRATIONS.Preview then return end
-
-	if not FN.PRE.lock_updates and FN.PRE.show_preview then FN.PRE.show_preview = false end
-	FN.PRE.add_update_event("immediate")
+	FN.PRE.stop_current_coroutine(true)
 end
 
--- Update simulation after joker sold:
+-- Update simulation after card in hand/consumeables/joker slots are removed:
 local orig_card_remove = Card.remove_from_area
 function Card:remove_from_area()
 	orig_card_remove(self)
-	if not MP.INTEGRATIONS.Preview then return end
-
-	if self.config.type == "joker" then FN.PRE.add_update_event("immediate") end
+    if self.area and G.STATE ~= G.STATES.HAND_PLAYED then        
+        if not (self == G.joker or self == G.consumeables or self == G.hand) then return end
+        FN.PRE.stop_current_coroutine()
+    end
 end
 
 -- Update simulation after joker reordering:
 local orig_update = CardArea.update
 function CardArea:update(dt)
 	orig_update(self, dt)
-	if not MP.INTEGRATIONS.Preview then return end
-
 	FN.PRE.update_on_card_order_change(self)
 end
 
 function FN.PRE.update_on_card_order_change(cardarea)
+    if not MP.INTEGRATIONS.Preview then return end
+    if not (cardarea == G.joker or cardarea == G.hand) then return end
 	if
-		#cardarea.cards == 0
+        not cardarea.cards
+		or #cardarea.cards == 0
 		or not (
 			G.STATE == G.STATES.SELECTING_HAND
 			or G.STATE == G.STATES.DRAW_TO_HAND
@@ -116,35 +109,30 @@ function FN.PRE.update_on_card_order_change(cardarea)
 		elseif cardarea.config.type == "hand" then
 			FN.PRE.hand_order = prev_order
 		end
-		if FN.PRE.show_preview and not FN.PRE.lock_updates then FN.PRE.show_preview = false end
-		FN.PRE.add_update_event("immediate")
+		FN.PRE.stop_current_coroutine(true)
 	end
 end
 
 -- SIMULATION RESET ADVICE:
 
-function FN.PRE.add_reset_event(trigger)
-	function reset_func()
-		FN.PRE.data = { score = { min = 0, exact = 0, max = 0 }, dollars = { min = 0, exact = 0, max = 0 } }
-		return true
-	end
-	if FN.PRE.enabled() then G.E_MANAGER:add_event(Event({ trigger = trigger, func = reset_func })) end
-end
-
 local orig_eval = G.FUNCS.evaluate_play
 function G.FUNCS.evaluate_play(e)
 	orig_eval(e)
 
-	if not MP.INTEGRATIONS.Preview then return end
-	FN.PRE.add_reset_event("after")
+    G.E_MANAGER:add_event(Event({
+        blocking = false,
+        func = function()
+            FN.PRE.stop_current_coroutine()
+            return true
+        end
+    }))
 end
 
 local orig_discard = G.FUNCS.discard_cards_from_highlighted
 function G.FUNCS.discard_cards_from_highlighted(e, is_hook_blind)
 	orig_discard(e, is_hook_blind)
 
-	if not MP.INTEGRATIONS.Preview then return end
-	if not is_hook_blind then FN.PRE.add_reset_event("immediate") end
+	if not is_hook_blind then FN.PRE.stop_current_coroutine() end
 end
 
 -- USER INTERFACE ADVICE:
