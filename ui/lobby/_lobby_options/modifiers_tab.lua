@@ -41,7 +41,7 @@ function MP.UI.create_gamemode_modifiers_tab()
 						"k_opts_pvp_timer",
 						0.85,
 						{ "90s", "120s", "150s", "180s", "210s", "240s", "270s", "300s", "330s", "360s" },
-						(MP.LOBBY.config.timer_base_seconds - 60) / 30,
+						MP.UTILS.get_array_index_by_value({ 90, 120, 150, 180, 210, 240, 270, 300, 330, 360 }, MP.LOBBY.config.timer_base_seconds) or 6, -- Default is 240
 						"change_timer_base_seconds"
 					),
 					create_lobby_option_cycle(
