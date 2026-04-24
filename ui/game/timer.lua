@@ -192,6 +192,9 @@ end
 local gameUpdateRef = Game.update
 ---@diagnostic disable-next-line: duplicate-set-field
 function Game:update(dt)
+    local new_time = os.clock()
+    local timer_dt = new_time - (MP.TIMER_CLOCK or new_time)
+    MP.TIMER_CLOCK = new_time
     if MP.LOBBY.code and MP.LOBBY.config.timer and not MP.GAME.timer_consumed and MP.GAME.timer and MP.GAME.timer > 0 then
         -- Do not tick when no pvp or we're ready
         if not MP.GAME.ready_blind and not MP.is_pvp_boss() then
@@ -200,7 +203,7 @@ function Game:update(dt)
             -- Do tick when game is paused or any overlay menu opened
             if not (G.CONTROLLER.locked or (G.GAME.STOP_USE or 0) > 0) or (G.SETTINGS.paused or G.OVERLAY_MENU) then
                 local timer_mult = MP.GAME.nemesis_timer_started and 2 or 1
-                MP.GAME.timer = MP.GAME.timer - G.real_dt * timer_mult
+                MP.GAME.timer = MP.GAME.timer - timer_dt * timer_mult
                 if MP.GAME.timer <= 0 then
                     MP.GAME.timer = 0
                     MP.GAME.timer_consumed = true
