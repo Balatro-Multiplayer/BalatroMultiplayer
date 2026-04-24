@@ -259,11 +259,9 @@ function Controller:key_press_update(key, dt)
 		end
 	end
 
-	if key == "tab" then
-		if not G.OVERLAY_MENU then
-			MP.SHORTCUTS.show()
-			return
-		end
+	if key == "tab" and not G.OVERLAY_MENU then
+		MP.SHORTCUTS.show()
+		if MP.SHORTCUTS.visible then return end
 	end
 	key_press_update_ref(self, key, dt)
 end
