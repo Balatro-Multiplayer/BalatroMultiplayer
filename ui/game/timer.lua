@@ -235,9 +235,10 @@ function Game:update(dt)
     local menu_or_paused = G.SETTINGS.paused or G.OVERLAY_MENU
     if not (interactive or menu_or_paused) then return end
 
-    local mult_value = MP.LOBBY.config.timer_speedup_multiplier or MP.Rulesets[MP.LOBBY.config.ruleset].timer_speedup_multiplier or 2
-    local mult = MP.GAME.nemesis_timer_started and mult_value or 1
-    MP.GAME.timer = math.max(0, MP.GAME.timer - timer_dt * mult)
+    local ruleset = MP.Rulesets[MP.LOBBY.config.ruleset]
+    local speedup = ruleset and ruleset.timer_speedup_multiplier or 2
+    local tick_mult = MP.GAME.nemesis_timer_started and speedup or 1
+    MP.GAME.timer = math.max(0, MP.GAME.timer - timer_dt * tick_mult)
 
     if MP.GAME.timer == 0 then
         MP.GAME.timer_consumed = true
