@@ -848,13 +848,17 @@ local function action_start_ante_timer(time, from_nemesis)
 			}))
 		end
 	end
-	if type(time) == "string" then time = tonumber(time) end
-	if time then MP.GAME.timer = time end
+	-- Under pressure_timer the two players' local timers are intentionally desynced;
+	-- never overwrite ours from the network.
+	if not MP.is_layer_active("pressure_timer") then
+		if type(time) == "string" then time = tonumber(time) end
+		if time then MP.GAME.timer = time end
+	end
     if from_nemesis then
         MP.GAME.nemesis_timer_started = true
         SMODS.Gradients.mp_timer_accelerated.mp_gradient_delay = MP.GAME.timer % 1
         if MP.speedlatro_timer then
-            SMODS.Gradients.mp_timer_accelerated.speedlatro_timer_accelerated = MP.speedlatro_timer.real % 1
+            SMODS.Gradients.mp_speedlatro_timer_accelerated.mp_gradient_delay = MP.speedlatro_timer.real % 1
         end
     else
         MP.GAME.timer_started = true
@@ -862,8 +866,10 @@ local function action_start_ante_timer(time, from_nemesis)
 end
 
 local function action_pause_ante_timer(time, from_nemesis)
-	if type(time) == "string" then time = tonumber(time) end
-	if time then MP.GAME.timer = time end
+	if not MP.is_layer_active("pressure_timer") then
+		if type(time) == "string" then time = tonumber(time) end
+		if time then MP.GAME.timer = time end
+	end
     if from_nemesis then
         MP.GAME.nemesis_timer_started = false
     else

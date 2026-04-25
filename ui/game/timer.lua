@@ -1,8 +1,9 @@
 -- ease_round override moved to game/round.lua
 
 function G.FUNCS.mp_timer_button(e)
-	-- pressure_timer auto-ticks; manual button is meaningless under it.
-	if MP.is_layer_active("pressure_timer") then return end
+	-- Under pressure_timer the local timer auto-ticks regardless of timer_started,
+	-- but the button still needs to fire — pressing it broadcasts startAnteTimer,
+	-- which is what flips the opponent's nemesis_timer_started and triggers 2x.
 	if MP.LOBBY.config.timer then
 		if MP.GAME.ready_blind then
 			if MP.GAME.timer <= 0 then
