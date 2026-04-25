@@ -236,8 +236,6 @@ function Game:update_hand_played(dt)
 							offset = { x = 0, y = -1.5 },
 							major = G.play,
 						})
-						MP.GAME.maintain_pvp_end_stop_use = true
-						stop_use()
 					end
 					if G.hand.cards[1] and G.STATE == G.STATES.HAND_PLAYED then
 						eval_hand_and_jokers()
@@ -259,16 +257,10 @@ function Game:update_hand_played(dt)
 		}))
 	end
 
-	if not MP.GAME.end_pvp and MP.GAME.maintain_pvp_end_stop_use and not (G.GAME.STOP_USE and G.GAME.STOP_USE > 0) then
-		stop_use()
-	end
-
 	if MP.GAME.end_pvp and MP.is_pvp_boss() and not (G.GAME.STOP_USE and G.GAME.STOP_USE > 0) then
-		stop_use()
 		G.STATE_COMPLETE = false
 		G.STATE = G.STATES.NEW_ROUND
 		MP.GAME.end_pvp = false
-		MP.GAME.maintain_pvp_end_stop_use = nil
 	end
 end
 
@@ -338,14 +330,12 @@ function Game:update_selecting_hand(dt)
 		if not MP.is_pvp_boss() then
 			G.STATE_COMPLETE = false
 			G.STATE = G.STATES.NEW_ROUND
-			stop_use()
 		else
 			if not MP.GHOST.is_active() then
 				MP.ACTIONS.play_hand(G.GAME.chips, 0)
 			end
 			G.STATE_COMPLETE = false
 			G.STATE = G.STATES.HAND_PLAYED
-			stop_use()
 		end
 		return
 	end
