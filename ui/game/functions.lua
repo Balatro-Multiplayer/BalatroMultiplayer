@@ -319,9 +319,10 @@ function G.FUNCS.overlay_endgame_menu()
 	}))
 end
 
-function MP.UI.ease_lives(mod)
+function MP.UI.ease_lives(mod, instant)
 	G.E_MANAGER:add_event(Event({
 		trigger = "immediate",
+        blockable = not instant,
 		func = function()
 			if not G.hand_text_area then return end
 

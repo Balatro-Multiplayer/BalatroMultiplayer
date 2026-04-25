@@ -360,7 +360,7 @@ local function action_player_info(lives)
 				MP.GAME.comeback_bonus = MP.GAME.comeback_bonus + 1
 			end
 		end
-		MP.UI.ease_lives(lives - MP.GAME.lives)
+		MP.UI.ease_lives(lives - MP.GAME.lives, true)
 		if MP.LOBBY.config.no_gold_on_round_loss and (G.GAME.blind and G.GAME.blind.dollars) then
 			G.GAME.blind.dollars = 0
 		end
