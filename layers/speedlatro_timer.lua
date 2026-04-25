@@ -3,7 +3,7 @@
 
 MP.Layer("speedlatro_timer", {
     preview_calculate_delay = 5,
-    preview_calculate_cost  = 5,
+    preview_calculate_cost  = 0,
     timer_speedup_multiplier = 2,
 })
 
