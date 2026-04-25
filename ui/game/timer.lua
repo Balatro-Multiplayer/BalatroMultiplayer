@@ -234,11 +234,13 @@ function Game:update(dt)
 
     -- Tick gating differs by layer:
     --   pressure_timer ON  -> tick during regular play (not ready_blind, not pvp boss)
-    --   pressure_timer OFF -> vanilla semantics: tick only when player has started the timer
+    --   pressure_timer OFF -> tick whenever someone pressed a timer button.
+    --     timer_started = YOU pressed it; nemesis_timer_started = OPPONENT pressed it
+    --     (i.e. they're timering you). Either way your local timer should tick.
     if MP.is_layer_active("pressure_timer") then
         if MP.GAME.ready_blind or MP.is_pvp_boss() then return end
     else
-        if not MP.GAME.timer_started then return end
+        if not (MP.GAME.timer_started or MP.GAME.nemesis_timer_started) then return end
     end
 
     -- Don't tick during animations, unless the user is paused or has a menu open
