@@ -116,7 +116,7 @@ Solo endurance — 1 life, no PvP blinds at all (all vanilla). Bans adversarial 
 
 `MP.resolve_layers(init)` runs **before** SMODS construction (because SMODS validates `required_params` in `__call`, not `inject()`). Left-to-right:
 - **Array fields** (`banned_*`, `reworked_*`): concatenated (union of all layers + ruleset additions)
-- **Scalar fields**: first layer wins; ruleset-level always overrides
+- **Scalar fields**: last layer wins; ruleset-level always overrides
 - Missing `banned_*`/`reworked_*` arrays default to `{}`
 
 ### Runtime query: `MP.is_layer_active(name)`

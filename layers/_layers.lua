@@ -21,32 +21,38 @@ MP._LAYER_ARRAY_FIELDS = {
 	"reworked_blinds",
 }
 
--- Resolve layers on the init table before SMODS construction validates required_params
+-- Resolve layers on the init table before SMODS construction validates required_params.
+-- Scalars: last layer wins, but the ruleset's own value always beats any layer.
+-- Arrays: concatenated across all layers + ruleset.
 function MP.resolve_layers(init)
 	if not init.layers then return init end
+	local ruleset_owned = {}
+	for k in pairs(init) do
+		ruleset_owned[k] = true
+	end
 	for _, layer_name in ipairs(init.layers) do
 		local layer = MP.Layers[layer_name]
 		if not layer then error("Unknown layer: " .. tostring(layer_name)) end
 		for k, v in pairs(layer) do
-			if init[k] == nil then
-				if type(v) == "table" then
+			if type(v) == "table" then
+				if init[k] == nil then
 					local copy = {}
 					for i, item in ipairs(v) do
 						copy[i] = item
 					end
 					init[k] = copy
-				else
-					init[k] = v
+				elseif type(init[k]) == "table" then
+					local merged = {}
+					for _, item in ipairs(v) do
+						merged[#merged + 1] = item
+					end
+					for _, item in ipairs(init[k]) do
+						merged[#merged + 1] = item
+					end
+					init[k] = merged
 				end
-			elseif type(v) == "table" and type(init[k]) == "table" then
-				local merged = {}
-				for _, item in ipairs(v) do
-					merged[#merged + 1] = item
-				end
-				for _, item in ipairs(init[k]) do
-					merged[#merged + 1] = item
-				end
-				init[k] = merged
+			elseif not ruleset_owned[k] then
+				init[k] = v
 			end
 		end
 	end
