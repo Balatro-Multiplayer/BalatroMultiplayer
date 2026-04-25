@@ -9,6 +9,11 @@ G.FUNCS.change_timer_base_seconds = function(args)
 	send_lobby_options()
 end
 
+G.FUNCS.change_timer_increment_seconds = function(args)
+	MP.LOBBY.config.timer_increment_seconds = tonumber(args.to_val:sub(1, -2))
+	send_lobby_options()
+end
+
 G.FUNCS.change_showdown_starting_antes = function(args)
 	MP.LOBBY.config.showdown_starting_antes = args.to_val
 	send_lobby_options()
@@ -40,9 +45,20 @@ function MP.UI.create_gamemode_modifiers_tab()
 						"pvp_timer_seconds_option",
 						"k_opts_pvp_timer",
 						0.85,
-						{ "90s", "120s", "150s", "180s", "210s", "240s", "270s", "300s", "330s", "360s" },
-						MP.UTILS.get_array_index_by_value({ 90, 120, 150, 180, 210, 240, 270, 300, 330, 360 }, MP.LOBBY.config.timer_base_seconds) or 6, -- Default is 240
+						{ "30s", "60s", "90s", "120s", "150s", "180s", "210s", "240s" },
+						MP.LOBBY.config.timer_base_seconds / 30,
 						"change_timer_base_seconds"
+					),
+					create_lobby_option_cycle(
+						"pvp_timer_increment_seconds_option",
+						"k_opts_pvp_timer_increment",
+						0.85,
+						{ "0s", "30s", "60s", "90s", "120s", "150s", "180s" },
+						MP.UTILS.get_array_index_by_value(
+							{ 0, 30, 60, 90, 120, 150, 180 },
+							MP.LOBBY.config.timer_increment_seconds
+						),
+						"change_timer_increment_seconds"
 					),
 					create_lobby_option_cycle(
 						"pvp_round_start_option",

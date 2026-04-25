@@ -1,6 +1,8 @@
 -- ease_round override moved to game/round.lua
 
 function G.FUNCS.mp_timer_button(e)
+	-- pressure_timer auto-ticks; manual button is meaningless under it.
+	if MP.is_layer_active("pressure_timer") then return end
 	if MP.LOBBY.config.timer then
 		if MP.GAME.ready_blind then
 			if MP.GAME.timer <= 0 then
@@ -228,7 +230,15 @@ function Game:update(dt)
     if MP.GAME.timer_consumed then return end
     if not MP.GAME.timer or MP.GAME.timer <= 0 then return end
     if MP.is_layer_active("speedlatro_timer") then return end
-    if MP.GAME.ready_blind or MP.is_pvp_boss() then return end
+
+    -- Tick gating differs by layer:
+    --   pressure_timer ON  -> tick during regular play (not ready_blind, not pvp boss)
+    --   pressure_timer OFF -> vanilla semantics: tick only when player has started the timer
+    if MP.is_layer_active("pressure_timer") then
+        if MP.GAME.ready_blind or MP.is_pvp_boss() then return end
+    else
+        if not MP.GAME.timer_started then return end
+    end
 
     -- Don't tick during animations, unless the user is paused or has a menu open
     local interactive = not (G.CONTROLLER.locked or (G.GAME.STOP_USE or 0) > 0)
@@ -236,7 +246,7 @@ function Game:update(dt)
     if not (interactive or menu_or_paused) then return end
 
     local ruleset = MP.Rulesets[MP.LOBBY.config.ruleset]
-    local speedup = ruleset and ruleset.timer_speedup_multiplier or 2
+    local speedup = (ruleset and ruleset.timer_speedup_multiplier) or 1
     local tick_mult = MP.GAME.nemesis_timer_started and speedup or 1
     MP.GAME.timer = math.max(0, MP.GAME.timer - timer_dt * tick_mult)
 

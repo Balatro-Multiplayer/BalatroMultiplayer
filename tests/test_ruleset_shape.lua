@@ -43,6 +43,7 @@ SMODS = {
 G = {
 	P_CENTER_POOLS = { Ruleset = {} },
 	localization = { descriptions = { Ruleset = {} } },
+	FUNCS = {},
 }
 
 MP = {

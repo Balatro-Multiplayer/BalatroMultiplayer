@@ -23,11 +23,13 @@ FN.PRE = {
 
 
 function FN.PRE.start_new_coroutine()
-    local timer_delay, timer_cost = 0, 0
+    -- Defaults are vanilla: free preview, slow (5s) delay.
+    -- Layers like pressure_timer set both via ruleset scalars.
+    local timer_delay, timer_cost = 5, 0
     if MP.LOBBY and MP.LOBBY.code and not MP.is_pvp_boss() then
         local ruleset = MP.Rulesets[MP.LOBBY.config.ruleset] or {}
-        timer_delay = MP.LOBBY.config.preview_calculate_delay or ruleset.preview_calculate_delay or 1.5
-        timer_cost  = MP.LOBBY.config.preview_calculate_cost or ruleset.preview_calculate_cost or 5
+        timer_delay = MP.LOBBY.config.preview_calculate_delay or ruleset.preview_calculate_delay or timer_delay
+        timer_cost  = MP.LOBBY.config.preview_calculate_cost or ruleset.preview_calculate_cost or timer_cost
     end
 
     if not FN.PRE.calculate_request then
@@ -39,14 +41,14 @@ function FN.PRE.start_new_coroutine()
             FN.PRE.show_preview = true
             FN.PRE.data = FN.PRE.simulate()
 
-            -- Subtract cost from timer
-            -- Since it's event, we check everything all over again
+            -- Subtract cost from timer (only if there's a cost — vanilla preview is free).
+            -- Min-clamp prevents an over-zealous calc from killing the player outright.
             if
-                FN.PRE.data and not FN.PRE.data.empty
+                timer_cost > 0
+                and FN.PRE.data and not FN.PRE.data.empty
                 and MP.LOBBY.code and not MP.is_pvp_boss()
             then
-                -- Die due to timer consume all your time is lame, let's prevent this
-                MP.UI.consume_timer(timer_cost - timer_delay, nil, math.max(10, timer_cost))
+                MP.UI.consume_timer(timer_cost, nil, math.max(10, timer_cost))
             end
             return true
         end

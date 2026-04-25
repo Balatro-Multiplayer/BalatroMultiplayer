@@ -257,7 +257,7 @@ local function action_start_blind()
 	MP.GAME.timer_started = false
 	MP.GAME.nemesis_timer_started = false
     MP.GAME.timer_consumed = false
-	MP.GAME.timer = MP.LOBBY.config.timer_base_seconds
+	MP.GAME.timer = MP.UTILS.timer_base()
 	MP.UI.start_pvp_countdown(begin_pvp_blind)
 end
 
@@ -347,7 +347,7 @@ end
 
 local function action_end_pvp()
 	MP.GAME.end_pvp = true
-	MP.GAME.timer = MP.LOBBY.config.timer_base_seconds
+	MP.GAME.timer = MP.UTILS.timer_base()
     MP.GAME.timer_consumed = false
 	MP.GAME.timer_started = false
 	MP.GAME.nemesis_timer_started = false
@@ -432,6 +432,7 @@ local function action_lobby_options(options)
 			k == "starting_lives"
 			or k == "pvp_start_round"
 			or k == "timer_base_seconds"
+			or k == "timer_increment_seconds"
 			or k == "showdown_starting_antes"
 			or k == "pvp_countdown_seconds"
 			or k == "timer_forgiveness"
@@ -847,8 +848,8 @@ local function action_start_ante_timer(time, from_nemesis)
 			}))
 		end
 	end
-	-- if type(time) == "string" then time = tonumber(time) end
-	-- MP.GAME.timer = time
+	if type(time) == "string" then time = tonumber(time) end
+	if time then MP.GAME.timer = time end
     if from_nemesis then
         MP.GAME.nemesis_timer_started = true
         SMODS.Gradients.mp_timer_accelerated.mp_gradient_delay = MP.GAME.timer % 1
@@ -858,12 +859,11 @@ local function action_start_ante_timer(time, from_nemesis)
     else
         MP.GAME.timer_started = true
     end
-	-- if not MP.is_layer_active("speedlatro_timer") then G.E_MANAGER:add_event(MP.timer_event) end
 end
 
 local function action_pause_ante_timer(time, from_nemesis)
-	-- if type(time) == "string" then time = tonumber(time) end
-	-- MP.GAME.timer = time
+	if type(time) == "string" then time = tonumber(time) end
+	if time then MP.GAME.timer = time end
     if from_nemesis then
         MP.GAME.nemesis_timer_started = false
     else

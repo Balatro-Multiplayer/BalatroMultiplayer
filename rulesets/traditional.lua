@@ -1,6 +1,6 @@
 MP.Ruleset({
 	key = "traditional",
-	layers = { "standard" },
+	layers = { "standard", "pressure_timer" },
 	banned_jokers = {
 		"j_mp_speedrun",
 		"j_mp_conjoined_joker",

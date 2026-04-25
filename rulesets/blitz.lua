@@ -1,4 +1,4 @@
 MP.Ruleset({
 	key = "blitz",
-	layers = { "standard" },
+	layers = { "standard", "pressure_timer" },
 }):inject()
