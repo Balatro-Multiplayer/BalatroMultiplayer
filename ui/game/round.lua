@@ -32,7 +32,10 @@ end
 
 local ease_round_ref = ease_round
 function ease_round(mod)
-	if MP.is_mp_or_ghost() and not MP.LOBBY.config.disable_live_and_timer_hud and MP.LOBBY.config.timer then return end
+	if MP.is_mp_or_ghost() and not MP.LOBBY.config.disable_live_and_timer_hud and MP.LOBBY.config.timer then
+        G.GAME.round = G.GAME.round + mod
+        return
+    end
 	ease_round_ref(mod)
 end
 
