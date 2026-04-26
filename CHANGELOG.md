@@ -19,6 +19,7 @@
 #### Economy & Enhancements
 
 - **Gold Card** (Enhancement) — Payout increased from $3 to $4.
+- **Comeback Gold** — Now awarded on any life loss again, not just PvP boss losses. Payout amounts ($4, or $2 on higher stakes) are unchanged.
 
 ### Quality of Life
 
