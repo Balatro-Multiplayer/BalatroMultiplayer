@@ -16,41 +16,6 @@ function Game:update_draw_to_hand(dt)
 				G.GAME.blind.pvp = false
 			end
 			if MP.is_pvp_boss() then
-				G.E_MANAGER:add_event(Event({
-					trigger = "after",
-					delay = 1,
-					blockable = false,
-					func = function()
-						G.HUD_blind:get_UIE_by_ID("HUD_blind_name").config.object:pop_out(0)
-						MP.UI.update_blind_HUD()
-						G.E_MANAGER:add_event(Event({
-							trigger = "after",
-							delay = 0.45,
-							blockable = false,
-							func = function()
-								-- Ghost uses static { string = ... } (name is fixed for the run);
-								-- live MP uses { ref_table, ref_value } so the HUD reacts to name changes.
-								local blind_name_string
-								if MP.GHOST.is_active() then
-									blind_name_string = MP.GHOST.get_blind_name_ui()
-								else
-									blind_name_string = {
-										{
-											ref_table = MP.LOBBY.is_host and MP.LOBBY.guest or MP.LOBBY.host,
-											ref_value = "username",
-										},
-									}
-								end
-								G.HUD_blind:get_UIE_by_ID("HUD_blind_name").config.object.config.string = blind_name_string
-								G.HUD_blind:get_UIE_by_ID("HUD_blind_name").config.object:update_text()
-								G.HUD_blind:get_UIE_by_ID("HUD_blind_name").config.object:pop_in(0)
-								return true
-							end,
-						}))
-						return true
-					end,
-				}))
-
 				MP.GAME.pincher_unlock = true
 				G.after_pvp = true -- i can't find a reasonable way to detect end of pvp (for pizza) so i'm doing something strange instead
 

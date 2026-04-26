@@ -1,31 +1,67 @@
-function MP.UI.update_blind_HUD()
-	if MP.is_mp_or_ghost() then
-		G.HUD_blind.alignment.offset.y = -10
-		G.E_MANAGER:add_event(Event({
-			trigger = "after",
-			delay = 0.3,
-			blockable = false,
-			func = function()
-				G.HUD_blind:get_UIE_by_ID("HUD_blind_count").config.ref_table = MP.GAME.enemy
-				G.HUD_blind:get_UIE_by_ID("HUD_blind_count").config.ref_value = "score_text"
-				G.HUD_blind:get_UIE_by_ID("HUD_blind_count").config.func = "multiplayer_blind_chip_UI_scale"
-				G.HUD_blind:get_UIE_by_ID("HUD_blind").children[2].children[2].children[2].children[1].children[1].config.text =
-					localize("k_enemy_score")
-				G.HUD_blind:get_UIE_by_ID("HUD_blind").children[2].children[2].children[2].children[3].children[1].config.text =
-					localize("k_enemy_hands")
-				G.HUD_blind:get_UIE_by_ID("dollars_to_be_earned").config.object.config.string =
-					{ { ref_table = MP.GAME.enemy, ref_value = "hands" } }
-				G.HUD_blind:get_UIE_by_ID("dollars_to_be_earned").config.object:update_text()
-				G.HUD_blind.alignment.offset.y = 0
-				if G.GAME.blind.config.blind.key == "bl_mp_nemesis" then -- this was just the first place i thought of to implement this sprite swapping, change if inappropriate
-					G.GAME.blind.children.animatedSprite.atlas = G.ANIMATION_ATLAS["mp_player_blind_col"]
-					local nemesis_blind_col = MP.UTILS.get_nemesis_key()
-					G.GAME.blind.children.animatedSprite:set_sprite_pos(G.P_BLINDS[nemesis_blind_col].pos)
-				end
-				return true
-			end,
-		}))
-	end
+function MP.UI.update_blind_HUD(blind, reset, silent)
+    if MP.is_mp_or_ghost() then
+        -- Prepare blind name
+        local blind_name_string
+        if MP.GHOST.is_active() then
+            blind_name_string = MP.GHOST.get_blind_name_ui()
+        else
+            blind_name_string = {
+                {
+                    ref_table = MP.LOBBY.is_host and MP.LOBBY.guest or MP.LOBBY.host,
+                    ref_value = "username",
+                },
+            }
+        end
+        -- Setup blind name display
+        G.HUD_blind:get_UIE_by_ID("HUD_blind_name").config.object.config.string = blind_name_string
+        G.HUD_blind:get_UIE_by_ID("HUD_blind_name").config.object:update_text()
+        G.HUD_blind:get_UIE_by_ID("HUD_blind_name").states.visible = false
+        -- Setup enemy score text
+        G.HUD_blind:get_UIE_by_ID("HUD_blind_count").config.ref_table = MP.GAME.enemy
+        G.HUD_blind:get_UIE_by_ID("HUD_blind_count").config.ref_value = "score_text"
+        G.HUD_blind:get_UIE_by_ID("HUD_blind_count").config.func = "multiplayer_blind_chip_UI_scale"
+        -- Setup labels
+        -- Casual balala UI experience right here
+        G.HUD_blind:get_UIE_by_ID("HUD_blind").children[2].children[2].children[2].children[1].children[1].config.text =
+            localize("k_enemy_score")
+        G.HUD_blind:get_UIE_by_ID("HUD_blind").children[2].children[2].children[2].children[3].children[1].config.text =
+            localize("k_enemy_hands")
+        -- Setup enemy hands
+        G.HUD_blind:get_UIE_by_ID("dollars_to_be_earned").parent.parent.states.visible = false
+        G.HUD_blind:get_UIE_by_ID("dollars_to_be_earned").config.object.config.string =
+            { { ref_table = MP.GAME.enemy, ref_value = "hands" } }
+        G.HUD_blind:get_UIE_by_ID("dollars_to_be_earned").config.object:update_text()
+
+        G.HUD_blind.alignment.offset.y = 0
+        G.E_MANAGER:add_event(Event({
+            trigger = 'after',
+            delay = 0.15,
+            blockable = false,
+            func = (function()
+                local self = G.GAME.blind
+
+                -- Setup blind atlas and pos
+                self.children.animatedSprite.atlas = G.ANIMATION_ATLAS["mp_player_blind_col"]
+                local nemesis_blind_col = MP.UTILS.get_nemesis_key()
+                self.children.animatedSprite:set_sprite_pos(G.P_BLINDS[nemesis_blind_col].pos)
+
+                G.HUD_blind:get_UIE_by_ID("HUD_blind_name").states.visible = true
+                G.HUD_blind:get_UIE_by_ID("dollars_to_be_earned").parent.parent.states.visible = true
+                G.HUD_blind:get_UIE_by_ID("dollars_to_be_earned").config.object:pop_in(0)
+                G.HUD_blind:get_UIE_by_ID("HUD_blind_name").config.object:pop_in(0)
+                G.HUD_blind:get_UIE_by_ID("HUD_blind_count"):juice_up()
+                self.dissolve = 0
+                self.blind_set = true
+                G.ROOM.jiggle = G.ROOM.jiggle + 3
+                if not reset and not silent then
+                    self:juice_up()
+                    if blind then play_sound('chips1', math.random()*0.1 + 0.55, 0.42);play_sound('gold_seal', math.random()*0.1 + 1.85, 0.26)--play_sound('cancel')
+                    end
+                end
+                return true
+            end)
+        }))
+    end
 end
 
 function MP.UI.reset_blind_HUD()

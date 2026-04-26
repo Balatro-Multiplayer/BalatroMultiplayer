@@ -54,3 +54,18 @@ payload = ''',
 }} or nil'''
 match_indent = true
 times = 1
+
+# Instant PvP blind change
+[[patches]]
+[patches.pattern]
+target = "blind.lua"
+pattern = '''G.HUD_blind:get_UIE_by_ID("HUD_blind_name").states.visible = false'''
+position = 'before'
+payload = '''
+if MP.is_mp_or_ghost() and MP.is_pvp_boss() then
+    MP.UI.update_blind_HUD(blind, reset, silent)
+    return true
+end
+'''
+match_indent = true
+times = 1
