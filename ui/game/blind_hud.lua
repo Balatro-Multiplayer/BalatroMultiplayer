@@ -40,10 +40,12 @@ function MP.UI.update_blind_HUD(blind, reset, silent)
             func = (function()
                 local self = G.GAME.blind
 
-                -- Setup blind atlas and pos
-                self.children.animatedSprite.atlas = G.ANIMATION_ATLAS["mp_player_blind_col"]
-                local nemesis_blind_col = MP.UTILS.get_nemesis_key()
-                self.children.animatedSprite:set_sprite_pos(G.P_BLINDS[nemesis_blind_col].pos)
+                if self.config.blind.key == "bl_mp_nemesis" then
+                    -- Setup blind atlas and pos
+                    self.children.animatedSprite.atlas = G.ANIMATION_ATLAS["mp_player_blind_col"]
+                    local nemesis_blind_col = MP.UTILS.get_nemesis_key()
+                    self.children.animatedSprite:set_sprite_pos(G.P_BLINDS[nemesis_blind_col].pos)
+                end
 
                 G.HUD_blind:get_UIE_by_ID("HUD_blind_name").states.visible = true
                 G.HUD_blind:get_UIE_by_ID("dollars_to_be_earned").parent.parent.states.visible = true

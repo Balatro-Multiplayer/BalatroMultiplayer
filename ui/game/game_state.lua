@@ -10,11 +10,6 @@ function Game:update_draw_to_hand(dt)
 			and G.GAME.current_round.discards_used == 0
 			and G.GAME.facing_blind
 		then
-			if G.GAME.round_resets.pvp_blind_choices[G.GAME.blind_on_deck] then
-				G.GAME.blind.pvp = true
-			else
-				G.GAME.blind.pvp = false
-			end
 			if MP.is_pvp_boss() then
 				MP.GAME.pincher_unlock = true
 				G.after_pvp = true -- i can't find a reasonable way to detect end of pvp (for pizza) so i'm doing something strange instead
@@ -61,6 +56,15 @@ function Game:update_draw_to_hand(dt)
 		end
 	end
 	update_draw_to_hand_ref(self, dt)
+end
+
+-- Set blind PvP state appropriately (moved from previous hook to be earlier)
+local blind_set_blindref = Blind.set_blind
+function Blind:set_blind(blind, reset, silent)
+	blind_set_blindref(self, blind, reset, silent)
+	if G.GAME.round_resets and G.GAME.round_resets.pvp_blind_choices then 
+		G.GAME.blind.pvp = G.GAME.round_resets.pvp_blind_choices[G.GAME.blind_on_deck]
+	end
 end
 
 local function eval_hand_and_jokers()
