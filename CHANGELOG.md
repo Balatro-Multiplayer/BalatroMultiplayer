@@ -20,9 +20,12 @@
 
 - **Gold Card** (Enhancement) — Payout increased from $3 to $4.
 
-#### Balanced Sticker
+### Quality of Life
 
-The Balanced sticker now shows a tooltip explaining what was changed.
+- **Balanced Sticker** — Now shows a tooltip explaining what was changed on the card it's attached to.
+- **Hotkeys — Menu Shortcuts** — Hold Tab in the menu to see context-sensitive shortcuts. Main menu: **C** creates a lobby, **V** joins from clipboard. In a lobby: **C** copies the code, **L** leaves, **D** picks deck. Disconnected: **R** reconnects.
+- **Timer and score preview rework** - TODO
+- **Match Replays (Practice Mode)** — Practice against a ghost opponent replayed from a past match. Drop a Lovely log (`.log`) or exported `.json` into the `replays/` folder and it shows up in the replay picker. Accessed via Practice → Ruleset → Replay Picker. Flip perspective to play as either side.
 
 ### Legacy Ranked
 
