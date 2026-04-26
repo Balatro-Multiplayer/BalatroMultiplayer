@@ -197,6 +197,7 @@ function MP.UI.enemy_location_definition()
 end
 
 function MP.UI.show_enemy_location()
+    if not G.HUD then return end
 	local row_dollars_chips = G.HUD:get_UIE_by_ID("row_dollars_chips")
 	if row_dollars_chips then
 		row_dollars_chips.children[1]:remove()
@@ -205,6 +206,7 @@ function MP.UI.show_enemy_location()
 	end
 end
 function MP.UI.hide_enemy_location()
+    if not G.HUD then return end
 	local row_dollars_chips = G.HUD:get_UIE_by_ID("row_dollars_chips")
 	if row_dollars_chips then
 		row_dollars_chips.children[1]:remove()
@@ -214,6 +216,7 @@ function MP.UI.hide_enemy_location()
 end
 
 function MP.UI.update_enemy_location_render()
+    if not G.HUD then return end
 	local renderer = G.HUD:get_UIE_by_ID("mp_enemy_location_render")
 	if renderer then
 		local blind_object_render = MP.UI.enemy_location_blind_render()

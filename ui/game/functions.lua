@@ -16,6 +16,8 @@ function G.FUNCS.mp_toggle_ready(e)
 	MP.GAME.ready_blind = not MP.GAME.ready_blind
 	MP.GAME.ready_blind_text = MP.GAME.ready_blind and localize("b_unready") or localize("b_ready")
 
+    MP.GAME.pvp_reached = true
+
 	if MP.GAME.ready_blind then
 		MP.ACTIONS.set_location("loc_ready")
 		MP.ACTIONS.ready_blind(e)
@@ -72,7 +74,12 @@ local skip_blind_ref = G.FUNCS.skip_blind
 G.FUNCS.skip_blind = function(e)
 	skip_blind_ref(e)
 	if MP.LOBBY.code then
-		if not MP.GAME.timer_started then MP.GAME.timer = MP.GAME.timer + MP.LOBBY.config.timer_increment_seconds end
+		-- pressure_timer applies pressure throughout the round, so skipping must not buy time.
+		if not MP.is_layer_active("pressure_timer")
+			and not MP.GAME.timer_started
+			and (MP.LOBBY.config.timer_increment_seconds or 0) > 0 then
+			MP.GAME.timer = MP.GAME.timer + MP.LOBBY.config.timer_increment_seconds
+		end
 		MP.ACTIONS.skip(G.GAME.skips)
 
 		--Update the furthest blind
@@ -331,7 +338,7 @@ function MP.UI.ease_lives(mod, instant)
 			end
 
 			local lives_UI = G.hand_text_area.ante
-			if not lives_UI then return true end
+			if not lives_UI or not lives_UI.config.object then return true end
 
 			mod = mod or 0
 			local text = "+"

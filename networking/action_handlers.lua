@@ -254,8 +254,11 @@ end
 
 local function action_start_blind()
 	MP.GAME.ready_blind = false
+    MP.GAME.pvp_reached = false
 	MP.GAME.timer_started = false
-	MP.GAME.timer = MP.LOBBY.config.timer_base_seconds
+	MP.GAME.nemesis_timer_started = false
+    MP.GAME.timer_consumed = false
+	MP.GAME.timer = MP.UTILS.timer_base()
 	MP.UI.start_pvp_countdown(begin_pvp_blind)
 end
 
@@ -345,10 +348,12 @@ end
 
 local function action_end_pvp()
 	MP.GAME.end_pvp = true
-	MP.GAME.timer = MP.LOBBY.config.timer_base_seconds
+	MP.GAME.timer = MP.UTILS.timer_base()
+    MP.GAME.timer_consumed = false
 	MP.GAME.timer_started = false
+	MP.GAME.nemesis_timer_started = false
 	MP.GAME.ready_blind = false
-
+    MP.GAME.pvp_reached = false
 end
 
 ---@param lives number
@@ -823,7 +828,7 @@ local function action_receive_nemesis_deck(deck_str)
 	G.FUNCS.load_nemesis_deck()
 end
 
-local function action_start_ante_timer(time)
+local function action_start_ante_timer(time, from_nemesis)
 	local option = SMODS.Mods["Multiplayer"].config.timersfx or 1
 	local timersfx = (option == 1) or (option == 2 and G.timer_ante ~= G.GAME.round_resets.ante)
 	G.timer_ante = G.GAME.round_resets.ante
@@ -844,16 +849,29 @@ local function action_start_ante_timer(time)
 			}))
 		end
 	end
-	if type(time) == "string" then time = tonumber(time) end
-	MP.GAME.timer = time
-	MP.GAME.timer_started = true
-	if not MP.is_layer_active("speedlatro_timer") then G.E_MANAGER:add_event(MP.timer_event) end
+	-- Under pressure_timer the two players' local timers are intentionally desynced;
+	-- never overwrite ours from the network.
+	if not MP.is_layer_active("pressure_timer") then
+		if type(time) == "string" then time = tonumber(time) end
+		if time then MP.GAME.timer = time end
+	end
+    if from_nemesis then
+        MP.GAME.nemesis_timer_started = true
+    else
+        MP.GAME.timer_started = true
+    end
 end
 
-local function action_pause_ante_timer(time)
-	if type(time) == "string" then time = tonumber(time) end
-	MP.GAME.timer = time
-	MP.GAME.timer_started = false
+local function action_pause_ante_timer(time, from_nemesis)
+	if not MP.is_layer_active("pressure_timer") then
+		if type(time) == "string" then time = tonumber(time) end
+		if time then MP.GAME.timer = time end
+	end
+    if from_nemesis then
+        MP.GAME.nemesis_timer_started = false
+    else
+        MP.GAME.timer_started = false
+    end
 end
 
 -- #region Client to Server
@@ -1308,9 +1326,9 @@ function Game:update(dt)
 			elseif parsedAction.action == "nemesisEndGameStats" then
 				-- Handle receiving game stats (is only logged now, now shown in the ui)
 			elseif parsedAction.action == "startAnteTimer" then
-				action_start_ante_timer(parsedAction.time)
+				action_start_ante_timer(parsedAction.time, true)
 			elseif parsedAction.action == "pauseAnteTimer" then
-				action_pause_ante_timer(parsedAction.time)
+				action_pause_ante_timer(parsedAction.time, true)
 			elseif parsedAction.action == "jimboAppear" then
 				action_jimbo_appear(parsedAction.pos, parsedAction.text)
 			elseif parsedAction.action == "jimboTalk" then

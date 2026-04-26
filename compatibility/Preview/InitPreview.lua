@@ -6,6 +6,7 @@ FN.PRE = {
 	data = {
 		score = { min = 0, exact = 0, max = 0 },
 		dollars = { min = 0, exact = 0, max = 0 },
+        empty = true,
 	},
 	text = {
 		score = { l = "", r = "" },
@@ -17,26 +18,62 @@ FN.PRE = {
 	lock_updates = false,
 	on_startup = true,
 	five_second_coroutine = nil,
+    calculate_request = nil,
 }
 
--- this coroutine nonsense is pissing me off so i'm doing events instead
--- it's fine because a calc takes close to no computing time
--- function name is the same, can't be bothered
 
 function FN.PRE.start_new_coroutine()
-	FN.PRE.lock_updates = true
-	FN.PRE.show_preview = true
-	FN.PRE.add_update_event("immediate") -- Force UI refresh
-	local delay = 0
-	if MP.LOBBY.code and not MP.is_pvp_boss() then delay = 5 * G.SETTINGS.GAMESPEED end
-	local func = function()
-		FN.PRE.simulate()
-		FN.PRE.lock_updates = false
-		FN.PRE.show_preview = true
-		FN.PRE.add_update_event("immediate") -- Refresh UI again
-		return true
-	end
-	G.E_MANAGER:add_event(Event({ trigger = "after", blockable = false, blocking = false, delay = delay, func = func }))
+    -- Defaults are vanilla: free preview, slow (5s) delay.
+    -- Layers like pressure_timer set both via ruleset scalars.
+    local timer_delay, timer_cost = 5, 0
+    if MP.LOBBY and MP.LOBBY.code and not MP.is_pvp_boss() then
+        local ruleset = MP.Rulesets[MP.LOBBY.config.ruleset] or {}
+        timer_delay = MP.LOBBY.config.preview_calculate_delay or ruleset.preview_calculate_delay or timer_delay
+        timer_cost  = MP.LOBBY.config.preview_calculate_cost or ruleset.preview_calculate_cost or timer_cost
+    end
+
+    if not FN.PRE.calculate_request then
+        FN.PRE.lock_updates = true
+        FN.PRE.show_preview = true
+        local func = function()
+            FN.PRE.calculate_request = nil
+            FN.PRE.lock_updates = false
+            FN.PRE.show_preview = true
+            FN.PRE.data = FN.PRE.simulate()
+
+            -- Subtract cost from timer (only if there's a cost — vanilla preview is free).
+            -- Min-clamp prevents an over-zealous calc from killing the player outright.
+            if
+                timer_cost > 0
+                and FN.PRE.data and not FN.PRE.data.empty
+                and MP.LOBBY.code and not MP.is_pvp_boss()
+            then
+                MP.UI.consume_timer(timer_cost, nil, math.max(10, timer_cost))
+            end
+            return true
+        end
+        FN.PRE.calculate_request = Event({
+            trigger = "after", delay = timer_delay, timer = "REAL",
+            blockable = false, blocking = false,
+            func = func
+        })
+        G.E_MANAGER:add_event(FN.PRE.calculate_request)
+    end
+end
+
+function FN.PRE.stop_current_coroutine(no_interrupt)
+    if not MP.INTEGRATIONS.Preview then return end
+    if no_interrupt and FN.PRE.lock_updates then return end
+    if FN.PRE.show_preview then
+        FN.PRE.show_preview = false
+        FN.PRE.data = FN.PRE.cleanup()
+    end
+    if FN.PRE.calculate_request then
+        FN.PRE.calculate_request.func = function() return true end
+        FN.PRE.calculate_request.complete = true
+        FN.PRE.calculate_request = nil
+        FN.PRE.lock_updates = false
+    end
 end
 
 --[[
