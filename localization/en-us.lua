@@ -1152,6 +1152,7 @@ return {
 	misc = {
 		labels = {
 			mp_phantom = "Phantom",
+			mp_sticker_balanced = "Balanced",
 			mp_sticker_extra_credit = "Extra Credit",
 			mp_sticker_persistent = "Persistent",
 			mp_sticker_unreliable = "Unreliable",
