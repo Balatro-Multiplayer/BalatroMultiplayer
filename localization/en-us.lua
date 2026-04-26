@@ -1136,6 +1136,7 @@ return {
 			k_wait_enemy = "Waiting for enemy to finish...",
 			k_wait_enemy_reach_this_blind = "Waiting for enemy to reach this blind...",
 			k_lives = "Lives",
+            k_skips = "Skips",
 			k_lost_life = "Lost a life",
 			k_total_lives_lost = " Total Lives Lost",
 			k_comeback_money_sandbox = " Comeback Money ($3 × ante cleared)",
