@@ -13,9 +13,23 @@ function MP.UI.update_blind_HUD(blind, reset, silent)
             }
         end
         -- Setup blind name display
-        G.HUD_blind:get_UIE_by_ID("HUD_blind_name").config.object.config.string = blind_name_string
-        G.HUD_blind:get_UIE_by_ID("HUD_blind_name").config.object:update_text()
-        G.HUD_blind:get_UIE_by_ID("HUD_blind_name").states.visible = false
+        local name_element = G.HUD_blind:get_UIE_by_ID("HUD_blind_name")
+        name_element.config.object.config.string =  {
+            {
+                ref_table = MP.LOBBY.is_host and MP.LOBBY.guest or MP.LOBBY.host,
+                ref_value = "username",
+            },
+        }
+        name_element.config.object.config.old_maxw = name_element.config.object.config.maxw
+        name_element.config.object.config.mp_maxw = true
+        name_element.config.object.config.maxw = 4.5
+        name_element.config.object.scale = name_element.config.object.config.scale
+        name_element.config.object:update_text(true)
+        if name_element.config.object.config.maxw then
+            name_element.config.object.scale = name_element.config.object.scale * (name_element.config.object.config.maxw/name_element.config.object.config.W)
+        end
+        name_element.config.object:update_text(true)
+        name_element.states.visible = false
         -- Setup enemy score text
         G.HUD_blind:get_UIE_by_ID("HUD_blind_count").config.ref_table = MP.GAME.enemy
         G.HUD_blind:get_UIE_by_ID("HUD_blind_count").config.ref_value = "score_text"
@@ -68,9 +82,19 @@ end
 
 function MP.UI.reset_blind_HUD()
 	if MP.is_mp_or_ghost() then
-		G.HUD_blind:get_UIE_by_ID("HUD_blind_name").config.object.config.string =
+        local name_element = G.HUD_blind:get_UIE_by_ID("HUD_blind_name")
+		name_element.config.object.config.string =
 			{ { ref_table = G.GAME.blind, ref_value = "loc_name" } }
-		G.HUD_blind:get_UIE_by_ID("HUD_blind_name").config.object:update_text()
+        if  name_element.config.object.config.mp_maxw then            
+            name_element.config.object.config.maxw = name_element.config.object.config.old_maxw
+            name_element.config.object.config.old_maxw = nil
+            name_element.config.object.scale = name_element.config.object.config.scale
+            name_element.config.object:update_text(true)
+            if name_element.config.object.config.maxw then
+                name_element.config.object.scale = name_element.config.object.scale * (name_element.config.object.config.maxw/name_element.config.object.config.W)
+            end
+            name_element.config.object:update_text(true)
+        end
 		G.HUD_blind:get_UIE_by_ID("HUD_blind_count").config.ref_table = G.GAME.blind
 		G.HUD_blind:get_UIE_by_ID("HUD_blind_count").config.ref_value = "chip_text"
 		G.HUD_blind:get_UIE_by_ID("HUD_blind").children[2].children[2].children[2].children[1].children[1].config.text =
