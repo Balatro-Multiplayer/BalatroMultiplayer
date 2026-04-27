@@ -330,6 +330,10 @@ local function action_enemy_info(score_str, hands_left_str, skips_str, lives_str
 		play_sound("holo1", 0.865, 0.9)
 		play_sound("gong", 0.765, 0.4)
 	end
+    if MP.GAME.enemy.skips < skips then
+        play_sound('negative', 0.865, 0.4)
+        play_sound("gong", 0.765, 0.4)
+    end
 
 	MP.GAME.enemy.hands = hands_left
 	MP.GAME.enemy.skips = skips

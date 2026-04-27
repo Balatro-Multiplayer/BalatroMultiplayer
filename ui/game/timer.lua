@@ -164,7 +164,10 @@ SMODS.Gradient({
         local ruleset = MP.Rulesets[MP.LOBBY.config.ruleset]
         local speedup = (ruleset and ruleset.timer_speedup_multiplier) or 1
 
-        local timer = (-(MP.GAME.timer or 0) / speedup)%self.cycle
+        -- When you "timering" opponent, timer stops and you cannot see is button pressed
+        -- So we need switch to real timer to make it flush
+        local time_value = MP.GAME.timer_started and G.TIMERS.REAL or -(MP.GAME.timer or 0)
+        local timer = (time_value / speedup)%self.cycle
         local start_index = math.ceil(timer*#self.colours/self.cycle)
         if start_index == 0 then start_index = 1 end
         local end_index = start_index == #self.colours and 1 or start_index+1
@@ -225,7 +228,7 @@ function G.FUNCS.set_timer_box(e)
 		end
 		e.config.colour = G.C.DYN_UI.BOSS_DARK
         -- Attention text if pressure timer
-		e.children[1].config.object.colours = { MP.is_layer_active("pressure_timer") and G.C.IMPORTANT or G.C.UI.TEXT_DARK }
+		e.children[1].config.object.colours = { MP.is_layer_active("pressure_timer") and not MP.is_pvp_boss() and G.C.IMPORTANT or G.C.UI.TEXT_DARK }
 	end
 end
 
@@ -249,6 +252,7 @@ function Game:update(dt)
     MP.TIMER_CLOCK = new_time
 
     -- Bail fast: not an MP PvP-timer context
+    if G.STATE == G.STATES.GAME_OVER then return end
     if not MP.LOBBY.code then return end
     if not MP.LOBBY.config.timer then return end
     if MP.GAME.timer_consumed then return end
