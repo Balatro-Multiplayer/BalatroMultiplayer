@@ -39,7 +39,15 @@ end
 
 function G.UIDEF.create_UIBox_lobby_menu()
 	local text_scale = 0.45
-	local back = MP.LOBBY.config.different_decks and MP.LOBBY.deck.back or MP.LOBBY.config.back
+	
+	-- Get deck key (prefer back_key, fallback to name)
+	local back_key
+	if MP.LOBBY.config.different_decks then
+		back_key = MP.LOBBY.deck.back_key or MP.LOBBY.deck.back
+	else
+		back_key = MP.LOBBY.config.back_key or MP.LOBBY.config.back
+	end
+	local back_name = MP.UTILS.get_deck_name_from_key(back_key) or "Red Deck"
 	local stake = MP.LOBBY.config.different_decks and MP.LOBBY.deck.stake or MP.LOBBY.config.stake
 
 	local t = {
@@ -86,7 +94,7 @@ function G.UIDEF.create_UIBox_lobby_menu()
 										col = true,
 									}) or nil,
 									MP.UI.create_spacer(),
-									MP.UI.create_lobby_deck_button(text_scale, back, stake),
+									MP.UI.create_lobby_deck_button(text_scale, back_name, stake),
 									MP.UI.create_spacer(),
 									MP.UI.create_players_section(text_scale),
 									MP.UI.create_spacer(),
@@ -263,11 +271,14 @@ function G.FUNCS.lobby_start_run(e, args)
 	if MP.LOBBY.config.different_decks == false then G.FUNCS.copy_host_deck() end
 
 	local challenge = nil
-	if MP.LOBBY.deck.back == "Challenge Deck" then
+	local deck_key = MP.LOBBY.deck.back_key or MP.LOBBY.deck.back
+	if deck_key == "Challenge Deck" or deck_key == "b_challenge_deck" then
 		challenge = G.CHALLENGES[get_challenge_int_from_id(MP.LOBBY.deck.challenge)]
 	else
-		G.GAME.viewed_back = G.P_CENTERS[MP.UTILS.get_deck_key_from_name(MP.LOBBY.deck.back)]
+		G.GAME.viewed_back = G.P_CENTERS[deck_key]
 	end
+
+
 
 	G.FUNCS.start_run(e, {
 		mp_start = true,
@@ -297,7 +308,8 @@ function Back:generate_UI(other, ui_scale, min_dims, challenge)
 end
 
 function G.FUNCS.copy_host_deck()
-	MP.LOBBY.deck.back = MP.LOBBY.config.back
+	MP.LOBBY.deck.back_key = MP.LOBBY.config.back_key or MP.LOBBY.config.back
+	MP.LOBBY.deck.back = MP.LOBBY.config.back  -- keep for long term
 	MP.LOBBY.deck.cocktail = MP.LOBBY.config.cocktail
 	MP.LOBBY.deck.sleeve = MP.LOBBY.config.sleeve
 	MP.LOBBY.deck.stake = MP.LOBBY.config.stake
@@ -375,17 +387,23 @@ G.FUNCS.start_run = function(e, args)
 				chosen_stake = MP.DECK.MAX_STAKE
 			end
 			if MP.LOBBY.is_host then
-				MP.LOBBY.config.back = args.challenge and "Challenge Deck"
-					or (args.deck and args.deck.name)
-					or G.GAME.viewed_back.name
-				MP.LOBBY.config.stake = chosen_stake
-				MP.LOBBY.config.sleeve = G.viewed_sleeve
-				MP.LOBBY.config.challenge = args.challenge and args.challenge.id or ""
-				send_lobby_options()
-			end
-			MP.LOBBY.deck.back = args.challenge and "Challenge Deck"
-				or (args.deck and args.deck.name)
-				or G.GAME.viewed_back.name
+					local deck_key = args.challenge and "Challenge Deck"
+						or (args.deck and MP.UTILS.get_deck_key_from_name(args.deck.name))
+						or (G.GAME.viewed_back and G.GAME.viewed_back.key)
+						or "b_red"
+					MP.LOBBY.config.back_key = deck_key
+					MP.LOBBY.config.back = deck_key  -- long
+					MP.LOBBY.config.stake = chosen_stake
+					MP.LOBBY.config.sleeve = G.viewed_sleeve
+					MP.LOBBY.config.challenge = args.challenge and args.challenge.id or ""
+					send_lobby_options()
+				end
+				local deck_key = args.challenge and "Challenge Deck"
+					or (args.deck and MP.UTILS.get_deck_key_from_name(args.deck.name))
+					or (G.GAME.viewed_back and G.GAME.viewed_back.key)
+					or "b_red"
+				MP.LOBBY.deck.back_key = deck_key
+				MP.LOBBY.deck.back = deck_key  -- long
 			MP.LOBBY.deck.stake = chosen_stake
 			MP.LOBBY.deck.sleeve = G.viewed_sleeve
 			MP.LOBBY.deck.challenge = args.challenge and args.challenge.id or ""

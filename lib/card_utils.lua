@@ -84,10 +84,40 @@ function MP.UTILS.run_for_each_phantom_joker(key, func)
 	end
 end
 
-function MP.UTILS.get_deck_key_from_name(_name)
-	for k, v in pairs(G.P_CENTERS) do
-		if v.name == _name then return k end
+function MP.UTILS.get_deck_key_from_name(deck_name_or_key)
+	if not deck_name_or_key then
+		return "b_red"
 	end
+
+	-- Already a valid key?
+	if G.P_CENTERS[deck_name_or_key] and G.P_CENTERS[deck_name_or_key].set == "Back" then
+		return deck_name_or_key
+	end
+
+	-- Search by name (localized or raw)
+	for k, v in pairs(G.P_CENTERS) do
+		if v.set == "Back" then
+			local loc_name = localize({type = 'name_text', key = k, set = 'Back'})
+			if v.name == deck_name_or_key or loc_name == deck_name_or_key then
+				return k
+			end
+		end
+	end
+
+	sendErrorMessage("MP.UTILS.get_deck_key_from_name: Could not find deck for '" .. tostring(deck_name_or_key) .. "'", "MULTIPLAYER")
+	return "b_red"
+end
+
+function MP.UTILS.get_deck_name_from_key(deck_key)
+	if not deck_key then
+		return "Red Deck"
+	end
+
+	if G.P_CENTERS[deck_key] and G.P_CENTERS[deck_key].set == "Back" then
+		return G.P_CENTERS[deck_key].name or localize({type = 'name_text', key = deck_key, set = 'Back'})
+	end
+
+	return "Red Deck"
 end
 
 function MP.UTILS.get_culled_pool(_type, _rarity, _legendary, _append)

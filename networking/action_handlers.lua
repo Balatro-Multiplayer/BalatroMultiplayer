@@ -458,7 +458,22 @@ local function action_lobby_options(options)
 			parsed_v = tonumber(v)
 		end
 
-		MP.LOBBY.config[k] = parsed_v
+		if k == "back_key" then
+			MP.LOBBY.config.back_key = parsed_v
+			MP.LOBBY.config.back = MP.UTILS.get_deck_name_from_key(parsed_v) or parsed_v
+		elseif k == "back" then
+			local key = MP.UTILS.get_deck_key_from_name(parsed_v)
+			if key then
+				MP.LOBBY.config.back_key = key
+				MP.LOBBY.config.back = MP.UTILS.get_deck_name_from_key(key)
+			else
+				MP.LOBBY.config.back = parsed_v
+			end
+		else
+			MP.LOBBY.config[k] = parsed_v
+		end
+
+		
 		if MP.UI.update_lobby_option_toggle then MP.UI.update_lobby_option_toggle(k) end
 		::continue::
 	end

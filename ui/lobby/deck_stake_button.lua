@@ -2,10 +2,20 @@ local Disableable_Button = MP.UI.Disableable_Button
 
 -- Component for deck selection button in lobby
 function MP.UI.create_lobby_deck_button(text_scale, back, stake)
+	-- Determine the correct deck key (prefer stored key, fallback to converting name)
+	local deck_key
+	if MP.LOBBY.deck.back_key then
+		deck_key = MP.LOBBY.deck.back_key
+	elseif MP.LOBBY.config.back_key then
+		deck_key = MP.LOBBY.config.back_key
+	else
+		deck_key = MP.UTILS.get_deck_key_from_name(back) or "b_red"
+	end
+
 	local deck_labels = {
 		localize({
 			type = "name_text",
-			key = MP.UTILS.get_deck_key_from_name(back),
+			key = deck_key,
 			set = "Back",
 		}),
 		localize({

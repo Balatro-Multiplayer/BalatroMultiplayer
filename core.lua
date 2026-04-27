@@ -19,6 +19,7 @@ MP.LOBBY = {
 	type = "",
 	config = {}, -- Now set in MP.reset_lobby_config
 	deck = {
+		back_key = "b_red",
 		back = "Red Deck",
 		sleeve = "sleeve_casl_none",
 		stake = 1,
@@ -171,6 +172,7 @@ function MP.reset_lobby_config(persist_ruleset_and_gamemode)
 		weekly = nil,
 		custom_seed = "random",
 		different_decks = false,
+		back_key = "b_red",
 		back = "Red Deck",
 		sleeve = "sleeve_casl_none",
 		stake = 1,
