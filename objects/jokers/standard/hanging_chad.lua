@@ -34,6 +34,6 @@ SMODS.Joker({
 		end
 	end,
 	mp_include = function(self)
-		return (MP.is_layer_active("standard") or MP.is_layer_active("sandbox")) and MP.LOBBY.code
+		return (MP.is_layer_active("standard") or MP.is_layer_active("sandbox") or MP.is_layer_active("classic")) and MP.LOBBY.code
 	end,
 })

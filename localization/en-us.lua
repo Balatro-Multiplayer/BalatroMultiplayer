@@ -101,6 +101,29 @@ return {
 					"earn {C:money}$#1#{} when scored",
 				},
 			},
+			j_mp_baron = {
+				name = "Baron",
+				text = {
+					"Each {C:attention}King{} held in hand",
+					"gives {X:mult,C:white} X#1# {} Mult",
+				},
+			},
+			j_mp_mime = {
+				name = "Mime",
+				text = {
+					"Retrigger all card",
+					"{C:attention}held in hand{} abilities",
+				},
+			},
+			j_mp_todo_list = {
+				name = "To Do List",
+				text = {
+					"Earn {C:money}$#1#{} if {C:attention}poker hand",
+					"played is a {C:attention}#2#{},",
+					"poker hand changes",
+					"at end of round",
+				},
+			},
 			j_broken = {
 				name = "BROKEN",
 				text = {
@@ -785,6 +808,14 @@ return {
 					"destroy card",
 				},
 			},
+			m_mp_display_gold = {
+				name = "Gold Card",
+				text = {
+					"{C:money}$#1#{} if this card is",
+					"{C:attention}held in hand{}",
+					"at end of round",
+				},
+			},
 		},
 		Back = {
 			b_mp_cocktail = {
@@ -861,6 +892,82 @@ return {
 				text = {
 					"Made with friends from",
 					"Balatro University!",
+				},
+			},
+			mp_sticker_balanced = {
+				name = "Balanced",
+				text = {
+					"This card has been rebalanced",
+				},
+			},
+			mp_sticker_balanced_j_mp_hanging_chad = {
+				name = "Balanced",
+				text = {
+					"Retriggers first {C:attention}2{} cards",
+					"instead of first card twice",
+				},
+			},
+			mp_sticker_balanced_j_mp_ticket = {
+				name = "Balanced",
+				text = {
+					"Now {C:green}Uncommon{}",
+					"No {C:attention}Gold{} card requirement",
+				},
+			},
+			mp_sticker_balanced_j_mp_seltzer = {
+				name = "Balanced",
+				text = {
+					"Lasts {C:attention}8{} hands",
+					"instead of {C:attention}10{}",
+				},
+			},
+			mp_sticker_balanced_j_mp_turtle_bean = {
+				name = "Balanced",
+				text = {
+					"{C:attention}+4{} hand size",
+					"instead of {C:attention}+5{}",
+				},
+			},
+			mp_sticker_balanced_j_mp_baron = {
+				name = "Balanced",
+				text = {
+					"Now {C:green}Uncommon{} ({C:money}$5{})",
+					"instead of {C:red}Rare{} ({C:money}$8{})",
+				},
+			},
+			mp_sticker_balanced_j_mp_mime = {
+				name = "Balanced",
+				text = {
+					"Now {C:red}Rare{} ({C:money}$8{})",
+					"instead of {C:green}Uncommon{} ({C:money}$5{})",
+				},
+			},
+			mp_sticker_balanced_j_mp_todo_list = {
+				name = "Balanced",
+				text = {
+					"Earns {C:money}$5{} instead of {C:money}$4{}",
+					"Picks from {C:attention}all{} poker hands,",
+					"not just discovered ones",
+				},
+			},
+			mp_sticker_balanced_c_mp_ouija_standard = {
+				name = "Balanced",
+				text = {
+					"Destroys {C:attention}3{} cards instead of",
+					"converting all cards and losing",
+					"{C:attention}-1{} hand size",
+				},
+			},
+			mp_sticker_balanced_m_gold = {
+				name = "Balanced",
+				text = {
+					"Earns {C:money}$4{} instead of {C:money}$3{}",
+				},
+			},
+			mp_sticker_balanced_m_mp_display_gold = {
+				name = "Balanced",
+				text = {
+					"Earns {C:money}$4{} instead of {C:money}$3{}",
 				},
 			},
 			current_nemesis = {
@@ -1045,6 +1152,7 @@ return {
 	misc = {
 		labels = {
 			mp_phantom = "Phantom",
+			mp_sticker_balanced = "Balanced",
 			mp_sticker_extra_credit = "Extra Credit",
 			mp_sticker_persistent = "Persistent",
 			mp_sticker_unreliable = "Unreliable",
