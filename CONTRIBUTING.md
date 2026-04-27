@@ -30,7 +30,7 @@ git commit -m "your changes"
 
 ```bash
 # Sync and create branch
-git checkout main && git pull upstream main && git push origin main
+git checkout dev && git pull upstream dev && git push origin dev
 git checkout -b feature/your-feature
 
 # Develop → Format → Commit → Push → PR
