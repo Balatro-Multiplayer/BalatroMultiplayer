@@ -40,7 +40,4 @@ SMODS.Joker({
 	remove_from_deck = function(self, card, from_debuff)
 		G.hand:change_size(-card.ability.extra.h_size)
 	end,
-	mp_include = function(self)
-		return MP.is_layer_active("standard") and MP.LOBBY.code
-	end,
 })

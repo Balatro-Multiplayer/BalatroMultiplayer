@@ -1,8 +1,53 @@
 MP.Layers = {}
 
+-- Reverse index: joker full key -> array of layer names that list it.
+-- Used to auto-attach `mp_include` on jokers whose only gating is layer membership,
+-- so the joker file doesn't have to repeat what the layer already declared.
+MP._JOKER_LAYERS = {}
+
 function MP.Layer(name, definition)
 	MP.Layers[name] = definition
+	if definition.reworked_jokers then
+		for _, joker_key in ipairs(definition.reworked_jokers) do
+			MP._JOKER_LAYERS[joker_key] = MP._JOKER_LAYERS[joker_key] or {}
+			table.insert(MP._JOKER_LAYERS[joker_key], name)
+		end
+	end
 end
+
+-- Wrap SMODS.Joker so that when a joker's full key (j_<prefix>_<key>) appears in
+-- some layer's reworked_jokers and the init table has no explicit mp_include, we
+-- attach a default gate: any owning layer active. is_layer_active already returns
+-- false outside of a live ruleset context (lobby or practice mode). Jokers that
+-- need bespoke gating keep defining their own mp_include; the wrapper leaves them
+-- alone.
+local _smods_joker = SMODS.Joker
+SMODS.Joker = setmetatable({}, {
+	__index = _smods_joker,
+	__newindex = function(_, k, v)
+		_smods_joker[k] = v
+	end,
+	__call = function(_, init)
+		if init and not init.mp_include and init.key then
+			local prefix = (SMODS.current_mod and SMODS.current_mod.prefix) or "mp"
+			local full_key = "j_" .. prefix .. "_" .. init.key
+			local owning_layers = MP._JOKER_LAYERS[full_key]
+			if owning_layers then
+				sendDebugMessage(
+					"Auto-gating " .. full_key .. " on layers: " .. table.concat(owning_layers, ", "),
+					"MULTIPLAYER"
+				)
+				init.mp_include = function(self)
+					for _, layer_name in ipairs(owning_layers) do
+						if MP.is_layer_active(layer_name) then return true end
+					end
+					return false
+				end
+			end
+		end
+		return _smods_joker(init)
+	end,
+})
 
 -- Array-valued fields that get merged (layer base + ruleset additions)
 MP._LAYER_ARRAY_FIELDS = {

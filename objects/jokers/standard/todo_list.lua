@@ -44,7 +44,4 @@ SMODS.Joker({
 		end
 		card.ability.extra.poker_hand = pseudorandom_element(_poker_hands, "todo_list")
 	end,
-	mp_include = function(self)
-		return MP.is_layer_active("standard") and MP.LOBBY.code
-	end,
 })
