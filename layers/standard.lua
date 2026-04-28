@@ -24,6 +24,7 @@ MP.Layer("standard", {
 		"j_mp_baron",
 		"j_mp_mime",
 		"j_mp_todo_list",
+		"j_mp_bloodstone",
 	},
 	reworked_consumables = {
 		"c_mp_ouija_standard",
