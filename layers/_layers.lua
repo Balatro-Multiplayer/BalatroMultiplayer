@@ -15,12 +15,19 @@ function MP.Layer(name, definition)
 	end
 end
 
--- Wrap SMODS.Joker so that when a joker's full key (j_<prefix>_<key>) appears in
--- some layer's reworked_jokers and the init table has no explicit mp_include, we
--- attach a default gate: any owning layer active. is_layer_active already returns
--- false outside of a live ruleset context (lobby or practice mode). Jokers that
--- need bespoke gating keep defining their own mp_include; the wrapper leaves them
--- alone.
+-- Eldritch horror warning
+-- The profane machinery below, the proxy wearing SMODS.Joker's skin, exists for
+-- one purpose only: to supply a default value for a function parameter.
+-- We replace SMODS.Joker with a hollow table wearing a metatable: 
+-- __index forwards reads, __newindex forwards writes, __call forwards calls. 
+-- From outside it is indistinguishable from the real thing.
+-- From inside, every joker registration passes through __call, 
+-- where we rifle through the init table and – if the joker belongs 
+-- to a known layer and didn't bring its own mp_include – graft on
+-- a default gate before passing it through.
+-- The real SMODS.Joker never knows it's been intercepted. 
+-- `is_layer_active` returns false outside a live ruleset context (lobby or practice),
+-- so the default gate fails closed. Jokers with bespoke mp_include slip past untouched.
 local _smods_joker = SMODS.Joker
 SMODS.Joker = setmetatable({}, {
 	__index = _smods_joker,
