@@ -65,6 +65,7 @@ MP.EXPERIMENTAL = {
 	use_new_networking = true,
 	show_sandbox_collection = false,
 	alt_stakes = false,
+	suppress_dev_warning = false,
 }
 
 -- Override experimental flags from .env file if present
