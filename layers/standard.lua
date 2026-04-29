@@ -17,6 +17,7 @@ MP.Layer("standard", {
 		"j_mp_ticket",
 		"j_mp_seltzer",
 		"j_mp_turtle_bean",
+        "j_mp_bloodstone",
 	},
 	reworked_consumables = {
 		"c_mp_ouija_standard",
