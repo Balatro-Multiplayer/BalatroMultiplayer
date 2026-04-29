@@ -1,7 +1,41 @@
 MP.Layers = {}
 
+-- Reverse index: joker full key -> array of layer names that list it.
+-- Used to auto-attach `mp_include` on jokers whose only gating is layer membership,
+-- so the joker file doesn't have to repeat what the layer already declared.
+MP._JOKER_LAYERS = {}
+
 function MP.Layer(name, definition)
 	MP.Layers[name] = definition
+	if definition.reworked_jokers then
+		for _, joker_key in ipairs(definition.reworked_jokers) do
+			MP._JOKER_LAYERS[joker_key] = MP._JOKER_LAYERS[joker_key] or {}
+			table.insert(MP._JOKER_LAYERS[joker_key], name)
+		end
+	end
+end
+
+-- A small graft on SMODS.Joker:register. Any joker whose full key appears in some
+-- layer's reworked_jokers gets a default mp_include stitched on when none is
+-- provided. By the time register runs the key is already prefixed, so we can look
+-- it up directly. is_layer_active fails closed outside a live ruleset context, and
+-- bespoke mp_include slips past untouched.
+local _original_register = SMODS.Joker.register
+function SMODS.Joker:register()
+	if not self.mp_include and MP._JOKER_LAYERS[self.key] then
+		local owning_layers = MP._JOKER_LAYERS[self.key]
+		sendDebugMessage(
+			"Auto-gating " .. self.key .. " on layers: " .. table.concat(owning_layers, ", "),
+			"MULTIPLAYER"
+		)
+		self.mp_include = function(_)
+			for _, layer_name in ipairs(owning_layers) do
+				if MP.is_layer_active(layer_name) then return true end
+			end
+			return false
+		end
+	end
+	return _original_register(self)
 end
 
 -- Array-valued fields that get merged (layer base + ruleset additions)
