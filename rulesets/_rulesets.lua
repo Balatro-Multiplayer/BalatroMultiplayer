@@ -280,5 +280,6 @@ function MP.LoadReworks(ruleset, key)
 				end
 			end
 		end
+		MP.LogLoadedPool()
 	end
 end
