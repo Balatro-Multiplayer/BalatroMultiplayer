@@ -8,6 +8,6 @@ MP.Ruleset({
 		MP.LOBBY.config.preview_disabled = true
 		MP.LOBBY.config.the_order = true
 		MP.LOBBY.config.starting_lives = 4
-		return true
+		return false
 	end,
 }):inject()
