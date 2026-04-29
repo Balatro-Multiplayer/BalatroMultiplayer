@@ -30,6 +30,20 @@ end
 local reconnectToken = nil
 local lastLobbyCode = nil
 
+local function create_log_hash()
+	local tmp = MP.path
+	local trimmed = tmp:gsub("[^/]+/?$", "") --removes the last /BalatroMultiplayer*/, we need absolute file path for io.read
+	local logsPath = trimmed .. "lovely/log/"
+	local files = love.filesystem.getDirectoryItems("Mods/lovely/log/")
+	table.sort(files)
+	local lastLog = files[#files]
+	local logFile = io.open(logsPath .. lastLog, "r")
+	if not logFile then return nil end
+	local logData = logFile:read("*a")
+	logFile:close()
+	sendTraceMessage("Log checksum - " .. MP.UTILS.encrypt_string(logData))
+end
+
 local function action_connected()
 	MP.LOBBY.connected = true
 	MP.UI.update_connection_status()
@@ -348,6 +362,7 @@ local function action_stop_game()
 		MP.UI.update_connection_status()
 		MP.reset_game_states()
 	end
+	create_log_hash()
 end
 
 local function action_end_pvp()
@@ -382,6 +397,7 @@ local function action_win_game()
 	MP.nemesis_deck_received = false
 	MP.GAME.won = true
 	MP.STATS.record_match(true)
+	create_log_hash()
 	win_game()
 end
 
@@ -393,6 +409,7 @@ local function action_lose_game()
 	MP.STATS.record_match(false)
 	G.STATE_COMPLETE = false
 	G.STATE = G.STATES.GAME_OVER
+	create_log_hash()
 end
 
 local function action_lobby_options(options)
