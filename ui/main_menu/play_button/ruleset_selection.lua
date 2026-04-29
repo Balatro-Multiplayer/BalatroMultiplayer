@@ -37,6 +37,7 @@ function G.UIDEF.ruleset_selection_options(mode)
 			name = "k_custom",
 			buttons = {
 				{ button_id = "blitz_ruleset_button", button_localize_key = "k_blitz" },
+				{ button_id = "experimental_ruleset_button", button_localize_key = "k_experimental" },
 				{ button_id = "traditional_ruleset_button", button_localize_key = "k_traditional" },
 				{ button_id = "vanilla_ruleset_button", button_localize_key = "k_vanilla" },
 				{ button_id = "badlatro_ruleset_button", button_localize_key = "k_badlatro" },

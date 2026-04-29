@@ -953,10 +953,10 @@ return {
 			mp_sticker_balanced_j_mp_bloodstone = {
 				name = "Balanced",
 				text = {
-					"In {C:attention}PvP{}, the {C:green}1 in 2{} chance",
-					"rolls from a {C:attention}shared sequence{}",
-					"so both players see the {X:mult,C:white} X1.5 {}",
-					"trigger on the {C:attention}same{} hands",
+					"In {C:attention}PvP{}, the {C:green}1 in 2{} rolls",
+					"come from a {C:attention}fixed sequence{}",
+					"shared between both players and",
+					"{C:attention}reused{} every hand of the round",
 				},
 			},
 			mp_sticker_balanced_c_mp_ouija_standard = {
@@ -1312,6 +1312,8 @@ return {
 			k_vanilla_description = "The original Balatro experience.\n\nNo Multiplayer jokers, no balance changes.\nJust the base game as it was designed.\n\nMultiplayer features like the timer are still available\nbut can be disabled in Lobby Options.",
 			k_blitz = "Standard",
 			k_blitz_description = "The balanced Multiplayer ruleset.\n\nIncludes Multiplayer jokers and balance changes\nwith full control over your lobby settings.\n\n(See bans and reworks tabs for details)",
+			k_experimental = "Experimental",
+			k_experimental_description = "Standard's bleeding edge.\n\nHeavier balance changes being trialed\nfor a future Standard ruleset.\nExpect things to shift between versions.\n\n(See bans and reworks tabs for details)",
 			k_traditional = "Traditional",
 			k_traditional_description = "Multiplayer content without time pressure.\n\nIncludes Multiplayer jokers and balance changes,\nbut removes time-based mechanics for methodical play.\n\nTime-based jokers are banned.\nTimer is disabled.\n\n(See bans and reworks tabs for details)",
 			k_majorleague = "Major League",
