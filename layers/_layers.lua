@@ -15,46 +15,28 @@ function MP.Layer(name, definition)
 	end
 end
 
--- Eldritch horror warning
--- The profane machinery below, the proxy wearing SMODS.Joker's skin, exists for
--- one purpose only: to supply a default value for a function parameter.
--- We replace SMODS.Joker with a hollow table wearing a metatable: 
--- __index forwards reads, __newindex forwards writes, __call forwards calls. 
--- From outside it is indistinguishable from the real thing.
--- From inside, every joker registration passes through __call, 
--- where we rifle through the init table and – if the joker belongs 
--- to a known layer and didn't bring its own mp_include – graft on
--- a default gate before passing it through.
--- The real SMODS.Joker never knows it's been intercepted. 
--- `is_layer_active` returns false outside a live ruleset context (lobby or practice),
--- so the default gate fails closed. Jokers with bespoke mp_include slip past untouched.
-local _smods_joker = SMODS.Joker
-SMODS.Joker = setmetatable({}, {
-	__index = _smods_joker,
-	__newindex = function(_, k, v)
-		_smods_joker[k] = v
-	end,
-	__call = function(_, init)
-		if init and not init.mp_include and init.key then
-			local prefix = (SMODS.current_mod and SMODS.current_mod.prefix) or "mp"
-			local full_key = "j_" .. prefix .. "_" .. init.key
-			local owning_layers = MP._JOKER_LAYERS[full_key]
-			if owning_layers then
-				sendDebugMessage(
-					"Auto-gating " .. full_key .. " on layers: " .. table.concat(owning_layers, ", "),
-					"MULTIPLAYER"
-				)
-				init.mp_include = function(self)
-					for _, layer_name in ipairs(owning_layers) do
-						if MP.is_layer_active(layer_name) then return true end
-					end
-					return false
-				end
+-- A small graft on SMODS.Joker:register. Any joker whose full key appears in some
+-- layer's reworked_jokers gets a default mp_include stitched on when none is
+-- provided. By the time register runs the key is already prefixed, so we can look
+-- it up directly. is_layer_active fails closed outside a live ruleset context, and
+-- bespoke mp_include slips past untouched.
+local _original_register = SMODS.Joker.register
+function SMODS.Joker:register()
+	if not self.mp_include and MP._JOKER_LAYERS[self.key] then
+		local owning_layers = MP._JOKER_LAYERS[self.key]
+		sendDebugMessage(
+			"Auto-gating " .. self.key .. " on layers: " .. table.concat(owning_layers, ", "),
+			"MULTIPLAYER"
+		)
+		self.mp_include = function(_)
+			for _, layer_name in ipairs(owning_layers) do
+				if MP.is_layer_active(layer_name) then return true end
 			end
+			return false
 		end
-		return _smods_joker(init)
-	end,
-})
+	end
+	return _original_register(self)
+end
 
 -- Array-valued fields that get merged (layer base + ruleset additions)
 MP._LAYER_ARRAY_FIELDS = {
