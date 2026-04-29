@@ -11,7 +11,7 @@ SMODS.Joker({
 	cost = 7,
 	pos = { x = 0, y = 8 },
 	no_collection = true,
-	config = { extra = { odds = 2, Xmult = 1.5 } },
+	config = { extra = { odds = 2, Xmult = 1.5 }, mp_balanced = true },
 	loc_vars = function(self, info_queue, card)
 		return {
 			key = "j_bloodstone",
