@@ -107,6 +107,7 @@ return {
       "m_mp_display_glass",
     },
     ["reworked_jokers"] = {
+      "j_mp_bloodstone",
       "j_mp_hanging_chad",
       "j_mp_seltzer",
       "j_mp_ticket",
@@ -172,6 +173,7 @@ return {
     ["reworked_jokers"] = {
       "j_mp_alloy_sandbox",
       "j_mp_ambrosia_sandbox",
+      "j_mp_bloodstone",
       "j_mp_bobby_sandbox",
       "j_mp_candynecklace_sandbox",
       "j_mp_chainlightning_sandbox",
@@ -226,6 +228,57 @@ return {
     ["reworked_vouchers"] = {},
     ["standard"] = true,
   },
+  ["experimental"] = {
+    ["_has_functions"] = {
+      ["create_info_menu"] = true,
+      ["force_lobby_options"] = true,
+      ["is_disabled"] = true,
+    },
+    ["banned_blinds"] = {},
+    ["banned_consumables"] = {},
+    ["banned_enhancements"] = {},
+    ["banned_jokers"] = {
+      "j_mp_speedrun",
+    },
+    ["banned_silent"] = {
+      "c_ouija",
+      "j_baron",
+      "j_bloodstone",
+      "j_hanging_chad",
+      "j_mime",
+      "j_selzer",
+      "j_ticket",
+      "j_todo_list",
+      "j_turtle_bean",
+    },
+    ["banned_tags"] = {},
+    ["banned_vouchers"] = {},
+    ["forced_gamemode"] = "gamemode_mp_attrition",
+    ["forced_lobby_options"] = true,
+    ["key"] = "experimental",
+    ["multiplayer_content"] = true,
+    ["reworked_blinds"] = {},
+    ["reworked_consumables"] = {
+      "c_mp_ouija_standard",
+    },
+    ["reworked_enhancements"] = {
+      "m_mp_display_glass",
+      "m_mp_display_gold",
+    },
+    ["reworked_jokers"] = {
+      "j_mp_baron",
+      "j_mp_bloodstone",
+      "j_mp_hanging_chad",
+      "j_mp_mime",
+      "j_mp_seltzer",
+      "j_mp_ticket",
+      "j_mp_todo_list",
+      "j_mp_turtle_bean",
+    },
+    ["reworked_tags"] = {},
+    ["reworked_vouchers"] = {},
+    ["standard"] = true,
+  },
   ["legacy_ranked"] = {
     ["_has_functions"] = {
       ["create_info_menu"] = true,
@@ -236,7 +289,9 @@ return {
     ["banned_consumables"] = {},
     ["banned_enhancements"] = {},
     ["banned_jokers"] = {},
-    ["banned_silent"] = {},
+    ["banned_silent"] = {
+      "j_hanging_chad",
+    },
     ["banned_tags"] = {},
     ["banned_vouchers"] = {},
     ["forced_gamemode"] = "gamemode_mp_attrition",
@@ -248,7 +303,9 @@ return {
     ["reworked_enhancements"] = {
       "m_mp_display_glass",
     },
-    ["reworked_jokers"] = {},
+    ["reworked_jokers"] = {
+      "j_mp_hanging_chad",
+    },
     ["reworked_tags"] = {},
     ["reworked_vouchers"] = {},
   },
@@ -427,6 +484,7 @@ return {
       "m_mp_display_glass",
     },
     ["reworked_jokers"] = {
+      "j_mp_bloodstone",
       "j_mp_hanging_chad",
       "j_mp_seltzer",
       "j_mp_ticket",
@@ -469,6 +527,7 @@ return {
       "m_mp_display_glass",
     },
     ["reworked_jokers"] = {
+      "j_mp_bloodstone",
       "j_mp_hanging_chad",
       "j_mp_seltzer",
       "j_mp_ticket",
@@ -512,6 +571,7 @@ return {
       "m_mp_display_glass",
     },
     ["reworked_jokers"] = {
+      "j_mp_bloodstone",
       "j_mp_hanging_chad",
       "j_mp_seltzer",
       "j_mp_ticket",
@@ -556,6 +616,7 @@ return {
       "m_mp_display_glass",
     },
     ["reworked_jokers"] = {
+      "j_mp_bloodstone",
       "j_mp_hanging_chad",
       "j_mp_seltzer",
       "j_mp_ticket",
