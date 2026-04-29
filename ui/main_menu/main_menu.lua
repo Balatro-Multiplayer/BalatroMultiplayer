@@ -5,6 +5,7 @@ function Game:main_menu(change_context)
 
 	Add_custom_multiplayer_cards(change_context)
 	Add_version_display()
+	MP.UI.show_dev_build_warning()
 
 	return ret
 end
