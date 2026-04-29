@@ -950,6 +950,15 @@ return {
 					"not just discovered ones",
 				},
 			},
+			mp_sticker_balanced_j_mp_bloodstone = {
+				name = "Balanced",
+				text = {
+					"In {C:attention}PvP{}, the {C:green}1 in 2{} chance",
+					"rolls from a {C:attention}shared sequence{}",
+					"so both players see the {X:mult,C:white} X1.5 {}",
+					"trigger on the {C:attention}same{} hands",
+				},
+			},
 			mp_sticker_balanced_c_mp_ouija_standard = {
 				name = "Balanced",
 				text = {
@@ -1244,7 +1253,7 @@ return {
 			k_wait_enemy = "Waiting for enemy to finish...",
 			k_wait_enemy_reach_this_blind = "Waiting for enemy to reach this blind...",
 			k_lives = "Lives",
-            k_skips = "Skips",
+			k_skips = "Skips",
 			k_lost_life = "Lost a life",
 			k_total_lives_lost = " Total Lives Lost",
 			k_comeback_money_sandbox = " Comeback Money ($3 × ante cleared)",
@@ -1474,9 +1483,15 @@ return {
 			ch_c_mp_indigo = {
 				"Played on {C:attention}Indigo Deck{}",
 			},
-			ch_c_mp_shop_planets = { "{C:planet}Planet{} cards appear" },
-			ch_c_mp_shop_planets_EXTENDED = { "{C:attention}40X{} more frequently in the shop" },
-			ch_c_mp_planet_tycoon_CREDITS = { "{C:inactive}(Idea by {C:attention}BlockAttack{C:inactive})" },
+			ch_c_mp_shop_planets = {
+				"{C:planet}Planet{} cards appear",
+			},
+			ch_c_mp_shop_planets_EXTENDED = {
+				"{C:attention}40X{} more frequently in the shop",
+			},
+			ch_c_mp_planet_tycoon_CREDITS = {
+				"{C:inactive}(Idea by {C:attention}BlockAttack{C:inactive})",
+			},
 			ch_c_mp_eeeee = {
 				"Some randomly selected RNG queues are {C:attention}bugged{} each Ante",
 			},
