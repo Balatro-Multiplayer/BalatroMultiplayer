@@ -38,7 +38,13 @@ SMODS = {
 	},
 	process_loc_text = function() end,
 	Mods = {},
+	-- Stubs for the register-grafts in layers/_layers.lua. The real SMODS classes
+	-- have a :register() method; the layer code stores the original and wraps it.
+	Joker = { register = function(self) return self end },
+	Consumable = { register = function(self) return self end },
 }
+
+function sendDebugMessage() end
 
 G = {
 	P_CENTER_POOLS = { Ruleset = {} },
