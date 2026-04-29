@@ -32,8 +32,7 @@ local RulesetBase = SMODS.GameObject:extend({
 	create_info_menu = function(self)
 		local gamemode_text = nil
 		if self.forced_gamemode then
-			gamemode_text = self.forced_gamemode_text
-				or ("k_" .. self.forced_gamemode:gsub("gamemode_mp_", ""))
+			gamemode_text = self.forced_gamemode_text or ("k_" .. self.forced_gamemode:gsub("gamemode_mp_", ""))
 		end
 		local raw_key = self.key:gsub("^ruleset_mp_", "")
 		return MP.UI.CreateRulesetInfoMenu({
@@ -94,9 +93,7 @@ function MP.get_active_gamemode()
 		return MP.LOBBY.config.gamemode
 	elseif MP.is_practice_mode() then
 		-- Ghost replay stores the gamemode directly
-		if MP.GHOST.is_active() and MP.GHOST.gamemode then
-			return MP.GHOST.gamemode
-		end
+		if MP.GHOST.is_active() and MP.GHOST.gamemode then return MP.GHOST.gamemode end
 		local ruleset_key = MP.SP and MP.SP.ruleset
 		if ruleset_key and MP.Rulesets[ruleset_key] then return MP.Rulesets[ruleset_key].forced_gamemode end
 	end
@@ -268,14 +265,10 @@ function MP.LoadReworks(ruleset, key)
 			for k, v in pairs(tbl) do
 				if v.mp_reworks then
 					-- Always reset to vanilla first
-					if v.mp_reworks["vanilla"] then
-						process(k, "mp_vanilla_", tbl)
-					end
+					if v.mp_reworks["vanilla"] then process(k, "mp_vanilla_", tbl) end
 					-- Apply layers in order, then self
 					for _, layer in ipairs(resolution) do
-						if v.mp_reworks[layer] then
-							process(k, "mp_" .. layer .. "_", tbl)
-						end
+						if v.mp_reworks[layer] then process(k, "mp_" .. layer .. "_", tbl) end
 					end
 				end
 			end

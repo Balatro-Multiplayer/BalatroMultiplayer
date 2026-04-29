@@ -1,9 +1,10 @@
 MP.Layers = {}
 
--- Reverse index: joker full key -> array of layer names that list it.
--- Used to auto-attach `mp_include` on jokers whose only gating is layer membership,
--- so the joker file doesn't have to repeat what the layer already declared.
+-- Reverse indices: full key -> array of layer names that list it.
+-- Used to auto-attach `mp_include` on cards whose only gating is layer membership,
+-- so the object file doesn't have to repeat what the layer already declared.
 MP._JOKER_LAYERS = {}
+MP._CONSUMABLE_LAYERS = {}
 
 function MP.Layer(name, definition)
 	MP.Layers[name] = definition
@@ -13,6 +14,22 @@ function MP.Layer(name, definition)
 			table.insert(MP._JOKER_LAYERS[joker_key], name)
 		end
 	end
+	if definition.reworked_consumables then
+		for _, consumable_key in ipairs(definition.reworked_consumables) do
+			MP._CONSUMABLE_LAYERS[consumable_key] = MP._CONSUMABLE_LAYERS[consumable_key] or {}
+			table.insert(MP._CONSUMABLE_LAYERS[consumable_key], name)
+		end
+	end
+end
+
+-- Build an mp_include closure that returns true iff any of the named layers is active.
+local function layer_membership_include(owning_layers)
+	return function(_)
+		for _, layer_name in ipairs(owning_layers) do
+			if MP.is_layer_active(layer_name) then return true end
+		end
+		return false
+	end
 end
 
 -- A small graft on SMODS.Joker:register. Any joker whose full key appears in some
@@ -20,7 +37,7 @@ end
 -- provided. By the time register runs the key is already prefixed, so we can look
 -- it up directly. is_layer_active fails closed outside a live ruleset context, and
 -- bespoke mp_include slips past untouched.
-local _original_register = SMODS.Joker.register
+local _original_joker_register = SMODS.Joker.register
 function SMODS.Joker:register()
 	if not self.mp_include and MP._JOKER_LAYERS[self.key] then
 		local owning_layers = MP._JOKER_LAYERS[self.key]
@@ -28,14 +45,25 @@ function SMODS.Joker:register()
 			"Auto-gating " .. self.key .. " on layers: " .. table.concat(owning_layers, ", "),
 			"MULTIPLAYER"
 		)
-		self.mp_include = function(_)
-			for _, layer_name in ipairs(owning_layers) do
-				if MP.is_layer_active(layer_name) then return true end
-			end
-			return false
-		end
+		self.mp_include = layer_membership_include(owning_layers)
 	end
-	return _original_register(self)
+	return _original_joker_register(self)
+end
+
+-- Same graft for consumables. The lovely patch in lovely/misc.toml that filters
+-- _pool entries by mp_include works on any center, so consumables behave the
+-- same way as jokers once mp_include is set.
+local _original_consumable_register = SMODS.Consumable.register
+function SMODS.Consumable:register()
+	if not self.mp_include and MP._CONSUMABLE_LAYERS[self.key] then
+		local owning_layers = MP._CONSUMABLE_LAYERS[self.key]
+		sendDebugMessage(
+			"Auto-gating " .. self.key .. " on layers: " .. table.concat(owning_layers, ", "),
+			"MULTIPLAYER"
+		)
+		self.mp_include = layer_membership_include(owning_layers)
+	end
+	return _original_consumable_register(self)
 end
 
 -- Array-valued fields that get merged (layer base + ruleset additions)
@@ -115,9 +143,7 @@ function MP.RunLayerHooks(hook_name)
 	if not ruleset or not ruleset._layer_order then return end
 	for _, layer_name in ipairs(ruleset._layer_order) do
 		local layer = MP.Layers[layer_name]
-		if layer and layer[hook_name] then
-			layer[hook_name]()
-		end
+		if layer and layer[hook_name] then layer[hook_name]() end
 	end
 end
 
