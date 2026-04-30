@@ -219,6 +219,7 @@ function MP.reset_game_states()
 		prevent_eval = false,
 		round_ended = false,
 		duplicate_end = false,
+		pvp_blind_started = false,
 		misprint_display = "",
 		spent_total = 0,
 		spent_before_shop = 0,

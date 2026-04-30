@@ -112,6 +112,25 @@ function Game:update(dt)
 			handle_reconnect_timeout("Reconnection failed.\nReturning to main menu.")
 		end
 	end
+		-- Auto-detect stuck outside PvP blind
+	if MP.LOBBY.code and MP.is_pvp_boss() and not MP.GAME.pvp_blind_started then
+
+		-- Check if opponent is already in PvP blind (has "playing" in their location)
+		if MP.GAME.enemy and MP.GAME.enemy.location and string.find(MP.GAME.enemy.location, "playing") then
+			sendDebugMessage("Auto-detected stuck outside PvP blind, recovering...", "MULTIPLAYER")
+
+			-- Trigger the same unstuck logic that the button uses
+			if G.FUNCS.mp_unstuck_blind then
+				G.FUNCS.mp_unstuck_blind()
+			end
+		end
+	end
+	
+	-- Also reset the flag when leaving PvP state
+	if MP.LOBBY.code and not MP.is_pvp_boss() and MP.GAME.pvp_blind_started then
+		MP.GAME.pvp_blind_started = false
+	end
+	
 	return _disconnect_gupdate(self, dt)
 end
 
@@ -247,9 +266,18 @@ local function begin_pvp_blind()
 end
 
 local function action_start_blind()
+
+	-- Reset state
 	MP.GAME.ready_blind = false
 	MP.GAME.timer_started = false
 	MP.GAME.timer = MP.LOBBY.config.timer_base_seconds
+	MP.GAME.pvp_blind_started = true  -- New flag
+	
+	-- Clear any pending stuck state
+	if MP.GAME.stuck_outside_pvp then
+		MP.GAME.stuck_outside_pvp = nil
+	end
+	
 	MP.UI.start_pvp_countdown(begin_pvp_blind)
 end
 
@@ -458,6 +486,7 @@ local function action_lobby_options(options)
 			parsed_v = tonumber(v)
 		end
 
+		-- Handle deck keys
 		if k == "back_key" then
 			MP.LOBBY.config.back_key = parsed_v
 			MP.LOBBY.config.back = MP.UTILS.get_deck_name_from_key(parsed_v) or parsed_v
@@ -473,33 +502,27 @@ local function action_lobby_options(options)
 			MP.LOBBY.config[k] = parsed_v
 		end
 
-		
 		if MP.UI.update_lobby_option_toggle then MP.UI.update_lobby_option_toggle(k) end
 		::continue::
 	end
+
 	if different_decks_before ~= MP.LOBBY.config.different_decks then
-		G.FUNCS.exit_overlay_menu() -- throw out guest from any menu.
+		G.FUNCS.exit_overlay_menu()
 	end
-
-	if MP.LOBBY.code and G.MAIN_MENU_UI then
-		G.MAIN_MENU_UI:remove()
-		G.FUNCS.display_lobby_main_menu_UI()
-	end
-
-	MP.ACTIONS.update_player_usernames() -- render new DECK button state
 
 	-- If different_decks is false, guest should see host's deck
 	if not MP.LOBBY.config.different_decks and not MP.LOBBY.is_host then
-		-- Sync guest's displayed deck to host's deck
 		MP.LOBBY.deck.back_key = MP.LOBBY.config.back_key
 		MP.LOBBY.deck.back = MP.LOBBY.config.back
 	end
 
-		-- Force UI refresh
+	-- Force UI refresh (only once, at the end)
 	if MP.LOBBY.code and G.MAIN_MENU_UI then
 		G.MAIN_MENU_UI:remove()
 		G.FUNCS.display_lobby_main_menu_UI()
 	end
+
+	MP.ACTIONS.update_player_usernames()
 end
 
 local function action_send_phantom(key)
@@ -1243,7 +1266,6 @@ function Game:update(dt)
 				end
 				return
 			end
-
 			local parsedAction = json.decode(msg)
 
 			if not ((parsedAction.action == "keepAlive") or (parsedAction.action == "keepAliveAck")) then
