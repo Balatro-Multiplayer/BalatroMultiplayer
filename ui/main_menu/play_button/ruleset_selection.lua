@@ -131,7 +131,6 @@ function G.UIDEF.ruleset_selection_options(mode, buttons)
 	else
         default_ruleset = string.match(buttons[1].buttons[1].button_id, "(.+)_ruleset_button$")
 	end
-    print(default_ruleset)
 
 	if mode == "sp" or mode == "practice" then
 		MP.SP.ruleset = "ruleset_mp_" .. default_ruleset
@@ -141,14 +140,12 @@ function G.UIDEF.ruleset_selection_options(mode, buttons)
 
 	MP.LoadReworks(default_ruleset)
     MP.UI.ruleset_selection_mode = mode
+    MP.UI.ruleset_selection_default_button = default_ruleset .. "_ruleset_button"
 
 	local default_ruleset_area = UIBox({
 		definition = G.UIDEF.ruleset_info(default_ruleset, mode),
 		config = { align = "cm" },
 	})
-
-
-
 	return MP.UI.Main_Lobby_Options(
 		"ruleset_area",
 		default_ruleset_area,
@@ -166,7 +163,7 @@ function G.FUNCS.change_ruleset_selection(e)
 
 	-- this currently doesn't work properly
 	-- local default_button = mode == "sp" and "vanilla_ruleset_button" or "standard_ranked_ruleset_button"
-	local default_button = "standard_ranked_ruleset_button"
+	local default_button = MP.UI.ruleset_selection_default_button or "standard_ranked_ruleset_button"
 
 	MP.UI.Change_Main_Lobby_Options(
 		e,
