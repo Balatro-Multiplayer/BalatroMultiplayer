@@ -6,5 +6,5 @@ MP.Layer("pressure_timer", {
     preview_calculate_delay = 1.5,
     preview_calculate_cost = 3.5,
     timer_speedup_multiplier = 2,
-    timer_base_multiplier = 5 / 3,
+    timer_base_multiplier = 2,
 })
