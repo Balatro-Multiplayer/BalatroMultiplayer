@@ -45,7 +45,7 @@ function G.FUNCS.select_gamemode(e)
 	G.SETTINGS.paused = true
 
 	G.FUNCS.overlay_menu({
-		definition = G.UIDEF.gamemode_selection_options(),
+        definition =  G.UIDEF.gamemode_selection_tabs(),
 	})
 end
 
