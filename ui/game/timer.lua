@@ -258,6 +258,7 @@ function Game:update(dt)
     local timer_dt = new_time - (MP.TIMER_CLOCK or new_time)
     MP.TIMER_CLOCK = new_time
     MP.TIMER_ANIMATION_BUDGET = math.min(animation_budget_capacity, (MP.TIMER_ANIMATION_BUDGET or animation_budget_capacity) + timer_dt * animation_budget_restore_rate)
+    MP.TIMER_FORCE_GAMESPEED = false
 
     -- Bail fast: not an MP PvP-timer context
     if G.STATE == G.STATES.GAME_OVER then return end
@@ -269,12 +270,16 @@ function Game:update(dt)
 
 
     local is_no_animation_timer = MP.is_layer_active("no_animation_timer")
+    local is_pressure_timer =  MP.is_layer_active("pressure_timer")
     -- Tick gating differs by layer:
     --   pressure_timer ON  -> tick during regular play (not ready_blind, not pvp boss)
     --   pressure_timer OFF -> tick whenever someone pressed a timer button.
     --     timer_started = YOU pressed it; nemesis_timer_started = OPPONENT pressed it
     --     (i.e. they're timering you). Either way your local timer should tick.
-    if MP.is_layer_active("pressure_timer") or is_no_animation_timer then
+    if is_pressure_timer or is_no_animation_timer then
+        if is_pressure_timer or (is_no_animation_timer and MP.GAME.nemesis_timer_started) then
+            MP.TIMER_FORCE_GAMESPEED = true
+        end
         if MP.GAME.ready_blind or MP.is_pvp_boss() then return end
         -- Tick when "unready" blind or old timer, and opponent "timering" you
         if (MP.GAME.pvp_reached or is_no_animation_timer) and not MP.GAME.nemesis_timer_started then return end
