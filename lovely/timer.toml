@@ -5,7 +5,7 @@ priority = 2147483600
 
 # Force gamespeed to vanilla 4x when we need to
 [[patches]]
-[patches.regex]
+[patches.pattern]
 target = 'game.lua'
 pattern = 'self.TIMERS.TOTAL = self.TIMERS.TOTAL + dt*(self.SPEEDFACTOR)'
 position = 'before'
@@ -15,3 +15,4 @@ if MP.TIMER_FORCE_GAMESPEED and (G.STAGE == G.STAGES.RUN and not G.SETTINGS.paus
 end
 '''
 times = 1
+match_indent = true
