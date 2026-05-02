@@ -1,66 +1,156 @@
-function G.UIDEF.ruleset_selection_options(mode)
+local ruleset_buttons_data = {
+    {
+        name = "k_matchmaking",
+        buttons = {
+            { button_id = "standard_ranked_ruleset_button", button_localize_key = "k_standard_ranked" },
+            { button_id = "legacy_ranked_ruleset_button", button_localize_key = "k_legacy_ranked" },
+            { button_id = "smallworld_ruleset_button", button_localize_key = "k_smallworld" },
+            { button_id = "sandbox_ruleset_button", button_localize_key = "k_sandbox" },
+        },
+    },
+    {
+        name = "k_custom",
+        buttons = {
+            { button_id = "blitz_ruleset_button", button_localize_key = "k_blitz" },
+            { button_id = "traditional_ruleset_button", button_localize_key = "k_traditional" },
+            { button_id = "vanilla_ruleset_button", button_localize_key = "k_vanilla" },
+            { button_id = "badlatro_ruleset_button", button_localize_key = "k_badlatro" },
+            { button_id = "speedlatro_ruleset_button", button_localize_key = "k_speedlatro" },
+            { button_id = "chaos_ruleset_button", button_localize_key = "k_chaos" },
+        },
+    },
+    {
+        name = "k_tournament",
+        buttons = {
+            { button_id = "majorleague_ruleset_button", button_localize_key = "k_majorleague" },
+            { button_id = "minorleague_ruleset_button", button_localize_key = "k_minorleague" },
+        },
+    },
+}
+
+local rulesets_tabs = {
+    default = {
+        {
+            name = "k_mp_ruleset_tab_general",
+            data = {
+                {
+                    name = "k_matchmaking",
+                    buttons = {
+                        { button_id = "standard_ranked_ruleset_button", button_localize_key = "k_standard_ranked" },
+                        { button_id = "legacy_ranked_ruleset_button", button_localize_key = "k_legacy_ranked" },
+                        { button_id = "smallworld_ruleset_button", button_localize_key = "k_smallworld" },
+                        { button_id = "sandbox_ruleset_button", button_localize_key = "k_sandbox" },
+                    },
+                },
+                {
+                    name = "k_custom",
+                    buttons = {
+                        { button_id = "blitz_ruleset_button", button_localize_key = "k_blitz" },
+                        { button_id = "traditional_ruleset_button", button_localize_key = "k_traditional" },
+                        { button_id = "vanilla_ruleset_button", button_localize_key = "k_vanilla" },
+
+                    },
+                },
+            },
+        },
+        {
+            name = "k_mp_ruleset_tab_torunaments",
+            data = {
+                {
+                    name = "k_tournament",
+                    buttons = {
+                        { button_id = "majorleague_ruleset_button", button_localize_key = "k_majorleague" },
+                        { button_id = "minorleague_ruleset_button", button_localize_key = "k_minorleague" },
+                    },
+                },
+                {
+                    name = "k_custom",
+                    buttons = {
+                        { button_id = "speedlatro_ruleset_button", button_localize_key = "k_speedlatro" },
+                        { button_id = "badlatro_ruleset_button", button_localize_key = "k_badlatro" },
+                        { button_id = "chaos_ruleset_button", button_localize_key = "k_chaos" },
+                    },
+                },
+            }
+        },
+        {
+            name = "k_mp_ruleset_tab_experimental",
+            data = {
+                {
+                    name = "k_experimental",
+                    buttons = {
+                        { button_id = "experimental_pressure_ruleset_button", button_localize_key = "k_experimental_pressure" },
+                        { button_id = "experimental_no_animation_ruleset_button", button_localize_key = "k_experimental_no_animation" },
+                        { button_id = "experimental_pressure_only_ruleset_button", button_localize_key = "k_experimental_pressure_only" },
+                        { button_id = "experimental_no_animation_only_ruleset_button", button_localize_key = "k_experimental_no_animation_only" },
+                    },
+                },
+            }
+        }
+    },
+}
+
+function G.UIDEF.ruleset_selection_tabs(mode)
+    local tabs_schema = rulesets_tabs[mode] or rulesets_tabs.default
+    local tabs = {}
+    for _, item in ipairs(tabs_schema) do
+        table.insert(tabs, {
+            label = localize(item.name),
+            tab_definition_function = function()
+                return G.UIDEF.ruleset_selection_options(mode, item.data)
+            end,
+        })
+    end
+    tabs[1].chosen = true
+    local t = create_UIBox_generic_options({
+		back_func = "play_options",
+		contents = {
+			{
+				n = G.UIT.R,
+				config = { align = "cm", padding = 0 },
+				nodes = {
+					create_tabs({
+						tabs = tabs,
+						colour = G.C.BOOSTER,
+					}),
+				},
+			},
+		},
+	})
+    return t
+end
+
+function G.UIDEF.ruleset_selection_options(mode, buttons)
 	mode = mode or "mp"
 	MP.LOBBY.fetched_weekly = "smallworld" -- temp
 
 	-- If ghost is active, preserve the replay's ruleset instead of resetting to default
 	local default_ruleset
 	if mode == "practice" and MP.GHOST.is_active() and MP.SP.ruleset then
-		default_ruleset = MP.SP.ruleset:gsub("^ruleset_mp_", "")
+		default_ruleset = MP.SP.ruleset
 	else
-		default_ruleset = "standard_ranked"
+        default_ruleset = string.match(buttons[1].buttons[1].button_id, "(.+)_ruleset_button$")
 	end
-	local default_button = default_ruleset .. "_ruleset_button"
 
 	if mode == "sp" or mode == "practice" then
 		MP.SP.ruleset = "ruleset_mp_" .. default_ruleset
 	else
 		MP.LOBBY.config.ruleset = "ruleset_mp_" .. default_ruleset
 	end
+
 	MP.LoadReworks(default_ruleset)
+    MP.UI.ruleset_selection_mode = mode
+    MP.UI.ruleset_selection_default_button = default_ruleset .. "_ruleset_button"
 
 	local default_ruleset_area = UIBox({
 		definition = G.UIDEF.ruleset_info(default_ruleset, mode),
 		config = { align = "cm" },
 	})
-
-	local ruleset_buttons_data = {
-		{
-			name = "k_matchmaking",
-			buttons = {
-				{ button_id = "standard_ranked_ruleset_button", button_localize_key = "k_standard_ranked" },
-				{ button_id = "legacy_ranked_ruleset_button", button_localize_key = "k_legacy_ranked" },
-				{ button_id = "smallworld_ruleset_button", button_localize_key = "k_smallworld" },
-				{ button_id = "sandbox_ruleset_button", button_localize_key = "k_sandbox" },
-			},
-		},
-		{
-			name = "k_custom",
-			buttons = {
-				{ button_id = "blitz_ruleset_button", button_localize_key = "k_blitz" },
-				{ button_id = "experimental_ruleset_button", button_localize_key = "k_experimental" },
-				{ button_id = "traditional_ruleset_button", button_localize_key = "k_traditional" },
-				{ button_id = "vanilla_ruleset_button", button_localize_key = "k_vanilla" },
-				{ button_id = "badlatro_ruleset_button", button_localize_key = "k_badlatro" },
-				{ button_id = "speedlatro_ruleset_button", button_localize_key = "k_speedlatro" },
-				{ button_id = "chaos_ruleset_button", button_localize_key = "k_chaos" },
-			},
-		},
-		{
-			name = "k_tournament",
-			buttons = {
-				{ button_id = "majorleague_ruleset_button", button_localize_key = "k_majorleague" },
-				{ button_id = "minorleague_ruleset_button", button_localize_key = "k_minorleague" },
-			},
-		},
-	}
-
-	MP.UI.ruleset_selection_mode = mode
-
 	return MP.UI.Main_Lobby_Options(
 		"ruleset_area",
 		default_ruleset_area,
 		"change_ruleset_selection",
-		ruleset_buttons_data
+		buttons
 	)
 end
 
@@ -73,7 +163,7 @@ function G.FUNCS.change_ruleset_selection(e)
 
 	-- this currently doesn't work properly
 	-- local default_button = mode == "sp" and "vanilla_ruleset_button" or "standard_ranked_ruleset_button"
-	local default_button = "standard_ranked_ruleset_button"
+	local default_button = MP.UI.ruleset_selection_default_button or "standard_ranked_ruleset_button"
 
 	MP.UI.Change_Main_Lobby_Options(
 		e,

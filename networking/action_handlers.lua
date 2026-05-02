@@ -275,6 +275,14 @@ local function action_enemy_info(score_str, hands_left_str, skips_str, lives_str
 	if MP.GAME.enemy.skips ~= skips then
 		for i = 1, skips - MP.GAME.enemy.skips do
 			MP.GAME.enemy.spent_in_shop[#MP.GAME.enemy.spent_in_shop + 1] = 0
+            if
+                MP.GAME.enemy.skips < skips
+                and MP.is_layer_active("no_animation_timer")
+                and not MP.GAME.timer_started
+                and (MP.LOBBY.config.timer_increment_seconds or 0) > 0
+            then
+                MP.GAME.timer = MP.GAME.timer + MP.LOBBY.config.timer_increment_seconds
+            end
 		end
 	end
 

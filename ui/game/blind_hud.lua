@@ -26,7 +26,7 @@ function MP.UI.update_blind_HUD(blind, reset, silent)
         name_element.config.object.scale = name_element.config.object.config.scale
         name_element.config.object:update_text(true)
         if name_element.config.object.config.maxw then
-            name_element.config.object.scale = name_element.config.object.scale * (name_element.config.object.config.maxw/name_element.config.object.config.W)
+            name_element.config.object.scale = name_element.config.object.scale * math.min(1, name_element.config.object.config.maxw/name_element.config.object.config.W)
         end
         name_element.config.object:update_text(true)
         name_element.states.visible = false
@@ -91,7 +91,7 @@ function MP.UI.reset_blind_HUD()
             name_element.config.object.scale = name_element.config.object.config.scale
             name_element.config.object:update_text(true)
             if name_element.config.object.config.maxw then
-                name_element.config.object.scale = name_element.config.object.scale * (name_element.config.object.config.maxw/name_element.config.object.config.W)
+                name_element.config.object.scale = name_element.config.object.scale * math.min(1, name_element.config.object.config.maxw/name_element.config.object.config.W)
             end
             name_element.config.object:update_text(true)
         end

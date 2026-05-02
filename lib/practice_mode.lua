@@ -16,7 +16,7 @@ function G.FUNCS.setup_practice_mode(e)
 	MP.GHOST.clear()
 
 	G.FUNCS.overlay_menu({
-		definition = G.UIDEF.ruleset_selection_options("practice"),
+		definition = G.UIDEF.ruleset_selection_tabs("practice"),
 	})
 end
 
