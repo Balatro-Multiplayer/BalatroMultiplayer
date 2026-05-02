@@ -30,7 +30,7 @@ MP.Layer("experimental", {
 		"c_mp_ouija_standard",
 	},
 	reworked_enhancements = {
-		"m_mp_display_glass",
-		"m_mp_display_gold",
+		"m_glass",
+		"m_gold",
 	},
 })
