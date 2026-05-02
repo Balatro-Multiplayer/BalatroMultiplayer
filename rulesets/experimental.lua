@@ -21,3 +21,9 @@ MP.Ruleset({
 	layers = { "standard", "ranked", "no_animation_timer" },
 	forced_gamemode = "gamemode_mp_attrition",
 }):inject()
+
+MP.Ruleset({
+	key = "experimental_pvp_timer",
+	layers = { "standard", "ranked", "pvp_timer" },
+	forced_gamemode = "gamemode_mp_attrition",
+}):inject()

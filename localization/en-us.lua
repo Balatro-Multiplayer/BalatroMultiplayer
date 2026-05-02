@@ -1322,6 +1322,8 @@ return {
 			k_experimental_pressure_only_description = "One of versions of Multiplayer 0.4.0 update.\n\nOnly new timer included.\n\nLonger timer which ticks from the start but stops during animations.\n300 seconds per ante, no additional time from skipping.",
 			k_experimental_no_animation_only = "No-Animation timer",
 			k_experimental_no_animation_only_description = "One of versions of Multiplayer 0.4.0 update.\n\nOnly alternative timer included.\n\nSmaller timer which stops during animations.\n120 seconds per ante.",
+			k_experimental_pvp_timer = "PvP timer",
+			k_experimental_pvp_timer_description = "PvP timer.\n\nCan pause opponent if your score is higher.\n90 seconds + 15 seconds per hand played,\nnot including animations.\nOn time out, lost a PvP.",
 			k_traditional = "Traditional",
 			k_traditional_description = "Multiplayer content without time pressure.\n\nIncludes Multiplayer jokers and balance changes,\nbut removes time-based mechanics for methodical play.\n\nTime-based jokers are banned.\nTimer is disabled.\n\n(See bans and reworks tabs for details)",
 			k_majorleague = "Major League",

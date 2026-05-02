@@ -83,6 +83,7 @@ local rulesets_tabs = {
                         { button_id = "experimental_no_animation_ruleset_button", button_localize_key = "k_experimental_no_animation" },
                         { button_id = "experimental_pressure_only_ruleset_button", button_localize_key = "k_experimental_pressure_only" },
                         { button_id = "experimental_no_animation_only_ruleset_button", button_localize_key = "k_experimental_no_animation_only" },
+                        { button_id = "experimental_pvp_timer_ruleset_button", button_localize_key = "k_experimental_pvp_timer" },
                     },
                 },
             }
