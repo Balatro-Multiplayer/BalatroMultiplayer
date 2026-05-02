@@ -1,6 +1,6 @@
 MP.Ruleset({
 	key = "experimental",
-	layers = { "experimental", "pressure_timer" },
+	layers = { "experimental" },
 	forced_gamemode = "gamemode_mp_attrition",
 	force_lobby_options = function(self)
 		MP.LOBBY.config.the_order = true
