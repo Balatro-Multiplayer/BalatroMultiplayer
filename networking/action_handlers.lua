@@ -292,7 +292,7 @@ local function action_enemy_info(score_str, hands_left_str, skips_str, lives_str
 	end
 
 	if MP.INSANE_INT.greater_than(score, MP.GAME.enemy.highest_score) then MP.GAME.enemy.highest_score = score end
-    if MP.is_layer_active("pvp_timer") and MP.is_pvp_boss() then
+    if MP.is_pvp_boss() and MP.is_layer_active("pvp_timer") then
         if MP.INSANE_INT.greater_than(MP.GAME.score, score) then
             MP.GAME.nemesis_timer_started = false
         else
@@ -374,6 +374,8 @@ local function action_end_pvp()
 	MP.GAME.ready_blind = false
     MP.GAME.pvp_reached = false
 end
+
+MP.register_mod_action("forcePvPEnd", action_end_pvp, "Multiplayer")
 
 ---@param lives number
 local function action_player_info(lives)
@@ -1022,7 +1024,7 @@ function MP.ACTIONS.play_hand(score, hands_left)
 		MP.GAME.highest_score = insane_int_score
 	end
 
-    if MP.is_layer_active("pvp_timer") and MP.is_pvp_boss() then
+    if MP.is_pvp_boss() and MP.is_layer_active("pvp_timer") then
         if not MP.GAME.timer_consumed then
             local ruleset_key = MP.LOBBY.config.ruleset
             local ruleset = MP.Rulesets and ruleset_key and MP.Rulesets[ruleset_key]
