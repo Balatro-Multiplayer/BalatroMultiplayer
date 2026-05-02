@@ -792,30 +792,6 @@ return {
 			},
 		},
 		Enhanced = {
-			m_mp_display_glass = {
-				name = "Glass Card",
-				text = {
-					"{X:mult,C:white} X#1# {} Mult",
-					"{C:green}#2# in #3#{} chance to",
-					"destroy card",
-				},
-			},
-			m_mp_sandbox_display_glass = {
-				name = "Glass Card",
-				text = {
-					"{X:mult,C:white} X#1# {} Mult",
-					"{C:green}#2# in #3#{} chance to",
-					"destroy card",
-				},
-			},
-			m_mp_display_gold = {
-				name = "Gold Card",
-				text = {
-					"{C:money}$#1#{} if this card is",
-					"{C:attention}held in hand{}",
-					"at end of round",
-				},
-			},
 		},
 		Back = {
 			b_mp_cocktail = {
@@ -968,12 +944,6 @@ return {
 				},
 			},
 			mp_sticker_balanced_m_gold = {
-				name = "Balanced",
-				text = {
-					"Earns {C:money}$4{} instead of {C:money}$3{}",
-				},
-			},
-			mp_sticker_balanced_m_mp_display_gold = {
 				name = "Balanced",
 				text = {
 					"Earns {C:money}$4{} instead of {C:money}$3{}",

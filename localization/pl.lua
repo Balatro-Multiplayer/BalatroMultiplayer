@@ -136,26 +136,6 @@ return {
 				},
 			},
 		},
-		Enhanced = {
-			m_mp_display_glass = {
-				name = "Szklany Joker",
-				text = {
-					"Ten joker zdobywa {X:mult,C:white} X#1# {}",
-					"do mnoż. za każdą zniszczoną",
-					"{C:attention}Kartę Szklaną",
-					"{C:inactive}(obecnie {X:mult,C:white} X#2# {C:inactive} do mnoż.)",
-				},
-			},
-			m_mp_sandbox_display_glass = {
-				name = "Szklany Joker",
-				text = {
-					"Ten joker zdobywa {X:mult,C:white} X#1# {}",
-					"do mnoż. za każdą zniszczoną",
-					"{C:attention}Kartę Szklaną",
-					"{C:inactive}(obecnie {X:mult,C:white} X#2# {C:inactive} do mnoż.)",
-				},
-			},
-		},
 		Back = {
 			b_mp_cocktail = {
 				name = "Koktajlowa talia",
