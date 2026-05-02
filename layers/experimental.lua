@@ -33,7 +33,4 @@ MP.Layer("experimental", {
 		"m_glass",
 		"m_gold",
 	},
-    is_disabled = function()
-        return false
-    end,
 })
