@@ -228,7 +228,7 @@ function MP.reset_game_states()
 		spent_total = 0,
 		spent_before_shop = 0,
 		highest_score = MP.INSANE_INT.empty(),
-		timer = MP.UTILS.timer_base(),
+		timer = 150,
 		timer_started = false,
         timer_consumed = false,
         pvp_reached = false,
