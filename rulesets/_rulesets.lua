@@ -94,10 +94,93 @@ function MP.get_active_gamemode()
 	elseif MP.is_practice_mode() then
 		-- Ghost replay stores the gamemode directly
 		if MP.GHOST.is_active() and MP.GHOST.gamemode then return MP.GHOST.gamemode end
-		local ruleset_key = MP.SP and MP.SP.ruleset
-		if ruleset_key and MP.Rulesets[ruleset_key] then return MP.Rulesets[ruleset_key].forced_gamemode end
+		return MP.current_ruleset().forced_gamemode
 	end
 	return nil
+end
+
+-- ----------------------------------------------------------------------------
+-- Active context: the resolved view of (ruleset + active modifiers)
+-- ----------------------------------------------------------------------------
+-- See .context/resolved-ruleset.md for the design rationale.
+
+local _array_field_set = nil
+local function array_field_set()
+	if not _array_field_set then
+		_array_field_set = {}
+		for _, f in ipairs(MP._LAYER_ARRAY_FIELDS) do
+			_array_field_set[f] = true
+		end
+	end
+	return _array_field_set
+end
+
+local function resolve_field(field)
+	local ruleset_key = MP.get_active_ruleset()
+	local ruleset = ruleset_key and MP.Rulesets[ruleset_key] or nil
+	if array_field_set()[field] then
+		local merged = {}
+		if ruleset and ruleset[field] then
+			for _, v in ipairs(ruleset[field]) do
+				merged[#merged + 1] = v
+			end
+		end
+		for _, mod_name in ipairs(MP.MODIFIERS) do
+			local layer = MP.Layers[mod_name]
+			if layer and layer[field] then
+				for _, v in ipairs(layer[field]) do
+					merged[#merged + 1] = v
+				end
+			end
+		end
+		return merged
+	end
+	-- Scalar / function / non-array: modifiers last-wins, then ruleset
+	for i = #MP.MODIFIERS, 1, -1 do
+		local layer = MP.Layers[MP.MODIFIERS[i]]
+		if layer and layer[field] ~= nil then return layer[field] end
+	end
+	if ruleset then return ruleset[field] end
+	return nil
+end
+
+local _resolver_mt = {
+	__index = function(_, field)
+		return resolve_field(field)
+	end,
+}
+
+-- Returns a proxy that resolves field reads across (ruleset + active modifiers).
+-- Always returns a usable proxy, even with no active ruleset (array fields read
+-- as {}, everything else as nil).
+function MP.current_ruleset()
+	return setmetatable({}, _resolver_mt)
+end
+
+-- Ordered list of active layer names: target ruleset's _layer_order, the
+-- ruleset's self-name, then modifiers (when target is the active ruleset).
+-- Defaults to the active ruleset when target_short is omitted.
+function MP.active_layer_chain(target_short)
+	local active_key = MP.get_active_ruleset()
+	local active_short = active_key and active_key:gsub("^ruleset_mp_", "") or nil
+	target_short = target_short or active_short
+
+	local result = {}
+	if target_short then
+		local ruleset = MP.Rulesets["ruleset_mp_" .. target_short]
+		if ruleset and ruleset._layer_order then
+			for _, name in ipairs(ruleset._layer_order) do
+				result[#result + 1] = name
+			end
+		end
+		result[#result + 1] = target_short
+	end
+	if target_short == active_short then
+		for _, name in ipairs(MP.MODIFIERS) do
+			result[#result + 1] = name
+		end
+	end
+	return result
 end
 
 function MP.ApplyBans()
@@ -106,7 +189,7 @@ function MP.ApplyBans()
 	local gamemode = gamemode_key and MP.Gamemodes[gamemode_key] or nil
 
 	if ruleset_key then
-		local ruleset = MP.Rulesets[ruleset_key]
+		local ruleset = MP.current_ruleset()
 		local banned_tables = {
 			"jokers",
 			"consumables",
@@ -127,25 +210,9 @@ function MP.ApplyBans()
 			for _, v in pairs(MP.DECK["BANNED_" .. string.upper(table)]) do
 				G.GAME.banned_keys[v] = true
 			end
-			for _, mod_name in ipairs(MP.MODIFIERS) do
-				local layer = MP.Layers[mod_name]
-				if layer then
-					for _, v in ipairs(layer["banned_" .. table] or {}) do
-						G.GAME.banned_keys[v] = true
-					end
-				end
-			end
 		end
-		for _, v in ipairs(ruleset["banned_silent"] or {}) do
+		for _, v in ipairs(ruleset.banned_silent) do
 			G.GAME.banned_keys[v] = true
-		end
-		for _, mod_name in ipairs(MP.MODIFIERS) do
-			local layer = MP.Layers[mod_name]
-			if layer then
-				for _, v in ipairs(layer["banned_silent"] or {}) do
-					G.GAME.banned_keys[v] = true
-				end
-			end
 		end
 	end
 end
@@ -258,20 +325,10 @@ function MP.LoadReworks(ruleset, key)
 		end
 	end
 
-	-- Build resolution order: vanilla → layers in order → self → modifiers
-	local resolution = {}
-	local ruleset_obj = MP.Rulesets["ruleset_mp_" .. ruleset]
-	if ruleset_obj and ruleset_obj._layer_order then
-		for _, layer in ipairs(ruleset_obj._layer_order) do
-			resolution[#resolution + 1] = layer
-		end
-	end
-	-- Self-layer (override escape hatch, also handles layerless rulesets like release)
-	resolution[#resolution + 1] = ruleset
-	-- Modifiers go last so they override ruleset-specific reworks
-	for _, mod_name in ipairs(MP.MODIFIERS) do
-		resolution[#resolution + 1] = mod_name
-	end
+	-- Resolution: vanilla → ruleset's layers → ruleset self → modifiers (only
+	-- when target is the active ruleset). active_layer_chain handles the full
+	-- layer-name list; vanilla is processed separately.
+	local resolution = MP.active_layer_chain(ruleset)
 
 	if key then
 		process(key, "mp_vanilla_")

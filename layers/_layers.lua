@@ -178,29 +178,19 @@ function MP.modifiers_parse(s)
 	end
 end
 
--- Call a named hook on each active layer, in layer order, then on each modifier.
+-- Fire a named hook on every layer in the active chain. The ruleset's
+-- self-name appears in the chain but isn't registered in MP.Layers, so the
+-- lookup no-ops harmlessly.
 function MP.RunLayerHooks(hook_name)
-	local ruleset_key = MP.get_active_ruleset()
-	if not ruleset_key then return end
-	local ruleset = MP.Rulesets[ruleset_key]
-	if ruleset and ruleset._layer_order then
-		for _, layer_name in ipairs(ruleset._layer_order) do
-			local layer = MP.Layers[layer_name]
-			if layer and layer[hook_name] then layer[hook_name]() end
-		end
-	end
-	for _, mod_name in ipairs(MP.MODIFIERS) do
-		local layer = MP.Layers[mod_name]
+	for _, name in ipairs(MP.active_layer_chain()) do
+		local layer = MP.Layers[name]
 		if layer and layer[hook_name] then layer[hook_name]() end
 	end
 end
 
 function MP.is_layer_active(layer_name)
-	if MP.has_modifier(layer_name) then return true end
-	local ruleset_key = MP.get_active_ruleset()
-	if not ruleset_key then return false end
-	-- Every ruleset is implicitly its own layer
-	if ruleset_key == "ruleset_mp_" .. layer_name then return true end
-	local ruleset = MP.Rulesets[ruleset_key]
-	return ruleset and ruleset._layers and ruleset._layers[layer_name] or false
+	for _, name in ipairs(MP.active_layer_chain()) do
+		if name == layer_name then return true end
+	end
+	return false
 end

@@ -101,9 +101,9 @@ function G.FUNCS.start_lobby(e)
 
 	MP.reset_lobby_config(true)
 
-	MP.LOBBY.config.multiplayer_jokers = MP.Rulesets[MP.LOBBY.config.ruleset].multiplayer_content
+	MP.LOBBY.config.multiplayer_jokers = MP.current_ruleset().multiplayer_content
 
-	MP.LOBBY.config.forced_config = MP.Rulesets[MP.LOBBY.config.ruleset].force_lobby_options()
+	MP.LOBBY.config.forced_config = MP.current_ruleset():force_lobby_options()
 
 	MP.LOBBY.config.modifier_layers = MP.modifiers_serialize()
 
