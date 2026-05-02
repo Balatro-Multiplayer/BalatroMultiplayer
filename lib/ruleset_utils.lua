@@ -13,6 +13,18 @@ function MP.UTILS.timer_base()
 	return base * mult
 end
 
+-- Base PvP timer in seconds, accounting for the active ruleset's pvp_timer_base_multiplier
+-- (set by layers like pvp_timer). The multiplier is applied at timer-init sites,
+-- so the lobby UI keeps showing the unmultiplied base.
+function MP.UTILS.pvp_timer_base()
+    if not MP.is_layer_active("pvp_timer") then return MP.UTILS.timer_base() end
+	local base = MP.LOBBY.config.pvp_timer_base_seconds or 90
+	local ruleset_key = MP.LOBBY.config.ruleset
+	local ruleset = MP.Rulesets and ruleset_key and MP.Rulesets[ruleset_key]
+	local mult = (ruleset and ruleset.pvp_timer_base_multiplier) or 1
+	return base * mult
+end
+
 function MP.UTILS.is_weekly(arg)
 	return MP.UTILS.get_weekly() == arg and MP.LOBBY.config.ruleset == "ruleset_mp_weekly"
 end

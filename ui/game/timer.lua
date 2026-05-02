@@ -219,7 +219,7 @@ function G.FUNCS.set_timer_box(e)
 			e.config.colour = G.C.DYN_UI.BOSS_DARK
             -- Pulse if it's pressure timer only
 			e.children[1].config.object.colours = { 
-                MP.GAME.timer > 0 and (MP.is_layer_active("pressure_timer") or MP.is_layer_active("no_animation_timer") or MP.is_layer_active("speedlatro"))
+                MP.GAME.timer > 0 and MP.is_any_layer_active({ "pressure_timer", "no_animation_timer", "speedlatro" })
                 and SMODS.Gradients["mp_timer_accelerated"] or G.C.IMPORTANT
             }
 			return
@@ -268,21 +268,27 @@ function Game:update(dt)
     if not MP.GAME.timer or MP.GAME.timer <= 0 then return end
     if MP.is_layer_active("speedlatro_timer") then return end
 
-
     local is_no_animation_timer = MP.is_layer_active("no_animation_timer")
-    local is_pressure_timer =  MP.is_layer_active("pressure_timer")
+    local is_pressure_timer = MP.is_layer_active("pressure_timer")
+    local is_pvp_boss = MP.is_pvp_boss()
+    local is_pvp_timer = MP.is_layer_active("pvp_timer") and is_pvp_boss
     -- Tick gating differs by layer:
     --   pressure_timer ON  -> tick during regular play (not ready_blind, not pvp boss)
     --   pressure_timer OFF -> tick whenever someone pressed a timer button.
     --     timer_started = YOU pressed it; nemesis_timer_started = OPPONENT pressed it
     --     (i.e. they're timering you). Either way your local timer should tick.
-    if is_pressure_timer or is_no_animation_timer then
-        if is_pressure_timer or (is_no_animation_timer and MP.GAME.nemesis_timer_started) then
+    if is_pressure_timer or is_no_animation_timer or is_pvp_timer then
+        if is_pressure_timer or is_pvp_timer or (is_no_animation_timer and MP.GAME.nemesis_timer_started) then
             MP.TIMER_FORCE_GAMESPEED = true
         end
-        if MP.GAME.ready_blind or MP.is_pvp_boss() then return end
-        -- Tick when "unready" blind or old timer, and opponent "timering" you
-        if (MP.GAME.pvp_reached or is_no_animation_timer) and not MP.GAME.nemesis_timer_started then return end
+        if is_pvp_timer then
+            if G.STATE == G.STATES.ROUND_EVAL then return end
+            if not MP.GAME.nemesis_timer_started then return end
+        else
+            if MP.GAME.ready_blind or is_pvp_boss then return end
+            -- Tick when "unready" blind or old timer, and opponent "timering" you
+            if (MP.GAME.pvp_reached or is_no_animation_timer) and not MP.GAME.nemesis_timer_started then return end
+        end
 
         -- Don't tick during animations, unless the user is paused or has a menu open
         local interactive = not (G.CONTROLLER.locked or (G.GAME.STOP_USE or 0) > 0)
@@ -298,15 +304,19 @@ function Game:update(dt)
 
     local ruleset = MP.Rulesets[MP.LOBBY.config.ruleset]
     local speedup = (ruleset and ruleset.timer_speedup_multiplier) or 1
-    local tick_mult = MP.GAME.nemesis_timer_started and speedup or 1
+    local tick_mult = (MP.GAME.nemesis_timer_started and not is_pvp_timer) and speedup or 1
     MP.GAME.timer = math.max(0, MP.GAME.timer - timer_dt * tick_mult)
 
     if MP.GAME.timer == 0 then
         MP.GAME.timer_consumed = true
-        if MP.GAME.timers_forgiven < MP.LOBBY.config.timer_forgiveness then
-            MP.GAME.timers_forgiven = MP.GAME.timers_forgiven + 1
+        if is_pvp_timer then
+            -- todo: what to do here: end pvp with loss or force your loss whatever score you did
         else
-            MP.ACTIONS.fail_timer()
+            if MP.GAME.timers_forgiven < MP.LOBBY.config.timer_forgiveness then
+                MP.GAME.timers_forgiven = MP.GAME.timers_forgiven + 1
+            else
+                MP.ACTIONS.fail_timer()
+            end
         end
     end
 end

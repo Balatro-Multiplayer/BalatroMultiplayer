@@ -258,7 +258,7 @@ local function action_start_blind()
 	MP.GAME.timer_started = false
 	MP.GAME.nemesis_timer_started = false
     MP.GAME.timer_consumed = false
-	MP.GAME.timer = MP.UTILS.timer_base()
+	MP.GAME.timer = MP.UTILS.pvp_timer_base()
 	MP.UI.start_pvp_countdown(begin_pvp_blind)
 end
 
@@ -861,7 +861,7 @@ local function action_start_ante_timer(time, from_nemesis)
 	end
 	-- Under pressure_timer the two players' local timers are intentionally desynced;
 	-- never overwrite ours from the network.
-	if not (MP.is_layer_active("pressure_timer") or MP.is_layer_active("no_animation_timer")) then
+	if not MP.is_any_layer_active({ "pressure_timer", "no_animation_timer" }) then
 		if type(time) == "string" then time = tonumber(time) end
 		if time then MP.GAME.timer = time end
 	end
@@ -873,7 +873,7 @@ local function action_start_ante_timer(time, from_nemesis)
 end
 
 local function action_pause_ante_timer(time, from_nemesis)
-	if not (MP.is_layer_active("pressure_timer") or MP.is_layer_active("no_animation_timer")) then
+	if not MP.is_any_layer_active({ "pressure_timer", "no_animation_timer" }) then
 		if type(time) == "string" then time = tonumber(time) end
 		if time then MP.GAME.timer = time end
 	end

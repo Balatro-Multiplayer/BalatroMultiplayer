@@ -25,10 +25,7 @@ end
 -- Build an mp_include closure that returns true iff any of the named layers is active.
 local function layer_membership_include(owning_layers)
 	return function(_)
-		for _, layer_name in ipairs(owning_layers) do
-			if MP.is_layer_active(layer_name) then return true end
-		end
-		return false
+        return MP.is_any_layer_active(owning_layers)
 	end
 end
 
@@ -154,4 +151,16 @@ function MP.is_layer_active(layer_name)
 	if ruleset_key == "ruleset_mp_" .. layer_name then return true end
 	local ruleset = MP.Rulesets[ruleset_key]
 	return ruleset and ruleset._layers and ruleset._layers[layer_name] or false
+end
+
+function MP.is_any_layer_active(layers)
+	local ruleset_key = MP.get_active_ruleset()
+	if not ruleset_key then return false end
+    for _, layer_name in ipairs(layers) do
+        -- Every ruleset is implicitly its own layer
+        if ruleset_key == "ruleset_mp_" .. layer_name then return true end
+        local ruleset = MP.Rulesets[ruleset_key]
+        if ruleset and ruleset._layers and ruleset._layers[layer_name] then return true end
+    end
+    return false
 end
