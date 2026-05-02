@@ -127,9 +127,25 @@ function MP.ApplyBans()
 			for _, v in pairs(MP.DECK["BANNED_" .. string.upper(table)]) do
 				G.GAME.banned_keys[v] = true
 			end
+			for _, mod_name in ipairs(MP.MODIFIERS) do
+				local layer = MP.Layers[mod_name]
+				if layer then
+					for _, v in ipairs(layer["banned_" .. table] or {}) do
+						G.GAME.banned_keys[v] = true
+					end
+				end
+			end
 		end
 		for _, v in ipairs(ruleset["banned_silent"] or {}) do
 			G.GAME.banned_keys[v] = true
+		end
+		for _, mod_name in ipairs(MP.MODIFIERS) do
+			local layer = MP.Layers[mod_name]
+			if layer then
+				for _, v in ipairs(layer["banned_silent"] or {}) do
+					G.GAME.banned_keys[v] = true
+				end
+			end
 		end
 	end
 end
@@ -242,7 +258,7 @@ function MP.LoadReworks(ruleset, key)
 		end
 	end
 
-	-- Build resolution order: vanilla → layers in order → self
+	-- Build resolution order: vanilla → layers in order → self → modifiers
 	local resolution = {}
 	local ruleset_obj = MP.Rulesets["ruleset_mp_" .. ruleset]
 	if ruleset_obj and ruleset_obj._layer_order then
@@ -250,8 +266,12 @@ function MP.LoadReworks(ruleset, key)
 			resolution[#resolution + 1] = layer
 		end
 	end
-	-- Self-layer last (override escape hatch, also handles layerless rulesets like release)
+	-- Self-layer (override escape hatch, also handles layerless rulesets like release)
 	resolution[#resolution + 1] = ruleset
+	-- Modifiers go last so they override ruleset-specific reworks
+	for _, mod_name in ipairs(MP.MODIFIERS) do
+		resolution[#resolution + 1] = mod_name
+	end
 
 	if key then
 		process(key, "mp_vanilla_")

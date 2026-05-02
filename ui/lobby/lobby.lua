@@ -392,14 +392,14 @@ function G.FUNCS.lobby_leave(e)
 			MP.LOBBY.code = nil
 			MP.ACTIONS.leave_lobby()
 			MP.UI.update_connection_status()
-			MP.clear_modifiers()
+			MP.MODIFIERS = {}
 			G.STATE = G.STATES.MENU
 		end)
 	else
 		MP.LOBBY.code = nil
 		MP.ACTIONS.leave_lobby()
 		MP.UI.update_connection_status()
-		MP.clear_modifiers()
+		MP.MODIFIERS = {}
 		G.STATE = G.STATES.MENU
 	end
 end
