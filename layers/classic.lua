@@ -7,6 +7,6 @@ MP.Layer("classic", {
 		"j_mp_hanging_chad",
 	},
 	reworked_enhancements = {
-		"m_mp_display_glass",
+		"m_glass",
 	},
 })
