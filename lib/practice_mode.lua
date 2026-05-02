@@ -14,6 +14,7 @@ function G.FUNCS.setup_practice_mode(e)
 	MP.SP.unlimited_slots = false
 	MP.SP.edition_cycling = false
 	MP.GHOST.clear()
+	MP.clear_modifiers()
 
 	G.FUNCS.overlay_menu({
 		definition = G.UIDEF.ruleset_selection_tabs("practice"),
@@ -22,6 +23,7 @@ end
 
 function G.FUNCS.start_practice_run(e)
 	G.FUNCS.exit_overlay_menu()
+	MP.apply_modifiers()
 	if MP.GHOST.is_active() then
 		local r = MP.GHOST.replay
 		MP.reset_game_states()

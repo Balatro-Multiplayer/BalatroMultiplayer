@@ -5,6 +5,7 @@ function G.FUNCS.setup_run_singleplayer(e)
 	MP.SP.ruleset = nil
 	MP.SP.practice = false
 	MP.GHOST.clear()
+	MP.clear_modifiers()
 
 	G.FUNCS.overlay_menu({
 		definition = G.UIDEF.ruleset_selection_tabs("sp"),
@@ -35,6 +36,8 @@ end
 
 function G.FUNCS.create_lobby(e)
 	G.SETTINGS.paused = true
+
+	MP.clear_modifiers()
 
 	G.FUNCS.overlay_menu({
 		definition = G.UIDEF.ruleset_selection_tabs("mp"),
@@ -101,6 +104,9 @@ function G.FUNCS.start_lobby(e)
 	MP.LOBBY.config.multiplayer_jokers = MP.Rulesets[MP.LOBBY.config.ruleset].multiplayer_content
 
 	MP.LOBBY.config.forced_config = MP.Rulesets[MP.LOBBY.config.ruleset].force_lobby_options()
+
+	MP.LOBBY.config.modifier_layers = MP.modifiers_serialize()
+	MP.apply_modifiers()
 
 	if MP.LOBBY.config.gamemode == "gamemode_mp_survival" then
 		MP.LOBBY.config.starting_lives = 1

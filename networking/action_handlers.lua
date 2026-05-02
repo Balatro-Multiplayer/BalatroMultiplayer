@@ -405,6 +405,7 @@ end
 
 local function action_lobby_options(options)
 	local different_decks_before = MP.LOBBY.config.different_decks
+	local saw_modifier_or_ruleset = false
 	for k, v in pairs(options) do
 		if k == "ruleset" then
 			if not MP.Rulesets[v] then
@@ -425,10 +426,17 @@ local function action_lobby_options(options)
 				return
 			end
 			MP.LOBBY.config.ruleset = v
+			saw_modifier_or_ruleset = true
 			goto continue
 		end
 		if k == "gamemode" then
 			MP.LOBBY.config.gamemode = v
+			goto continue
+		end
+		if k == "modifier_layers" then
+			MP.LOBBY.config.modifier_layers = v
+			MP.modifiers_parse(v)
+			saw_modifier_or_ruleset = true
 			goto continue
 		end
 
@@ -455,6 +463,7 @@ local function action_lobby_options(options)
 		if MP.UI.update_lobby_option_toggle then MP.UI.update_lobby_option_toggle(k) end
 		::continue::
 	end
+	if saw_modifier_or_ruleset then MP.apply_modifiers() end
 	if different_decks_before ~= MP.LOBBY.config.different_decks then
 		G.FUNCS.exit_overlay_menu() -- throw out guest from any menu.
 	end

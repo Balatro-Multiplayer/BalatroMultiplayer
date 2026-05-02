@@ -155,3 +155,175 @@ function MP.is_layer_active(layer_name)
 	local ruleset = MP.Rulesets[ruleset_key]
 	return ruleset and ruleset._layers and ruleset._layers[layer_name] or false
 end
+
+-- ----------------------------------------------------------------------------
+-- Modifier layers
+-- ----------------------------------------------------------------------------
+-- Runtime-toggleable layers picked by the host in the Modifiers overlay (or by
+-- the player in practice mode). Source of truth is MP.MODIFIERS — an ordered
+-- list of layer names. At lobby/practice create we *graft* these onto the
+-- active ruleset's _layer_order/_layers and merge their banned_*/reworked_*
+-- arrays and scalars in. After that, modifier layers ARE just layers as far as
+-- is_layer_active, RunLayerHooks, LoadReworks, ApplyBans, and ruleset UI tabs
+-- are concerned. On lobby leave / practice exit we restore from the snapshot.
+--
+-- Modifier layers are appended last in the layer order, so their scalars beat
+-- both ruleset layers and the ruleset's own scalar values — modifiers are an
+-- explicit override.
+
+MP.MODIFIERS = {}
+
+local _array_field_set = {}
+for _, f in ipairs(MP._LAYER_ARRAY_FIELDS) do
+	_array_field_set[f] = true
+end
+
+local _ruleset_snapshots = {} -- key -> snapshot
+local _augmented_key = nil    -- which ruleset is currently grafted
+
+local function shallow_copy_array(arr)
+	local out = {}
+	for i, v in ipairs(arr or {}) do
+		out[i] = v
+	end
+	return out
+end
+
+local function shallow_copy_set(t)
+	local out = {}
+	for k, v in pairs(t or {}) do
+		out[k] = v
+	end
+	return out
+end
+
+-- Snapshot ruleset state we'll mutate. Captures _layer_order, _layers, every
+-- array field, and any scalar a modifier layer might overwrite (computed
+-- lazily as we apply, so the snapshot only grows).
+local function take_snapshot(ruleset)
+	local snap = {
+		_layer_order = shallow_copy_array(ruleset._layer_order),
+		_layers = shallow_copy_set(ruleset._layers),
+		arrays = {},
+		scalars = {}, -- field -> original value, or "NULL" sentinel for nil
+	}
+	for _, field in ipairs(MP._LAYER_ARRAY_FIELDS) do
+		snap.arrays[field] = shallow_copy_array(ruleset[field])
+	end
+	return snap
+end
+
+local function restore_from_snapshot(ruleset, snap)
+	ruleset._layer_order = shallow_copy_array(snap._layer_order)
+	ruleset._layers = shallow_copy_set(snap._layers)
+	for _, field in ipairs(MP._LAYER_ARRAY_FIELDS) do
+		ruleset[field] = shallow_copy_array(snap.arrays[field])
+	end
+	for k, v in pairs(snap.scalars) do
+		if v == "NULL" then
+			ruleset[k] = nil
+		else
+			ruleset[k] = v
+		end
+	end
+end
+
+-- Apply MP.MODIFIERS to the active ruleset. Idempotent: if a different ruleset
+-- was previously grafted we restore it first, and re-applying onto the same
+-- ruleset re-resets to snapshot before grafting.
+function MP.apply_modifiers()
+	local ruleset_key = MP.get_active_ruleset()
+	if not ruleset_key then return end
+	local ruleset = MP.Rulesets[ruleset_key]
+	if not ruleset then return end
+
+	if _augmented_key and _augmented_key ~= ruleset_key then
+		local prev = MP.Rulesets[_augmented_key]
+		local prev_snap = _ruleset_snapshots[_augmented_key]
+		if prev and prev_snap then
+			restore_from_snapshot(prev, prev_snap)
+		end
+		_ruleset_snapshots[_augmented_key] = nil
+	end
+
+	local snap = _ruleset_snapshots[ruleset_key]
+	if not snap then
+		snap = take_snapshot(ruleset)
+		_ruleset_snapshots[ruleset_key] = snap
+	else
+		restore_from_snapshot(ruleset, snap)
+	end
+	_augmented_key = ruleset_key
+
+	for _, mod_name in ipairs(MP.MODIFIERS) do
+		local layer = MP.Layers[mod_name]
+		if layer and not ruleset._layers[mod_name] then
+			ruleset._layer_order[#ruleset._layer_order + 1] = mod_name
+			ruleset._layers[mod_name] = true
+			for k, v in pairs(layer) do
+				if _array_field_set[k] then
+					if type(v) == "table" then
+						local target = ruleset[k]
+						for _, item in ipairs(v) do
+							target[#target + 1] = item
+						end
+					end
+				elseif type(v) ~= "table" and type(v) ~= "function" then
+					if snap.scalars[k] == nil then
+						snap.scalars[k] = ruleset[k] == nil and "NULL" or ruleset[k]
+					end
+					ruleset[k] = v
+				end
+			end
+		end
+	end
+end
+
+-- Restore the augmented ruleset and clear MP.MODIFIERS. Call on lobby leave,
+-- practice exit, or whenever entering a fresh selection screen.
+function MP.clear_modifiers()
+	if _augmented_key then
+		local ruleset = MP.Rulesets[_augmented_key]
+		local snap = _ruleset_snapshots[_augmented_key]
+		if ruleset and snap then
+			restore_from_snapshot(ruleset, snap)
+		end
+		_ruleset_snapshots[_augmented_key] = nil
+		_augmented_key = nil
+	end
+	MP.MODIFIERS = {}
+end
+
+function MP.has_modifier(name)
+	for _, n in ipairs(MP.MODIFIERS) do
+		if n == name then return true end
+	end
+	return false
+end
+
+function MP.add_modifier(name)
+	if not name or name == "" or MP.has_modifier(name) then return end
+	MP.MODIFIERS[#MP.MODIFIERS + 1] = name
+end
+
+function MP.remove_modifier(name)
+	for i, n in ipairs(MP.MODIFIERS) do
+		if n == name then
+			table.remove(MP.MODIFIERS, i)
+			return
+		end
+	end
+end
+
+-- Wire format: comma-separated string for the existing lobby_options protocol.
+function MP.modifiers_serialize()
+	return table.concat(MP.MODIFIERS, ",")
+end
+
+function MP.modifiers_parse(s)
+	MP.MODIFIERS = {}
+	if not s or s == "" then return end
+	for n in string.gmatch(s, "[^,]+") do
+		MP.MODIFIERS[#MP.MODIFIERS + 1] = n
+	end
+end
