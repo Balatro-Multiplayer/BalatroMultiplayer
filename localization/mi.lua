@@ -133,24 +133,6 @@ return {
 				},
 			},
 		},
-		Enhanced = {
-			m_mp_display_glass = {
-				name = "Kāri Karāhe",
-				text = {
-					"{X:mult,C:white} X#1# {} Rea",
-					"He {C:green}#2#/#3#{} te tūpono ka",
-					"pakaru te kāri",
-				},
-			},
-			m_mp_sandbox_display_glass = {
-				name = "Kāri Karāhe",
-				text = {
-					"{X:mult,C:white} X#1# {} Rea",
-					"He {C:green}#2#/#3#{} te tūpono ka",
-					"pakaru te kāri",
-				},
-			},
-		},
 		Other = {
 			current_nemesis = {
 				name = "Te Hoariri",

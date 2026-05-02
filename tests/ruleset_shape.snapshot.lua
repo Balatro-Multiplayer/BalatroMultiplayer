@@ -104,7 +104,7 @@ return {
       "c_mp_ouija_standard",
     },
     ["reworked_enhancements"] = {
-      "m_mp_display_glass",
+      "m_glass",
     },
     ["reworked_jokers"] = {
       "j_mp_bloodstone",
@@ -167,8 +167,8 @@ return {
       "c_mp_ouija_standard",
     },
     ["reworked_enhancements"] = {
-      "m_mp_display_glass",
-      "m_mp_sandbox_display_glass",
+      "m_glass",
+      "m_glass",
     },
     ["reworked_jokers"] = {
       "j_mp_alloy_sandbox",
@@ -262,8 +262,8 @@ return {
       "c_mp_ouija_standard",
     },
     ["reworked_enhancements"] = {
-      "m_mp_display_glass",
-      "m_mp_display_gold",
+      "m_glass",
+      "m_gold",
     },
     ["reworked_jokers"] = {
       "j_mp_baron",
@@ -301,7 +301,7 @@ return {
     ["reworked_blinds"] = {},
     ["reworked_consumables"] = {},
     ["reworked_enhancements"] = {
-      "m_mp_display_glass",
+      "m_glass",
     },
     ["reworked_jokers"] = {
       "j_mp_hanging_chad",
@@ -398,7 +398,7 @@ return {
       "c_mp_ouija_standard",
     },
     ["reworked_enhancements"] = {
-      "m_mp_sandbox_display_glass",
+      "m_glass",
     },
     ["reworked_jokers"] = {
       "j_mp_alloy_sandbox",
@@ -481,7 +481,7 @@ return {
       "c_mp_ouija_standard",
     },
     ["reworked_enhancements"] = {
-      "m_mp_display_glass",
+      "m_glass",
     },
     ["reworked_jokers"] = {
       "j_mp_bloodstone",
@@ -524,7 +524,7 @@ return {
       "c_mp_ouija_standard",
     },
     ["reworked_enhancements"] = {
-      "m_mp_display_glass",
+      "m_glass",
     },
     ["reworked_jokers"] = {
       "j_mp_bloodstone",
@@ -568,7 +568,7 @@ return {
       "c_mp_ouija_standard",
     },
     ["reworked_enhancements"] = {
-      "m_mp_display_glass",
+      "m_glass",
     },
     ["reworked_jokers"] = {
       "j_mp_bloodstone",
@@ -613,7 +613,7 @@ return {
       "c_mp_ouija_standard",
     },
     ["reworked_enhancements"] = {
-      "m_mp_display_glass",
+      "m_glass",
     },
     ["reworked_jokers"] = {
       "j_mp_bloodstone",
