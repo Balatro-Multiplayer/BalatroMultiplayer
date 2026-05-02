@@ -80,7 +80,11 @@ function MP.is_ruleset_active(ruleset_name)
 end
 
 function MP.get_active_ruleset()
-	if MP.LOBBY.code then
+	-- "Active" covers both a live lobby and the configuration-in-progress phase
+	-- (start_lobby reads ruleset properties before the lobby code arrives from
+	-- the server). Setup flows clear config.ruleset when entering non-MP paths
+	-- so there's no stale-bleed risk.
+	if MP.LOBBY.config.ruleset then
 		return MP.LOBBY.config.ruleset
 	elseif MP.is_practice_mode() then
 		return MP.SP.ruleset
