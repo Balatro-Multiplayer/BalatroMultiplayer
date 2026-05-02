@@ -138,24 +138,6 @@ return {
 				},
 			},
 		},
-		Enhanced = {
-			m_mp_display_glass = {
-				name = "Carta de Vidro",
-				text = {
-					"{X:mult,C:white} X#1# {} Multi",
-					"Chance de {C:green}#2# em #3#{} de",
-					"destruir carta",
-				},
-			},
-			m_mp_sandbox_display_glass = {
-				name = "Carta de Vidro",
-				text = {
-					"{X:mult,C:white} X#1# {} Multi",
-					"Chance de {C:green}#2# em #3#{} de",
-					"destruir carta",
-				},
-			},
-		},
 		Back = {
 			b_mp_cocktail = {
 				name = "Baralho Coquetel",
