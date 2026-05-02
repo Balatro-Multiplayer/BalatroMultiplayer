@@ -1323,7 +1323,7 @@ return {
 			k_release = "Release Ver.",
 			k_release_description = "Allan please add details",
             k_mp_ruleset_tab_general = "General",
-            k_mp_ruleset_tab_torunaments = "Tournaments",
+            k_mp_ruleset_tab_tournaments = "Tournaments",
             k_mp_ruleset_tab_experimental = "Experimental",
 			k_cost_up = "Cost Up",
 			k_destabilized = "Destabilized",
