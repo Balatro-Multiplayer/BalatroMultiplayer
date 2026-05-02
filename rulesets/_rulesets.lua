@@ -136,75 +136,80 @@ end
 
 local LOADED_REWORKS = {}
 -- Rework a center for specific layer(s). Use MP.LoadReworks() to swap in the active ruleset.
+-- Multiple calls for the same key accumulate — each call targets its own layer slot
+-- on the center, so registering a key once per layer is the supported pattern.
 ---@param key string e.g. "j_hanging_chad"
 ---@param opts table { layers, loc_key?, silent?, ...center properties }
 function MP.ReworkCenter(key, opts)
-	LOADED_REWORKS[key] = opts or {}
+	LOADED_REWORKS[key] = LOADED_REWORKS[key] or {}
+	table.insert(LOADED_REWORKS[key], opts or {})
 end
 
 -- inject reworks properly
 local inject_ref = SMODS.injectItems
 function SMODS.injectItems()
 	local ret = inject_ref()
-	for key, opts in pairs(LOADED_REWORKS) do
-		local center_table = type(opts.center_table) == "table" and opts.center_table
-			or G[opts.center_table]
-			or G.P_CENTERS
-		local center = center_table[key]
+	for key, opts_list in pairs(LOADED_REWORKS) do
+		for _, opts in ipairs(opts_list) do
+			local center_table = type(opts.center_table) == "table" and opts.center_table
+				or G[opts.center_table]
+				or G.P_CENTERS
+			local center = center_table[key]
 
-		-- Meta keys (not center properties)
-		local reserved = { layers = true, loc_key = true, silent = true }
-		local layers = opts.layers
-		local loc_key = opts.loc_key
-		local silent = opts.silent
+			-- Meta keys (not center properties)
+			local reserved = { layers = true, loc_key = true, silent = true }
+			local layers = opts.layers
+			local loc_key = opts.loc_key
+			local silent = opts.silent
 
-		-- Convert single layer to list
-		if type(layers) == "string" then layers = { layers } end
+			-- Convert single layer to list
+			if type(layers) == "string" then layers = { layers } end
 
-		-- Wrap loc_vars to inject loc_key if provided
-		if loc_key then
-			local user_loc_vars = opts.loc_vars or function()
-				return {}
-			end
-			opts.loc_vars = function(self, info_queue, card)
-				local result = user_loc_vars(self, info_queue, card)
-				result.key = loc_key
-				return result
-			end
-		end
-
-		-- do we need to inject generate_ui for loc_vars to work?
-		local needs_generate_ui = opts.loc_vars
-			and not opts.generate_ui
-			and not (center.generate_ui and type(center.generate_ui) == "function")
-
-		-- Apply changes to all specified layers
-		for _, layer in ipairs(layers) do
-			local prefix = "mp_" .. layer .. "_"
-
-			-- Store all reworked properties
-			for k, v in pairs(opts) do
-				if not reserved[k] then
-					center[prefix .. k] = v
-					if not center["mp_vanilla_" .. k] then center["mp_vanilla_" .. k] = center[k] or "NULL" end
+			-- Wrap loc_vars to inject loc_key if provided
+			if loc_key then
+				local user_loc_vars = opts.loc_vars or function()
+					return {}
+				end
+				opts.loc_vars = function(self, info_queue, card)
+					local result = user_loc_vars(self, info_queue, card)
+					result.key = loc_key
+					return result
 				end
 			end
 
-			-- Auto-inject generate_ui when adding loc_vars to vanilla centers
-			if needs_generate_ui then
-				center[prefix .. "generate_ui"] = SMODS.Center.generate_ui
-				if not center.mp_vanilla_generate_ui then
-					center.mp_vanilla_generate_ui = center.generate_ui or "NULL"
+			-- do we need to inject generate_ui for loc_vars to work?
+			local needs_generate_ui = opts.loc_vars
+				and not opts.generate_ui
+				and not (center.generate_ui and type(center.generate_ui) == "function")
+
+			-- Apply changes to all specified layers
+			for _, layer in ipairs(layers) do
+				local prefix = "mp_" .. layer .. "_"
+
+				-- Store all reworked properties
+				for k, v in pairs(opts) do
+					if not reserved[k] then
+						center[prefix .. k] = v
+						if not center["mp_vanilla_" .. k] then center["mp_vanilla_" .. k] = center[k] or "NULL" end
+					end
 				end
+
+				-- Auto-inject generate_ui when adding loc_vars to vanilla centers
+				if needs_generate_ui then
+					center[prefix .. "generate_ui"] = SMODS.Center.generate_ui
+					if not center.mp_vanilla_generate_ui then
+						center.mp_vanilla_generate_ui = center.generate_ui or "NULL"
+					end
+				end
+
+				-- Mark this center as having reworks
+				center.mp_reworks = center.mp_reworks or {}
+				center.mp_reworks[layer] = true
+				center.mp_reworks["vanilla"] = true
+
+				center.mp_silent = center.mp_silent or {}
+				center.mp_silent[layer] = silent
 			end
-
-			-- Mark this center as having reworks
-			center.mp_reworks = center.mp_reworks or {}
-			center.mp_reworks[layer] = true
-			center.mp_reworks["vanilla"] = true
-
-			center.mp_silent = center.mp_silent or {}
-			center.mp_silent[layer] = silent
 		end
 	end
 	return ret
