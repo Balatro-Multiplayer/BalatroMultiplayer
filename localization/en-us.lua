@@ -1500,6 +1500,9 @@ return {
 			ch_c_mp_eeeee = {
 				"Some randomly selected RNG queues are {C:attention}bugged{} each Ante",
 			},
+			ch_c_mp_shared_pockets = {
+				"{C:attention}Hand size{}, {C:attention}Joker Slots{}, and {C:attention}Consumable Slots{} are shared",
+			},
 		},
 		challenge_names = {
 			c_mp_standard = "Standard",
@@ -1530,6 +1533,7 @@ return {
 			c_mp_planet_tycoon = "Planet Tycoon",
 			c_mp_bacon = "Blue Ice",
 			c_mp_eeeee = "EEEEE",
+			c_mp_shared_pockets = "Shared Pockets",
 		},
 	},
 }
