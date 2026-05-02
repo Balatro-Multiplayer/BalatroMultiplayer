@@ -275,50 +275,31 @@ function G.UIDEF.ruleset_info(ruleset_name, mode)
 	end
 
 	local show_modifiers = (mode == "mp" or mode == "practice") and not ruleset.forced_lobby_options
-	local action_row_nodes = {}
 	if show_modifiers then
-		action_row_nodes[#action_row_nodes + 1] = MP.UI.Disableable_Button({
-			id = "ruleset_modifiers_button",
-			button = "open_ruleset_modifiers",
-			align = "cm",
-			padding = 0.05,
-			r = 0.1,
-			minw = 3,
-			minh = 0.8,
-			colour = G.C.PURPLE,
-			hover = true,
-			shadow = true,
-			label = { localize("b_modifiers") },
-			scale = 0.5,
-			col = true,
-			enabled_ref_table = { val = true },
-			enabled_ref_value = "val",
-			disabled_text = { localize("b_modifiers") },
-		})
-		action_row_nodes[#action_row_nodes + 1] = { n = G.UIT.B, config = { w = 0.15, h = 0.1 } }
+		content_nodes[#content_nodes + 1] = MP.UI.build_modifier_row()
 	end
-	action_row_nodes[#action_row_nodes + 1] = MP.UI.Disableable_Button({
-		id = button_config.id,
-		button = button_config.button,
-		align = "cm",
-		padding = 0.05,
-		r = 0.1,
-		minw = show_modifiers and 5 or 8,
-		minh = 0.8,
-		colour = button_config.colour,
-		hover = true,
-		shadow = true,
-		label = button_config.label,
-		scale = 0.5,
-		col = true,
-		enabled_ref_table = { val = not ruleset_disabled },
-		enabled_ref_value = "val",
-		disabled_text = { ruleset_disabled },
-	})
 	content_nodes[#content_nodes + 1] = {
 		n = G.UIT.R,
 		config = { align = "cm" },
-		nodes = action_row_nodes,
+		nodes = {
+			MP.UI.Disableable_Button({
+				id = button_config.id,
+				button = button_config.button,
+				align = "cm",
+				padding = 0.05,
+				r = 0.1,
+				minw = 8,
+				minh = 0.8,
+				colour = button_config.colour,
+				hover = true,
+				shadow = true,
+				label = button_config.label,
+				scale = 0.5,
+				enabled_ref_table = { val = not ruleset_disabled },
+				enabled_ref_value = "val",
+				disabled_text = { ruleset_disabled },
+			}),
+		},
 	}
 
 	return {
@@ -445,15 +426,25 @@ local function create_bans_and_reworks_tabs(ruleset_or_gamemode, is_banned_tab, 
 		other = "k_other",
 	}
 	local function copy_list(key)
+		local lists
 		if is_banned_tab then
-			return merge_lists({
+			lists = {
 				MP.DECK["BANNED_" .. string.upper(key)],
 				ruleset_or_gamemode["banned_" .. key],
 				forced_gamemode["banned_" .. key],
-			})
+			}
+			for _, mod_name in ipairs(MP.MODIFIERS) do
+				local layer = MP.Layers[mod_name]
+				if layer then lists[#lists + 1] = layer["banned_" .. key] end
+			end
 		else
-			return merge_lists({ ruleset_or_gamemode["reworked_" .. key], forced_gamemode["reworked_" .. key] })
+			lists = { ruleset_or_gamemode["reworked_" .. key], forced_gamemode["reworked_" .. key] }
+			for _, mod_name in ipairs(MP.MODIFIERS) do
+				local layer = MP.Layers[mod_name]
+				if layer then lists[#lists + 1] = layer["reworked_" .. key] end
+			end
 		end
+		return merge_lists(lists)
 	end
 	for _, v in ipairs({ "jokers", "consumables", "vouchers", "enhancements", "other" }) do
 		local entry = { type = localize(loc_keys[v]) }
@@ -732,10 +723,9 @@ function G.UIDEF.ruleset_cardarea_definition(args)
 	end
 end
 
--- Modifiers overlay. Toggle handlers write MP.MODIFIERS directly — no network
--- calls. The merge into the active ruleset happens at start_lobby /
--- start_practice_run; the host's lobby_options push then carries the
--- serialized modifier list to the guest, who re-applies on receipt.
+-- Modifier toggles render inline inside the ruleset info panel. The handlers
+-- write MP.MODIFIERS directly (no network) — the host's lobby_options push at
+-- start_lobby carries the serialized list to the guest.
 local function timer_modifier_to_index()
 	if MP.has_modifier("no_animation_timer") then return 2 end
 	if MP.has_modifier("pressure_timer") then return 3 end
@@ -752,18 +742,19 @@ G.FUNCS.change_modifier_timer = function(args)
 	end
 end
 
-function G.UIDEF.ruleset_modifiers_overlay()
+function MP.UI.build_modifier_row()
+	local timer_cycle = MP.UI.Disableable_Option_Cycle({
+		id = "modifier_timer_option",
+		enabled_ref_table = { val = true },
+		enabled_ref_value = "val",
+		label = localize("k_opts_modifier_timer"),
+		scale = 0.6,
+		options = { "default", "no_anim", "pressure" },
+		current_option = timer_modifier_to_index(),
+		opt_callback = "change_modifier_timer",
+	})
+
 	local smallworld_proxy = { val = MP.has_modifier("smallworld") }
-
-	local timer_cycle = create_lobby_option_cycle(
-		"modifier_timer_option",
-		"k_opts_modifier_timer",
-		0.85,
-		{ "default", "no_anim", "pressure" },
-		timer_modifier_to_index(),
-		"change_modifier_timer"
-	)
-
 	local smallworld_toggle = create_toggle({
 		id = "modifier_smallworld_toggle",
 		label = localize("b_opts_modifier_smallworld"),
@@ -778,40 +769,13 @@ function G.UIDEF.ruleset_modifiers_overlay()
 		end,
 	})
 
-	return create_UIBox_generic_options({
-		back_func = "exit_overlay_menu",
-		contents = {
-			{
-				n = G.UIT.R,
-				config = { align = "cm", padding = 0.1 },
-				nodes = {
-					{
-						n = G.UIT.T,
-						config = {
-							text = localize("k_modifiers"),
-							scale = 0.6,
-							colour = G.C.UI.TEXT_LIGHT,
-							shadow = true,
-						},
-					},
-				},
-			},
-			{
-				n = G.UIT.R,
-				config = { align = "cm", padding = 0.1, minw = 8 },
-				nodes = { timer_cycle },
-			},
-			{
-				n = G.UIT.R,
-				config = { align = "cm", padding = 0.1, minw = 8 },
-				nodes = { smallworld_toggle },
-			},
+	return {
+		n = G.UIT.R,
+		config = { align = "cm", padding = 0.05 },
+		nodes = {
+			timer_cycle,
+			{ n = G.UIT.B, config = { w = 0.4, h = 0.1 } },
+			smallworld_toggle,
 		},
-	})
-end
-
-G.FUNCS.open_ruleset_modifiers = function(e)
-	G.FUNCS.overlay_menu({
-		definition = G.UIDEF.ruleset_modifiers_overlay(),
-	})
+	}
 end
