@@ -1,26 +1,11 @@
 MP.ReworkCenter("m_glass", {
-	layers = "standard",
+	layers = { "standard", "classic" },
 	config = { Xmult = 1.5, extra = 4 },
 })
 
 MP.ReworkCenter("m_glass", {
 	layers = "sandbox",
 	config = { Xmult = 1.5, extra = 3 },
-})
-
-MP.ReworkCenter("m_glass", {
-	layers = "classic",
-	config = { Xmult = 1.5, extra = 4 },
-})
-
-MP.ReworkCenter("m_glass", {
-	layers = "experimental",
-	config = { Xmult = 1.5, extra = 4 },
-})
-
-MP.ReworkCenter("m_glass", {
-	layers = "ranked",
-	config = { Xmult = 1.5, extra = 4 },
 })
 
 -- This is a glass that is permanently at X1.5 to be shown in ruleset descriptions
