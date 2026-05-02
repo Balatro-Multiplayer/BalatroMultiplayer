@@ -337,3 +337,20 @@ function MP.UI.consume_timer(amount, silent, min_timer)
         end
     end
 end
+
+function MP.UI.restore_timer(amount, silent, max_timer)
+    if
+        amount > 0
+        and MP.LOBBY.config.timer
+        and MP.GAME.timer
+        and (not max_timer or MP.GAME.timer < max_timer)
+    then
+        MP.GAME.timer = math.max(0, MP.GAME.timer + amount)
+        if not silent then
+            local timer_ui = G.HUD:get_UIE_by_ID("timer_UI_count")
+            if timer_ui then
+                timer_ui.config.object:juice_up()
+            end
+        end
+    end
+end

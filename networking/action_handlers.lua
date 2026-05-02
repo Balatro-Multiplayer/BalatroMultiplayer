@@ -292,6 +292,25 @@ local function action_enemy_info(score_str, hands_left_str, skips_str, lives_str
 	end
 
 	if MP.INSANE_INT.greater_than(score, MP.GAME.enemy.highest_score) then MP.GAME.enemy.highest_score = score end
+    if MP.is_layer_active("pvp_timer") and MP.is_pvp_boss() then
+        -- BRUH, I'm just copying this shit
+
+        local fixed_score = tostring(to_big(score))
+        -- Credit to sidmeierscivilizationv on discord for this fix for Talisman
+        if string.match(fixed_score, "[eE]") == nil and string.match(fixed_score, "[.]") then
+            -- Remove decimal from non-exponential numbers
+            fixed_score = string.sub(string.gsub(fixed_score, "%.", ","), 1, -3)
+        end
+        fixed_score = string.gsub(fixed_score, ",", "") -- Remove commas
+
+        local insane_int_score = MP.INSANE_INT.from_string(fixed_score)
+
+        if MP.INSANE_INT.greater_than(insane_int_score, score) then
+            MP.GAME.nemesis_timer_started = false
+        else
+            MP.GAME.timer_started = false
+        end
+    end
 
 	G.E_MANAGER:add_event(Event({
 		blockable = false,
@@ -1013,6 +1032,22 @@ function MP.ACTIONS.play_hand(score, hands_left)
 	if MP.INSANE_INT.greater_than(insane_int_score, MP.GAME.highest_score) then
 		MP.GAME.highest_score = insane_int_score
 	end
+
+    if MP.is_layer_active("pvp_timer") and MP.is_pvp_boss() then
+        if not MP.GAME.timer_consumed then
+            local ruleset_key = MP.LOBBY.config.ruleset
+            local ruleset = MP.Rulesets and ruleset_key and MP.Rulesets[ruleset_key]
+            local increment = ruleset and ruleset.pvp_timer_increment_seconds or 0
+            MP.UI.restore_timer(increment)
+        end
+
+        if MP.INSANE_INT.greater_than(insane_int_score, MP.GAME.enemy.score) then
+            MP.GAME.nemesis_timer_started = false
+        else
+            MP.GAME.timer_started = false
+        end
+    end
+
 	Client.send({
 		action = "playHand",
 		score = fixed_score,
