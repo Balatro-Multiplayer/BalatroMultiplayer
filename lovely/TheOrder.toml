@@ -1,0 +1,200 @@
+# Credit to @MathIsFun_ for creating TheOrder, which this integration is a copy of
+[manifest]
+version = "1.0.0"
+dump_lua = true
+priority = 0
+
+# Patches boss generation to be ante-based
+[[patches]]
+[patches.pattern]
+target = "functions/common_events.lua"
+pattern = "local _, boss = pseudorandom_element(eligible_bosses, pseudoseed('boss'))"
+position = "at"
+payload = '''local boss = nil
+if MP.should_use_the_order() then
+	_, boss = pseudorandom_element(eligible_bosses, pseudoseed('boss'..G.GAME.round_resets.ante))
+else
+	_, boss = pseudorandom_element(eligible_bosses, pseudoseed('boss'))
+end'''
+match_indent = true
+
+# Adds an asterisk to the front of the seed
+# This isn't required for the mod to function, but it makes it easier to identify that seeds vary from vanilla
+[[patches]]
+[patches.pattern]
+target = "game.lua"
+pattern = "for k, v in pairs(self.GAME.pseudorandom) do if v == 0 then self.GAME.pseudorandom[k] = pseudohash(k..self.GAME.pseudorandom.seed) end end"
+position = "before"
+payload = '''if self.GAME.pseudorandom.seed:sub(1, 1) ~= "*" and MP.should_use_the_order() then self.GAME.pseudorandom.seed = "*" .. self.GAME.pseudorandom.seed end'''
+match_indent = true
+
+# Ankh compat w/ previous patch
+[[patches]]
+[patches.pattern]
+target = "game.lua"
+pattern = "self.GAME.pseudorandom.seed = hash_seed(self.GAME.pseudorandom.seed)"
+position = "before"
+payload = '''if self.GAME.pseudorandom.seed:sub(1, 1) ~= "*" and MP.should_use_the_order() then self.GAME.pseudorandom.seed = "*" .. self.GAME.pseudorandom.seed end'''
+match_indent = true
+
+
+
+
+# Make hallucination coinflip queue global
+[[patches]]
+[patches.pattern]
+target = "card.lua"
+pattern = '''if SMODS.pseudorandom_probability(self, 'halu'..G.GAME.round_resets.ante, 1, self.ability.extra) then'''
+position = "at"
+payload = '''if SMODS.pseudorandom_probability(self, 'halu'..MP.ante_based(), 1, self.ability.extra) then'''
+match_indent = true
+
+# Make booster pack queue global
+[[patches]]
+[patches.pattern]
+target = '''=[SMODS _ "src/overrides.lua"]'''
+pattern = '''local poll = pseudorandom(pseudoseed((_key or 'pack_generic')..G.GAME.round_resets.ante))*cume'''
+position = "at"
+payload = '''local poll = pseudorandom(pseudoseed((_key or 'pack_generic')..MP.ante_based()))*cume'''
+match_indent = true
+
+# Make deck shuffles round based
+[[patches]]
+[patches.pattern]
+target = "functions/state_events.lua"
+pattern = '''G.deck:shuffle('nr'..G.GAME.round_resets.ante)'''
+position = "at"
+payload = '''G.deck:shuffle('nr'..MP.order_round_based(true))'''
+match_indent = true
+
+[[patches]]
+[patches.pattern]
+target = "functions/button_callbacks.lua"
+pattern = '''G.deck:shuffle('cashout'..G.GAME.round_resets.ante)'''
+position = "at"
+payload = '''G.deck:shuffle('cashout'..MP.order_round_based(true))'''
+match_indent = true
+
+# Patch polled rate
+# This determines whether shop card is tarot/joker/planet/etc
+[[patches]]
+[patches.pattern]
+target = "functions/UI_definitions.lua"
+pattern = '''local polled_rate = pseudorandom(pseudoseed('cdt'..G.GAME.round_resets.ante))*total_rate'''
+position = "at"
+payload = '''local polled_rate = pseudorandom(pseudoseed('cdt'..MP.ante_based()))*total_rate'''
+match_indent = true
+
+# Resample advances rarity queue
+[[patches]]
+[patches.pattern]
+target = "functions/common_events.lua"
+pattern = '''center = pseudorandom_element(_pool, pseudoseed(_pool_key..'_resample'..it))'''
+position = "at"
+payload = '''
+center = pseudorandom_element(_pool, pseudoseed(_pool_key..(MP.should_use_the_order() and '' or ('_resample'..it)) ))
+if MP.should_use_the_order() and it > 1000 then -- fallback
+	center = pseudorandom_element(_pool, pseudoseed(_pool_key..'_resample'..it))
+end
+'''
+match_indent = true
+
+# Patch joker editions/stickers to be dependent on individual jokers rather than queue
+[[patches]]
+[patches.pattern]
+target = "functions/common_events.lua"
+pattern = '''if (area == G.shop_jokers) or (area == G.pack_cards) then'''
+position = "before"
+payload = '''
+local _etpeareakey = MP.should_use_the_order() and 'etperpoll' or (area == G.pack_cards and 'packetper' or 'etperpoll')
+local _rentareakey = MP.should_use_the_order() and 'ssjr' or (area == G.pack_cards and 'packssjr' or 'ssjr')
+local _order = MP.should_use_the_order() and center.key or ""
+'''
+match_indent = true
+
+[[patches]]
+[patches.pattern]
+target = "functions/common_events.lua"
+pattern = '''local eternal_perishable_poll = pseudorandom((area == G.pack_cards and 'packetper' or 'etperpoll')..G.GAME.round_resets.ante)'''
+position = "at"
+payload = '''local eternal_perishable_poll = pseudorandom(_order.._etpeareakey..G.GAME.round_resets.ante)'''
+match_indent = true
+
+[[patches]]
+[patches.pattern]
+target = "functions/common_events.lua"
+pattern = '''if G.GAME.modifiers.enable_rentals_in_shop and pseudorandom((area == G.pack_cards and 'packssjr' or 'ssjr')..G.GAME.round_resets.ante) > 0.7 and not SMODS.Stickers["rental"].should_apply then'''
+position = "at"
+payload = '''if G.GAME.modifiers.enable_rentals_in_shop and pseudorandom(_order.._rentareakey..G.GAME.round_resets.ante) > 0.7 and not SMODS.Stickers["rental"].should_apply then'''
+match_indent = true
+
+[[patches]]
+[patches.pattern]
+target = "functions/common_events.lua"
+pattern = '''local edition = poll_edition('edi'..(key_append or '')..G.GAME.round_resets.ante)'''
+position = "at"
+payload = '''
+if MP.should_use_the_order() then key_append = nil end	-- why does this even use key_append again?
+local edition = poll_edition(_order..'edi'..(key_append or '')..G.GAME.round_resets.ante)
+'''
+match_indent = true
+
+# Make soul/black hole queue not dependent on type (omen globe)
+# Avoid black hole overwriting soul
+[[patches]]
+[patches.pattern]
+target = "functions/common_events.lua"
+pattern = '''if pseudorandom('soul_'.._type..G.GAME.round_resets.ante) > 0.997 then
+	forced_key = 'c_soul''''
+position = "at"
+payload = '''if pseudorandom('soul_'..(MP.should_use_the_order() and 'c_soul' or _type)..G.GAME.round_resets.ante) > 0.997 then
+	forced_key = 'c_soul''''
+match_indent = true
+
+[[patches]]
+[patches.pattern]
+target = "functions/common_events.lua"
+pattern = '''if pseudorandom('soul_'.._type..G.GAME.round_resets.ante) > 0.997 then
+	forced_key = 'c_black_hole''''
+position = "at"
+payload = '''if pseudorandom('soul_'..(MP.should_use_the_order() and 'c_black_hole' or _type)..G.GAME.round_resets.ante) > 0.997 then
+	if not (MP.should_use_the_order() and forced_key) then
+		forced_key = 'c_black_hole'
+	end'''
+match_indent = true
+
+# Patch Wraith rarity to be the same as Rare Tag (because order uses it for some reason)
+[[patches]]
+[patches.pattern]
+target = "card.lua"
+pattern = '''local card = create_card('Joker', G.jokers, nil, 0.99, nil, nil, nil, 'wra')'''
+position = "at"
+payload = '''local card = create_card('Joker', G.jokers, nil, MP.should_use_the_order() and 1 or 0.99, nil, nil, nil, 'wra')'''
+match_indent = true
+
+# Patch To-Do List rng to be the same on different operating systems
+# This is a vanilla bug!
+# Orbital adjacent fix is in ui/game.lua
+[[patches]]
+[patches.pattern]
+target = "card.lua"
+pattern = '''while not self.ability.to_do_poker_hand do'''
+position = "before"
+payload = '''
+if MP.should_use_the_order() then
+	_poker_hands = MP.sorted_hand_list(self.ability.to_do_poker_hand)
+end
+'''
+match_indent = true
+
+[[patches]]
+[patches.pattern]
+target = "card.lua"
+pattern = '''self.ability.to_do_poker_hand = pseudorandom_element(_poker_hands, pseudoseed('to_do'))'''
+position = "before"
+payload = '''
+if MP.should_use_the_order() then
+	_poker_hands = MP.sorted_hand_list(self.ability.to_do_poker_hand)
+end
+'''
+match_indent = true

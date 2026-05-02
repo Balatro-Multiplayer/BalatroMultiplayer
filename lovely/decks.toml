@@ -1,0 +1,43 @@
+[manifest]
+version = "1.0.0"
+dump_lua = true
+priority = 2147483600
+
+
+# ---- Oracle Deck
+
+
+# max
+[[patches]]
+[patches.pattern]
+target = 'functions/common_events.lua'
+pattern = '''G.GAME.dollars = G.GAME.dollars + mod'''
+position = 'before'
+payload = '''
+if G.GAME.modifiers.oracle_max then
+	mod = oracle_apply_dollar_cap(mod, G.GAME.dollars, G.GAME.modifiers.oracle_max + G.GAME.interest_cap)
+	if oracle_should_show_max(mod, G.GAME.dollars, G.GAME.modifiers.oracle_max + G.GAME.interest_cap) then
+		text = "MAX"
+		col = G.C.RED
+	end
+end
+'''
+match_indent = true
+times = 1
+
+# show max alert
+# janky since we check the text instead of a condition but hey easily fixed
+[[patches]]
+[patches.pattern]
+target = 'functions/common_events.lua'
+pattern = '''        attention_text({
+          text = text..tostring(math.abs(mod)),'''
+position = 'before'
+payload = '''
+if text == "MAX" then
+	oracle_show_max_alert(dollar_UI)
+	return
+end
+'''
+match_indent = true
+times = 1

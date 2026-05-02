@@ -1,0 +1,11 @@
+.vscode
+.luarc.json
+.idea
+.lovelyignore
+.vs
+.DS_Store
+.env
+.claude/
+CLAUDE.local.md
+replays/*
+!replays/.gitkeep

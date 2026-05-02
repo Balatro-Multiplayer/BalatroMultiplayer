@@ -1,0 +1,1360 @@
+local json = require("json")
+
+Client = {}
+
+function Client.send(msg)
+	msg = json.encode(msg)
+	if msg ~= '{"action":"keepAliveAck"}' then
+		sendTraceMessage(string.format("Client sent message: %s", msg), "MULTIPLAYER")
+	end
+	love.thread.getChannel("uiToNetwork"):push(msg)
+end
+
+-- Server to Client
+function MP.ACTIONS.set_username(username)
+	MP.LOBBY.username = username or "Guest"
+	if MP.LOBBY.connected then
+		Client.send({
+			action = "username",
+			username = MP.LOBBY.username .. "~" .. MP.LOBBY.blind_col,
+			modHash = MP.MOD_STRING,
+		})
+	end
+end
+
+function MP.ACTIONS.set_blind_col(num)
+	MP.LOBBY.blind_col = num or 1
+end
+
+-- Reconnection state (persists across connections)
+local reconnectToken = nil
+local lastLobbyCode = nil
+
+local function action_connected()
+	MP.LOBBY.connected = true
+	MP.UI.update_connection_status()
+	Client.send({
+		action = "username",
+		username = MP.LOBBY.username .. "~" .. MP.LOBBY.blind_col,
+		modHash = MP.MOD_STRING,
+	})
+
+	-- If we have reconnect info, attempt to rejoin the lobby
+	if reconnectToken and lastLobbyCode then
+		Client.send({
+			action = "rejoinLobby",
+			code = lastLobbyCode,
+			reconnectToken = reconnectToken,
+		})
+	end
+end
+
+local function action_joinedLobby(code, type, token)
+	MP.LOBBY.code = code
+	MP.LOBBY.type = type
+	MP.LOBBY.ready_to_start = false
+	-- Store reconnect info for potential future reconnection
+	if token then reconnectToken = token end
+	lastLobbyCode = code
+	MP.ACTIONS.sync_client()
+	MP.ACTIONS.lobby_info()
+	MP.UI.update_connection_status()
+end
+
+local function action_rejoinedLobby(code, type, token)
+	MP.LOBBY.code = code
+	MP.LOBBY.type = type
+	-- Update reconnect token
+	reconnectToken = token
+	lastLobbyCode = code
+	MP.self_reconnect_countdown = nil
+	MP.ACTIONS.sync_client()
+	MP.ACTIONS.lobby_info()
+	MP.UI.update_connection_status()
+	sendWarnMessage("Reconnected to lobby!", "MULTIPLAYER")
+	G.FUNCS.exit_overlay_menu()
+	MP.UI.UTILS.overlay_message("Reconnected to lobby!")
+end
+
+-- Countdown state for disconnect overlays
+MP.enemy_disconnect_countdown = nil
+MP.self_reconnect_countdown = nil
+
+-- Shared timeout handler for both countdowns
+local function handle_reconnect_timeout(message)
+	G.FUNCS.exit_overlay_menu()
+	MP.LOBBY.connected = false
+	if MP.LOBBY.code then MP.LOBBY.code = nil end
+	reconnectToken = nil
+	lastLobbyCode = nil
+	MP.UI.update_connection_status()
+	if G.STAGE ~= G.STAGES.MAIN_MENU then
+		MP.reset_game_states()
+		G.FUNCS.go_to_menu()
+	end
+	MP.UI.UTILS.overlay_message(message)
+end
+
+-- Hook into Game.update to tick countdown displays
+local _disconnect_gupdate = Game.update
+function Game:update(dt)
+	if MP.enemy_disconnect_countdown then
+		local remaining = math.max(0, math.ceil(MP.enemy_disconnect_countdown.end_time - love.timer.getTime()))
+		MP.enemy_disconnect_countdown.display = remaining .. "s remaining"
+		-- No client-side timeout needed: the server sends stopGame
+		-- when the grace period expires, which handles the cleanup
+	end
+	if MP.self_reconnect_countdown then
+		local remaining = math.max(0, math.ceil(MP.self_reconnect_countdown.end_time - love.timer.getTime()))
+		MP.self_reconnect_countdown.display = remaining .. "s remaining"
+		if remaining <= 0 then
+			MP.self_reconnect_countdown = nil
+			handle_reconnect_timeout("Reconnection failed.\nReturning to main menu.")
+		end
+	end
+	return _disconnect_gupdate(self, dt)
+end
+
+local function action_enemyDisconnected(timeout)
+	timeout = timeout or 60
+	sendWarnMessage("Opponent disconnected, waiting for reconnection...", "MULTIPLAYER")
+
+	MP.enemy_disconnect_countdown = {
+		end_time = love.timer.getTime() + timeout,
+		display = timeout .. "s remaining",
+	}
+
+	MP.UI.UTILS.overlay_message_countdown(
+		"Opponent disconnected,\nwaiting for reconnection...",
+		MP.enemy_disconnect_countdown,
+		true
+	)
+end
+
+local function action_enemyReconnected()
+	MP.enemy_disconnect_countdown = nil
+	sendWarnMessage("Opponent reconnected!", "MULTIPLAYER")
+	G.FUNCS.exit_overlay_menu()
+	MP.UI.UTILS.overlay_message("Opponent reconnected!")
+end
+
+local function action_lobbyInfo(host, hostHash, hostCached, guest, guestHash, guestCached, guestReady, is_host)
+	MP.LOBBY.players = {}
+	MP.LOBBY.is_host = is_host
+	local function parseName(name)
+		local username, col_str = string.match(name, "([^~]+)~(%d+)")
+		username = username or "Guest"
+		local col = tonumber(col_str) or 1
+		col = math.max(1, math.min(col, 25))
+		return username, col
+	end
+	local hostName, hostCol = parseName(host)
+	local hostConfig, hostMods = MP.UTILS.parse_Hash(hostHash)
+	MP.LOBBY.host = {
+		username = hostName,
+		blind_col = hostCol,
+		hash_str = hostMods,
+		hash = hash(hostMods),
+		cached = hostCached,
+		config = hostConfig,
+	}
+
+	if guest ~= nil then
+		local guestName, guestCol = parseName(guest)
+		local guestConfig, guestMods = MP.UTILS.parse_Hash(guestHash)
+		MP.LOBBY.guest = {
+			username = guestName,
+			blind_col = guestCol,
+			hash_str = guestMods,
+			hash = hash(guestMods),
+			cached = guestCached,
+			config = guestConfig,
+		}
+	else
+		MP.LOBBY.guest = {}
+	end
+
+	-- TODO: This should check for player count instead
+	-- once we enable more than 2 players
+	MP.LOBBY.ready_to_start = guest ~= nil and guestReady
+
+	if MP.LOBBY.is_host then MP.ACTIONS.lobby_options() end
+
+	if G.STAGE == G.STAGES.MAIN_MENU then MP.ACTIONS.update_player_usernames() end
+end
+
+local function action_error(message)
+	sendWarnMessage(message, "MULTIPLAYER")
+
+	MP.UI.UTILS.overlay_message(message)
+end
+
+local function action_keep_alive()
+	Client.send({
+		action = "keepAliveAck",
+	})
+end
+
+local function action_disconnected()
+	MP.LOBBY.connected = false
+	MP.self_reconnect_countdown = nil
+	if MP.LOBBY.code then MP.LOBBY.code = nil end
+	-- Clear reconnect state since all reconnection attempts failed
+	reconnectToken = nil
+	lastLobbyCode = nil
+	MP.UI.update_connection_status()
+end
+
+local function action_reconnecting()
+	-- Only show if we were in a lobby and don't already have a countdown running
+	if reconnectToken and lastLobbyCode and not MP.self_reconnect_countdown then
+		MP.LOBBY.connected = false
+		MP.UI.update_connection_status()
+		sendWarnMessage("Connection lost, attempting to reconnect...", "MULTIPLAYER")
+
+		MP.self_reconnect_countdown = {
+			end_time = love.timer.getTime() + 60,
+			display = "60s remaining",
+		}
+
+		MP.UI.UTILS.overlay_message_countdown(
+			"Connection lost,\nattempting to reconnect...",
+			MP.self_reconnect_countdown,
+			true
+		)
+	end
+end
+
+---@param seed string
+---@param stake_str string
+local function action_start_game(seed, stake_str)
+	sendDebugMessage(string.format("Game starting — %s", os.date("%Y-%m-%dT%H:%M:%S%z")), "MULTIPLAYER")
+	-- Clear any stale practice/ghost state so it can't leak into real MP
+	MP.SP.practice = false
+	MP.GHOST.clear()
+
+	MP.reset_game_states()
+	local stake = tonumber(stake_str)
+	MP.ACTIONS.set_ante(0)
+	if not MP.LOBBY.config.different_seeds and MP.LOBBY.config.custom_seed ~= "random" then
+		seed = MP.LOBBY.config.custom_seed
+	end
+	G.FUNCS.lobby_start_run(nil, { seed = seed, stake = stake })
+	MP.LOBBY.ready_to_start = false
+
+end
+
+local function begin_pvp_blind()
+	if MP.GAME.next_blind_context then
+		G.FUNCS.select_blind(MP.GAME.next_blind_context)
+	else
+		sendErrorMessage("No next blind context", "MULTIPLAYER")
+	end
+end
+
+local function action_start_blind()
+	MP.GAME.ready_blind = false
+    MP.GAME.pvp_reached = false
+	MP.GAME.timer_started = false
+	MP.GAME.nemesis_timer_started = false
+    MP.GAME.timer_consumed = false
+	MP.GAME.timer = MP.UTILS.timer_base()
+	MP.UI.start_pvp_countdown(begin_pvp_blind)
+end
+
+---@param score_str string
+---@param hands_left_str string
+---@param skips_str string
+local function action_enemy_info(score_str, hands_left_str, skips_str, lives_str)
+	local score = MP.INSANE_INT.from_string(score_str)
+
+	local hands_left = tonumber(hands_left_str)
+	local skips = tonumber(skips_str)
+	local lives = tonumber(lives_str)
+
+	if MP.GAME.enemy.skips ~= skips then
+		for i = 1, skips - MP.GAME.enemy.skips do
+			MP.GAME.enemy.spent_in_shop[#MP.GAME.enemy.spent_in_shop + 1] = 0
+            if
+                MP.GAME.enemy.skips < skips
+                and MP.is_layer_active("no_animation_timer")
+                and not MP.GAME.timer_started
+                and (MP.LOBBY.config.timer_increment_seconds or 0) > 0
+            then
+                MP.GAME.timer = MP.GAME.timer + MP.LOBBY.config.timer_increment_seconds
+            end
+		end
+	end
+
+	if score == nil or hands_left == nil then
+		sendDebugMessage("Invalid score or hands_left", "MULTIPLAYER")
+		return
+	end
+
+	if MP.INSANE_INT.greater_than(score, MP.GAME.enemy.highest_score) then MP.GAME.enemy.highest_score = score end
+
+	G.E_MANAGER:add_event(Event({
+		blockable = false,
+		blocking = false,
+		trigger = "ease",
+		delay = 3,
+		ref_table = MP.GAME.enemy.score,
+		ref_value = "e_count",
+		ease_to = score.e_count,
+		func = function(t)
+			return math.floor(t)
+		end,
+	}))
+
+	G.E_MANAGER:add_event(Event({
+		blockable = false,
+		blocking = false,
+		trigger = "ease",
+		delay = 3,
+		ref_table = MP.GAME.enemy.score,
+		ref_value = "coeffiocient", -- why is this misspelled
+		ease_to = score.coeffiocient,
+		func = function(t)
+			local mult = 1
+			if score.exponent > 0 then mult = 100 end
+			return math.floor(t * mult) / mult
+		end,
+	}))
+
+	G.E_MANAGER:add_event(Event({
+		blockable = false,
+		blocking = false,
+		trigger = "ease",
+		delay = 3,
+		ref_table = MP.GAME.enemy.score,
+		ref_value = "exponent",
+		ease_to = score.exponent,
+		func = function(t)
+			return math.floor(t)
+		end,
+	}))
+
+	if MP.GAME.enemy.lives > lives then
+		play_sound("holo1", 0.865, 0.9)
+		play_sound("gong", 0.765, 0.4)
+	end
+    if MP.GAME.enemy.skips < skips then
+        play_sound('negative', 0.865, 0.4)
+        play_sound("gong", 0.765, 0.4)
+    end
+
+	MP.GAME.enemy.hands = hands_left
+	MP.GAME.enemy.skips = skips
+	MP.GAME.enemy.lives = lives
+	if MP.UI.juice_up_pvp_hud then MP.UI.juice_up_pvp_hud() end
+end
+
+local function action_stop_game()
+	MP.enemy_disconnect_countdown = nil
+	if G.STAGE ~= G.STAGES.MAIN_MENU then
+		G.FUNCS.go_to_menu()
+		MP.UI.update_connection_status()
+		MP.reset_game_states()
+	end
+end
+
+local function action_end_pvp()
+	MP.GAME.end_pvp = true
+	MP.GAME.timer = MP.UTILS.timer_base()
+    MP.GAME.timer_consumed = false
+	MP.GAME.timer_started = false
+	MP.GAME.nemesis_timer_started = false
+	MP.GAME.ready_blind = false
+    MP.GAME.pvp_reached = false
+end
+
+---@param lives number
+local function action_player_info(lives)
+	if MP.GAME.lives ~= lives then
+		if MP.GAME.lives ~= 0 and MP.LOBBY.config.gold_on_life_loss then
+			MP.GAME.comeback_bonus_given = false
+			MP.GAME.comeback_bonus = MP.GAME.comeback_bonus + 1
+		end
+		MP.UI.ease_lives(lives - MP.GAME.lives, true)
+		if MP.LOBBY.config.no_gold_on_round_loss and (G.GAME.blind and G.GAME.blind.dollars) then
+			G.GAME.blind.dollars = 0
+		end
+	end
+	MP.GAME.lives = lives
+end
+
+local function action_win_game()
+	MP.end_game_jokers_payload = ""
+	MP.nemesis_deck_string = ""
+	MP.end_game_jokers_received = false
+	MP.nemesis_deck_received = false
+	MP.GAME.won = true
+	MP.STATS.record_match(true)
+	win_game()
+end
+
+local function action_lose_game()
+	MP.end_game_jokers_payload = ""
+	MP.nemesis_deck_string = ""
+	MP.end_game_jokers_received = false
+	MP.nemesis_deck_received = false
+	MP.STATS.record_match(false)
+	G.STATE_COMPLETE = false
+	G.STATE = G.STATES.GAME_OVER
+end
+
+local function action_lobby_options(options)
+	local different_decks_before = MP.LOBBY.config.different_decks
+	for k, v in pairs(options) do
+		if k == "ruleset" then
+			if not MP.Rulesets[v] then
+				G.FUNCS.lobby_leave(nil)
+				MP.UI.UTILS.overlay_message(localize({
+					type = "variable",
+					key = "k_failed_to_join_lobby",
+					vars = { localize("k_ruleset_not_found") },
+				}))
+				return
+			end
+			local disabled = MP.Rulesets[v].is_disabled()
+			if disabled then
+				G.FUNCS.lobby_leave(nil)
+				MP.UI.UTILS.overlay_message(
+					localize({ type = "variable", key = "k_failed_to_join_lobby", vars = { disabled } })
+				)
+				return
+			end
+			MP.LOBBY.config.ruleset = v
+			goto continue
+		end
+		if k == "gamemode" then
+			MP.LOBBY.config.gamemode = v
+			goto continue
+		end
+
+		local parsed_v = v
+		if v == "true" then
+			parsed_v = true
+		elseif v == "false" then
+			parsed_v = false
+		end
+
+		if
+			k == "starting_lives"
+			or k == "pvp_start_round"
+			or k == "timer_base_seconds"
+			or k == "timer_increment_seconds"
+			or k == "showdown_starting_antes"
+			or k == "pvp_countdown_seconds"
+			or k == "timer_forgiveness"
+		then
+			parsed_v = tonumber(v)
+		end
+
+		MP.LOBBY.config[k] = parsed_v
+		if MP.UI.update_lobby_option_toggle then MP.UI.update_lobby_option_toggle(k) end
+		::continue::
+	end
+	if different_decks_before ~= MP.LOBBY.config.different_decks then
+		G.FUNCS.exit_overlay_menu() -- throw out guest from any menu.
+	end
+	MP.ACTIONS.update_player_usernames() -- render new DECK button state
+end
+
+local function action_send_phantom(key)
+	local menu = G.OVERLAY_MENU -- we are spoofing a menu here, which disables duplicate protection
+	G.OVERLAY_MENU = G.OVERLAY_MENU or true
+	local new_card = create_card("Joker", MP.shared, false, nil, nil, nil, key)
+	new_card:set_edition("e_mp_phantom")
+	new_card:add_to_deck()
+	MP.shared:emplace(new_card)
+	G.OVERLAY_MENU = menu
+end
+
+local function action_remove_phantom(key)
+	local card = MP.UTILS.get_phantom_joker(key)
+	if card then
+		card:remove_from_deck()
+		card:start_dissolve({ G.C.RED }, nil, 1.6)
+		MP.shared:remove_card(card)
+	end
+end
+
+-- card:remove is called in an event so we have to hook the function instead of doing normal things
+local cardremove = Card.remove
+function Card:remove()
+	local menu = G.OVERLAY_MENU
+	if self.edition and self.edition.type == "mp_phantom" then G.OVERLAY_MENU = G.OVERLAY_MENU or true end
+	cardremove(self)
+	G.OVERLAY_MENU = menu
+end
+
+-- and smods find card STILL needs to be patched here
+local smodsfindcard = SMODS.find_card
+function SMODS.find_card(key, count_debuffed)
+	local ret = smodsfindcard(key, count_debuffed)
+	local new_ret = {}
+	for i, v in ipairs(ret) do
+		if not v.edition or v.edition.type ~= "mp_phantom" then new_ret[#new_ret + 1] = v end
+	end
+	return new_ret
+end
+
+-- don't poll edition
+local origedpoll = poll_edition
+function poll_edition(_key, _mod, _no_neg, _guaranteed, _options)
+	if G.OVERLAY_MENU then return nil end
+	return origedpoll(_key, _mod, _no_neg, _guaranteed, _options)
+end
+
+local function action_speedrun()
+	SMODS.calculate_context({ mp_speedrun = true })
+end
+
+local function enemyLocation(options)
+	local location = options.location
+	local value = ""
+
+	if string.find(location, "-") then
+		local split = {}
+		for str in string.gmatch(location, "([^-]+)") do
+			table.insert(split, str)
+		end
+		location = split[1]
+		value = split[2] or ""
+	end
+
+	local loc_location = G.localization.misc.dictionary[location]
+
+	if loc_location == nil then
+		if location ~= nil then
+			loc_location = location
+		else
+			loc_location = "Unknown"
+		end
+	end
+
+	MP.GAME.enemy.location = loc_location
+	MP.GAME.enemy.location_blind = value
+	MP.GAME.enemy.location_type = location
+	MP.GAME.enemy.location_full = location .. "-" .. value
+	MP.UI.update_enemy_location_render()
+end
+
+local function action_version()
+	MP.ACTIONS.version()
+end
+
+local action_asteroid = action_asteroid
+	or function()
+		if MP.UI.show_asteroid_hand_level_up then MP.UI.show_asteroid_hand_level_up() end
+	end
+
+local function action_sold_joker()
+	-- HACK: this action is being sent when any card is being sold, since Taxes is now reworked
+	MP.GAME.enemy.sells = MP.GAME.enemy.sells + 1
+	MP.GAME.enemy.sells_per_ante[G.GAME.round_resets.ante] = (
+		(MP.GAME.enemy.sells_per_ante[G.GAME.round_resets.ante] or 0) + 1
+	)
+end
+
+local function action_lets_go_gambling_nemesis()
+	local card = MP.UTILS.get_phantom_joker("j_mp_lets_go_gambling")
+	if card then card:juice_up() end
+	ease_dollars(card and card.ability and card.ability.extra and card.ability.extra.nemesis_dollars or 5)
+end
+
+local function action_eat_pizza(discards)
+	MP.GAME.pizza_discards = MP.GAME.pizza_discards + discards
+	G.GAME.round_resets.discards = G.GAME.round_resets.discards + discards
+	ease_discard(discards)
+end
+
+local function action_spent_last_shop(amount)
+	MP.GAME.enemy.spent_in_shop[#MP.GAME.enemy.spent_in_shop + 1] = tonumber(amount)
+end
+
+local function action_magnet()
+	local card = nil
+	for _, v in pairs(G.jokers.cards) do
+		if not card or v.sell_cost > card.sell_cost then card = v end
+	end
+
+	if card then
+		local candidates = {}
+		for _, v in pairs(G.jokers.cards) do
+			if v.sell_cost == card.sell_cost then table.insert(candidates, v) end
+		end
+
+		-- Scale the pseudo from 0 - 1 to the number of candidates
+		local random_index = math.floor(pseudorandom("j_mp_magnet") * #candidates) + 1
+		local chosen_card = candidates[random_index]
+		sendTraceMessage(
+			string.format("Sending magnet joker: %s", MP.UTILS.joker_to_string(chosen_card)),
+			"MULTIPLAYER"
+		)
+
+		local card_save = chosen_card:save()
+		local card_encoded = MP.UTILS.str_pack_and_encode(card_save)
+		MP.ACTIONS.magnet_response(card_encoded)
+	end
+end
+
+local function action_jimbo_appear(pos, text)
+	pos = tonumber(pos)
+	if not pos or pos < 1 or pos > 4 then
+		sendDebugMessage("jimboAppear: invalid pos: " .. tostring(pos), "MULTIPLAYER")
+		return
+	end
+	if text and type(text) ~= "string" then
+		sendDebugMessage("jimboAppear: invalid text type: " .. type(text), "MULTIPLAYER")
+		return
+	end
+	MP.UI.create_jimbo(pos)
+	if text and text ~= "" then MP.UI.jimbo_say(text) end
+end
+
+local function action_jimbo_talk(text)
+	if not text or type(text) ~= "string" or text == "" then
+		sendDebugMessage("jimboTalk: invalid or empty text", "MULTIPLAYER")
+		return
+	end
+	MP.UI.jimbo_say(text)
+end
+
+local function action_jimbo_move(pos)
+	pos = tonumber(pos)
+	if not pos or pos < 1 or pos > 4 then
+		sendDebugMessage("jimboMove: invalid pos: " .. tostring(pos), "MULTIPLAYER")
+		return
+	end
+	MP.UI.move_jimbo(pos)
+end
+
+local function action_jimbo_remove()
+	MP.UI.remove_jimbo()
+end
+
+local function action_magnet_response(key)
+	local card_save, success, err
+
+	card_save, err = MP.UTILS.str_decode_and_unpack(key)
+	if not card_save then
+		sendDebugMessage(string.format("Failed to unpack magnet joker: %s", err), "MULTIPLAYER")
+		return
+	end
+
+	local card =
+		Card(G.jokers.T.x + G.jokers.T.w / 2, G.jokers.T.y, G.CARD_W, G.CARD_H, G.P_CENTERS.j_joker, G.P_CENTERS.c_base)
+	-- Avoid crashing if the load function ends up indexing a nil value
+	success, err = pcall(card.load, card, card_save)
+	if not success then
+		sendDebugMessage(string.format("Failed to load magnet joker: %s", err), "MULTIPLAYER")
+		return
+	end
+
+	-- BALATRO BUG (version 1.0.1o): `card.VT.h` is mistakenly set to nil after calling `card:load()`
+	-- Without this call to `card:hard_set_VT()`, the game will crash later when the card is drawn
+	card:hard_set_VT()
+
+	-- Enforce "add to deck" effects (e.g. increase hand size effects)
+	card.added_to_deck = nil
+
+	card:add_to_deck()
+	G.jokers:emplace(card)
+	sendTraceMessage(string.format("Received magnet joker: %s", MP.UTILS.joker_to_string(card)), "MULTIPLAYER")
+end
+
+function G.FUNCS.load_end_game_jokers()
+	local card_area_save, success, err
+
+	if not MP.end_game_jokers or not MP.end_game_jokers_payload then return end
+
+	card_area_save, err = MP.UTILS.str_decode_and_unpack(MP.end_game_jokers_payload)
+	if not card_area_save then
+		sendDebugMessage(string.format("Failed to unpack enemy jokers: %s", err), "MULTIPLAYER")
+		return
+	end
+
+	-- Avoid crashing if the load function ends up indexing a nil value
+	success, err = pcall(MP.end_game_jokers.load, MP.end_game_jokers, card_area_save)
+	if not success then
+		sendDebugMessage(string.format("Failed to load enemy jokers: %s", err), "MULTIPLAYER")
+		-- Reset the card area if loading fails to avoid inconsistent state
+		MP.end_game_jokers:remove()
+		MP.end_game_jokers:init(
+			---@diagnostic disable-next-line: param-type-mismatch
+			0,
+			0,
+			5 * G.CARD_W,
+			G.CARD_H,
+			{ card_limit = G.GAME.starting_params.joker_slots, type = "joker", highlight_limit = 1 }
+		)
+		return
+	end
+
+	-- Log the jokers
+	if MP.end_game_jokers.cards then
+		local jokers_str = ""
+		for _, card in pairs(MP.end_game_jokers.cards) do
+			jokers_str = jokers_str .. ";" .. MP.UTILS.joker_to_string(card)
+		end
+		sendTraceMessage(string.format("Received end game jokers: %s", jokers_str), "MULTIPLAYER")
+	end
+end
+
+local function action_receive_end_game_jokers(keys)
+	MP.end_game_jokers_payload = keys
+	MP.end_game_jokers_received = true
+	G.FUNCS.load_end_game_jokers()
+end
+
+local function action_get_end_game_jokers()
+	if not G.jokers or not G.jokers.cards then
+		Client.send({
+			action = "receiveEndGameJokers",
+			keys = {},
+		})
+		return
+	end
+
+	-- Log the jokers
+	local jokers_str = ""
+	for _, card in pairs(G.jokers.cards) do
+		jokers_str = jokers_str .. ";" .. MP.UTILS.joker_to_string(card)
+	end
+	sendTraceMessage(string.format("Sending end game jokers: %s", jokers_str), "MULTIPLAYER")
+
+	local jokers_save = G.jokers:save()
+	local jokers_encoded = MP.UTILS.str_pack_and_encode(jokers_save)
+
+	Client.send({
+		action = "receiveEndGameJokers",
+		keys = jokers_encoded,
+	})
+end
+
+local function action_get_nemesis_deck()
+	local deck_str = ""
+	for _, card in ipairs(G.playing_cards) do
+		deck_str = deck_str .. ";" .. MP.UTILS.card_to_string(card)
+	end
+	Client.send({
+		action = "receiveNemesisDeck",
+		cards = deck_str,
+	})
+end
+
+local function action_send_game_stats()
+	if not MP.GAME.stats then
+		Client.send({
+			action = "nemesisEndGameStats",
+		})
+		return
+	end
+
+	local stats = {
+		action = "nemesisEndGameStats",
+		reroll_count = MP.GAME.stats.reroll_count,
+		reroll_cost_total = MP.GAME.stats.reroll_cost_total,
+	}
+
+	-- Extract voucher keys where value is true and join them with a dash
+	local voucher_keys = ""
+	if G.GAME.used_vouchers then
+		local keys = {}
+		for k, v in pairs(G.GAME.used_vouchers) do
+			if v == true then table.insert(keys, k) end
+		end
+		voucher_keys = table.concat(keys, "-")
+	end
+
+	-- Add voucher keys to stats string
+	if voucher_keys ~= "" then stats.vouchers = voucher_keys end
+
+	Client.send(stats)
+end
+
+function G.FUNCS.load_nemesis_deck()
+	if not MP.nemesis_deck_string or not MP.nemesis_deck or not MP.nemesis_cards or not MP.LOBBY.code then return end
+
+	local card_strings = MP.UTILS.string_split(MP.nemesis_deck_string, ";")
+
+	for k, _ in pairs(MP.nemesis_cards) do
+		MP.nemesis_cards[k] = nil
+	end
+
+	for _, card_str in pairs(card_strings) do
+		if card_str == "" then goto continue end
+
+		local card_params = MP.UTILS.string_split(card_str, "-")
+
+		local suit = card_params[1]
+		local rank = card_params[2]
+		local enhancement = card_params[3]
+		local edition = card_params[4]
+		local seal = card_params[5]
+
+		-- Validate the card parameters
+		-- If invalid suit or rank, skip the card
+		-- If invalid enhancement, edition, or seal, fallback to "none"
+		local front_key = tostring(suit) .. "_" .. tostring(rank)
+		if not G.P_CARDS[front_key] then
+			sendDebugMessage(string.format("Invalid playing card key: %s", front_key), "MULTIPLAYER")
+			goto continue
+		end
+		if not enhancement or (enhancement ~= "none" and not G.P_CENTERS[enhancement]) then
+			sendDebugMessage(string.format("Invalid enhancement: %s", enhancement), "MULTIPLAYER")
+			enhancement = "none"
+		end
+		if not edition or (edition ~= "none" and not G.P_CENTERS["e_" .. edition]) then
+			sendDebugMessage(string.format("Invalid edition: %s", edition), "MULTIPLAYER")
+			edition = "none"
+		end
+		if not seal or (seal ~= "none" and not G.P_SEALS[seal]) then
+			sendDebugMessage(string.format("Invalid seal: %s", seal), "MULTIPLAYER")
+			seal = "none"
+		end
+
+		-- Create the card
+		local card = create_playing_card({
+			front = G.P_CARDS[front_key],
+			center = enhancement ~= "none" and G.P_CENTERS[enhancement] or nil,
+		}, MP.nemesis_deck, true, true, nil, false)
+		if edition ~= "none" then card:set_edition({ [edition] = true }, true, true) end
+		if seal ~= "none" then card:set_seal(seal, true, true) end
+
+		-- Remove the card from G.playing_cards and insert into MP.nemesis_cards
+		table.remove(G.playing_cards, #G.playing_cards)
+		table.insert(MP.nemesis_cards, card)
+
+		::continue::
+	end
+end
+
+local function action_receive_nemesis_deck(deck_str)
+	MP.nemesis_deck_string = deck_str
+	MP.nemesis_deck_received = true
+	G.FUNCS.load_nemesis_deck()
+end
+
+local function action_start_ante_timer(time, from_nemesis)
+	local option = SMODS.Mods["Multiplayer"].config.timersfx or 1
+	local timersfx = (option == 1) or (option == 2 and G.timer_ante ~= G.GAME.round_resets.ante)
+	G.timer_ante = G.GAME.round_resets.ante
+
+	if timersfx then
+		for i = 1, 3 do
+			local wait_time = (0.15 * (i - 1))
+			G.E_MANAGER:add_event(Event({
+				blocking = false,
+				blockable = false,
+				trigger = "after",
+				delay = G.SETTINGS.GAMESPEED * wait_time,
+				func = function()
+					play_sound("timpani", 0.55 + 0.25 * i, 0.7)
+					play_sound("generic1", 0.75 + 0.25 * i, 0.7)
+					return true
+				end,
+			}))
+		end
+	end
+	-- Under pressure_timer the two players' local timers are intentionally desynced;
+	-- never overwrite ours from the network.
+	if not (MP.is_layer_active("pressure_timer") or MP.is_layer_active("no_animation_timer")) then
+		if type(time) == "string" then time = tonumber(time) end
+		if time then MP.GAME.timer = time end
+	end
+    if from_nemesis then
+        MP.GAME.nemesis_timer_started = true
+    else
+        MP.GAME.timer_started = true
+    end
+end
+
+local function action_pause_ante_timer(time, from_nemesis)
+	if not (MP.is_layer_active("pressure_timer") or MP.is_layer_active("no_animation_timer")) then
+		if type(time) == "string" then time = tonumber(time) end
+		if time then MP.GAME.timer = time end
+	end
+    if from_nemesis then
+        MP.GAME.nemesis_timer_started = false
+    else
+        MP.GAME.timer_started = false
+    end
+end
+
+-- #region Client to Server
+function MP.ACTIONS.create_lobby(gamemode)
+	Client.send({
+		action = "createLobby",
+		gameMode = gamemode,
+	})
+end
+
+function MP.ACTIONS.join_lobby(code)
+	Client.send({
+		action = "joinLobby",
+		code = code,
+	})
+end
+
+function MP.ACTIONS.ready_lobby()
+	Client.send({
+		action = "readyLobby",
+	})
+end
+
+function MP.ACTIONS.unready_lobby()
+	Client.send({
+		action = "unreadyLobby",
+	})
+end
+
+function MP.ACTIONS.lobby_info()
+	Client.send({
+		action = "lobbyInfo",
+	})
+end
+
+function MP.ACTIONS.leave_lobby()
+	-- Clear reconnect state on voluntary leave
+	reconnectToken = nil
+	lastLobbyCode = nil
+	Client.send({
+		action = "leaveLobby",
+	})
+end
+
+function MP.ACTIONS.start_game()
+	Client.send({
+		action = "startGame",
+	})
+end
+
+function MP.ACTIONS.ready_blind(e)
+	MP.GAME.next_blind_context = e
+	Client.send({
+		action = "readyBlind",
+	})
+end
+
+function MP.ACTIONS.unready_blind()
+	Client.send({
+		action = "unreadyBlind",
+	})
+end
+
+function MP.ACTIONS.stop_game()
+	Client.send({
+		action = "stopGame",
+	})
+end
+
+function MP.ACTIONS.fail_round(hands_used)
+	if MP.LOBBY.config.no_gold_on_round_loss then G.GAME.blind.dollars = 0 end
+	if hands_used == 0 then return end
+	Client.send({
+		action = "failRound",
+	})
+end
+
+function MP.ACTIONS.version()
+	Client.send({
+		action = "version",
+		version = MULTIPLAYER_VERSION,
+	})
+end
+
+function MP.ACTIONS.set_location(location, blind)
+	local location_type = location
+	local location_blind = blind
+	if string.find(location, "-") then
+		local split = {}
+		for str in string.gmatch(location, "([^-]+)") do
+			table.insert(split, str)
+		end
+		location_type = split[1]
+		location_blind = split[2] or ""
+	else
+		location_blind = MP.UTILS.get_blind_to_display(blind) or ""
+	end
+	location = location_type .. "-" .. location_blind
+
+	if MP.GAME.location == location then return end
+	MP.GAME.location = location
+	MP.GAME.location_type = location_type
+	MP.GAME.location_blind = location_blind
+	MP.GAME.location_full = location
+	Client.send({
+		action = "setLocation",
+		location = location,
+	})
+end
+
+function MP.ACTIONS.update_location(keep_blind)
+	if MP.GAME.location_type then
+		MP.ACTIONS.set_location(MP.GAME.location_type, keep_blind and MP.GAME.location_blind or nil)
+	end
+end
+
+---@param score number
+---@param hands_left number
+function MP.ACTIONS.play_hand(score, hands_left)
+	local fixed_score = tostring(to_big(score))
+	-- Credit to sidmeierscivilizationv on discord for this fix for Talisman
+	if string.match(fixed_score, "[eE]") == nil and string.match(fixed_score, "[.]") then
+		-- Remove decimal from non-exponential numbers
+		fixed_score = string.sub(string.gsub(fixed_score, "%.", ","), 1, -3)
+	end
+	fixed_score = string.gsub(fixed_score, ",", "") -- Remove commas
+
+	local insane_int_score = MP.INSANE_INT.from_string(fixed_score)
+	if MP.INSANE_INT.greater_than(insane_int_score, MP.GAME.highest_score) then
+		MP.GAME.highest_score = insane_int_score
+	end
+	Client.send({
+		action = "playHand",
+		score = fixed_score,
+		handsLeft = hands_left,
+	})
+end
+
+function MP.ACTIONS.lobby_options()
+	---@type table<string, any>
+	local msg = {
+		action = "lobbyOptions",
+	}
+	for k, v in pairs(MP.LOBBY.config) do
+		msg[tostring(k)] = v
+	end
+	Client.send(msg)
+end
+
+function MP.ACTIONS.set_ante(ante)
+	Client.send({
+		action = "setAnte",
+		ante = ante,
+	})
+end
+
+function MP.ACTIONS.new_round()
+	MP.GAME.duplicate_end = false
+	MP.GAME.round_ended = false
+	Client.send({
+		action = "newRound",
+	})
+end
+
+function MP.ACTIONS.set_furthest_blind(furthest_blind)
+	Client.send({
+		action = "setFurthestBlind",
+		furthestBlind = furthest_blind,
+	})
+end
+
+function MP.ACTIONS.skip(skips)
+	Client.send({
+		action = "skip",
+		skips = skips,
+	})
+end
+
+function MP.ACTIONS.send_phantom(key)
+	Client.send({
+		action = "sendPhantom",
+		key = key,
+	})
+end
+
+function MP.ACTIONS.remove_phantom(key)
+	Client.send({
+		action = "removePhantom",
+		key = key,
+	})
+end
+
+function MP.ACTIONS.asteroid()
+	Client.send({
+		action = "asteroid",
+	})
+end
+
+function MP.ACTIONS.sold_joker()
+	Client.send({
+		action = "soldJoker",
+	})
+end
+
+function MP.ACTIONS.lets_go_gambling_nemesis()
+	Client.send({
+		action = "letsGoGamblingNemesis",
+	})
+end
+
+function MP.ACTIONS.eat_pizza(discards)
+	Client.send({
+		action = "eatPizza",
+		whole = discards,
+	})
+end
+
+function MP.ACTIONS.spent_last_shop(amount)
+	Client.send({
+		action = "spentLastShop",
+		amount = amount,
+	})
+end
+
+function MP.ACTIONS.magnet()
+	Client.send({
+		action = "magnet",
+	})
+end
+
+function MP.ACTIONS.magnet_response(key)
+	Client.send({
+		action = "magnetResponse",
+		key = key,
+	})
+end
+
+function MP.ACTIONS.get_end_game_jokers()
+	Client.send({
+		action = "getEndGameJokers",
+	})
+end
+
+function MP.ACTIONS.get_nemesis_deck()
+	Client.send({
+		action = "getNemesisDeck",
+	})
+end
+
+function MP.ACTIONS.send_game_stats()
+	Client.send({
+		action = "sendGameStats",
+	})
+	action_send_game_stats()
+end
+
+function MP.ACTIONS.request_nemesis_stats()
+	Client.send({
+		action = "endGameStatsRequested",
+	})
+end
+
+function MP.ACTIONS.start_ante_timer()
+	Client.send({
+		action = "startAnteTimer",
+		time = MP.GAME.timer,
+	})
+	action_start_ante_timer(MP.GAME.timer)
+end
+
+function MP.ACTIONS.pause_ante_timer()
+	Client.send({
+		action = "pauseAnteTimer",
+		time = MP.GAME.timer,
+	})
+	action_pause_ante_timer(MP.GAME.timer) -- TODO
+end
+
+function MP.ACTIONS.fail_timer()
+	Client.send({
+		action = "failTimer",
+	})
+end
+
+function MP.ACTIONS.sync_client()
+	Client.send({
+		action = "syncClient",
+		isCached = _RELEASE_MODE,
+	})
+end
+
+function MP.ACTIONS.modded(modId, modAction, params, target)
+	local msg = {
+		action = "moddedAction",
+		modId = modId,
+		modAction = modAction,
+	}
+	if params then
+		for k, v in pairs(params) do
+			msg[k] = v
+		end
+	end
+	if target then msg.target = target end
+	Client.send(msg)
+end
+
+-- #endregion Client to Server
+
+-- Utils
+function MP.ACTIONS.connect()
+	Client.send({
+		action = "connect",
+	})
+end
+
+function MP.ACTIONS.update_player_usernames()
+	if MP.LOBBY.code then
+		if G.MAIN_MENU_UI then G.MAIN_MENU_UI:remove() end
+		set_main_menu_UI()
+	end
+end
+
+local function string_to_table(str)
+	local tbl = {}
+	for part in string.gmatch(str, "([^,]+)") do
+		local key, value = string.match(part, "([^:]+):(.+)")
+		if key and value then tbl[key] = value end
+	end
+	return tbl
+end
+
+local last_game_seed = nil
+
+local game_update_ref = Game.update
+---@diagnostic disable-next-line: duplicate-set-field
+function Game:update(dt)
+	game_update_ref(self, dt)
+
+	repeat
+		local msg = love.thread.getChannel("networkToUi"):pop()
+		if msg then
+			-- horribly messy catch
+			if string.sub(msg, 1, 1) == "a" then
+				if msg ~= "action:keepAlive" then
+					local networkToUiChannel = love.thread.getChannel("networkToUi")
+					networkToUiChannel:push(json.encode({
+						action = "error",
+						message = "Attempting to connect to outdated server",
+					}))
+					networkToUiChannel:push('{"action":"disconnected"}')
+				end
+				return
+			end
+
+			local parsedAction = json.decode(msg)
+
+			if not ((parsedAction.action == "keepAlive") or (parsedAction.action == "keepAliveAck")) then
+				local log = string.format("Client got %s message: ", parsedAction.action)
+				for k, v in pairs(parsedAction) do
+					if parsedAction.action == "startGame" and k == "seed" then
+						last_game_seed = v
+					else
+						log = log .. string.format(" (%s: %s) ", k, v)
+					end
+				end
+				if
+					(parsedAction.action == "receiveEndGameJokers" or parsedAction.action == "stopGame")
+					and last_game_seed
+				then
+					log = log .. string.format(" (seed: %s) ", last_game_seed)
+				end
+				sendTraceMessage(log, "MULTIPLAYER")
+			end
+
+			if parsedAction.action == "connected" then
+				action_connected()
+			elseif parsedAction.action == "version" then
+				action_version()
+			elseif parsedAction.action == "disconnected" then
+				action_disconnected()
+			elseif parsedAction.action == "reconnecting" then
+				action_reconnecting()
+			elseif parsedAction.action == "joinedLobby" then
+				action_joinedLobby(parsedAction.code, parsedAction.type, parsedAction.reconnectToken)
+			elseif parsedAction.action == "rejoinedLobby" then
+				action_rejoinedLobby(parsedAction.code, parsedAction.type, parsedAction.reconnectToken)
+			elseif parsedAction.action == "enemyDisconnected" then
+				action_enemyDisconnected(parsedAction.timeout)
+			elseif parsedAction.action == "enemyReconnected" then
+				action_enemyReconnected()
+			elseif parsedAction.action == "lobbyInfo" then
+				action_lobbyInfo(
+					parsedAction.host,
+					parsedAction.hostHash,
+					parsedAction.hostCached,
+					parsedAction.guest,
+					parsedAction.guestHash,
+					parsedAction.guestCached,
+					parsedAction.guestReady,
+					parsedAction.isHost
+				)
+			elseif parsedAction.action == "startGame" then
+				action_start_game(parsedAction.seed, parsedAction.stake)
+			elseif parsedAction.action == "startBlind" then
+				action_start_blind()
+			elseif parsedAction.action == "enemyInfo" then
+				action_enemy_info(parsedAction.score, parsedAction.handsLeft, parsedAction.skips, parsedAction.lives)
+			elseif parsedAction.action == "stopGame" then
+				action_stop_game()
+			elseif parsedAction.action == "endPvP" then
+				action_end_pvp()
+			elseif parsedAction.action == "playerInfo" then
+				action_player_info(parsedAction.lives)
+			elseif parsedAction.action == "winGame" then
+				action_win_game()
+			elseif parsedAction.action == "loseGame" then
+				action_lose_game()
+			elseif parsedAction.action == "lobbyOptions" then
+				action_lobby_options(parsedAction)
+			elseif parsedAction.action == "enemyLocation" then
+				enemyLocation(parsedAction)
+			elseif parsedAction.action == "sendPhantom" then
+				action_send_phantom(parsedAction.key)
+			elseif parsedAction.action == "removePhantom" then
+				action_remove_phantom(parsedAction.key)
+			elseif parsedAction.action == "speedrun" then
+				action_speedrun()
+			elseif parsedAction.action == "asteroid" then
+				action_asteroid()
+			elseif parsedAction.action == "soldJoker" then
+				action_sold_joker()
+			elseif parsedAction.action == "letsGoGamblingNemesis" then
+				action_lets_go_gambling_nemesis()
+			elseif parsedAction.action == "eatPizza" then
+				action_eat_pizza(parsedAction.whole) -- rename to "discards" when possible
+			elseif parsedAction.action == "spentLastShop" then
+				action_spent_last_shop(parsedAction.amount)
+			elseif parsedAction.action == "magnet" then
+				action_magnet()
+			elseif parsedAction.action == "magnetResponse" then
+				action_magnet_response(parsedAction.key)
+			elseif parsedAction.action == "getEndGameJokers" then
+				action_get_end_game_jokers()
+			elseif parsedAction.action == "receiveEndGameJokers" then
+				action_receive_end_game_jokers(parsedAction.keys)
+			elseif parsedAction.action == "getNemesisDeck" then
+				action_get_nemesis_deck()
+			elseif parsedAction.action == "receiveNemesisDeck" then
+				action_receive_nemesis_deck(parsedAction.cards)
+			elseif parsedAction.action == "endGameStatsRequested" then
+				action_send_game_stats()
+			elseif parsedAction.action == "nemesisEndGameStats" then
+				-- Handle receiving game stats (is only logged now, now shown in the ui)
+			elseif parsedAction.action == "startAnteTimer" then
+				action_start_ante_timer(parsedAction.time, true)
+			elseif parsedAction.action == "pauseAnteTimer" then
+				action_pause_ante_timer(parsedAction.time, true)
+			elseif parsedAction.action == "jimboAppear" then
+				action_jimbo_appear(parsedAction.pos, parsedAction.text)
+			elseif parsedAction.action == "jimboTalk" then
+				action_jimbo_talk(parsedAction.text)
+			elseif parsedAction.action == "jimboMove" then
+				action_jimbo_move(parsedAction.pos)
+			elseif parsedAction.action == "jimboRemove" then
+				action_jimbo_remove()
+			elseif parsedAction.action == "moddedAction" then
+				local registry = MP.MOD_ACTIONS[parsedAction.modId]
+				if registry and registry[parsedAction.modAction] then registry[parsedAction.modAction](parsedAction) end
+			elseif parsedAction.action == "error" then
+				action_error(parsedAction.message)
+			elseif parsedAction.action == "keepAlive" then
+				action_keep_alive()
+			end
+		end
+	until not msg
+end

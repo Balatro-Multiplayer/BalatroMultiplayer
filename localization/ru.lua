@@ -1,0 +1,301 @@
+-- Localization by @astryder75, @KilledByLava, @FaLNioNe, @sidmeierscivilizationv and @karta_wada on discord
+return {
+	descriptions = {
+		Joker = {
+			j_broken = {
+				name = "ОШИБКА",
+				text = {
+					"Эта карта либо сломана,",
+					"либо ещё не добавлена",
+					"в данной версии мода.",
+				},
+			},
+			j_mp_defensive_joker = {
+				name = "Защитный джокер",
+				text = {
+					"{C:chips}+#1#{} фишек",
+					"за каждую {C:red,E:1}жизнь{} меньше,",
+					"чем у вашего {X:purple,C:white}противника{}",
+					"{C:inactive}(сейчас: {C:chips}+#2#{C:inactive} фишек)",
+				},
+			},
+			j_mp_skip_off = {
+				name = "Проскок",
+				text = {
+					"{C:blue}+#1#{} рука и {C:red}+#2#{} сброс за каждый",
+					"пропущенный {C:attention}блайнд{} больше,",
+					"чем у вашего {X:purple,C:white}противника{}",
+					"{C:inactive}(сейчас: {C:blue}+#3#{C:inactive}/{C:red}+#4#{C:inactive}, #5#)",
+				},
+			},
+			j_mp_lets_go_gambling = {
+				name = "Вращайте барабан",
+				text = {
+					"Имеет шанс {C:green}#1# к #2#{}",
+					"дать {X:mult,C:white}X#3#{} множ. и {C:money}$#4#{}",
+					"и имеет шанс {C:green}#5# к #6#{}",
+					"дать {C:money}$#7#{} вашему {X:purple,C:white}противнику{}",
+				},
+			},
+			j_mp_speedrun = {
+				name = "СПИДРАН",
+				text = {
+					"Создаёт случ. {C:spectral}Спектральную{} карту",
+					"при достижении {C:attention}сражения{}",
+					"быстрее вашего {X:purple,C:white}противника{}",
+					"{C:inactive}(должно быть место)",
+				},
+			},
+			j_mp_conjoined_joker = {
+				name = "Соединённый джокер",
+				text = {
+					"В {C:attention}сражении{} даёт {X:mult,C:white}X#1#{} множ.",
+					"за каждую оставшуюся {C:blue}руку{}",
+					"у вашего {X:purple,C:white}противника{}",
+					"{C:inactive}(максимум: {X:mult,C:white}X#2#{C:inactive} множ., сейчас: {X:mult,C:white}X#3#{C:inactive} множ.)",
+				},
+			},
+			j_mp_penny_pincher = {
+				name = "Крохобор",
+				text = {
+					"При входе в магазин даёт {C:money}$#1#{}",
+					"за каждые {C:money}$#2#{},",
+					"потраченных вашим {X:purple,C:white}противником{}",
+					"в прошлом магазине",
+				},
+			},
+			j_mp_taxes = {
+				name = "Налоги",
+				text = {
+					"Получает {C:mult}+#1#{} множ.",
+					"при продаже карты вашим {X:purple,C:white}противником{}",
+					"{C:inactive}(сейчас: {C:mult}+#2#{C:inactive} множ.)",
+				},
+			},
+			j_mp_magnet = {
+				name = "Магнит",
+				text = {
+					"{C:attention}Копирует{} джокера",
+					"с наибольшей суммой продажи",
+					"у вашего {X:purple,C:white}противника{} при продаже",
+					"спустя #1#{} раунд(-а)",
+					"{C:inactive}(сейчас: {C:attention}#2#{C:inactive}/#3# раундов)",
+				},
+			},
+			j_mp_pizza = {
+				name = "Пицца",
+				text = {
+					"{C:red}+#1#{} сбросов каждому игроку",
+					"{C:red}-#2#{} сброс при выборе блайнда игроками",
+					"Съедается при пропуске блайнда {X:purple,C:white}противником{}",
+				},
+			},
+			j_mp_pacifist = {
+				name = "Пацифист",
+				text = {
+					"{X:mult,C:white}X#1#{} множ.",
+					"при нахождении не в {C:attention}сражении{}",
+				},
+			},
+			j_mp_hanging_chad = {
+				name = "Недонадорванный бюллетень",
+				text = {
+					"Эффекты {C:attention}первой{} и {C:attention}второй{}",
+					"сыгранных карт срабатывают ещё {C:attention}#1#{} раз",
+					"при подсчёте",
+				},
+			},
+		},
+		Planet = {
+			c_mp_asteroid = {
+				name = "Астероид",
+				text = {
+					"Уменьшает уровень",
+					"{C:legendary,E:1}покерной руки{} с наивысшим уровнем",
+					"вашего {X:purple,C:white}противника{} на #1#",
+				},
+			},
+		},
+		Blind = {
+			bl_mp_nemesis = {
+				name = "Ваш противник",
+				text = {
+					"Сразитесь с вашим противником,",
+					"игрок с наибольшим счётом побеждает",
+				},
+			},
+		},
+		Edition = {
+			e_mp_phantom = {
+				name = "Фантомный",
+				text = {
+					"{C:attention}Вечный{} и {C:dark_edition}Негативный{}",
+					"Создан и уничтожен вашим {X:purple,C:white}противником{}",
+				},
+			},
+		},
+		Other = {
+			current_nemesis = {
+				name = "Соперник",
+				text = {
+					"{X:purple,C:white}#1#{}",
+					"Ваш единственный противник",
+				},
+			},
+		},
+	},
+	misc = {
+		labels = {
+			mp_phantom = "Фантомный",
+		},
+		dictionary = {
+			b_singleplayer = "Одиночная Игра",
+			b_join_lobby = "Подключиться к лобби",
+			b_return_lobby = "Вернуться в лобби",
+			b_reconnect = "Переподключиться",
+			b_create_lobby = "Создать лобби",
+			b_start_lobby = "Начать игру",
+			b_ready = "Приготовиться",
+			b_unready = "Отменить",
+			b_leave_lobby = "Выйти из лобби",
+			b_mp_discord = "Дискорд-серверу Balatro Multiplayer",
+			b_start = "НАЧАТЬ",
+			b_wait_for_host_start = {
+				"ЖДЁМ",
+				"НАЧАЛА ИГРЫ",
+			},
+			b_wait_for_players = {
+				"ЖДЁМ",
+				"ИГРОКОВ",
+			},
+			b_lobby_options = "ПАРАМЕТРЫ ЛОББИ",
+			b_copy_clipboard = "Скопировать",
+			b_view_code = "УВИДЕТЬ КОД",
+			b_copy_code = "КОПИРОВАТЬ КОД",
+			b_leave = "ВЫЙТИ",
+			b_opts_cb_money = "Давать доп. золото при потере жизни",
+			b_opts_no_gold_on_loss = "Не давать золото при поражении в раунде",
+			b_opts_death_on_loss = "Терять жизнь при поражении не в сражении",
+			b_opts_start_antes = "Количество анте до сражений",
+			b_opts_diff_seeds = "У игроков разные сиды",
+			b_opts_lives = "Кол-во жизней",
+			b_opts_multiplayer_jokers = "Включить джокеров из мода",
+			b_opts_player_diff_deck = "У игроков разные колоды",
+			b_reset = "Сбросить",
+			b_set_custom_seed = "Использовать cвой сид",
+			b_mp_kofi_button = "поддержать меня на Ko-fi",
+			b_unstuck = "Выбраться",
+			b_unstuck_arcana = "Выбраться из набора",
+			b_unstuck_blind = "Выбраться из сражения",
+			b_misprint_display = "Показывать следующую карту в колоде",
+			b_players = "Игроки",
+			b_continue_singleplayer = "Продолжить в одиночной игре",
+			k_enemy_score = "Счёт противника",
+			k_enemy_hands = "Кол-во оставшихся рук у противника: ",
+			k_coming_soon = "Скоро!",
+			k_wait_enemy = "Ждём, пока противник завершит...",
+			k_lives = "Жизни",
+			k_lost_life = "Потеряна жизнь",
+			k_total_lives_lost = " жизней потеряно (по $4 каждая)",
+			k_attrition_name = "Истощение",
+			k_enter_lobby_code = "Введите код лобби",
+			k_paste = "Вставить с буфера обмена",
+			k_username = "Имя:",
+			k_enter_username = "Введите имя",
+			k_join_discord = "Присоединяйтесь к ",
+			k_discord_msg = "Там вы можете сообщать об ошибках и находить людей для игры",
+			k_enter_to_save = "Нажмите Enter, чтобы сохранить",
+			k_in_lobby = "В лобби",
+			k_connected = "Подключено к сервисам",
+			k_warn_service = "ПРЕДУПРЕЖДЕНИЕ: Не удалось найти сервисы",
+			k_set_name = "Введите своё имя в главном меню! (Mods > Multiplayer > Config)",
+			k_mod_hash_warning = "У игроков разные моды, либо разные версии модов! Может привести к ошибкам!",
+			k_lobby_options = "Параметры лобби",
+			k_connect_player = "Игроки в лобби:",
+			k_opts_only_host = "Только ведущий может менять эти настройки",
+			k_opts_gm = "Настройки игры",
+			k_bl_life = "Жизнь",
+			k_bl_or = "или",
+			k_bl_death = "Смерть",
+			k_current_seed = "Текущий сид: ",
+			k_random = "Случайный",
+			k_standard = "Стандартный режим",
+			k_standard_description = "Стандартные правила, в которые включены уникальные карты мода и изменения базовой игры.",
+			k_vanilla = "Ванилла",
+			k_vanilla_description = "Ванильные правила, без карт мода, без изменений базовой игры.",
+			k_weekly = "Недельный режим",
+			k_weekly_description = "Специальный режим, меняется раз в одну или две недели. Придётся понять самим, каковы текущие правила! Сейчас: ",
+			k_tournament = "Турнирный режим",
+			k_tournament_description = "Правила турниров, те же правила, что и в стандартном режиме, но параметры лобби менять запрещено.",
+			k_badlatro = "Плохлатро",
+			k_badlatro_description = "Недельный режим, разработанный пользователем дискорд-сервера, @dr_monty_the_snek, и добавленный на постоянной основе.",
+			k_oops_ex = "Упс!",
+			k_timer = "Таймер",
+			k_mods_list = "Список модов",
+			k_enemy_jokers = "Джокеры противника",
+			ml_enemy_loc = {
+				"Статус",
+				"противника",
+			},
+			ml_mp_kofi_message = {
+				"Данный мод и сервер для него",
+				"разработан и обслуживается",
+				"одним человеком, при",
+				"желании вы можете",
+			},
+			loc_ready = "Готов к сражению",
+			loc_selecting = "Выбирает блайнд",
+			loc_shop = "В магазине",
+			loc_playing = "Против ",
+		},
+		v_dictionary = {
+			a_mp_art = {
+				"Дизайн: #1#",
+			},
+			a_mp_code = {
+				"Код: #1#",
+			},
+			a_mp_idea = {
+				"Идея: #1#",
+			},
+			a_mp_skips_ahead = {
+				"Впереди на #1# пропусков",
+			},
+			a_mp_skips_behind = {
+				"Позади на #1# пропусков",
+			},
+			a_mp_skips_tied = {
+				"Равны",
+			},
+		},
+		v_text = {
+			ch_c_hanging_chad_rework = {
+				"{C:attention}Ещё разок{} {C:dark_edition}переработан",
+			},
+			ch_c_glass_cards_rework = {
+				"{C:attention}Стеклянные карты{} {C:dark_edition}переработаны",
+			},
+		},
+		challenge_names = {
+			c_mp_standard = "Стандартный режим",
+			c_mp_badlatro = "Плохлатро",
+			c_mp_tournament = "Турнирный режим",
+			c_mp_weekly = "Недельный режим",
+			c_mp_vanilla = "Ванилла",
+			c_mp_misprint_deck = "Колода с опечаткой",
+			c_mp_legendaries = "Легендарки",
+			c_mp_psychosis = "Психоз",
+			c_mp_scratch = "С чистого листа",
+			c_mp_twin_towers = "Башни-близнецы",
+			c_mp_in_the_red = "In the Red",
+			c_mp_paper_money = "Бумажные деньги",
+			c_mp_chore_list = "Список дел",
+			c_mp_oops_all_jokers = "Упс! Все джокеры",
+			c_mp_divination = "Гадание",
+			c_mp_skip_off = "Проскок",
+			c_mp_lets_go_gambling = "Вращайте барабан",
+			c_mp_high_hand = "Старшая рука",
+			c_mp_speed = "Скорость",
+		},
+	},
+}

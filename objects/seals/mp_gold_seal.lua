@@ -1,0 +1,9 @@
+-- Gold Seal $3 -> $4 rework commented out for 0.4.0; revisit later.
+-- MP.ReworkCenter("Gold", {
+-- 	center_table = "P_SEALS",
+-- 	layers = "standard",
+-- 	config = { extra = { p_dollars = 4 } },
+-- 	get_p_dollars = function(self, card)
+-- 		return card.ability.seal.extra.p_dollars
+-- 	end,
+-- })

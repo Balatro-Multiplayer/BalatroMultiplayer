@@ -1,0 +1,58 @@
+[manifest]
+version = "1.0.0"
+dump_lua = true
+priority = 2
+
+[[patches]]
+[patches.pattern]
+target = '''cardarea.lua'''
+pattern = '''function CardArea:emplace(card, location, stay_flipped)'''
+position = "after"
+payload = '''
+for k, v in pairs(self.cards) do
+	if v == card then return end
+end
+'''
+match_indent = true
+
+[[patches]]
+[patches.pattern]
+target = '''cardarea.lua'''
+pattern = ''' if area:is(CardArea) then'''
+position = "after"
+payload = '''
+local prevent = false
+do
+	local _cards = discarded_only and {} or area.cards
+	local card = nil
+	if discarded_only then 
+		for k, v in ipairs(area.cards) do
+			if v.ability and v.ability.discarded then 
+				_cards[#_cards+1] = v
+			end
+		end
+	end
+	if area.config.type == 'discard' or area.config.type == 'deck' then
+		card = _cards[#_cards]
+	else
+		card = _cards[1]
+	end
+	for k, v in pairs(self.cards) do
+		if v == card then prevent = true; break end
+	end
+end
+if prevent then return end
+'''
+match_indent = true
+
+[[patches]]
+[patches.pattern]
+target = '''functions/common_events.lua'''
+pattern = '''function draw_card(from, to, percent, dir, sort, card, delay, mute, stay_flipped, vol, discarded_only)'''
+position = "after"
+payload = '''
+for k, v in pairs(to.cards) do
+	if v == card then return end
+end
+'''
+match_indent = true

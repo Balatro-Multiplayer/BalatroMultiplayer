@@ -1,0 +1,16 @@
+# StyLua configuration for Balatro Multiplayer
+
+indent_type = "Tabs"
+column_width = 120
+
+quote_style = "AutoPreferDouble"
+
+# Function call style
+call_parentheses = "Always"
+collapse_simple_statement = "ConditionalOnly"
+
+# End of line handling
+line_endings = "Unix"
+
+# Space handling around operators and assignments
+space_after_function_names = "Never"

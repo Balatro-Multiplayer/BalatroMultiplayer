@@ -1,0 +1,153 @@
+[manifest]
+version = "1.0.0"
+dump_lua = true
+priority = 2147483600
+
+[[patches]]
+[patches.regex]
+target = "card.lua"
+pattern = '''\) then self.cost = 0 end'''
+position = 'after'
+payload = '''if self.edition and self.edition.type == 'mp_phantom' then self.sell_cost = 0 end'''
+times = 1
+
+[[patches]]
+[patches.pattern]
+target = "card.lua"
+pattern = '''if G.jokers.cards[i] ~= self then'''
+position = 'at'
+payload = '''if G.jokers.cards[i] ~= self and (not G.jokers.cards[i].edition or G.jokers.cards[i].edition.type ~= "mp_phantom") then'''
+match_indent = true
+times = 1
+
+[[patches]]
+[patches.pattern]
+target = "card.lua"
+pattern = '''local chosen_joker = pseudorandom_element(G.jokers.cards, pseudoseed('ankh_choice'))'''
+position = 'at'
+payload = '''local copyable_jokers = {}
+    for i, v in ipairs(G.jokers.cards) do
+      if not G.jokers.cards[i].edition or G.jokers.cards[i].edition.type ~= "mp_phantom" then copyable_jokers[#copyable_jokers + 1] = v end
+    end
+    local chosen_joker = pseudorandom_element(copyable_jokers, pseudoseed('ankh_choice'))'''
+match_indent = true
+times = 1
+
+[[patches]]
+[patches.regex]
+target = "card.lua"
+pattern = '''--if there is at least one joker(?<pre>[\s\S]+?)for k, v in pairs\(G.jokers.cards\) do'''
+position = 'at'
+payload = '''--if there is at least one joker$pre local copyable_jokers = {}
+      for i, v in ipairs(G.jokers.cards) do
+        if not G.jokers.cards[i].edition or G.jokers.cards[i].edition.type ~= "mp_phantom" then copyable_jokers[#copyable_jokers + 1] = v end
+      end
+      for k, v in pairs(copyable_jokers) do'''
+times = 1
+
+# Sets the balanced sticker on reworked cards.
+# Auto-apply on reworks is disabled for now — only honors config.mp_balanced.
+# TODO before re-enabling:
+#   1. Key off the ruleset's layers, not its short name (current code only hits
+#      when ruleset name == layer name, e.g. experimental/sandbox).
+#   2. Sticker UI is janky — forces "Balanced" title + generic blurb over the
+#      card's own loc_text. Needs its own rendering path.
+[[patches]]
+[patches.pattern]
+target = "card.lua"
+pattern = '''if center.consumeable then'''
+position = 'before'
+payload = '''
+if old_center ~= center or initial then
+	self.ability.mp_sticker_balanced = false
+	-- TODO: see lovely/cards.toml note above re: rework-based auto-apply
+	if center.config.mp_balanced then
+		self.ability.mp_sticker_balanced = true
+	end
+end'''
+match_indent = true
+times = 1
+
+# Fixes the issue with baseball card working on phantom jokers
+[[patches]]
+[patches.pattern]
+target = "card.lua"
+pattern = '''if self.ability.name == 'Baseball Card' and self ~= context.other_joker and context.other_joker:is_rarity("Uncommon") then'''
+position = 'after'
+payload = '''if context.other_joker.edition and context.other_joker.edition.type == 'mp_phantom' then return end'''
+match_indent = true
+times = 1
+
+# STEAMODDED BUG - move this thing again???
+[[patches]]
+[patches.pattern]
+target = "functions/common_events.lua"
+pattern = '''    for k, v in pairs(other.ability) do
+        if type(v) == 'table' then 
+            new_card.ability[k] = copy_table(v)
+        else
+            new_card.ability[k] = v
+        end
+    end'''
+position = 'at'
+payload = ''' '''
+match_indent = true
+times = 1
+
+# STEAMODDED BUG - move this thing again???
+[[patches]]
+[patches.pattern]
+target = "functions/common_events.lua"
+pattern = '''if other.params then'''
+position = 'before'
+payload = '''
+    for k, v in pairs(other.ability) do
+        if type(v) == 'table' then 
+            new_card.ability[k] = copy_table(v)
+        else
+            new_card.ability[k] = v
+        end
+    end'''
+match_indent = true
+times = 1
+
+# STEAMODDED BUG - add strip_edition check
+[[patches]]
+[patches.pattern]
+target = "functions/common_events.lua"
+pattern = '''if other.params then'''
+position = 'before'
+payload = '''
+    for k, v in pairs(other.ability) do
+        if type(v) == 'table' then 
+            new_card.ability[k] = copy_table(v)
+        else
+            new_card.ability[k] = v
+        end
+    end'''
+match_indent = true
+times = 1
+
+# STEAMODDED BUG - add check for this because perkeo
+[[patches]]
+[patches.pattern]
+target = "functions/common_events.lua"
+pattern = '''if other.edition then'''
+position = 'at'
+payload = '''if other.edition and strip_edition then'''
+match_indent = true
+times = 1
+
+# STEAMODDED BUG - disable this
+# feels weird but recent steamodded commit to dev version removes this
+# so it's correct i guess
+[[patches]]
+[patches.pattern]
+target = "functions/common_events.lua"
+pattern = '''if other.seal then
+	new_card.ability.card_limit = new_card.ability.card_limit - (other.ability.seal.card_limit or 0)'''
+position = 'at'
+payload = '''if false then
+	new_card.ability.card_limit = new_card.ability.card_limit - (other.ability.seal.card_limit or 0)'''
+match_indent = true
+times = 1
