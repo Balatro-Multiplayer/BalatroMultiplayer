@@ -371,24 +371,6 @@ return {
 				},
 			},
 		},
-		Enhanced = {
-			m_mp_display_glass = {
-				name = "グラスカード",
-				text = {
-					"倍率 {X:mult,C:white} X#1# {}",
-					"ただし、{C:green}#3#分の#2#{} の確率で",
-					"破壊されてしまう",
-				},
-			},
-			m_mp_sandbox_display_glass = {
-				name = "グラスカード",
-				text = {
-					"倍率 {X:mult,C:white} X#1# {}",
-					"ただし、{C:green}#3#分の#2#{} の確率で",
-					"破壊されてしまう",
-				},
-			},
-		},
 		Back = {
 			b_mp_cocktail = {
 				name = "カクテルデッキ",
