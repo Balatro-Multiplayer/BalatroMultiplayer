@@ -1,7 +1,11 @@
 MP.Ruleset({
 	key = "experimental",
-	layers = { "experimental", "ranked", "pressure_timer" },
+	layers = { "experimental", "pressure_timer" },
 	forced_gamemode = "gamemode_mp_attrition",
+	force_lobby_options = function(self)
+		MP.LOBBY.config.the_order = true
+		return false
+	end,
 }):inject()
 
 -- TODO: instead of forking experimental into N rulesets per timer/balance combo,
