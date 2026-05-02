@@ -5,7 +5,9 @@ function G.FUNCS.mp_timer_button(e)
 	-- but the button still needs to fire — pressing it broadcasts startAnteTimer,
 	-- which is what flips the opponent's nemesis_timer_started and triggers 2x.
 	if MP.LOBBY.config.timer then
-		if MP.GAME.ready_blind or (MP.is_pvp_boss() and MP.is_layer_active("pvp_timer")) then
+		if
+            MP.GAME.ready_blind or (MP.is_pvp_boss() and MP.is_layer_active("pvp_timer") and MP.INSANE_INT.greater_than(MP.GAME.score, MP.GAME.enemy.score))
+        then
 			if MP.GAME.timer <= 0 then
 				return
 			elseif not MP.GAME.timer_started then
@@ -224,7 +226,7 @@ function G.FUNCS.set_timer_box(e)
             }
 			return
 		end
-		if not MP.GAME.timer_started and (MP.GAME.ready_blind or (MP.is_pvp_boss() and MP.is_layer_active("pvp_timer"))) then
+		if not MP.GAME.timer_started and (MP.GAME.ready_blind or (MP.is_pvp_boss() and MP.is_layer_active("pvp_timer") and MP.INSANE_INT.greater_than(MP.GAME.score, MP.GAME.enemy.score))) then
 			e.config.colour = G.C.IMPORTANT
 			e.children[1].config.object.colours = { G.C.UI.TEXT_LIGHT }
 			return

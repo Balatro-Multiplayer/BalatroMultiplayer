@@ -293,19 +293,7 @@ local function action_enemy_info(score_str, hands_left_str, skips_str, lives_str
 
 	if MP.INSANE_INT.greater_than(score, MP.GAME.enemy.highest_score) then MP.GAME.enemy.highest_score = score end
     if MP.is_layer_active("pvp_timer") and MP.is_pvp_boss() then
-        -- BRUH, I'm just copying this shit
-
-        local fixed_score = tostring(to_big(score))
-        -- Credit to sidmeierscivilizationv on discord for this fix for Talisman
-        if string.match(fixed_score, "[eE]") == nil and string.match(fixed_score, "[.]") then
-            -- Remove decimal from non-exponential numbers
-            fixed_score = string.sub(string.gsub(fixed_score, "%.", ","), 1, -3)
-        end
-        fixed_score = string.gsub(fixed_score, ",", "") -- Remove commas
-
-        local insane_int_score = MP.INSANE_INT.from_string(fixed_score)
-
-        if MP.INSANE_INT.greater_than(insane_int_score, score) then
+        if MP.INSANE_INT.greater_than(MP.GAME.score, score) then
             MP.GAME.nemesis_timer_started = false
         else
             MP.GAME.timer_started = false
@@ -880,7 +868,7 @@ local function action_start_ante_timer(time, from_nemesis)
 	end
 	-- Under pressure_timer the two players' local timers are intentionally desynced;
 	-- never overwrite ours from the network.
-	if not MP.is_any_layer_active({ "pressure_timer", "no_animation_timer" }) then
+	if not (MP.is_any_layer_active({ "pressure_timer", "no_animation_timer" }) or (MP.is_pvp_boss() and MP.is_layer_active("pvp_timer"))) then
 		if type(time) == "string" then time = tonumber(time) end
 		if time then MP.GAME.timer = time end
 	end
@@ -892,7 +880,7 @@ local function action_start_ante_timer(time, from_nemesis)
 end
 
 local function action_pause_ante_timer(time, from_nemesis)
-	if not MP.is_any_layer_active({ "pressure_timer", "no_animation_timer" }) then
+	if not (MP.is_any_layer_active({ "pressure_timer", "no_animation_timer" }) or (MP.is_pvp_boss() and MP.is_layer_active("pvp_timer"))) then
 		if type(time) == "string" then time = tonumber(time) end
 		if time then MP.GAME.timer = time end
 	end
@@ -1029,6 +1017,7 @@ function MP.ACTIONS.play_hand(score, hands_left)
 	fixed_score = string.gsub(fixed_score, ",", "") -- Remove commas
 
 	local insane_int_score = MP.INSANE_INT.from_string(fixed_score)
+    MP.GAME.score = insane_int_score
 	if MP.INSANE_INT.greater_than(insane_int_score, MP.GAME.highest_score) then
 		MP.GAME.highest_score = insane_int_score
 	end
