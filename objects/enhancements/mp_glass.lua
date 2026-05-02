@@ -13,6 +13,16 @@ MP.ReworkCenter("m_glass", {
 	config = { Xmult = 1.5, extra = 4 },
 })
 
+MP.ReworkCenter("m_glass", {
+	layers = "experimental",
+	config = { Xmult = 1.5, extra = 4 },
+})
+
+MP.ReworkCenter("m_glass", {
+	layers = "ranked",
+	config = { Xmult = 1.5, extra = 4 },
+})
+
 -- This is a glass that is permanently at X1.5 to be shown in ruleset descriptions
 -- (Because glass will show at X2 in rulesets otherwise)
 SMODS.Enhancement({

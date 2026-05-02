@@ -235,6 +235,10 @@ function G.FUNCS.set_timer_box(e)
 	end
 end
 
+local animation_budget_capacity = 40
+local animation_budget_restore_rate = 2.5
+local animation_budget_decay_rate = 1
+
 local gameUpdateRef = Game.update
 ---@diagnostic disable-next-line: duplicate-set-field
 function Game:update(dt)
@@ -253,6 +257,8 @@ function Game:update(dt)
     local new_time = love.timer.getTime()
     local timer_dt = new_time - (MP.TIMER_CLOCK or new_time)
     MP.TIMER_CLOCK = new_time
+    MP.TIMER_ANIMATION_BUDGET = math.min(animation_budget_capacity, (MP.TIMER_ANIMATION_BUDGET or animation_budget_capacity) + timer_dt * animation_budget_restore_rate)
+    MP.TIMER_FORCE_GAMESPEED = false
 
     -- Bail fast: not an MP PvP-timer context
     if G.STATE == G.STATES.GAME_OVER then return end
@@ -264,12 +270,16 @@ function Game:update(dt)
 
 
     local is_no_animation_timer = MP.is_layer_active("no_animation_timer")
+    local is_pressure_timer =  MP.is_layer_active("pressure_timer")
     -- Tick gating differs by layer:
     --   pressure_timer ON  -> tick during regular play (not ready_blind, not pvp boss)
     --   pressure_timer OFF -> tick whenever someone pressed a timer button.
     --     timer_started = YOU pressed it; nemesis_timer_started = OPPONENT pressed it
     --     (i.e. they're timering you). Either way your local timer should tick.
-    if MP.is_layer_active("pressure_timer") or is_no_animation_timer then
+    if is_pressure_timer or is_no_animation_timer then
+        if is_pressure_timer or (is_no_animation_timer and MP.GAME.nemesis_timer_started) then
+            MP.TIMER_FORCE_GAMESPEED = true
+        end
         if MP.GAME.ready_blind or MP.is_pvp_boss() then return end
         -- Tick when "unready" blind or old timer, and opponent "timering" you
         if (MP.GAME.pvp_reached or is_no_animation_timer) and not MP.GAME.nemesis_timer_started then return end
@@ -277,7 +287,11 @@ function Game:update(dt)
         -- Don't tick during animations, unless the user is paused or has a menu open
         local interactive = not (G.CONTROLLER.locked or (G.GAME.STOP_USE or 0) > 0)
         local menu_or_paused = G.SETTINGS.paused or G.OVERLAY_MENU
-        if not (interactive or menu_or_paused) then return end
+
+        if not (interactive or menu_or_paused) then
+            MP.TIMER_ANIMATION_BUDGET = math.max(0, MP.TIMER_ANIMATION_BUDGET - timer_dt * (animation_budget_restore_rate + animation_budget_decay_rate))
+            if MP.TIMER_ANIMATION_BUDGET > 0 then return end
+        end
     else
         if not (MP.GAME.timer_started or MP.GAME.nemesis_timer_started) then return end
     end

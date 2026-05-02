@@ -75,7 +75,7 @@ G.FUNCS.skip_blind = function(e)
 	skip_blind_ref(e)
 	if MP.LOBBY.code then
 		-- pressure_timer applies pressure throughout the round, so skipping must not buy time.
-		if not MP.is_layer_active("pressure_timer")
+		if not (MP.is_layer_active("pressure_timer"))
 			and not MP.GAME.timer_started
 			and (MP.LOBBY.config.timer_increment_seconds or 0) > 0 then
 			MP.GAME.timer = MP.GAME.timer + MP.LOBBY.config.timer_increment_seconds

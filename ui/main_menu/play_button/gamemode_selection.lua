@@ -30,6 +30,34 @@ function G.UIDEF.gamemode_selection_options()
 	)
 end
 
+function G.UIDEF.gamemode_selection_tabs()
+    local tabs = {
+        {
+            label = localize("k_gamemodes"),
+            tab_definition_function = function()
+                return G.UIDEF.gamemode_selection_options()
+            end,
+            chosen = true,
+        }
+    }
+    local t = create_UIBox_generic_options({
+		back_func = "create_lobby",
+		contents = {
+			{
+				n = G.UIT.R,
+				config = { align = "cm", padding = 0 },
+				nodes = {
+					create_tabs({
+						tabs = tabs,
+						colour = G.C.BOOSTER,
+					}),
+				},
+			},
+		},
+	})
+    return t
+end
+
 function G.FUNCS.change_gamemode_selection(e)
 	MP.UI.Change_Main_Lobby_Options(
 		e,

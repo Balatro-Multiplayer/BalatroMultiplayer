@@ -7,7 +7,7 @@ function G.FUNCS.setup_run_singleplayer(e)
 	MP.GHOST.clear()
 
 	G.FUNCS.overlay_menu({
-		definition = G.UIDEF.ruleset_selection_options("sp"),
+		definition = G.UIDEF.ruleset_selection_tabs("sp"),
 	})
 end
 
@@ -37,7 +37,7 @@ function G.FUNCS.create_lobby(e)
 	G.SETTINGS.paused = true
 
 	G.FUNCS.overlay_menu({
-		definition = G.UIDEF.ruleset_selection_options("mp"),
+		definition = G.UIDEF.ruleset_selection_tabs("mp"),
 	})
 end
 
@@ -45,7 +45,7 @@ function G.FUNCS.select_gamemode(e)
 	G.SETTINGS.paused = true
 
 	G.FUNCS.overlay_menu({
-		definition = G.UIDEF.gamemode_selection_options(),
+        definition =  G.UIDEF.gamemode_selection_tabs(),
 	})
 end
 

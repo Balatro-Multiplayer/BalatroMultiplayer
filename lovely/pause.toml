@@ -6,6 +6,19 @@ priority = 2147483600
 [[patches]]
 [patches.pattern]
 target = 'functions/UI_definitions.lua'
+pattern = '''local customize = nil'''
+position = 'after'
+payload = '''
+local unstuck_button = nil
+local return_to_lobby = nil
+local leave_lobby = nil
+'''
+match_indent = true
+times = 1
+
+[[patches]]
+[patches.pattern]
+target = 'functions/UI_definitions.lua'
 pattern = '''main_menu = UIBox_button{ label = {localize('b_main_menu')}, button = "go_to_menu", minw = 5}'''
 position = 'after'
 payload = '''unstuck_button = UIBox_button{ label = {localize('b_unstuck')}, button = "mp_unstuck", minw = 5}

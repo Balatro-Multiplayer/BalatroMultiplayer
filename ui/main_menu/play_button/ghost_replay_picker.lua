@@ -4,7 +4,7 @@
 
 local function reopen_practice_menu()
 	G.FUNCS.overlay_menu({
-		definition = G.UIDEF.ruleset_selection_options("practice"),
+		definition = G.UIDEF.ruleset_selection_tabs("practice"),
 	})
 end
 

@@ -33,3 +33,9 @@ SMODS.Joker({
 		end
 	end,
 })
+
+MP.ReworkCenter("j_mp_ticket", {
+    layers = "experimental",
+	config = { extra = { dollars = 4 }, mp_balanced = true },
+    rarity = 2,
+})
