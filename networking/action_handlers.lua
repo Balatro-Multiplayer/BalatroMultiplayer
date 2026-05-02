@@ -373,6 +373,7 @@ local function action_end_pvp()
 	MP.GAME.nemesis_timer_started = false
 	MP.GAME.ready_blind = false
     MP.GAME.pvp_reached = false
+    MP.GAME.score = nil
 end
 
 MP.register_mod_action("forcePvPEnd", action_end_pvp, "Multiplayer")
