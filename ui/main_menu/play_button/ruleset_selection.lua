@@ -1,107 +1,104 @@
 local ruleset_buttons_data = {
-    {
-        name = "k_matchmaking",
-        buttons = {
-            { button_id = "standard_ranked_ruleset_button", button_localize_key = "k_standard_ranked" },
-            { button_id = "legacy_ranked_ruleset_button", button_localize_key = "k_legacy_ranked" },
-            { button_id = "smallworld_ruleset_button", button_localize_key = "k_smallworld" },
-            { button_id = "sandbox_ruleset_button", button_localize_key = "k_sandbox" },
-        },
-    },
-    {
-        name = "k_custom",
-        buttons = {
-            { button_id = "blitz_ruleset_button", button_localize_key = "k_blitz" },
-            { button_id = "traditional_ruleset_button", button_localize_key = "k_traditional" },
-            { button_id = "vanilla_ruleset_button", button_localize_key = "k_vanilla" },
-            { button_id = "badlatro_ruleset_button", button_localize_key = "k_badlatro" },
-            { button_id = "speedlatro_ruleset_button", button_localize_key = "k_speedlatro" },
-            { button_id = "chaos_ruleset_button", button_localize_key = "k_chaos" },
-        },
-    },
-    {
-        name = "k_tournament",
-        buttons = {
-            { button_id = "majorleague_ruleset_button", button_localize_key = "k_majorleague" },
-            { button_id = "minorleague_ruleset_button", button_localize_key = "k_minorleague" },
-        },
-    },
+	{
+		name = "k_matchmaking",
+		buttons = {
+			{ button_id = "standard_ranked_ruleset_button", button_localize_key = "k_standard_ranked" },
+			{ button_id = "legacy_ranked_ruleset_button", button_localize_key = "k_legacy_ranked" },
+			{ button_id = "smallworld_ruleset_button", button_localize_key = "k_smallworld" },
+			{ button_id = "sandbox_ruleset_button", button_localize_key = "k_sandbox" },
+		},
+	},
+	{
+		name = "k_custom",
+		buttons = {
+			{ button_id = "blitz_ruleset_button", button_localize_key = "k_blitz" },
+			{ button_id = "traditional_ruleset_button", button_localize_key = "k_traditional" },
+			{ button_id = "vanilla_ruleset_button", button_localize_key = "k_vanilla" },
+			{ button_id = "badlatro_ruleset_button", button_localize_key = "k_badlatro" },
+			{ button_id = "speedlatro_ruleset_button", button_localize_key = "k_speedlatro" },
+			{ button_id = "chaos_ruleset_button", button_localize_key = "k_chaos" },
+		},
+	},
+	{
+		name = "k_tournament",
+		buttons = {
+			{ button_id = "majorleague_ruleset_button", button_localize_key = "k_majorleague" },
+			{ button_id = "minorleague_ruleset_button", button_localize_key = "k_minorleague" },
+		},
+	},
 }
 
 local rulesets_tabs = {
-    default = {
-        {
-            name = "k_mp_ruleset_tab_general",
-            data = {
-                {
-                    name = "k_matchmaking",
-                    buttons = {
-                        { button_id = "standard_ranked_ruleset_button", button_localize_key = "k_standard_ranked" },
-                        { button_id = "legacy_ranked_ruleset_button", button_localize_key = "k_legacy_ranked" },
-                        { button_id = "smallworld_ruleset_button", button_localize_key = "k_smallworld" },
-                        { button_id = "sandbox_ruleset_button", button_localize_key = "k_sandbox" },
-                    },
-                },
-                {
-                    name = "k_custom",
-                    buttons = {
-                        { button_id = "blitz_ruleset_button", button_localize_key = "k_blitz" },
-                        { button_id = "traditional_ruleset_button", button_localize_key = "k_traditional" },
-                        { button_id = "vanilla_ruleset_button", button_localize_key = "k_vanilla" },
-
-                    },
-                },
-            },
-        },
-        {
-            name = "k_mp_ruleset_tab_torunaments",
-            data = {
-                {
-                    name = "k_tournament",
-                    buttons = {
-                        { button_id = "majorleague_ruleset_button", button_localize_key = "k_majorleague" },
-                        { button_id = "minorleague_ruleset_button", button_localize_key = "k_minorleague" },
-                    },
-                },
-                {
-                    name = "k_custom",
-                    buttons = {
-                        { button_id = "speedlatro_ruleset_button", button_localize_key = "k_speedlatro" },
-                        { button_id = "badlatro_ruleset_button", button_localize_key = "k_badlatro" },
-                        { button_id = "chaos_ruleset_button", button_localize_key = "k_chaos" },
-                    },
-                },
-            }
-        },
-        -- TODO: rather than splitting Experimental into N variants, surface the
-        -- timer/balance combinations as toggles inside the single ruleset.
-        {
-            name = "k_mp_ruleset_tab_experimental",
-            data = {
-                {
-                    name = "k_experimental",
-                    buttons = {
-                        { button_id = "experimental_ruleset_button", button_localize_key = "k_experimental" },
-                    },
-                },
-            }
-        }
-    },
+	default = {
+		{
+			name = "k_mp_ruleset_tab_general",
+			data = {
+				{
+					name = "k_matchmaking",
+					buttons = {
+						{ button_id = "standard_ranked_ruleset_button", button_localize_key = "k_standard_ranked" },
+						{ button_id = "legacy_ranked_ruleset_button", button_localize_key = "k_legacy_ranked" },
+						{ button_id = "smallworld_ruleset_button", button_localize_key = "k_smallworld" },
+						{ button_id = "sandbox_ruleset_button", button_localize_key = "k_sandbox" },
+					},
+				},
+				{
+					name = "k_custom",
+					buttons = {
+						{ button_id = "blitz_ruleset_button", button_localize_key = "k_blitz" },
+						{ button_id = "traditional_ruleset_button", button_localize_key = "k_traditional" },
+						{ button_id = "vanilla_ruleset_button", button_localize_key = "k_vanilla" },
+					},
+				},
+			},
+		},
+		{
+			name = "k_mp_ruleset_tab_torunaments",
+			data = {
+				{
+					name = "k_tournament",
+					buttons = {
+						{ button_id = "majorleague_ruleset_button", button_localize_key = "k_majorleague" },
+						{ button_id = "minorleague_ruleset_button", button_localize_key = "k_minorleague" },
+					},
+				},
+				{
+					name = "k_custom",
+					buttons = {
+						{ button_id = "speedlatro_ruleset_button", button_localize_key = "k_speedlatro" },
+						{ button_id = "badlatro_ruleset_button", button_localize_key = "k_badlatro" },
+						{ button_id = "chaos_ruleset_button", button_localize_key = "k_chaos" },
+					},
+				},
+			},
+		},
+		{
+			name = "k_mp_ruleset_tab_experimental",
+			data = {
+				{
+					name = "k_experimental",
+					buttons = {
+						{ button_id = "experimental_ruleset_button", button_localize_key = "k_experimental" },
+					},
+				},
+			},
+		},
+	},
 }
 
 function G.UIDEF.ruleset_selection_tabs(mode)
-    local tabs_schema = rulesets_tabs[mode] or rulesets_tabs.default
-    local tabs = {}
-    for _, item in ipairs(tabs_schema) do
-        table.insert(tabs, {
-            label = localize(item.name),
-            tab_definition_function = function()
-                return G.UIDEF.ruleset_selection_options(mode, item.data)
-            end,
-        })
-    end
-    tabs[1].chosen = true
-    local t = create_UIBox_generic_options({
+	local tabs_schema = rulesets_tabs[mode] or rulesets_tabs.default
+	local tabs = {}
+	for _, item in ipairs(tabs_schema) do
+		table.insert(tabs, {
+			label = localize(item.name),
+			tab_definition_function = function()
+				return G.UIDEF.ruleset_selection_options(mode, item.data)
+			end,
+		})
+	end
+	tabs[1].chosen = true
+	local t = create_UIBox_generic_options({
 		back_func = "play_options",
 		contents = {
 			{
@@ -116,7 +113,7 @@ function G.UIDEF.ruleset_selection_tabs(mode)
 			},
 		},
 	})
-    return t
+	return t
 end
 
 function G.UIDEF.ruleset_selection_options(mode, buttons)
@@ -128,7 +125,7 @@ function G.UIDEF.ruleset_selection_options(mode, buttons)
 	if mode == "practice" and MP.GHOST.is_active() and MP.SP.ruleset then
 		default_ruleset = MP.SP.ruleset
 	else
-        default_ruleset = string.match(buttons[1].buttons[1].button_id, "(.+)_ruleset_button$")
+		default_ruleset = string.match(buttons[1].buttons[1].button_id, "(.+)_ruleset_button$")
 	end
 
 	if mode == "sp" or mode == "practice" then
@@ -137,20 +134,21 @@ function G.UIDEF.ruleset_selection_options(mode, buttons)
 		MP.LOBBY.config.ruleset = "ruleset_mp_" .. default_ruleset
 	end
 
+	-- Modifiers are per-ruleset; reset on (re)entry to a tab so a previous
+	-- ruleset's toggles can't bleed into the new one.
+	-- i'm not a huge fan of any of this living here but
+	-- here we are
+	MP.MODIFIERS = {}
+
 	MP.LoadReworks(default_ruleset)
-    MP.UI.ruleset_selection_mode = mode
-    MP.UI.ruleset_selection_default_button = default_ruleset .. "_ruleset_button"
+	MP.UI.ruleset_selection_mode = mode
+	MP.UI.ruleset_selection_default_button = default_ruleset .. "_ruleset_button"
 
 	local default_ruleset_area = UIBox({
 		definition = G.UIDEF.ruleset_info(default_ruleset, mode),
 		config = { align = "cm" },
 	})
-	return MP.UI.Main_Lobby_Options(
-		"ruleset_area",
-		default_ruleset_area,
-		"change_ruleset_selection",
-		buttons
-	)
+	return MP.UI.Main_Lobby_Options("ruleset_area", default_ruleset_area, "change_ruleset_selection", buttons)
 end
 
 function G.FUNCS.change_ruleset_selection(e)
@@ -177,6 +175,7 @@ function G.FUNCS.change_ruleset_selection(e)
 			else
 				MP.LOBBY.config.ruleset = "ruleset_mp_" .. ruleset_name
 			end
+			MP.MODIFIERS = {}
 			MP.LoadReworks(ruleset_name)
 		end
 	)
@@ -252,9 +251,7 @@ function G.UIDEF.ruleset_info(ruleset_name, mode)
 
 		-- Ghost replay picker button
 		local ghost_label = localize("k_ghost_replays")
-		if MP.GHOST.is_active() then
-			ghost_label = ghost_label .. " (Active)"
-		end
+		if MP.GHOST.is_active() then ghost_label = ghost_label .. " (Active)" end
 		content_nodes[#content_nodes + 1] = {
 			n = G.UIT.R,
 			config = { align = "cm", padding = 0.05 },
@@ -274,6 +271,8 @@ function G.UIDEF.ruleset_info(ruleset_name, mode)
 		}
 	end
 
+	local show_modifiers = (mode == "mp" or mode == "practice") and not ruleset.forced_lobby_options
+	if show_modifiers then content_nodes[#content_nodes + 1] = MP.UI.build_modifier_row() end
 	content_nodes[#content_nodes + 1] = {
 		n = G.UIT.R,
 		config = { align = "cm" },
@@ -422,15 +421,25 @@ local function create_bans_and_reworks_tabs(ruleset_or_gamemode, is_banned_tab, 
 		other = "k_other",
 	}
 	local function copy_list(key)
+		local lists
 		if is_banned_tab then
-			return merge_lists({
+			lists = {
 				MP.DECK["BANNED_" .. string.upper(key)],
 				ruleset_or_gamemode["banned_" .. key],
 				forced_gamemode["banned_" .. key],
-			})
+			}
+			for _, mod_name in ipairs(MP.MODIFIERS) do
+				local layer = MP.Layers[mod_name]
+				if layer then lists[#lists + 1] = layer["banned_" .. key] end
+			end
 		else
-			return merge_lists({ ruleset_or_gamemode["reworked_" .. key], forced_gamemode["reworked_" .. key] })
+			lists = { ruleset_or_gamemode["reworked_" .. key], forced_gamemode["reworked_" .. key] }
+			for _, mod_name in ipairs(MP.MODIFIERS) do
+				local layer = MP.Layers[mod_name]
+				if layer then lists[#lists + 1] = layer["reworked_" .. key] end
+			end
 		end
+		return merge_lists(lists)
 	end
 	for _, v in ipairs({ "jokers", "consumables", "vouchers", "enhancements", "other" }) do
 		local entry = { type = localize(loc_keys[v]) }
@@ -707,4 +716,62 @@ function G.UIDEF.ruleset_cardarea_definition(args)
 			},
 		}
 	end
+end
+
+-- Modifier toggles render inline inside the ruleset info panel. The handlers
+-- write MP.MODIFIERS directly (no network) — the host's lobby_options push at
+-- start_lobby carries the serialized list to the guest.
+local function timer_modifier_to_index()
+	if MP.has_modifier("no_animation_timer") then return 2 end
+	if MP.has_modifier("pressure_timer") then return 3 end
+	return 1
+end
+
+-- Indices line up with localization ml_mp_modifier_timer_opt: 1=default, 2=no_anim, 3=pressure
+G.FUNCS.change_modifier_timer = function(args)
+	MP.remove_modifier("no_animation_timer")
+	MP.remove_modifier("pressure_timer")
+	if args.to_key == 2 then
+		MP.add_modifier("no_animation_timer")
+	elseif args.to_key == 3 then
+		MP.add_modifier("pressure_timer")
+	end
+end
+
+function MP.UI.build_modifier_row()
+	local timer_cycle = MP.UI.Disableable_Option_Cycle({
+		id = "modifier_timer_option",
+		enabled_ref_table = { val = true },
+		enabled_ref_value = "val",
+		label = localize("k_opts_modifier_timer"),
+		scale = 0.6,
+		options = localize("ml_mp_modifier_timer_opt"),
+		current_option = timer_modifier_to_index(),
+		opt_callback = "change_modifier_timer",
+	})
+
+	local smallworld_proxy = { val = MP.has_modifier("smallworld") }
+	local smallworld_toggle = create_toggle({
+		id = "modifier_smallworld_toggle",
+		label = localize("b_opts_modifier_smallworld"),
+		ref_table = smallworld_proxy,
+		ref_value = "val",
+		callback = function(new_val)
+			if new_val then
+				MP.add_modifier("smallworld")
+			else
+				MP.remove_modifier("smallworld")
+			end
+		end,
+	})
+
+	return {
+		n = G.UIT.R,
+		config = { align = "cm", padding = 0.05 },
+		nodes = {
+			timer_cycle,
+			{ n = G.UIT.B, config = { w = 0.4, h = 0.1 } },
+			smallworld_toggle,
+		},
+	}
 end

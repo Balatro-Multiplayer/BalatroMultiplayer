@@ -254,7 +254,6 @@ return {
     ["banned_tags"] = {},
     ["banned_vouchers"] = {},
     ["forced_gamemode"] = "gamemode_mp_attrition",
-    ["forced_lobby_options"] = true,
     ["key"] = "experimental",
     ["multiplayer_content"] = true,
     ["reworked_blinds"] = {},
