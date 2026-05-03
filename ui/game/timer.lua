@@ -161,8 +161,7 @@ SMODS.Gradient({
 	},
     update = function(self, dt)
         if #self.colours < 2 or not MP.LOBBY.config.ruleset then return end
-        local ruleset = MP.Rulesets[MP.LOBBY.config.ruleset]
-        local speedup = MP.GAME.timer_started and 1 or (ruleset and ruleset.timer_speedup_multiplier) or 1
+        local speedup = MP.GAME.timer_started and 1 or MP.current_ruleset().timer_speedup_multiplier or 1
 
         -- When you "timering" opponent, timer stops and you cannot see is button pressed
         -- So we need switch to real timer to make it flush
@@ -194,8 +193,7 @@ SMODS.Gradient({
 	},
     update = function(self, dt)
         if #self.colours < 2 or not MP.speedlatro_timer then return end
-        local ruleset = MP.Rulesets[MP.LOBBY.config.ruleset]
-        local speedup = (ruleset and ruleset.timer_speedup_multiplier) or 1
+        local speedup = MP.current_ruleset().timer_speedup_multiplier or 1
 
         local timer = MP.GAME.ready_blind and 0 or (-(MP.speedlatro_timer.real or 0) / speedup)%self.cycle
         local start_index = math.ceil(timer*#self.colours/self.cycle)
@@ -296,8 +294,7 @@ function Game:update(dt)
         if not (MP.GAME.timer_started or MP.GAME.nemesis_timer_started) then return end
     end
 
-    local ruleset = MP.Rulesets[MP.LOBBY.config.ruleset]
-    local speedup = (ruleset and ruleset.timer_speedup_multiplier) or 1
+    local speedup = MP.current_ruleset().timer_speedup_multiplier or 1
     local tick_mult = MP.GAME.nemesis_timer_started and speedup or 1
     MP.GAME.timer = math.max(0, MP.GAME.timer - timer_dt * tick_mult)
 

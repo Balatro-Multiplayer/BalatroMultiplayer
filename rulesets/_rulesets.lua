@@ -50,24 +50,14 @@ local RulesetBase = SMODS.GameObject:extend({
 	end,
 })
 
--- Why the wrapper: SMODS.GameObject validates `required_params` inside __call
--- (the constructor), not during inject(). That means all the banned_*/reworked_*
--- arrays need to exist on the init table BEFORE we hand it to RulesetBase().
--- Layers provide these fields, but they're declared separately — so we need a
--- pre-construction pass (resolve_layers) to merge them in. We can't do this
--- inside inject() or any later hook because validation would already have failed.
---
--- The setmetatable trick gives us a callable that looks like RulesetBase to the
--- rest of the codebase (__index falls through) but intercepts construction to
--- run the layer merge first. It's a workaround for SMODS not having a
--- pre-validation hook. If SMODS ever adds one, this can collapse back into a
--- plain extend().
-MP.Ruleset = setmetatable({}, {
-	__call = function(_, init)
-		return RulesetBase(MP.resolve_layers(init))
-	end,
-	__index = RulesetBase,
-})
+-- SMODS validates `required_params` inside __call, not inject(). Layers
+-- declare those arrays separately, so resolve_layers has to pre-bake them
+-- before construction. This is a workaround.
+-- Proper fix: stop treating rulesets as GameObjects up front.
+-- Keep them as plain tables and only flip into a SMODS object at inject() time
+function MP.Ruleset(init)
+	return RulesetBase(MP.resolve_layers(init))
+end
 
 function MP.is_ruleset_active(ruleset_name)
 	local key = "ruleset_mp_" .. ruleset_name
@@ -79,8 +69,9 @@ function MP.is_ruleset_active(ruleset_name)
 	return false
 end
 
+-- "Active" meaning both a live lobby and the configuration-in-progress phase.
 function MP.get_active_ruleset()
-	if MP.LOBBY.code then
+	if MP.LOBBY.config.ruleset then
 		return MP.LOBBY.config.ruleset
 	elseif MP.is_practice_mode() then
 		return MP.SP.ruleset
@@ -94,10 +85,97 @@ function MP.get_active_gamemode()
 	elseif MP.is_practice_mode() then
 		-- Ghost replay stores the gamemode directly
 		if MP.GHOST.is_active() and MP.GHOST.gamemode then return MP.GHOST.gamemode end
-		local ruleset_key = MP.SP and MP.SP.ruleset
-		if ruleset_key and MP.Rulesets[ruleset_key] then return MP.Rulesets[ruleset_key].forced_gamemode end
+		return MP.current_ruleset().forced_gamemode
 	end
 	return nil
+end
+
+-- ----------------------------------------------------------------------------
+-- Active context: the resolved view of (ruleset + active modifiers)
+-- ----------------------------------------------------------------------------
+-- Prep work. Looks pointless. Isn't.
+-- A set so "is this an array field?" is O(1), and a per-lookup resolver that
+-- merges (ruleset + active modifiers).
+
+local _array_field_set = {}
+for _, f in ipairs(MP._LAYER_ARRAY_FIELDS) do
+	_array_field_set[f] = true
+end
+
+local function resolve_field(field)
+	local ruleset_key = MP.get_active_ruleset()
+	local ruleset = ruleset_key and MP.Rulesets[ruleset_key] or nil
+	if _array_field_set[field] then
+		local merged = {}
+		if ruleset and ruleset[field] then
+			for _, v in ipairs(ruleset[field]) do
+				merged[#merged + 1] = v
+			end
+		end
+		for _, mod_name in ipairs(MP.MODIFIERS) do
+			local layer = MP.Layers[mod_name]
+			if layer and layer[field] then
+				for _, v in ipairs(layer[field]) do
+					merged[#merged + 1] = v
+				end
+			end
+		end
+		return merged
+	end
+	-- Scalar / function / non-array: modifiers last-wins, then ruleset
+	for i = #MP.MODIFIERS, 1, -1 do
+		local layer = MP.Layers[MP.MODIFIERS[i]]
+		if layer and layer[field] ~= nil then return layer[field] end
+	end
+	if ruleset then return ruleset[field] end
+	return nil
+end
+
+local _resolver = setmetatable({}, {
+	__index = function(_, field)
+		return resolve_field(field)
+	end,
+})
+
+-- The answer to "what's in the active ruleset?".
+-- Safe with no active ruleset: arrays read as {}, the rest as nil.
+function MP.current_ruleset()
+	return _resolver
+end
+
+-- Returns a single deduped, ordered list of active layer names. Body looks
+-- scarier than it is. Order: target ruleset's _layer_order, then its
+-- self-name, then modifiers (when target is the active ruleset). Dedup
+-- matters because not every hook is idempotent — smallworld's 75% cull
+-- would re-cull the survivors.
+function MP.active_layer_chain(target_short)
+	local active_key = MP.get_active_ruleset()
+	local active_short = active_key and active_key:gsub("^ruleset_mp_", "") or nil
+	target_short = target_short or active_short
+
+	local result, seen = {}, {}
+	local function add(name)
+		if name and not seen[name] then
+			seen[name] = true
+			result[#result + 1] = name
+		end
+	end
+
+	if target_short then
+		local ruleset = MP.Rulesets["ruleset_mp_" .. target_short]
+		if ruleset and ruleset._layer_order then
+			for _, name in ipairs(ruleset._layer_order) do
+				add(name)
+			end
+		end
+		add(target_short)
+	end
+	if target_short == active_short then
+		for _, name in ipairs(MP.MODIFIERS) do
+			add(name)
+		end
+	end
+	return result
 end
 
 function MP.ApplyBans()
@@ -106,7 +184,7 @@ function MP.ApplyBans()
 	local gamemode = gamemode_key and MP.Gamemodes[gamemode_key] or nil
 
 	if ruleset_key then
-		local ruleset = MP.Rulesets[ruleset_key]
+		local ruleset = MP.current_ruleset()
 		local banned_tables = {
 			"jokers",
 			"consumables",
@@ -128,7 +206,7 @@ function MP.ApplyBans()
 				G.GAME.banned_keys[v] = true
 			end
 		end
-		for _, v in ipairs(ruleset["banned_silent"] or {}) do
+		for _, v in ipairs(ruleset.banned_silent) do
 			G.GAME.banned_keys[v] = true
 		end
 	end
@@ -242,16 +320,10 @@ function MP.LoadReworks(ruleset, key)
 		end
 	end
 
-	-- Build resolution order: vanilla → layers in order → self
-	local resolution = {}
-	local ruleset_obj = MP.Rulesets["ruleset_mp_" .. ruleset]
-	if ruleset_obj and ruleset_obj._layer_order then
-		for _, layer in ipairs(ruleset_obj._layer_order) do
-			resolution[#resolution + 1] = layer
-		end
-	end
-	-- Self-layer last (override escape hatch, also handles layerless rulesets like release)
-	resolution[#resolution + 1] = ruleset
+	-- Resolution: vanilla → ruleset's layers → ruleset self → modifiers (only
+	-- when target is the active ruleset). active_layer_chain handles the full
+	-- layer-name list; vanilla is processed separately.
+	local resolution = MP.active_layer_chain(ruleset)
 
 	if key then
 		process(key, "mp_vanilla_")

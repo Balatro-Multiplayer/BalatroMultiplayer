@@ -81,8 +81,7 @@ function Game:update(dt)
 				local self_score = MP.INSANE_INT.from_string(fixed_score)
 
 				if (not MP.is_pvp_boss()) or MP.INSANE_INT.greater_than(MP.GAME.enemy.score, self_score) then
-					local ruleset = MP.Rulesets[MP.LOBBY.config.ruleset]
-					local speedup = ruleset and ruleset.timer_speedup_multiplier or 2
+					local speedup = MP.current_ruleset().timer_speedup_multiplier or 2
 					local tick_mult = (MP.GAME.nemesis_timer_started and not MP.is_pvp_boss()) and speedup or 1
 					MP.speedlatro_timer.real = MP.speedlatro_timer.real - dt * tick_mult
 				end
