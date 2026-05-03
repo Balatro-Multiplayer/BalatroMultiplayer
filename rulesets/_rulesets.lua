@@ -50,9 +50,11 @@ local RulesetBase = SMODS.GameObject:extend({
 	end,
 })
 
--- SMODS validates `required_params` inside __call, not inject() — so the
--- banned_*/reworked_* arrays must exist on init before construction. Layers
--- declare them separately, so we run resolve_layers as a pre-construction pass.
+-- SMODS validates `required_params` inside __call, not inject(). Layers
+-- declare those arrays separately, so resolve_layers has to pre-bake them
+-- before construction. This is a workaround.
+-- Proper fix: stop treating rulesets as GameObjects up front.
+-- Keep them as plain tables and only flip into a SMODS object at inject() time
 function MP.Ruleset(init)
 	return RulesetBase(MP.resolve_layers(init))
 end
@@ -67,11 +69,8 @@ function MP.is_ruleset_active(ruleset_name)
 	return false
 end
 
+-- "Active" meaning both a live lobby and the configuration-in-progress phase.
 function MP.get_active_ruleset()
-	-- "Active" covers both a live lobby and the configuration-in-progress phase
-	-- (start_lobby reads ruleset properties before the lobby code arrives from
-	-- the server). Setup flows clear config.ruleset when entering non-MP paths
-	-- so there's no stale-bleed risk.
 	if MP.LOBBY.config.ruleset then
 		return MP.LOBBY.config.ruleset
 	elseif MP.is_practice_mode() then
@@ -94,7 +93,9 @@ end
 -- ----------------------------------------------------------------------------
 -- Active context: the resolved view of (ruleset + active modifiers)
 -- ----------------------------------------------------------------------------
--- See .context/resolved-ruleset.md for the design rationale.
+-- Prep work. Looks pointless. Isn't.
+-- A set so "is this an array field?" is O(1), and a per-lookup resolver that
+-- merges (ruleset + active modifiers).
 
 local _array_field_set = {}
 for _, f in ipairs(MP._LAYER_ARRAY_FIELDS) do
@@ -130,29 +131,23 @@ local function resolve_field(field)
 	return nil
 end
 
--- Singleton proxy: holds no state, only the metatable matters. Resolves field
--- reads across (ruleset + active modifiers). Always usable, even with no active
--- ruleset (array fields read as {}, everything else as nil).
 local _resolver = setmetatable({}, {
 	__index = function(_, field)
 		return resolve_field(field)
 	end,
 })
 
+-- The answer to "what's in the active ruleset?".
+-- Safe with no active ruleset: arrays read as {}, the rest as nil.
 function MP.current_ruleset()
 	return _resolver
 end
 
--- Ordered list of active layer names: target ruleset's _layer_order, the
--- ruleset's self-name, then modifiers (when target is the active ruleset).
--- Defaults to the active ruleset when target_short is omitted.
---
--- Deduped: if the ruleset's self-name matches a layer in _layer_order (e.g.
--- ruleset_mp_smallworld composes the smallworld layer), or a modifier matches
--- a layer the ruleset already includes, the duplicate is dropped. First
--- occurrence wins. Without dedup, RunLayerHooks would fire on_apply_bans
--- twice for that layer — fine for idempotent hooks, broken for smallworld's
--- 75% pseudorandom cull (re-culls the survivors).
+-- Returns a single deduped, ordered list of active layer names. Body looks
+-- scarier than it is. Order: target ruleset's _layer_order, then its
+-- self-name, then modifiers (when target is the active ruleset). Dedup
+-- matters because not every hook is idempotent — smallworld's 75% cull
+-- would re-cull the survivors.
 function MP.active_layer_chain(target_short)
 	local active_key = MP.get_active_ruleset()
 	local active_short = active_key and active_key:gsub("^ruleset_mp_", "") or nil
