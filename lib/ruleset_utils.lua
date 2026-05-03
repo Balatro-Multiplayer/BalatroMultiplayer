@@ -7,7 +7,7 @@ end
 -- so the lobby UI keeps showing the unmultiplied base.
 function MP.UTILS.timer_base()
 	local base = MP.LOBBY.config.timer_base_seconds or 150
-	local mult = MP.current_ruleset().timer_base_multiplier or 1
+	local mult = MP.current_ruleset and MP.current_ruleset().timer_base_multiplier or 1
 	return base * mult
 end
 
