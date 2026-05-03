@@ -146,24 +146,38 @@ end
 -- Ordered list of active layer names: target ruleset's _layer_order, the
 -- ruleset's self-name, then modifiers (when target is the active ruleset).
 -- Defaults to the active ruleset when target_short is omitted.
+--
+-- Deduped: if the ruleset's self-name matches a layer in _layer_order (e.g.
+-- ruleset_mp_smallworld composes the smallworld layer), or a modifier matches
+-- a layer the ruleset already includes, the duplicate is dropped. First
+-- occurrence wins. Without dedup, RunLayerHooks would fire on_apply_bans
+-- twice for that layer — fine for idempotent hooks, broken for smallworld's
+-- 75% pseudorandom cull (re-culls the survivors).
 function MP.active_layer_chain(target_short)
 	local active_key = MP.get_active_ruleset()
 	local active_short = active_key and active_key:gsub("^ruleset_mp_", "") or nil
 	target_short = target_short or active_short
 
-	local result = {}
+	local result, seen = {}, {}
+	local function add(name)
+		if name and not seen[name] then
+			seen[name] = true
+			result[#result + 1] = name
+		end
+	end
+
 	if target_short then
 		local ruleset = MP.Rulesets["ruleset_mp_" .. target_short]
 		if ruleset and ruleset._layer_order then
 			for _, name in ipairs(ruleset._layer_order) do
-				result[#result + 1] = name
+				add(name)
 			end
 		end
-		result[#result + 1] = target_short
+		add(target_short)
 	end
 	if target_short == active_short then
 		for _, name in ipairs(MP.MODIFIERS) do
-			result[#result + 1] = name
+			add(name)
 		end
 	end
 	return result
