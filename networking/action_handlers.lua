@@ -31,13 +31,9 @@ local reconnectToken = nil
 local lastLobbyCode = nil
 
 local function create_log_hash()
-	local tmp = MP.path
-	local trimmed = tmp:gsub("[^/]+/?$", "") --removes the last /BalatroMultiplayer*/, we need absolute file path for io.read
-	local logsPath = trimmed .. "lovely/log/"
-	local files = love.filesystem.getDirectoryItems("Mods/lovely/log/")
-	table.sort(files)
-	local lastLog = files[#files]
-	local logFile = io.open(logsPath .. lastLog, "r")
+	local tmp = require("lovely").log_path
+	local logName = tmp:match("[^\\]+$") --logname.txt
+	local logFile = io.open(require("lovely").log_path, "r")
 	if not logFile then return nil end
 	local logData = logFile:read("*a")
 	logFile:close()
