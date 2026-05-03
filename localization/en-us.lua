@@ -1372,6 +1372,11 @@ return {
 				"Once per Ante",
 				"Off",
 			},
+			ml_mp_modifier_timer_opt = {
+				"Default",
+				"No Animation",
+				"Pressure",
+			},
 			k_sc_title = "SHORTCUTS",
 			k_sc_hint = "Press key or release TAB to close",
 			b_sc_choose_deck = "Choose Deck/Stake",
