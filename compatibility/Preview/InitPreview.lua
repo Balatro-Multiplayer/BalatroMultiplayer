@@ -30,7 +30,7 @@ function FN.PRE.start_new_coroutine()
         timer_delay = 5
         timer_cost = 0
 
-        local ruleset = MP.Rulesets[MP.LOBBY.config.ruleset] or {}
+        local ruleset = MP.current_ruleset()
         timer_delay = MP.LOBBY.config.preview_calculate_delay or ruleset.preview_calculate_delay or timer_delay
         timer_cost  = MP.LOBBY.config.preview_calculate_cost or ruleset.preview_calculate_cost or timer_cost
     end
