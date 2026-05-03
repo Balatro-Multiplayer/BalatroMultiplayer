@@ -1032,9 +1032,7 @@ function MP.ACTIONS.play_hand(score, hands_left)
 
     if MP.is_pvp_boss() and MP.is_layer_active("pvp_timer") then
         if not MP.GAME.timer_consumed then
-            local ruleset_key = MP.LOBBY.config.ruleset
-            local ruleset = MP.Rulesets and ruleset_key and MP.Rulesets[ruleset_key]
-            local increment = ruleset and ruleset.pvp_timer_increment_seconds or 0
+            local increment = MP.LOBBY.config.pvp_timer_increment_seconds or MP.current_ruleset().pvp_timer_increment_seconds or 0
             MP.UI.restore_timer(increment)
         end
 

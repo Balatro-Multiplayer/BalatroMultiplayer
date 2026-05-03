@@ -110,6 +110,10 @@ function MP.is_major_league_ruleset()
 	return MP.LOBBY and MP.LOBBY.config and MP.LOBBY.config.ruleset == "ruleset_mp_majorleague" and MP.LOBBY.code
 end
 
+function MP.current_ruleset()
+    return {}
+end
+
 function MP.load_mp_file(file)
 	local chunk, err = SMODS.load_file(file, "Multiplayer")
 	if chunk then
