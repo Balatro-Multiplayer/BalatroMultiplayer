@@ -72,8 +72,6 @@ local rulesets_tabs = {
 				},
 			},
 		},
-		-- TODO: rather than splitting Experimental into N variants, surface the
-		-- timer/balance combinations as toggles inside the single ruleset.
 		{
 			name = "k_mp_ruleset_tab_experimental",
 			data = {
