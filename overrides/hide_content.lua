@@ -1,7 +1,7 @@
 -- small file because it feels wrong to add it somewhere else
 
 function MP.should_hide_mp_content()
-	if (not MP.LOBBY.code) or not MP.Rulesets[MP.LOBBY.config.ruleset].multiplayer_content then -- check for vanilla context
+	if (not MP.LOBBY.code) or not MP.current_ruleset().multiplayer_content then -- check for vanilla context
 		if SMODS.Mods["Multiplayer"].config.hide_mp_content then return true end
 	end
 	return false

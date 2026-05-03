@@ -441,6 +441,11 @@ local function action_lobby_options(options)
 			MP.LOBBY.config.gamemode = v
 			goto continue
 		end
+		if k == "modifier_layers" then
+			MP.LOBBY.config.modifier_layers = v
+			MP.modifiers_parse(v)
+			goto continue
+		end
 
 		local parsed_v = v
 		if v == "true" then

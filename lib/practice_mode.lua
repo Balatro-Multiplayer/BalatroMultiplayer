@@ -14,6 +14,7 @@ function G.FUNCS.setup_practice_mode(e)
 	MP.SP.unlimited_slots = false
 	MP.SP.edition_cycling = false
 	MP.GHOST.clear()
+	MP.MODIFIERS = {}
 
 	G.FUNCS.overlay_menu({
 		definition = G.UIDEF.ruleset_selection_tabs("practice"),

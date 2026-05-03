@@ -132,25 +132,64 @@ function MP.resolve_layers(init)
 	return init
 end
 
--- Call a named hook on each active layer, in layer order
+-- ----------------------------------------------------------------------------
+-- Modifier layers
+-- ----------------------------------------------------------------------------
+-- MP.MODIFIERS is an ordered list of layer names picked at runtime (host in
+-- the Modifiers overlay, or player in practice mode). Modifiers are *not*
+-- materialized onto the ruleset — they're queried at read sites alongside the
+-- ruleset's own layers. Reset to {} on lobby leave / practice exit.
+
+MP.MODIFIERS = {}
+
+function MP.has_modifier(name)
+	for _, n in ipairs(MP.MODIFIERS) do
+		if n == name then return true end
+	end
+	return false
+end
+
+function MP.add_modifier(name)
+	if not name or name == "" or MP.has_modifier(name) then return end
+	MP.MODIFIERS[#MP.MODIFIERS + 1] = name
+end
+
+function MP.remove_modifier(name)
+	for i, n in ipairs(MP.MODIFIERS) do
+		if n == name then
+			table.remove(MP.MODIFIERS, i)
+			return
+		end
+	end
+end
+
+function MP.modifiers_serialize()
+	return table.concat(MP.MODIFIERS, ",")
+end
+
+function MP.modifiers_parse(s)
+	MP.MODIFIERS = {}
+	if not s or s == "" then return end
+	for n in string.gmatch(s, "[^,]+") do
+		MP.MODIFIERS[#MP.MODIFIERS + 1] = n
+	end
+end
+
+-- Fire a named hook on every layer in the active chain. The ruleset's
+-- self-name appears in the chain but isn't registered in MP.Layers, so the
+-- lookup no-ops harmlessly.
 function MP.RunLayerHooks(hook_name)
-	local ruleset_key = MP.get_active_ruleset()
-	if not ruleset_key then return end
-	local ruleset = MP.Rulesets[ruleset_key]
-	if not ruleset or not ruleset._layer_order then return end
-	for _, layer_name in ipairs(ruleset._layer_order) do
-		local layer = MP.Layers[layer_name]
+	for _, name in ipairs(MP.active_layer_chain()) do
+		local layer = MP.Layers[name]
 		if layer and layer[hook_name] then layer[hook_name]() end
 	end
 end
 
 function MP.is_layer_active(layer_name)
-	local ruleset_key = MP.get_active_ruleset()
-	if not ruleset_key then return false end
-	-- Every ruleset is implicitly its own layer
-	if ruleset_key == "ruleset_mp_" .. layer_name then return true end
-	local ruleset = MP.Rulesets[ruleset_key]
-	return ruleset and ruleset._layers and ruleset._layers[layer_name] or false
+	for _, name in ipairs(MP.active_layer_chain()) do
+		if name == layer_name then return true end
+	end
+	return false
 end
 
 function MP.is_any_layer_active(layers)
