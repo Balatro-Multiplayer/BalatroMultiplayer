@@ -50,24 +50,12 @@ local RulesetBase = SMODS.GameObject:extend({
 	end,
 })
 
--- Why the wrapper: SMODS.GameObject validates `required_params` inside __call
--- (the constructor), not during inject(). That means all the banned_*/reworked_*
--- arrays need to exist on the init table BEFORE we hand it to RulesetBase().
--- Layers provide these fields, but they're declared separately — so we need a
--- pre-construction pass (resolve_layers) to merge them in. We can't do this
--- inside inject() or any later hook because validation would already have failed.
---
--- The setmetatable trick gives us a callable that looks like RulesetBase to the
--- rest of the codebase (__index falls through) but intercepts construction to
--- run the layer merge first. It's a workaround for SMODS not having a
--- pre-validation hook. If SMODS ever adds one, this can collapse back into a
--- plain extend().
-MP.Ruleset = setmetatable({}, {
-	__call = function(_, init)
-		return RulesetBase(MP.resolve_layers(init))
-	end,
-	__index = RulesetBase,
-})
+-- SMODS validates `required_params` inside __call, not inject() — so the
+-- banned_*/reworked_* arrays must exist on init before construction. Layers
+-- declare them separately, so we run resolve_layers as a pre-construction pass.
+function MP.Ruleset(init)
+	return RulesetBase(MP.resolve_layers(init))
+end
 
 function MP.is_ruleset_active(ruleset_name)
 	local key = "ruleset_mp_" .. ruleset_name
@@ -108,21 +96,15 @@ end
 -- ----------------------------------------------------------------------------
 -- See .context/resolved-ruleset.md for the design rationale.
 
-local _array_field_set = nil
-local function array_field_set()
-	if not _array_field_set then
-		_array_field_set = {}
-		for _, f in ipairs(MP._LAYER_ARRAY_FIELDS) do
-			_array_field_set[f] = true
-		end
-	end
-	return _array_field_set
+local _array_field_set = {}
+for _, f in ipairs(MP._LAYER_ARRAY_FIELDS) do
+	_array_field_set[f] = true
 end
 
 local function resolve_field(field)
 	local ruleset_key = MP.get_active_ruleset()
 	local ruleset = ruleset_key and MP.Rulesets[ruleset_key] or nil
-	if array_field_set()[field] then
+	if _array_field_set[field] then
 		local merged = {}
 		if ruleset and ruleset[field] then
 			for _, v in ipairs(ruleset[field]) do
@@ -148,17 +130,17 @@ local function resolve_field(field)
 	return nil
 end
 
-local _resolver_mt = {
+-- Singleton proxy: holds no state, only the metatable matters. Resolves field
+-- reads across (ruleset + active modifiers). Always usable, even with no active
+-- ruleset (array fields read as {}, everything else as nil).
+local _resolver = setmetatable({}, {
 	__index = function(_, field)
 		return resolve_field(field)
 	end,
-}
+})
 
--- Returns a proxy that resolves field reads across (ruleset + active modifiers).
--- Always returns a usable proxy, even with no active ruleset (array fields read
--- as {}, everything else as nil).
 function MP.current_ruleset()
-	return setmetatable({}, _resolver_mt)
+	return _resolver
 end
 
 -- Ordered list of active layer names: target ruleset's _layer_order, the
