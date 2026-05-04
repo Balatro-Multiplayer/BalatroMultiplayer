@@ -22,6 +22,14 @@ function MP.UTILS.encrypt_string(str)
 	return string.format("%08x", hash)
 end
 
+function MP.UTILS.emit_log_checksum()
+	local logFile = io.open(require("lovely").log_path, "rb")
+	if not logFile then return end
+	local logData = logFile:read("*a")
+	logFile:close()
+	sendTraceMessage("Log checksum - " .. MP.UTILS.encrypt_string(logData))
+end
+
 function MP.UTILS.server_connection_ID()
 	local os_name = love.system.getOS()
 	local raw_id
