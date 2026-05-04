@@ -193,13 +193,8 @@ function MP.is_layer_active(layer_name)
 end
 
 function MP.is_any_layer_active(layers)
-	local ruleset_key = MP.get_active_ruleset()
-	if not ruleset_key then return false end
     for _, layer_name in ipairs(layers) do
-        -- Every ruleset is implicitly its own layer
-        if ruleset_key == "ruleset_mp_" .. layer_name then return true end
-        local ruleset = MP.Rulesets[ruleset_key]
-        if ruleset and ruleset._layers and ruleset._layers[layer_name] then return true end
+        if MP.is_layer_active(layer_name) then return true end
     end
     return false
 end

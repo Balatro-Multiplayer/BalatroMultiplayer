@@ -108,12 +108,14 @@ function MP.UI.start_pvp_countdown(callback)
 	if MP.LOBBY and MP.LOBBY.config and MP.LOBBY.config.pvp_countdown_seconds then
 		seconds = MP.LOBBY.config.pvp_countdown_seconds
 	end
+    MP.GAME.pvp_countdown_in_progress = true
 	MP.GAME.pvp_countdown = seconds
 
 	G.CONTROLLER.locks.enter_pvp = true
 
 	local function show_next()
 		if MP.GAME.pvp_countdown <= 0 then
+            MP.GAME.pvp_countdown_in_progress = nil
 			if callback then callback() end
 			G.E_MANAGER:add_event(Event({
 				no_delete = true,
@@ -178,7 +180,7 @@ SMODS.Gradient({
 
 		-- When you "timering" opponent, timer stops and you cannot see is button pressed
 		-- So we need switch to real timer to make it flush
-		local time_value = (MP.GAME.timer_started and G.TIMERS.REAL or -(MP.GAME.timer or 0)) + 0.5
+		local time_value = (MP.GAME.timer_started and G.TIMERS.REAL or -(MP.GAME.timer or 0))
 		local timer = (time_value / speedup) % self.cycle
 		local start_index = math.ceil(timer * #self.colours / self.cycle)
 		if start_index == 0 then start_index = 1 end
@@ -230,12 +232,9 @@ function G.FUNCS.set_timer_box(e)
 	if MP.LOBBY.config.timer then
 		if MP.GAME.timer_started or MP.GAME.nemesis_timer_started then
 			e.config.colour = G.C.DYN_UI.BOSS_DARK
-			-- Pulse if it's pressure timer only
+			-- Pulse because why not
 			e.children[1].config.object.colours = {
-				MP.GAME.timer > 0
-						and MP.is_any_layer_active({ "pressure_timer", "no_animation_timer", "speedlatro", "pvp_timer" })
-						and SMODS.Gradients["mp_timer_accelerated"]
-					or G.C.IMPORTANT,
+				MP.GAME.timer > 0 and SMODS.Gradients["mp_timer_accelerated"] or G.C.IMPORTANT,
 			}
 			return
 		end
@@ -245,9 +244,11 @@ function G.FUNCS.set_timer_box(e)
 			return
 		end
 		e.config.colour = G.C.DYN_UI.BOSS_DARK
-		-- Attention text if pressure timer
 		e.children[1].config.object.colours =
-			{ MP.is_layer_active("pressure_timer") and not MP.is_pvp_boss() and G.C.IMPORTANT or G.C.UI.TEXT_DARK }
+			{
+                MP.is_layer_active("pressure_timer") and not MP.is_pvp_boss() and not MP.GAME.pvp_countdown_in_progress
+                and G.C.IMPORTANT or G.C.UI.TEXT_DARK
+            }
 	end
 end
 
@@ -336,7 +337,7 @@ function Game:update(dt)
 		end
 	end
 
-	local speedup = MP.current_ruleset().timer_speedup_multiplier or 1
+	local speedup = is_pvp_timer and 1 or MP.current_ruleset().timer_speedup_multiplier or 1
 	local tick_mult = MP.GAME.nemesis_timer_started and speedup or 1
 	MP.GAME.timer = math.max(0, MP.GAME.timer - timer_dt * tick_mult)
 
@@ -373,4 +374,16 @@ function MP.UI.restore_timer(amount, silent, max_timer)
 			if timer_ui then timer_ui.config.object:juice_up() end
 		end
 	end
+end
+
+local old_play = G.FUNCS.play_cards_from_highlighted
+function G.FUNCS.play_cards_from_highlighted(...)
+    old_play(...)
+    if G.play and G.play.cards[1] then return end
+    if not MP.is_pvp_boss() and MP.is_layer_active("pressure_timer") and MP.is_layer_active("pressure_timer_plus") then
+        if not MP.GAME.timer_consumed then
+            local increment = MP.LOBBY.config.timer_hand_played_increment_seconds or MP.current_ruleset().timer_hand_played_increment_seconds or 0
+            MP.UI.restore_timer(increment)
+        end
+    end
 end
