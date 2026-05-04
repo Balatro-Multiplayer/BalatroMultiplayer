@@ -30,14 +30,6 @@ end
 local reconnectToken = nil
 local lastLobbyCode = nil
 
-local function emit_log_checksum()
-	local logFile = io.open(require("lovely").log_path, "rb")
-	if not logFile then return end
-	local logData = logFile:read("*a")
-	logFile:close()
-	sendTraceMessage("Log checksum - " .. MP.UTILS.encrypt_string(logData))
-end
-
 local function action_connected()
 	MP.LOBBY.connected = true
 	MP.UI.update_connection_status()
@@ -356,7 +348,7 @@ local function action_stop_game()
 		MP.UI.update_connection_status()
 		MP.reset_game_states()
 	end
-	emit_log_checksum()
+	MP.UTILS.emit_log_checksum()
 end
 
 local function action_end_pvp()
@@ -391,7 +383,7 @@ local function action_win_game()
 	MP.nemesis_deck_received = false
 	MP.GAME.won = true
 	MP.STATS.record_match(true)
-	emit_log_checksum()
+	MP.UTILS.emit_log_checksum()
 	win_game()
 end
 
@@ -403,7 +395,7 @@ local function action_lose_game()
 	MP.STATS.record_match(false)
 	G.STATE_COMPLETE = false
 	G.STATE = G.STATES.GAME_OVER
-	emit_log_checksum()
+	MP.UTILS.emit_log_checksum()
 end
 
 local function action_lobby_options(options)
