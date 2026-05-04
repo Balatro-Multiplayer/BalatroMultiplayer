@@ -22,12 +22,18 @@ function MP.UTILS.encrypt_string(str)
 	return string.format("%08x", hash)
 end
 
+-- Emits a checksum of the log up to the snapshot point taken inside this
+-- function. Format: "Log checksum v1 @ <byte_offset> - <8_hex>". Bytes
+-- [0, byte_offset) are the verified region; anything at or past byte_offset
+-- (including this line and any racy concurrent writes) is excluded.
 function MP.UTILS.emit_log_checksum()
 	local logFile = io.open(require("lovely").log_path, "rb")
 	if not logFile then return end
 	local logData = logFile:read("*a")
 	logFile:close()
-	sendTraceMessage("Log checksum - " .. MP.UTILS.encrypt_string(logData))
+	sendTraceMessage(
+		string.format("Log checksum v1 @ %d - %s", #logData, MP.UTILS.encrypt_string(logData))
+	)
 end
 
 function MP.UTILS.server_connection_ID()
