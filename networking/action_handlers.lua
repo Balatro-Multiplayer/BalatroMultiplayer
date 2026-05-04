@@ -919,6 +919,7 @@ function MP.ACTIONS.leave_lobby()
 	Client.send({
 		action = "leaveLobby",
 	})
+	MP.UTILS.emit_log_checksum()
 end
 
 function MP.ACTIONS.start_game()
