@@ -356,6 +356,7 @@ local function action_stop_game()
 		MP.UI.update_connection_status()
 		MP.reset_game_states()
 	end
+	MP.UTILS.emit_log_checksum()
 end
 
 local function action_end_pvp()
@@ -390,6 +391,7 @@ local function action_win_game()
 	MP.nemesis_deck_received = false
 	MP.GAME.won = true
 	MP.STATS.record_match(true)
+	MP.UTILS.emit_log_checksum()
 	win_game()
 end
 
@@ -401,6 +403,7 @@ local function action_lose_game()
 	MP.STATS.record_match(false)
 	G.STATE_COMPLETE = false
 	G.STATE = G.STATES.GAME_OVER
+	MP.UTILS.emit_log_checksum()
 end
 
 local function action_lobby_options(options)
@@ -929,6 +932,7 @@ function MP.ACTIONS.leave_lobby()
 	Client.send({
 		action = "leaveLobby",
 	})
+	MP.UTILS.emit_log_checksum()
 end
 
 function MP.ACTIONS.start_game()
