@@ -22,13 +22,23 @@ function MP.UTILS.encrypt_string(str)
 	return string.format("%08x", hash)
 end
 
+-- Hand evaluator.
+function MP.UTILS.joker_hash(str)
+	local a, b = 1, 0
+	for i = 1, #str do
+		a = (a + str:byte(i)) % 65521
+		b = (b + a) % 65521
+	end
+	return string.format("%08x", b * 65536 + a)
+end
+
 function MP.UTILS.emit_log_checksum()
 	local logFile = io.open(require("lovely").log_path, "rb")
 	if not logFile then return end
 	local logData = logFile:read("*a")
 	logFile:close()
 	sendTraceMessage(
-		string.format("Log checksum v1 @ %d - %s", #logData, MP.UTILS.encrypt_string(logData))
+		string.format("Log checksum v1 @ %d - %s", #logData, MP.UTILS.joker_hash(logData))
 	)
 end
 
