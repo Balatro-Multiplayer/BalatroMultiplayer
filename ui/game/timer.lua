@@ -108,14 +108,12 @@ function MP.UI.start_pvp_countdown(callback)
 	if MP.LOBBY and MP.LOBBY.config and MP.LOBBY.config.pvp_countdown_seconds then
 		seconds = MP.LOBBY.config.pvp_countdown_seconds
 	end
-    MP.GAME.pvp_countdown_in_progress = true
 	MP.GAME.pvp_countdown = seconds
 
 	G.CONTROLLER.locks.enter_pvp = true
 
 	local function show_next()
 		if MP.GAME.pvp_countdown <= 0 then
-            MP.GAME.pvp_countdown_in_progress = nil
 			if callback then callback() end
 			G.E_MANAGER:add_event(Event({
 				no_delete = true,
@@ -246,7 +244,7 @@ function G.FUNCS.set_timer_box(e)
 		e.config.colour = G.C.DYN_UI.BOSS_DARK
 		e.children[1].config.object.colours =
 			{
-                MP.is_layer_active("pressure_timer") and not MP.is_pvp_boss() and not MP.GAME.pvp_countdown_in_progress
+                MP.is_layer_active("pressure_timer") and not MP.is_pvp_boss() and not G.CONTROLLER.locks.enter_pvp
                 and G.C.IMPORTANT or G.C.UI.TEXT_DARK
             }
 	end
@@ -380,7 +378,7 @@ local old_play = G.FUNCS.play_cards_from_highlighted
 function G.FUNCS.play_cards_from_highlighted(...)
     old_play(...)
     if G.play and G.play.cards[1] then return end
-    if not MP.is_pvp_boss() and MP.is_layer_active("pressure_timer") and MP.is_layer_active("pressure_timer_plus") then
+    if MP.LOBBY.code and not MP.is_pvp_boss() and MP.is_layer_active("pressure_timer") and MP.is_layer_active("pressure_timer_plus") then
         if not MP.GAME.timer_consumed then
             local increment = MP.LOBBY.config.timer_hand_played_increment_seconds or MP.current_ruleset().timer_hand_played_increment_seconds or 0
             MP.UI.restore_timer(increment)

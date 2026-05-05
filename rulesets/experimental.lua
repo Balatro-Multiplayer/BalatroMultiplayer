@@ -2,8 +2,9 @@
 -- write MP.MODIFIERS directly (no network) — the host's lobby_options push at
 -- start_lobby carries the serialized list to the guest.
 local function timer_modifier_to_index()
-	if MP.has_modifier("no_animation_timer") then return 2 end
+	if MP.has_modifier("pressure_timer_plus") then return 4 end
 	if MP.has_modifier("pressure_timer") then return 3 end
+	if MP.has_modifier("no_animation_timer") then return 2 end
 	return 1
 end
 
