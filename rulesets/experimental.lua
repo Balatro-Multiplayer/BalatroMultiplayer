@@ -164,3 +164,40 @@ MP.Ruleset({
         }
     end,
 }):inject()
+
+MP.Ruleset({
+	key = "experimental_no_balance",
+	layers = { "standard" },
+	forced_gamemode = "gamemode_mp_attrition",
+	force_lobby_options = function(self)
+		MP.LOBBY.config.the_order = true
+		return false
+	end,
+    get_modifiers_ui = function(self, mode)
+        return {
+            n = G.UIT.R,
+            config = { align = "cm" },
+            nodes = {
+                MP.UI.Disableable_Button({
+                    button = "open_experimental_medifiers",
+                    align = "cm",
+                    padding = 0.05,
+                    r = 0.1,
+                    minw = 8,
+                    minh = 0.8,
+                    colour = G.C.ORANGE,
+                    hover = true,
+                    shadow = true,
+                    label = { "Modifiers" },
+                    scale = 0.5,
+                    enabled_ref_table = { val = true },
+				    enabled_ref_value = "val",
+                    ref_table = {
+                        ruleset = self,
+                        mode = mode,
+                    }
+                }),
+            }
+        }
+    end,
+}):inject()

@@ -336,7 +336,7 @@ function Game:update(dt)
 		MP.TIMER_FORCE_GAMESPEED = true
 
 		-- Don't tick during animations, unless the user is paused or has a menu open
-		local interactive = not (G.CONTROLLER.locked or (G.GAME.STOP_USE or 0) > 0)
+		local interactive = not ((G.CONTROLLER.locked and not G.CONTROLLER.locks.frame) or (G.GAME.STOP_USE or 0) > 0)
 		local menu_or_paused = G.SETTINGS.paused or G.OVERLAY_MENU
 
 		-- Consume animations time from budget

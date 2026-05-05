@@ -79,6 +79,7 @@ local rulesets_tabs = {
 					name = "k_experimental",
 					buttons = {
 						{ button_id = "experimental_ruleset_button", button_localize_key = "k_experimental" },
+						{ button_id = "experimental_no_balance_ruleset_button", button_localize_key = "k_experimental_no_balance" },
 					},
 				},
 			},
