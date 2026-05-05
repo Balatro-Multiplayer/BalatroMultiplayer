@@ -43,16 +43,9 @@ function G.UIDEF.create_UIBox_lobby_menu()
 	-- Get deck key (prefer back_key, fallback to name)
 	local back_key
 	if MP.LOBBY.config.different_decks then
-		-- Each player uses their own deck
 		back_key = MP.LOBBY.deck.back_key or MP.LOBBY.deck.back
 	else
-		-- Everyone uses host's deck
-		if MP.LOBBY.is_host then
-			back_key = MP.LOBBY.config.back_key or MP.LOBBY.config.back
-		else
-			-- Guest: use host's deck from config
-			back_key = MP.LOBBY.config.back_key or MP.LOBBY.deck.back_key or MP.LOBBY.deck.back
-		end
+		back_key = MP.LOBBY.config.back_key or MP.LOBBY.config.back
 	end
 	local back_name = MP.UTILS.get_deck_name_from_key(back_key) or "Red Deck"
 	local stake = MP.LOBBY.config.different_decks and MP.LOBBY.deck.stake or MP.LOBBY.config.stake

@@ -510,19 +510,8 @@ local function action_lobby_options(options)
 		G.FUNCS.exit_overlay_menu()
 	end
 
-	-- If different_decks is false, guest should see host's deck
-	if not MP.LOBBY.config.different_decks and not MP.LOBBY.is_host then
-		MP.LOBBY.deck.back_key = MP.LOBBY.config.back_key
-		MP.LOBBY.deck.back = MP.LOBBY.config.back
-	end
+	MP.ACTIONS.update_player_usernames() -- render new DECK button state
 
-	-- Force UI refresh (only once, at the end)
-	if MP.LOBBY.code and G.MAIN_MENU_UI then
-		G.MAIN_MENU_UI:remove()
-		G.FUNCS.display_lobby_main_menu_UI()
-	end
-
-	MP.ACTIONS.update_player_usernames()
 end
 
 local function action_send_phantom(key)
