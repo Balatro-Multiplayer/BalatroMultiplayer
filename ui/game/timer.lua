@@ -108,6 +108,7 @@ function MP.UI.start_pvp_countdown(callback)
 	if MP.LOBBY and MP.LOBBY.config and MP.LOBBY.config.pvp_countdown_seconds then
 		seconds = MP.LOBBY.config.pvp_countdown_seconds
 	end
+    MP.GAME.pvp_countdown_in_progress = true
 	MP.GAME.pvp_countdown = seconds
 
 	G.CONTROLLER.locks.enter_pvp = true
@@ -115,6 +116,19 @@ function MP.UI.start_pvp_countdown(callback)
 	local function show_next()
 		if MP.GAME.pvp_countdown <= 0 then
 			if callback then callback() end
+            G.E_MANAGER:add_event(Event({
+                blocking = false,
+                func = function()
+                    G.E_MANAGER:add_event(Event({
+                        blocking = false,
+                        func = function()
+                            MP.GAME.pvp_countdown_in_progress = nil
+                            return true
+                        end,
+                    }))
+                    return true
+                end,
+            }))
 			G.E_MANAGER:add_event(Event({
 				no_delete = true,
 				trigger = "after",
@@ -244,7 +258,7 @@ function G.FUNCS.set_timer_box(e)
 		e.config.colour = G.C.DYN_UI.BOSS_DARK
 		e.children[1].config.object.colours =
 			{
-                MP.is_layer_active("pressure_timer") and not MP.is_pvp_boss() and not G.CONTROLLER.locks.enter_pvp
+                MP.is_layer_active("pressure_timer") and not MP.is_pvp_boss() and not MP.GAME.pvp_countdown_in_progress
                 and G.C.IMPORTANT or G.C.UI.TEXT_DARK
             }
 	end
