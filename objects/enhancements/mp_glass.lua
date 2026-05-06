@@ -1,5 +1,5 @@
 MP.ReworkCenter("m_glass", {
-	layers = { "standard", "classic", "experimental" },
+	layers = { "standard", "classic" },
 	config = { Xmult = 1.5, extra = 4 },
 })
 
