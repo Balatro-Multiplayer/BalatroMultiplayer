@@ -258,7 +258,7 @@ function G.FUNCS.set_timer_box(e)
 		e.config.colour = G.C.DYN_UI.BOSS_DARK
 		e.children[1].config.object.colours =
 			{
-                MP.is_layer_active("pressure_timer") and not MP.is_pvp_boss() and not MP.GAME.pvp_countdown_in_progress
+                not MP.is_pvp_boss() and not MP.GAME.pvp_countdown_in_progress and not MP.is_layer_active("pressure_timer")
                 and G.C.IMPORTANT or G.C.UI.TEXT_DARK
             }
 	end
@@ -266,7 +266,7 @@ end
 
 local animation_budget_capacity = 40
 local animation_budget_restore_rate = 2.5
-local animation_budget_decay_rate = 1
+local animation_budget_decay_rate = 0
 
 MP.TIMER_ANIMATION_BUDGET = animation_budget_capacity
 
@@ -317,18 +317,23 @@ function Game:update(dt)
 	local should_check_animations = false
 
 	if is_pvp_timer then
+        -- PvP timer: tick when opponent timering, stop when animations, state checks, pvp blind only
 		if not MP.GAME.nemesis_timer_started then return end
 		if G.STATE == G.STATES.NEW_ROUND or G.STATE == G.STATES.ROUND_EVAL then return end
 		should_check_animations = true
 	elseif is_pressure_timer then
+        -- Pressure timer: tick from the start of a game, stop when reached pvp (unless timered) or animations, not in pvp blind
 		if MP.GAME.pvp_reached and not MP.GAME.nemesis_timer_started then return end
 		if MP.GAME.ready_blind or is_pvp_boss then return end
 		should_check_animations = true
 	elseif is_no_animation_timer then
+        -- No-animation timer: tick when opponen timering, stop when animations, not in pvp
 		if not MP.GAME.nemesis_timer_started then return end
 		if MP.GAME.ready_blind or is_pvp_boss then return end
 		should_check_animations = true
 	else
+        -- Old timer: tick when opponent timering, not in pvp
+        if is_pvp_boss then return end
 		if not (MP.GAME.timer_started or MP.GAME.nemesis_timer_started) then return end
 	end
 
@@ -356,9 +361,11 @@ function Game:update(dt)
 	if MP.GAME.timer == 0 then
 		MP.GAME.timer_consumed = true
 		if is_pvp_timer then
+            -- PvP timer: end PvP immediately as a loss
 			MP.ACTIONS.fail_round(G.GAME.hands)
 			MP.ACTIONS.modded("Multiplayer", "forcePvPEnd", {}, "all")
 		else
+            -- Old, No-animations, Pressure timers: lose a live
 			if MP.GAME.timers_forgiven < MP.LOBBY.config.timer_forgiveness then
 				MP.GAME.timers_forgiven = MP.GAME.timers_forgiven + 1
 			else
@@ -392,10 +399,19 @@ local old_play = G.FUNCS.play_cards_from_highlighted
 function G.FUNCS.play_cards_from_highlighted(...)
     old_play(...)
     if G.play and G.play.cards[1] then return end
-    if MP.LOBBY.code and not MP.is_pvp_boss() and MP.is_layer_active("pressure_timer") and MP.is_layer_active("pressure_timer_plus") then
-        if not MP.GAME.timer_consumed then
-            local increment = MP.LOBBY.config.timer_hand_played_increment_seconds or MP.current_ruleset().timer_hand_played_increment_seconds or 0
-            MP.UI.restore_timer(increment)
+    if MP.LOBBY.code and MP.LOBBY.config.timer and not MP.GAME.timer_consumed then
+        if MP.is_pvp_boss() then
+            -- PvP timer: Increment timer when hand is played during pvp
+            if MP.is_layer_active("pvp_timer") then
+                local increment = MP.LOBBY.config.pvp_timer_hand_played_increment_seconds or MP.current_ruleset().pvp_timer_hand_played_increment_seconds or 0
+                MP.UI.restore_timer(increment)
+            end
+        else
+            -- No-animation, Pressure timers: Increment timer when hand is played during regular blinds
+            if MP.is_any_layer_active({ "no_animation_timer", "pressure_timer" }) then
+                local increment = MP.LOBBY.config.timer_hand_played_increment_seconds or MP.current_ruleset().timer_hand_played_increment_seconds or 0
+                MP.UI.restore_timer(increment)
+            end
         end
     end
 end

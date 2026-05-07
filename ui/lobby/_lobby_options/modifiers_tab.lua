@@ -5,7 +5,8 @@ G.FUNCS.change_starting_pvp_round = function(args)
 end
 
 G.FUNCS.change_timer_base_seconds = function(args)
-	MP.LOBBY.config.timer_base_seconds = tonumber(args.to_val:sub(1, -2))
+    local mult = MP.LOBBY.config.timer_base_multiplier or MP.current_ruleset().timer_base_multiplier or 1
+	MP.LOBBY.config.timer_base_seconds = tonumber(args.to_val:sub(1, -2)) / mult
 	send_lobby_options()
 end
 
@@ -25,6 +26,16 @@ G.FUNCS.change_pvp_countdown_seconds = function(args)
 end
 
 function MP.UI.create_gamemode_modifiers_tab()
+    local mult = MP.LOBBY.config.timer_base_multiplier or MP.current_ruleset().timer_base_multiplier or 1
+
+    local time_options = { 30, 60, 90, 120, 150, 180, 210, 240 }
+    local result_timer_options = {}
+    for i, option in ipairs(time_options) do
+        result_timer_options[i] = tostring(option * mult) .. "s"
+    end
+
+    local should_display_increment_seconds = not MP.is_layer_active("pressure_timer")
+
 	return {
 		n = G.UIT.ROOT,
 		config = {
@@ -45,11 +56,14 @@ function MP.UI.create_gamemode_modifiers_tab()
 						"pvp_timer_seconds_option",
 						"k_opts_pvp_timer",
 						0.85,
-						{ "30s", "60s", "90s", "120s", "150s", "180s", "210s", "240s" },
-						MP.LOBBY.config.timer_base_seconds / 30,
+						result_timer_options,
+                        MP.UTILS.get_array_index_by_value(
+							time_options,
+							MP.LOBBY.config.timer_base_seconds
+						),
 						"change_timer_base_seconds"
 					),
-					create_lobby_option_cycle(
+					should_display_increment_seconds and create_lobby_option_cycle(
 						"pvp_timer_increment_seconds_option",
 						"k_opts_pvp_timer_increment",
 						0.85,
@@ -59,7 +73,7 @@ function MP.UI.create_gamemode_modifiers_tab()
 							MP.LOBBY.config.timer_increment_seconds
 						),
 						"change_timer_increment_seconds"
-					),
+					) or nil,
 					create_lobby_option_cycle(
 						"pvp_round_start_option",
 						"k_opts_pvp_start_round",

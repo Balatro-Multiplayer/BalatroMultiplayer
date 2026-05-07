@@ -186,6 +186,7 @@ function MP.RunLayerHooks(hook_name)
 end
 
 function MP.is_layer_active(layer_name)
+    if not layer_name then return false end
 	for _, name in ipairs(MP.active_layer_chain()) do
 		if name == layer_name then return true end
 	end
@@ -193,7 +194,7 @@ function MP.is_layer_active(layer_name)
 end
 
 function MP.is_any_layer_active(layers)
-    for _, layer_name in ipairs(layers) do
+    for _, layer_name in pairs(layers) do
         if MP.is_layer_active(layer_name) then return true end
     end
     return false
