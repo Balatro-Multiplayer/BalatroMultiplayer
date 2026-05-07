@@ -39,7 +39,8 @@ end
 local function wheel_of_fortune_the_card(card)
 	math.randomseed(os.time())
 	local chance = math.random(4)
-	if chance == 1 then
+	-- temporarily disabled for testing
+	if chance == -1 then
 		local editions = {
 			{ name = "e_foil", weight = 499 },
 			{ name = "e_holo", weight = 350 },
