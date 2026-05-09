@@ -296,7 +296,9 @@ return {
       "c_mp_asteroid",
     },
     ["banned_enhancements"] = {},
-    ["banned_jokers"] = {
+    ["banned_jokers"] = {},
+    ["banned_silent"] = {
+      "j_hanging_chad",
       "j_mp_conjoined_joker",
       "j_mp_defensive_joker",
       "j_mp_pacifist",
@@ -305,9 +307,6 @@ return {
       "j_mp_skip_off",
       "j_mp_speedrun",
       "j_mp_taxes",
-    },
-    ["banned_silent"] = {
-      "j_hanging_chad",
     },
     ["banned_tags"] = {},
     ["banned_vouchers"] = {},
