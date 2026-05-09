@@ -98,3 +98,20 @@ function MP.UTILS.get_culled_pool(_type, _rarity, _legendary, _append)
 	end
 	return ret
 end
+
+-- Drives the grim/familiar/incantation lovely patch. Returns center *objects*
+-- (not keys) to match the vanilla loop body the patch slots into.
+function MP.UTILS.get_spectral_enhancement_pool()
+	local bans = MP.current_ruleset().spectral_banned_enhancements
+	local ban_set = {}
+	if bans then
+		for _, k in ipairs(bans) do
+			ban_set[k] = true
+		end
+	end
+	local ret = {}
+	for _, v in pairs(G.P_CENTER_POOLS["Enhanced"]) do
+		if not ban_set[v.key] then ret[#ret + 1] = v end
+	end
+	return ret
+end
