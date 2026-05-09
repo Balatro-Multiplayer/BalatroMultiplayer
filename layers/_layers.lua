@@ -78,6 +78,7 @@ MP._LAYER_ARRAY_FIELDS = {
 	"reworked_enhancements",
 	"reworked_tags",
 	"reworked_blinds",
+	"spectral_banned_enhancements",
 }
 
 -- Resolve layers on the init table before SMODS construction validates required_params.

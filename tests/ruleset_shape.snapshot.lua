@@ -74,6 +74,9 @@ return {
     ["reworked_jokers"] = {},
     ["reworked_tags"] = {},
     ["reworked_vouchers"] = {},
+    ["spectral_banned_enhancements"] = {
+      "m_glass",
+    },
   },
   ["blitz"] = {
     ["_has_functions"] = {
@@ -115,6 +118,7 @@ return {
     },
     ["reworked_tags"] = {},
     ["reworked_vouchers"] = {},
+    ["spectral_banned_enhancements"] = {},
     ["standard"] = true,
   },
   ["chaos"] = {
@@ -226,6 +230,7 @@ return {
       "tag_mp_juggle_sandbox",
     },
     ["reworked_vouchers"] = {},
+    ["spectral_banned_enhancements"] = {},
     ["standard"] = true,
   },
   ["experimental"] = {
@@ -235,21 +240,23 @@ return {
       ["is_disabled"] = true,
     },
     ["banned_blinds"] = {},
-    ["banned_consumables"] = {},
-    ["banned_enhancements"] = {},
+    ["banned_consumables"] = {
+      "c_justice",
+    },
+    ["banned_enhancements"] = {
+      "m_glass",
+    },
     ["banned_jokers"] = {
       "j_mp_speedrun",
     },
     ["banned_silent"] = {
       "c_ouija",
-      "j_baron",
       "j_bloodstone",
       "j_hanging_chad",
-      "j_mime",
+      "j_idol",
       "j_selzer",
       "j_ticket",
       "j_todo_list",
-      "j_turtle_bean",
     },
     ["banned_tags"] = {},
     ["banned_vouchers"] = {},
@@ -265,17 +272,16 @@ return {
       "m_gold",
     },
     ["reworked_jokers"] = {
-      "j_mp_baron",
       "j_mp_bloodstone",
       "j_mp_hanging_chad",
-      "j_mp_mime",
+      "j_mp_idol_rare",
       "j_mp_seltzer",
-      "j_mp_ticket",
+      "j_mp_ticket_experimental",
       "j_mp_todo_list",
-      "j_mp_turtle_bean",
     },
     ["reworked_tags"] = {},
     ["reworked_vouchers"] = {},
+    ["spectral_banned_enhancements"] = {},
     ["standard"] = true,
   },
   ["legacy_ranked"] = {
@@ -307,6 +313,7 @@ return {
     },
     ["reworked_tags"] = {},
     ["reworked_vouchers"] = {},
+    ["spectral_banned_enhancements"] = {},
   },
   ["majorleague"] = {
     ["_has_functions"] = {
@@ -450,6 +457,7 @@ return {
       "tag_mp_juggle_sandbox",
     },
     ["reworked_vouchers"] = {},
+    ["spectral_banned_enhancements"] = {},
   },
   ["smallworld"] = {
     ["_has_functions"] = {
@@ -491,6 +499,7 @@ return {
     },
     ["reworked_tags"] = {},
     ["reworked_vouchers"] = {},
+    ["spectral_banned_enhancements"] = {},
     ["standard"] = true,
   },
   ["speedlatro"] = {
@@ -534,6 +543,7 @@ return {
     },
     ["reworked_tags"] = {},
     ["reworked_vouchers"] = {},
+    ["spectral_banned_enhancements"] = {},
     ["standard"] = true,
   },
   ["standard_ranked"] = {
@@ -578,6 +588,7 @@ return {
     },
     ["reworked_tags"] = {},
     ["reworked_vouchers"] = {},
+    ["spectral_banned_enhancements"] = {},
     ["standard"] = true,
   },
   ["traditional"] = {
@@ -623,6 +634,7 @@ return {
     },
     ["reworked_tags"] = {},
     ["reworked_vouchers"] = {},
+    ["spectral_banned_enhancements"] = {},
     ["standard"] = true,
   },
   ["vanilla"] = {
