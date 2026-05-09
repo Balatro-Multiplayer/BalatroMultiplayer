@@ -2,6 +2,7 @@
 
 function MP.UI.cam_timer_opponent()
 	if not MP.LOBBY.config.timer then return false end
+    if MP.GAME.pvp_countdown_in_progress then return false end
 	if MP.is_pvp_boss() and MP.is_layer_active("pvp_timer") then
 		if G.STATE == G.STATES.ROUND_EVAL or G.STATE == G.STATES.NEW_ROUND then return false end
 		if not MP.INSANE_INT.greater_than(MP.GAME.score, MP.GAME.enemy.score) then return false end
@@ -258,7 +259,7 @@ function G.FUNCS.set_timer_box(e)
 		e.config.colour = G.C.DYN_UI.BOSS_DARK
 		e.children[1].config.object.colours =
 			{
-                not MP.is_pvp_boss() and not MP.GAME.pvp_countdown_in_progress and not MP.is_layer_active("pressure_timer")
+                (not MP.is_pvp_boss() and not MP.GAME.pvp_countdown_in_progress and MP.is_layer_active("pressure_timer"))
                 and G.C.IMPORTANT or G.C.UI.TEXT_DARK
             }
 	end

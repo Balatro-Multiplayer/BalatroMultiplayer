@@ -241,7 +241,6 @@ local function action_start_game(seed, stake_str)
 	end
 	G.FUNCS.lobby_start_run(nil, { seed = seed, stake = stake })
 	MP.LOBBY.ready_to_start = false
-
 end
 
 local function begin_pvp_blind()
@@ -254,10 +253,10 @@ end
 
 local function action_start_blind()
 	MP.GAME.ready_blind = false
-    MP.GAME.pvp_reached = false
+	MP.GAME.pvp_reached = false
 	MP.GAME.timer_started = false
 	MP.GAME.nemesis_timer_started = false
-    MP.GAME.timer_consumed = false
+	MP.GAME.timer_consumed = false
 	MP.GAME.timer = MP.UTILS.pvp_timer_base()
 	MP.UI.start_pvp_countdown(begin_pvp_blind)
 end
@@ -272,39 +271,39 @@ local function action_enemy_info(score_str, hands_left_str, skips_str, lives_str
 	local skips = tonumber(skips_str)
 	local lives = tonumber(lives_str)
 
-    -- No-animation timer: If opponent skip, add time immediately
-	if MP.GAME.enemy.skips ~= skips then
+	-- No-animation timer: If opponent skip, add time immediately
+	if skips and MP.GAME.enemy.skips ~= skips then
 		for i = 1, skips - MP.GAME.enemy.skips do
 			MP.GAME.enemy.spent_in_shop[#MP.GAME.enemy.spent_in_shop + 1] = 0
-            if
-                MP.GAME.enemy.skips < skips
-                and MP.LOBBY.config.timer
-                and not MP.GAME.timer_started
-                and not MP.GAME.nemesis_timer_started
-                and not MP.GAME.timer_consumed
-                and MP.is_layer_active("no_animation_timer")
-                and (MP.LOBBY.config.timer_increment_seconds or 0) > 0
-            then
-                MP.UI.restore_timer(MP.LOBBY.config.timer_increment_seconds)
-            end
+			if
+				MP.GAME.enemy.skips < skips
+				and MP.LOBBY.config.timer
+				and not MP.GAME.timer_started
+				and not MP.GAME.nemesis_timer_started
+				and not MP.GAME.timer_consumed
+				and MP.is_any_layer_active({ "no_animation_timer", "pressure_timer" })
+				and (MP.LOBBY.config.timer_increment_seconds or 0) > 0
+			then
+				MP.UI.restore_timer(MP.LOBBY.config.timer_increment_seconds)
+			end
 		end
 	end
 
-	if score == nil or hands_left == nil then
+    if score == nil or hands_left == nil then
 		sendDebugMessage("Invalid score or hands_left", "MULTIPLAYER")
 		return
 	end
 
 	if MP.INSANE_INT.greater_than(score, MP.GAME.enemy.highest_score) then MP.GAME.enemy.highest_score = score end
 
-    -- PvP timer: stop timer according to score
-    if MP.is_pvp_boss() and MP.is_layer_active("pvp_timer") then
-        if MP.INSANE_INT.greater_than(MP.GAME.score, score) then
-            MP.GAME.nemesis_timer_started = false
-        else
-            MP.GAME.timer_started = false
-        end
-    end
+	-- PvP timer: stop timer according to score
+	if MP.is_pvp_boss() and MP.is_layer_active("pvp_timer") then
+		if MP.INSANE_INT.greater_than(MP.GAME.score, score) then
+			MP.GAME.nemesis_timer_started = false
+		else
+			MP.GAME.timer_started = false
+		end
+	end
 
 	G.E_MANAGER:add_event(Event({
 		blockable = false,
@@ -351,10 +350,10 @@ local function action_enemy_info(score_str, hands_left_str, skips_str, lives_str
 		play_sound("holo1", 0.865, 0.9)
 		play_sound("gong", 0.765, 0.4)
 	end
-    if MP.GAME.enemy.skips < skips then
-        play_sound('negative', 0.865, 0.4)
-        play_sound("gong", 0.765, 0.4)
-    end
+	if MP.GAME.enemy.skips < skips then
+		play_sound("negative", 0.865, 0.4)
+		play_sound("gong", 0.765, 0.4)
+	end
 
 	MP.GAME.enemy.hands = hands_left
 	MP.GAME.enemy.skips = skips
@@ -374,12 +373,12 @@ end
 local function action_end_pvp()
 	MP.GAME.end_pvp = true
 	MP.GAME.timer = MP.UTILS.timer_base()
-    MP.GAME.timer_consumed = false
+	MP.GAME.timer_consumed = false
 	MP.GAME.timer_started = false
 	MP.GAME.nemesis_timer_started = false
 	MP.GAME.ready_blind = false
-    MP.GAME.pvp_reached = false
-    MP.GAME.score = nil
+	MP.GAME.pvp_reached = false
+	MP.GAME.score = nil
 end
 
 MP.register_mod_action("forcePvPEnd", action_end_pvp, "Multiplayer")
@@ -880,29 +879,33 @@ local function action_start_ante_timer(time, from_nemesis)
 			}))
 		end
 	end
-    -- Old timer: sync timers between players
-    if not MP.is_any_layer_active({ "pressure_timer", "no_animation_timer", MP.is_pvp_boss() and "pvp_timer" or nil }) then
+	-- Old timer: sync timers between players
+	if
+		not MP.is_any_layer_active({ "pressure_timer", "no_animation_timer", MP.is_pvp_boss() and "pvp_timer" or nil })
+	then
 		if type(time) == "string" then time = tonumber(time) end
 		if time then MP.GAME.timer = time end
 	end
-    if from_nemesis then
-        MP.GAME.nemesis_timer_started = true
-    else
-        MP.GAME.timer_started = true
-    end
+	if from_nemesis then
+		MP.GAME.nemesis_timer_started = true
+	else
+		MP.GAME.timer_started = true
+	end
 end
 
 local function action_pause_ante_timer(time, from_nemesis)
-    -- Old timer: sync timers between players
-	if not MP.is_any_layer_active({ "pressure_timer", "no_animation_timer", MP.is_pvp_boss() and "pvp_timer" or nil }) then
+	-- Old timer: sync timers between players
+	if
+		not MP.is_any_layer_active({ "pressure_timer", "no_animation_timer", MP.is_pvp_boss() and "pvp_timer" or nil })
+	then
 		if type(time) == "string" then time = tonumber(time) end
 		if time then MP.GAME.timer = time end
 	end
-    if from_nemesis then
-        MP.GAME.nemesis_timer_started = false
-    else
-        MP.GAME.timer_started = false
-    end
+	if from_nemesis then
+		MP.GAME.nemesis_timer_started = false
+	else
+		MP.GAME.timer_started = false
+	end
 end
 
 -- #region Client to Server
@@ -1031,19 +1034,19 @@ function MP.ACTIONS.play_hand(score, hands_left)
 	fixed_score = string.gsub(fixed_score, ",", "") -- Remove commas
 
 	local insane_int_score = MP.INSANE_INT.from_string(fixed_score)
-    MP.GAME.score = insane_int_score
+	MP.GAME.score = insane_int_score
 	if MP.INSANE_INT.greater_than(insane_int_score, MP.GAME.highest_score) then
 		MP.GAME.highest_score = insane_int_score
 	end
 
-    -- Stop PvP timers according to score
-    if MP.is_pvp_boss() and MP.is_layer_active("pvp_timer") then
-        if MP.INSANE_INT.greater_than(insane_int_score, MP.GAME.enemy.score) then
-            MP.GAME.nemesis_timer_started = false
-        else
-            MP.GAME.timer_started = false
-        end
-    end
+	-- Stop PvP timers according to score
+	if MP.is_pvp_boss() and MP.is_layer_active("pvp_timer") then
+		if MP.INSANE_INT.greater_than(insane_int_score, MP.GAME.enemy.score) then
+			MP.GAME.nemesis_timer_started = false
+		else
+			MP.GAME.timer_started = false
+		end
+	end
 
 	Client.send({
 		action = "playHand",
