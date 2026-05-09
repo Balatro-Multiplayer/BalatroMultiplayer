@@ -252,7 +252,9 @@ function G.UIDEF.ruleset_info(ruleset_name, mode)
         end
     end
 
-	content_nodes[#content_nodes + 1] = MP.UI.get_continue_button(ruleset, mode)
+    if not ruleset.hide_continue_button then
+        content_nodes[#content_nodes + 1] = MP.UI.get_continue_button(ruleset, mode)
+    end
 
 	return {
 		n = G.UIT.ROOT,
