@@ -34,8 +34,6 @@ function MP.UI.create_gamemode_modifiers_tab()
         result_timer_options[i] = tostring(option * mult) .. "s"
     end
 
-    local should_display_increment_seconds = not MP.is_layer_active("pressure_timer")
-
 	return {
 		n = G.UIT.ROOT,
 		config = {
@@ -63,7 +61,7 @@ function MP.UI.create_gamemode_modifiers_tab()
 						),
 						"change_timer_base_seconds"
 					),
-					should_display_increment_seconds and create_lobby_option_cycle(
+					create_lobby_option_cycle(
 						"pvp_timer_increment_seconds_option",
 						"k_opts_pvp_timer_increment",
 						0.85,
