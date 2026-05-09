@@ -284,6 +284,49 @@ return {
     ["spectral_banned_enhancements"] = {},
     ["standard"] = true,
   },
+  ["experimental_legacy"] = {
+    ["_has_functions"] = {
+      ["create_info_menu"] = true,
+      ["force_lobby_options"] = true,
+      ["is_disabled"] = true,
+    },
+    ["banned_blinds"] = {},
+    ["banned_consumables"] = {
+      "c_justice",
+      "c_mp_asteroid",
+    },
+    ["banned_enhancements"] = {},
+    ["banned_jokers"] = {},
+    ["banned_silent"] = {
+      "j_hanging_chad",
+      "j_mp_conjoined_joker",
+      "j_mp_defensive_joker",
+      "j_mp_pacifist",
+      "j_mp_penny_pincher",
+      "j_mp_pizza",
+      "j_mp_skip_off",
+      "j_mp_speedrun",
+      "j_mp_taxes",
+    },
+    ["banned_tags"] = {},
+    ["banned_vouchers"] = {},
+    ["forced_gamemode"] = "gamemode_mp_attrition",
+    ["forced_lobby_options"] = true,
+    ["key"] = "experimental_legacy",
+    ["multiplayer_content"] = true,
+    ["reworked_blinds"] = {},
+    ["reworked_consumables"] = {},
+    ["reworked_enhancements"] = {
+      "m_glass",
+    },
+    ["reworked_jokers"] = {
+      "j_mp_hanging_chad",
+      "j_mp_lets_go_gambling",
+    },
+    ["reworked_tags"] = {},
+    ["reworked_vouchers"] = {},
+    ["spectral_banned_enhancements"] = {},
+  },
   ["legacy_ranked"] = {
     ["_has_functions"] = {
       ["create_info_menu"] = true,
@@ -294,9 +337,7 @@ return {
     ["banned_consumables"] = {},
     ["banned_enhancements"] = {},
     ["banned_jokers"] = {},
-    ["banned_silent"] = {
-      "j_hanging_chad",
-    },
+    ["banned_silent"] = {},
     ["banned_tags"] = {},
     ["banned_vouchers"] = {},
     ["forced_gamemode"] = "gamemode_mp_attrition",
@@ -308,9 +349,7 @@ return {
     ["reworked_enhancements"] = {
       "m_glass",
     },
-    ["reworked_jokers"] = {
-      "j_mp_hanging_chad",
-    },
+    ["reworked_jokers"] = {},
     ["reworked_tags"] = {},
     ["reworked_vouchers"] = {},
     ["spectral_banned_enhancements"] = {},
