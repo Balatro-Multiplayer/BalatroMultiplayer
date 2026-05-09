@@ -52,6 +52,9 @@ MP.Ruleset({
 	banned_enhancements = {
 		"m_glass",
 	},
+	spectral_banned_enhancements = {
+		"m_glass",
+	},
 	banned_tags = {
 		"tag_uncommon",
 		"tag_meteor",
