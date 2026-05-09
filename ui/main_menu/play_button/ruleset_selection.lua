@@ -79,6 +79,7 @@ local rulesets_tabs = {
 					name = "k_experimental",
 					buttons = {
 						{ button_id = "experimental_ruleset_button", button_localize_key = "k_experimental" },
+						{ button_id = "experimental_legacy_ruleset_button", button_localize_key = "k_experimental_legacy" },
 						{ button_id = "experimental_no_balance_ruleset_button", button_localize_key = "k_experimental_no_balance" },
 					},
 				},
@@ -245,16 +246,14 @@ function G.UIDEF.ruleset_info(ruleset_name, mode)
 		}
 	end
 
-    if (mode == "mp" or mode == "practice") and not ruleset.forced_lobby_options then
-        local modifiers_row = MP.UI.build_modifier_row(ruleset, mode)
-        if modifiers_row then
-            content_nodes[#content_nodes + 1] = modifiers_row
-        end
-    end
+	if (mode == "mp" or mode == "practice") and not ruleset.forced_lobby_options then
+		local modifiers_row = MP.UI.build_modifier_row(ruleset, mode)
+		if modifiers_row then content_nodes[#content_nodes + 1] = modifiers_row end
+	end
 
-    if not ruleset.hide_continue_button then
-        content_nodes[#content_nodes + 1] = MP.UI.get_continue_button(ruleset, mode)
-    end
+	if not ruleset.hide_continue_button then
+		content_nodes[#content_nodes + 1] = MP.UI.get_continue_button(ruleset, mode)
+	end
 
 	return {
 		n = G.UIT.ROOT,
@@ -678,14 +677,12 @@ function G.UIDEF.ruleset_cardarea_definition(args)
 end
 
 function MP.UI.build_modifier_row(ruleset, mode)
-    if type(ruleset.get_modifiers_ui) == "function" then
-        return ruleset:get_modifiers_ui(mode)
-    end
+	if type(ruleset.get_modifiers_ui) == "function" then return ruleset:get_modifiers_ui(mode) end
 end
 
 function MP.UI.get_continue_button(ruleset, mode)
-    local ruleset_disabled = ruleset.is_disabled()
-    local button_config
+	local ruleset_disabled = ruleset.is_disabled()
+	local button_config
 	if mode == "sp" then
 		button_config = {
 			id = "start_sp_button",
@@ -708,7 +705,7 @@ function MP.UI.get_continue_button(ruleset, mode)
 			colour = G.C.BLUE,
 		}
 	end
-    return {
+	return {
 		n = G.UIT.R,
 		config = { align = "cm" },
 		nodes = {

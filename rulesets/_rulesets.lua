@@ -56,6 +56,22 @@ local RulesetBase = SMODS.GameObject:extend({
 -- Proper fix: stop treating rulesets as GameObjects up front.
 -- Keep them as plain tables and only flip into a SMODS object at inject() time
 function MP.Ruleset(init)
+	-- Mirror MP.Layer()'s reverse-index population for ruleset-level reworked
+	-- entries, using the ruleset's short name (which appears in active_layer_chain).
+	-- Lets the auto-graft mp_include in layers/_layers.lua gate cards declared
+	-- directly on a ruleset, not just via a layer.
+	if init.reworked_jokers then
+		for _, key in ipairs(init.reworked_jokers) do
+			MP._JOKER_LAYERS[key] = MP._JOKER_LAYERS[key] or {}
+			table.insert(MP._JOKER_LAYERS[key], init.key)
+		end
+	end
+	if init.reworked_consumables then
+		for _, key in ipairs(init.reworked_consumables) do
+			MP._CONSUMABLE_LAYERS[key] = MP._CONSUMABLE_LAYERS[key] or {}
+			table.insert(MP._CONSUMABLE_LAYERS[key], init.key)
+		end
+	end
 	return RulesetBase(MP.resolve_layers(init))
 end
 

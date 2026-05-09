@@ -94,7 +94,23 @@ return {
 					"{s:0.8}Card changes every round",
 				},
 			},
+			j_mp_idol_rare = {
+				name = "The Idol",
+				text = {
+					"Each played {C:attention}#2#",
+					"of {V:1}#3#{} gives",
+					"{X:mult,C:white} X#1# {} Mult when scored",
+					"{s:0.8}Card changes every round",
+				},
+			},
 			j_mp_ticket = {
+				name = "Golden Ticket",
+				text = {
+					"Played {C:attention}Gold{} cards",
+					"earn {C:money}$#1#{} when scored",
+				},
+			},
+			j_mp_ticket_experimental = {
 				name = "Golden Ticket",
 				text = {
 					"Played {C:attention}Gold{} cards",
@@ -1300,9 +1316,10 @@ return {
 			k_vanilla_description = "The original Balatro experience.\n\nNo Multiplayer jokers, no balance changes.\nJust the base game as it was designed.\n\nMultiplayer features like the timer are still available\nbut can be disabled in Lobby Options.",
 			k_blitz = "Standard",
 			k_blitz_description = "The balanced Multiplayer ruleset.\n\nIncludes Multiplayer jokers and balance changes\nwith full control over your lobby settings.\n\n(See bans and reworks tabs for details)",
-			k_experimental = "Experimental + Balance",
+			k_experimental = "Experimental",
+			k_experimental_standard = "Experimental (Standard)",
 			k_experimental_description = "Standard's bleeding edge.\n\nHeavier balance changes being trialed\nfor a future Standard ruleset.\nExpect things to shift between versions.\n\n(See bans and reworks tabs for details)",
-			k_experimental_no_balance = "Experimental",
+			k_experimental_no_balance = "Experimental (No Balance)",
 			k_experimental_no_balance_description = "Standard's bleeding edge.\n\nNo balance changes, only new features.\nExpect things to shift between versions.",
 			k_traditional = "Traditional",
 			k_traditional_description = "Multiplayer content without time pressure.\n\nIncludes Multiplayer jokers and balance changes,\nbut removes time-based mechanics for methodical play.\n\nTime-based jokers are banned.\nTimer is disabled.\n\n(See bans and reworks tabs for details)",
@@ -1314,6 +1331,8 @@ return {
 			k_standard_ranked_description = "The official competitive ruleset.\n\nStandard ruleset with locked settings:\n- Attrition gamemode\n- The Order enabled\n- Requires recommended Steamodded version",
 			k_legacy_ranked = "Legacy Ranked",
 			k_legacy_ranked_description = "A minimal competitive ruleset.\n\nNo Multiplayer cards or balance changes\nexcept Glass. Has locked settings:\n- Attrition gamemode\n- The Order enabled\n- Requires recommended Steamodded version",
+			k_experimental_legacy = "Experimental (Legacy)",
+			k_experimental_legacy_description = "Legacy Ranked's bleeding edge.\n\nLegacy Ranked, plus Let's Go Gambling.\nJustice is banned. Locked settings:\n- Attrition gamemode\n- The Order enabled\n- Requires recommended Steamodded version",
 			k_badlatro = "Badlatro",
 			k_badlatro_description = "A weekly ruleset designed by @dr_monty_the_snek on the discord server\nthat has been added to the mod permanently.\n\nThis ruleset bans 48 jokers, consumables, tags, etc.",
 			k_attrition = "Attrition",
