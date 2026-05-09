@@ -150,6 +150,7 @@ local DATA_FIELDS = {
 	"banned_tags",
 	"banned_blinds",
 	"banned_silent",
+	"spectral_banned_enhancements",
 	-- Rework arrays
 	"reworked_jokers",
 	"reworked_consumables",
