@@ -47,10 +47,12 @@ local function wheel_of_fortune_the_card(card)
 			{ name = "e_negative", weight = 1 },
 		}
 		local edition = poll_edition("main_menu" .. os.time(), nil, nil, true, editions)
-        card:set_edition(nil, true, true)
-		card:set_edition(edition, true)
-		Juice_up(card, 0.3, 0.5)
-		G.CONTROLLER.locks.edition = false -- if this isn't done, set_edition will block inputs for 0.1s
+        if edition and edition.name then
+            card:set_edition(nil, true, true)
+            card:set_edition(edition.name, true)
+            Juice_up(card, 0.3, 0.5)
+            G.CONTROLLER.locks.edition = false -- if this isn't done, set_edition will block inputs for 0.1s
+        end
 	else
 		nope_a_joker(card)
 		Juice_up(card, 0.3, 0.5)
@@ -68,7 +70,7 @@ MP.title_card = nil
 
 function Add_custom_multiplayer_cards(change_context)
     local first_card = G.title_top.cards[1]
-    if not first_card.mod_flag and first_card.config.center.key == "c_base" then
+    if first_card and not first_card.mod_flag and first_card.config.center.key == "c_base" then
         first_card:set_base(G.P_CARDS["S_A"], true)
     end
 
