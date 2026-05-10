@@ -291,12 +291,6 @@ function MP.GHOST.build_label(r)
 	)
 end
 
--- Load ghost replays from .log and .json files in the replays/ folder.
--- Files are read once when the picker is opened; drop a Lovely log or
--- a .json file into replays/ and it shows up in the ghost replay picker.
-
--- Load a .json replay file — useful for verifying log parser output or
--- loading replays exported from external tools.
 local function load_json_replay(filepath, filename)
 	local json = require("json")
 	local content = NFS.read(filepath)
@@ -308,7 +302,6 @@ local function load_json_replay(filepath, filename)
 		return nil
 	end
 
-	-- Convert string ante keys to numbers for consistency
 	local fixed = {}
 	for k, v in pairs(replay.ante_snapshots) do
 		fixed[tonumber(k) or k] = v
@@ -317,6 +310,28 @@ local function load_json_replay(filepath, filename)
 	replay._source = "file"
 	replay._filename = filename
 	return replay
+end
+
+local function parse_log_into_replays(log_parser, content, filename, source)
+	local out = {}
+	if not (content and log_parser) then return out end
+	local ok, game_records = pcall(log_parser.process_log, content)
+	if not (ok and game_records) then
+		sendWarnMessage("Failed to parse log: " .. filename, "MULTIPLAYER")
+		return out
+	end
+	local total = #game_records
+	for idx, game in ipairs(game_records) do
+		local ok2, replay = pcall(log_parser.to_replay, game)
+		if ok2 and replay and replay.ante_snapshots and next(replay.ante_snapshots) then
+			replay._source = source
+			replay._filename = filename
+			replay._game_index = idx
+			replay._game_count = total
+			out[#out + 1] = replay
+		end
+	end
+	return out
 end
 
 function MP.GHOST.load_folder_replays()
@@ -330,25 +345,9 @@ function MP.GHOST.load_folder_replays()
 
 	for _, item in ipairs(items) do
 		if item.type == "file" and item.name:match("%.log$") then
-			local filepath = replays_dir .. "/" .. item.name
-			local content = NFS.read(filepath)
-			if content and log_parser then
-				local ok, game_records = pcall(log_parser.process_log, content)
-				if ok and game_records then
-					local total = #game_records
-					for idx, game in ipairs(game_records) do
-						local ok2, replay = pcall(log_parser.to_replay, game)
-						if ok2 and replay and replay.ante_snapshots and next(replay.ante_snapshots) then
-							replay._source = "file"
-							replay._filename = item.name
-							replay._game_index = idx
-							replay._game_count = total
-							table.insert(results, replay)
-						end
-					end
-				else
-					sendWarnMessage("Failed to parse log: " .. item.name, "MULTIPLAYER")
-				end
+			local content = NFS.read(replays_dir .. "/" .. item.name)
+			for _, replay in ipairs(parse_log_into_replays(log_parser, content, item.name, "file")) do
+				results[#results + 1] = replay
 			end
 		elseif item.type == "file" and item.name:match("%.json$") then
 			local replay = load_json_replay(replays_dir .. "/" .. item.name, item.name)
@@ -356,10 +355,56 @@ function MP.GHOST.load_folder_replays()
 		end
 	end
 
-	-- Sort by timestamp descending (newest first)
 	table.sort(results, function(a, b)
 		return (a.timestamp or 0) > (b.timestamp or 0)
 	end)
 
+	return results
+end
+
+-- NFS is nativefs — accepts absolute paths directly, no sandboxing.
+local function lovely_log_dir()
+	local ok, lovely = pcall(require, "lovely")
+	if not (ok and lovely and lovely.log_path) then return nil end
+	local dir = lovely.log_path:match("(.*)[/\\]")
+	if not dir or dir == "" then return nil end
+	return dir
+end
+
+-- A single .log file can contain multiple games; parse newest-first and stop once we hit `limit`.
+function MP.GHOST.load_lovely_log_replays(limit)
+	limit = limit or 10
+	local dir = lovely_log_dir()
+	if not dir then return {} end
+
+	local items = NFS.getDirectoryItemsInfo(dir)
+	if not items then return {} end
+	local logs = {}
+	for _, item in ipairs(items) do
+		if item.type == "file" and item.name:match("%.log$") then
+			logs[#logs + 1] = item
+		end
+	end
+	table.sort(logs, function(a, b)
+		return (a.modtime or 0) > (b.modtime or 0)
+	end)
+
+	local log_parser = MP.load_mp_file("lib/log_parser.lua")
+	local results = {}
+	for _, item in ipairs(logs) do
+		local content = NFS.read(dir .. "/" .. item.name)
+		for _, replay in ipairs(parse_log_into_replays(log_parser, content, item.name, "lovely_log")) do
+			results[#results + 1] = replay
+		end
+		if #results >= limit then break end
+	end
+
+	table.sort(results, function(a, b)
+		return (a.timestamp or 0) > (b.timestamp or 0)
+	end)
+
+	while #results > limit do
+		results[#results] = nil
+	end
 	return results
 end
