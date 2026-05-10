@@ -75,7 +75,10 @@ function Add_custom_multiplayer_cards(change_context)
     end
 
     -- Taken from SMODS
-	local title_card = create_card("Base", G.title_top, nil, nil, nil, nil)
+	local title_card = SMODS.create_card({
+        key = "c_base", no_edition = true, area = G.title_top,
+        bypass_discovery_center = true, skip_materialize = true
+    })
 	title_card:set_base(G.P_CARDS["H_A"], true)
     G.title_top.T.w = G.title_top.T.w + (1.7675 / math.max(#G.title_top.cards, 1))
     G.title_top.T.x = G.title_top.T.x - (0.885 / math.max(#G.title_top.cards, 1)) -- everyone who used -0.8 was WRONG
