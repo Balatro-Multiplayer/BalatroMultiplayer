@@ -371,7 +371,14 @@ local function action_stop_game()
 	MP.UTILS.emit_log_checksum()
 end
 
-local function action_end_pvp()
+local function action_end_pvp(message)
+    if message.loser == (MP.LOBBY.is_host and "host" or "guest") then
+        stop_use()
+        MP.ACTIONS.fail_round(math.max(1, G.GAME.current_round.hands_played))
+        if G.GAME.current_round.hands_left > 0 then
+            SMODS.calculate_context({ mp_pvp_loss = true, mp_hands_left = G.GAME.current_round.hands_left })
+        end
+    end
 	MP.GAME.end_pvp = true
 	MP.GAME.timer = MP.UTILS.timer_base()
 	MP.GAME.timer_consumed = false

@@ -320,6 +320,7 @@ function Game:update(dt)
 	if is_pvp_timer then
         -- PvP timer: tick when opponent timering, stop when animations, state checks, pvp blind only
 		if not MP.GAME.nemesis_timer_started then return end
+        if G.GAME.current_round.hands_left <= 0 then return end
 		if G.STATE == G.STATES.NEW_ROUND or G.STATE == G.STATES.ROUND_EVAL then return end
 		should_check_animations = true
 	elseif is_pressure_timer then
@@ -363,8 +364,7 @@ function Game:update(dt)
 		MP.GAME.timer_consumed = true
 		if is_pvp_timer then
             -- PvP timer: end PvP immediately as a loss
-			MP.ACTIONS.fail_round(G.GAME.hands)
-			MP.ACTIONS.modded("Multiplayer", "forcePvPEnd", {}, "all")
+			MP.ACTIONS.modded("Multiplayer", "forcePvPEnd", { loser = MP.LOBBY.is_host and "host" or "guest" }, "all")
 		else
             -- Old, No-animations, Pressure timers: lose a live
 			if MP.GAME.timers_forgiven < MP.LOBBY.config.timer_forgiveness then
