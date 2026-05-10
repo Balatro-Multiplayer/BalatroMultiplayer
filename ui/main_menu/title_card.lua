@@ -79,9 +79,9 @@ function Add_custom_multiplayer_cards(change_context)
 	title_card:set_base(G.P_CARDS["H_A"], true)
     G.title_top.T.w = G.title_top.T.w + (1.7675 / math.max(#G.title_top.cards, 1))
     G.title_top.T.x = G.title_top.T.x - (0.885 / math.max(#G.title_top.cards, 1)) -- everyone who used -0.8 was WRONG
-	G.title_top:emplace(title_card)
 	title_card.T.w = title_card.T.w * 1.1 * 1.2
 	title_card.T.h = title_card.T.h * 1.1 * 1.2
+	G.title_top:emplace(title_card)
 	title_card.no_ui = true
 	title_card.states.visible = false
 
