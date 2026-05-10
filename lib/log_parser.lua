@@ -348,6 +348,9 @@ function LOG_PARSER.process_log(content)
 				end
 				game.nemesis_stats = stats
 
+			elseif action == "receiveEndGameJokers" then
+				if kv.seed then game.seed = tostring(kv.seed) end
+
 			elseif action == "stopGame" then
 				if kv.seed then game.seed = tostring(kv.seed) end
 				if ts then game.game_end_ts = ts end
