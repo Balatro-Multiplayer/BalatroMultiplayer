@@ -434,15 +434,23 @@ end
 -------------------------------------------------------------------------------
 
 function G.UIDEF.ghost_replay_picker()
-	-- Load replays from the replays/ folder, sorted newest-first
 	local all = MP.GHOST.load_folder_replays()
+	local seen = {}
+	for _, r in ipairs(all) do
+		seen[(r._filename or "") .. ":" .. (r._game_index or 0)] = true
+	end
+	for _, r in ipairs(MP.GHOST.load_lovely_log_replays(10)) do
+		local key = (r._filename or "") .. ":" .. (r._game_index or 0)
+		if not seen[key] then
+			seen[key] = true
+			all[#all + 1] = r
+		end
+	end
 
-	-- Sort newest-first
 	table.sort(all, function(a, b)
 		return (a.timestamp or 0) > (b.timestamp or 0)
 	end)
 
-	-- Stash for callbacks to index into
 	_picker_replays = all
 
 	-- Left column: replay list
@@ -470,7 +478,7 @@ function G.UIDEF.ghost_replay_picker()
 				{
 					n = G.UIT.T,
 					config = {
-						text = "Place .log or .json files in the replays/ folder",
+						text = "Play a match, or place .log/.json in replays/",
 						scale = 0.28,
 						colour = G.C.UI.TEXT_INACTIVE,
 					},
