@@ -39,7 +39,7 @@ end
 local function wheel_of_fortune_the_card(card)
 	math.randomseed(os.time())
 	local chance = math.random(4)
-	if chance == 1 then
+	if chance == 1 and not card.edition then
 		local editions = {
 			{ name = "e_foil", weight = 499 },
 			{ name = "e_holo", weight = 350 },
@@ -57,16 +57,6 @@ local function wheel_of_fortune_the_card(card)
 	end
 end
 
-local function has_mod_manipulating_title_card()
-	-- maintain a list of all mods that affect the title card here
-	-- (must use the mod's id, not its name)
-	local modlist = { "BUMod", "Cryptid", "Talisman", "Pokermon", "FGCBalatro" }
-	for _, modname in ipairs(modlist) do
-		if SMODS.Mods[modname] and SMODS.Mods[modname].can_load then return true end
-	end
-	return false
-end
-
 local function make_wheel_of_fortune_a_card_func(card)
 	return function()
 		if card then wheel_of_fortune_the_card(card) end
@@ -77,15 +67,16 @@ end
 MP.title_card = nil
 
 function Add_custom_multiplayer_cards(change_context)
-	local only_mod_affecting_title_card = not has_mod_manipulating_title_card()
+    local first_card = G.title_top.cards[1]
+    if not first_card.mod_flag and first_card.config.center.key == "c_base" then
+        first_card:set_base(G.P_CARDS["S_A"], true)
+    end
 
-	if only_mod_affecting_title_card then G.title_top.cards[1]:set_base(G.P_CARDS["S_A"], true) end
-
-	-- Credit to the Cryptid mod for the original code to add a card to the main menu
+    -- Taken from SMODS
 	local title_card = create_card("Base", G.title_top, nil, nil, nil, nil)
 	title_card:set_base(G.P_CARDS["H_A"], true)
-	G.title_top.T.w = G.title_top.T.w * 1.7675
-	G.title_top.T.x = G.title_top.T.x - 0.8
+    G.title_top.T.w = G.title_top.T.w + (1.7675 / math.max(#G.title_top.cards, 1))
+    G.title_top.T.x = G.title_top.T.x - (0.885 / math.max(#G.title_top.cards, 1)) -- everyone who used -0.8 was WRONG
 	G.title_top:emplace(title_card)
 	title_card.T.w = title_card.T.w * 1.1 * 1.2
 	title_card.T.h = title_card.T.h * 1.1 * 1.2
@@ -117,16 +108,15 @@ function Add_custom_multiplayer_cards(change_context)
 	-- base delay in seconds, increases as needed
 	local wheel_delay = 2
 
-	if only_mod_affecting_title_card then
-		G.E_MANAGER:add_event(Event({
-			trigger = "after",
-			delay = wheel_delay,
-			blockable = false,
-			blocking = false,
-			func = make_wheel_of_fortune_a_card_func(G.title_top.cards[1]),
-		}))
-		wheel_delay = wheel_delay + 1
-	end
+    G.E_MANAGER:add_event(Event({
+        trigger = "after",
+        delay = wheel_delay,
+        blockable = false,
+        blocking = false,
+        func = make_wheel_of_fortune_a_card_func(first_card),
+    }))
+
+    wheel_delay = wheel_delay + 1
 
 	G.E_MANAGER:add_event(Event({
 		trigger = "after",
