@@ -78,9 +78,9 @@ local rulesets_tabs = {
 				{
 					name = "k_experimental",
 					buttons = {
-						{ button_id = "experimental_ruleset_button", button_localize_key = "k_experimental" },
-						{ button_id = "experimental_legacy_ruleset_button", button_localize_key = "k_experimental_legacy" },
+						{ button_id = "experimental_ruleset_button", button_localize_key = "k_experimental_standard" },
 						{ button_id = "experimental_no_balance_ruleset_button", button_localize_key = "k_experimental_no_balance" },
+						{ button_id = "experimental_legacy_ruleset_button", button_localize_key = "k_experimental_legacy" },
 					},
 				},
 			},
@@ -246,7 +246,7 @@ function G.UIDEF.ruleset_info(ruleset_name, mode)
 		}
 	end
 
-	if (mode == "mp" or mode == "practice") and not ruleset.forced_lobby_options then
+	if (mode == "mp" or mode == "practice") then
 		local modifiers_row = MP.UI.build_modifier_row(ruleset, mode)
 		if modifiers_row then content_nodes[#content_nodes + 1] = modifiers_row end
 	end

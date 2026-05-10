@@ -128,78 +128,30 @@ G.FUNCS.open_experimental_medifiers = function(e)
 	})
 end
 
-MP.Ruleset({
-	key = "experimental",
-	layers = { "experimental" },
-	forced_gamemode = "gamemode_mp_attrition",
-	force_lobby_options = function(self)
-		MP.LOBBY.config.the_order = true
-		return false
-	end,
-	hide_continue_button = true,
-	get_modifiers_ui = function(self, mode)
-		return {
-			n = G.UIT.R,
-			config = { align = "cm" },
-			nodes = {
-				MP.UI.Disableable_Button({
-					button = "open_experimental_medifiers",
-					align = "cm",
-					padding = 0.05,
-					r = 0.1,
-					minw = 8,
-					minh = 0.8,
-					colour = G.C.ORANGE,
-					hover = true,
-					shadow = true,
-					label = { "Modifiers" },
-					scale = 0.5,
-					enabled_ref_table = { val = true },
-					enabled_ref_value = "val",
-					ref_table = {
-						ruleset = self,
-						mode = mode,
-					},
-				}),
-			},
-		}
-	end,
-}):inject()
-
-MP.Ruleset({
-	key = "experimental_no_balance",
-	layers = { "standard" },
-	forced_gamemode = "gamemode_mp_attrition",
-	force_lobby_options = function(self)
-		MP.LOBBY.config.the_order = true
-		return false
-	end,
-	hide_continue_button = true,
-	get_modifiers_ui = function(self, mode)
-		return {
-			n = G.UIT.R,
-			config = { align = "cm" },
-			nodes = {
-				MP.UI.Disableable_Button({
-					button = "open_experimental_medifiers",
-					align = "cm",
-					padding = 0.05,
-					r = 0.1,
-					minw = 8,
-					minh = 0.8,
-					colour = G.C.ORANGE,
-					hover = true,
-					shadow = true,
-					label = { "Modifiers" },
-					scale = 0.5,
-					enabled_ref_table = { val = true },
-					enabled_ref_value = "val",
-					ref_table = {
-						ruleset = self,
-						mode = mode,
-					},
-				}),
-			},
-		}
-	end,
-}):inject()
+G.UIDEF.mp_experimental_modifiers_ui = function(ruleset, mode)
+	return {
+		n = G.UIT.R,
+		config = { align = "cm" },
+		nodes = {
+			MP.UI.Disableable_Button({
+				button = "open_experimental_medifiers",
+				align = "cm",
+				padding = 0.05,
+				r = 0.1,
+				minw = 8,
+				minh = 0.8,
+				colour = G.C.ORANGE,
+				hover = true,
+				shadow = true,
+				label = { "Modifiers" },
+				scale = 0.5,
+				enabled_ref_table = { val = true },
+				enabled_ref_value = "val",
+				ref_table = {
+					ruleset = ruleset,
+					mode = mode,
+				},
+			}),
+		},
+	}
+end
