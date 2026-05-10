@@ -70,7 +70,7 @@ MP.title_card = nil
 
 function Add_custom_multiplayer_cards(change_context)
     local first_card = G.title_top.cards[1]
-    if first_card and not first_card.mod_flag and first_card.config.center.key == "c_base" then
+    if first_card and not first_card.mod_flag and first_card.config and first_card.config.center_key == "c_base" then
         first_card:set_base(G.P_CARDS["S_A"], true)
     end
 
