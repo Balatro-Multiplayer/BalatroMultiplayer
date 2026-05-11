@@ -45,6 +45,7 @@ function FN.PRE.get_calculate_score_button()
 			colour = G.C.RED,
 			hover = true,
 			shadow = true,
+            maxw = 4.5
 		},
 		nodes = {
 			{
@@ -76,7 +77,7 @@ function FN.PRE.get_score_node()
 
 	return {
 		n = G.UIT.C,
-		config = { id = "fn_pre_score", align = "cm" },
+		config = { id = "fn_pre_score", align = "cm", minh = 0.5 },
 		nodes = {
 			{
 				n = G.UIT.O,
@@ -89,6 +90,22 @@ function FN.PRE.get_score_node()
 						shadow = true,
 						float = true,
 						scale = text_scale,
+                        maxw = 2,
+					}),
+				},
+			},
+			{
+				n = G.UIT.O,
+				config = {
+					id = "fn_pre_m",
+					func = "fn_pre_score_UI_set",
+					object = DynaText({
+						string = { { ref_table = FN.PRE.text.score, ref_value = "m" } },
+						colours = { G.C.UI.TEXT_LIGHT },
+						shadow = true,
+						float = true,
+						scale = text_scale,
+                        maxw = 4,
 					}),
 				},
 			},
@@ -103,6 +120,7 @@ function FN.PRE.get_score_node()
 						shadow = true,
 						float = true,
 						scale = text_scale,
+                        maxw = 2,
 					}),
 				},
 			},

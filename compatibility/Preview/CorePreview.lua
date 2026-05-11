@@ -142,7 +142,7 @@ function G.FUNCS.fn_pre_score_UI_set(e)
 	local new_preview_text = ""
 	local should_juice = false
 	if FN.PRE.lock_updates then
-		if e.config.id == "fn_pre_l" then
+		if e.config.id == "fn_pre_m" then
 			new_preview_text = " " .. MP.UTILS.get_preview_cfg("text") .. " "
 			should_juice = true
 		end
@@ -150,8 +150,11 @@ function G.FUNCS.fn_pre_score_UI_set(e)
 		if FN.PRE.data then
 			if FN.PRE.show_preview and (FN.PRE.data.score.min ~= FN.PRE.data.score.max) then
 				-- Format as 'X - Y' :
-				if e.config.id == "fn_pre_l" then
-					new_preview_text = FN.PRE.format_number(FN.PRE.data.score.min) .. " - "
+				if e.config.id == "fn_pre_m" then
+                    new_preview_text = " - "
+					if FN.PRE.is_enough_to_win(FN.PRE.data.score.min) then should_juice = true end
+                elseif e.config.id == "fn_pre_l" then
+					new_preview_text = FN.PRE.format_number(FN.PRE.data.score.min)
 					if FN.PRE.is_enough_to_win(FN.PRE.data.score.min) then should_juice = true end
 				elseif e.config.id == "fn_pre_r" then
 					new_preview_text = FN.PRE.format_number(FN.PRE.data.score.max)
@@ -164,7 +167,7 @@ function G.FUNCS.fn_pre_score_UI_set(e)
 						-- Spaces around number necessary to distinguish Min/Max text from Exact text,
 						-- which is itself necessary to force a HUD update when switching between Min/Max and Exact.
 						if FN.PRE.show_preview then
-							new_preview_text = " " .. FN.PRE.format_number(FN.PRE.data.score.min) .. " "
+							new_preview_text = FN.PRE.format_number(FN.PRE.data.score.min)
 							if FN.PRE.is_enough_to_win(FN.PRE.data.score.min) then should_juice = true end
 						else
 							if FN.PRE.is_enough_to_win(FN.PRE.data.score.min) then
@@ -200,7 +203,12 @@ function G.FUNCS.fn_pre_score_UI_set(e)
 
 	if (not FN.PRE.text.score[e.config.id:sub(-1)]) or new_preview_text ~= FN.PRE.text.score[e.config.id:sub(-1)] then
 		FN.PRE.text.score[e.config.id:sub(-1)] = new_preview_text
+        e.config.object.scale = e.config.object.config.scale
 		e.config.object:update_text()
+        if e.config.object.config.maxw then
+            e.config.object.scale = e.config.object.config.scale * math.min(1, e.config.object.config.maxw/e.config.object.config.W)
+            e.config.object:update_text(true)
+        end
 		-- Wobble:
 		if not G.TAROT_INTERRUPT_PULSE then
 			if should_juice then
@@ -245,7 +253,12 @@ function G.FUNCS.fn_pre_dollars_UI_set(e)
 	if not FN.PRE.text.dollars[e.config.id:sub(-3)] or new_preview_text ~= FN.PRE.text.dollars[e.config.id:sub(-3)] then
 		FN.PRE.text.dollars[e.config.id:sub(-3)] = new_preview_text
 		e.config.object.colours = { new_colour }
+        e.config.object.scale = e.config.object.config.scale
 		e.config.object:update_text()
+        if e.config.object.config.maxw then
+            e.config.object.scale = e.config.object.config.scale * math.min(1, e.config.object.config.maxw/e.config.object.config.W)
+            e.config.object:update_text(true)
+        end
 		if not G.TAROT_INTERRUPT_PULSE then e.config.object:pulse(0.25) end
 	end
 end
