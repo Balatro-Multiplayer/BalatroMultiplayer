@@ -5,8 +5,9 @@ function MP.UI.cam_timer_opponent()
     if MP.GAME.pvp_countdown_in_progress then return false end
 	if MP.is_pvp_boss() and MP.is_layer_active("pvp_timer") then
 		if G.STATE == G.STATES.ROUND_EVAL or G.STATE == G.STATES.NEW_ROUND then return false end
-		if not MP.INSANE_INT.greater_than(MP.GAME.score, MP.GAME.enemy.score) then return false end
-		return true
+		if MP.INSANE_INT.greater_than(MP.GAME.score, MP.GAME.enemy.score) then return true end
+        if MP.INSANE_INT.equal(MP.GAME.score, MP.GAME.enemy.score) then return MP.GAME.pvp_reached_first end
+		return false
 	end
 	return MP.GAME.ready_blind
 end
@@ -364,7 +365,7 @@ function Game:update(dt)
 		MP.GAME.timer_consumed = true
 		if is_pvp_timer then
             -- PvP timer: end PvP immediately as a loss
-			MP.ACTIONS.modded("Multiplayer", "forcePvPEnd", { loser = MP.LOBBY.is_host and "host" or "guest" }, "all")
+            MP.ACTIONS.fail_pvp_timer()
 		else
             -- Old, No-animations, Pressure timers: lose a live
 			if MP.GAME.timers_forgiven < MP.LOBBY.config.timer_forgiveness then

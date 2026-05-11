@@ -63,6 +63,14 @@ MP.INSANE_INT.greater_than = function(insane_int_display1, insane_int_display2)
 	return tonumber(insane_int_display1.coeffiocient) > tonumber(insane_int_display2.coeffiocient)
 end
 
+MP.INSANE_INT.equal = function(insane_int_display1, insane_int_display2)
+    if not insane_int_display1 or not insane_int_display2 then return false end
+	if insane_int_display1.e_count ~= insane_int_display2.e_count then return false end
+	if insane_int_display1.exponent ~= insane_int_display2.exponent then return false end
+	if insane_int_display1.coeffiocient ~= insane_int_display2.coeffiocient then return false end
+    return true
+end
+
 -- ignore deprected warning for math.pow
 -- math.pow is used instead of ^ to avoid conflicts with talisman's __pow override
 -- theoretically the talisman override only applies to their special big number types and using '^' would be fine,

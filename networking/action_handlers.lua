@@ -251,13 +251,14 @@ local function begin_pvp_blind()
 	end
 end
 
-local function action_start_blind()
+local function action_start_blind(first_player)
 	MP.GAME.ready_blind = false
 	MP.GAME.pvp_reached = false
 	MP.GAME.timer_started = false
 	MP.GAME.nemesis_timer_started = false
 	MP.GAME.timer_consumed = false
 	MP.GAME.timer = MP.UTILS.pvp_timer_base()
+	MP.GAME.pvp_reached_first = (MP.LOBBY.is_host and "host" or "guest") == first_player
 	MP.UI.start_pvp_countdown(begin_pvp_blind)
 end
 
@@ -289,7 +290,7 @@ local function action_enemy_info(score_str, hands_left_str, skips_str, lives_str
 		end
 	end
 
-    if score == nil or hands_left == nil then
+	if score == nil or hands_left == nil then
 		sendDebugMessage("Invalid score or hands_left", "MULTIPLAYER")
 		return
 	end
@@ -300,7 +301,9 @@ local function action_enemy_info(score_str, hands_left_str, skips_str, lives_str
 	if MP.is_pvp_boss() and MP.is_layer_active("pvp_timer") then
 		if MP.INSANE_INT.greater_than(MP.GAME.score, score) then
 			MP.GAME.nemesis_timer_started = false
-		else
+        elseif MP.INSANE_INT.equal(MP.GAME.score, score) and MP.GAME.pvp_reached_first then
+            MP.GAME.nemesis_timer_started = false
+        else
 			MP.GAME.timer_started = false
 		end
 	end
@@ -371,14 +374,13 @@ local function action_stop_game()
 	MP.UTILS.emit_log_checksum()
 end
 
-local function action_end_pvp(message)
-    if message.loser == (MP.LOBBY.is_host and "host" or "guest") then
-        stop_use()
-        MP.ACTIONS.fail_round(math.max(1, G.GAME.current_round.hands_played))
-        if G.GAME.current_round.hands_left > 0 then
-            SMODS.calculate_context({ mp_pvp_loss = true, mp_hands_left = G.GAME.current_round.hands_left })
-        end
-    end
+local function action_end_pvp(lost, pvpTimerLost)
+	if lost and pvpTimerLost then
+		if G.GAME.current_round.hands_left > 0 then
+            stop_use()
+			SMODS.calculate_context({ mp_pvp_loss = true, mp_hands_left = G.GAME.current_round.hands_left })
+		end
+	end
 	MP.GAME.end_pvp = true
 	MP.GAME.timer = MP.UTILS.timer_base()
 	MP.GAME.timer_consumed = false
@@ -386,10 +388,9 @@ local function action_end_pvp(message)
 	MP.GAME.nemesis_timer_started = false
 	MP.GAME.ready_blind = false
 	MP.GAME.pvp_reached = false
+    MP.GAME.pvp_reached_first = false
 	MP.GAME.score = nil
 end
-
-MP.register_mod_action("forcePvPEnd", action_end_pvp, "Multiplayer")
 
 ---@param lives number
 local function action_player_info(lives)
@@ -1054,6 +1055,8 @@ function MP.ACTIONS.play_hand(score, hands_left)
 	if MP.is_pvp_boss() and MP.is_layer_active("pvp_timer") then
 		if MP.INSANE_INT.greater_than(insane_int_score, MP.GAME.enemy.score) then
 			MP.GAME.nemesis_timer_started = false
+        elseif MP.INSANE_INT.equal(insane_int_score, MP.GAME.enemy.score) and MP.GAME.pvp_reached_first then
+            MP.GAME.nemesis_timer_started = false
 		else
 			MP.GAME.timer_started = false
 		end
@@ -1211,6 +1214,11 @@ function MP.ACTIONS.fail_timer()
 		action = "failTimer",
 	})
 end
+function MP.ACTIONS.fail_pvp_timer()
+	Client.send({
+		action = "failPvPTimer",
+	})
+end
 
 function MP.ACTIONS.sync_client()
 	Client.send({
@@ -1332,13 +1340,13 @@ function Game:update(dt)
 			elseif parsedAction.action == "startGame" then
 				action_start_game(parsedAction.seed, parsedAction.stake)
 			elseif parsedAction.action == "startBlind" then
-				action_start_blind()
+				action_start_blind(parsedAction.firstPlayer)
 			elseif parsedAction.action == "enemyInfo" then
 				action_enemy_info(parsedAction.score, parsedAction.handsLeft, parsedAction.skips, parsedAction.lives)
 			elseif parsedAction.action == "stopGame" then
 				action_stop_game()
 			elseif parsedAction.action == "endPvP" then
-				action_end_pvp()
+				action_end_pvp(parsedAction.lost, parsedAction.pvpTimerLost)
 			elseif parsedAction.action == "playerInfo" then
 				action_player_info(parsedAction.lives)
 			elseif parsedAction.action == "winGame" then
