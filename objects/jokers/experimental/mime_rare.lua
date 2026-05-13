@@ -1,3 +1,4 @@
+--[[
 SMODS.Joker({
 	key = "mime",
 	no_collection = true,
@@ -16,3 +17,4 @@ SMODS.Joker({
 		end
 	end,
 })
+--]]

@@ -8,7 +8,6 @@
 
 - **To Do List** — Reworked. Now pays $5 (up from $4). Target poker hand is chosen from all hands, not just discovered ones.
 - **Golden Ticket** — Reverted payout nerf, now earns $4 (up from $3)
-- **Baron** and **Mime** — Swapped rarities. Baron is now Uncommon ($5), Mime is now Rare ($8).
 - **Speedrun** — Out of rotation.
 - **Ouija** and **Ectoplasm** — Now cost $4 (bug fix).
 
