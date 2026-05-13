@@ -124,7 +124,7 @@ function G.UIDEF.ruleset_selection_options(mode, buttons)
 	-- If ghost is active, preserve the replay's ruleset instead of resetting to default
 	local default_ruleset
 	if mode == "practice" and MP.GHOST.is_active() and MP.SP.ruleset then
-		default_ruleset = MP.SP.ruleset
+		default_ruleset = MP.SP.ruleset:gsub("^ruleset_mp_", "")
 	else
 		default_ruleset = string.match(buttons[1].buttons[1].button_id, "(.+)_ruleset_button$")
 	end
