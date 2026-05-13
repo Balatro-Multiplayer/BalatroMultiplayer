@@ -33,7 +33,7 @@ MP.SANDBOX.joker_mappings = {
 	{ sandbox = "j_mp_satellite_sandbox", vanilla = "j_satellite", active = false },
 
 	-- Extra Credit jokers
-	{ sandbox = "j_mp_alloy_sandbox", vanilla = nil, active = true, group = "extra_credit" },
+	-- { sandbox = "j_mp_alloy_sandbox", vanilla = nil, active = true, group = "extra_credit" },
 	{ sandbox = "j_mp_ambrosia_sandbox", vanilla = nil, active = true, group = "extra_credit" },
 	{ sandbox = "j_mp_bobby_sandbox", vanilla = nil, active = true, group = "extra_credit" },
 	{ sandbox = "j_mp_candynecklace_sandbox", vanilla = nil, active = true, group = "extra_credit" },
