@@ -23,7 +23,7 @@ G.FUNCS.change_modifier_timer = function(args)
 	end
 end
 
-G.FUNCS.open_experimental_medifiers = function(e)
+G.FUNCS.mp_open_modifiers_overlay = function(e)
 	local timer_cycle = MP.UI.Disableable_Option_Cycle({
 		id = "modifier_timer_option",
 		enabled_ref_table = { val = true },
@@ -128,13 +128,13 @@ G.FUNCS.open_experimental_medifiers = function(e)
 	})
 end
 
-G.UIDEF.mp_experimental_modifiers_ui = function(ruleset, mode)
+G.UIDEF.mp_modifiers_button_row = function(ruleset, mode)
 	return {
 		n = G.UIT.R,
 		config = { align = "cm" },
 		nodes = {
 			MP.UI.Disableable_Button({
-				button = "open_experimental_medifiers",
+				button = "mp_open_modifiers_overlay",
 				align = "cm",
 				padding = 0.05,
 				r = 0.1,

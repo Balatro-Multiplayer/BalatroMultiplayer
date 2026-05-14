@@ -676,7 +676,9 @@ function G.UIDEF.ruleset_cardarea_definition(args)
 end
 
 function MP.UI.build_modifier_row(ruleset, mode)
+	if ruleset.forced_lobby_options then return nil end
 	if type(ruleset.get_modifiers_ui) == "function" then return ruleset:get_modifiers_ui(mode) end
+	return G.UIDEF.mp_modifiers_button_row(ruleset, mode)
 end
 
 function MP.UI.get_continue_button(ruleset, mode)
