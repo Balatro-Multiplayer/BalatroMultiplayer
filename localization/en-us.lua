@@ -1302,6 +1302,11 @@ return {
                 "  {C:chips}90{} seconds plus {C:chips}15{} seconds per hand played {C:attention}minus animations{}.",
                 "  Can \"timer\" opponent only when you have {C:attention}higher{} score"
             },
+            k_experimental_modifiers_smallworld = {
+                "- {C:attention}75%{} of jokers, consumables, vouchers and tags",
+                "  are randomly banned each game.",
+                "- {C:attention}Showman{} effect always active.",
+            },
 			k_bl_life = "Life",
 			k_bl_or = "or",
 			k_bl_death = "Death",

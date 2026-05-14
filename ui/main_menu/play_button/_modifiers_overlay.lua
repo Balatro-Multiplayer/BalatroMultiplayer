@@ -37,19 +37,19 @@ G.FUNCS.mp_open_modifiers_overlay = function(e)
 		w = 4,
 	})
 
-	-- local smallworld_toggle = create_toggle({
-	--     id = "modifier_smallworld_toggle",
-	--     label = localize("b_opts_modifier_smallworld"),
-	--     ref_table = { val = MP.has_modifier("smallworld") },
-	--     ref_value = "val",
-	--     callback = function(new_val)
-	--         if new_val then
-	--             MP.add_modifier("smallworld")
-	--         else
-	--             MP.remove_modifier("smallworld")
-	--         end
-	--     end,
-	-- })
+	local smallworld_toggle = create_toggle({
+		id = "modifier_smallworld_toggle",
+		label = localize("b_opts_modifier_smallworld"),
+		ref_table = { val = MP.has_modifier("smallworld") },
+		ref_value = "val",
+		callback = function(new_val)
+			if new_val then
+				MP.add_modifier("smallworld")
+			else
+				MP.remove_modifier("smallworld")
+			end
+		end,
+	})
 
 	local pvp_timer_toggle = create_toggle({
 		id = "modifier_pvp_timer_toggle",
@@ -117,6 +117,8 @@ G.FUNCS.mp_open_modifiers_overlay = function(e)
 								create_entry(timer_cycle, "k_experimental_modifiers_timers"),
 								{ n = G.UIT.R, config = { minh = 0.25 } },
 								create_entry(pvp_timer_toggle, "k_experimental_modifiers_pvp_timer"),
+								{ n = G.UIT.R, config = { minh = 0.25 } },
+								create_entry(smallworld_toggle, "k_experimental_modifiers_smallworld"),
 							},
 						},
 						{ n = G.UIT.R },
