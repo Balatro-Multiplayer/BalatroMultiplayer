@@ -241,7 +241,6 @@ local function action_start_game(seed, stake_str)
 	end
 	G.FUNCS.lobby_start_run(nil, { seed = seed, stake = stake })
 	MP.LOBBY.ready_to_start = false
-
 end
 
 local function begin_pvp_blind()
@@ -252,13 +251,14 @@ local function begin_pvp_blind()
 	end
 end
 
-local function action_start_blind()
+local function action_start_blind(first_player)
 	MP.GAME.ready_blind = false
-    MP.GAME.pvp_reached = false
+	MP.GAME.pvp_reached = false
 	MP.GAME.timer_started = false
 	MP.GAME.nemesis_timer_started = false
-    MP.GAME.timer_consumed = false
-	MP.GAME.timer = MP.UTILS.timer_base()
+	MP.GAME.timer_consumed = false
+	MP.GAME.timer = MP.UTILS.pvp_timer_base()
+	MP.GAME.pvp_reached_first = (MP.LOBBY.is_host and "host" or "guest") == first_player
 	MP.UI.start_pvp_countdown(begin_pvp_blind)
 end
 
@@ -272,17 +272,21 @@ local function action_enemy_info(score_str, hands_left_str, skips_str, lives_str
 	local skips = tonumber(skips_str)
 	local lives = tonumber(lives_str)
 
-	if MP.GAME.enemy.skips ~= skips then
+	-- No-animation timer: If opponent skip, add time immediately
+	if skips and MP.GAME.enemy.skips ~= skips then
 		for i = 1, skips - MP.GAME.enemy.skips do
 			MP.GAME.enemy.spent_in_shop[#MP.GAME.enemy.spent_in_shop + 1] = 0
-            if
-                MP.GAME.enemy.skips < skips
-                and MP.is_layer_active("no_animation_timer")
-                and not MP.GAME.timer_started
-                and (MP.LOBBY.config.timer_increment_seconds or 0) > 0
-            then
-                MP.GAME.timer = MP.GAME.timer + MP.LOBBY.config.timer_increment_seconds
-            end
+			if
+				MP.GAME.enemy.skips < skips
+				and MP.LOBBY.config.timer
+				and not MP.GAME.timer_started
+				and not MP.GAME.nemesis_timer_started
+				and not MP.GAME.timer_consumed
+				and MP.is_any_layer_active({ "no_animation_timer", "pressure_timer" })
+				and (MP.LOBBY.config.timer_increment_seconds or 0) > 0
+			then
+				MP.UI.restore_timer(MP.LOBBY.config.timer_increment_seconds)
+			end
 		end
 	end
 
@@ -292,6 +296,17 @@ local function action_enemy_info(score_str, hands_left_str, skips_str, lives_str
 	end
 
 	if MP.INSANE_INT.greater_than(score, MP.GAME.enemy.highest_score) then MP.GAME.enemy.highest_score = score end
+
+	-- PvP timer: stop timer according to score
+	if MP.is_pvp_boss() and MP.is_layer_active("pvp_timer") then
+		if MP.INSANE_INT.greater_than(MP.GAME.score, score) then
+			MP.GAME.nemesis_timer_started = false
+        elseif MP.INSANE_INT.equal(MP.GAME.score, score) and MP.GAME.pvp_reached_first then
+            MP.GAME.nemesis_timer_started = false
+        else
+			MP.GAME.timer_started = false
+		end
+	end
 
 	G.E_MANAGER:add_event(Event({
 		blockable = false,
@@ -338,10 +353,10 @@ local function action_enemy_info(score_str, hands_left_str, skips_str, lives_str
 		play_sound("holo1", 0.865, 0.9)
 		play_sound("gong", 0.765, 0.4)
 	end
-    if MP.GAME.enemy.skips < skips then
-        play_sound('negative', 0.865, 0.4)
-        play_sound("gong", 0.765, 0.4)
-    end
+	if MP.GAME.enemy.skips < skips then
+		play_sound("negative", 0.865, 0.4)
+		play_sound("gong", 0.765, 0.4)
+	end
 
 	MP.GAME.enemy.hands = hands_left
 	MP.GAME.enemy.skips = skips
@@ -359,14 +374,22 @@ local function action_stop_game()
 	MP.UTILS.emit_log_checksum()
 end
 
-local function action_end_pvp()
+local function action_end_pvp(lost, pvpTimerLost)
+	if lost and pvpTimerLost then
+		if G.GAME.current_round.hands_left > 0 then
+            stop_use()
+			SMODS.calculate_context({ mp_pvp_loss = true, mp_hands_left = G.GAME.current_round.hands_left })
+		end
+	end
 	MP.GAME.end_pvp = true
 	MP.GAME.timer = MP.UTILS.timer_base()
-    MP.GAME.timer_consumed = false
+	MP.GAME.timer_consumed = false
 	MP.GAME.timer_started = false
 	MP.GAME.nemesis_timer_started = false
 	MP.GAME.ready_blind = false
-    MP.GAME.pvp_reached = false
+	MP.GAME.pvp_reached = false
+    MP.GAME.pvp_reached_first = false
+	MP.GAME.score = nil
 end
 
 ---@param lives number
@@ -867,29 +890,29 @@ local function action_start_ante_timer(time, from_nemesis)
 			}))
 		end
 	end
-	-- Under pressure_timer the two players' local timers are intentionally desynced;
-	-- never overwrite ours from the network.
-	if not (MP.is_layer_active("pressure_timer") or MP.is_layer_active("no_animation_timer")) then
+	-- Default timer is server-synced; pressure/no-anim/pvp timers run locally.
+	if not MP.timer_is_local() then
 		if type(time) == "string" then time = tonumber(time) end
 		if time then MP.GAME.timer = time end
 	end
-    if from_nemesis then
-        MP.GAME.nemesis_timer_started = true
-    else
-        MP.GAME.timer_started = true
-    end
+	if from_nemesis then
+		MP.GAME.nemesis_timer_started = true
+	else
+		MP.GAME.timer_started = true
+	end
 end
 
 local function action_pause_ante_timer(time, from_nemesis)
-	if not (MP.is_layer_active("pressure_timer") or MP.is_layer_active("no_animation_timer")) then
+	-- Default timer is server-synced; pressure/no-anim/pvp timers run locally.
+	if not MP.timer_is_local() then
 		if type(time) == "string" then time = tonumber(time) end
 		if time then MP.GAME.timer = time end
 	end
-    if from_nemesis then
-        MP.GAME.nemesis_timer_started = false
-    else
-        MP.GAME.timer_started = false
-    end
+	if from_nemesis then
+		MP.GAME.nemesis_timer_started = false
+	else
+		MP.GAME.timer_started = false
+	end
 end
 
 -- #region Client to Server
@@ -1019,9 +1042,22 @@ function MP.ACTIONS.play_hand(score, hands_left)
 	fixed_score = string.gsub(fixed_score, ",", "") -- Remove commas
 
 	local insane_int_score = MP.INSANE_INT.from_string(fixed_score)
+	MP.GAME.score = insane_int_score
 	if MP.INSANE_INT.greater_than(insane_int_score, MP.GAME.highest_score) then
 		MP.GAME.highest_score = insane_int_score
 	end
+
+	-- Stop PvP timers according to score
+	if MP.is_pvp_boss() and MP.is_layer_active("pvp_timer") then
+		if MP.INSANE_INT.greater_than(insane_int_score, MP.GAME.enemy.score) then
+			MP.GAME.nemesis_timer_started = false
+        elseif MP.INSANE_INT.equal(insane_int_score, MP.GAME.enemy.score) and MP.GAME.pvp_reached_first then
+            MP.GAME.nemesis_timer_started = false
+		else
+			MP.GAME.timer_started = false
+		end
+	end
+
 	Client.send({
 		action = "playHand",
 		score = fixed_score,
@@ -1174,6 +1210,11 @@ function MP.ACTIONS.fail_timer()
 		action = "failTimer",
 	})
 end
+function MP.ACTIONS.fail_pvp_timer()
+	Client.send({
+		action = "failPvPTimer",
+	})
+end
 
 function MP.ACTIONS.sync_client()
 	Client.send({
@@ -1295,13 +1336,13 @@ function Game:update(dt)
 			elseif parsedAction.action == "startGame" then
 				action_start_game(parsedAction.seed, parsedAction.stake)
 			elseif parsedAction.action == "startBlind" then
-				action_start_blind()
+				action_start_blind(parsedAction.firstPlayer)
 			elseif parsedAction.action == "enemyInfo" then
 				action_enemy_info(parsedAction.score, parsedAction.handsLeft, parsedAction.skips, parsedAction.lives)
 			elseif parsedAction.action == "stopGame" then
 				action_stop_game()
 			elseif parsedAction.action == "endPvP" then
-				action_end_pvp()
+				action_end_pvp(parsedAction.lost, parsedAction.pvpTimerLost)
 			elseif parsedAction.action == "playerInfo" then
 				action_player_info(parsedAction.lives)
 			elseif parsedAction.action == "winGame" then

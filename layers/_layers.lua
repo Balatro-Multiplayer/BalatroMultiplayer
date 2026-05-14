@@ -25,10 +25,7 @@ end
 -- Build an mp_include closure that returns true iff any of the named layers is active.
 local function layer_membership_include(owning_layers)
 	return function(_)
-		for _, layer_name in ipairs(owning_layers) do
-			if MP.is_layer_active(layer_name) then return true end
-		end
-		return false
+        return MP.is_any_layer_active(owning_layers)
 	end
 end
 
@@ -220,8 +217,16 @@ function MP.RunLayerHooks(hook_name)
 end
 
 function MP.is_layer_active(layer_name)
+    if not layer_name then return false end
 	for _, name in ipairs(MP.active_layer_chain()) do
 		if name == layer_name then return true end
 	end
 	return false
+end
+
+function MP.is_any_layer_active(layers)
+    for _, layer_name in pairs(layers) do
+        if MP.is_layer_active(layer_name) then return true end
+    end
+    return false
 end
