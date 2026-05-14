@@ -2,9 +2,9 @@
 local old_ice_cream_calculate = G.P_CENTERS.j_ice_cream.calculate or function(self, card, context) end
 SMODS.Joker:take_ownership("j_ice_cream", {
 	calculate = function(self, card, context)
-		-- early return for clarity
-		if not MP.is_layer_active("pvp_timer") then return old_ice_cream_calculate(self, card, context) end
-		if context.mp_pvp_loss and not context.blueprint then
+		-- calculate runs every frame on every on-screen joker; keep the layer check
+		-- gated behind the cheap context field test.
+		if context.mp_pvp_loss and not context.blueprint and MP.is_layer_active("pvp_timer") then
 			local hands_decrease = context.mp_hands_left or 1
 			local chips_decrease = card.ability.extra.chip_mod * hands_decrease
 			if card.ability.extra.chips - chips_decrease <= 0 then

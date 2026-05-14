@@ -39,9 +39,9 @@ SMODS.Joker({
 local old_seltzer_calculate = G.P_CENTERS.j_selzer.calculate or function(self, card, context) end
 SMODS.Joker:take_ownership("j_selzer", {
 	calculate = function(self, card, context)
-		-- early return for clarity
-		if not MP.is_layer_active("pvp_timer") then return old_seltzer_calculate(self, card, context) end
-		if context.mp_pvp_loss and not context.blueprint then
+		-- calculate runs every frame on every on-screen joker; keep the layer check
+		-- gated behind the cheap context field test.
+		if context.mp_pvp_loss and not context.blueprint and MP.is_layer_active("pvp_timer") then
 			local hands_decrease = context.mp_hands_left or 1
 			if card.ability.extra - hands_decrease <= 0 then
 				SMODS.destroy_cards(card, nil, nil, true)
