@@ -23,7 +23,6 @@ MP.Ruleset({
 		"j_mp_hanging_chad",
 		"j_mp_lets_go_gambling",
 	},
-	hide_continue_button = true,
 	force_lobby_options = function(self)
 		MP.LOBBY.config.the_order = true
 		return false
