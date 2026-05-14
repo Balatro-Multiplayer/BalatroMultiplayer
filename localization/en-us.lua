@@ -1316,8 +1316,6 @@ return {
 			k_blitz = "Standard",
 			k_blitz_description = "The balanced Multiplayer ruleset.\n\nIncludes Multiplayer jokers and balance changes\nwith full control over your lobby settings.\n\n(See bans and reworks tabs for details)",
 			k_experimental = "Experimental",
-			k_experimental_no_balance = "Experimental (No Balance)",
-			k_experimental_no_balance_description = "Standard's bleeding edge.\n\nNo balance changes, only new features.\nExpect things to shift between versions.",
 			k_traditional = "Traditional",
 			k_traditional_description = "Multiplayer content without time pressure.\n\nIncludes Multiplayer jokers and balance changes,\nbut removes time-based mechanics for methodical play.\n\nTime-based jokers are banned.\nTimer is disabled.\n\n(See bans and reworks tabs for details)",
 			k_majorleague = "Major League",
