@@ -16,7 +16,9 @@ SMODS.Joker({
 		if context.repetition and context.cardarea == G.play then return {
 			repetitions = 1,
 		} end
-		if (context.after or context.mp_pvp_loss) and not context.blueprint then
+		-- after-hand path runs every blind; mp_pvp_loss only matters under pvp_timer,
+		-- so the layer check sits behind the cheap context field test.
+		if (context.after or (context.mp_pvp_loss and MP.is_layer_active("pvp_timer"))) and not context.blueprint then
 			local hands_decrease = context.mp_pvp_loss and context.mp_hands_left or 1
 			if card.ability.extra.hands_left - hands_decrease <= 0 then
 				SMODS.destroy_cards(card, nil, nil, true)
