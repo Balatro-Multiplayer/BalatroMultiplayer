@@ -5,6 +5,7 @@ MP.Layers = {}
 -- so the object file doesn't have to repeat what the layer already declared.
 MP._JOKER_LAYERS = {}
 MP._CONSUMABLE_LAYERS = {}
+MP._TAG_LAYERS = {}
 
 function MP.Layer(name, definition)
 	MP.Layers[name] = definition
@@ -18,6 +19,12 @@ function MP.Layer(name, definition)
 		for _, consumable_key in ipairs(definition.reworked_consumables) do
 			MP._CONSUMABLE_LAYERS[consumable_key] = MP._CONSUMABLE_LAYERS[consumable_key] or {}
 			table.insert(MP._CONSUMABLE_LAYERS[consumable_key], name)
+		end
+	end
+	if definition.reworked_tags then
+		for _, tag_key in ipairs(definition.reworked_tags) do
+			MP._TAG_LAYERS[tag_key] = MP._TAG_LAYERS[tag_key] or {}
+			table.insert(MP._TAG_LAYERS[tag_key], name)
 		end
 	end
 end
@@ -34,7 +41,7 @@ function MP.should_exclude_from_pool(v)
 	-- User reports they got a joker that shouldn’t exist in their ruleset.
 	-- I check, confidently. Tell them no, that’s impossible, I disabled it.
 	-- Then I read my own code.
-	if v.key and (v.key:sub(1, 5) == "j_mp_" or v.key:sub(1, 5) == "c_mp_") then return true end
+	if v.key and v.key:match("^%a+_mp_") then return true end
 	return false
 end
 
@@ -91,6 +98,24 @@ function SMODS.Consumable:register()
 	end
 	if not self.mp_include then warn_if_ungated(self.key, "consumable", "c_mp_") end
 	return _original_consumable_register(self)
+end
+
+-- Same graft for tags. Tags also flow through get_current_pool, so mp_include
+-- gates them too. The default-deny on tag_mp_* in should_exclude_from_pool means
+-- a tag must be listed in some layer's reworked_tags (or define its own
+-- mp_include) to appear in any ruleset's pool.
+local _original_tag_register = SMODS.Tag.register
+function SMODS.Tag:register()
+	if not self.mp_include and MP._TAG_LAYERS[self.key] then
+		local owning_layers = MP._TAG_LAYERS[self.key]
+		sendDebugMessage(
+			"Auto-gating " .. self.key .. " on layers: " .. table.concat(owning_layers, ", "),
+			"MULTIPLAYER"
+		)
+		self.mp_include = layer_membership_include(owning_layers)
+	end
+	if not self.mp_include then warn_if_ungated(self.key, "tag", "tag_mp_") end
+	return _original_tag_register(self)
 end
 
 -- Array-valued fields that get merged (layer base + ruleset additions)

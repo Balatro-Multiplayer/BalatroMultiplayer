@@ -20,7 +20,4 @@ SMODS.Tag({
 	unlocked = true,
 	discovered = true,
 	no_collection = MP.sandbox_no_collection,
-	in_pool = function(self)
-		return MP.is_layer_active("sandbox")
-	end,
 })
