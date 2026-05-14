@@ -17,7 +17,7 @@ SMODS.Joker({
 			repetitions = 1,
 		} end
 		if (context.after or context.mp_pvp_loss) and not context.blueprint then
-            local hands_decrease = context.mp_pvp_loss and context.mp_hands_left or 1
+			local hands_decrease = context.mp_pvp_loss and context.mp_hands_left or 1
 			if card.ability.extra.hands_left - hands_decrease <= 0 then
 				SMODS.destroy_cards(card, nil, nil, true)
 				return {
@@ -35,12 +35,14 @@ SMODS.Joker({
 	end,
 })
 
-
+-- Under pvp_timer, losing the round to the clock drinks vanilla seltzer by the number of unused hands.
 local old_seltzer_calculate = G.P_CENTERS.j_selzer.calculate or function(self, card, context) end
 SMODS.Joker:take_ownership("j_selzer", {
-    calculate = function(self, card, context)
-        if context.mp_pvp_loss and not context.blueprint then
-            local hands_decrease = context.mp_hands_left or 1
+	calculate = function(self, card, context)
+		-- early return for clarity
+		if not MP.is_layer_active("pvp_timer") then return old_seltzer_calculate(self, card, context) end
+		if context.mp_pvp_loss and not context.blueprint then
+			local hands_decrease = context.mp_hands_left or 1
 			if card.ability.extra - hands_decrease <= 0 then
 				SMODS.destroy_cards(card, nil, nil, true)
 				return {
@@ -55,6 +57,6 @@ SMODS.Joker:take_ownership("j_selzer", {
 				}
 			end
 		end
-        return old_seltzer_calculate(self, card, context)
-    end,
+		return old_seltzer_calculate(self, card, context)
+	end,
 }, true)
