@@ -74,12 +74,18 @@ local skip_blind_ref = G.FUNCS.skip_blind
 G.FUNCS.skip_blind = function(e)
 	skip_blind_ref(e)
 	if MP.LOBBY.code then
-		-- pressure_timer applies pressure throughout the round, so skipping must not buy time.
-		if not (MP.is_layer_active("pressure_timer"))
+		-- Old timer: add time from skipping to own timer when not timered and not timering
+		if
+            MP.LOBBY.config.timer
 			and not MP.GAME.timer_started
-			and (MP.LOBBY.config.timer_increment_seconds or 0) > 0 then
-			MP.GAME.timer = MP.GAME.timer + MP.LOBBY.config.timer_increment_seconds
+			and not MP.GAME.nemesis_timer_started
+            and not MP.GAME.timer_consumed
+            and not MP.is_any_layer_active({ "no_animation_timer", "pressure_timer" })
+			and (MP.LOBBY.config.timer_increment_seconds or 0) > 0
+        then
+            MP.UI.restore_timer(MP.LOBBY.config.timer_increment_seconds)
 		end
+
 		MP.ACTIONS.skip(G.GAME.skips)
 
 		--Update the furthest blind

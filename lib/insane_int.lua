@@ -51,6 +51,7 @@ end
 -- This doesn't really fit with the comment at the top,
 -- but I needed a way to compare highscores without storing this value seperately for no reason
 MP.INSANE_INT.greater_than = function(insane_int_display1, insane_int_display2)
+    if not insane_int_display1 or not insane_int_display2 then return false end
 	if insane_int_display1.e_count ~= insane_int_display2.e_count then
 		return tonumber(insane_int_display1.e_count) > tonumber(insane_int_display2.e_count)
 	end
@@ -60,6 +61,14 @@ MP.INSANE_INT.greater_than = function(insane_int_display1, insane_int_display2)
 	end
 
 	return tonumber(insane_int_display1.coeffiocient) > tonumber(insane_int_display2.coeffiocient)
+end
+
+MP.INSANE_INT.equal = function(insane_int_display1, insane_int_display2)
+    if not insane_int_display1 or not insane_int_display2 then return false end
+	if insane_int_display1.e_count ~= insane_int_display2.e_count then return false end
+	if insane_int_display1.exponent ~= insane_int_display2.exponent then return false end
+	if insane_int_display1.coeffiocient ~= insane_int_display2.coeffiocient then return false end
+    return true
 end
 
 -- ignore deprected warning for math.pow
