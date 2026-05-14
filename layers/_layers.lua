@@ -32,6 +32,34 @@ local function layer_membership_include(owning_layers)
 	end
 end
 
+function MP.should_exclude_from_pool(v)
+	if v.mp_include and type(v.mp_include) == "function" then return not v:mp_include() end
+	-- User reports they got a joker that shouldn’t exist in their ruleset.
+	-- I check, confidently. Tell them no, that’s impossible, I disabled it.
+	-- Then I read my own code.
+	if v.key and (v.key:sub(1, 5) == "j_mp_" or v.key:sub(1, 5) == "c_mp_") then return true end
+	return false
+end
+
+-- After auto-gating, we warn if an MP-prefixed card still has no mp_include and
+-- isn't in any reworked_jokers list.
+local function warn_if_ungated(key, kind, prefix)
+	if key and key:sub(1, #prefix) == prefix then
+		sendDebugMessage(
+			"WARNING: "
+				.. kind
+				.. " "
+				.. key
+				.. " has no mp_include and is not in any reworked list. "
+				.. "Under default-deny it will be excluded from every ruleset's pool. "
+				.. "Either add the key to a layer/ruleset's reworked_"
+				.. kind
+				.. "s, or define an explicit mp_include.",
+			"MULTIPLAYER"
+		)
+	end
+end
+
 -- A small graft on SMODS.Joker:register. Any joker whose full key appears in some
 -- layer's reworked_jokers gets a default mp_include stitched on when none is
 -- provided. By the time register runs the key is already prefixed, so we can look
@@ -47,6 +75,7 @@ function SMODS.Joker:register()
 		)
 		self.mp_include = layer_membership_include(owning_layers)
 	end
+	if not self.mp_include then warn_if_ungated(self.key, "joker", "j_mp_") end
 	return _original_joker_register(self)
 end
 
@@ -63,6 +92,7 @@ function SMODS.Consumable:register()
 		)
 		self.mp_include = layer_membership_include(owning_layers)
 	end
+	if not self.mp_include then warn_if_ungated(self.key, "consumable", "c_mp_") end
 	return _original_consumable_register(self)
 end
 
