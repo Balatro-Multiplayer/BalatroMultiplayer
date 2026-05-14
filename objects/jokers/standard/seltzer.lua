@@ -16,15 +16,16 @@ SMODS.Joker({
 		if context.repetition and context.cardarea == G.play then return {
 			repetitions = 1,
 		} end
-		if context.after and not context.blueprint then
-			if card.ability.extra.hands_left - 1 <= 0 then
+		if (context.after or context.mp_pvp_loss) and not context.blueprint then
+            local hands_decrease = context.mp_pvp_loss and context.mp_hands_left or 1
+			if card.ability.extra.hands_left - hands_decrease <= 0 then
 				SMODS.destroy_cards(card, nil, nil, true)
 				return {
 					message = localize("k_drank_ex"),
 					colour = G.C.FILTER,
 				}
 			else
-				card.ability.extra.hands_left = card.ability.extra.hands_left - 1
+				card.ability.extra.hands_left = card.ability.extra.hands_left - hands_decrease
 				return {
 					message = card.ability.extra.hands_left .. "",
 					colour = G.C.FILTER,
@@ -33,3 +34,27 @@ SMODS.Joker({
 		end
 	end,
 })
+
+
+local old_seltzer_calculate = G.P_CENTERS.j_selzer.calculate or function(self, card, context) end
+SMODS.Joker:take_ownership("j_selzer", {
+    calculate = function(self, card, context)
+        if context.mp_pvp_loss and not context.blueprint then
+            local hands_decrease = context.mp_hands_left or 1
+			if card.ability.extra - hands_decrease <= 0 then
+				SMODS.destroy_cards(card, nil, nil, true)
+				return {
+					message = localize("k_drank_ex"),
+					colour = G.C.FILTER,
+				}
+			else
+				card.ability.extra = card.ability.extra - hands_decrease
+				return {
+					message = card.ability.extra .. "",
+					colour = G.C.FILTER,
+				}
+			end
+		end
+        return old_seltzer_calculate(self, card, context)
+    end,
+}, true)

@@ -8,3 +8,7 @@ MP.Layer("pressure_timer", {
     timer_speedup_multiplier = 2,
     timer_base_multiplier = 2,
 })
+
+MP.Layer("pressure_timer_plus", {
+    timer_hand_played_increment_seconds = 15
+})

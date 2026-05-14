@@ -26,7 +26,7 @@ function FN.PRE.start_new_coroutine()
     -- Defaults are vanilla: free preview, slow (5s) delay.
     -- Layers like pressure_timer set both via ruleset scalars.
     local timer_delay, timer_cost = 0, 0
-    if MP.LOBBY and MP.LOBBY.code and not MP.is_pvp_boss() then
+    if MP.LOBBY and MP.LOBBY.code and MP.LOBBY.config.timer and not MP.is_pvp_boss() then
         timer_delay = 5
         timer_cost = 0
 
@@ -50,6 +50,10 @@ function FN.PRE.start_new_coroutine()
                 timer_cost > 0
                 and FN.PRE.data and not FN.PRE.data.empty
                 and MP.LOBBY.code and not MP.is_pvp_boss()
+                and MP.LOBBY.config.timer
+                and not MP.GAME.timer_started
+                and not MP.GAME.nemesis_timer_started
+                and not MP.GAME.timer_consumed
             then
                 MP.UI.consume_timer(timer_cost, nil, math.max(10, timer_cost))
             end

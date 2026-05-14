@@ -6,8 +6,20 @@ end
 -- (set by layers like pressure_timer). The multiplier is applied at timer-init sites,
 -- so the lobby UI keeps showing the unmultiplied base.
 function MP.UTILS.timer_base()
-	local base = MP.LOBBY.config.timer_base_seconds or 150
-	local mult = MP.current_ruleset and MP.current_ruleset().timer_base_multiplier or 1
+    local ruleset = MP.current_ruleset()
+	local base = MP.LOBBY.config.timer_base_seconds or ruleset.timer_base_seconds or 150
+	local mult = ruleset.timer_base_multiplier or 1
+	return base * mult
+end
+
+-- Base PvP timer in seconds, accounting for the active ruleset's pvp_timer_base_multiplier
+-- (set by layers like pvp_timer). The multiplier is applied at timer-init sites,
+-- so the lobby UI keeps showing the unmultiplied base.
+function MP.UTILS.pvp_timer_base()
+    if not MP.is_layer_active("pvp_timer") then return MP.UTILS.timer_base() end
+    local ruleset = MP.current_ruleset()
+	local base = MP.LOBBY.config.pvp_timer_base_seconds or ruleset.pvp_timer_base_seconds or 90
+	local mult = ruleset.pvp_timer_base_multiplier or 1
 	return base * mult
 end
 
