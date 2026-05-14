@@ -227,8 +227,8 @@ Registration stores properties as `mp_<layer>_<prop>` on the center. `MP.LoadRew
 
 ### Wiring: when the layer entry is enough vs. when you need more
 
-- **Path A jokers / consumables** (`reworked_jokers`, `reworked_consumables`): the layer entry *does* drive runtime gating — auto-mp_include kicks in. You still write the `SMODS.Joker`/`SMODS.Consumable` definition and the `banned_silent` entry for the vanilla version, but no manual `mp_include` is needed for layer-only gates.
-- **Path B centers** (`reworked_enhancements`, `reworked_vouchers`, `reworked_tags`, `reworked_blinds`): the layer entry is **display metadata only**. Runtime patching needs a separate `MP.ReworkCenter(key, { layers = "..." })` call. Auto-gating doesn't apply because Path B doesn't go through `register`.
+- **Path A jokers / consumables / tags** (`reworked_jokers`, `reworked_consumables`, `reworked_tags`): the layer entry *does* drive runtime gating — auto-mp_include kicks in. You still write the `SMODS.Joker`/`SMODS.Consumable`/`SMODS.Tag` definition and the `banned_silent` entry for the vanilla version (if reskinning one), but no manual `mp_include` or `in_pool` is needed for layer-only gates. `tag_mp_*` is default-deny: a tag must be listed in some layer's `reworked_tags` (or define its own `mp_include`) to appear anywhere.
+- **Path B centers** (`reworked_enhancements`, `reworked_vouchers`, `reworked_blinds`): the layer entry is **display metadata only**. Runtime patching needs a separate `MP.ReworkCenter(key, { layers = "..." })` call. Auto-gating doesn't apply because Path B doesn't go through `register`.
 
 ### Ruleset Details
 
