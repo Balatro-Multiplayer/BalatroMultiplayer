@@ -23,6 +23,14 @@ function MP.UTILS.pvp_timer_base()
 	return base * mult
 end
 
+-- True when an active layer is driving the timer locally (not server-synced).
+-- pvp_timer only counts during a PvP boss; outside PvP it's dormant.
+function MP.timer_is_local()
+	return MP.is_layer_active("pressure_timer")
+		or MP.is_layer_active("no_animation_timer")
+		or (MP.is_pvp_boss() and MP.is_layer_active("pvp_timer"))
+end
+
 function MP.UTILS.is_weekly(arg)
 	return MP.UTILS.get_weekly() == arg and MP.LOBBY.config.ruleset == "ruleset_mp_weekly"
 end

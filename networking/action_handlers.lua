@@ -890,10 +890,8 @@ local function action_start_ante_timer(time, from_nemesis)
 			}))
 		end
 	end
-	-- Old timer: sync timers between players
-	if
-		not MP.is_any_layer_active({ "pressure_timer", "no_animation_timer", MP.is_pvp_boss() and "pvp_timer" or nil })
-	then
+	-- Default timer is server-synced; pressure/no-anim/pvp timers run locally.
+	if not MP.timer_is_local() then
 		if type(time) == "string" then time = tonumber(time) end
 		if time then MP.GAME.timer = time end
 	end
@@ -905,10 +903,8 @@ local function action_start_ante_timer(time, from_nemesis)
 end
 
 local function action_pause_ante_timer(time, from_nemesis)
-	-- Old timer: sync timers between players
-	if
-		not MP.is_any_layer_active({ "pressure_timer", "no_animation_timer", MP.is_pvp_boss() and "pvp_timer" or nil })
-	then
+	-- Default timer is server-synced; pressure/no-anim/pvp timers run locally.
+	if not MP.timer_is_local() then
 		if type(time) == "string" then time = tonumber(time) end
 		if time then MP.GAME.timer = time end
 	end
