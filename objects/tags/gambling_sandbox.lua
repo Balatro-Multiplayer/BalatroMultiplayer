@@ -13,9 +13,6 @@ SMODS.Tag({
 	dependencies = {
 		items = {},
 	},
-	in_pool = function(self)
-		return MP.is_layer_active("sandbox")
-	end,
 	name = "Gambling Tag",
 	discovered = true,
 	min_ante = 2, -- less degeneracy

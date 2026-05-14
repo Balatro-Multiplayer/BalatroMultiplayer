@@ -42,6 +42,7 @@ SMODS = {
 	-- have a :register() method; the layer code stores the original and wraps it.
 	Joker = { register = function(self) return self end },
 	Consumable = { register = function(self) return self end },
+	Tag = { register = function(self) return self end },
 }
 
 function sendDebugMessage() end
