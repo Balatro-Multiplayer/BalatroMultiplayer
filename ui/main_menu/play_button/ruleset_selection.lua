@@ -245,12 +245,7 @@ function G.UIDEF.ruleset_info(ruleset_name, mode)
 		}
 	end
 
-	if (mode == "mp" or mode == "practice") then
-		local modifiers_row = MP.UI.build_modifier_row(ruleset, mode)
-		if modifiers_row then content_nodes[#content_nodes + 1] = modifiers_row end
-	end
-
-	content_nodes[#content_nodes + 1] = MP.UI.get_continue_button(ruleset, mode)
+	content_nodes[#content_nodes + 1] = MP.UI.build_action_row(ruleset, mode)
 
 	return {
 		n = G.UIT.ROOT,
@@ -673,10 +668,28 @@ function G.UIDEF.ruleset_cardarea_definition(args)
 	end
 end
 
-function MP.UI.build_modifier_row(ruleset, mode)
+function MP.UI.build_modifier_button(ruleset, mode)
 	if ruleset.forced_lobby_options then return nil end
 	if type(ruleset.get_modifiers_ui) == "function" then return ruleset:get_modifiers_ui(mode) end
-	return G.UIDEF.mp_modifiers_button_row(ruleset, mode)
+	return MP.UI.Disableable_Button({
+		button = "mp_open_modifiers_overlay",
+		align = "cm",
+		padding = 0.05,
+		r = 0.1,
+		minw = 3.5,
+		minh = 0.8,
+		colour = G.C.ORANGE,
+		hover = true,
+		shadow = true,
+		label = { "Modifiers..." },
+		scale = 0.4,
+		enabled_ref_table = { val = true },
+		enabled_ref_value = "val",
+		ref_table = {
+			ruleset = ruleset,
+			mode = mode,
+		},
+	})
 end
 
 function MP.UI.get_continue_button(ruleset, mode)
@@ -704,27 +717,38 @@ function MP.UI.get_continue_button(ruleset, mode)
 			colour = G.C.BLUE,
 		}
 	end
-	return {
-		n = G.UIT.R,
-		config = { align = "cm" },
-		nodes = {
-			MP.UI.Disableable_Button({
-				id = button_config.id,
-				button = button_config.button,
-				align = "cm",
-				padding = 0.05,
-				r = 0.1,
-				minw = 8,
-				minh = 0.8,
-				colour = button_config.colour,
-				hover = true,
-				shadow = true,
-				label = button_config.label,
-				scale = 0.5,
-				enabled_ref_table = { val = not ruleset_disabled },
-				enabled_ref_value = "val",
-				disabled_text = { ruleset_disabled },
-			}),
-		},
-	}
+	return MP.UI.Disableable_Button({
+		id = button_config.id,
+		button = button_config.button,
+		align = "cm",
+		padding = 0.05,
+		r = 0.1,
+		minw = 5,
+		minh = 0.8,
+		colour = button_config.colour,
+		hover = true,
+		shadow = true,
+		label = button_config.label,
+		scale = 0.5,
+		enabled_ref_table = { val = not ruleset_disabled },
+		enabled_ref_value = "val",
+		disabled_text = { ruleset_disabled },
+	})
+end
+
+function MP.UI.build_action_row(ruleset, mode)
+	local columns = {}
+	local function add_col(button)
+		columns[#columns + 1] = {
+			n = G.UIT.C,
+			config = { align = "cm", padding = 0.05 },
+			nodes = { button },
+		}
+	end
+	if mode == "mp" or mode == "practice" then
+		local modifier_btn = MP.UI.build_modifier_button(ruleset, mode)
+		if modifier_btn then add_col(modifier_btn) end
+	end
+	add_col(MP.UI.get_continue_button(ruleset, mode))
+	return { n = G.UIT.R, config = { align = "cm" }, nodes = columns }
 end

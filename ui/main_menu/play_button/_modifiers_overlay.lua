@@ -120,38 +120,16 @@ G.FUNCS.mp_open_modifiers_overlay = function(e)
 							},
 						},
 						{ n = G.UIT.R },
-						MP.UI.get_continue_button(e.config.ref_table.ruleset, e.config.ref_table.mode),
+						{
+							n = G.UIT.R,
+							config = { align = "cm" },
+							nodes = {
+								MP.UI.get_continue_button(e.config.ref_table.ruleset, e.config.ref_table.mode),
+							},
+						},
 					},
 				},
 			},
 		}),
 	})
-end
-
-G.UIDEF.mp_modifiers_button_row = function(ruleset, mode)
-	return {
-		n = G.UIT.R,
-		config = { align = "cm" },
-		nodes = {
-			MP.UI.Disableable_Button({
-				button = "mp_open_modifiers_overlay",
-				align = "cm",
-				padding = 0.05,
-				r = 0.1,
-				minw = 8,
-				minh = 0.8,
-				colour = G.C.ORANGE,
-				hover = true,
-				shadow = true,
-				label = { "Modifiers" },
-				scale = 0.5,
-				enabled_ref_table = { val = true },
-				enabled_ref_value = "val",
-				ref_table = {
-					ruleset = ruleset,
-					mode = mode,
-				},
-			}),
-		},
-	}
 end
