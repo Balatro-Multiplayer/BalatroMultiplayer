@@ -53,7 +53,7 @@ local rulesets_tabs = {
 			},
 		},
 		{
-			name = "k_mp_ruleset_tab_torunaments",
+			name = "k_mp_ruleset_tab_tournaments",
 			data = {
 				{
 					name = "k_tournament",
@@ -79,6 +79,7 @@ local rulesets_tabs = {
 					name = "k_experimental",
 					buttons = {
 						{ button_id = "experimental_ruleset_button", button_localize_key = "k_experimental_standard" },
+						{ button_id = "experimental_no_balance_ruleset_button", button_localize_key = "k_experimental_no_balance" },
 						{ button_id = "experimental_legacy_ruleset_button", button_localize_key = "k_experimental_legacy" },
 					},
 				},
@@ -193,33 +194,6 @@ function G.UIDEF.ruleset_info(ruleset_name, mode)
 		config = { align = "cm" },
 	})
 
-	local ruleset_disabled = ruleset.is_disabled()
-
-	-- Different button config for SP vs MP vs Practice
-	local button_config
-	if mode == "sp" then
-		button_config = {
-			id = "start_sp_button",
-			button = "start_sp_run",
-			label = { localize("b_play_cap") },
-			colour = G.C.GREEN,
-		}
-	elseif mode == "practice" then
-		button_config = {
-			id = "start_practice_button",
-			button = "start_practice_run",
-			label = { localize("b_play_cap") },
-			colour = G.C.GREEN,
-		}
-	else
-		button_config = {
-			id = "select_gamemode_button",
-			button = ruleset.forced_gamemode and "force_" .. ruleset.forced_gamemode or "select_gamemode",
-			label = { ruleset.forced_gamemode and localize("b_create_lobby") or localize("b_next") },
-			colour = G.C.BLUE,
-		}
-	end
-
 	local content_nodes = {
 		{
 			n = G.UIT.R,
@@ -272,31 +246,14 @@ function G.UIDEF.ruleset_info(ruleset_name, mode)
 		}
 	end
 
-	local show_modifiers = (mode == "mp" or mode == "practice") and not ruleset.forced_lobby_options
-	if show_modifiers then content_nodes[#content_nodes + 1] = MP.UI.build_modifier_row() end
-	content_nodes[#content_nodes + 1] = {
-		n = G.UIT.R,
-		config = { align = "cm" },
-		nodes = {
-			MP.UI.Disableable_Button({
-				id = button_config.id,
-				button = button_config.button,
-				align = "cm",
-				padding = 0.05,
-				r = 0.1,
-				minw = 8,
-				minh = 0.8,
-				colour = button_config.colour,
-				hover = true,
-				shadow = true,
-				label = button_config.label,
-				scale = 0.5,
-				enabled_ref_table = { val = not ruleset_disabled },
-				enabled_ref_value = "val",
-				disabled_text = { ruleset_disabled },
-			}),
-		},
-	}
+	if (mode == "mp" or mode == "practice") then
+		local modifiers_row = MP.UI.build_modifier_row(ruleset, mode)
+		if modifiers_row then content_nodes[#content_nodes + 1] = modifiers_row end
+	end
+
+	if not ruleset.hide_continue_button then
+		content_nodes[#content_nodes + 1] = MP.UI.get_continue_button(ruleset, mode)
+	end
 
 	return {
 		n = G.UIT.ROOT,
@@ -719,60 +676,56 @@ function G.UIDEF.ruleset_cardarea_definition(args)
 	end
 end
 
--- Modifier toggles render inline inside the ruleset info panel. The handlers
--- write MP.MODIFIERS directly (no network) — the host's lobby_options push at
--- start_lobby carries the serialized list to the guest.
-local function timer_modifier_to_index()
-	if MP.has_modifier("no_animation_timer") then return 2 end
-	if MP.has_modifier("pressure_timer") then return 3 end
-	return 1
+function MP.UI.build_modifier_row(ruleset, mode)
+	if type(ruleset.get_modifiers_ui) == "function" then return ruleset:get_modifiers_ui(mode) end
 end
 
--- Indices line up with localization ml_mp_modifier_timer_opt: 1=default, 2=no_anim, 3=pressure
-G.FUNCS.change_modifier_timer = function(args)
-	MP.remove_modifier("no_animation_timer")
-	MP.remove_modifier("pressure_timer")
-	if args.to_key == 2 then
-		MP.add_modifier("no_animation_timer")
-	elseif args.to_key == 3 then
-		MP.add_modifier("pressure_timer")
+function MP.UI.get_continue_button(ruleset, mode)
+	local ruleset_disabled = ruleset.is_disabled()
+	local button_config
+	if mode == "sp" then
+		button_config = {
+			id = "start_sp_button",
+			button = "start_sp_run",
+			label = { localize("b_play_cap") },
+			colour = G.C.GREEN,
+		}
+	elseif mode == "practice" then
+		button_config = {
+			id = "start_practice_button",
+			button = "start_practice_run",
+			label = { localize("b_play_cap") },
+			colour = G.C.GREEN,
+		}
+	else
+		button_config = {
+			id = "select_gamemode_button",
+			button = ruleset.forced_gamemode and "force_" .. ruleset.forced_gamemode or "select_gamemode",
+			label = { ruleset.forced_gamemode and localize("b_create_lobby") or localize("b_next") },
+			colour = G.C.BLUE,
+		}
 	end
-end
-
-function MP.UI.build_modifier_row()
-	local timer_cycle = MP.UI.Disableable_Option_Cycle({
-		id = "modifier_timer_option",
-		enabled_ref_table = { val = true },
-		enabled_ref_value = "val",
-		label = localize("k_opts_modifier_timer"),
-		scale = 0.6,
-		options = localize("ml_mp_modifier_timer_opt"),
-		current_option = timer_modifier_to_index(),
-		opt_callback = "change_modifier_timer",
-	})
-
-	local smallworld_proxy = { val = MP.has_modifier("smallworld") }
-	local smallworld_toggle = create_toggle({
-		id = "modifier_smallworld_toggle",
-		label = localize("b_opts_modifier_smallworld"),
-		ref_table = smallworld_proxy,
-		ref_value = "val",
-		callback = function(new_val)
-			if new_val then
-				MP.add_modifier("smallworld")
-			else
-				MP.remove_modifier("smallworld")
-			end
-		end,
-	})
-
 	return {
 		n = G.UIT.R,
-		config = { align = "cm", padding = 0.05 },
+		config = { align = "cm" },
 		nodes = {
-			timer_cycle,
-			{ n = G.UIT.B, config = { w = 0.4, h = 0.1 } },
-			smallworld_toggle,
+			MP.UI.Disableable_Button({
+				id = button_config.id,
+				button = button_config.button,
+				align = "cm",
+				padding = 0.05,
+				r = 0.1,
+				minw = 8,
+				minh = 0.8,
+				colour = button_config.colour,
+				hover = true,
+				shadow = true,
+				label = button_config.label,
+				scale = 0.5,
+				enabled_ref_table = { val = not ruleset_disabled },
+				enabled_ref_value = "val",
+				disabled_text = { ruleset_disabled },
+			}),
 		},
 	}
 end
