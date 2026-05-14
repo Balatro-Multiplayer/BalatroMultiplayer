@@ -6,5 +6,4 @@ MP.Ruleset({
 		MP.LOBBY.config.the_order = true
 		return false
 	end,
-	hide_continue_button = true,
 }):inject()
