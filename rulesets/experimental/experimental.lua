@@ -7,7 +7,4 @@ MP.Ruleset({
 		return false
 	end,
 	hide_continue_button = true,
-	get_modifiers_ui = function(self, mode)
-		return G.UIDEF.mp_experimental_modifiers_ui(self, mode)
-	end,
 }):inject()

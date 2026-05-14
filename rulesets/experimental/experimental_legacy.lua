@@ -24,9 +24,6 @@ MP.Ruleset({
 		"j_mp_lets_go_gambling",
 	},
 	hide_continue_button = true,
-	get_modifiers_ui = function(self, mode)
-		return G.UIDEF.mp_experimental_modifiers_ui(self, mode)
-	end,
 	force_lobby_options = function(self)
 		MP.LOBBY.config.the_order = true
 		return false
