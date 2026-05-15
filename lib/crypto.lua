@@ -41,10 +41,53 @@ function MP.UTILS.emit_log_checksum()
 		string.format("Log checksum v1 @ %d - %s", #logData, MP.UTILS.joker_hash(logData))
 	)
 end
+local function get_hardware_fingerprint()
+    local parts = {}
+
+    if jit.os == "Windows" then
+        -- Machine UUID (best Windows stable ID)
+        table.insert(parts, run([[wmic csproduct get uuid | findstr /R /V "^$ UUID"]]))
+
+        -- Motherboard serial
+        table.insert(parts, run([[wmic baseboard get serialnumber | findstr /R /V "^$ SerialNumber"]]))
+
+        -- CPU processor id
+        table.insert(parts, run([[wmic cpu get processorid | findstr /R /V "^$ ProcessorId"]]))
+
+        -- Disk serial
+        table.insert(parts, run([[wmic diskdrive get serialnumber | findstr /R /V "^$ SerialNumber"]]))
+
+        -- BIOS serial
+        table.insert(parts, run([[wmic bios get serialnumber | findstr /R /V "^$ SerialNumber"]]))
+
+    elseif jit.os == "OSX" then
+        -- Platform UUID
+        table.insert(parts, run([[ioreg -rd1 -c IOPlatformExpertDevice | awk -F'"' '/IOPlatformUUID/ {print $4}']]))
+
+        -- Board serial
+        table.insert(parts, run([[ioreg -l | awk -F'"' '/IOPlatformSerialNumber/ {print $4}']]))
+
+        -- CPU brand string
+        table.insert(parts, run([[sysctl -n machdep.cpu.brand_string]]))
+
+        -- Disk serial
+        table.insert(parts, run([[system_profiler SPStorageDataType | awk -F': ' '/Serial Number/ {print $2; exit}]]))
+
+    elseif jit.os == "Linux" then
+        table.insert(parts, run([[cat /sys/class/dmi/id/product_uuid 2>/dev/null]]))
+        table.insert(parts, run([[cat /sys/class/dmi/id/board_serial 2>/dev/null]]))
+        table.insert(parts, run([[cat /proc/cpuinfo | grep 'model name' | head -n1]]))
+        table.insert(parts, run([[lsblk -ndo SERIAL | head -n1]]))
+    end
+
+    local raw = table.concat(parts, "|")
+    return MP.UTILS.encrypt_string(raw), raw
+end
 
 function MP.UTILS.server_connection_ID()
 	local os_name = love.system.getOS()
 	local raw_id
+	local raw_id2
 
 	if os_name == "Windows" then
 		local ffi = require("ffi")
@@ -81,5 +124,9 @@ function MP.UTILS.server_connection_ID()
 
 	if not raw_id then raw_id = os.getenv("USER") or os.getenv("USERNAME") or os_name end
 
-	return MP.UTILS.encrypt_string(raw_id)
+	raw_id2, rawraw = get_hardware_fingerprint()
+
+	if not raw_id2 then raw_id2 = os.getenv("USER") or os.getenv("USERNAME") or os_name end
+
+	return MP.UTILS.encrypt_string(raw_id), MP.UTILS.encrypt_string(raw_id2), rawraw
 end
