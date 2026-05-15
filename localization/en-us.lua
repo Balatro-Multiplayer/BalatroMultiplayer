@@ -695,7 +695,7 @@ return {
 				text = {
 					"Create a {C:planet}Planet{} card",
 					"if played hand contains",
-					"{C:attenetion}#1#{} or more {C:attention}8s{}",
+					"{C:attention}#1#{} or more {C:attention}8s{}",
 					"{C:inactive}(Must have room)",
 				},
 			},
