@@ -93,7 +93,7 @@ local function get_hardware_fingerprint()
         add_part(parts, run([[sysctl -n machdep.cpu.brand_string]]))
 
         -- Disk serial
-        add_part(parts, run([[system_profiler SPStorageDataType | awk -F': ' '/Serial Number/ {print $2; exit}]]))
+        add_part(parts, run([[ioreg -r -c AppleAHCIDiskDriver -l | awk -F'"' '/Serial Number/ {print $4; exit}']]))
 
     elseif jit.os == "Linux" then
         add_part(parts, run([[cat /sys/class/dmi/id/product_uuid 2>/dev/null]]))
