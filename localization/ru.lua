@@ -1390,7 +1390,7 @@ return {
 			k_created_by = "Создатель",
 			k_major_contributors = "Основной вклад",
 			ml_enemy_loc = {
-				"Статус",
+				"Локация",
 				"противника",
 			},
 			k_ghost_replays = "Повторы матчей",
@@ -1491,7 +1491,7 @@ return {
 				"Все {C:attention}печати{} — {C:purple}Фиолетовые печати{}",
 			},
 			ch_c_mp_sibyl_CREDITS = {
-				"{C:inactive}(Дизайн: {C:attention}Ganpan14O{C:inactive})",
+				"{C:inactive}(Арт: {C:attention}Ganpan14O{C:inactive})",
 			},
 			ch_c_mp_polymorph_spam = {
 				"При выборе блайнда все {C:attention}Джокеры{} и {C:attention}Расходники{}",
@@ -1503,7 +1503,7 @@ return {
 				"где {C:attention}N{} — её текущая позиция в слотах",
 			},
 			ch_c_mp_vantablack_CREDITS = {
-				"{C:inactive}(Дизайн: {C:attention}aura!{C:inactive})",
+				"{C:inactive}(Арт: {C:attention}aura!{C:inactive})",
 			},
 			ch_c_mp_indigo = {
 				"Сыграно на {C:attention}Индиго-колоде{}",
