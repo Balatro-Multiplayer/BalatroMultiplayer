@@ -62,7 +62,6 @@ MP.PREVIEW = {
 }
 
 MP.EXPERIMENTAL = {
-	use_new_networking = true,
 	show_sandbox_collection = false,
 	alt_stakes = false,
 	suppress_dev_warning = false,
@@ -291,8 +290,7 @@ SMODS.Atlas({
 
 MP.load_mp_dir("compatibility")
 
-local networking_dir = MP.EXPERIMENTAL.use_new_networking and "networking" or "networking-old"
-MP.load_mp_file(networking_dir .. "/action_handlers.lua")
+MP.load_mp_file("networking/action_handlers.lua")
 
 MP.load_mp_dir("gamemodes")
 MP.load_mp_dir("layers")
@@ -321,7 +319,7 @@ MP.load_mp_dir("objects/consumables/sandbox")
 MP.load_mp_dir("objects/boosters")
 MP.load_mp_dir("objects/challenges")
 
-local SOCKET = MP.load_mp_file(networking_dir .. "/socket.lua")
+local SOCKET = MP.load_mp_file("networking/socket.lua")
 MP.NETWORKING_THREAD = love.thread.newThread(SOCKET)
 MP.NETWORKING_THREAD:start(SMODS.Mods["Multiplayer"].config.server_url, SMODS.Mods["Multiplayer"].config.server_port)
 MP.ACTIONS.connect()
