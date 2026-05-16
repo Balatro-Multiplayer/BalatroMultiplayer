@@ -1265,6 +1265,62 @@ end
 
 local last_game_seed = nil
 
+local HANDLERS = {
+	connected = function(p) action_connected() end,
+	version = function(p) action_version() end,
+	disconnected = function(p) action_disconnected() end,
+	reconnecting = function(p) action_reconnecting() end,
+	joinedLobby = function(p) action_joinedLobby(p.code, p.type, p.reconnectToken) end,
+	rejoinedLobby = function(p) action_rejoinedLobby(p.code, p.type, p.reconnectToken) end,
+	enemyDisconnected = function(p) action_enemyDisconnected(p.timeout) end,
+	enemyReconnected = function(p) action_enemyReconnected() end,
+	lobbyInfo = function(p)
+		action_lobbyInfo(
+			p.host, p.hostHash, p.hostCached,
+			p.guest, p.guestHash, p.guestCached, p.guestReady,
+			p.isHost
+		)
+	end,
+	startGame = function(p) action_start_game(p.seed, p.stake) end,
+	startBlind = function(p) action_start_blind(p.firstPlayer) end,
+	enemyInfo = function(p) action_enemy_info(p.score, p.handsLeft, p.skips, p.lives) end,
+	stopGame = function(p) action_stop_game() end,
+	endPvP = function(p) action_end_pvp(p.lost, p.pvpTimerLost) end,
+	playerInfo = function(p) action_player_info(p.lives) end,
+	winGame = function(p) action_win_game() end,
+	loseGame = function(p) action_lose_game() end,
+	lobbyOptions = function(p) action_lobby_options(p) end,
+	enemyLocation = function(p) enemyLocation(p) end,
+	sendPhantom = function(p) action_send_phantom(p.key) end,
+	removePhantom = function(p) action_remove_phantom(p.key) end,
+	speedrun = function(p) action_speedrun() end,
+	asteroid = function(p) action_asteroid() end,
+	soldJoker = function(p) action_sold_joker() end,
+	letsGoGamblingNemesis = function(p) action_lets_go_gambling_nemesis() end,
+	eatPizza = function(p) action_eat_pizza(p.whole) end, -- rename to "discards" when possible
+	spentLastShop = function(p) action_spent_last_shop(p.amount) end,
+	magnet = function(p) action_magnet() end,
+	magnetResponse = function(p) action_magnet_response(p.key) end,
+	getEndGameJokers = function(p) action_get_end_game_jokers() end,
+	receiveEndGameJokers = function(p) action_receive_end_game_jokers(p.keys) end,
+	getNemesisDeck = function(p) action_get_nemesis_deck() end,
+	receiveNemesisDeck = function(p) action_receive_nemesis_deck(p.cards) end,
+	endGameStatsRequested = function(p) action_send_game_stats() end,
+	nemesisEndGameStats = function(p) end, -- logged only, no handler
+	startAnteTimer = function(p) action_start_ante_timer(p.time, true) end,
+	pauseAnteTimer = function(p) action_pause_ante_timer(p.time, true) end,
+	jimboAppear = function(p) action_jimbo_appear(p.pos, p.text) end,
+	jimboTalk = function(p) action_jimbo_talk(p.text) end,
+	jimboMove = function(p) action_jimbo_move(p.pos) end,
+	jimboRemove = function(p) action_jimbo_remove() end,
+	moddedAction = function(p)
+		local registry = MP.MOD_ACTIONS[p.modId]
+		if registry and registry[p.modAction] then registry[p.modAction](p) end
+	end,
+	error = function(p) action_error(p.message) end,
+	keepAlive = function(p) action_keep_alive() end,
+}
+
 local game_update_ref = Game.update
 ---@diagnostic disable-next-line: duplicate-set-field
 function Game:update(dt)
@@ -1306,105 +1362,8 @@ function Game:update(dt)
 				sendTraceMessage(log, "MULTIPLAYER")
 			end
 
-			if parsedAction.action == "connected" then
-				action_connected()
-			elseif parsedAction.action == "version" then
-				action_version()
-			elseif parsedAction.action == "disconnected" then
-				action_disconnected()
-			elseif parsedAction.action == "reconnecting" then
-				action_reconnecting()
-			elseif parsedAction.action == "joinedLobby" then
-				action_joinedLobby(parsedAction.code, parsedAction.type, parsedAction.reconnectToken)
-			elseif parsedAction.action == "rejoinedLobby" then
-				action_rejoinedLobby(parsedAction.code, parsedAction.type, parsedAction.reconnectToken)
-			elseif parsedAction.action == "enemyDisconnected" then
-				action_enemyDisconnected(parsedAction.timeout)
-			elseif parsedAction.action == "enemyReconnected" then
-				action_enemyReconnected()
-			elseif parsedAction.action == "lobbyInfo" then
-				action_lobbyInfo(
-					parsedAction.host,
-					parsedAction.hostHash,
-					parsedAction.hostCached,
-					parsedAction.guest,
-					parsedAction.guestHash,
-					parsedAction.guestCached,
-					parsedAction.guestReady,
-					parsedAction.isHost
-				)
-			elseif parsedAction.action == "startGame" then
-				action_start_game(parsedAction.seed, parsedAction.stake)
-			elseif parsedAction.action == "startBlind" then
-				action_start_blind(parsedAction.firstPlayer)
-			elseif parsedAction.action == "enemyInfo" then
-				action_enemy_info(parsedAction.score, parsedAction.handsLeft, parsedAction.skips, parsedAction.lives)
-			elseif parsedAction.action == "stopGame" then
-				action_stop_game()
-			elseif parsedAction.action == "endPvP" then
-				action_end_pvp(parsedAction.lost, parsedAction.pvpTimerLost)
-			elseif parsedAction.action == "playerInfo" then
-				action_player_info(parsedAction.lives)
-			elseif parsedAction.action == "winGame" then
-				action_win_game()
-			elseif parsedAction.action == "loseGame" then
-				action_lose_game()
-			elseif parsedAction.action == "lobbyOptions" then
-				action_lobby_options(parsedAction)
-			elseif parsedAction.action == "enemyLocation" then
-				enemyLocation(parsedAction)
-			elseif parsedAction.action == "sendPhantom" then
-				action_send_phantom(parsedAction.key)
-			elseif parsedAction.action == "removePhantom" then
-				action_remove_phantom(parsedAction.key)
-			elseif parsedAction.action == "speedrun" then
-				action_speedrun()
-			elseif parsedAction.action == "asteroid" then
-				action_asteroid()
-			elseif parsedAction.action == "soldJoker" then
-				action_sold_joker()
-			elseif parsedAction.action == "letsGoGamblingNemesis" then
-				action_lets_go_gambling_nemesis()
-			elseif parsedAction.action == "eatPizza" then
-				action_eat_pizza(parsedAction.whole) -- rename to "discards" when possible
-			elseif parsedAction.action == "spentLastShop" then
-				action_spent_last_shop(parsedAction.amount)
-			elseif parsedAction.action == "magnet" then
-				action_magnet()
-			elseif parsedAction.action == "magnetResponse" then
-				action_magnet_response(parsedAction.key)
-			elseif parsedAction.action == "getEndGameJokers" then
-				action_get_end_game_jokers()
-			elseif parsedAction.action == "receiveEndGameJokers" then
-				action_receive_end_game_jokers(parsedAction.keys)
-			elseif parsedAction.action == "getNemesisDeck" then
-				action_get_nemesis_deck()
-			elseif parsedAction.action == "receiveNemesisDeck" then
-				action_receive_nemesis_deck(parsedAction.cards)
-			elseif parsedAction.action == "endGameStatsRequested" then
-				action_send_game_stats()
-			elseif parsedAction.action == "nemesisEndGameStats" then
-				-- Handle receiving game stats (is only logged now, now shown in the ui)
-			elseif parsedAction.action == "startAnteTimer" then
-				action_start_ante_timer(parsedAction.time, true)
-			elseif parsedAction.action == "pauseAnteTimer" then
-				action_pause_ante_timer(parsedAction.time, true)
-			elseif parsedAction.action == "jimboAppear" then
-				action_jimbo_appear(parsedAction.pos, parsedAction.text)
-			elseif parsedAction.action == "jimboTalk" then
-				action_jimbo_talk(parsedAction.text)
-			elseif parsedAction.action == "jimboMove" then
-				action_jimbo_move(parsedAction.pos)
-			elseif parsedAction.action == "jimboRemove" then
-				action_jimbo_remove()
-			elseif parsedAction.action == "moddedAction" then
-				local registry = MP.MOD_ACTIONS[parsedAction.modId]
-				if registry and registry[parsedAction.modAction] then registry[parsedAction.modAction](parsedAction) end
-			elseif parsedAction.action == "error" then
-				action_error(parsedAction.message)
-			elseif parsedAction.action == "keepAlive" then
-				action_keep_alive()
-			end
+			local handler = HANDLERS[parsedAction.action]
+			if handler then handler(parsedAction) end
 		end
 	until not msg
 end
