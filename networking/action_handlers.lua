@@ -1,3 +1,27 @@
+-- ─── DON'T PATCH THIS FILE ───────────────────────────────────────────────────
+-- This file owns the core network action dispatch. The contents move; the
+-- string literals in here are NOT an API. HANDLERS is a file-local on
+-- purpose — there is no global, no MP.HANDLERS, no _G shim coming to save you.
+--
+-- If you want to handle a network action from a mod, use one of:
+--
+--   MP.register_mod_action(name, cb)  -- PREFERRED. Pair with the
+--                                     -- "moddedAction" envelope on the server:
+--                                     --   {action = "moddedAction",
+--                                     --    modId = …, modAction = name, …}
+--                                     -- Keeps your action names namespaced to
+--                                     -- your modId; no collisions with core
+--                                     -- or other mods.
+--
+--   MP.register_action(name, cb)      -- Escape hatch for legacy server code
+--                                     -- that emits flat top-level action
+--                                     -- names. Refuses to register over an
+--                                     -- existing handler (including core) —
+--                                     -- first registration wins, collisions
+--                                     -- warn and are dropped. Use the mod API
+--                                     -- above if you can.
+-- ─────────────────────────────────────────────────────────────────────────────
+
 local json = require("json")
 
 Client = {}
@@ -1336,6 +1360,17 @@ local HANDLERS = {
 	error = action_error,
 	keepAlive = action_keep_alive,
 }
+
+function MP.register_action(name, cb)
+	if HANDLERS[name] then
+		sendWarnMessage(
+			"MP.register_action: '" .. name .. "' already has a handler; refusing to register. Use MP.register_mod_action if possible.",
+			"MULTIPLAYER"
+		)
+		return
+	end
+	HANDLERS[name] = cb
+end
 
 local game_update_ref = Game.update
 ---@diagnostic disable-next-line: duplicate-set-field
