@@ -1,3 +1,27 @@
+-- ─── DON'T PATCH THIS FILE ───────────────────────────────────────────────────
+-- This file owns the core network action dispatch. The contents move; the
+-- string literals in here are NOT an API. HANDLERS is a file-local on
+-- purpose — there is no global, no MP.HANDLERS, no _G shim coming to save you.
+--
+-- If you want to handle a network action from a mod, use one of:
+--
+--   MP.register_mod_action(name, cb)  -- PREFERRED. Pair with the
+--                                     -- "moddedAction" envelope on the server:
+--                                     --   {action = "moddedAction",
+--                                     --    modId = …, modAction = name, …}
+--                                     -- Keeps your action names namespaced to
+--                                     -- your modId; no collisions with core
+--                                     -- or other mods.
+--
+--   MP.register_action(name, cb)      -- Escape hatch for legacy server code
+--                                     -- that emits flat top-level action
+--                                     -- names. Refuses to register over an
+--                                     -- existing handler (including core) —
+--                                     -- first registration wins, collisions
+--                                     -- warn and are dropped. Use the mod API
+--                                     -- above if you can.
+-- ─────────────────────────────────────────────────────────────────────────────
+
 local json = require("json")
 
 Client = {}
@@ -49,7 +73,8 @@ local function action_connected()
 	end
 end
 
-local function action_joinedLobby(code, type, token)
+local function action_joinedLobby(p)
+	local code, type, token = p.code, p.type, p.reconnectToken
 	MP.LOBBY.code = code
 	MP.LOBBY.type = type
 	MP.LOBBY.ready_to_start = false
@@ -61,7 +86,8 @@ local function action_joinedLobby(code, type, token)
 	MP.UI.update_connection_status()
 end
 
-local function action_rejoinedLobby(code, type, token)
+local function action_rejoinedLobby(p)
+	local code, type, token = p.code, p.type, p.reconnectToken
 	MP.LOBBY.code = code
 	MP.LOBBY.type = type
 	-- Update reconnect token
@@ -115,8 +141,8 @@ function Game:update(dt)
 	return _disconnect_gupdate(self, dt)
 end
 
-local function action_enemyDisconnected(timeout)
-	timeout = timeout or 60
+local function action_enemyDisconnected(p)
+	local timeout = p.timeout or 60
 	sendWarnMessage("Opponent disconnected, waiting for reconnection...", "MULTIPLAYER")
 
 	MP.enemy_disconnect_countdown = {
@@ -138,7 +164,10 @@ local function action_enemyReconnected()
 	MP.UI.UTILS.overlay_message("Opponent reconnected!")
 end
 
-local function action_lobbyInfo(host, hostHash, hostCached, guest, guestHash, guestCached, guestReady, is_host)
+local function action_lobbyInfo(p)
+	local host, hostHash, hostCached = p.host, p.hostHash, p.hostCached
+	local guest, guestHash, guestCached, guestReady = p.guest, p.guestHash, p.guestCached, p.guestReady
+	local is_host = p.isHost
 	MP.LOBBY.players = {}
 	MP.LOBBY.is_host = is_host
 	local function parseName(name)
@@ -183,7 +212,8 @@ local function action_lobbyInfo(host, hostHash, hostCached, guest, guestHash, gu
 	if G.STAGE == G.STAGES.MAIN_MENU then MP.ACTIONS.update_player_usernames() end
 end
 
-local function action_error(message)
+local function action_error(p)
+	local message = p.message
 	sendWarnMessage(message, "MULTIPLAYER")
 
 	MP.UI.UTILS.overlay_message(message)
@@ -225,16 +255,15 @@ local function action_reconnecting()
 	end
 end
 
----@param seed string
----@param stake_str string
-local function action_start_game(seed, stake_str)
+local function action_start_game(p)
+	local seed = p.seed
 	sendDebugMessage(string.format("Game starting — %s", os.date("%Y-%m-%dT%H:%M:%S%z")), "MULTIPLAYER")
 	-- Clear any stale practice/ghost state so it can't leak into real MP
 	MP.SP.practice = false
 	MP.GHOST.clear()
 
 	MP.reset_game_states()
-	local stake = tonumber(stake_str)
+	local stake = tonumber(p.stake)
 	MP.ACTIONS.set_ante(0)
 	if not MP.LOBBY.config.different_seeds and MP.LOBBY.config.custom_seed ~= "random" then
 		seed = MP.LOBBY.config.custom_seed
@@ -251,7 +280,8 @@ local function begin_pvp_blind()
 	end
 end
 
-local function action_start_blind(first_player)
+local function action_start_blind(p)
+	local first_player = p.firstPlayer
 	MP.GAME.ready_blind = false
 	MP.GAME.pvp_reached = false
 	MP.GAME.timer_started = false
@@ -262,15 +292,12 @@ local function action_start_blind(first_player)
 	MP.UI.start_pvp_countdown(begin_pvp_blind)
 end
 
----@param score_str string
----@param hands_left_str string
----@param skips_str string
-local function action_enemy_info(score_str, hands_left_str, skips_str, lives_str)
-	local score = MP.INSANE_INT.from_string(score_str)
+local function action_enemy_info(p)
+	local score = MP.INSANE_INT.from_string(p.score)
 
-	local hands_left = tonumber(hands_left_str)
-	local skips = tonumber(skips_str)
-	local lives = tonumber(lives_str)
+	local hands_left = tonumber(p.handsLeft)
+	local skips = tonumber(p.skips)
+	local lives = tonumber(p.lives)
 
 	-- No-animation timer: If opponent skip, add time immediately
 	if skips and MP.GAME.enemy.skips ~= skips then
@@ -374,7 +401,8 @@ local function action_stop_game()
 	MP.UTILS.emit_log_checksum()
 end
 
-local function action_end_pvp(lost, pvpTimerLost)
+local function action_end_pvp(p)
+	local lost, pvpTimerLost = p.lost, p.pvpTimerLost
 	if lost and pvpTimerLost then
 		if G.GAME.current_round.hands_left > 0 then
             stop_use()
@@ -392,8 +420,8 @@ local function action_end_pvp(lost, pvpTimerLost)
 	MP.GAME.score = nil
 end
 
----@param lives number
-local function action_player_info(lives)
+local function action_player_info(p)
+	local lives = p.lives
 	if MP.GAME.lives ~= lives then
 		if MP.GAME.lives ~= 0 and MP.LOBBY.config.gold_on_life_loss then
 			MP.GAME.comeback_bonus_given = false
@@ -492,7 +520,8 @@ local function action_lobby_options(options)
 	MP.ACTIONS.update_player_usernames() -- render new DECK button state
 end
 
-local function action_send_phantom(key)
+local function action_send_phantom(p)
+	local key = p.key
 	local menu = G.OVERLAY_MENU -- we are spoofing a menu here, which disables duplicate protection
 	G.OVERLAY_MENU = G.OVERLAY_MENU or true
 	local new_card = create_card("Joker", MP.shared, false, nil, nil, nil, key)
@@ -502,8 +531,8 @@ local function action_send_phantom(key)
 	G.OVERLAY_MENU = menu
 end
 
-local function action_remove_phantom(key)
-	local card = MP.UTILS.get_phantom_joker(key)
+local function action_remove_phantom(p)
+	local card = MP.UTILS.get_phantom_joker(p.key)
 	if card then
 		card:remove_from_deck()
 		card:start_dissolve({ G.C.RED }, nil, 1.6)
@@ -595,14 +624,15 @@ local function action_lets_go_gambling_nemesis()
 	ease_dollars(card and card.ability and card.ability.extra and card.ability.extra.nemesis_dollars or 5)
 end
 
-local function action_eat_pizza(discards)
+local function action_eat_pizza(p)
+	local discards = p.whole -- rename to "discards" when possible
 	MP.GAME.pizza_discards = MP.GAME.pizza_discards + discards
 	G.GAME.round_resets.discards = G.GAME.round_resets.discards + discards
 	ease_discard(discards)
 end
 
-local function action_spent_last_shop(amount)
-	MP.GAME.enemy.spent_in_shop[#MP.GAME.enemy.spent_in_shop + 1] = tonumber(amount)
+local function action_spent_last_shop(p)
+	MP.GAME.enemy.spent_in_shop[#MP.GAME.enemy.spent_in_shop + 1] = tonumber(p.amount)
 end
 
 local function action_magnet()
@@ -631,8 +661,9 @@ local function action_magnet()
 	end
 end
 
-local function action_jimbo_appear(pos, text)
-	pos = tonumber(pos)
+local function action_jimbo_appear(p)
+	local pos = tonumber(p.pos)
+	local text = p.text
 	if not pos or pos < 1 or pos > 4 then
 		sendDebugMessage("jimboAppear: invalid pos: " .. tostring(pos), "MULTIPLAYER")
 		return
@@ -645,7 +676,8 @@ local function action_jimbo_appear(pos, text)
 	if text and text ~= "" then MP.UI.jimbo_say(text) end
 end
 
-local function action_jimbo_talk(text)
+local function action_jimbo_talk(p)
+	local text = p.text
 	if not text or type(text) ~= "string" or text == "" then
 		sendDebugMessage("jimboTalk: invalid or empty text", "MULTIPLAYER")
 		return
@@ -653,8 +685,8 @@ local function action_jimbo_talk(text)
 	MP.UI.jimbo_say(text)
 end
 
-local function action_jimbo_move(pos)
-	pos = tonumber(pos)
+local function action_jimbo_move(p)
+	local pos = tonumber(p.pos)
 	if not pos or pos < 1 or pos > 4 then
 		sendDebugMessage("jimboMove: invalid pos: " .. tostring(pos), "MULTIPLAYER")
 		return
@@ -666,10 +698,10 @@ local function action_jimbo_remove()
 	MP.UI.remove_jimbo()
 end
 
-local function action_magnet_response(key)
+local function action_magnet_response(p)
 	local card_save, success, err
 
-	card_save, err = MP.UTILS.str_decode_and_unpack(key)
+	card_save, err = MP.UTILS.str_decode_and_unpack(p.key)
 	if not card_save then
 		sendDebugMessage(string.format("Failed to unpack magnet joker: %s", err), "MULTIPLAYER")
 		return
@@ -734,8 +766,8 @@ function G.FUNCS.load_end_game_jokers()
 	end
 end
 
-local function action_receive_end_game_jokers(keys)
-	MP.end_game_jokers_payload = keys
+local function action_receive_end_game_jokers(p)
+	MP.end_game_jokers_payload = p.keys
 	MP.end_game_jokers_received = true
 	G.FUNCS.load_end_game_jokers()
 end
@@ -863,13 +895,19 @@ function G.FUNCS.load_nemesis_deck()
 	end
 end
 
-local function action_receive_nemesis_deck(deck_str)
-	MP.nemesis_deck_string = deck_str
+local function action_receive_nemesis_deck(p)
+	MP.nemesis_deck_string = p.cards
 	MP.nemesis_deck_received = true
 	G.FUNCS.load_nemesis_deck()
 end
 
-local function action_start_ante_timer(time, from_nemesis)
+-- Dual-call: dispatched from network (fromNemesis defaults to true) or self-triggered
+-- by MP.ACTIONS.start_ante_timer (passes fromNemesis = false explicitly).
+local function action_start_ante_timer(p)
+	local time = p.time
+	local from_nemesis = p.fromNemesis
+	if from_nemesis == nil then from_nemesis = true end
+
 	local option = SMODS.Mods["Multiplayer"].config.timersfx or 1
 	local timersfx = (option == 1) or (option == 2 and G.timer_ante ~= G.GAME.round_resets.ante)
 	G.timer_ante = G.GAME.round_resets.ante
@@ -902,7 +940,11 @@ local function action_start_ante_timer(time, from_nemesis)
 	end
 end
 
-local function action_pause_ante_timer(time, from_nemesis)
+local function action_pause_ante_timer(p)
+	local time = p.time
+	local from_nemesis = p.fromNemesis
+	if from_nemesis == nil then from_nemesis = true end
+
 	-- Default timer is server-synced; pressure/no-anim/pvp timers run locally.
 	if not MP.timer_is_local() then
 		if type(time) == "string" then time = tonumber(time) end
@@ -913,6 +955,11 @@ local function action_pause_ante_timer(time, from_nemesis)
 	else
 		MP.GAME.timer_started = false
 	end
+end
+
+local function action_modded_action(p)
+	local registry = MP.MOD_ACTIONS[p.modId]
+	if registry and registry[p.modAction] then registry[p.modAction](p) end
 end
 
 -- #region Client to Server
@@ -1194,7 +1241,7 @@ function MP.ACTIONS.start_ante_timer()
 		action = "startAnteTimer",
 		time = MP.GAME.timer,
 	})
-	action_start_ante_timer(MP.GAME.timer)
+	action_start_ante_timer({ time = MP.GAME.timer, fromNemesis = false })
 end
 
 function MP.ACTIONS.pause_ante_timer()
@@ -1202,7 +1249,7 @@ function MP.ACTIONS.pause_ante_timer()
 		action = "pauseAnteTimer",
 		time = MP.GAME.timer,
 	})
-	action_pause_ante_timer(MP.GAME.timer) -- TODO
+	action_pause_ante_timer({ time = MP.GAME.timer, fromNemesis = false })
 end
 
 function MP.ACTIONS.fail_timer()
@@ -1265,6 +1312,66 @@ end
 
 local last_game_seed = nil
 
+local function noop() end
+
+local HANDLERS = {
+	connected = action_connected,
+	version = action_version,
+	disconnected = action_disconnected,
+	reconnecting = action_reconnecting,
+	joinedLobby = action_joinedLobby,
+	rejoinedLobby = action_rejoinedLobby,
+	enemyDisconnected = action_enemyDisconnected,
+	enemyReconnected = action_enemyReconnected,
+	lobbyInfo = action_lobbyInfo,
+	startGame = action_start_game,
+	startBlind = action_start_blind,
+	enemyInfo = action_enemy_info,
+	stopGame = action_stop_game,
+	endPvP = action_end_pvp,
+	playerInfo = action_player_info,
+	winGame = action_win_game,
+	loseGame = action_lose_game,
+	lobbyOptions = action_lobby_options,
+	enemyLocation = enemyLocation,
+	sendPhantom = action_send_phantom,
+	removePhantom = action_remove_phantom,
+	speedrun = action_speedrun,
+	asteroid = action_asteroid,
+	soldJoker = action_sold_joker,
+	letsGoGamblingNemesis = action_lets_go_gambling_nemesis,
+	eatPizza = action_eat_pizza,
+	spentLastShop = action_spent_last_shop,
+	magnet = action_magnet,
+	magnetResponse = action_magnet_response,
+	getEndGameJokers = action_get_end_game_jokers,
+	receiveEndGameJokers = action_receive_end_game_jokers,
+	getNemesisDeck = action_get_nemesis_deck,
+	receiveNemesisDeck = action_receive_nemesis_deck,
+	endGameStatsRequested = action_send_game_stats,
+	nemesisEndGameStats = noop, -- logged only, no handler
+	startAnteTimer = action_start_ante_timer,
+	pauseAnteTimer = action_pause_ante_timer,
+	jimboAppear = action_jimbo_appear,
+	jimboTalk = action_jimbo_talk,
+	jimboMove = action_jimbo_move,
+	jimboRemove = action_jimbo_remove,
+	moddedAction = action_modded_action,
+	error = action_error,
+	keepAlive = action_keep_alive,
+}
+
+function MP.register_action(name, cb)
+	if HANDLERS[name] then
+		sendWarnMessage(
+			"MP.register_action: '" .. name .. "' already has a handler; refusing to register. Use MP.register_mod_action if possible.",
+			"MULTIPLAYER"
+		)
+		return
+	end
+	HANDLERS[name] = cb
+end
+
 local game_update_ref = Game.update
 ---@diagnostic disable-next-line: duplicate-set-field
 function Game:update(dt)
@@ -1306,105 +1413,8 @@ function Game:update(dt)
 				sendTraceMessage(log, "MULTIPLAYER")
 			end
 
-			if parsedAction.action == "connected" then
-				action_connected()
-			elseif parsedAction.action == "version" then
-				action_version()
-			elseif parsedAction.action == "disconnected" then
-				action_disconnected()
-			elseif parsedAction.action == "reconnecting" then
-				action_reconnecting()
-			elseif parsedAction.action == "joinedLobby" then
-				action_joinedLobby(parsedAction.code, parsedAction.type, parsedAction.reconnectToken)
-			elseif parsedAction.action == "rejoinedLobby" then
-				action_rejoinedLobby(parsedAction.code, parsedAction.type, parsedAction.reconnectToken)
-			elseif parsedAction.action == "enemyDisconnected" then
-				action_enemyDisconnected(parsedAction.timeout)
-			elseif parsedAction.action == "enemyReconnected" then
-				action_enemyReconnected()
-			elseif parsedAction.action == "lobbyInfo" then
-				action_lobbyInfo(
-					parsedAction.host,
-					parsedAction.hostHash,
-					parsedAction.hostCached,
-					parsedAction.guest,
-					parsedAction.guestHash,
-					parsedAction.guestCached,
-					parsedAction.guestReady,
-					parsedAction.isHost
-				)
-			elseif parsedAction.action == "startGame" then
-				action_start_game(parsedAction.seed, parsedAction.stake)
-			elseif parsedAction.action == "startBlind" then
-				action_start_blind(parsedAction.firstPlayer)
-			elseif parsedAction.action == "enemyInfo" then
-				action_enemy_info(parsedAction.score, parsedAction.handsLeft, parsedAction.skips, parsedAction.lives)
-			elseif parsedAction.action == "stopGame" then
-				action_stop_game()
-			elseif parsedAction.action == "endPvP" then
-				action_end_pvp(parsedAction.lost, parsedAction.pvpTimerLost)
-			elseif parsedAction.action == "playerInfo" then
-				action_player_info(parsedAction.lives)
-			elseif parsedAction.action == "winGame" then
-				action_win_game()
-			elseif parsedAction.action == "loseGame" then
-				action_lose_game()
-			elseif parsedAction.action == "lobbyOptions" then
-				action_lobby_options(parsedAction)
-			elseif parsedAction.action == "enemyLocation" then
-				enemyLocation(parsedAction)
-			elseif parsedAction.action == "sendPhantom" then
-				action_send_phantom(parsedAction.key)
-			elseif parsedAction.action == "removePhantom" then
-				action_remove_phantom(parsedAction.key)
-			elseif parsedAction.action == "speedrun" then
-				action_speedrun()
-			elseif parsedAction.action == "asteroid" then
-				action_asteroid()
-			elseif parsedAction.action == "soldJoker" then
-				action_sold_joker()
-			elseif parsedAction.action == "letsGoGamblingNemesis" then
-				action_lets_go_gambling_nemesis()
-			elseif parsedAction.action == "eatPizza" then
-				action_eat_pizza(parsedAction.whole) -- rename to "discards" when possible
-			elseif parsedAction.action == "spentLastShop" then
-				action_spent_last_shop(parsedAction.amount)
-			elseif parsedAction.action == "magnet" then
-				action_magnet()
-			elseif parsedAction.action == "magnetResponse" then
-				action_magnet_response(parsedAction.key)
-			elseif parsedAction.action == "getEndGameJokers" then
-				action_get_end_game_jokers()
-			elseif parsedAction.action == "receiveEndGameJokers" then
-				action_receive_end_game_jokers(parsedAction.keys)
-			elseif parsedAction.action == "getNemesisDeck" then
-				action_get_nemesis_deck()
-			elseif parsedAction.action == "receiveNemesisDeck" then
-				action_receive_nemesis_deck(parsedAction.cards)
-			elseif parsedAction.action == "endGameStatsRequested" then
-				action_send_game_stats()
-			elseif parsedAction.action == "nemesisEndGameStats" then
-				-- Handle receiving game stats (is only logged now, now shown in the ui)
-			elseif parsedAction.action == "startAnteTimer" then
-				action_start_ante_timer(parsedAction.time, true)
-			elseif parsedAction.action == "pauseAnteTimer" then
-				action_pause_ante_timer(parsedAction.time, true)
-			elseif parsedAction.action == "jimboAppear" then
-				action_jimbo_appear(parsedAction.pos, parsedAction.text)
-			elseif parsedAction.action == "jimboTalk" then
-				action_jimbo_talk(parsedAction.text)
-			elseif parsedAction.action == "jimboMove" then
-				action_jimbo_move(parsedAction.pos)
-			elseif parsedAction.action == "jimboRemove" then
-				action_jimbo_remove()
-			elseif parsedAction.action == "moddedAction" then
-				local registry = MP.MOD_ACTIONS[parsedAction.modId]
-				if registry and registry[parsedAction.modAction] then registry[parsedAction.modAction](parsedAction) end
-			elseif parsedAction.action == "error" then
-				action_error(parsedAction.message)
-			elseif parsedAction.action == "keepAlive" then
-				action_keep_alive()
-			end
+			local handler = HANDLERS[parsedAction.action]
+			if handler then handler(parsedAction) end
 		end
 	until not msg
 end
