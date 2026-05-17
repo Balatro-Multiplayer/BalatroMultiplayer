@@ -53,7 +53,7 @@ function G.FUNCS.load_previewed_ghost(e)
 
 	_preview_idx = nil
 	_preview_flipped = false
-	reopen_practice_menu()
+	G.FUNCS.start_practice_run(e)
 end
 
 -- Keep old name working for any external callers
