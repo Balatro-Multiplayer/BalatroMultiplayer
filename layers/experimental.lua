@@ -32,9 +32,9 @@ MP.Layer("experimental", {
 	},
 	reworked_enhancements = {
 		"m_glass",
-		"m_gold",
 	},
 	on_apply_bans = function()
 		change_shop_size(1)
+        G.GAME.starting_params.ante_scaling = 1.15
 	end,
 })
