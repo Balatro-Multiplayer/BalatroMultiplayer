@@ -1159,6 +1159,7 @@ return {
 			k_practice_collection_hint = "Psst... click a card and it's yours. No questions asked!",
 			k_unlimited_slots = "Unlimited Slots",
 			k_edition_cycling = "Edition Cycling (Q)",
+			k_practice_options = "Practice Options...",
 			b_join_lobby = "Join Lobby",
 			b_join_lobby_clipboard = "Join From Clipboard",
 			b_return_lobby = "Return to Lobby",
