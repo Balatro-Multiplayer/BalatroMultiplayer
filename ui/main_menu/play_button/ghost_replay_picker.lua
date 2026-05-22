@@ -103,10 +103,10 @@ local function text_row(label, value, scale, label_colour, value_colour)
 end
 
 local function section_header(title, scale)
-	scale = scale or 0.32
+	scale = scale or 0.3
 	return {
 		n = G.UIT.R,
-		config = { align = "cl", padding = 0.04 },
+		config = { align = "cl", padding = 0.02 },
 		nodes = {
 			{ n = G.UIT.T, config = { text = title, scale = scale, colour = G.C.GOLD } },
 		},
@@ -202,29 +202,47 @@ local function build_stats_panel(r)
 		},
 	}
 
-	-- Top band: Match Info + Ante Breakdown, side by side
-	local match_info_nodes = {}
-	match_info_nodes[#match_info_nodes + 1] = section_header("Match Info")
-	if r._filename then
-		local source_label = r._filename
-		if r._game_index and r._game_count and r._game_count > 1 then
-			source_label = source_label .. string.format(" (game %d of %d)", r._game_index, r._game_count)
-		end
-		match_info_nodes[#match_info_nodes + 1] = text_row("Source:", source_label, 0.25)
-	end
+	-- Top band: Match Info — header on its own row, fields in a 2-col grid below
 	local ruleset_display = r.ruleset and r.ruleset:gsub("^ruleset_mp_", "") or "?"
 	local gamemode_display = r.gamemode and r.gamemode:gsub("^gamemode_mp_", "") or "?"
 	local deck_display = r.deck or "?"
-	match_info_nodes[#match_info_nodes + 1] = text_row("Ruleset:", ruleset_display)
-	match_info_nodes[#match_info_nodes + 1] = text_row("Gamemode:", gamemode_display)
-	match_info_nodes[#match_info_nodes + 1] = text_row("Deck:", deck_display)
-	if r.seed then match_info_nodes[#match_info_nodes + 1] = text_row("Seed:", r.seed) end
-	if r.stake then match_info_nodes[#match_info_nodes + 1] = text_row("Stake:", tostring(r.stake)) end
-	match_info_nodes[#match_info_nodes + 1] = text_row("Final Ante:", tostring(r.final_ante or "?"))
-	if r.duration then match_info_nodes[#match_info_nodes + 1] = text_row("Duration:", r.duration) end
+
+	local info_left = {}
+	local info_right = {}
+	info_left[#info_left + 1] = text_row("Ruleset:", ruleset_display, 0.25)
+	info_left[#info_left + 1] = text_row("Gamemode:", gamemode_display, 0.25)
+	info_left[#info_left + 1] = text_row("Deck:", deck_display, 0.25)
+	if r.seed then info_left[#info_left + 1] = text_row("Seed:", r.seed, 0.25) end
+	if r.stake then info_left[#info_left + 1] = text_row("Stake:", tostring(r.stake), 0.25) end
+
+	info_right[#info_right + 1] = text_row("Final Ante:", tostring(r.final_ante or "?"), 0.25)
+	if r.duration then info_right[#info_right + 1] = text_row("Duration:", r.duration, 0.25) end
 	if r.timestamp then
-		match_info_nodes[#match_info_nodes + 1] = text_row("Date:", os.date("%Y-%m-%d %H:%M", r.timestamp))
+		info_right[#info_right + 1] = text_row("Date:", os.date("%Y-%m-%d %H:%M", r.timestamp), 0.25)
 	end
+	if r._filename then
+		local source_label = r._filename
+		if r._game_index and r._game_count and r._game_count > 1 then
+			source_label = source_label .. string.format(" (g%d/%d)", r._game_index, r._game_count)
+		end
+		info_right[#info_right + 1] = text_row("Source:", source_label, 0.22)
+	end
+
+	local match_info_band = {
+		n = G.UIT.C,
+		config = { align = "tm", padding = 0.02 },
+		nodes = {
+			section_header("Match Info"),
+			{
+				n = G.UIT.R,
+				config = { align = "tm", padding = 0.02 },
+				nodes = {
+					{ n = G.UIT.C, config = { align = "tl", padding = 0.04, minw = 4 }, nodes = info_left },
+					{ n = G.UIT.C, config = { align = "tl", padding = 0.04, minw = 4 }, nodes = info_right },
+				},
+			},
+		},
+	}
 
 	local ante_nodes = {}
 	if r.ante_snapshots then
@@ -273,50 +291,24 @@ local function build_stats_panel(r)
 		end
 	end
 
-	-- Duel body: symmetric You / Opponent columns (stats + vouchers + jokers)
+	-- Duel body: symmetric You / Opponent columns (vouchers + jokers)
+	-- Note: reroll_count / reroll_cost_total are only captured for the local
+	-- player, so they live in the footer's "Spending" cell instead of here.
 	local function build_side_nodes(stats, jokers, label)
 		local nodes = {}
 		nodes[#nodes + 1] = section_header(label)
-		if stats then
-			if stats.reroll_count then
-				nodes[#nodes + 1] = text_row("Rerolls:", tostring(stats.reroll_count), 0.28)
+		if stats and stats.vouchers then
+			local voucher_keys = {}
+			for key in stats.vouchers:gmatch("[^-]+") do
+				if G.P_CENTERS[key] then voucher_keys[#voucher_keys + 1] = key end
 			end
-			if stats.reroll_cost_total then
-				nodes[#nodes + 1] = text_row("Reroll $:", tostring(stats.reroll_cost_total), 0.28)
-			end
-			if stats.vouchers then
-				local voucher_keys = {}
-				for key in stats.vouchers:gmatch("[^-]+") do
-					if G.P_CENTERS[key] then voucher_keys[#voucher_keys + 1] = key end
-				end
-				if #voucher_keys > 0 then
-					nodes[#nodes + 1] = {
-						n = G.UIT.R,
-						config = { align = "cl", padding = 0.02 },
-						nodes = {
-							{
-								n = G.UIT.T,
-								config = { text = "Vouchers ", scale = 0.28, colour = G.C.UI.TEXT_INACTIVE },
-							},
-						},
-					}
-					local voucher_area = build_joker_card_area(voucher_keys, 4, 0.5)
-					if voucher_area then nodes[#nodes + 1] = voucher_area end
-				end
+			if #voucher_keys > 0 then
+				local voucher_area = build_joker_card_area(voucher_keys, 4, 0.45)
+				if voucher_area then nodes[#nodes + 1] = voucher_area end
 			end
 		end
 		if jokers then
-			nodes[#nodes + 1] = {
-				n = G.UIT.R,
-				config = { align = "cl", padding = 0.02 },
-				nodes = {
-					{
-						n = G.UIT.T,
-						config = { text = "Jokers ", scale = 0.28, colour = G.C.UI.TEXT_INACTIVE },
-					},
-				},
-			}
-			local joker_area = build_joker_card_area(jokers, 4)
+			local joker_area = build_joker_card_area(jokers, 4, 0.6)
 			if joker_area then nodes[#nodes + 1] = joker_area end
 		end
 		return nodes
@@ -325,32 +317,42 @@ local function build_stats_panel(r)
 	local your_nodes = build_side_nodes(r.player_stats, r.player_jokers, r.player_name or "You")
 	local opp_nodes = build_side_nodes(r.nemesis_stats, r.nemesis_jokers, r.nemesis_name or "Opponent")
 
-	-- Footer band: Shop Spending + Failed Rounds
+	-- Footer band: Your Spending (rerolls + shop) + Failed Rounds
 	local shop_nodes = {}
-	if r.shop_spending then
-		shop_nodes[#shop_nodes + 1] = section_header("Shop Spending")
-		local total = 0
-		local antes = {}
-		for k, v in pairs(r.shop_spending) do
-			antes[#antes + 1] = tonumber(k)
-			total = total + v
+	local ps = r.player_stats
+	local has_rerolls = ps and (ps.reroll_count or ps.reroll_cost_total)
+	if r.shop_spending or has_rerolls then
+		shop_nodes[#shop_nodes + 1] = section_header("Your Spending")
+		if ps and ps.reroll_count then
+			shop_nodes[#shop_nodes + 1] = text_row("Rerolls:", tostring(ps.reroll_count), 0.28)
 		end
-		table.sort(antes)
-		local parts = {}
-		for _, a in ipairs(antes) do
-			parts[#parts + 1] = string.format("A%d:$%d", a, r.shop_spending[tostring(a)] or r.shop_spending[a])
+		if ps and ps.reroll_cost_total then
+			shop_nodes[#shop_nodes + 1] = text_row("Reroll $:", "$" .. tostring(ps.reroll_cost_total), 0.28)
 		end
-		shop_nodes[#shop_nodes + 1] = text_row("Total:", "$" .. tostring(total), 0.28)
-		shop_nodes[#shop_nodes + 1] = {
-			n = G.UIT.R,
-			config = { align = "cl", padding = 0.02, maxw = 6 },
-			nodes = {
-				{
-					n = G.UIT.T,
-					config = { text = table.concat(parts, "  "), scale = 0.24, colour = G.C.UI.TEXT_INACTIVE },
+		if r.shop_spending then
+			local total = 0
+			local antes = {}
+			for k, v in pairs(r.shop_spending) do
+				antes[#antes + 1] = tonumber(k)
+				total = total + v
+			end
+			table.sort(antes)
+			local parts = {}
+			for _, a in ipairs(antes) do
+				parts[#parts + 1] = string.format("A%d:$%d", a, r.shop_spending[tostring(a)] or r.shop_spending[a])
+			end
+			shop_nodes[#shop_nodes + 1] = text_row("Shop $:", "$" .. tostring(total), 0.28)
+			shop_nodes[#shop_nodes + 1] = {
+				n = G.UIT.R,
+				config = { align = "cl", padding = 0.02, maxw = 6 },
+				nodes = {
+					{
+						n = G.UIT.T,
+						config = { text = table.concat(parts, "  "), scale = 0.24, colour = G.C.UI.TEXT_INACTIVE },
+					},
 				},
-			},
-		}
+			}
+		end
 	end
 
 	local failed_nodes = {}
@@ -364,31 +366,30 @@ local function build_stats_panel(r)
 			text_row("Antes:", table.concat(fr_parts, ", "), 0.28, G.C.UI.TEXT_INACTIVE, G.C.RED)
 	end
 
-	-- Three vertically stacked bands: meta, duel, footer
+	-- Three vertically stacked bands: meta (just Match Info), duel, footer
 	local meta_band = {
 		n = G.UIT.R,
-		config = { align = "tm", padding = 0.05 },
-		nodes = {
-			{ n = G.UIT.C, config = { align = "tm", padding = 0.08, minw = 5 }, nodes = match_info_nodes },
-			{ n = G.UIT.C, config = { align = "tm", padding = 0.08, minw = 5 }, nodes = ante_nodes },
-		},
+		config = { align = "tm", padding = 0.02 },
+		nodes = { match_info_band },
 	}
 
 	local duel_band = {
 		n = G.UIT.R,
-		config = { align = "tm", padding = 0.05 },
+		config = { align = "tm", padding = 0.02 },
 		nodes = {
-			{ n = G.UIT.C, config = { align = "tm", padding = 0.08, minw = 5 }, nodes = your_nodes },
-			{ n = G.UIT.C, config = { align = "tm", padding = 0.08, minw = 5 }, nodes = opp_nodes },
+			{ n = G.UIT.C, config = { align = "tm", padding = 0.05, minw = 5 }, nodes = your_nodes },
+			{ n = G.UIT.C, config = { align = "tm", padding = 0.05, minw = 5 }, nodes = opp_nodes },
 		},
 	}
 
+	-- Ante Breakdown + Your Spending are both "match flow / your $ over time" data
 	local footer_band = {
 		n = G.UIT.R,
-		config = { align = "tm", padding = 0.05 },
+		config = { align = "tm", padding = 0.02 },
 		nodes = {
-			{ n = G.UIT.C, config = { align = "tm", padding = 0.08, minw = 5 }, nodes = shop_nodes },
-			{ n = G.UIT.C, config = { align = "tm", padding = 0.08, minw = 5 }, nodes = failed_nodes },
+			{ n = G.UIT.C, config = { align = "tm", padding = 0.05, minw = 4 }, nodes = ante_nodes },
+			{ n = G.UIT.C, config = { align = "tm", padding = 0.05, minw = 4 }, nodes = shop_nodes },
+			{ n = G.UIT.C, config = { align = "tm", padding = 0.05, minw = 2 }, nodes = failed_nodes },
 		},
 	}
 
@@ -684,7 +685,7 @@ function G.UIDEF.ghost_replay_picker()
 							r = 0.1,
 							colour = G.C.BLACK,
 							maxw = 16.5,
-							maxh = 8.5,
+							maxh = 8,
 						},
 						nodes = {
 							{
