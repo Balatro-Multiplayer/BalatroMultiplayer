@@ -37,6 +37,16 @@ MP.Layer("experimental", {
 		change_shop_size(1)
         G.GAME.starting_params.ante_scaling = 1.15
         G.GAME.modifiers.mp_extra_reroll_increment = 1
+
+        -- The three modes compose into 2³ = 8 distinct skill expression profiles.
+        local rolled = {}
+        for _, mode in ipairs({ "persistent", "unreliable", "draining" }) do
+            local roll = pseudorandom(pseudoseed("experimental_" .. mode))
+            local on = roll < 1/3
+            if on then G.GAME.modifiers["mp_enable_" .. mode .. "_jokers"] = true end
+            rolled[#rolled+1] = string.format("%s=%.3f%s", mode, roll, on and " [ON]" or "")
+        end
+        sendInfoMessage("Experimental sticker rolls: " .. table.concat(rolled, ", "), "MULTIPLAYER")
 	end,
 })
 
