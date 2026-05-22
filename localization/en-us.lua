@@ -1333,7 +1333,7 @@ return {
 			k_legacy_ranked = "Legacy Ranked",
 			k_legacy_ranked_description = "A minimal competitive ruleset.\n\nNo Multiplayer cards or balance changes\nexcept Glass. Has locked settings:\n- Attrition gamemode\n- The Order enabled\n- Requires recommended Steamodded version",
 			k_experimental_standard = "Experimental (Standard)",
-			k_experimental_description = "Standard's bleeding edge.\n\nHeavier balance changes being trialed\nfor a future Standard ruleset.\n\nEach run rolls {C:attention}1/3{} on each of {C:attention}Persistent{}, {C:attention}Unreliable{}, {C:attention}Draining{}.\n\n(See bans and reworks tabs for details)",
+			k_experimental_description = "Standard's bleeding edge.\n\nHeavier balance changes being trialed\nfor a future Standard ruleset.\n\nEach run rolls {C:attention}1/3{} on each of {C:purple}Persistent{}, {C:green}Unreliable{}, {C:red}Draining{}.\n\n(See bans and reworks tabs for details)",
 			k_experimental_legacy = "Experimental (Classic)",
 			k_experimental_legacy_description = "An opinionated take on Legacy Ranked.\n\nGlass nerfed, Hanging Chad reworked, Justice banned,\nLet's Go Gambling.",
 			k_badlatro = "Badlatro",
