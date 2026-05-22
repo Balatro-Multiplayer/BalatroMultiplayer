@@ -155,28 +155,10 @@ local function build_joker_card_area(jokers, width, base_scale)
 end
 
 -------------------------------------------------------------------------------
--- Stats detail panel (right column)
+-- Stats panel sub-builders
 -------------------------------------------------------------------------------
 
-local function build_stats_panel(r)
-	if not r then
-		return {
-			n = G.UIT.C,
-			config = { align = "cm", padding = 0.2, minw = 6, minh = 5 },
-			nodes = {
-				{
-					n = G.UIT.T,
-					config = {
-						text = "Select a match",
-						scale = 0.35,
-						colour = G.C.UI.TEXT_INACTIVE,
-					},
-				},
-			},
-		}
-	end
-
-	-- Header row (spans both columns)
+local function build_header_row(r)
 	local header_nodes = {}
 
 	local result_str = (r.winner == "player") and "VICTORY" or "DEFEAT"
@@ -202,7 +184,10 @@ local function build_stats_panel(r)
 		},
 	}
 
-	-- Top band: Match Info — header on its own row, fields in a 2-col grid below
+	return header_nodes
+end
+
+local function build_match_info_band(r)
 	local ruleset_display = r.ruleset and r.ruleset:gsub("^ruleset_mp_", "") or "?"
 	local gamemode_display = r.gamemode and r.gamemode:gsub("^gamemode_mp_", "") or "?"
 	local deck_display = r.deck or "?"
@@ -228,7 +213,7 @@ local function build_stats_panel(r)
 		info_right[#info_right + 1] = text_row("Source:", source_label, 0.22)
 	end
 
-	local match_info_band = {
+	return {
 		n = G.UIT.C,
 		config = { align = "tm", padding = 0.02 },
 		nodes = {
@@ -243,7 +228,9 @@ local function build_stats_panel(r)
 			},
 		},
 	}
+end
 
+local function build_ante_breakdown(r)
 	local ante_nodes = {}
 	if r.ante_snapshots then
 		ante_nodes[#ante_nodes + 1] = section_header("Ante Breakdown")
@@ -290,34 +277,33 @@ local function build_stats_panel(r)
 			end
 		end
 	end
+	return ante_nodes
+end
 
-	-- Duel body: symmetric You / Opponent columns (vouchers + jokers)
-	-- Note: reroll_count / reroll_cost_total are only captured for the local
-	-- player, so they live in the footer's "Spending" cell instead of here.
-	local function build_side_nodes(stats, jokers, label)
-		local nodes = {}
-		nodes[#nodes + 1] = section_header(label)
-		if stats and stats.vouchers then
-			local voucher_keys = {}
-			for key in stats.vouchers:gmatch("[^-]+") do
-				if G.P_CENTERS[key] then voucher_keys[#voucher_keys + 1] = key end
-			end
-			if #voucher_keys > 0 then
-				local voucher_area = build_joker_card_area(voucher_keys, 4, 0.45)
-				if voucher_area then nodes[#nodes + 1] = voucher_area end
-			end
+-- Duel body: symmetric You / Opponent columns (vouchers + jokers)
+-- Note: reroll_count / reroll_cost_total are only captured for the local
+-- player, so they live in the footer's "Spending" cell instead of here.
+local function build_side_nodes(stats, jokers, label)
+	local nodes = {}
+	nodes[#nodes + 1] = section_header(label)
+	if stats and stats.vouchers then
+		local voucher_keys = {}
+		for key in stats.vouchers:gmatch("[^-]+") do
+			if G.P_CENTERS[key] then voucher_keys[#voucher_keys + 1] = key end
 		end
-		if jokers then
-			local joker_area = build_joker_card_area(jokers, 4, 0.6)
-			if joker_area then nodes[#nodes + 1] = joker_area end
+		if #voucher_keys > 0 then
+			local voucher_area = build_joker_card_area(voucher_keys, 4, 0.45)
+			if voucher_area then nodes[#nodes + 1] = voucher_area end
 		end
-		return nodes
 	end
+	if jokers then
+		local joker_area = build_joker_card_area(jokers, 4, 0.6)
+		if joker_area then nodes[#nodes + 1] = joker_area end
+	end
+	return nodes
+end
 
-	local your_nodes = build_side_nodes(r.player_stats, r.player_jokers, r.player_name or "You")
-	local opp_nodes = build_side_nodes(r.nemesis_stats, r.nemesis_jokers, r.nemesis_name or "Opponent")
-
-	-- Footer band: Your Spending (rerolls + shop) + Failed Rounds
+local function build_spending_cell(r)
 	local shop_nodes = {}
 	local ps = r.player_stats
 	local has_rerolls = ps and (ps.reroll_count or ps.reroll_cost_total)
@@ -354,7 +340,10 @@ local function build_stats_panel(r)
 			}
 		end
 	end
+	return shop_nodes
+end
 
+local function build_failed_rounds_cell(r)
 	local failed_nodes = {}
 	if r.failed_rounds and #r.failed_rounds > 0 then
 		local fr_parts = {}
@@ -365,48 +354,12 @@ local function build_stats_panel(r)
 		failed_nodes[#failed_nodes + 1] =
 			text_row("Antes:", table.concat(fr_parts, ", "), 0.28, G.C.UI.TEXT_INACTIVE, G.C.RED)
 	end
+	return failed_nodes
+end
 
-	-- Three vertically stacked bands: meta (just Match Info), duel, footer
-	local meta_band = {
-		n = G.UIT.R,
-		config = { align = "tm", padding = 0.02 },
-		nodes = { match_info_band },
-	}
-
-	local duel_band = {
-		n = G.UIT.R,
-		config = { align = "tm", padding = 0.02 },
-		nodes = {
-			{ n = G.UIT.C, config = { align = "tm", padding = 0.05, minw = 5 }, nodes = your_nodes },
-			{ n = G.UIT.C, config = { align = "tm", padding = 0.05, minw = 5 }, nodes = opp_nodes },
-		},
-	}
-
-	-- Ante Breakdown + Your Spending are both "match flow / your $ over time" data
-	local footer_band = {
-		n = G.UIT.R,
-		config = { align = "tm", padding = 0.02 },
-		nodes = {
-			{ n = G.UIT.C, config = { align = "tm", padding = 0.05, minw = 4 }, nodes = ante_nodes },
-			{ n = G.UIT.C, config = { align = "tm", padding = 0.05, minw = 4 }, nodes = shop_nodes },
-			{ n = G.UIT.C, config = { align = "tm", padding = 0.05, minw = 2 }, nodes = failed_nodes },
-		},
-	}
-
-	local body_row = {
-		n = G.UIT.R,
-		config = { align = "tm", padding = 0.02 },
-		nodes = {
-			{
-				n = G.UIT.C,
-				config = { align = "tm", padding = 0.02 },
-				nodes = { meta_band, duel_band, footer_band },
-			},
-		},
-	}
-
+local function build_action_buttons(r, flipped)
 	-- Playing-as flip button + Load button (spans full width)
-	local playing_as = _preview_flipped
+	local playing_as = flipped
 		and (r.nemesis_name or "?")
 		or (r.player_name or "?")
 
@@ -453,10 +406,81 @@ local function build_stats_panel(r)
 		}
 	end
 
-	local load_button = {
+	return {
 		n = G.UIT.R,
 		config = { align = "cm", padding = 0.08 },
 		nodes = action_nodes,
+	}
+end
+
+-------------------------------------------------------------------------------
+-- Stats detail panel (right column)
+-------------------------------------------------------------------------------
+
+local function build_stats_panel(r)
+	if not r then
+		return {
+			n = G.UIT.C,
+			config = { align = "cm", padding = 0.2, minw = 6, minh = 5 },
+			nodes = {
+				{
+					n = G.UIT.T,
+					config = {
+						text = "Select a match",
+						scale = 0.35,
+						colour = G.C.UI.TEXT_INACTIVE,
+					},
+				},
+			},
+		}
+	end
+
+	local header_nodes = build_header_row(r)
+	local match_info_band = build_match_info_band(r)
+	local ante_nodes = build_ante_breakdown(r)
+	local your_nodes = build_side_nodes(r.player_stats, r.player_jokers, r.player_name or "You")
+	local opp_nodes = build_side_nodes(r.nemesis_stats, r.nemesis_jokers, r.nemesis_name or "Opponent")
+	local shop_nodes = build_spending_cell(r)
+	local failed_nodes = build_failed_rounds_cell(r)
+	local load_button = build_action_buttons(r, _preview_flipped)
+
+	-- Three vertically stacked bands: meta (just Match Info), duel, footer
+	local meta_band = {
+		n = G.UIT.R,
+		config = { align = "tm", padding = 0.02 },
+		nodes = { match_info_band },
+	}
+
+	local duel_band = {
+		n = G.UIT.R,
+		config = { align = "tm", padding = 0.02 },
+		nodes = {
+			{ n = G.UIT.C, config = { align = "tm", padding = 0.05, minw = 5 }, nodes = your_nodes },
+			{ n = G.UIT.C, config = { align = "tm", padding = 0.05, minw = 5 }, nodes = opp_nodes },
+		},
+	}
+
+	-- Ante Breakdown + Your Spending are both "match flow / your $ over time" data
+	local footer_band = {
+		n = G.UIT.R,
+		config = { align = "tm", padding = 0.02 },
+		nodes = {
+			{ n = G.UIT.C, config = { align = "tm", padding = 0.05, minw = 4 }, nodes = ante_nodes },
+			{ n = G.UIT.C, config = { align = "tm", padding = 0.05, minw = 4 }, nodes = shop_nodes },
+			{ n = G.UIT.C, config = { align = "tm", padding = 0.05, minw = 2 }, nodes = failed_nodes },
+		},
+	}
+
+	local body_row = {
+		n = G.UIT.R,
+		config = { align = "tm", padding = 0.02 },
+		nodes = {
+			{
+				n = G.UIT.C,
+				config = { align = "tm", padding = 0.02 },
+				nodes = { meta_band, duel_band, footer_band },
+			},
+		},
 	}
 
 	return {
@@ -481,7 +505,7 @@ end
 -- Main picker UI
 -------------------------------------------------------------------------------
 
-function G.UIDEF.ghost_replay_picker()
+local function load_all_replays()
 	local all = MP.GHOST.load_folder_replays()
 	local seen = {}
 	for _, r in ipairs(all) do
@@ -499,12 +523,13 @@ function G.UIDEF.ghost_replay_picker()
 		return (a.timestamp or 0) > (b.timestamp or 0)
 	end)
 
-	_picker_replays = all
+	return all
+end
 
-	-- Left column: replay list
+local function build_replay_list(replays, preview_idx)
 	local replay_nodes = {}
 
-	if #all == 0 then
+	if #replays == 0 then
 		replay_nodes[#replay_nodes + 1] = {
 			n = G.UIT.R,
 			config = { align = "cm", padding = 0.2 },
@@ -535,7 +560,7 @@ function G.UIDEF.ghost_replay_picker()
 		}
 	else
 		local last_filename = nil
-		for i, r in ipairs(all) do
+		for i, r in ipairs(replays) do
 			-- Show filename header when entering a new log file group with multiple games
 			if r._filename and r._game_count and r._game_count > 1 then
 				if r._filename ~= last_filename then
@@ -561,7 +586,7 @@ function G.UIDEF.ghost_replay_picker()
 			end
 
 			local label = MP.GHOST.build_label(r)
-			local is_selected = (_preview_idx == i)
+			local is_selected = (preview_idx == i)
 			local btn_colour
 			if is_selected then
 				btn_colour = G.C.WHITE
@@ -590,6 +615,15 @@ function G.UIDEF.ghost_replay_picker()
 			}
 		end
 	end
+
+	return replay_nodes
+end
+
+function G.UIDEF.ghost_replay_picker()
+	local all = load_all_replays()
+	_picker_replays = all
+
+	local replay_nodes = build_replay_list(all, _preview_idx)
 
 	-- Control buttons below the list
 	local control_nodes = {}
