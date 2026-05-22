@@ -202,32 +202,33 @@ local function build_stats_panel(r)
 		},
 	}
 
-	-- Left inner column: match info + ante breakdown + stats
-	local left_nodes = {}
-
-	left_nodes[#left_nodes + 1] = section_header("Match Info")
+	-- Top band: Match Info + Ante Breakdown, side by side
+	local match_info_nodes = {}
+	match_info_nodes[#match_info_nodes + 1] = section_header("Match Info")
 	if r._filename then
 		local source_label = r._filename
 		if r._game_index and r._game_count and r._game_count > 1 then
 			source_label = source_label .. string.format(" (game %d of %d)", r._game_index, r._game_count)
 		end
-		left_nodes[#left_nodes + 1] = text_row("Source:", source_label, 0.25)
+		match_info_nodes[#match_info_nodes + 1] = text_row("Source:", source_label, 0.25)
 	end
 	local ruleset_display = r.ruleset and r.ruleset:gsub("^ruleset_mp_", "") or "?"
 	local gamemode_display = r.gamemode and r.gamemode:gsub("^gamemode_mp_", "") or "?"
 	local deck_display = r.deck or "?"
-	left_nodes[#left_nodes + 1] = text_row("Ruleset:", ruleset_display)
-	left_nodes[#left_nodes + 1] = text_row("Gamemode:", gamemode_display)
-	left_nodes[#left_nodes + 1] = text_row("Deck:", deck_display)
-	if r.seed then left_nodes[#left_nodes + 1] = text_row("Seed:", r.seed) end
-	if r.stake then left_nodes[#left_nodes + 1] = text_row("Stake:", tostring(r.stake)) end
-	left_nodes[#left_nodes + 1] = text_row("Final Ante:", tostring(r.final_ante or "?"))
-	if r.duration then left_nodes[#left_nodes + 1] = text_row("Duration:", r.duration) end
-	if r.timestamp then left_nodes[#left_nodes + 1] = text_row("Date:", os.date("%Y-%m-%d %H:%M", r.timestamp)) end
+	match_info_nodes[#match_info_nodes + 1] = text_row("Ruleset:", ruleset_display)
+	match_info_nodes[#match_info_nodes + 1] = text_row("Gamemode:", gamemode_display)
+	match_info_nodes[#match_info_nodes + 1] = text_row("Deck:", deck_display)
+	if r.seed then match_info_nodes[#match_info_nodes + 1] = text_row("Seed:", r.seed) end
+	if r.stake then match_info_nodes[#match_info_nodes + 1] = text_row("Stake:", tostring(r.stake)) end
+	match_info_nodes[#match_info_nodes + 1] = text_row("Final Ante:", tostring(r.final_ante or "?"))
+	if r.duration then match_info_nodes[#match_info_nodes + 1] = text_row("Duration:", r.duration) end
+	if r.timestamp then
+		match_info_nodes[#match_info_nodes + 1] = text_row("Date:", os.date("%Y-%m-%d %H:%M", r.timestamp))
+	end
 
-	-- Ante breakdown
+	local ante_nodes = {}
 	if r.ante_snapshots then
-		left_nodes[#left_nodes + 1] = section_header("Ante Breakdown")
+		ante_nodes[#ante_nodes + 1] = section_header("Ante Breakdown")
 		local antes = {}
 		for k in pairs(r.ante_snapshots) do
 			antes[#antes + 1] = tonumber(k)
@@ -245,7 +246,7 @@ local function build_stats_panel(r)
 				if snap.player_lives and snap.enemy_lives then
 					lives_str = string.format("  [%d-%d]", snap.player_lives, snap.enemy_lives)
 				end
-				left_nodes[#left_nodes + 1] = {
+				ante_nodes[#ante_nodes + 1] = {
 					n = G.UIT.R,
 					config = { align = "cl", padding = 0.01 },
 					nodes = {
@@ -272,68 +273,62 @@ local function build_stats_panel(r)
 		end
 	end
 
-	-- Player/opponent stats
-	local function add_stats(nodes, stats, label)
-		if not stats then return end
+	-- Duel body: symmetric You / Opponent columns (stats + vouchers + jokers)
+	local function build_side_nodes(stats, jokers, label)
+		local nodes = {}
 		nodes[#nodes + 1] = section_header(label)
-		if stats.reroll_count then nodes[#nodes + 1] = text_row("Rerolls:", tostring(stats.reroll_count), 0.28) end
-		if stats.reroll_cost_total then
-			nodes[#nodes + 1] = text_row("Reroll $:", tostring(stats.reroll_cost_total), 0.28)
-		end
-		if stats.vouchers then
-			local voucher_keys = {}
-			for key in stats.vouchers:gmatch("[^-]+") do
-				if G.P_CENTERS[key] then voucher_keys[#voucher_keys + 1] = key end
+		if stats then
+			if stats.reroll_count then
+				nodes[#nodes + 1] = text_row("Rerolls:", tostring(stats.reroll_count), 0.28)
 			end
-			if #voucher_keys > 0 then
-				nodes[#nodes + 1] = {
-					n = G.UIT.R,
-					config = { align = "cl", padding = 0.02 },
-					nodes = {
-						{
-							n = G.UIT.T,
-							config = { text = "Vouchers ", scale = 0.28, colour = G.C.UI.TEXT_INACTIVE },
+			if stats.reroll_cost_total then
+				nodes[#nodes + 1] = text_row("Reroll $:", tostring(stats.reroll_cost_total), 0.28)
+			end
+			if stats.vouchers then
+				local voucher_keys = {}
+				for key in stats.vouchers:gmatch("[^-]+") do
+					if G.P_CENTERS[key] then voucher_keys[#voucher_keys + 1] = key end
+				end
+				if #voucher_keys > 0 then
+					nodes[#nodes + 1] = {
+						n = G.UIT.R,
+						config = { align = "cl", padding = 0.02 },
+						nodes = {
+							{
+								n = G.UIT.T,
+								config = { text = "Vouchers ", scale = 0.28, colour = G.C.UI.TEXT_INACTIVE },
+							},
 						},
-					},
-				}
-				local voucher_area = build_joker_card_area(voucher_keys, 4, 0.5)
-				if voucher_area then nodes[#nodes + 1] = voucher_area end
+					}
+					local voucher_area = build_joker_card_area(voucher_keys, 4, 0.5)
+					if voucher_area then nodes[#nodes + 1] = voucher_area end
+				end
 			end
 		end
-	end
-
-	add_stats(left_nodes, r.player_stats, "Your Stats")
-
-	if r.player_jokers then
-		left_nodes[#left_nodes + 1] = section_header("Your Jokers")
-		local joker_area = build_joker_card_area(r.player_jokers, 4)
-		if joker_area then left_nodes[#left_nodes + 1] = joker_area end
-	end
-
-	-- Failed rounds
-	if r.failed_rounds and #r.failed_rounds > 0 then
-		local fr_parts = {}
-		for _, a in ipairs(r.failed_rounds) do
-			fr_parts[#fr_parts + 1] = "A" .. tostring(a)
+		if jokers then
+			nodes[#nodes + 1] = {
+				n = G.UIT.R,
+				config = { align = "cl", padding = 0.02 },
+				nodes = {
+					{
+						n = G.UIT.T,
+						config = { text = "Jokers ", scale = 0.28, colour = G.C.UI.TEXT_INACTIVE },
+					},
+				},
+			}
+			local joker_area = build_joker_card_area(jokers, 4)
+			if joker_area then nodes[#nodes + 1] = joker_area end
 		end
-		left_nodes[#left_nodes + 1] =
-			text_row("Failed Rounds:", table.concat(fr_parts, ", "), 0.28, G.C.UI.TEXT_INACTIVE, G.C.RED)
+		return nodes
 	end
 
-	-- Right inner column: opponent + shop spending
-	local right_nodes = {}
+	local your_nodes = build_side_nodes(r.player_stats, r.player_jokers, r.player_name or "You")
+	local opp_nodes = build_side_nodes(r.nemesis_stats, r.nemesis_jokers, r.nemesis_name or "Opponent")
 
-	add_stats(right_nodes, r.nemesis_stats, "Opponent Stats")
-
-	if r.nemesis_jokers then
-		right_nodes[#right_nodes + 1] = section_header("Opponent Jokers")
-		local joker_area = build_joker_card_area(r.nemesis_jokers, 4)
-		if joker_area then right_nodes[#right_nodes + 1] = joker_area end
-	end
-
-	-- Shop spending
+	-- Footer band: Shop Spending + Failed Rounds
+	local shop_nodes = {}
 	if r.shop_spending then
-		right_nodes[#right_nodes + 1] = section_header("Shop Spending")
+		shop_nodes[#shop_nodes + 1] = section_header("Shop Spending")
 		local total = 0
 		local antes = {}
 		for k, v in pairs(r.shop_spending) do
@@ -345,10 +340,10 @@ local function build_stats_panel(r)
 		for _, a in ipairs(antes) do
 			parts[#parts + 1] = string.format("A%d:$%d", a, r.shop_spending[tostring(a)] or r.shop_spending[a])
 		end
-		right_nodes[#right_nodes + 1] = text_row("Total:", "$" .. tostring(total), 0.28)
-		right_nodes[#right_nodes + 1] = {
+		shop_nodes[#shop_nodes + 1] = text_row("Total:", "$" .. tostring(total), 0.28)
+		shop_nodes[#shop_nodes + 1] = {
 			n = G.UIT.R,
-			config = { align = "cl", padding = 0.02, maxw = 4 },
+			config = { align = "cl", padding = 0.02, maxw = 6 },
 			nodes = {
 				{
 					n = G.UIT.T,
@@ -358,20 +353,53 @@ local function build_stats_panel(r)
 		}
 	end
 
-	-- Assemble two-column body
-	local body_row = {
+	local failed_nodes = {}
+	if r.failed_rounds and #r.failed_rounds > 0 then
+		local fr_parts = {}
+		for _, a in ipairs(r.failed_rounds) do
+			fr_parts[#fr_parts + 1] = "A" .. tostring(a)
+		end
+		failed_nodes[#failed_nodes + 1] = section_header("Failed Rounds")
+		failed_nodes[#failed_nodes + 1] =
+			text_row("Antes:", table.concat(fr_parts, ", "), 0.28, G.C.UI.TEXT_INACTIVE, G.C.RED)
+	end
+
+	-- Three vertically stacked bands: meta, duel, footer
+	local meta_band = {
 		n = G.UIT.R,
 		config = { align = "tm", padding = 0.05 },
 		nodes = {
+			{ n = G.UIT.C, config = { align = "tm", padding = 0.08, minw = 5 }, nodes = match_info_nodes },
+			{ n = G.UIT.C, config = { align = "tm", padding = 0.08, minw = 5 }, nodes = ante_nodes },
+		},
+	}
+
+	local duel_band = {
+		n = G.UIT.R,
+		config = { align = "tm", padding = 0.05 },
+		nodes = {
+			{ n = G.UIT.C, config = { align = "tm", padding = 0.08, minw = 5 }, nodes = your_nodes },
+			{ n = G.UIT.C, config = { align = "tm", padding = 0.08, minw = 5 }, nodes = opp_nodes },
+		},
+	}
+
+	local footer_band = {
+		n = G.UIT.R,
+		config = { align = "tm", padding = 0.05 },
+		nodes = {
+			{ n = G.UIT.C, config = { align = "tm", padding = 0.08, minw = 5 }, nodes = shop_nodes },
+			{ n = G.UIT.C, config = { align = "tm", padding = 0.08, minw = 5 }, nodes = failed_nodes },
+		},
+	}
+
+	local body_row = {
+		n = G.UIT.R,
+		config = { align = "tm", padding = 0.02 },
+		nodes = {
 			{
 				n = G.UIT.C,
-				config = { align = "tm", padding = 0.08, minw = 4 },
-				nodes = left_nodes,
-			},
-			{
-				n = G.UIT.C,
-				config = { align = "tm", padding = 0.08, minw = 4.5 },
-				nodes = right_nodes,
+				config = { align = "tm", padding = 0.02 },
+				nodes = { meta_band, duel_band, footer_band },
 			},
 		},
 	}
