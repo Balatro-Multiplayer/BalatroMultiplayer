@@ -114,11 +114,12 @@ local function section_header(title, scale)
 end
 
 
-local function build_joker_card_area(jokers, width)
+local function build_joker_card_area(jokers, width, base_scale)
 	if not jokers or #jokers == 0 then return nil end
 
 	width = width or 5.5
-	local card_size = math.max(0.3, 0.8 - 0.01 * #jokers)
+	base_scale = base_scale or 0.8
+	local card_size = math.max(0.3, base_scale - 0.01 * #jokers)
 	local card_area = CardArea(0, 0, width, G.CARD_H * card_size, {
 		card_limit = nil,
 		type = "title_2",
@@ -280,13 +281,34 @@ local function build_stats_panel(r)
 			nodes[#nodes + 1] = text_row("Reroll $:", tostring(stats.reroll_cost_total), 0.28)
 		end
 		if stats.vouchers then
-			nodes[#nodes + 1] =
-				text_row("Vouchers:", stats.vouchers:gsub("v_", ""):gsub("-", ", "):gsub("_", " "), 0.28)
+			local voucher_keys = {}
+			for key in stats.vouchers:gmatch("[^-]+") do
+				if G.P_CENTERS[key] then voucher_keys[#voucher_keys + 1] = key end
+			end
+			if #voucher_keys > 0 then
+				nodes[#nodes + 1] = {
+					n = G.UIT.R,
+					config = { align = "cl", padding = 0.02 },
+					nodes = {
+						{
+							n = G.UIT.T,
+							config = { text = "Vouchers ", scale = 0.28, colour = G.C.UI.TEXT_INACTIVE },
+						},
+					},
+				}
+				local voucher_area = build_joker_card_area(voucher_keys, 4, 0.5)
+				if voucher_area then nodes[#nodes + 1] = voucher_area end
+			end
 		end
 	end
 
 	add_stats(left_nodes, r.player_stats, "Your Stats")
-	add_stats(left_nodes, r.nemesis_stats, "Opponent Stats")
+
+	if r.player_jokers then
+		left_nodes[#left_nodes + 1] = section_header("Your Jokers")
+		local joker_area = build_joker_card_area(r.player_jokers, 4)
+		if joker_area then left_nodes[#left_nodes + 1] = joker_area end
+	end
 
 	-- Failed rounds
 	if r.failed_rounds and #r.failed_rounds > 0 then
@@ -298,14 +320,11 @@ local function build_stats_panel(r)
 			text_row("Failed Rounds:", table.concat(fr_parts, ", "), 0.28, G.C.UI.TEXT_INACTIVE, G.C.RED)
 	end
 
-	-- Right inner column: jokers + shop spending
+	-- Right inner column: opponent + shop spending
 	local right_nodes = {}
 
-	if r.player_jokers then
-		right_nodes[#right_nodes + 1] = section_header("Your Jokers")
-		local joker_area = build_joker_card_area(r.player_jokers, 4)
-		if joker_area then right_nodes[#right_nodes + 1] = joker_area end
-	end
+	add_stats(right_nodes, r.nemesis_stats, "Opponent Stats")
+
 	if r.nemesis_jokers then
 		right_nodes[#right_nodes + 1] = section_header("Opponent Jokers")
 		local joker_area = build_joker_card_area(r.nemesis_jokers, 4)
@@ -631,7 +650,14 @@ function G.UIDEF.ghost_replay_picker()
 				nodes = {
 					{
 						n = G.UIT.C,
-						config = { align = "tm", padding = 0.15, r = 0.1, colour = G.C.BLACK },
+						config = {
+							align = "tm",
+							padding = 0.15,
+							r = 0.1,
+							colour = G.C.BLACK,
+							maxw = 16.5,
+							maxh = 8.5,
+						},
 						nodes = {
 							{
 								n = G.UIT.R,
