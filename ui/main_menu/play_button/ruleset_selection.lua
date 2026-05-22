@@ -203,48 +203,6 @@ function G.UIDEF.ruleset_info(ruleset_name, mode)
 		},
 	}
 
-	if mode == "practice" then
-		local practice_toggles = {
-			{ id = "unlimited_slots_toggle", label = "k_unlimited_slots", ref_value = "unlimited_slots" },
-			{ id = "edition_cycling_toggle", label = "k_edition_cycling", ref_value = "edition_cycling" },
-		}
-		local toggle_nodes = {}
-		for _, t in ipairs(practice_toggles) do
-			toggle_nodes[#toggle_nodes + 1] = create_toggle({
-				id = t.id,
-				label = localize(t.label),
-				ref_table = MP.SP,
-				ref_value = t.ref_value,
-			})
-		end
-		content_nodes[#content_nodes + 1] = {
-			n = G.UIT.R,
-			config = { align = "cm", padding = 0.05 },
-			nodes = toggle_nodes,
-		}
-
-		-- Ghost replay picker button
-		local ghost_label = localize("k_ghost_replays")
-		if MP.GHOST.is_active() then ghost_label = ghost_label .. " (Active)" end
-		content_nodes[#content_nodes + 1] = {
-			n = G.UIT.R,
-			config = { align = "cm", padding = 0.05 },
-			nodes = {
-				UIBox_button({
-					id = "ghost_replay_button",
-					button = "open_ghost_replay_picker",
-					label = { ghost_label },
-					minw = 4,
-					minh = 0.6,
-					scale = 0.4,
-					colour = MP.GHOST.is_active() and G.C.GREEN or G.C.BLUE,
-					hover = true,
-					shadow = true,
-				}),
-			},
-		}
-	end
-
 	content_nodes[#content_nodes + 1] = MP.UI.build_action_row(ruleset, mode)
 
 	return {
@@ -736,6 +694,20 @@ function MP.UI.get_continue_button(ruleset, mode)
 	})
 end
 
+function MP.UI.build_practice_options_button()
+	return UIBox_button({
+		id = "practice_options_button",
+		button = "mp_open_practice_options_overlay",
+		label = { localize("k_practice_options") },
+		minw = 3.5,
+		minh = 0.8,
+		scale = 0.4,
+		colour = G.C.ORANGE,
+		hover = true,
+		shadow = true,
+	})
+end
+
 function MP.UI.build_action_row(ruleset, mode)
 	local columns = {}
 	local function add_col(button)
@@ -745,7 +717,11 @@ function MP.UI.build_action_row(ruleset, mode)
 			nodes = { button },
 		}
 	end
-	if mode == "mp" or mode == "practice" then
+	if mode == "practice" then
+		-- In practice, the Modifiers button is folded into Practice Options to
+		-- keep the action row to two buttons regardless of ruleset.
+		add_col(MP.UI.build_practice_options_button())
+	elseif mode == "mp" then
 		local modifier_btn = MP.UI.build_modifier_button(ruleset, mode)
 		if modifier_btn then add_col(modifier_btn) end
 	end

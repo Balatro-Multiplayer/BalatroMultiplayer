@@ -103,9 +103,11 @@ G.FUNCS.mp_open_modifiers_overlay = function(e)
 		}
 	end
 
+	local back_func = MP.is_practice_mode() and "mp_open_practice_options_overlay" or "create_lobby"
+
 	G.FUNCS.overlay_menu({
 		definition = create_UIBox_generic_options({
-			back_func = "create_lobby",
+			back_func = back_func,
 			contents = {
 				{
 					n = G.UIT.R,
