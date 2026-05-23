@@ -26,6 +26,9 @@ function ease_ante(mod)
 				return true
 			end,
 		}))
+
+		-- technically doesn't have to be in this block, but less logspam is nicer
+		MP.UTILS.log_mem_debug_messages()
 	end
 	return ease_ante_ref(mod)
 end

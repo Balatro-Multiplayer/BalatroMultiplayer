@@ -142,7 +142,7 @@ val.children.center.VT.x, val.children.center.VT.y = temp_x, temp_y
 match_indent = true
 times = 1
 
-# cocktail deck - compatibility spoof with patchwork deck
+# cocktail deck - compatibility with patchwork deck
 [[patches]]
 [patches.pattern]
 target = "game.lua"
@@ -163,6 +163,18 @@ pattern = "local flags = SMODS.calculate_context({create_shop_card = true, set =
 position = 'before'
 payload = '''
 args.front = false
+'''
+match_indent = true
+times = 1
+
+# log any panic collects
+[[patches]]
+[patches.pattern]
+target = "functions/misc_functions.lua"
+pattern = '''collectgarbage("collect")'''
+position = 'before'
+payload = '''
+MP._DEBUG_PANIC_COLLECTS = (MP._DEBUG_PANIC_COLLECTS or 0) + 1
 '''
 match_indent = true
 times = 1

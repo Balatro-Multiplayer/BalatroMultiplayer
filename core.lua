@@ -65,6 +65,7 @@ MP.EXPERIMENTAL = {
 	show_sandbox_collection = false,
 	alt_stakes = false,
 	suppress_dev_warning = false,
+	mem_debug = true,
 }
 
 -- Override experimental flags from .env file if present
@@ -296,11 +297,6 @@ MP.load_mp_dir("gamemodes")
 MP.load_mp_dir("layers")
 MP.load_mp_dir("rulesets", true)
 MP.load_mp_dir("ui", true)
-
-if MP.LOBBY.config.weekly then -- this could be a function but why bother
-	MP.load_mp_file("rulesets/weeklies/" .. MP.LOBBY.config.weekly .. ".lua")
-end
-
 MP.load_mp_dir("objects/editions")
 MP.load_mp_dir("objects/enhancements")
 MP.load_mp_dir("objects/seals")
