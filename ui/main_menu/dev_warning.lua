@@ -7,7 +7,7 @@ function MP.UI.show_dev_build_warning()
 	if MP.EXPERIMENTAL.suppress_dev_warning then return end
 
 	local version = SMODS.Mods["Multiplayer"].version or ""
-	if not version:match("~DEV$") then return end
+	if not version:lower():match("dev") then return end
 
 	MP._dev_warning_shown = true
 
