@@ -232,6 +232,19 @@ function MP.modifiers_parse(s)
 	end
 end
 
+-- Reset MP.MODIFIERS and seed it from the given ruleset's `default_modifiers`,
+-- if any. Used at ruleset-selection entry points so preset modifiers appear
+-- pre-checked in the overlay while remaining user-editable.
+function MP.apply_default_modifiers(ruleset_short)
+	MP.MODIFIERS = {}
+	if not ruleset_short then return end
+	local ruleset = MP.Rulesets["ruleset_mp_" .. ruleset_short]
+	if not ruleset or not ruleset.default_modifiers then return end
+	for _, name in ipairs(ruleset.default_modifiers) do
+		MP.add_modifier(name)
+	end
+end
+
 -- Fire a named hook on every layer in the active chain. The ruleset's
 -- self-name appears in the chain but isn't registered in MP.Layers, so the
 -- lookup no-ops harmlessly.
