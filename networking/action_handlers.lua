@@ -442,6 +442,7 @@ local function action_win_game()
 	MP.nemesis_deck_received = false
 	MP.GAME.won = true
 	MP.STATS.record_match(true)
+	MP.UTILS.log_mem_debug_messages()
 	MP.UTILS.emit_log_checksum()
 	win_game()
 end
@@ -454,6 +455,7 @@ local function action_lose_game()
 	MP.STATS.record_match(false)
 	G.STATE_COMPLETE = false
 	G.STATE = G.STATES.GAME_OVER
+	MP.UTILS.log_mem_debug_messages()
 	MP.UTILS.emit_log_checksum()
 end
 

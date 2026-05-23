@@ -2,27 +2,10 @@
 --[[
 MP.Ruleset({
 	key = "release",
-	multiplayer_content = false,
-	banned_jokers = {},
-	banned_consumables = {},
-	banned_vouchers = {},
-	banned_enhancements = {},
-	banned_tags = {},
-	banned_blinds = {},
-	reworked_jokers = {},
-	reworked_consumables = {},
-	reworked_vouchers = {},
-	reworked_enhancements = {},
-	reworked_tags = {},
-	reworked_blinds = {},
-	create_info_menu = function()
-		return MP.UI.CreateRulesetInfoMenu({
-			multiplayer_content = false,
-			forced_lobby_options = false,
-			description_key = "k_release_description",
-		})
-	end,
+	layers = { "release" },
 }):inject()
+
+-- below nonsense should be in the layers equivalent but reworkcenter loads with rulesets so
 
 SMODS.Atlas({
 	key = "release_jokers",
@@ -32,44 +15,44 @@ SMODS.Atlas({
 })
 
 MP.ReworkCenter("j_greedy_joker", {
-	rulesets = "release",
+	layers = "release",
 	config = {extra = {s_mult = 4, suit = 'Diamonds'}},
 })
 
 MP.ReworkCenter("j_lusty_joker", {
-	rulesets = "release",
+	layers = "release",
 	config = {extra = {s_mult = 4, suit = 'Hearts'}},
 })
 
 MP.ReworkCenter("j_wrathful_joker", {
-	rulesets = "release",
+	layers = "release",
 	config = {extra = {s_mult = 4, suit = 'Spades'}},
 })
 
 MP.ReworkCenter("j_gluttenous_joker", {
-	rulesets = "release",
+	layers = "release",
 	config = {extra = {s_mult = 4, suit = 'Clubs'}},
 })
 
 MP.ReworkCenter("j_mad", {
-	rulesets = "release",
+	layers = "release",
 	config = {t_mult = 20, type = 'Four of a Kind'},
 	atlas = "mp_release_jokers",
 })
 
 MP.ReworkCenter("j_clever", {
-	rulesets = "release",
+	layers = "release",
 	config = {t_chips = 150, type = 'Four of a Kind'},
 	atlas = "mp_release_jokers",
 })
 
 MP.ReworkCenter("j_banner", {
-	rulesets = "release",
+	layers = "release",
 	config = {extra = 40},
 })
 
 MP.ReworkCenter("j_8_ball", {
-	rulesets = "release",
+	layers = "release",
 	loc_key = "j_mp_8ball_release",
 	config = {extra = 2},
 	atlas = "mp_release_jokers",
@@ -113,42 +96,42 @@ MP.ReworkCenter("j_8_ball", {
 })
 
 MP.ReworkCenter("j_fibonacci", {
-	rulesets = "release",
+	layers = "release",
 	cost = 7,
 })
 
 MP.ReworkCenter("j_steel_joker", {
-	rulesets = "release",
+	layers = "release",
 	config = {extra = 0.25},
 })
 
 MP.ReworkCenter("j_gros_michel", {
-	rulesets = "release",
+	layers = "release",
 	config = {extra = {odds = 4, mult = 15}},
 })
 
 MP.ReworkCenter("j_odd_todd", {
-	rulesets = "release",
+	layers = "release",
 	config = {extra = 30},
 })
 
 MP.ReworkCenter("j_runner", {
-	rulesets = "release",
+	layers = "release",
 	config = {extra = {chips = 20, chip_mod = 10}},
 })
 
 MP.ReworkCenter("j_sixth_sense", {
-	rulesets = "release",
+	layers = "release",
 	rarity = 3,
 })
 
 MP.ReworkCenter("j_hiker", {
-	rulesets = "release",
+	layers = "release",
 	config = {extra = 4},
 })
 
 MP.ReworkCenter("j_todo_list", {
-	rulesets = "release",
+	layers = "release",
 	loc_key = "j_mp_todo_list_release",
 	config = {extra = {dollars = 5, poker_hand = 'High Card'}},
 	calculate = function(self, card, context)
@@ -180,7 +163,7 @@ MP.ReworkCenter("j_todo_list", {
 })
 
 MP.ReworkCenter("j_madness", {
-	rulesets = "release",
+	layers = "release",
 	loc_key = "j_mp_madness_release",
 	calculate = function(self, card, context)
 		if context.setting_blind and not context.blueprint then
@@ -207,7 +190,7 @@ MP.ReworkCenter("j_madness", {
 })
 
 MP.ReworkCenter("j_square", {
-	rulesets = "release",
+	layers = "release",
 	config = {extra = {chips = 16, chip_mod = 4}},
 	cost = 5,
 	atlas = "mp_release_jokers",
@@ -228,18 +211,18 @@ function Card:set_ability(center, initial, delay_sprites)
 end
 
 MP.ReworkCenter("j_seance", {
-	rulesets = "release",
+	layers = "release",
 	rarity = 3,
 	cost = 7,
 })
 
 MP.ReworkCenter("j_riff_raff", {
-	rulesets = "release",
+	layers = "release",
 	cost = 4,
 })
 
 MP.ReworkCenter("j_vampire", {
-	rulesets = "release",
+	layers = "release",
 	loc_key = "j_mp_vampire_release",
 	config = {extra = 0.2, Xmult = 1},
 	calculate = function(self, card, context)
@@ -273,19 +256,19 @@ MP.ReworkCenter("j_vampire", {
 })
 
 MP.ReworkCenter("j_vagabond", {
-	rulesets = "release",
+	layers = "release",
 	rarity = 2,
 	config = {extra = 3},
 	cost = 6,
 })
 
 MP.ReworkCenter("j_cloud_9", {
-	rulesets = "release",
+	layers = "release",
 	cost = 6,
 })
 
 MP.ReworkCenter("j_midas_mask", {
-	rulesets = "release",
+	layers = "release",
 	loc_key = "j_mp_midas_mask_release",
 	cost = 6,
 	calculate = function(self, card, context)
@@ -316,47 +299,47 @@ MP.ReworkCenter("j_midas_mask", {
 })
 
 MP.ReworkCenter("j_luchador", {
-	rulesets = "release",
+	layers = "release",
 	eternal_compat = true, -- ok
 })
 
 MP.ReworkCenter("j_reserved_parking", {
-	rulesets = "release",
+	layers = "release",
 	rarity = 2,
 })
 
 MP.ReworkCenter("j_mail", {
-	rulesets = "release",
+	layers = "release",
 	config = {extra = 3},
 })
 
 MP.ReworkCenter("j_lucky_cat", {
-	rulesets = "release",
+	layers = "release",
 	config = {Xmult = 1, extra = 0.2},
 })
 
 MP.ReworkCenter("j_trading", {
-	rulesets = "release",
+	layers = "release",
 	cost = 5,
 })
 
 MP.ReworkCenter("j_smiley", {
-	rulesets = "release",
+	layers = "release",
 	config = {extra = 4},
 })
 
 MP.ReworkCenter("j_campfire", {
-	rulesets = "release",
+	layers = "release",
 	config = {extra = 0.5},
 })
 
 MP.ReworkCenter("j_ticket", {
-	rulesets = "release",
+	layers = "release",
 	config = {extra = 3},
 })
 
 MP.ReworkCenter("j_swashbuckler", {
-	rulesets = "release",
+	layers = "release",
 	loc_key = "j_mp_swashbuckler_release",
 	config = {mult = 1, release = true},
 })
@@ -377,28 +360,28 @@ function Card:update(dt)
 end
 
 MP.ReworkCenter("j_hanging_chad", {
-	rulesets = "release",
+	layers = "release",
 	loc_key = "j_mp_hanging_chad_release",
 	config = {extra = 1},
 })
 
 MP.ReworkCenter("j_bloodstone", {
-	rulesets = "release",
+	layers = "release",
 	config = {extra = {odds = 3, Xmult = 2}},
 })
 
 MP.ReworkCenter("j_onyx_agate", {
-	rulesets = "release",
+	layers = "release",
 	config = {extra = 8},
 })
 
 MP.ReworkCenter("j_glass", {
-	rulesets = "release",
+	layers = "release",
 	config = {extra = 0.5, Xmult = 1},
 })
 
 MP.ReworkCenter("j_flower_pot", {
-	rulesets = "release",
+	layers = "release",
 	loc_key = "j_mp_flower_pot_release",
 	calculate = function(self, card, context)
 		if context.joker_main then
@@ -439,31 +422,31 @@ MP.ReworkCenter("j_flower_pot", {
 })
 
 MP.ReworkCenter("j_wee", {
-	rulesets = "release",
+	layers = "release",
 	config = {extra = {chips = 10, chip_mod = 8}},
 })
 
 MP.ReworkCenter("j_stuntman", {
-	rulesets = "release",
+	layers = "release",
 	rarity = 2,
 	config = {extra = {h_size = 2, chip_mod = 300}},
 	cost = 6,
 })
 
 MP.ReworkCenter("j_invisible", {
-	rulesets = "release",
+	layers = "release",
 	config = {extra = 3},
 	cost = 10,
 })
 
 MP.ReworkCenter("j_burnt", {
-	rulesets = "release",
+	layers = "release",
 	rarity = 2,
 	cost = 6,
 })
 
 MP.ReworkCenter("j_yorick", {
-	rulesets = "release",
+	layers = "release",
 	loc_key = "j_mp_yorick_release",
 	config = {extra = {xmult = 5, discards = 23}},
 	calculate = function(self, card, context)
@@ -497,7 +480,7 @@ MP.ReworkCenter("j_yorick", {
 })
 
 MP.ReworkCenter("c_magician", {
-	rulesets = "release",
+	layers = "release",
 	loc_key = "c_mp_magician_release",
 	config = {mod_conv = "m_lucky", max_highlighted = 1},
 	-- don't understand why we need to redefine loc_vars here
@@ -510,7 +493,7 @@ MP.ReworkCenter("c_magician", {
 })
 
 MP.ReworkCenter("tag_uncommon", {
-	rulesets = "release",
+	layers = "release",
 	center_table = "P_TAGS",
 	loc_key = "tag_mp_uncommon_release",
 	apply = function(self, tag, context)
@@ -529,7 +512,7 @@ MP.ReworkCenter("tag_uncommon", {
 })
 
 MP.ReworkCenter("tag_rare", {
-	rulesets = "release",
+	layers = "release",
 	center_table = "P_TAGS",
 	loc_key = "tag_mp_rare_release",
 	apply = function(self, tag, context)
@@ -561,7 +544,7 @@ MP.ReworkCenter("tag_rare", {
 })
 
 MP.ReworkCenter("tag_negative", {
-	rulesets = "release",
+	layers = "release",
 	center_table = "P_TAGS",
 	loc_key = "tag_mp_negative_release",
 	apply = function(self, tag, context)
@@ -582,7 +565,7 @@ MP.ReworkCenter("tag_negative", {
 })
 
 MP.ReworkCenter("tag_foil", {
-	rulesets = "release",
+	layers = "release",
 	center_table = "P_TAGS",
 	loc_key = "tag_mp_foil_release",
 	apply = function(self, tag, context)
@@ -603,7 +586,7 @@ MP.ReworkCenter("tag_foil", {
 })
 
 MP.ReworkCenter("tag_holo", {
-	rulesets = "release",
+	layers = "release",
 	center_table = "P_TAGS",
 	loc_key = "tag_mp_holo_release",
 	apply = function(self, tag, context)
@@ -624,7 +607,7 @@ MP.ReworkCenter("tag_holo", {
 })
 
 MP.ReworkCenter("tag_polychrome", {
-	rulesets = "release",
+	layers = "release",
 	center_table = "P_TAGS",
 	loc_key = "tag_mp_poly_release",
 	apply = function(self, tag, context)
@@ -658,13 +641,13 @@ for k, v in ipairs({
 end
 
 MP.ReworkCenter("tag_investment", {
-	rulesets = "release",
+	layers = "release",
 	center_table = "P_TAGS",
 	config = {type = 'eval', dollars = 15},
 })
 
 MP.ReworkCenter("Blue", {
-	rulesets = "release",
+	layers = "release",
 	center_table = "P_SEALS",
 	release = true,
 	loc_key = "mp_blue_seal_release",
@@ -700,48 +683,48 @@ function Card:get_end_of_round_effect(context)
 end
 
 MP.ReworkCenter("Straight", {
-	rulesets = "release",
+	layers = "release",
 	center_table = SMODS.PokerHands,
 	l_mult = 2,
 })
 
 -- no behaviour change, just so it shows the sticker
 MP.ReworkCenter("c_saturn", {
-	rulesets = "release"
+	layers = "release"
 })
 
 MP.ReworkCenter("Straight Flush", {
-	rulesets = "release",
+	layers = "release",
 	center_table = SMODS.PokerHands,
 	l_mult = 3,
 })
 
 MP.ReworkCenter("c_neptune", {
-	rulesets = "release",
+	layers = "release",
 })
 
 MP.ReworkCenter("Flush House", {
-	rulesets = "release",
+	layers = "release",
 	center_table = SMODS.PokerHands,
 	l_mult = 3,
 })
 
 MP.ReworkCenter("c_ceres", {
-	rulesets = "release",
+	layers = "release",
 })
 
 MP.ReworkCenter("Flush Five", {
-	rulesets = "release",
+	layers = "release",
 	center_table = SMODS.PokerHands,
 	l_chips = 40,
 })
 
 MP.ReworkCenter("c_eris", {
-	rulesets = "release",
+	layers = "release",
 })
 
 MP.ReworkCenter("stake_green", {
-	rulesets = "release",
+	layers = "release",
 	center_table = "P_STAKES",
 	modifiers = function()
 		G.GAME.modifiers.scaling = (G.GAME.modifiers.scaling or 1) + 1
@@ -750,7 +733,7 @@ MP.ReworkCenter("stake_green", {
 })
 
 MP.ReworkCenter("stake_purple", {
-	rulesets = "release",
+	layers = "release",
 	center_table = "P_STAKES",
 	modifiers = function()
 		G.GAME.modifiers.scaling = (G.GAME.modifiers.scaling or 1) + 1
@@ -781,7 +764,7 @@ function get_blind_amount(ante)
 end
 
 MP.ReworkCenter("stake_orange", {
-	rulesets = "release",
+	layers = "release",
 	center_table = "P_STAKES",
 	loc_key = "stake_mp_orange_release",
 	modifiers = function()
@@ -790,7 +773,7 @@ MP.ReworkCenter("stake_orange", {
 })
 
 MP.ReworkCenter("stake_gold", {
-	rulesets = "release",
+	layers = "release",
 	center_table = "P_STAKES",
 	loc_key = "stake_mp_gold_release",
 	modifiers = function()
@@ -800,7 +783,7 @@ MP.ReworkCenter("stake_gold", {
 
 -- there's an incredibly obscure crash directly caused by adding any sort of function or recursive table to the blind center, so this will crash the game even if the ruleset isn't loaded. i cba to figure out why at this point
 MP.ReworkCenter("bl_arm", {
-	rulesets = "release",
+	layers = "release",
 	center_table = "P_BLINDS",
 	debuff_hand = function(self, cards, hand, handname, check)
 		if G.GAME.hands[handname].level > 0 then

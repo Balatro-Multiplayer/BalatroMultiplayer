@@ -46,12 +46,8 @@ payload = '''--if there is at least one joker$pre local copyable_jokers = {}
 times = 1
 
 # Sets the balanced sticker on reworked cards.
-# Auto-apply on reworks is disabled for now — only honors config.mp_balanced.
-# TODO before re-enabling:
-#   1. Key off the ruleset's layers, not its short name (current code only hits
-#      when ruleset name == layer name, e.g. experimental/sandbox).
-#   2. Sticker UI is janky — forces "Balanced" title + generic blurb over the
-#      card's own loc_text. Needs its own rendering path.
+# ReworkCenter mutation should automatically set card.config.mp_balanced if applicable
+# Custom localization is unsupported as of now
 [[patches]]
 [patches.pattern]
 target = "card.lua"
@@ -60,7 +56,6 @@ position = 'before'
 payload = '''
 if old_center ~= center or initial then
 	self.ability.mp_sticker_balanced = false
-	-- TODO: see lovely/cards.toml note above re: rework-based auto-apply
 	if center.config.mp_balanced then
 		self.ability.mp_sticker_balanced = true
 	end
@@ -75,79 +70,5 @@ target = "card.lua"
 pattern = '''if self.ability.name == 'Baseball Card' and self ~= context.other_joker and context.other_joker:is_rarity("Uncommon") then'''
 position = 'after'
 payload = '''if context.other_joker.edition and context.other_joker.edition.type == 'mp_phantom' then return end'''
-match_indent = true
-times = 1
-
-# STEAMODDED BUG - move this thing again???
-[[patches]]
-[patches.pattern]
-target = "functions/common_events.lua"
-pattern = '''    for k, v in pairs(other.ability) do
-        if type(v) == 'table' then 
-            new_card.ability[k] = copy_table(v)
-        else
-            new_card.ability[k] = v
-        end
-    end'''
-position = 'at'
-payload = ''' '''
-match_indent = true
-times = 1
-
-# STEAMODDED BUG - move this thing again???
-[[patches]]
-[patches.pattern]
-target = "functions/common_events.lua"
-pattern = '''if other.params then'''
-position = 'before'
-payload = '''
-    for k, v in pairs(other.ability) do
-        if type(v) == 'table' then 
-            new_card.ability[k] = copy_table(v)
-        else
-            new_card.ability[k] = v
-        end
-    end'''
-match_indent = true
-times = 1
-
-# STEAMODDED BUG - add strip_edition check
-[[patches]]
-[patches.pattern]
-target = "functions/common_events.lua"
-pattern = '''if other.params then'''
-position = 'before'
-payload = '''
-    for k, v in pairs(other.ability) do
-        if type(v) == 'table' then 
-            new_card.ability[k] = copy_table(v)
-        else
-            new_card.ability[k] = v
-        end
-    end'''
-match_indent = true
-times = 1
-
-# STEAMODDED BUG - add check for this because perkeo
-[[patches]]
-[patches.pattern]
-target = "functions/common_events.lua"
-pattern = '''if other.edition then'''
-position = 'at'
-payload = '''if other.edition and strip_edition then'''
-match_indent = true
-times = 1
-
-# STEAMODDED BUG - disable this
-# feels weird but recent steamodded commit to dev version removes this
-# so it's correct i guess
-[[patches]]
-[patches.pattern]
-target = "functions/common_events.lua"
-pattern = '''if other.seal then
-	new_card.ability.card_limit = new_card.ability.card_limit - (other.ability.seal.card_limit or 0)'''
-position = 'at'
-payload = '''if false then
-	new_card.ability.card_limit = new_card.ability.card_limit - (other.ability.seal.card_limit or 0)'''
 match_indent = true
 times = 1
