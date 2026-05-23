@@ -33,9 +33,14 @@ MP.Layer("experimental", {
 	reworked_enhancements = {
 		"m_glass",
 	},
+	stickers = {
+		"persistent",
+		"unreliable",
+		"draining",
+	},
 	on_apply_bans = function()
 		change_shop_size(1)
-        G.GAME.starting_params.ante_scaling = 1.15
+        G.GAME.starting_params.ante_scaling = (G.GAME.starting_params.ante_scaling or 1) * 1.15
         G.GAME.modifiers.mp_extra_reroll_increment = 1
 
         -- The three modes compose into 2³ = 8 distinct skill expression profiles.
