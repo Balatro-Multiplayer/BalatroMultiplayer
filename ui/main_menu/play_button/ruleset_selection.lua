@@ -136,10 +136,11 @@ function G.UIDEF.ruleset_selection_options(mode, buttons)
 	end
 
 	-- Modifiers are per-ruleset; reset on (re)entry to a tab so a previous
-	-- ruleset's toggles can't bleed into the new one.
+	-- ruleset's toggles can't bleed into the new one. Rulesets with
+	-- `default_modifiers` get those pre-checked.
 	-- i'm not a huge fan of any of this living here but
 	-- here we are
-	MP.MODIFIERS = {}
+	MP.apply_default_modifiers(default_ruleset)
 
 	MP.LoadReworks(default_ruleset)
 	MP.UI.ruleset_selection_mode = mode
@@ -176,7 +177,7 @@ function G.FUNCS.change_ruleset_selection(e)
 			else
 				MP.LOBBY.config.ruleset = "ruleset_mp_" .. ruleset_name
 			end
-			MP.MODIFIERS = {}
+			MP.apply_default_modifiers(ruleset_name)
 			MP.LoadReworks(ruleset_name)
 		end
 	)
