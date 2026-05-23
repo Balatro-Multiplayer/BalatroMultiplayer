@@ -40,6 +40,7 @@ local RulesetBase = SMODS.GameObject:extend({
 			forced_lobby_options = self.forced_lobby_options,
 			forced_gamemode_text = gamemode_text,
 			description_key = self.description_key or ("k_" .. raw_key .. "_description"),
+			stickers = self.stickers,
 		})
 	end,
 	is_disabled = function(self)
