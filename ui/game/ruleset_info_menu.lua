@@ -36,7 +36,7 @@ function MP.UI.CreateRulesetInfoMenu(config)
 	local forces_gamemode_text = config.forced_gamemode_text or "k_no"
 	local forces_gamemode_color = config.forced_gamemode_text and G.C.GREEN or G.C.RED
 
-	return {
+	local rows = {
 		{
 			n = G.UIT.R,
 			config = {
@@ -96,19 +96,71 @@ function MP.UI.CreateRulesetInfoMenu(config)
 				minh = 0.05,
 			},
 		},
-		{
-			n = G.UIT.R,
-			config = {
-				align = "cl",
-				padding = 0.1,
-			},
-			nodes = {
-				{
-					n = G.UIT.C,
-					config = { align = "cl" },
-					nodes = parse_colored_lines(localize(config.description_key), 0.6),
-				},
+	}
+
+	rows[#rows + 1] = {
+		n = G.UIT.R,
+		config = {
+			align = "cl",
+			padding = 0.1,
+		},
+		nodes = {
+			{
+				n = G.UIT.C,
+				config = { align = "cl" },
+				nodes = parse_colored_lines(localize(config.description_key), 0.6),
 			},
 		},
 	}
+
+	if config.stickers and #config.stickers > 0 then
+		local sticker_nodes = {}
+		for _, key in ipairs(config.stickers) do
+			local sticker_obj = SMODS.Stickers and SMODS.Stickers["mp_sticker_" .. key]
+			if sticker_obj then
+				local atlas = G.ASSET_ATLAS[sticker_obj.atlas]
+				if atlas then
+					local sprite = Sprite(0, 0, 0.55, 0.74, atlas, sticker_obj.pos or { x = 0, y = 0 })
+					sticker_nodes[#sticker_nodes + 1] = {
+						n = G.UIT.C,
+						config = { align = "cm", padding = 0.05 },
+						nodes = {
+							{
+								n = G.UIT.R,
+								config = { align = "cm" },
+								nodes = { { n = G.UIT.O, config = { object = sprite } } },
+							},
+							{
+								n = G.UIT.R,
+								config = { align = "cm", padding = 0.02 },
+								nodes = {
+									{
+										n = G.UIT.T,
+										config = {
+											text = localize{ type = "name_text", set = "Other", key = "mp_sticker_" .. key },
+											scale = 0.3,
+											colour = sticker_obj.badge_colour or G.C.UI.TEXT_LIGHT,
+										},
+									},
+								},
+							},
+						},
+					}
+				end
+			end
+		end
+		if #sticker_nodes > 0 then
+			rows[#rows + 1] = {
+				n = G.UIT.R,
+				config = { align = "cr" },
+				nodes = {
+					MP.UI.BackgroundGrouping(localize("k_may_roll_stickers"), {
+						{ n = G.UIT.R, config = { align = "cm" }, nodes = sticker_nodes },
+					}, { text_scale = 0.4 }),
+				},
+			}
+		end
+	end
+
+	return rows
 end
