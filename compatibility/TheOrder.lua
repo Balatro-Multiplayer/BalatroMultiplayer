@@ -92,7 +92,8 @@ function reset_idol_card()
 						.. " with weight "
 						.. entry.count
 						.. " of total "
-						.. total_weight
+						.. total_weight,
+					"MULTIPLAYER"
 				)
 				G.GAME.current_round.idol_card.rank = idol_card.base.value
 				G.GAME.current_round.idol_card.suit = idol_card.base.suit
@@ -154,14 +155,17 @@ function reset_mail_rank()
 			local weight = (count / total_weight)
 			threshold = threshold + weight
 			if raw_random < threshold then
+				--[[ nobody cares
 				sendDebugMessage(
 					"(Mail) Selected card "
 						.. entry.example_card.base.value
 						.. " with weight "
 						.. count
 						.. " of total "
-						.. total_weight
+						.. total_weight,
+					"MULTIPLAYER"
 				)
+				]]
 				G.GAME.current_round.mail_card.rank = entry.example_card.base.value
 				G.GAME.current_round.mail_card.id = entry.example_card.base.id
 				break
@@ -293,7 +297,7 @@ end
 -- Handle round based rng with order (avoid desync with skips)
 function MP.order_round_based(ante_based)
 	if MP.should_use_the_order() then
-		return G.GAME.round_resets.ante .. (G.GAME.blind.config.blind.key or "") -- fine becase no boss shenanigans... change this if that happens
+		return G.GAME.round_resets.ante .. (G.GAME.blind.config.blind.key or "") .. (G.GAME.blind_on_deck or "")
 	end
 	if ante_based then return MP.ante_based() end
 	return ""

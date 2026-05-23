@@ -276,6 +276,12 @@ function SMODS.injectItems()
 				and not opts.generate_ui
 				and not (center.generate_ui and type(center.generate_ui) == "function")
 
+			-- inject mp_balanced if applicable
+			if center.config then
+				opts.config = opts.config or copy_table(center.config)
+				opts.config.mp_balanced = true
+			end
+
 			-- Apply changes to all specified layers
 			for _, layer in ipairs(layers) do
 				local prefix = "mp_" .. layer .. "_"
