@@ -352,10 +352,8 @@ end
 
 local start_run_ref = Game.start_run
 function Game:start_run(args)
-	-- MP lobby ruleset if present, else the sp/practice selection. Don't route
-	-- this through get_active_ruleset(): the "sp" run flow leaves practice=false
-	-- yet still sets MP.SP.ruleset, and get_active_ruleset() only honours
-	-- MP.SP.ruleset in practice mode — it'd drop the sp selection to vanilla.
+	-- Not get_active_ruleset(): the sp run flow leaves practice=false but still
+	-- sets MP.SP.ruleset, which get_active_ruleset() only honours in practice.
 	MP.LoadReworks(MP.LOBBY.config.ruleset or MP.SP.ruleset)
 
 	start_run_ref(self, args)

@@ -117,11 +117,9 @@ function G.UIDEF.ruleset_selection_tabs(mode)
 	return t
 end
 
--- Single source of truth for "selecting a ruleset writes where?". In sp/practice
--- the selection lives on MP.SP.ruleset; in mp it lives on MP.LOBBY.config.ruleset.
--- Every selection entry point routes through here so the two can't drift — writing
--- the MP global while in practice is exactly what let a previewed ruleset bleed into
--- ghost replays.
+-- sp/practice selections stay local on MP.SP.ruleset; mp writes the shared
+-- MP.LOBBY.config.ruleset. Every writer routes through here so practice can't
+-- touch the MP global.
 local function set_selected_ruleset(mode, ruleset_key)
 	if mode == "sp" or mode == "practice" then
 		MP.SP.ruleset = ruleset_key

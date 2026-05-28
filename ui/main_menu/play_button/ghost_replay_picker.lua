@@ -45,9 +45,7 @@ function G.FUNCS.load_previewed_ghost(e)
 	MP.GHOST.load(replay)
 	MP.GHOST.flipped = _preview_flipped
 
-	-- Replay's ruleset wins; if it has none, fall back to whatever the picker
-	-- left in MP.SP.ruleset. If neither exists we're flying blind, but
-	-- apply_default_modifiers(nil) just clears, so we degrade quietly.
+	-- Replay's ruleset, else the picker's current selection.
 	local ruleset_key = replay.ruleset or MP.SP.ruleset
 	if ruleset_key then
 		MP.SP.ruleset = ruleset_key
