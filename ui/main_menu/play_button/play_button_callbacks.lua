@@ -37,6 +37,9 @@ end
 function G.FUNCS.create_lobby(e)
 	G.SETTINGS.paused = true
 
+	-- Clear practice/ghost state so it can't shadow MP reads during lobby setup.
+	MP.SP.practice = false
+	MP.GHOST.clear()
 	MP.MODIFIERS = {}
 
 	G.FUNCS.overlay_menu({
@@ -54,6 +57,10 @@ end
 
 function G.FUNCS.join_lobby(e)
 	G.SETTINGS.paused = true
+
+	-- Same isolation as create_lobby; modifiers arrive from the host.
+	MP.SP.practice = false
+	MP.GHOST.clear()
 
 	G.FUNCS.overlay_menu({
 		definition = G.UIDEF.create_UIBox_join_lobby_button(),
