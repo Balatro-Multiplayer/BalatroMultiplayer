@@ -45,9 +45,14 @@ function G.FUNCS.load_previewed_ghost(e)
 	MP.GHOST.load(replay)
 	MP.GHOST.flipped = _preview_flipped
 
-	if replay.ruleset then
-		MP.SP.ruleset = replay.ruleset
-		local ruleset_name = replay.ruleset:gsub("^ruleset_mp_", "")
+	-- Replay's ruleset wins; if it has none, fall back to whatever the picker
+	-- left in MP.SP.ruleset. If neither exists we're flying blind, but
+	-- apply_default_modifiers(nil) just clears, so we degrade quietly.
+	local ruleset_key = replay.ruleset or MP.SP.ruleset
+	if ruleset_key then
+		MP.SP.ruleset = ruleset_key
+		local ruleset_name = ruleset_key:gsub("^ruleset_mp_", "")
+		MP.apply_default_modifiers(ruleset_name)
 		MP.LoadReworks(ruleset_name)
 	end
 
