@@ -37,8 +37,7 @@ end
 function G.FUNCS.create_lobby(e)
 	G.SETTINGS.paused = true
 
-	-- Entering an MP flow: clear any practice/ghost state so a stale practice
-	-- flag can't shadow MP reads during lobby setup (before a code exists).
+	-- Clear practice/ghost state so it can't shadow MP reads during lobby setup.
 	MP.SP.practice = false
 	MP.GHOST.clear()
 	MP.MODIFIERS = {}
@@ -59,8 +58,7 @@ end
 function G.FUNCS.join_lobby(e)
 	G.SETTINGS.paused = true
 
-	-- Same isolation as create_lobby: a guest arriving from practice must not
-	-- carry practice/ghost state into the lobby. Modifiers come from the host.
+	-- Same isolation as create_lobby; modifiers arrive from the host.
 	MP.SP.practice = false
 	MP.GHOST.clear()
 
