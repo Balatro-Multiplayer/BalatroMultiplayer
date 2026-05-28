@@ -352,7 +352,8 @@ end
 
 local start_run_ref = Game.start_run
 function Game:start_run(args)
-	-- Use MP ruleset if in lobby, otherwise use SP ruleset (if selected)
+	-- Not get_active_ruleset(): the sp run flow leaves practice=false but still
+	-- sets MP.SP.ruleset, which get_active_ruleset() only honours in practice.
 	MP.LoadReworks(MP.LOBBY.config.ruleset or MP.SP.ruleset)
 
 	start_run_ref(self, args)

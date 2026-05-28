@@ -117,6 +117,17 @@ function G.UIDEF.ruleset_selection_tabs(mode)
 	return t
 end
 
+-- sp/practice selections stay local on MP.SP.ruleset; mp writes the shared
+-- MP.LOBBY.config.ruleset. Every writer routes through here so practice can't
+-- touch the MP global.
+local function set_selected_ruleset(mode, ruleset_key)
+	if mode == "sp" or mode == "practice" then
+		MP.SP.ruleset = ruleset_key
+	else
+		MP.LOBBY.config.ruleset = ruleset_key
+	end
+end
+
 function G.UIDEF.ruleset_selection_options(mode, buttons)
 	mode = mode or "mp"
 	MP.LOBBY.fetched_weekly = "smallworld" -- temp
@@ -129,11 +140,7 @@ function G.UIDEF.ruleset_selection_options(mode, buttons)
 		default_ruleset = string.match(buttons[1].buttons[1].button_id, "(.+)_ruleset_button$")
 	end
 
-	if mode == "sp" or mode == "practice" then
-		MP.SP.ruleset = "ruleset_mp_" .. default_ruleset
-	else
-		MP.LOBBY.config.ruleset = "ruleset_mp_" .. default_ruleset
-	end
+	set_selected_ruleset(mode, "ruleset_mp_" .. default_ruleset)
 
 	-- Modifiers are per-ruleset; reset on (re)entry to a tab so a previous
 	-- ruleset's toggles can't bleed into the new one. Rulesets with
@@ -172,11 +179,7 @@ function G.FUNCS.change_ruleset_selection(e)
 		end,
 		default_button,
 		function(ruleset_name)
-			if mode == "sp" or mode == "practice" then
-				MP.SP.ruleset = "ruleset_mp_" .. ruleset_name
-			else
-				MP.LOBBY.config.ruleset = "ruleset_mp_" .. ruleset_name
-			end
+			set_selected_ruleset(mode, "ruleset_mp_" .. ruleset_name)
 			MP.apply_default_modifiers(ruleset_name)
 			MP.LoadReworks(ruleset_name)
 		end
@@ -271,23 +274,23 @@ function G.FUNCS.ruleset_switch_tabs(args)
 	local active_tab = tabs_wrap.UIBox:get_UIE_by_ID("ruleset_active_tab")
 	local active_tab_idx = active_tab and active_tab.config.tab_idx or 1
 
+	local mode = MP.UI.ruleset_selection_mode or "mp"
 	local tab_type = (args.to_key == 2 and "banned") or (args.to_key == 3 and "rework") or "info"
 	local def = nil
+
+	set_selected_ruleset(mode, callback_args.ruleset.key)
 
 	if tab_type == "banned" then
 		def = G.UIDEF.lobby_setup_tabs_definition(callback_args.ruleset, "banned", active_tab_idx, true)
 		tabs_object.config.tab_type = "banned"
-		MP.LOBBY.config.ruleset = callback_args.ruleset.key
 		MP.LOBBY.ruleset_preview = false
 	elseif tab_type == "rework" then
 		def = G.UIDEF.lobby_setup_tabs_definition(callback_args.ruleset, "rework", active_tab_idx, true)
 		tabs_object.config.tab_type = "rework"
-		MP.LOBBY.config.ruleset = callback_args.ruleset.key
 		MP.LOBBY.ruleset_preview = true
 	else
 		def = G.UIDEF.lobby_setup_tabs_definition(callback_args.ruleset, "info", active_tab_idx, true)
 		tabs_object.config.tab_type = "info"
-		MP.LOBBY.config.ruleset = callback_args.ruleset.key
 		MP.LOBBY.ruleset_preview = false
 	end
 
