@@ -248,7 +248,12 @@ function LOG_PARSER.process_log(content)
 			local action, kv = parse_got_kv(line)
 			if not action then goto continue end
 
-			if action == "joinedLobby" then
+			if action == "lobbyOptions" then
+				-- Guests receive lobbyOptions rather than sending them; capture
+				-- here so startGame can read the final deck/ruleset/etc.
+				last_lobby_options = kv
+
+			elseif action == "joinedLobby" then
 				if kv.code then game.lobby_code = tostring(kv.code) end
 
 			elseif action == "lobbyInfo" then
