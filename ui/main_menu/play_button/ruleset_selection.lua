@@ -149,7 +149,9 @@ function G.UIDEF.ruleset_selection_options(mode, buttons)
 	-- here we are
 	MP.apply_default_modifiers(default_ruleset)
 
-	MP.LoadReworks(default_ruleset)
+	-- Preview only: projects into the isolated _PREVIEW_VIEW, never the live
+	-- centers the next game reads. Browsing can't desync anyone now.
+	MP.PreviewReworks(default_ruleset)
 	MP.UI.ruleset_selection_mode = mode
 	MP.UI.ruleset_selection_default_button = default_ruleset .. "_ruleset_button"
 
@@ -181,7 +183,7 @@ function G.FUNCS.change_ruleset_selection(e)
 		function(ruleset_name)
 			set_selected_ruleset(mode, "ruleset_mp_" .. ruleset_name)
 			MP.apply_default_modifiers(ruleset_name)
-			MP.LoadReworks(ruleset_name)
+			MP.PreviewReworks(ruleset_name)
 		end
 	)
 
@@ -449,7 +451,9 @@ function G.UIDEF.ruleset_cardarea_definition(args)
 						G.CARD_W * card_size,
 						G.CARD_H * card_size,
 						nil,
-						G.P_CENTERS[v],
+						-- Read through the preview projection, not the live center,
+						-- so the panel shows reworked numbers without mutating G.P_*.
+						MP.preview_center(v),
 						{ bypass_discovery_center = true, bypass_discovery_ui = true }
 					)
 					card_area:emplace(card)

@@ -354,7 +354,9 @@ local start_run_ref = Game.start_run
 function Game:start_run(args)
 	-- Not get_active_ruleset(): the sp run flow leaves practice=false but still
 	-- sets MP.SP.ruleset, which get_active_ruleset() only honours in practice.
-	MP.LoadReworks(MP.LOBBY.config.ruleset or MP.SP.ruleset)
+	-- The single live mutation of G.P_* — rebuilt from the frozen baseline, so
+	-- identical on both clients regardless of what either previewed first.
+	MP.ApplyReworks(MP.LOBBY.config.ruleset or MP.SP.ruleset)
 
 	start_run_ref(self, args)
 

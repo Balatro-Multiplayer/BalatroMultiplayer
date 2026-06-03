@@ -31,4 +31,17 @@ After `capture`, review the diff in `tests/ruleset_snapshot.lua` before committi
 
 - Function bodies (only whether a function is defined)
 - Runtime behavior (ApplyBans hook chains, smallworld cull logic, speedlatro timer)
-- Rework center definitions (`MP.ReworkCenter` calls)
+- Rework center definitions (`MP.ReworkCenter` calls) — see the rework determinism test below
+
+## Rework Determinism + Desync-Safety
+
+`test_rework_determinism.lua` backstops the part the shape snapshot explicitly skips: the `MP.ReworkCenter` / `MP.ApplyReworks` / `MP.PreviewReworks` center-mutation path. It loads the real `rulesets/_rulesets.lua`, registers the shipped reworks (the multi-layer `m_glass`, the rarity-bumped `j_sixth_sense`), then drives the mechanism through hostile call histories (preview ruleset Y then apply X, apply twice, fake menu cycles) and asserts:
+
+- **D1 — determinism:** a reworked center's effective props are a pure function of the resolved context (ruleset + layers + modifiers), identical regardless of preview/cycle/call-count history.
+- **D2 — desync-safety:** the rarity-pool *order* is byte-identical across divergent histories; the membership predicate matches vanilla `game.lua` (`not wip`, `not demo`, `set == 'Joker'`); previews never mutate live centers or pools; the frozen baseline rejects writes.
+
+Like the shape snapshot it is necessary-not-sufficient — it stubs game globals rather than running the real engine — but it exercises the mutation path the shape test cannot.
+
+```bash
+lua tests/test_rework_determinism.lua
+```
