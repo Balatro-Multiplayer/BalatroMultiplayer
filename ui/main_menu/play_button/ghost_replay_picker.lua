@@ -51,7 +51,9 @@ function G.FUNCS.load_previewed_ghost(e)
 		MP.SP.ruleset = ruleset_key
 		local ruleset_name = ruleset_key:gsub("^ruleset_mp_", "")
 		MP.apply_default_modifiers(ruleset_name)
-		MP.LoadReworks(ruleset_name)
+		-- Preview projection only; the live centers are mutated at run start
+		-- by start_practice_run → Game:start_run → ApplyReworks.
+		MP.PreviewReworks(ruleset_name)
 	end
 
 	_preview_idx = nil
