@@ -85,7 +85,7 @@ position = "at"
 payload = '''local polled_rate = pseudorandom(pseudoseed('cdt'..MP.ante_based()))*total_rate'''
 match_indent = true
 
-# Resample advances rarity queue
+# Resample advances queue instead of rerolling
 [[patches]]
 [patches.pattern]
 target = "functions/common_events.lua"
@@ -99,77 +99,83 @@ end
 '''
 match_indent = true
 
-# Patch joker editions/stickers to be dependent on individual jokers rather than queue
+# stable shop
+# select rarity, then that rarity's stickers, then the joker from either normal or stickered queue
+[[patches]]
+[patches.pattern]
+target = "functions/common_events.lua"
+pattern = '''if forced_key and not G.GAME.banned_keys[forced_key] then'''
+position = "before"
+payload = '''
+local _order_et, _order_per, _order_rent, _order_ed = nil, nil, nil, nil
+if _type == "Joker" and not forced_key and MP.should_use_the_order() then
+	local _pool, _pool_key = get_current_pool(_type, _rarity, legendary, key_append)
+	forced_key = "UNAVAILABLE"
+	local it = 0
+	while forced_key == "UNAVAILABLE" do
+		_order_et, _order_per, _order_rent, _order_ed = nil, nil, nil, nil
+		-- select stickers based off of rarity
+		if (area == G.pack_cards) or (area == G.shop_jokers) then
+			local eternal_perishable_poll = pseudorandom("_etper".._pool_key)
+
+			-- block of nonsense
+			if G.GAME.modifiers.enable_eternals_in_shop
+			and eternal_perishable_poll > 0.7
+			and not SMODS.Stickers["eternal"].should_apply then
+				_order_et = true
+			elseif G.GAME.modifiers.enable_perishables_in_shop
+			and ((eternal_perishable_poll > 0.4)
+			and (eternal_perishable_poll <= 0.7))
+			and not SMODS.Stickers["perishable"].should_apply then
+				_order_per = true
+			end
+			if G.GAME.modifiers.enable_rentals_in_shop
+			and pseudorandom("_rent".._pool_key) > 0.7
+			and not SMODS.Stickers["rental"].should_apply then
+				_order_rent = true
+			end
+		end
+
+		local _s_append = ""
+		if _order_et or _order_per or _order_rent then
+			_s_append = "_sticker"
+		end
+		forced_key = pseudorandom_element(_pool, pseudoseed(_pool_key.._s_append))
+		if it > 1000 then -- fallback
+			forced_key = pseudorandom_element(_pool, pseudoseed(_pool_key.._s_append..'_resample'..it))
+		end
+		if forced_key ~= "UNAVAILABLE" then
+			-- breaking news. this mutates the `_pool` (IT'S NOT LOCAL)
+			-- so only do it when you're done (IT'S NOT LOCAL)
+			-- we'll need to advance the rng queue silently (THE VARIABLE POINTS TO A GLOBAL)
+			_order_ed = poll_edition('edi'.._pool_key.._s_append)
+		else
+			-- advance said rng queue silently
+			pseudorandom(pseudoseed('edi'.._pool_key.._s_append))
+		end
+		it = it + 1
+	end
+end
+'''
+match_indent = true
+
+# override vanilla sticker and edition setting with the previously defined stickers and editions
 [[patches]]
 [patches.pattern]
 target = "functions/common_events.lua"
 pattern = '''if (area == G.shop_jokers) or (area == G.pack_cards) then'''
 position = "before"
 payload = '''
-local _etpeareakey = MP.should_use_the_order() and 'etperpoll' or (area == G.pack_cards and 'packetper' or 'etperpoll')
-local _rentareakey = MP.should_use_the_order() and 'ssjr' or (area == G.pack_cards and 'packssjr' or 'ssjr')
-local _order = MP.should_use_the_order() and center.key or ""
+if MP.should_use_the_order() then
+	if _order_et then card:set_eternal(_order_et) end
+	if _order_per then card:set_perishable(_order_per) end
+	if _order_rent then card:set_rental(_order_rent) end
+	card:set_edition(_order_ed)
+	-- wow what a suspiciously dangerously placed return that prevents any code below it from running!
+	-- i sure hope this doesn't cause any problems whatsoever
+	return card
+end
 '''
-match_indent = true
-
-[[patches]]
-[patches.pattern]
-target = "functions/common_events.lua"
-pattern = '''local eternal_perishable_poll = pseudorandom((area == G.pack_cards and 'packetper' or 'etperpoll')..G.GAME.round_resets.ante)'''
-position = "at"
-payload = '''local eternal_perishable_poll = pseudorandom(_order.._etpeareakey..G.GAME.round_resets.ante)'''
-match_indent = true
-
-[[patches]]
-[patches.pattern]
-target = "functions/common_events.lua"
-pattern = '''if G.GAME.modifiers.enable_rentals_in_shop and pseudorandom((area == G.pack_cards and 'packssjr' or 'ssjr')..G.GAME.round_resets.ante) > 0.7 and not SMODS.Stickers["rental"].should_apply then'''
-position = "at"
-payload = '''if G.GAME.modifiers.enable_rentals_in_shop and pseudorandom(_order.._rentareakey..G.GAME.round_resets.ante) > 0.7 and not SMODS.Stickers["rental"].should_apply then'''
-match_indent = true
-
-[[patches]]
-[patches.pattern]
-target = "functions/common_events.lua"
-pattern = '''local edition = poll_edition('edi'..(key_append or '')..G.GAME.round_resets.ante)'''
-position = "at"
-payload = '''
-if MP.should_use_the_order() then key_append = nil end	-- why does this even use key_append again?
-local edition = poll_edition(_order..'edi'..(key_append or '')..G.GAME.round_resets.ante)
-'''
-match_indent = true
-
-# Make soul/black hole queue not dependent on type (omen globe)
-# Avoid black hole overwriting soul
-[[patches]]
-[patches.pattern]
-target = "functions/common_events.lua"
-pattern = '''if pseudorandom('soul_'.._type..G.GAME.round_resets.ante) > 0.997 then
-	forced_key = 'c_soul''''
-position = "at"
-payload = '''if pseudorandom('soul_'..(MP.should_use_the_order() and 'c_soul' or _type)..G.GAME.round_resets.ante) > 0.997 then
-	forced_key = 'c_soul''''
-match_indent = true
-
-[[patches]]
-[patches.pattern]
-target = "functions/common_events.lua"
-pattern = '''if pseudorandom('soul_'.._type..G.GAME.round_resets.ante) > 0.997 then
-	forced_key = 'c_black_hole''''
-position = "at"
-payload = '''if pseudorandom('soul_'..(MP.should_use_the_order() and 'c_black_hole' or _type)..G.GAME.round_resets.ante) > 0.997 then
-	if not (MP.should_use_the_order() and forced_key) then
-		forced_key = 'c_black_hole'
-	end'''
-match_indent = true
-
-# Patch Wraith rarity to be the same as Rare Tag (because order uses it for some reason)
-[[patches]]
-[patches.pattern]
-target = "card.lua"
-pattern = '''local card = create_card('Joker', G.jokers, nil, 0.99, nil, nil, nil, 'wra')'''
-position = "at"
-payload = '''local card = create_card('Joker', G.jokers, nil, MP.should_use_the_order() and 1 or 0.99, nil, nil, nil, 'wra')'''
 match_indent = true
 
 # Patch To-Do List rng to be the same on different operating systems
