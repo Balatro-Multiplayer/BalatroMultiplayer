@@ -350,6 +350,16 @@ function Game:update_blind_select(dt)
 	update_blind_select_ref(self, dt)
 end
 
+-- Symmetric counterpart to the start_run apply below: when a run ends and we drop
+-- back to the menu, rebuild the live centers from the frozen baseline (nil ruleset
+-- = empty layer chain = pure vanilla). Otherwise the centers keep the last run's
+-- reworked numbers and the vanilla collection screen shows them until the next run.
+local main_menu_ref_reworks = Game.main_menu
+function Game:main_menu(change_context)
+	main_menu_ref_reworks(self, change_context)
+	MP.ApplyReworks(nil)
+end
+
 local start_run_ref = Game.start_run
 function Game:start_run(args)
 	-- Not get_active_ruleset(): the sp run flow leaves practice=false but still
