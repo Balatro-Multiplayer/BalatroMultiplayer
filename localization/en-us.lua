@@ -94,15 +94,6 @@ return {
 					"{s:0.8}Card changes every round",
 				},
 			},
-			j_mp_idol_rare = {
-				name = "The Idol",
-				text = {
-					"Each played {C:attention}#2#",
-					"of {V:1}#3#{} gives",
-					"{X:mult,C:white} X#1# {} Mult when scored",
-					"{s:0.8}Card changes every round",
-				},
-			},
 			j_mp_ticket = {
 				name = "Golden Ticket",
 				text = {

@@ -103,7 +103,7 @@ SMODS.showman = function() return false end
 
 local function lua_files_in(dir)
 	local files = {}
-	local p = io.popen('ls "' .. dir .. '"/*.lua 2>/dev/null')
+	local p = io.popen('find "' .. dir .. '" -name "*.lua" 2>/dev/null')
 	if p then
 		for line in p:lines() do
 			files[#files + 1] = line

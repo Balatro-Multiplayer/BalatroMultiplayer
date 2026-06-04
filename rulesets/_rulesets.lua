@@ -230,27 +230,17 @@ function MP.ApplyBans()
 end
 
 -- ----------------------------------------------------------------------------
--- ReworkCenter: declarative center rebalancing, derived purely from context
+-- ReworkCenter: center rebalancing as a pure projection of the active context
 -- ----------------------------------------------------------------------------
--- Old model smeared mp_<layer>_<prop> onto the shared center and mutated it in
--- place every time the active context changed. Effective state depended on call
--- history, not on (ruleset + layers + modifiers). Menu previews leaked into the
--- state gameplay reads (3a42f503), the "NULL" sentinel conflated absent-vs-real,
--- and rarity reworks re-sorted the pseudorandom pool incrementally — three of
--- the documented desync vectors, in one function.
---
--- New model is three tiers:
---   1. BASELINE — a deep, frozen snapshot of vanilla, captured once. The truth
---      we always rebuild from, so the result is the same on call 1 and call 100.
---   2. LEDGER — declared overrides, normalized per (table, key, layer). No
---      prefixes on the center; the override lives off to the side.
---   3. LIVE — G.P_* is a *projection* of (baseline ⊕ active layers), recomputed
---      from scratch. ApplyReworks is the only writer; PreviewReworks computes
---      into an isolated namespace and never touches G.P_*.
---
--- effective_props is a pure function of (table, key, layer-chain). That's the
--- whole determinism argument: two clients that finalize the same chain get
--- byte-identical centers regardless of what either browsed first.
+-- The predecessor mutated the shared center in place and let the result depend on
+-- call history, which is a polite way of saying two clients desynced if they
+-- did things in a different order. Three tiers now, nothing touched
+-- until run start, and only ever rebuilt from a frozen copy of vanilla:
+--   BASELINE — deep-frozen vanilla, captured once. The same on call 1 and call 100.
+--   LEDGER   — declared overrides, filed per (table, key, layer), off to the side.
+--   LIVE     — G.P_* recomputed from (baseline ⊕ active layers). ApplyReworks is
+--              the only writer; PreviewReworks projects elsewhere and touches nothing.
+-- effective_props() is pure in (table, key, layer-chain). 
 
 -- Tables ReworkCenter can target, keyed by a stable id so baseline/ledger don't
 -- alias across tables that happen to share a key string.
@@ -293,8 +283,8 @@ local function deep_copy(v)
 	return out
 end
 
--- Recursive freeze. A frozen baseline that's written to errors immediately,
--- instead of silently desyncing two clients weeks later.
+-- Recursive freeze. Writing to the baseline errors loudly here and now, rather
+-- than desyncing two clients quietly, three weeks from now, mid-tournament.
 local function deep_freeze(v)
 	if type(v) ~= "table" then return v end
 	local inner = {}
@@ -312,9 +302,8 @@ local function deep_freeze(v)
 	return proxy
 end
 
--- Deep-merge src onto dst (both plain tables). Tables recurse; scalars overwrite.
--- Mirrors the old config behaviour where {extra={...}} layered onto vanilla
--- config rather than replacing it wholesale.
+-- Deep-merge src onto dst. Tables recurse; scalars overwrite. So {extra={...}}
+-- layers onto vanilla config instead of clobbering the whole table.
 local function deep_merge(dst, src)
 	for k, v in pairs(src) do
 		if type(v) == "table" and type(dst[k]) == "table" then
@@ -347,9 +336,7 @@ function MP.ReworkCenter(key, opts)
 end
 
 -- Normalize one ReworkCenter call into the ledger. Runs once, post-registration.
--- This is where the loc_var-wrap / generate_ui / mp_balanced enrichment lives —
--- byte-for-byte the same behaviour as the old graft, just normalized into a
--- side table instead of smeared onto the center as mp_<layer>_<prop>.
+-- Where the loc_var-wrap / generate_ui / mp_balanced enrichment happens.
 local function ingest_rework(key, opts)
 	local table_id = resolve_table_id(opts.center_table)
 	if not table_id then return end
@@ -361,7 +348,7 @@ local function ingest_rework(key, opts)
 	if type(layers) == "string" then layers = { layers } end
 	if not layers then return end
 
-	-- Wrap loc_vars to inject loc_key if provided (unchanged semantics).
+	-- Wrap loc_vars to inject loc_key if provided.
 	local loc_key = opts.loc_key
 	if loc_key then
 		local user_loc_vars = opts.loc_vars or function()
@@ -374,14 +361,13 @@ local function ingest_rework(key, opts)
 		end
 	end
 
-	-- Inject generate_ui when adding loc_vars to a vanilla center (unchanged).
+	-- Inject generate_ui when adding loc_vars to a vanilla center.
 	local needs_generate_ui = opts.loc_vars
 		and not opts.generate_ui
 		and not (center.generate_ui and type(center.generate_ui) == "function")
 
-	-- Force mp_balanced on the reworked config so the sticker patch fires
-	-- (unchanged). We seed from vanilla config so callers can override a single
-	-- field without re-declaring the whole table.
+	-- Force mp_balanced on the config so the sticker patch fires. Seed from vanilla
+	-- config so a caller can override one field without re-declaring the whole table.
 	if center.config then
 		opts.config = opts.config or deep_copy(center.config)
 		opts.config.mp_balanced = true
@@ -400,9 +386,8 @@ local function ingest_rework(key, opts)
 	MP._REWORK_OWNED[table_id][key] = MP._REWORK_OWNED[table_id][key] or {}
 	local owned = MP._REWORK_OWNED[table_id][key]
 
-	-- Baseline: deep snapshot of every prop this rework touches, before anyone
-	-- mutates anything. Present-booleans, not a "NULL" string — absent stays
-	-- absent. Frozen so the snapshot can't drift.
+	-- Baseline: deep snapshot of every prop this rework touches, taken before
+	-- anything mutates. A present-flag, not a magic "absent" value, so nil stays nil.
 	MP._REWORK_BASELINE[table_id] = MP._REWORK_BASELINE[table_id] or {}
 	MP._REWORK_BASELINE[table_id][key] = MP._REWORK_BASELINE[table_id][key] or {}
 	local baseline = MP._REWORK_BASELINE[table_id][key]
@@ -420,7 +405,7 @@ local function ingest_rework(key, opts)
 	end
 
 	for _, layer in ipairs(layers) do
-		-- Last write for a (key, layer) wins, matching the old prefix-overwrite.
+		-- Last write for a (key, layer) wins.
 		MP._REWORK_LEDGER[table_id][key][layer] = {
 			props = deep_copy(props),
 			silent = opts.silent,
@@ -428,17 +413,16 @@ local function ingest_rework(key, opts)
 	end
 end
 
--- Compute the effective props for one center under an ordered layer chain.
--- PURE: depends only on (frozen baseline, ledger, chain). No reads of, or writes
--- to, the live center — this is the heart of the determinism guarantee.
--- Returns (effective, owned) where `effective[prop] = value | nil`.
+-- Effective props for one center under an ordered layer chain. PURE: reads only
+-- (frozen baseline, ledger, chain), never the live center. Returns (effective,
+-- owned) where `effective[prop] = value | nil`.
 local function effective_props(table_id, key, chain)
 	local owned = (MP._REWORK_OWNED[table_id] or {})[key] or {}
 	local baseline = (MP._REWORK_BASELINE[table_id] or {})[key] or {}
 	local ledger = (MP._REWORK_LEDGER[table_id] or {})[key] or {}
 
-	-- Start from vanilla: every owned prop resets to its frozen baseline (or
-	-- absent). This is why call-count and preview history can't leak in.
+	-- Start from vanilla: every owned prop resets to baseline (or absent). No
+	-- history survives this line, which is the entire point of the rewrite.
 	local effective = {}
 	for prop in pairs(owned) do
 		local b = baseline[prop]
@@ -474,11 +458,10 @@ local function reworked_keys(table_id)
 	return out
 end
 
--- Rebuild G.P_JOKER_RARITY_POOLS from scratch under the effective rarities.
--- NOT incremental: collect every joker whose effective rarity is bucket B,
--- stable-sort by (.order, key), and replace the bucket wholesale. Two clients
--- with the same chain produce byte-identical pools regardless of how many times
--- this ran or what they previewed — defeating the rarity re-sort desync.
+-- Rebuild G.P_JOKER_RARITY_POOLS from scratch. NOT incremental: collect every
+-- joker whose effective rarity is bucket B, stable-sort by (.order, key), replace
+-- wholesale. Incremental re-sorting is precisely how the rarity pool used to drift
+-- two clients apart, so we don't do that anymore.
 local function rebuild_rarity_pools(chain, effective_rarity)
 	if not G.P_JOKER_RARITY_POOLS then return end
 	for bucket, pool in pairs(G.P_JOKER_RARITY_POOLS) do
@@ -520,11 +503,10 @@ local function chain_for(ruleset)
 	return MP.active_layer_chain(ruleset)
 end
 
--- Apply reworks for the active ruleset onto the LIVE centers. The ONLY function
--- that writes G.P_*; called once at run start (game_state.lua). Idempotent: it
--- rebuilds every owned prop from the frozen baseline, so calling it twice — or
--- after any number of previews — lands on the same state.
--- Pass a `key` to limit to one center (kept for parity with old call sites).
+-- The ONLY writer of G.P_*. Called once at run start (game_state.lua). Idempotent
+-- by construction: every owned prop is rebuilt from the frozen baseline, so once,
+-- twice, or after fifty menu previews all land in exactly the same place.
+-- Pass a `key` to limit to one center (parity with old call sites).
 function MP.ApplyReworks(ruleset, key)
 	if MP._PREVIEW_ACTIVE then
 		error("ApplyReworks called during preview phase — pool mutation is forbidden while previewing")
@@ -561,10 +543,10 @@ function MP.ApplyReworks(ruleset, key)
 	if not key and next(effective_rarity) then rebuild_rarity_pools(chain, effective_rarity) end
 end
 
--- Project reworks for `ruleset` into an isolated read-only namespace. Never
--- writes G.P_* or the rarity pools. The info panel reads through
--- MP.preview_center(), so previewing ruleset Y can't leave residue in the state
--- a later game under ruleset X reads. This is the asymmetric-call-site fix.
+-- Project reworks into an isolated read-only namespace. Never writes G.P_* or the
+-- pools; the info panel reads through MP.preview_center(). So previewing ruleset Y
+-- leaves no residue for a later game under X — the exact bug this rewrite exists
+-- to kill, back when the menu and the run shared one mutable center.
 function MP.PreviewReworks(ruleset)
 	local chain = chain_for(ruleset)
 	MP._PREVIEW_VIEW = {}
@@ -579,20 +561,20 @@ function MP.PreviewReworks(ruleset)
 	MP._PREVIEW_ACTIVE = false
 end
 
--- Thin accessor: the center as the active preview would render it. UI that
--- displays reworked centers reads through this instead of the live table, so it
--- shows preview numbers without anything mutating the live center. Outside a
--- preview (empty view) it returns the live center unchanged.
+-- The center as the active preview would render it. UI reads through this instead
+-- of the live table, so it shows preview numbers without mutating anything.
+-- Outside a preview (empty view) it just hands back the live center.
 function MP.preview_center(key, center_table)
 	local table_id = resolve_table_id(center_table) or "P_CENTERS"
 	local tbl = rework_tables()[table_id]
 	local live = tbl and tbl[key]
 	local overlay = (MP._PREVIEW_VIEW[table_id] or {})[key]
 	if not live or not overlay then return live end
-	-- Read-through proxy: overlaid props (incl. the already-merged config the
-	-- panel + balanced sticker read) come from the projection; everything else
-	-- falls through to live. Writes land on the throwaway proxy, never on live —
-	-- so even a Card constructor that scribbles on its center can't desync.
+	-- Read-through proxy: overlaid props (incl. the merged config the panel +
+	-- balanced sticker read) come from the projection, the rest fall through to
+	-- live. Writes hit the throwaway proxy, never live — a Card scribbling on its
+	-- center can't desync us. (It can still surprise us in other ways: this proxy
+	-- has no identity in G.P_CENTERS, which is its own small saga elsewhere.)
 	return setmetatable({}, {
 		__index = function(_, prop)
 			local ov = overlay[prop]
@@ -602,11 +584,10 @@ function MP.preview_center(key, center_table)
 	})
 end
 
--- Backwards-compatible shim. Old call sites pass a ruleset (+ optional key).
--- Game-start applies for real; menu/replay sites should migrate to
--- PreviewReworks, but routing them here keeps them correct (a preview that
--- writes the live center is still deterministic — it's just wasteful — because
--- the next ApplyReworks rebuilds from the frozen baseline regardless).
+-- Backwards-compatible shim for the ~70 old call sites. Menu/replay sites really
+-- ought to use PreviewReworks, but routing them through here stays correct — the
+-- next ApplyReworks rebuilds from baseline regardless, so the worst case is some
+-- wasted work, not a desync.
 function MP.LoadReworks(ruleset, key)
 	MP.ApplyReworks(ruleset, key)
 end

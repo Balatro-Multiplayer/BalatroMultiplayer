@@ -8,7 +8,6 @@ MP.Layer("experimental", {
 		"j_bloodstone",
 		"c_ouija",
 		"j_todo_list",
-		"j_idol",
 	},
 	banned_jokers = {
 		"j_mp_speedrun",
@@ -25,7 +24,7 @@ MP.Layer("experimental", {
 		"j_mp_seltzer",
 		"j_mp_todo_list",
 		"j_mp_bloodstone",
-		"j_mp_idol_rare",
+        "j_idol",
 	},
 	reworked_consumables = {
 		"c_mp_ouija_standard",
