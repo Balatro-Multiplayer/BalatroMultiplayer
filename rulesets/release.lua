@@ -4,8 +4,6 @@ MP.Ruleset({
 	layers = { "release" },
 }):inject()
 
--- below nonsense should be in the layers equivalent but reworkcenter loads with rulesets so
-
 SMODS.Atlas({
 	key = "release_jokers",
 	path = "release_jokers.png",
