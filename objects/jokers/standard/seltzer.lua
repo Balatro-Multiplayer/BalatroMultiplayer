@@ -6,7 +6,7 @@ SMODS.Joker({
 	blueprint_compat = true,
 	eternal_compat = false,
 	rarity = 2,
-	cost = 5,
+	cost = 6,
 	pos = { x = 3, y = 15 },
 	config = { extra = { hands_left = 8 }, mp_balanced = true },
 	loc_vars = function(self, info_queue, card)
