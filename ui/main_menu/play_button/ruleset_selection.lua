@@ -87,7 +87,7 @@ local rulesets_tabs = {
 	},
 }
 
-function G.UIDEF.ruleset_selection_tabs(mode)
+function G.UIDEF.ruleset_selection_tabs(mode, chosen_label)
 	local tabs_schema = rulesets_tabs[mode] or rulesets_tabs.default
 	local tabs = {}
 	for _, item in ipairs(tabs_schema) do
@@ -98,7 +98,25 @@ function G.UIDEF.ruleset_selection_tabs(mode)
 			end,
 		})
 	end
-	tabs[1].chosen = true
+	-- Bespoke custom-ruleset editor tab (raw strings, no loc keys yet).
+	if MP.UI.build_custom_ruleset_editor then
+		table.insert(tabs, {
+			label = "Custom",
+			tab_definition_function = function()
+				return MP.UI.build_custom_ruleset_editor(mode)
+			end,
+		})
+	end
+	-- Open on a specific tab when asked (e.g. returning from the ban picker),
+	-- otherwise default to the first.
+	local chose = false
+	if chosen_label then
+		for _, tab in ipairs(tabs) do
+			tab.chosen = tab.label == chosen_label
+			if tab.chosen then chose = true end
+		end
+	end
+	if not chose then tabs[1].chosen = true end
 	local t = create_UIBox_generic_options({
 		back_func = "play_options",
 		contents = {

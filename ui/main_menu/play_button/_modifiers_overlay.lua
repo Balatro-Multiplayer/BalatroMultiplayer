@@ -1,41 +1,6 @@
--- Modifier toggles render inline inside the ruleset info panel. The handlers
--- write MP.MODIFIERS directly (no network) — the host's lobby_options push at
--- start_lobby carries the serialized list to the guest.
-local function timer_modifier_to_index()
-	if MP.has_modifier("pressure_timer_plus") then return 4 end
-	if MP.has_modifier("pressure_timer") then return 3 end
-	if MP.has_modifier("no_animation_timer") then return 2 end
-	return 1
-end
-
--- Indices line up with localization ml_mp_modifier_timer_opt: 1=default, 2=no_anim, 3=pressure
-G.FUNCS.change_modifier_timer = function(args)
-	MP.remove_modifier("no_animation_timer")
-	MP.remove_modifier("pressure_timer")
-	MP.remove_modifier("pressure_timer_plus")
-	if args.to_key == 2 then
-		MP.add_modifier("no_animation_timer")
-	elseif args.to_key == 3 then
-		MP.add_modifier("pressure_timer")
-	elseif args.to_key == 4 then
-		MP.add_modifier("pressure_timer")
-		MP.add_modifier("pressure_timer_plus")
-	end
-end
-
 G.FUNCS.mp_open_modifiers_overlay = function(e)
-	local timer_cycle = MP.UI.Disableable_Option_Cycle({
-		id = "modifier_timer_option",
-		enabled_ref_table = { val = true },
-		enabled_ref_value = "val",
-		label = localize("k_opts_modifier_timer"),
-		scale = 0.8,
-		options = localize("ml_mp_modifier_timer_opt"),
-		current_option = timer_modifier_to_index(),
-		opt_callback = "change_modifier_timer",
-		minw = 4,
-		w = 4,
-	})
+	local timer_cycle = MP.UI.build_timer_modifier_cycle()
+	local pvp_timer_toggle = MP.UI.build_pvp_timer_toggle()
 
 	local smallworld_toggle = create_toggle({
 		id = "modifier_smallworld_toggle",
@@ -47,20 +12,6 @@ G.FUNCS.mp_open_modifiers_overlay = function(e)
 				MP.add_modifier("smallworld")
 			else
 				MP.remove_modifier("smallworld")
-			end
-		end,
-	})
-
-	local pvp_timer_toggle = create_toggle({
-		id = "modifier_pvp_timer_toggle",
-		label = localize("b_opts_modifier_pvp_timer"),
-		ref_table = { val = MP.has_modifier("pvp_timer") },
-		ref_value = "val",
-		callback = function(new_val)
-			if new_val then
-				MP.add_modifier("pvp_timer")
-			else
-				MP.remove_modifier("pvp_timer")
 			end
 		end,
 	})
