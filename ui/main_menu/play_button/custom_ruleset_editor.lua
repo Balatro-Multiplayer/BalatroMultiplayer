@@ -162,71 +162,6 @@ G.FUNCS.mp_custom_open_collection = function(e)
 end
 
 
-local SUBMIT = {
-	form_id = "REPLACE_WITH_FORM_ID",
-	entry = "entry.000000000", -- single long-answer field; holds the whole JSON blob
-}
-
-local json = require("json")
-
-local function urlencode(str)
-	return (tostring(str or ""):gsub("\n", "\r\n"):gsub("([^%w _%%%-%.~])", function(c)
-		return string.format("%%%02X", string.byte(c))
-	end):gsub(" ", "+"))
-end
-
-local function ensure_http_thread()
-	if MP.CUSTOM._http_thread then return end
-	MP.CUSTOM._http_thread = love.thread.newThread([[
-		local ok, https = pcall(require, "https")
-		local CHANNEL = love.thread.getChannel("mp_custom_http")
-		while true do
-			local req = CHANNEL:demand()
-			if req and ok then
-				pcall(https.request, req.url, {
-					method = "POST",
-					data = req.body,
-					headers = { ["Content-Type"] = "application/x-www-form-urlencoded" },
-				})
-			end
-		end
-	]])
-	MP.CUSTOM._http_thread:start()
-end
-
-function MP.CUSTOM.submit_dream(draft)
-	if not draft then return end
-	if SUBMIT.form_id == "REPLACE_WITH_FORM_ID" then
-		sendDebugMessage("custom ruleset submit: Google Form not configured (stub)", "MULTIPLAYER")
-		return
-	end
-	ensure_http_thread()
-	local mod = SMODS.Mods["Multiplayer"]
-	local payload = json.encode({
-		name = draft.name,
-		base = draft.base,
-		modifiers = MP.MODIFIERS, -- live, edited via the shared modifiers overlay
-		scalars = draft.scalars,
-		banned_jokers = draft.banned_jokers,
-		banned_consumables = draft.banned_consumables,
-		banned_vouchers = draft.banned_vouchers,
-		user = mod and mod.config and mod.config.username,
-		version = mod and mod.version,
-	})
-	love.thread.getChannel("mp_custom_http"):push({
-		url = "https://docs.google.com/forms/d/e/" .. SUBMIT.form_id .. "/formResponse",
-		body = SUBMIT.entry .. "=" .. urlencode(payload),
-	})
-end
-
-G.FUNCS.mp_custom_submit_dream = function(e)
-	MP.CUSTOM.submit_dream(MP.CUSTOM.draft)
-	MP.CUSTOM.submitted = true
-	play_sound("generic1", 1.0, 0.6)
-	if e then e:juice_up(0.3, 0.1) end
-	G.FUNCS.mp_custom_back_to_editor(e) -- re-render so the button reads "Sent"
-end
-
 -- ---------------------------------------------------------------------------
 -- Tab content
 -- ---------------------------------------------------------------------------
@@ -339,31 +274,11 @@ function MP.UI.build_custom_ruleset_editor(mode)
 		MP.UI.build_mutator_randomize_row(),
 	}
 
-	local submit_node = MP.CUSTOM.submitted
-			and soon_pill("Sent! thanks")
-		or {
-			n = G.UIT.C,
-			config = { align = "cm", padding = 0.06 },
-			nodes = {
-				UIBox_button({
-					id = "mp_custom_submit_btn",
-					button = "mp_custom_submit_dream",
-					label = { "Submit your dream ruleset" },
-					colour = G.C.GREEN,
-					minw = 4.5,
-					minh = 0.85,
-					scale = 0.45,
-					hover = true,
-					shadow = true,
-				}),
-			},
-		}
 	local actions = {
 		n = G.UIT.R,
 		config = { align = "cm", padding = 0.12 },
 		nodes = {
 			{ n = G.UIT.C, config = { align = "cm", padding = 0.06 }, nodes = { soon_pill("Save & Play") } },
-			submit_node,
 		},
 	}
 
