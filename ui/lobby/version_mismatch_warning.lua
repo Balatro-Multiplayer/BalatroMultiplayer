@@ -4,7 +4,6 @@ end
 
 function MP.UI.show_version_mismatch_warning(our_version, their_version)
 	if MP._version_mismatch_shown then return end
-	if G.STAGE ~= G.STAGES.MAIN_MENU then return end
 
 	MP._version_mismatch_shown = true
 
@@ -77,4 +76,15 @@ function MP.UI.show_version_mismatch_warning(our_version, their_version)
 			},
 		}),
 	})
+end
+
+-- Detection happens in action_lobbyInfo, but the guest's lobbyInfo can land mid
+-- join->menu transition, so show from the update loop once the lobby stage is ready.
+local _vmw_update = Game.update
+function Game:update(dt)
+	_vmw_update(self, dt)
+	local m = MP._version_mismatch
+	if m and not MP._version_mismatch_shown and MP.LOBBY.code and G.STAGE == G.STAGES.MAIN_MENU then
+		MP.UI.show_version_mismatch_warning(m.our, m.their)
+	end
 end
