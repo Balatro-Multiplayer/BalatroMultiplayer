@@ -2,12 +2,7 @@ function G.FUNCS.mp_open_update_docs(e)
 	love.system.openURL("https://balatromp.com/docs/getting-started/installation")
 end
 
-function MP.UI.show_version_mismatch_warning(our_version, their_version)
-	if MP._version_mismatch_shown then return end
-	if G.STAGE ~= G.STAGES.MAIN_MENU then return end
-
-	MP._version_mismatch_shown = true
-
+local function build_version_mismatch_modal(our_version, their_version)
 	G.FUNCS.overlay_menu({
 		definition = create_UIBox_generic_options({
 			no_back = true,
@@ -77,4 +72,29 @@ function MP.UI.show_version_mismatch_warning(our_version, their_version)
 			},
 		}),
 	})
+end
+
+-- Arm once per mismatch, then show only after the lobby is visually settled. The
+-- guest's mismatch is detected mid join->menu transition, where go_to_menu's screenwipe
+-- would tear an overlay back down. The deferred event waits out the wipe and any
+-- competing overlay (re-runs while it returns false) before building the modal.
+function MP.UI.show_version_mismatch_warning(our_version, their_version)
+	if MP._version_mismatch_shown then return end
+	MP._version_mismatch_shown = true
+	MP._version_mismatch = { our = our_version, their = their_version }
+
+	G.E_MANAGER:add_event(Event({
+		trigger = "after",
+		delay = 0.3,
+		blocking = false,
+		blockable = false,
+		no_delete = true,
+		func = function()
+			if G.screenwipe or G.OVERLAY_MENU then return false end
+			if G.STAGE ~= G.STAGES.MAIN_MENU or not MP.LOBBY.code then return true end
+			local m = MP._version_mismatch
+			if m then build_version_mismatch_modal(m.our, m.their) end
+			return true
+		end,
+	}))
 end
