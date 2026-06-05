@@ -64,7 +64,7 @@ local MUTATOR_WALL = {
 		cells = {
 			{ key = "inflation", label = "Inflation", desc = { "Shop prices creep up $1 with", "every card you buy." } },
 			{ key = "no_interest", label = "No Interest", desc = { "Savings earn nothing.", "Spend it or lose the edge." } },
-			{ key = "discard_tax", label = "Discard Tax", desc = { "Every discard costs $1.", "Think before you toss." } },
+			{ key = "discard_tax", label = "Discard Tax", desc = { "Every discard costs $1." } },
 			{ key = "frugal", label = "Frugal", desc = { "Unspent discards pay out,", "like leftover hands do." } },
 		},
 	},
@@ -75,16 +75,16 @@ local MUTATOR_WALL = {
 			{ key = "flipped_cards", label = "Blind Poker", desc = { "Your hand is dealt face-down.", "Play by memory and nerve." } },
 			{ key = "debuff_played_cards", label = "Dead Cards", desc = { "Played cards score zero.", "Jokers are the whole engine." } },
 			{ key = "all_eternal", label = "No Takebacks", desc = { "Every joker is eternal —", "unsellable, undestroyable." } },
-			{ key = "shrinking_hand", label = "Heavy Pockets", desc = { "-1 hand size for every $10", "you're holding. Rich, clumsy." } },
+			{ key = "shrinking_hand", label = "Heavy Pockets", desc = { "-1 hand size for every $10", "you're holding." } },
 		},
 	},
 	{
 		name = "HAZARDS",
 		colour = G.C.RED,
 		cells = {
-			{ key = "gambling_opportunity", label = "No Easy Money", desc = { "No Gold or Lucky cards.", "Earn it the hard way." } },
-			{ key = "no_legendaries", label = "No Legends", desc = { "The five legendary jokers", "are out of the pool." } },
-			{ key = "sticker_shop", label = "Risky Shelf", desc = { "Shop stocks eternal, perishable", "and rental jokers. Beware." } },
+			{ key = "gambling_opportunity", label = "No Easy Money", desc = { "No Gold or Lucky cards." } },
+			{ key = "no_rares", label = "No Rares", desc = { "Rare jokers are out", "of the pool." } },
+			{ key = "sticker_shop", label = "Risky Shelf", desc = { "Shop stocks eternal, perishable", "and rental jokers." } },
 			{ key = "chip_cap", label = "Cash Ceiling", desc = { "Chip score can't exceed your", "cash. Greed is the only way up." } },
 		},
 	},
@@ -94,7 +94,7 @@ local MUTATOR_WALL = {
 		cells = {
 			{ key = "glass_cannon", label = "Glass Cannon", desc = { "Only 2 hands a round — but", "every hand hits for 4x mult." } },
 			{ key = "smallworld", label = "Small World", desc = { "75% of the pool banned at", "random. Showman always on." } },
-			{ key = "spartan", label = "Spartan", desc = { "No cash from Small or Big", "blinds. Lean times." } },
+			{ key = "spartan", label = "Spartan", desc = { "No cash from Small or Big", "blinds." } },
 			{ key = "pricey_packs", label = "Pricey Packs", desc = { "Booster packs cost more", "for each ante you reach." } },
 		},
 	},
