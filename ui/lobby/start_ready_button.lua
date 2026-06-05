@@ -61,6 +61,14 @@ local function get_warnings()
 		end
 	end
 
+	if MP.UTILS.mp_version_mismatch() then
+		table.insert(warnings, {
+			localize("k_mp_version_warning"),
+			G.C.RED,
+			0.4,
+		})
+	end
+
 	local host_banned_mods = MP.LOBBY.host
 			and MP.LOBBY.host.config
 			and MP.UTILS.get_banned_mods(MP.LOBBY.host.config.Mods)

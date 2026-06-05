@@ -393,6 +393,7 @@ function G.FUNCS.lobby_leave(e)
 			MP.ACTIONS.leave_lobby()
 			MP.UI.update_connection_status()
 			MP.MODIFIERS = {}
+			MP._version_mismatch_shown = false
 			G.STATE = G.STATES.MENU
 		end)
 	else
@@ -400,6 +401,7 @@ function G.FUNCS.lobby_leave(e)
 		MP.ACTIONS.leave_lobby()
 		MP.UI.update_connection_status()
 		MP.MODIFIERS = {}
+		MP._version_mismatch_shown = false
 		G.STATE = G.STATES.MENU
 	end
 end
