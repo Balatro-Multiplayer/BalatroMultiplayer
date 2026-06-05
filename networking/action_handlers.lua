@@ -210,6 +210,14 @@ local function action_lobbyInfo(p)
 	if MP.LOBBY.is_host then MP.ACTIONS.lobby_options() end
 
 	if G.STAGE == G.STAGES.MAIN_MENU then MP.ACTIONS.update_player_usernames() end
+
+	local mismatch, our_version, their_version = MP.UTILS.mp_version_mismatch()
+	if mismatch then
+		MP.UI.show_version_mismatch_warning(our_version, their_version)
+	else
+		MP._version_mismatch = nil
+		MP._version_mismatch_shown = false
+	end
 end
 
 local function action_error(p)
