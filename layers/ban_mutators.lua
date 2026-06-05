@@ -14,13 +14,9 @@ MP.Layer("gambling_opportunity", {
 	},
 })
 
--- No legendary jokers in the pool.
-MP.Layer("no_legendaries", {
+-- No rare jokers in the pool.
+MP.Layer("no_rares", {
 	banned_jokers = {
-		"j_caino",
-		"j_triboulet",
-		"j_yorick",
-		"j_chicot",
-		"j_perkeo",
+		-- todo
 	},
 })
