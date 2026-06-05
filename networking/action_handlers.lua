@@ -215,6 +215,7 @@ local function action_lobbyInfo(p)
 	if mismatch then
 		MP.UI.show_version_mismatch_warning(our_version, their_version)
 	else
+		MP._version_mismatch = nil
 		MP._version_mismatch_shown = false
 	end
 end
