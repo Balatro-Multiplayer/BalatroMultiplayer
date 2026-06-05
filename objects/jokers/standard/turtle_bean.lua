@@ -6,7 +6,7 @@ SMODS.Joker({
 	blueprint_compat = false,
 	eternal_compat = false,
 	rarity = 2,
-	cost = 5,
+	cost = 6,
 	pos = { x = 4, y = 13 },
 	config = { extra = { h_size = 4, h_mod = 1 }, mp_balanced = true },
 	loc_vars = function(self, info_queue, card)
