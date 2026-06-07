@@ -1,18 +1,6 @@
 MP.CUSTOM = MP.CUSTOM or {}
 
-local CONTENT_SETS = { "none", "standard", "experimental", "classic" }
-local LIVES_OPTIONS = { 1, 2, 3, 4, 5, 6, 7, 8 }
-local PVP_START_OPTIONS = { 1, 2, 3, 4, 5, 6, 7, 8 }
-
-local function as_strings(nums)
-	local out = {}
-	for i, n in ipairs(nums) do
-		out[i] = tostring(n)
-	end
-	return out
-end
-local LIVES_LABELS = as_strings(LIVES_OPTIONS)
-local PVP_START_LABELS = as_strings(PVP_START_OPTIONS)
+local CONTENT_SETS = { "Vanilla", "Standard", "Standard (0.2)", "Sandbox", "Experimental" }
 
 -- ---------------------------------------------------------------------------
 function MP.CUSTOM.new_draft()
@@ -23,7 +11,6 @@ function MP.CUSTOM.new_draft()
 		banned_jokers = {},
 		banned_consumables = {},
 		banned_vouchers = {},
-		scalars = { starting_lives = 4, pvp_start_round = 2 },
 	}
 end
 
@@ -144,17 +131,6 @@ G.FUNCS.mp_custom_set_base = function(args)
 	if MP.CUSTOM.draft and args and args.to_key then MP.CUSTOM.draft.base = CONTENT_SETS[args.to_key] end
 end
 
-G.FUNCS.mp_custom_set_lives = function(args)
-	if MP.CUSTOM.draft and args and args.to_key then
-		MP.CUSTOM.draft.scalars.starting_lives = LIVES_OPTIONS[args.to_key]
-	end
-end
-
-G.FUNCS.mp_custom_set_pvp_start = function(args)
-	if MP.CUSTOM.draft and args and args.to_key then
-		MP.CUSTOM.draft.scalars.pvp_start_round = PVP_START_OPTIONS[args.to_key]
-	end
-end
 
 G.FUNCS.mp_custom_open_collection = function(e)
 	MP.CUSTOM.editing_bans = true
@@ -228,24 +204,6 @@ function MP.UI.build_custom_ruleset_editor(mode)
 		w = 4,
 	}))
 
-	-- scalars
-	knobs[#knobs + 1] = knob_row(create_option_cycle({
-		label = "Starting lives",
-		scale = 0.8,
-		options = LIVES_LABELS,
-		current_option = index_of(LIVES_OPTIONS, d.scalars.starting_lives, 4),
-		opt_callback = "mp_custom_set_lives",
-		w = 4,
-	}))
-	knobs[#knobs + 1] = knob_row(create_option_cycle({
-		label = "PvP start ante",
-		scale = 0.8,
-		options = PVP_START_LABELS,
-		current_option = index_of(PVP_START_OPTIONS, d.scalars.pvp_start_round, 2),
-		opt_callback = "mp_custom_set_pvp_start",
-		w = 4,
-	}))
-
 	-- edit-bans button
 	knobs[#knobs + 1] = knob_row(UIBox_button({
 		button = "mp_custom_open_collection",
@@ -260,15 +218,20 @@ function MP.UI.build_custom_ruleset_editor(mode)
 	knobs[#knobs + 1] = text_row("Banned jokers: " .. tostring(#d.banned_jokers), 0.32, G.C.UI.TEXT_INACTIVE)
 	knobs[#knobs + 1] = text_row("(hover a card, press DELETE)", 0.28, G.C.UI.TEXT_DARK)
 
-	local modifiers_panel = {
-		{
-			n = G.UIT.R,
-			config = { align = "cm", padding = 0.04 },
-			nodes = {
-				{ n = G.UIT.C, config = { align = "cm", padding = 0.1 }, nodes = { MP.UI.build_timer_modifier_cycle() } },
-				{ n = G.UIT.C, config = { align = "cm", padding = 0.1 }, nodes = { MP.UI.build_pvp_timer_toggle() } },
-			},
+	-- Variants strip: option-cycles for graded knobs (timer / glass) plus the PvP
+	-- toggle. Binary twists live on the wall below.
+	local variants_strip = {
+		n = G.UIT.R,
+		config = { align = "cm", padding = 0.04 },
+		nodes = {
+			{ n = G.UIT.C, config = { align = "cm", padding = 0.1 }, nodes = { MP.UI.build_timer_modifier_cycle() } },
+			{ n = G.UIT.C, config = { align = "cm", padding = 0.1 }, nodes = { MP.UI.build_glass_cycle() } },
+			{ n = G.UIT.C, config = { align = "cm", padding = 0.1 }, nodes = { MP.UI.build_pvp_timer_toggle() } },
 		},
+	}
+
+	local modifiers_panel = {
+		variants_strip,
 		MP.UI.build_mutators_wall(),
 		{ n = G.UIT.R, config = { minh = 0.06 } },
 		MP.UI.build_mutator_randomize_row(),

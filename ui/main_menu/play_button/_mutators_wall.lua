@@ -1,15 +1,3 @@
--- The MUTATORS wall and its shared MP.UI builders. Toggles write MP.MODIFIERS
--- directly (no network) — the host's lobby_options push at start_lobby carries
--- the serialized list to the guest.
---
--- This file owns the wall data, the per-cell toggle handlers, the timer
--- cycle/blurb logic, and the reusable MP.UI.build_* builders. Both the custom
--- ruleset editor (custom_ruleset_editor.lua) and any overlay that wants the wall
--- consume these builders — one source of truth. The cells are toggle "pills"
--- grouped into themed columns: dim-tinted when off, full category colour when
--- on, description on hover. Cells recolour live via a per-frame `func` (engine
--- reads config.colour each draw) so nothing rebuilds.
-
 local function timer_modifier_to_index()
 	if MP.has_modifier("pressure_timer_plus") then return 4 end
 	if MP.has_modifier("pressure_timer") then return 3 end
@@ -17,7 +5,6 @@ local function timer_modifier_to_index()
 	return 1
 end
 
--- Indices line up with localization ml_mp_modifier_timer_opt: 1=default, 2=no_anim, 3=pressure
 G.FUNCS.change_modifier_timer = function(args)
 	MP.remove_modifier("no_animation_timer")
 	MP.remove_modifier("pressure_timer")
@@ -32,8 +19,6 @@ G.FUNCS.change_modifier_timer = function(args)
 	end
 end
 
--- One-line blurb per timer option (indices match timer_modifier_to_index).
--- Shown next to the cycle instead of all four at once; updated live as you cycle.
 local TIMER_BLURBS = {
 	"Regular 150s timer.",
 	"100s timer, animations off.",
@@ -41,8 +26,6 @@ local TIMER_BLURBS = {
 	"Pressure, +15s per hand played.",
 }
 
--- Live-update the timer blurb to match the current cycle selection. Mirrors
--- display_custom_seed: mutate the child text node and recalculate only on change.
 G.FUNCS.mp_timer_blurb = function(e)
 	local txt = TIMER_BLURBS[timer_modifier_to_index()] or ""
 	if e.children[1] and e.children[1].config.text ~= txt then
@@ -51,12 +34,51 @@ G.FUNCS.mp_timer_blurb = function(e)
 	end
 end
 
--- ---------------------------------------------------------------------------
--- The wall
--- ---------------------------------------------------------------------------
--- View config only — `key` is the layer name (what MP.MODIFIERS stores). Names
--- and blurbs are inline for now; trivially swappable to localize() later.
--- Each column shares a colour; cells tint dark when off, bright when on.
+
+-- Each cycle is one table: label / mod / blurb on the same line. mod = nil means
+-- "no modifier" (the cycle's default, inherits whatever the ruleset does).
+local GLASS_VARIANTS = {
+	{ label = "Inherit",      mod = nil,                  blurb = "Inherit the main ruleset." },
+	{ label = "Vanilla",      mod = "glass_vanilla",      blurb = "x2 mult." },
+	{ label = "Standard",     mod = "glass_standard",     blurb = "x1.5 (Justice Disabled)." },
+	{ label = "Legacy",       mod = "glass_legacy",       blurb = "x1.5 (Justice Enabled)." },
+	{ label = "Experimental", mod = "glass_experimental", blurb = "x2 (Grim/Familiar/Incantation only)." },
+}
+
+local function variant_labels(variants)
+	local labels = {}
+	for i, v in ipairs(variants) do labels[i] = v.label end
+	return labels
+end
+
+local function variant_index(variants)
+	for i, v in ipairs(variants) do
+		if v.mod and MP.has_modifier(v.mod) then return i end
+	end
+	return 1
+end
+
+local function pick_variant(variants, to_key)
+	for _, v in ipairs(variants) do
+		if v.mod then MP.remove_modifier(v.mod) end
+	end
+	local chosen = variants[to_key]
+	if chosen and chosen.mod then MP.add_modifier(chosen.mod) end
+end
+
+local function variant_blurb_func(variants)
+	return function(e)
+		local txt = variants[variant_index(variants)].blurb
+		if e.children[1] and e.children[1].config.text ~= txt then
+			e.children[1].config.text = txt
+			e.UIBox:recalculate(true)
+		end
+	end
+end
+
+G.FUNCS.change_glass_variant = function(args) pick_variant(GLASS_VARIANTS, args.to_key) end
+G.FUNCS.mp_glass_blurb = variant_blurb_func(GLASS_VARIANTS)
+
 local MUTATOR_WALL = {
 	{
 		name = "ECONOMY",
@@ -65,16 +87,16 @@ local MUTATOR_WALL = {
 			{ key = "inflation", label = "Inflation", desc = { "Shop prices creep up $1 with", "every card you buy." } },
 			{ key = "no_interest", label = "No Interest", desc = { "Savings earn nothing.", "Spend it or lose the edge." } },
 			{ key = "discard_tax", label = "Discard Tax", desc = { "Every discard costs $1." } },
-			{ key = "frugal", label = "Frugal", desc = { "Unspent discards pay out,", "like leftover hands do." } },
+			{ key = "frugal", label = "Frugal", desc = { "Unspent discards pay out $1."} },
 		},
 	},
 	{
 		name = "MAYHEM",
 		colour = G.C.PURPLE,
 		cells = {
-			{ key = "flipped_cards", label = "Blind Poker", desc = { "Your hand is dealt face-down.", "Play by memory and nerve." } },
-			{ key = "debuff_played_cards", label = "Dead Cards", desc = { "Played cards score zero.", "Jokers are the whole engine." } },
-			{ key = "all_eternal", label = "No Takebacks", desc = { "Every joker is eternal —", "unsellable, undestroyable." } },
+			{ key = "flipped_cards", label = "Blind Poker", desc = { "Your hand is dealt face-down." } },
+			{ key = "debuff_played_cards", label = "Dead Cards", desc = { "Playing cards are debuffed.", "Jokers are the whole engine." } },
+			{ key = "all_eternal", label = "No Takebacks", desc = { "Every joker is eternal." } },
 			{ key = "shrinking_hand", label = "Heavy Pockets", desc = { "-1 hand size for every $10", "you're holding." } },
 		},
 	},
@@ -83,8 +105,8 @@ local MUTATOR_WALL = {
 		colour = G.C.RED,
 		cells = {
 			{ key = "gambling_opportunity", label = "No Easy Money", desc = { "No Gold or Lucky cards." } },
-			{ key = "no_rares", label = "No Rares", desc = { "Rare jokers are out", "of the pool." } },
-			{ key = "sticker_shop", label = "Risky Shelf", desc = { "Shop stocks eternal, perishable", "and rental jokers." } },
+			{ key = "no_uncommons", label = "No Uncommons", desc = { "Uncommon jokers are out", "of the pool." } },
+			{ key = "bigger_shop", label = "Bigger Shop", desc = { "One extra card slot", "in the shop." } },
 			{ key = "chip_cap", label = "Cash Ceiling", desc = { "Chip score can't exceed your", "cash. Greed is the only way up." } },
 		},
 	},
@@ -241,6 +263,50 @@ function MP.UI.build_pvp_timer_toggle()
 		end,
 	})
 end
+
+-- A variant cycle = the option-cycle plus a live one-line blurb stacked under it.
+-- Shared shape for glass / shop-size (and any future "pick one of N" knob).
+local function variant_cycle(args)
+	return {
+		n = G.UIT.R,
+		config = { align = "cm", padding = 0.04 },
+		nodes = {
+			{
+				n = G.UIT.R,
+				config = { align = "cm" },
+				nodes = {
+					create_option_cycle({
+						id = args.id,
+						label = args.label,
+						scale = 0.7,
+						options = args.options,
+						current_option = args.current_option,
+						opt_callback = args.opt_callback,
+						w = 4,
+						minw = 4,
+					}),
+				},
+			},
+			{
+				n = G.UIT.R,
+				config = { align = "cm", func = args.blurb_func, minh = 0.3 },
+				nodes = { { n = G.UIT.T, config = { text = "", scale = 0.3, colour = G.C.UI.TEXT_INACTIVE } } },
+			},
+		},
+	}
+end
+
+function MP.UI.build_glass_cycle()
+	return variant_cycle({
+		id = "modifier_glass_option",
+		label = "Glass",
+		options = variant_labels(GLASS_VARIANTS),
+		current_option = variant_index(GLASS_VARIANTS),
+		opt_callback = "change_glass_variant",
+		blurb_func = "mp_glass_blurb",
+	})
+end
+
 
 -- The MUTATORS wall block: header + subtitle + themed columns + coming-soon line.
 -- Returns one node (rows stack vertically since they're R children).

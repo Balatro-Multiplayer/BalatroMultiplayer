@@ -14,9 +14,7 @@ MP.Layer("gambling_opportunity", {
 	},
 })
 
--- No rare jokers in the pool.
-MP.Layer("no_rares", {
-	banned_jokers = {
-		-- todo
-	},
+
+MP.Layer("no_uncommons", {
+    banned_jokers = {},
 })
