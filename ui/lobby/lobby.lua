@@ -410,6 +410,11 @@ function G.FUNCS.lobby_start_game(e)
 end
 
 function G.FUNCS.lobby_ready_up(e)
+	-- On the first ready-up with a version mismatch, show the modal and bail without readying;
+	-- the guest must dismiss and press Ready again. Keeps the host's Start (gated on
+	-- ready_to_start) disabled until the mismatch is acknowledged.
+	if not MP.LOBBY.ready_to_start and MP.UI.show_version_mismatch_if_needed() then return end
+
 	MP.LOBBY.ready_to_start = not MP.LOBBY.ready_to_start
 
 	e.config.colour = MP.LOBBY.ready_to_start and G.C.GREEN or G.C.RED
@@ -448,7 +453,6 @@ function G.FUNCS.lobby_leave(e)
 			MP.ACTIONS.leave_lobby()
 			MP.UI.update_connection_status()
 			MP.MODIFIERS = {}
-			MP._version_mismatch = nil
 			MP._version_mismatch_shown = false
 			G.STATE = G.STATES.MENU
 		end)
@@ -457,7 +461,6 @@ function G.FUNCS.lobby_leave(e)
 		MP.ACTIONS.leave_lobby()
 		MP.UI.update_connection_status()
 		MP.MODIFIERS = {}
-		MP._version_mismatch = nil
 		MP._version_mismatch_shown = false
 		G.STATE = G.STATES.MENU
 	end
