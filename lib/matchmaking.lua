@@ -212,6 +212,39 @@ function MP.UTILS.mp_version_mismatch()
 	return false
 end
 
+-- Multiplayer compares on the X.Y.Z prefix (clean semver); Steamodded on the full string
+-- (its ~BETA-<build> suffix makes any difference worth flagging).
+local VERSION_CHECKS = {
+	{ name = "Multiplayer", prefix = true },
+	{ name = "Steamodded", prefix = false },
+}
+
+-- Returns { mod, our, their } for each checked mod whose version differs from the opponent's.
+function MP.UTILS.version_mismatches()
+	local other = MP.LOBBY.is_host and MP.LOBBY.guest or MP.LOBBY.host
+	if not other then return {} end
+
+	local results = {}
+	for _, check in ipairs(VERSION_CHECKS) do
+		local their_version = MP.UTILS.player_mod_version(other, check.name)
+		local our_version = SMODS.Mods[check.name] and SMODS.Mods[check.name].version
+		if their_version and our_version then
+			local mismatch
+			if check.prefix then
+				local op = MP.UTILS.version_prefix(our_version)
+				local tp = MP.UTILS.version_prefix(their_version)
+				mismatch = op and tp and op ~= tp
+			else
+				mismatch = our_version ~= their_version
+			end
+			if mismatch then
+				table.insert(results, { mod = check.name, our = our_version, their = their_version })
+			end
+		end
+	end
+	return results
+end
+
 function MP.UTILS.get_banned_mods(mods)
 	local banned_mods = {}
 	if not mods then return banned_mods end
