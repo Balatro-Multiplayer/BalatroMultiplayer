@@ -204,29 +204,84 @@ end
 function MP.UI.modlist_to_view(mods, text_colour)
 	local t = {}
 
-	if not mods then return t end
+	if not mods then
+		return t
+	end
 
+    local special_mods_targets = {
+        "Steamodded",
+        "Lovely",
+        "Multiplayer",
+        "Preview",
+    }
+    local special_mods_found = {}
+	local other_mods = {}
 	for mod_name, mod_version in pairs(mods) do
-		local display_text = mod_version and (mod_name .. "-" .. mod_version) or mod_name
-		local color = MP.BANNED_MODS[mod_name] and G.C.RED or text_colour
+        local found = false
+        for _, id in ipairs(special_mods_targets) do
+            if not special_mods_found[id] and MP.UTILS.string_starts(mod_name, id) then
+                special_mods_found[id] = { name = mod_name, version = mod_version }
+                found = true
+                break
+            end
+        end
+        if not found then
+            table.insert(other_mods, { name = mod_name, version = mod_version })
+        end
+	end
+
+	table.sort(other_mods, function(a, b)
+		return a.name < b.name
+	end)
+
+	local function add_mod_row(mod)
+		local mod_name, mod_version = MP.UTILS.resolve_mod_name_and_version(mod.name, mod.version)
+		local color = MP.BANNED_MODS[mod.name] and G.C.RED or text_colour
 		table.insert(t, {
 			n = G.UIT.R,
 			config = {
-				padding = 0.02,
-				align = "cm",
+				padding = 0.025,
 			},
 			nodes = {
 				{
 					n = G.UIT.T,
 					config = {
-						text = display_text,
-						shadow = true,
-						scale = 0.4,
+						text = mod_name,
+						scale = 0.32,
 						colour = color,
 					},
 				},
+				mod_version and {
+					n = G.UIT.T,
+					config = {
+						text = " " .. mod_version,
+						scale = 0.32,
+						colour = adjust_alpha(color, 0.6),
+					},
+				} or nil,
 			},
 		})
+	end
+	local function add_separator()
+		table.insert(t, {
+			n = G.UIT.R,
+			config = {
+				minh = 0.025,
+				colour = adjust_alpha(text_colour, 0.25),
+			},
+		})
+	end
+
+	for _, mod in pairs({ special_mods_found.Lovely, special_mods_found.Steamodded }) do
+		add_mod_row(mod)
+	end
+	add_separator()
+	for _, mod in pairs({ special_mods_found.Multiplayer, special_mods_found.Preview }) do
+		add_mod_row(mod)
+	end
+	add_separator()
+	for _, mod in ipairs(other_mods) do
+		add_mod_row(mod)
 	end
 	return t
 end
