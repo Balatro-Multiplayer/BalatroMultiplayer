@@ -178,6 +178,14 @@ function MP.UTILS.parse_modlist(mod_entries)
 	return mods
 end
 
+function MP.UTILS.resolve_mod_name_and_version(mod_name, mod_version)
+    local fullname = mod_name .. "-" .. (mod_version or "")
+    local new_mod_name, new_mod_version = fullname:match("^(.*)%-([^~]+~.*)$")
+    mod_name = new_mod_name or mod_name
+    mod_version = new_mod_version or mod_version
+    return mod_name, mod_version
+end
+
 -- "0.4.0~pre1-DEV" -> "0.4.0". nil if no leading numeric version.
 function MP.UTILS.version_prefix(version)
 	if type(version) ~= "string" then return nil end
