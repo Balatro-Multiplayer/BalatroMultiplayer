@@ -180,26 +180,29 @@ function MP.UI.create_UIBox_player_row(type)
 		nodes = {
 			{
 				n = G.UIT.C,
-				config = { align = "cm", padding = 0.05, r = 0.1, colour = G.C.BLACK },
+				config = { align = "cm" },
 				nodes = {
 					{
 						n = G.UIT.C,
 						config = {
 							align = "cm",
-							padding = 0.025,
+							padding = 0.05,
 							r = 0.1,
 							colour = G.C.MULT,
 							minw = 2,
+							maxw = 2,
 							outline = 0.5,
 							outline_colour = G.C.MULT,
+							emboss = 0.07,
 						},
 						nodes = {
 							{
 								n = G.UIT.T,
 								config = {
 									text = tostring(lives) .. " " .. localize("k_lives"),
-									scale = 0.4,
+									scale = 0.375,
 									colour = G.C.UI.TEXT_LIGHT,
+									shadow = true,
 								},
 							},
 						},
@@ -229,26 +232,29 @@ function MP.UI.create_UIBox_player_row(type)
 			},
 			{
 				n = G.UIT.C,
-				config = { align = "cm", padding = 0.05, colour = G.C.BLACK, r = 0.1 },
+				config = { align = "cm" },
 				nodes = {
 					{
 						n = G.UIT.C,
 						config = {
 							align = "cm",
-							padding = 0.025,
+							padding = 0.05,
 							r = 0.1,
 							colour = G.C.PURPLE,
 							minw = 1.75,
+							maxw = 1.75,
 							outline = 0.5,
 							outline_colour = G.C.PURPLE,
+							emboss = 0.07,
 						},
 						nodes = {
 							{
 								n = G.UIT.T,
 								config = {
 									text = tostring(skips) .. " " .. localize("k_skips"),
-									scale = 0.4,
+									scale = 0.375,
 									colour = G.C.UI.TEXT_LIGHT,
+                                    shadow = true,
 								},
 							},
 						},
@@ -294,7 +300,7 @@ function MP.UI.create_UIBox_player_row(type)
 						n = G.UIT.T,
 						config = {
 							text = MP.INSANE_INT.to_string(highest_score),
-							scale = 0.45,
+							scale = 0.425,
 							colour = G.C.FILTER,
 							shadow = true,
 						},
