@@ -68,7 +68,8 @@ MP.EXPERIMENTAL = {
 	mem_debug = true,
 }
 
--- Override experimental flags from .env file if present
+-- Override experimental flags and server config from .env file if present
+MP.ENV = {}
 local env_path = MP.path .. "/.env"
 local env_info = NFS.getInfo(env_path)
 if env_info then
@@ -78,17 +79,20 @@ if env_info then
 			line = line:match("^%s*(.-)%s*$") -- trim
 			if line ~= "" and not line:match("^#") then
 				local key, val = line:match("^([%w_]+)%s*=%s*(.+)$")
-				if key and MP.EXPERIMENTAL[key] ~= nil then
+				if key then
 					if val == "true" then
 						val = true
 					elseif val == "false" then
 						val = false
 					end
-					MP.EXPERIMENTAL[key] = val
+					MP.ENV[key] = val
+					if MP.EXPERIMENTAL[key] ~= nil then
+						MP.EXPERIMENTAL[key] = val
+					end
 				end
 			end
 		end
-		sendDebugMessage("Loaded .env overrides for MP.EXPERIMENTAL", "MULTIPLAYER")
+		sendDebugMessage("Loaded .env overrides", "MULTIPLAYER")
 	end
 end
 
@@ -317,5 +321,11 @@ MP.load_mp_dir("objects/challenges")
 
 local SOCKET = MP.load_mp_file("networking/socket.lua")
 MP.NETWORKING_THREAD = love.thread.newThread(SOCKET)
-MP.NETWORKING_THREAD:start(SMODS.Mods["Multiplayer"].config.server_url, SMODS.Mods["Multiplayer"].config.server_port)
+local server_url = MP.ENV.server_url or SMODS.Mods["Multiplayer"].config.server_url
+local server_port = tonumber(MP.ENV.server_port) or SMODS.Mods["Multiplayer"].config.server_port
+sendInfoMessage(
+	string.format("Connecting to %s:%s", tostring(server_url), tostring(server_port)),
+	"MULTIPLAYER"
+)
+MP.NETWORKING_THREAD:start(server_url, server_port)
 MP.ACTIONS.connect()
