@@ -8,10 +8,10 @@
 #               keeps the "-DEV" version (which triggers the in-game dev warning).
 #
 #   --release   Shippable build. Source is still the WORKING TREE for now
-#               (see TODO below to switch to a clean git tag/ref), but:
+#               (TODO: switch to a clean git tag/ref + GitHub runner), but:
 #                 - .env is NOT shipped (build falls back to config.lua)
 #                 - version is auto-stripped to a clean release string
-#                   (drops ~preN and -DEV, so no dev-warning overlay)
+#                   (drops ~preN and -DEV)
 #                 - config.lua server port is forced to production
 #                 - core.lua debug defaults (mem_debug) are turned off
 #
@@ -24,7 +24,7 @@ set -euo pipefail
 PROD_SERVER_URL="balatro.virtualized.dev"
 PROD_SERVER_PORT=8788
 
-# --- mode (required, no default — defaulting would risk leaking your .env) ---
+# --- mode (required) ---
 MODE="${1:-}"
 case "$MODE" in
   --dev)     MODE=dev ;;
@@ -41,7 +41,7 @@ cd "$ROOT"
 # Portable in-place edit (BSD/macOS + GNU sed differ; perl is consistent).
 inplace() { perl -0pi -e "$1" "$2"; }
 
-# --- version (from manifest), with release sanitization ---------------------
+# --- version (from manifest) ---------------------
 VERSION="$(grep -m1 '"version"' Multiplayer.json \
   | sed -E 's/.*"version"[[:space:]]*:[[:space:]]*"([^"]+)".*/\1/')"
 
@@ -72,8 +72,10 @@ mkdir -p "$STAGE"
 #   git archive --format=tar <tag> | ( cd "$STAGE" && tar -xf - )
 # then skip the rsync below. For now both modes use the working tree.
 #
-# -a archive. In --dev we also pass -L to follow symlinks (turns the .env
-# symlink into its real contents); --release excludes .env entirely instead.
+# -a archive. In --dev we also pass -L to follow symlinks
+# to symlink into its real contents)
+# as some maintainers use symlinks for their .env.
+# --release excludes .env entirely instead.
 RSYNC_FLAGS=(-a)
 ENV_EXCLUDE=()
 if [ "$MODE" = dev ]; then
@@ -134,8 +136,7 @@ fi
 # --- zip it -----------------------------------------------------------------
 # Zip from INSIDE the stage so the mod files land at the archive root (no outer
 # "Multiplayer-vX/" wrapper). BMM and balatromp.com expect Multiplayer.json at
-# the zip root — see .github/RELEASE_CHECKLIST.md ("recompress from the files
-# instead of the outer folder").
+# the zip root — see .github/RELEASE_CHECKLIST.md
 ( cd "$STAGE" && zip -rqX "../${NAME}.zip" . )
 
 echo "==> folder: ${STAGE}"
