@@ -1,23 +1,35 @@
 # RELEASE CHECKLIST
 
-## Creating the main ZIP
-*(This ensures we keep the DEV tag on the source code and ensures BMM and balatromp.com don't break, since they rely on the "BalatroMultiplayer.zip" file existing for each release)*
-1. Download the source code.
-2. Uncompress the source code and open `Multiplayer.json` to remove "~DEV" from the version tag.
-3. Recompress the source code, ensuring to recomopress from the files instead of the outer folder, and name it exactly "BalatroMultiplayer.zip".
-4. Upload `BalatroMultiplayer.zip` with the release.
-5. Upload `BalatroMultiplayer.zip` to [balatromp.com's releases page](https://balatromp.com/admin/releases)
-    - Ensure that the Steamodded version is set to the intended Steamodded version for ranked
-    - Ensure that the Lovely version is set to the intended Lovely version for ranked
-    - Ensure that the Branch is set to main
-    - Ensure the Version matches exactly the version in Multiplayer.json
+## 1. Build the ZIP
 
-## Uploading the server files
-*(We upload the server files for each OS with every release so that people don't have to go digging for these files)*
-- If the server **has not** changed since last update then simply download the `server-win.exe`, `server-macos`, and `server-linux` files from the previous releasee and upload them with the new release.
-- If the server **has** changed since last update then run the build script for the server files locally, and upload the `server-win.exe`, `server-macos`, and `server-linux` files created in the `build` folder.
+Check out the commit you're shipping with a clean working tree, then:
 
-## After release
-- Increase the version in the `Multiplayer.json` of main branch to be one patch version above the previous release, and ensure the "~DEV" tag still exists.
-  - Eg. "0.2.18~DEV" -> "0.2.19~DEV", Or if a higher version like 1.0 was released then it should become "1.0.1~DEV"
-- If the recommended Steamodded or Lovely was updated then be sure to update `README.md` and `CONTRIBUTING.md` with the correct versions.
+```sh
+./scripts/release.sh --release
+```
+
+Builds the zip from tracked files, strips the `~DEV` tag, points config at the production server, and names it `BalatroMultiplayer.zip` — produced in `dist/`, ready to upload.
+
+## 2. Upload the ZIP
+
+1. Attach `BalatroMultiplayer.zip` to the GitHub release.
+2. Upload it to [balatromp.com's releases page](https://balatromp.com/admin/releases):
+   - Steamodded version = the version ranked requires
+   - Lovely version = the version ranked requires
+   - Branch = `main`
+   - Version = the version from `Multiplayer.json`, without the `~DEV` tag
+
+## 3. Upload the server files
+
+Ship a copy for each OS so players don't have to go digging.
+
+- **Server unchanged:** re-upload `server-win.exe`, `server-macos`, and
+  `server-linux` from the previous release.
+- **Server changed:** build it locally and upload the three files from `build/`.
+
+## 4. After release
+
+- On `main`, bump `Multiplayer.json` by one patch, keeping `~DEV`
+  (`0.2.18~DEV` → `0.2.19~DEV`).
+- If the required Steamodded or Lovely version changed, update `README.md` and
+  `CONTRIBUTING.md` to match.
