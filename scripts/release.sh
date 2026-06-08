@@ -58,59 +58,68 @@ fi
 SAFE_VERSION="$(printf '%s' "$VERSION" | tr -c 'A-Za-z0-9._-' '_')"
 NAME="Multiplayer-v${SAFE_VERSION}"
 
+# Release artifacts MUST be named exactly "BalatroMultiplayer.zip" — BMM and
+# balatromp.com look up that literal filename for every release (see
+# .github/RELEASE_CHECKLIST.md). Dev builds stay versioned so playtest zips
+# don't clobber each other.
+if [ "$MODE" = release ]; then
+  ZIP_NAME="BalatroMultiplayer"
+else
+  ZIP_NAME="$NAME"
+fi
+
 DIST="${ROOT}/dist"
 STAGE="${DIST}/${NAME}"
-ZIP="${DIST}/${NAME}.zip"
+ZIP="${DIST}/${ZIP_NAME}.zip"
 
 echo "==> building ${NAME}  (mode: ${MODE}, version: ${VERSION})"
 
 rm -rf "$STAGE" "$ZIP"
 mkdir -p "$STAGE"
 
-# --- copy working tree, strip noise -----------------------------------------
-# TODO(release): build from a clean git ref instead of the working tree, e.g.
-#   git archive --format=tar <tag> | ( cd "$STAGE" && tar -xf - )
-# then skip the rsync below. For now both modes use the working tree.
+# --- enumerate the files that should ship -----------------------------------
+# The file list comes from git, not from a raw filesystem walk, so the build
+# only ever contains things that actually belong to the repo
+
+# local dev folders, editor/tooling junk, scratch files, 
+# and anything matched by .gitignore are excluded
 #
-# -a archive. In --dev we also pass -L to follow symlinks
-# to symlink into its real contents)
-# as some maintainers use symlinks for their .env.
-# --release excludes .env entirely instead.
+#   --dev:     tracked files + new (untracked, non-ignored) files
+#   --release: tracked files only — a clean, repo-faithful set
+#
+# -a archive. In --dev we also pass -L to follow symlinks (some maintainers
+# symlink their .env to its real contents); --release omits .env entirely.
 RSYNC_FLAGS=(-a)
-ENV_EXCLUDE=()
+GIT_LS=(git ls-files -z)
 if [ "$MODE" = dev ]; then
   RSYNC_FLAGS+=(-L)
+  GIT_LS+=(--cached --others --exclude-standard)
 else
-  ENV_EXCLUDE+=(--exclude='/.env')
+  GIT_LS+=(--cached)
 fi
 
-rsync "${RSYNC_FLAGS[@]}" \
-  ${ENV_EXCLUDE[@]+"${ENV_EXCLUDE[@]}"} \
-  --exclude='/dist/' \
-  --exclude='.git' \
-  --exclude='/.github/' \
-  --exclude='.gitignore' \
-  --exclude='.gitattributes' \
-  --exclude='.DS_Store' \
-  --exclude='/.context/' \
-  --exclude='/.claude/' \
-  --exclude='.vscode/' \
-  --exclude='.idea/' \
-  --exclude='.vs/' \
-  --exclude='.luarc.json' \
-  --exclude='.lovelyignore' \
-  --exclude='/agents.md' \
-  --exclude='CLAUDE.md' \
-  --exclude='CLAUDE.local.md' \
-  --exclude='/CONTRIBUTING.md' \
-  --exclude='stylua.toml' \
-  --exclude='/tests/' \
-  --exclude='/scripts/' \
-  ./ "$STAGE/"
+# Build the NUL-delimited file list, then pipe it straight into rsync 
+# .env is gitignored on purpose (git never lists it), so
+# append it by hand for dev builds 
+{
+  "${GIT_LS[@]}" -- \
+    ':(exclude).github' \
+    ':(exclude).gitignore' \
+    ':(exclude)stylua.toml' \
+    ':(exclude)agents.md' \
+    ':(exclude)CONTRIBUTING.md' \
+    ':(exclude)tests' \
+    ':(exclude)scripts' \
+    ':(exclude).claude' 
+  if [ "$MODE" = dev ] && [ -e .env ]; then
+    printf '%s\0' .env
+  fi
+} | rsync "${RSYNC_FLAGS[@]}" --from0 --files-from=- ./ "$STAGE/"
 
+# we love macOS here
 find "$STAGE" -name '.DS_Store' -delete
 
-# --- release-only: sanitize the staged copy ---------------------------------
+# --- sanitize the release copy ---------------------------------
 if [ "$MODE" = release ]; then
   # Clean version into the shipped manifest (no ~preN / -DEV -> no dev warning).
   inplace "s/(\"version\"\\s*:\\s*\")[^\"]+\"/\${1}${VERSION}\"/" "$STAGE/Multiplayer.json"
@@ -134,10 +143,10 @@ else
 fi
 
 # --- zip it -----------------------------------------------------------------
-# Zip from INSIDE the stage so the mod files land at the archive root (no outer
+# from INSIDE the stage so the mod files land at the archive root (no outer
 # "Multiplayer-vX/" wrapper). BMM and balatromp.com expect Multiplayer.json at
 # the zip root — see .github/RELEASE_CHECKLIST.md
-( cd "$STAGE" && zip -rqX "../${NAME}.zip" . )
+( cd "$STAGE" && zip -rqX "../${ZIP_NAME}.zip" . )
 
 echo "==> folder: ${STAGE}"
 echo "==> zip:    ${ZIP}"
