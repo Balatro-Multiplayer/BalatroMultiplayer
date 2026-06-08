@@ -3,6 +3,7 @@
 function MP.UI.cam_timer_opponent()
 	if not MP.LOBBY.config.timer then return false end
     if MP.GAME.pvp_countdown_in_progress then return false end
+    if MP.GAME.timer <= 0 then return false end
 	if MP.is_pvp_boss() and MP.is_layer_active("pvp_timer") then
 		if G.STATE == G.STATES.ROUND_EVAL or G.STATE == G.STATES.NEW_ROUND then return false end
 		if MP.INSANE_INT.greater_than(MP.GAME.score, MP.GAME.enemy.score) then return true end
@@ -194,7 +195,7 @@ SMODS.Gradient({
 
 		-- When you "timering" opponent, timer stops and you cannot see is button pressed
 		-- So we need switch to real timer to make it flush
-		local time_value = (MP.GAME.timer_started and G.TIMERS.REAL or -(MP.GAME.timer or 0))
+		local time_value = MP.GAME.timer_started and G.TIMERS.REAL or -(MP.GAME.timer or 0)
 		local timer = (time_value / speedup) % self.cycle
 		local start_index = math.ceil(timer * #self.colours / self.cycle)
 		if start_index == 0 then start_index = 1 end
@@ -225,7 +226,8 @@ SMODS.Gradient({
 		if #self.colours < 2 or not MP.speedlatro_timer then return end
 		local speedup = MP.current_ruleset().timer_speedup_multiplier or 1
 
-		local timer = MP.GAME.ready_blind and 0 or ((-(MP.speedlatro_timer.real or 0) / speedup) % self.cycle) + 0.5
+        local timer_value = MP.GAME.ready_blind and 0 or -(MP.speedlatro_timer.real or 0)
+		local timer = (timer_value / speedup) % self.cycle
 		local start_index = math.ceil(timer * #self.colours / self.cycle)
 		if start_index == 0 then start_index = 1 end
 		local end_index = start_index == #self.colours and 1 or start_index + 1
@@ -363,17 +365,20 @@ function Game:update(dt)
 
 	if MP.GAME.timer == 0 then
 		MP.GAME.timer_consumed = true
-		if is_pvp_timer then
-            -- PvP timer: end PvP immediately as a loss
-            MP.ACTIONS.fail_pvp_timer()
-		else
-            -- Old, No-animations, Pressure timers: lose a live
-			if MP.GAME.timers_forgiven < MP.LOBBY.config.timer_forgiveness then
-				MP.GAME.timers_forgiven = MP.GAME.timers_forgiven + 1
-			else
-				MP.ACTIONS.fail_timer()
-			end
-		end
+        -- PvP timer: end PvP immediately as a loss (only when timered by opponent)
+        if is_pvp_timer then
+            if MP.GAME.nemesis_timer_started then
+                MP.ACTIONS.fail_pvp_timer()
+            end
+        -- Old, No-animations: lose a live when timered by opponent
+        -- Pressure timers: lose a live regardless
+        elseif (is_pressure_timer or MP.GAME.nemesis_timer_started) then
+            if MP.GAME.timers_forgiven < MP.LOBBY.config.timer_forgiveness then
+                MP.GAME.timers_forgiven = MP.GAME.timers_forgiven + 1
+            else
+                MP.ACTIONS.fail_timer()
+            end
+        end
 	end
 end
 
