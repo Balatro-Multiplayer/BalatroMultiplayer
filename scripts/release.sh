@@ -15,8 +15,10 @@
 #                 - config.lua server port is forced to production
 #                 - core.lua debug defaults (mem_debug) are turned off
 #
-# Output: dist/Multiplayer-v<version>/      (clean unzipped folder)
-#         dist/Multiplayer-v<version>.zip   (zipped, ready to ship)
+# Output: dist/Multiplayer-v<version>/      (clean unzipped folder, both modes)
+#         dist/Multiplayer-v<version>.zip   (--dev: versioned playtest zip)
+#         dist/BalatroMultiplayer.zip       (--release: literal name BMM and
+#                                            balatromp.com require)
 #
 set -euo pipefail
 
