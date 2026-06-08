@@ -132,7 +132,11 @@ else
 fi
 
 # --- zip it -----------------------------------------------------------------
-( cd "$DIST" && zip -rqX "${NAME}.zip" "$NAME" )
+# Zip from INSIDE the stage so the mod files land at the archive root (no outer
+# "Multiplayer-vX/" wrapper). BMM and balatromp.com expect Multiplayer.json at
+# the zip root — see .github/RELEASE_CHECKLIST.md ("recompress from the files
+# instead of the outer folder").
+( cd "$STAGE" && zip -rqX "../${NAME}.zip" . )
 
 echo "==> folder: ${STAGE}"
 echo "==> zip:    ${ZIP}"
