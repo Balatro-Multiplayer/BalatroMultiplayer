@@ -221,36 +221,33 @@ function reset_idol_card()
 		end
 
 		-- ----------------------------------------------------------------
-		-- Step 10: Weighted random selection by total_score
+		-- Step 10: Sort by score, then weighted random selection by count
 		-- ----------------------------------------------------------------
+		table.sort(valid_idol_cards, function(a, b)
+			if a.total_score ~= b.total_score then return a.total_score > b.total_score end
+			if suit_index[a.suit] ~= suit_index[b.suit] then return suit_index[a.suit] < suit_index[b.suit] end
+			return (rank_index[a.value] or 0) < (rank_index[b.value] or 0)
+		end)
+
 		local total_weight = 0
 		for _, entry in ipairs(valid_idol_cards) do
-			total_weight = total_weight + entry.total_score
+			total_weight = total_weight + entry.count
 		end
 
-		-- Fallback: if all scores are zero (e.g. perfectly uniform deck),
-		-- fall back to raw count weighting so we still pick something.
-		if total_weight <= 0 then
-			for _, entry in ipairs(valid_idol_cards) do
-				total_weight = total_weight + entry.count
-			end
-			for _, entry in ipairs(valid_idol_cards) do
-				entry.total_score = entry.count
-			end
-		end
+		if total_weight <= 0 then return end
 
 		local raw_random = pseudorandom("idol" .. G.GAME.round_resets.ante)
 
 		local threshold = 0
 		for _, entry in ipairs(valid_idol_cards) do
-			threshold = threshold + (entry.total_score / total_weight)
+			threshold = threshold + (entry.count / total_weight)
 			if raw_random < threshold then
 				local idol_card = entry.card
 				--[[sendDebugMessage(
 					string.format(
-						"(Idol) Selected %s of %s (score=%.4f, total_weight=%.4f)",
+						"(Idol) Selected %s of %s (score=%.4f, count=%d, total_weight=%d)",
 						idol_card.base.value, idol_card.base.suit,
-						entry.total_score, total_weight
+						entry.total_score, entry.count, total_weight
 					)
 				)]]
 				G.GAME.current_round.idol_card.rank = idol_card.base.value
