@@ -229,149 +229,377 @@ function MP.ApplyBans()
 	end
 end
 
-local LOADED_REWORKS = {}
--- Rework a center for specific layer(s). Use MP.LoadReworks() to swap in the active ruleset.
--- Multiple calls for the same key accumulate — each call targets its own layer slot
--- on the center, so registering a key once per layer is the supported pattern.
----@param key string e.g. "j_hanging_chad"
----@param opts table { layers, loc_key?, silent?, ...center properties }
-function MP.ReworkCenter(key, opts)
-	LOADED_REWORKS[key] = LOADED_REWORKS[key] or {}
-	table.insert(LOADED_REWORKS[key], opts or {})
+-- ----------------------------------------------------------------------------
+-- ReworkCenter: center rebalancing as a pure projection of the active context
+-- ----------------------------------------------------------------------------
+-- The predecessor mutated the shared center in place and let the result depend on
+-- call history, which is a polite way of saying two clients desynced if they
+-- did things in a different order. Three tiers now, nothing touched
+-- until run start, and only ever rebuilt from a frozen copy of vanilla:
+--   BASELINE — deep-frozen vanilla, captured once. The same on call 1 and call 100.
+--   LEDGER   — declared overrides, filed per (table, key, layer), off to the side.
+--   LIVE     — G.P_* recomputed from (baseline ⊕ active layers). ApplyReworks is
+--              the only writer; PreviewReworks projects elsewhere and touches nothing.
+-- effective_props() is pure in (table, key, layer-chain). 
+
+-- Tables ReworkCenter can target, keyed by a stable id so baseline/ledger don't
+-- alias across tables that happen to share a key string.
+local function rework_tables()
+	return {
+		P_CENTERS = G.P_CENTERS,
+		P_TAGS = G.P_TAGS,
+		P_SEALS = G.P_SEALS,
+		PokerHands = SMODS.PokerHands,
+		P_STAKES = G.P_STAKES,
+		P_BLINDS = G.P_BLINDS,
+	}
 end
 
--- inject reworks properly
+-- Resolve an opts.center_table (table ref, global name, or nil) to a stable id.
+local function resolve_table_id(center_table)
+	if center_table == nil then return "P_CENTERS" end
+	local tables = rework_tables()
+	if type(center_table) == "string" then
+		return tables[center_table] and center_table or nil
+	end
+	for id, tbl in pairs(tables) do
+		if tbl == center_table then return id end
+	end
+	return nil
+end
+
+-- Frozen tables are read-through proxies: the real data lives behind FROZEN_DATA
+-- so EVERY write (new key or existing) trips __newindex, not just new keys.
+-- LuaJIT is 5.1 (no __pairs / table.freeze), so deep_copy unwraps them directly.
+local FROZEN_DATA = setmetatable({}, { __mode = "k" })
+
+local function deep_copy(v)
+	if type(v) ~= "table" then return v end
+	local src = FROZEN_DATA[v] or v
+	local out = {}
+	for k, vv in pairs(src) do
+		out[k] = deep_copy(vv)
+	end
+	return out
+end
+
+-- Recursive freeze. Writing to the baseline errors loudly here and now, rather
+-- than desyncing two clients quietly, three weeks from now, mid-tournament.
+local function deep_freeze(v)
+	if type(v) ~= "table" then return v end
+	local inner = {}
+	for k, vv in pairs(v) do
+		inner[k] = deep_freeze(vv)
+	end
+	local proxy = setmetatable({}, {
+		__index = inner,
+		__newindex = function()
+			error("attempt to mutate a frozen rework baseline", 2)
+		end,
+		__metatable = false,
+	})
+	FROZEN_DATA[proxy] = inner
+	return proxy
+end
+
+-- Deep-merge src onto dst. Tables recurse; scalars overwrite. So {extra={...}}
+-- layers onto vanilla config instead of clobbering the whole table.
+local function deep_merge(dst, src)
+	for k, v in pairs(src) do
+		if type(v) == "table" and type(dst[k]) == "table" then
+			deep_merge(dst[k], v)
+		else
+			dst[k] = deep_copy(v)
+		end
+	end
+	return dst
+end
+
+MP._REWORK_BASELINE = {} -- [table_id][key] = { [prop] = { value, present = true } } (frozen)
+MP._REWORK_LEDGER = {} -- [table_id][key][layer] = { props = <deepcopy>, silent }
+MP._REWORK_OWNED = {} -- [table_id][key] = { prop = true } — the key-reset set
+MP._PREVIEW_VIEW = {} -- [table_id][key] = { [prop] = value } — read-only preview projection
+MP._PREVIEW_ACTIVE = false -- phase guard: true while a preview projection is live
+
+-- Pending ReworkCenter calls, drained once at injectItems. We can't capture the
+-- baseline at call time because the center may not be registered yet.
+local PENDING_REWORKS = {}
+
+-- Rework a center for specific layer(s). Effective props are derived from the
+-- active context at ApplyReworks/PreviewReworks time — registering is pure data.
+-- Multiple calls for the same key accumulate; each call's layers get their own
+-- ledger slot, so a key reworked differently per layer is the supported pattern.
+---@param key string e.g. "j_hanging_chad"
+---@param opts table { layers, loc_key?, silent?, center_table?, ...center properties }
+function MP.ReworkCenter(key, opts)
+	PENDING_REWORKS[#PENDING_REWORKS + 1] = { key = key, opts = opts or {} }
+end
+
+-- Normalize one ReworkCenter call into the ledger. Runs once, post-registration.
+-- Where the loc_var-wrap / generate_ui / mp_balanced enrichment happens.
+local function ingest_rework(key, opts)
+	local table_id = resolve_table_id(opts.center_table)
+	if not table_id then return end
+	local center = rework_tables()[table_id][key]
+	if not center then return end
+
+	local reserved = { layers = true, loc_key = true, silent = true, center_table = true }
+	local layers = opts.layers
+	if type(layers) == "string" then layers = { layers } end
+	if not layers then return end
+
+	-- Wrap loc_vars to inject loc_key if provided.
+	local loc_key = opts.loc_key
+	if loc_key then
+		local user_loc_vars = opts.loc_vars or function()
+			return {}
+		end
+		opts.loc_vars = function(self, info_queue, card)
+			local result = user_loc_vars(self, info_queue, card)
+			result.key = loc_key
+			return result
+		end
+	end
+
+	-- Inject generate_ui when adding loc_vars to a vanilla center.
+	local needs_generate_ui = opts.loc_vars
+		and not opts.generate_ui
+		and not (center.generate_ui and type(center.generate_ui) == "function")
+
+	-- Force mp_balanced on the config so the sticker patch fires. Seed from vanilla
+	-- config so a caller can override one field without re-declaring the whole table.
+	if center.config then
+		opts.config = opts.config or deep_copy(center.config)
+		opts.config.mp_balanced = true
+	end
+
+	-- Collect the declared props once (same for every layer in this call).
+	local props = {}
+	for k, v in pairs(opts) do
+		if not reserved[k] then props[k] = v end
+	end
+	if needs_generate_ui then props.generate_ui = SMODS.Center.generate_ui end
+
+	MP._REWORK_LEDGER[table_id] = MP._REWORK_LEDGER[table_id] or {}
+	MP._REWORK_LEDGER[table_id][key] = MP._REWORK_LEDGER[table_id][key] or {}
+	MP._REWORK_OWNED[table_id] = MP._REWORK_OWNED[table_id] or {}
+	MP._REWORK_OWNED[table_id][key] = MP._REWORK_OWNED[table_id][key] or {}
+	local owned = MP._REWORK_OWNED[table_id][key]
+
+	-- Baseline: deep snapshot of every prop this rework touches, taken before
+	-- anything mutates. A present-flag, not a magic "absent" value, so nil stays nil.
+	MP._REWORK_BASELINE[table_id] = MP._REWORK_BASELINE[table_id] or {}
+	MP._REWORK_BASELINE[table_id][key] = MP._REWORK_BASELINE[table_id][key] or {}
+	local baseline = MP._REWORK_BASELINE[table_id][key]
+
+	for prop in pairs(props) do
+		owned[prop] = true
+		if baseline[prop] == nil then
+			local cur = center[prop]
+			if cur == nil then
+				baseline[prop] = deep_freeze({ present = false })
+			else
+				baseline[prop] = deep_freeze({ value = deep_copy(cur), present = true })
+			end
+		end
+	end
+
+	for _, layer in ipairs(layers) do
+		-- Last write for a (key, layer) wins.
+		MP._REWORK_LEDGER[table_id][key][layer] = {
+			props = deep_copy(props),
+			silent = opts.silent,
+		}
+	end
+end
+
+-- Effective props for one center under an ordered layer chain. PURE: reads only
+-- (frozen baseline, ledger, chain), never the live center. Returns (effective,
+-- owned) where `effective[prop] = value | nil`.
+local function effective_props(table_id, key, chain)
+	local owned = (MP._REWORK_OWNED[table_id] or {})[key] or {}
+	local baseline = (MP._REWORK_BASELINE[table_id] or {})[key] or {}
+	local ledger = (MP._REWORK_LEDGER[table_id] or {})[key] or {}
+
+	-- Start from vanilla: every owned prop resets to baseline (or absent). No
+	-- history survives this line, which is the entire point of the rewrite.
+	local effective = {}
+	for prop in pairs(owned) do
+		local b = baseline[prop]
+		if b and b.present then effective[prop] = deep_copy(b.value) end
+	end
+
+	-- Fold each active layer in chain order; later layers win, config deep-merges.
+	for _, layer in ipairs(chain) do
+		local slot = ledger[layer]
+		if slot then
+			for prop, v in pairs(slot.props) do
+				if prop == "config" and type(v) == "table" and type(effective.config) == "table" then
+					deep_merge(effective.config, v)
+				else
+					effective[prop] = deep_copy(v)
+				end
+			end
+		end
+	end
+	return effective, owned
+end
+
+-- Set of centers some ledger entry touches, per table. Iterating this (not the
+-- whole P_* table) keeps ApplyReworks scoped to rework-owned keys.
+local function reworked_keys(table_id)
+	local out = {}
+	local ledger = MP._REWORK_LEDGER[table_id]
+	if ledger then
+		for key in pairs(ledger) do
+			out[#out + 1] = key
+		end
+	end
+	return out
+end
+
+-- Rebuild G.P_JOKER_RARITY_POOLS from scratch. NOT incremental: collect every
+-- joker whose effective rarity is bucket B, stable-sort by (.order, key), replace
+-- wholesale. Incremental re-sorting is precisely how the rarity pool used to drift
+-- two clients apart, so we don't do that anymore.
+local function rebuild_rarity_pools(chain, effective_rarity)
+	if not G.P_JOKER_RARITY_POOLS then return end
+	for bucket, pool in pairs(G.P_JOKER_RARITY_POOLS) do
+		local members = {}
+		for _, center in pairs(G.P_CENTERS) do
+			-- Membership mirrors vanilla pool init byte-for-byte (game.lua:818/822):
+			--   if not v.wip then if v.rarity and v.set == 'Joker' and not v.demo
+			-- — i.e. a non-WIP Joker with a rarity that isn't a demo card. Effective
+			-- rarity = the layer override if reworked, else the center's own rarity.
+			-- (Vanilla applies no banned/discovered/skip_pool gate to the rarity
+			-- pool; those act elsewhere or at draw-time, so we don't either.)
+			local rarity = effective_rarity[center.key]
+			if rarity == nil then rarity = center.rarity end
+			if not center.wip and rarity and center.set == "Joker" and not center.demo and rarity == bucket then
+				members[#members + 1] = center
+			end
+		end
+		-- Vanilla sorts by .order alone; we add a key tiebreak so equal-order
+		-- jokers can't land in different positions on two clients (table.sort is
+		-- not stable). Strictly more deterministic than the game's own sort.
+		table.sort(members, function(a, b)
+			if a.order ~= b.order then return (a.order or 0) < (b.order or 0) end
+			return tostring(a.key) < tostring(b.key)
+		end)
+		-- Replace contents in place (other code holds a reference to `pool`).
+		for i = #pool, 1, -1 do
+			pool[i] = nil
+		end
+		for i, center in ipairs(members) do
+			pool[i] = center
+		end
+	end
+end
+
+-- Strip ruleset_mp_ prefix; nil/empty means vanilla (no layers active).
+local function chain_for(ruleset)
+	if not ruleset or ruleset == "" then return {} end
+	if string.sub(ruleset, 1, 11) == "ruleset_mp_" then ruleset = string.sub(ruleset, 12) end
+	return MP.active_layer_chain(ruleset)
+end
+
+-- The ONLY writer of G.P_*. Called once at run start (game_state.lua). Idempotent
+-- by construction: every owned prop is rebuilt from the frozen baseline, so once,
+-- twice, or after fifty menu previews all land in exactly the same place.
+-- Pass a `key` to limit to one center (parity with old call sites).
+function MP.ApplyReworks(ruleset, key)
+	if MP._PREVIEW_ACTIVE then
+		error("ApplyReworks called during preview phase — pool mutation is forbidden while previewing")
+	end
+	local chain = chain_for(ruleset)
+	local effective_rarity = {}
+
+	for table_id, tbl in pairs(rework_tables()) do
+		local keys = key and { key } or reworked_keys(table_id)
+		for _, k in ipairs(keys) do
+			local center = tbl[k]
+			if center and (MP._REWORK_LEDGER[table_id] or {})[k] then
+				local effective, owned = effective_props(table_id, k, chain)
+				-- KEY-RESET the union of owned props: effective, else baseline,
+				-- else nil. No prefix scanning — we touch exactly what reworks own.
+				local baseline = MP._REWORK_BASELINE[table_id][k]
+				for prop in pairs(owned) do
+					if effective[prop] ~= nil then
+						center[prop] = effective[prop]
+					else
+						local b = baseline[prop]
+						center[prop] = (b and b.present) and deep_copy(b.value) or nil
+					end
+				end
+				if table_id == "P_CENTERS" and owned.rarity then
+					effective_rarity[k] = center.rarity
+				end
+			end
+		end
+	end
+
+	-- One deterministic rebuild after all rarities are live (skip in by-key mode;
+	-- a single center can't define a consistent whole-pool order).
+	if not key and next(effective_rarity) then rebuild_rarity_pools(chain, effective_rarity) end
+end
+
+-- Project reworks into an isolated read-only namespace. Never writes G.P_* or the
+-- pools; the info panel reads through MP.preview_center(). So previewing ruleset Y
+-- leaves no residue for a later game under X — the exact bug this rewrite exists
+-- to kill, back when the menu and the run shared one mutable center.
+function MP.PreviewReworks(ruleset)
+	local chain = chain_for(ruleset)
+	MP._PREVIEW_VIEW = {}
+	MP._PREVIEW_ACTIVE = true
+	for table_id in pairs(rework_tables()) do
+		for _, k in ipairs(reworked_keys(table_id)) do
+			local effective = effective_props(table_id, k, chain)
+			MP._PREVIEW_VIEW[table_id] = MP._PREVIEW_VIEW[table_id] or {}
+			MP._PREVIEW_VIEW[table_id][k] = effective
+		end
+	end
+	MP._PREVIEW_ACTIVE = false
+end
+
+-- The center as the active preview would render it. UI reads through this instead
+-- of the live table, so it shows preview numbers without mutating anything.
+-- Outside a preview (empty view) it just hands back the live center.
+function MP.preview_center(key, center_table)
+	local table_id = resolve_table_id(center_table) or "P_CENTERS"
+	local tbl = rework_tables()[table_id]
+	local live = tbl and tbl[key]
+	local overlay = (MP._PREVIEW_VIEW[table_id] or {})[key]
+	if not live or not overlay then return live end
+	-- Read-through proxy: overlaid props (incl. the merged config the panel +
+	-- balanced sticker read) come from the projection, the rest fall through to
+	-- live. Writes hit the throwaway proxy, never live — a Card scribbling on its
+	-- center can't desync us. (It can still surprise us in other ways: this proxy
+	-- has no identity in G.P_CENTERS, which is its own small saga elsewhere.)
+	return setmetatable({}, {
+		__index = function(_, prop)
+			local ov = overlay[prop]
+			if ov ~= nil then return ov end
+			return live[prop]
+		end,
+	})
+end
+
+-- Backwards-compatible shim for the ~70 old call sites. Menu/replay sites really
+-- ought to use PreviewReworks, but routing them through here stays correct — the
+-- next ApplyReworks rebuilds from baseline regardless, so the worst case is some
+-- wasted work, not a desync.
+function MP.LoadReworks(ruleset, key)
+	MP.ApplyReworks(ruleset, key)
+end
+
+-- inject reworks properly: drain every pending ReworkCenter into the ledger
+-- AFTER the real injectItems has registered all centers.
 local inject_ref = SMODS.injectItems
 function SMODS.injectItems()
 	local ret = inject_ref()
-	for key, opts_list in pairs(LOADED_REWORKS) do
-		for _, opts in ipairs(opts_list) do
-			local center_table = type(opts.center_table) == "table" and opts.center_table
-				or G[opts.center_table]
-				or G.P_CENTERS
-			local center = center_table[key]
-
-			-- Meta keys (not center properties)
-			local reserved = { layers = true, loc_key = true, silent = true }
-			local layers = opts.layers
-			local loc_key = opts.loc_key
-			local silent = opts.silent
-
-			-- Convert single layer to list
-			if type(layers) == "string" then layers = { layers } end
-
-			-- Wrap loc_vars to inject loc_key if provided
-			if loc_key then
-				local user_loc_vars = opts.loc_vars or function()
-					return {}
-				end
-				opts.loc_vars = function(self, info_queue, card)
-					local result = user_loc_vars(self, info_queue, card)
-					result.key = loc_key
-					return result
-				end
-			end
-
-			-- do we need to inject generate_ui for loc_vars to work?
-			local needs_generate_ui = opts.loc_vars
-				and not opts.generate_ui
-				and not (center.generate_ui and type(center.generate_ui) == "function")
-
-			-- inject mp_balanced if applicable
-			if center.config then
-				opts.config = opts.config or copy_table(center.config)
-				opts.config.mp_balanced = true
-			end
-
-			-- Apply changes to all specified layers
-			for _, layer in ipairs(layers) do
-				local prefix = "mp_" .. layer .. "_"
-
-				-- Store all reworked properties
-				for k, v in pairs(opts) do
-					if not reserved[k] then
-						center[prefix .. k] = v
-						if not center["mp_vanilla_" .. k] then center["mp_vanilla_" .. k] = center[k] or "NULL" end
-					end
-				end
-
-				-- Auto-inject generate_ui when adding loc_vars to vanilla centers
-				if needs_generate_ui then
-					center[prefix .. "generate_ui"] = SMODS.Center.generate_ui
-					if not center.mp_vanilla_generate_ui then
-						center.mp_vanilla_generate_ui = center.generate_ui or "NULL"
-					end
-				end
-
-				-- Mark this center as having reworks
-				center.mp_reworks = center.mp_reworks or {}
-				center.mp_reworks[layer] = true
-				center.mp_reworks["vanilla"] = true
-
-				center.mp_silent = center.mp_silent or {}
-				center.mp_silent[layer] = silent
-			end
-		end
+	for _, entry in ipairs(PENDING_REWORKS) do
+		ingest_rework(entry.key, entry.opts)
 	end
+	PENDING_REWORKS = {}
 	return ret
-end
-
--- Load reworks for the active ruleset. Resolves via layer order then self-layer.
--- You can also call this function with a key to only affect that specific center.
-function MP.LoadReworks(ruleset, key)
-	ruleset = ruleset or "vanilla"
-	if string.sub(ruleset, 1, 11) == "ruleset_mp_" then ruleset = string.sub(ruleset, 12, #ruleset) end
-
-	local function process(key_, prefix_, tbl_)
-		local center = tbl_[key_]
-		for k, v in pairs(center) do
-			if string.sub(k, 1, #prefix_) == prefix_ then
-				local orig = string.sub(k, #prefix_ + 1)
-				if orig == "rarity" then
-					SMODS.remove_pool(G.P_JOKER_RARITY_POOLS[center[orig]], center.key)
-					table.insert(G.P_JOKER_RARITY_POOLS[center[k]], center)
-					table.sort(G.P_JOKER_RARITY_POOLS[center[k]], function(a, b)
-						return a.order < b.order
-					end)
-				end
-				if center[k] == "NULL" then
-					center[orig] = nil
-				else
-					center[orig] = center[k]
-				end
-			end
-		end
-	end
-
-	-- Resolution: vanilla → ruleset's layers → ruleset self → modifiers (only
-	-- when target is the active ruleset). active_layer_chain handles the full
-	-- layer-name list; vanilla is processed separately.
-	local resolution = MP.active_layer_chain(ruleset)
-
-	if key then
-		process(key, "mp_vanilla_")
-		for _, layer in ipairs(resolution) do
-			process(key, "mp_" .. layer .. "_")
-		end
-	else
-		for _, tbl in ipairs({
-			G.P_CENTERS,
-			G.P_TAGS,
-			G.P_SEALS,
-			SMODS.PokerHands,
-			G.P_STAKES,
-			G.P_BLINDS,
-		}) do
-			for k, v in pairs(tbl) do
-				if v.mp_reworks then
-					-- Always reset to vanilla first
-					if v.mp_reworks["vanilla"] then process(k, "mp_vanilla_", tbl) end
-					-- Apply layers in order, then self
-					for _, layer in ipairs(resolution) do
-						if v.mp_reworks[layer] then process(k, "mp_" .. layer .. "_", tbl) end
-					end
-				end
-			end
-		end
-	end
 end

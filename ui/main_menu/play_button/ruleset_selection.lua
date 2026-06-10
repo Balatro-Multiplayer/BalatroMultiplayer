@@ -17,6 +17,7 @@ local ruleset_buttons_data = {
 			{ button_id = "badlatro_ruleset_button", button_localize_key = "k_badlatro" },
 			{ button_id = "speedlatro_ruleset_button", button_localize_key = "k_speedlatro" },
 			{ button_id = "chaos_ruleset_button", button_localize_key = "k_chaos" },
+			{ button_id = "release_ruleset_button", button_localize_key = "k_release" },
 		},
 	},
 	{
@@ -68,6 +69,7 @@ local rulesets_tabs = {
 						{ button_id = "speedlatro_ruleset_button", button_localize_key = "k_speedlatro" },
 						{ button_id = "badlatro_ruleset_button", button_localize_key = "k_badlatro" },
 						{ button_id = "chaos_ruleset_button", button_localize_key = "k_chaos" },
+						{ button_id = "release_ruleset_button", button_localize_key = "k_release" },
 					},
 				},
 			},
@@ -79,7 +81,10 @@ local rulesets_tabs = {
 					name = "k_experimental",
 					buttons = {
 						{ button_id = "experimental_ruleset_button", button_localize_key = "k_experimental_standard" },
-						{ button_id = "experimental_legacy_ruleset_button", button_localize_key = "k_experimental_legacy" },
+						{
+							button_id = "experimental_legacy_ruleset_button",
+							button_localize_key = "k_experimental_legacy",
+						},
 					},
 				},
 			},
@@ -167,7 +172,9 @@ function G.UIDEF.ruleset_selection_options(mode, buttons)
 	-- here we are
 	MP.apply_default_modifiers(default_ruleset)
 
-	MP.LoadReworks(default_ruleset)
+	-- Preview only — projects into _PREVIEW_VIEW, never the live centers the next
+	-- game reads. Browse all you like; nobody desyncs.
+	MP.PreviewReworks(default_ruleset)
 	MP.UI.ruleset_selection_mode = mode
 	MP.UI.ruleset_selection_default_button = default_ruleset .. "_ruleset_button"
 
@@ -199,7 +206,7 @@ function G.FUNCS.change_ruleset_selection(e)
 		function(ruleset_name)
 			set_selected_ruleset(mode, "ruleset_mp_" .. ruleset_name)
 			MP.apply_default_modifiers(ruleset_name)
-			MP.LoadReworks(ruleset_name)
+			MP.PreviewReworks(ruleset_name)
 		end
 	)
 
@@ -467,9 +474,16 @@ function G.UIDEF.ruleset_cardarea_definition(args)
 						G.CARD_W * card_size,
 						G.CARD_H * card_size,
 						nil,
-						G.P_CENTERS[v],
+						-- Read through the preview projection, not the live center,
+						-- so the panel shows reworked numbers without mutating G.P_*.
+						MP.preview_center(v),
 						{ bypass_discovery_center = true, bypass_discovery_ui = true }
 					)
+					-- preview_center returns a proxy, so Card:set_ability's identity
+					-- scan of G.P_CENTERS can't find it to populate center_key. Set it
+					-- from the key we already have, or the balanced sticker's loc_vars
+					-- crashes on hover.
+					card.config.center_key = v
 					card_area:emplace(card)
 				end
 
