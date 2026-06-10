@@ -29,8 +29,8 @@ local submitted
 MP = {
 	LOBBY = { code = "TEST" },
 	ACTIONS = {
-		submit_log_hashes = function(c, h, seed)
-			submitted = { carbon = c, human = h, seed = seed }
+		submit_log_hashes = function(c, h, seed, log)
+			submitted = { carbon = c, human = h, seed = seed, log = log }
 		end,
 	},
 	UTILS = {
@@ -109,5 +109,12 @@ assert(carbon_hash == chk_carbon and human_hash == chk_human, "end_run return !=
 assert(submitted, "hashes not submitted to server")
 assert(submitted.carbon == carbon_hash and submitted.human == human_hash, "submitted hashes mismatch")
 assert(submitted.seed == "ABCD", "seed not forwarded to server")
+
+-- The full carbon block (manifest + actions + END + CHK) is shipped to the server
+-- so it keeps the whole viewable/replayable log, not just the hash.
+assert(submitted.log, "carbon log not sent to server")
+assert(submitted.log:match("MP_RLOG: MANIFEST {"), "sent log missing manifest line")
+assert(submitted.log:match("MP_RLOG: 2 buy 1 2"), "sent log missing action lines")
+assert(submitted.log:match("MP_RLOG: CHK v1 "), "sent log missing CHK trailer")
 
 print("test_rlog_roundtrip: OK")
