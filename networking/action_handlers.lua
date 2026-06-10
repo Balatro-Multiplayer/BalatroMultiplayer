@@ -1318,12 +1318,13 @@ end
 -- End-of-game replay-log fingerprints. The server stores these (keyed by
 -- lobby + seed + game) so a presented log can later be re-hashed and compared
 -- without a line-by-line diff. See lib/replay_log.lua (MP.RLOG).
-function MP.ACTIONS.submit_log_hashes(carbon, human, seed)
+function MP.ACTIONS.submit_log_hashes(carbon, human, seed, log)
 	Client.send({
 		action = "submitLogHashes",
 		carbon = carbon,
 		human = human,
 		seed = seed,
+		log = log,
 	})
 end
 

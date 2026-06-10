@@ -37,6 +37,7 @@ RLOG.REQUIRED_MANIFEST_KEYS = { "seed", "ruleset", "gamemode", "deck", "stake" }
 
 RLOG._seq = 0
 RLOG._carbon_buffer = {} -- the action "MP_RLOG: <seq> ..." lines, hashed at end
+RLOG._carbon_full = {} -- the full carbon block (manifest + actions + END + CHK), sent to the server
 RLOG._human_buffer = {} -- the "Client sent message: ..." lines, hashed at end
 RLOG._run_active = false
 RLOG._manifest = nil
@@ -84,6 +85,14 @@ local function emit(msg)
 	sendTraceMessage(msg, "MULTIPLAYER")
 end
 
+-- Emit a carbon-stream line: tee to the Lovely log AND accumulate it into the
+-- full block we ship to the server at end_run (so the server keeps the whole
+-- viewable/replayable action log, not just its hash).
+local function emit_carbon(msg)
+	RLOG._carbon_full[#RLOG._carbon_full + 1] = msg
+	sendTraceMessage(msg, "MULTIPLAYER")
+end
+
 -------------------------------------------------------------------------------
 -- Public API
 -------------------------------------------------------------------------------
@@ -103,7 +112,7 @@ function RLOG.record(opcode, args, human)
 	local argstr = fmt_args(args)
 	local cline = RLOG.CARBON_PREFIX .. " " .. seq .. " " .. opcode .. (argstr ~= "" and (" " .. argstr) or "")
 	RLOG._carbon_buffer[#RLOG._carbon_buffer + 1] = cline
-	emit(cline)
+	emit_carbon(cline)
 
 	if human ~= nil and human ~= "" then
 		local hline = RLOG.HUMAN_PREFIX .. " " .. human
@@ -124,21 +133,22 @@ function RLOG.begin_run(manifest)
 
 	RLOG._seq = 0
 	RLOG._carbon_buffer = {}
+	RLOG._carbon_full = {}
 	RLOG._human_buffer = {}
 	RLOG._manifest = manifest
 	RLOG._run_active = true
 
 	local json = require("json")
-	emit(RLOG.CARBON_PREFIX .. " MANIFEST " .. json.encode(manifest))
+	emit_carbon(RLOG.CARBON_PREFIX .. " MANIFEST " .. json.encode(manifest))
 end
 
 -- Close the current game's block: emit the END line, hash each stream, emit the
--- CHK trailer, and submit both hashes to the server.
+-- CHK trailer, and submit the hashes plus the full carbon block to the server.
 function RLOG.end_run(outcome)
 	if not RLOG._run_active then return end
 
 	local json = require("json")
-	emit(RLOG.CARBON_PREFIX .. " END " .. json.encode(outcome or {}))
+	emit_carbon(RLOG.CARBON_PREFIX .. " END " .. json.encode(outcome or {}))
 
 	local carbon_str = table.concat(RLOG._carbon_buffer, "\n")
 	local human_str = table.concat(RLOG._human_buffer, "\n")
@@ -146,10 +156,13 @@ function RLOG.end_run(outcome)
 	local human_hash = MP.UTILS.joker_hash(human_str)
 	local bytes = #carbon_str + #human_str
 
-	emit(string.format("%s CHK v1 carbon=%s human=%s bytes=%d", RLOG.CARBON_PREFIX, carbon_hash, human_hash, bytes))
+	emit_carbon(string.format("%s CHK v1 carbon=%s human=%s bytes=%d", RLOG.CARBON_PREFIX, carbon_hash, human_hash, bytes))
 
 	if MP.ACTIONS and MP.ACTIONS.submit_log_hashes then
-		MP.ACTIONS.submit_log_hashes(carbon_hash, human_hash, RLOG._manifest and RLOG._manifest.seed)
+		-- The full carbon block (manifest + actions + END + CHK) so the server
+		-- keeps the complete viewable/replayable log, not just its hash.
+		local carbon_log = table.concat(RLOG._carbon_full, "\n")
+		MP.ACTIONS.submit_log_hashes(carbon_hash, human_hash, RLOG._manifest and RLOG._manifest.seed, carbon_log)
 	end
 
 	RLOG._run_active = false
