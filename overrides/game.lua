@@ -15,10 +15,10 @@ end
 local sell_card_ref = Card.sell_card
 function Card:sell_card()
 	if self.ability and self.ability.name then
-		local human = string.format("action:soldCard,card:%s", self.ability.name)
-		sendTraceMessage("Client sent message: " .. human, "MULTIPLAYER")
-		-- Carbon: positional sell by area + slot, captured before the card leaves
+		-- record() emits both the carbon line and the human "Client sent message:"
+		-- line. Sell is positional by area + slot, captured before the card leaves
 		-- its area. Area distinguishes selling a joker (4) from a consumable (5).
+		local human = string.format("action:soldCard,card:%s", self.ability.name)
 		local area = MP.UTILS.area_enum(self.area)
 		local idx = MP.UTILS.index_in_area(self)
 		if area and idx then MP.RLOG.record("sell", { area, idx }, human) end
@@ -28,12 +28,10 @@ end
 
 local reroll_shop_ref = G.FUNCS.reroll_shop
 function G.FUNCS.reroll_shop(e)
-	local human = string.format("action:rerollShop,cost:%s", G.GAME.current_round.reroll_cost)
-	sendTraceMessage("Client sent message: " .. human, "MULTIPLAYER")
-
-	-- Carbon: reroll has no positional target; the shop contents it produces are
+	-- Reroll has no positional target; the shop contents it produces are
 	-- deterministic from the seed, so the bare opcode is enough to replay.
-	MP.RLOG.record("reroll", nil, human)
+	-- record() emits both the carbon line and the human "Client sent message:".
+	MP.RLOG.record("reroll", nil, string.format("action:rerollShop,cost:%s", G.GAME.current_round.reroll_cost))
 
 	-- Update reroll stats if in a multiplayer game
 	if MP.LOBBY.code and MP.GAME.stats then
@@ -48,11 +46,11 @@ local buy_from_shop_ref = G.FUNCS.buy_from_shop
 function G.FUNCS.buy_from_shop(e)
 	local c1 = e.config.ref_table
 	if c1 and c1:is(Card) then
-		local human = string.format("action:boughtCardFromShop,card:%s,cost:%s", c1.ability.name, c1.cost)
-		sendTraceMessage("Client sent message: " .. human, "MULTIPLAYER")
-		-- Carbon: positional buy by shop area + slot, captured before the card
+		-- record() emits both the carbon line and the human "Client sent message:"
+		-- line. Buy is positional by shop area + slot, captured before the card
 		-- leaves the shop. Booster packs and vouchers get distinct opcodes since
 		-- they branch the game differently, but all reference an area + slot.
+		local human = string.format("action:boughtCardFromShop,card:%s,cost:%s", c1.ability.name, c1.cost)
 		local area = MP.UTILS.area_enum(c1.area)
 		local idx = MP.UTILS.index_in_area(c1)
 		if area and idx then
@@ -73,8 +71,8 @@ local use_card_ref = G.FUNCS.use_card
 function G.FUNCS.use_card(e, mute, nosave)
 	local card = e.config and e.config.ref_table
 	if card and card.ability and card.ability.name then
+		-- record() emits both the carbon line and the human "Client sent message:".
 		local human = string.format("action:usedCard,card:%s", card.ability.name)
-		sendTraceMessage("Client sent message: " .. human, "MULTIPLAYER")
 		-- Pack picks share this hook (a picked card lives in G.pack_cards) but get
 		-- their own opcode. Both reference a slot plus any highlighted hand targets
 		-- (e.g. a Tarot from an Arcana pack applied to selected cards).
