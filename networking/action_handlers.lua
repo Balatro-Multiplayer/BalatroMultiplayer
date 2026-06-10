@@ -271,6 +271,33 @@ local function action_start_game(p)
 	if not MP.LOBBY.config.different_seeds and MP.LOBBY.config.custom_seed ~= "random" then
 		seed = MP.LOBBY.config.custom_seed
 	end
+
+	-- Open a new replay-log block for this game with everything needed to
+	-- reconstruct it deterministically later. Uses the resolved seed.
+	MP.RLOG.begin_run({
+		seed = seed,
+		stake = stake,
+		deck = MP.LOBBY.config.back,
+		sleeve = MP.LOBBY.config.sleeve,
+		challenge = MP.LOBBY.config.challenge,
+		ruleset = MP.LOBBY.config.ruleset,
+		gamemode = MP.LOBBY.config.gamemode,
+		modifier_layers = MP.LOBBY.config.modifier_layers,
+		lobby_config = MP.LOBBY.config,
+		the_order_enabled = MP.should_use_the_order(),
+		different_seeds = MP.LOBBY.config.different_seeds,
+		mod_version = SMODS.Mods["Multiplayer"] and SMODS.Mods["Multiplayer"].version,
+		mod_hash = MP.MOD_STRING,
+		smods_version = MP.SMODS_VERSION,
+		lovely_version = MP.REQUIRED_LOVELY_VERSION,
+		lobby_code = MP.LOBBY.code,
+		is_host = MP.LOBBY.is_host,
+		player = MP.LOBBY.username,
+		opponent = (MP.LOBBY.is_host and MP.LOBBY.guest and MP.LOBBY.guest.username)
+			or (MP.LOBBY.host and MP.LOBBY.host.username),
+		start_ts = os.date("%Y-%m-%dT%H:%M:%S%z"),
+	})
+
 	G.FUNCS.lobby_start_run(nil, { seed = seed, stake = stake })
 	MP.LOBBY.ready_to_start = false
 end
@@ -401,6 +428,7 @@ local function action_stop_game()
 		MP.UI.update_connection_status()
 		MP.reset_game_states()
 	end
+	MP.RLOG.end_run({ result = "stop" })
 	MP.UTILS.emit_log_checksum()
 end
 
@@ -445,6 +473,7 @@ local function action_win_game()
 	MP.nemesis_deck_received = false
 	MP.GAME.won = true
 	MP.STATS.record_match(true)
+	MP.RLOG.end_run({ result = "win" })
 	MP.UTILS.log_mem_debug_messages()
 	MP.UTILS.emit_log_checksum()
 	win_game()
@@ -458,6 +487,7 @@ local function action_lose_game()
 	MP.STATS.record_match(false)
 	G.STATE_COMPLETE = false
 	G.STATE = G.STATES.GAME_OVER
+	MP.RLOG.end_run({ result = "loss" })
 	MP.UTILS.log_mem_debug_messages()
 	MP.UTILS.emit_log_checksum()
 end
@@ -527,6 +557,9 @@ end
 
 local function action_send_phantom(p)
 	local key = p.key
+	-- Carbon: exogenous opponent effect. Keyed by content (not a board index),
+	-- logged in received order so a solo re-sim reproduces it faithfully.
+	MP.RLOG.record("net_phantom_add", key, "action:netPhantomAdd,key:" .. tostring(key))
 	local menu = G.OVERLAY_MENU -- we are spoofing a menu here, which disables duplicate protection
 	G.OVERLAY_MENU = G.OVERLAY_MENU or true
 	local new_card = create_card("Joker", MP.shared, false, nil, nil, nil, key)
@@ -537,6 +570,7 @@ local function action_send_phantom(p)
 end
 
 local function action_remove_phantom(p)
+	MP.RLOG.record("net_phantom_remove", p.key, "action:netPhantomRemove,key:" .. tostring(p.key))
 	local card = MP.UTILS.get_phantom_joker(p.key)
 	if card then
 		card:remove_from_deck()
@@ -610,10 +644,14 @@ local function action_version()
 	MP.ACTIONS.version()
 end
 
-local action_asteroid = action_asteroid
+local action_asteroid_ref = action_asteroid
 	or function()
 		if MP.UI.show_asteroid_hand_level_up then MP.UI.show_asteroid_hand_level_up() end
 	end
+local function action_asteroid(p)
+	MP.RLOG.record("net_asteroid", nil, "action:netAsteroid")
+	return action_asteroid_ref(p)
+end
 
 local function action_sold_joker()
 	-- HACK: this action is being sent when any card is being sold, since Taxes is now reworked
@@ -631,6 +669,7 @@ end
 
 local function action_eat_pizza(p)
 	local discards = p.whole -- rename to "discards" when possible
+	MP.RLOG.record("net_pizza", discards, "action:netPizza,discards:" .. tostring(discards))
 	MP.GAME.pizza_discards = MP.GAME.pizza_discards + discards
 	G.GAME.round_resets.discards = G.GAME.round_resets.discards + discards
 	ease_discard(discards)
@@ -641,6 +680,7 @@ local function action_spent_last_shop(p)
 end
 
 local function action_magnet()
+	MP.RLOG.record("net_magnet", nil, "action:netMagnet")
 	local card = nil
 	for _, v in pairs(G.jokers.cards) do
 		if not card or v.sell_cost > card.sell_cost then card = v end
@@ -1272,6 +1312,18 @@ function MP.ACTIONS.sync_client()
 	Client.send({
 		action = "syncClient",
 		isCached = _RELEASE_MODE,
+	})
+end
+
+-- End-of-game replay-log fingerprints. The server stores these (keyed by
+-- lobby + seed + game) so a presented log can later be re-hashed and compared
+-- without a line-by-line diff. See lib/replay_log.lua (MP.RLOG).
+function MP.ACTIONS.submit_log_hashes(carbon, human, seed)
+	Client.send({
+		action = "submitLogHashes",
+		carbon = carbon,
+		human = human,
+		seed = seed,
 	})
 end
 

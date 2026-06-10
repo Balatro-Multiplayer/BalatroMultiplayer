@@ -15,6 +15,7 @@ function G.FUNCS.mp_toggle_ready(e)
 	sendTraceMessage("Toggling Ready", "MULTIPLAYER")
 	MP.GAME.ready_blind = not MP.GAME.ready_blind
 	MP.GAME.ready_blind_text = MP.GAME.ready_blind and localize("b_unready") or localize("b_ready")
+	MP.RLOG.record("ready_blind", MP.GAME.ready_blind and 1 or 0)
 
     MP.GAME.pvp_reached = true
 
@@ -62,6 +63,16 @@ function G.FUNCS.select_blind(e)
 	if MP.is_mp_or_ghost() then
 		MP.GAME.ante_key = tostring(math.random())
 		if not MP.GHOST.is_active() then
+			-- Carbon: log the freshly-rolled (non-deterministic) ante_key first so
+			-- a replay can restore it, then the blind selection itself.
+			MP.RLOG.record("set_ante_key", MP.GAME.ante_key)
+			MP.RLOG.record(
+				"select_blind",
+				0,
+				string.format("action:selectBlind,blind:%s", tostring(e.config.ref_table.key or e.config.ref_table.name))
+			)
+			-- Flush the carbon file each round to bound data loss on a crash.
+			MP.RLOG.flush()
 			MP.ACTIONS.play_hand(0, G.GAME.round_resets.hands)
 			MP.ACTIONS.new_round()
 			MP.ACTIONS.set_location("loc_playing", (e.config.ref_table.key or e.config.ref_table.name))
@@ -87,6 +98,7 @@ G.FUNCS.skip_blind = function(e)
 		end
 
 		MP.ACTIONS.skip(G.GAME.skips)
+		MP.RLOG.record("skip_blind", 0, "action:skipBlind")
 
 		--Update the furthest blind
 		local temp_furthest_blind = 0
