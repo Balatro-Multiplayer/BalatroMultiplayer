@@ -71,8 +71,6 @@ function G.FUNCS.select_blind(e)
 				0,
 				string.format("action:selectBlind,blind:%s", tostring(e.config.ref_table.key or e.config.ref_table.name))
 			)
-			-- Flush the carbon file each round to bound data loss on a crash.
-			MP.RLOG.flush()
 			MP.ACTIONS.play_hand(0, G.GAME.round_resets.hands)
 			MP.ACTIONS.new_round()
 			MP.ACTIONS.set_location("loc_playing", (e.config.ref_table.key or e.config.ref_table.name))

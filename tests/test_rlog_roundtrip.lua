@@ -1,47 +1,28 @@
 --[[
   Replay-log (MP.RLOG) round-trip test.
 
-  Drives lib/replay_log.lua with stubbed globals, writes a real .carbon file to
-  tests/, parses it back, and asserts the dual stream is well-formed: manifest +
-  trailer present, A/H lines paired by a gapless monotonic sequence, positional
-  args (including ordered index-lists) round-trip exactly, and the CHK trailer's
-  per-stream hashes equal a recompute over the parsed lines and match what was
-  submitted to the server.
+  Drives lib/replay_log.lua with stubbed globals, captures the lines it emits to
+  the Lovely log, and asserts the dual stream is well-formed: a MANIFEST header
+  and END + CHK trailer under the "MP_RLOG:" carbon prefix; carbon action lines
+  with a gapless monotonic sequence; positional args (including ordered index-
+  lists) intact; a paired human "Client sent message:" line per action; and CHK
+  per-stream hashes that equal a recompute over the captured lines and match
+  what was submitted to the server.
 
   Run from the repo root:
     lua tests/test_rlog_roundtrip.lua
 ]]
 
--- ─── Stubs ──────────────────────────────────────────────────────────────────
-
--- Minimal deterministic encoder; the test manifest/outcome are flat scalars.
 package.loaded["json"] = {
-	encode = function(t)
-		local keys = {}
-		for k in pairs(t) do keys[#keys + 1] = k end
-		table.sort(keys)
-		local parts = {}
-		for _, k in ipairs(keys) do
-			local v = t[k]
-			local vs
-			if type(v) == "string" then
-				vs = '"' .. v .. '"'
-			elseif type(v) == "table" then
-				vs = "{}"
-			else
-				vs = tostring(v)
-			end
-			parts[#parts + 1] = '"' .. k .. '":' .. vs
-		end
-		return "{" .. table.concat(parts, ",") .. "}"
+	encode = function()
+		return "{}"
 	end,
 }
 
-local CARBON_LOG = "tests/_rlog_roundtrip.log"
-local CARBON_FILE = "tests/_rlog_roundtrip.carbon"
-package.loaded["lovely"] = { log_path = CARBON_LOG }
-
-function sendTraceMessage() end
+local captured = {}
+function sendTraceMessage(msg)
+	captured[#captured + 1] = msg
+end
 function sendWarnMessage() end
 
 local submitted
@@ -65,9 +46,7 @@ MP = {
 	},
 }
 
-os.remove(CARBON_FILE)
 dofile("lib/replay_log.lua")
-
 local RLOG = assert(MP.RLOG, "MP.RLOG not defined after load")
 
 -- ─── Drive a run ────────────────────────────────────────────────────────────
@@ -80,37 +59,30 @@ RLOG.record("use", { 1, { 2, 4 } }, "action:usedCard,card:The Tower")
 RLOG.record("reroll", nil, "action:rerollShop,cost:5")
 local carbon_hash, human_hash = RLOG.end_run({ result = "win" })
 
--- ─── Read + parse the carbon file ───────────────────────────────────────────
+-- ─── Parse the captured log lines ───────────────────────────────────────────
 
-local f = assert(io.open(CARBON_FILE, "r"), "carbon file not written")
-local content = f:read("*a")
-f:close()
+assert(captured[1]:match("^MP_RLOG: MANIFEST {"), "first line must be MANIFEST, got: " .. tostring(captured[1]))
+assert(captured[#captured - 1]:match("^MP_RLOG: END {"), "penultimate must be END, got: " .. tostring(captured[#captured - 1]))
+assert(
+	captured[#captured]:match("^MP_RLOG: CHK v1 carbon=%x+ human=%x+ bytes=%d+$"),
+	"bad CHK: " .. tostring(captured[#captured])
+)
 
-local lines = {}
-for line in content:gmatch("[^\n]+") do
-	lines[#lines + 1] = line
-end
-
-assert(lines[1]:match("^MANIFEST {"), "first line must be MANIFEST, got: " .. tostring(lines[1]))
-assert(lines[#lines - 1]:match("^END {"), "penultimate line must be END, got: " .. tostring(lines[#lines - 1]))
-assert(lines[#lines]:match("^CHK v1 carbon=%x+ human=%x+ bytes=%d+$"), "bad CHK: " .. tostring(lines[#lines]))
-
-local A, H = {}, {} -- seq -> arg string / human payload
-local A_full, H_full = {}, {} -- in-order full lines (the hash domain)
+local A = {} -- seq -> arg string
+local carbon_lines, human_lines = {}, {} -- in-order full lines (the hash domains)
 local last_seq = 0
-for _, l in ipairs(lines) do
-	local s, rest = l:match("^A (%d+) (.+)$")
+for _, l in ipairs(captured) do
+	local s, rest = l:match("^MP_RLOG: (%d+) (.+)$")
 	if s then
 		s = tonumber(s)
 		A[s] = rest
-		A_full[#A_full + 1] = l
-		assert(s == last_seq + 1, "A sequence not gapless/monotonic at " .. s)
+		carbon_lines[#carbon_lines + 1] = l
+		assert(s == last_seq + 1, "carbon sequence not gapless/monotonic at " .. s)
 		last_seq = s
 	end
-	local hs, hrest = l:match("^H (%d+) (.+)$")
-	if hs then
-		H[tonumber(hs)] = hrest
-		H_full[#H_full + 1] = l
+	local payload = l:match("^Client sent message: (.+)$")
+	if payload then
+		human_lines[#human_lines + 1] = l
 	end
 end
 
@@ -121,17 +93,16 @@ assert(A[2] == "buy 1 2", "A2=" .. tostring(A[2]))
 assert(A[3] == "play 1.3.5.7.8", "A3=" .. tostring(A[3])) -- ordered index-list preserved
 assert(A[4] == "use 1 2.4", "A4=" .. tostring(A[4])) -- target index-list preserved
 assert(A[5] == "reroll", "A5=" .. tostring(A[5])) -- nil args -> bare opcode
-assert(A[6] == nil, "unexpected extra A line")
+assert(A[6] == nil, "unexpected extra carbon action line")
 
-for i = 1, 5 do
-	assert(H[i], "missing paired H line for seq " .. i)
-end
-assert(H[2] == "action:boughtCardFromShop,card:Blueprint,cost:4", "H2=" .. tostring(H[2]))
+assert(#human_lines == 5, "expected 5 human lines, got " .. #human_lines)
+assert(human_lines[2] == "Client sent message: action:boughtCardFromShop,card:Blueprint,cost:4", "H2=" .. human_lines[2])
 
--- Hash domains: CHK values must equal a recompute over the in-order A / H lines.
-local chk_carbon, chk_human = lines[#lines]:match("carbon=(%x+) human=(%x+)")
-assert(chk_carbon == MP.UTILS.joker_hash(table.concat(A_full, "\n")), "carbon hash domain mismatch")
-assert(chk_human == MP.UTILS.joker_hash(table.concat(H_full, "\n")), "human hash domain mismatch")
+-- Hash domains: CHK values must equal a recompute over the in-order carbon /
+-- human lines (exactly what gets re-extracted from a log by prefix).
+local chk_carbon, chk_human = captured[#captured]:match("carbon=(%x+) human=(%x+)")
+assert(chk_carbon == MP.UTILS.joker_hash(table.concat(carbon_lines, "\n")), "carbon hash domain mismatch")
+assert(chk_human == MP.UTILS.joker_hash(table.concat(human_lines, "\n")), "human hash domain mismatch")
 assert(carbon_hash == chk_carbon and human_hash == chk_human, "end_run return != CHK trailer")
 
 -- The same hashes are what we send to the server, with the seed for keying.
@@ -139,5 +110,4 @@ assert(submitted, "hashes not submitted to server")
 assert(submitted.carbon == carbon_hash and submitted.human == human_hash, "submitted hashes mismatch")
 assert(submitted.seed == "ABCD", "seed not forwarded to server")
 
-os.remove(CARBON_FILE)
 print("test_rlog_roundtrip: OK")
