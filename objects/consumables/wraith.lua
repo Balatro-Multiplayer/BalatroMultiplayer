@@ -2,7 +2,6 @@
 SMODS.Consumable({
 	key = "wraith",
 	set = "Spectral",
-	atlas = "Spectral",
 	pos = { x = 5, y = 4 },
 	cost = 4,
 	unlocked = true,
