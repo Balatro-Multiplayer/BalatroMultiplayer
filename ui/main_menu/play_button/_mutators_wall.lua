@@ -178,27 +178,6 @@ local MUTATOR_WALL = {
 	},
 }
 
-local SOON = {
-	colour = G.C.GREY,
-	cells = {
-		{
-			key = "pvp_reward_draft",
-			label = "Reward Draft",
-			desc = { "Win a PvP blind, draft 1 of 3", "rewards.", "(coming soon)" },
-		},
-		{
-			key = "rubber_band",
-			label = "Rubber Band",
-			desc = { "Falling behind grants", "escalating buffs.", "(coming soon)" },
-		},
-		{
-			key = "score_tax",
-			label = "Score Tax",
-			desc = { "Each hand you play raises", "your opponent's target.", "(coming soon)" },
-		},
-	},
-}
-
 G.FUNCS.mp_toggle_mutator = function(e)
 	local key = e.config.ref_table.key
 	MP.MUTATORS_BLIND = false -- touching anything reveals the wall
@@ -382,11 +361,6 @@ function MP.UI.build_mutators_wall()
 	for _, cat in ipairs(MUTATOR_WALL) do
 		columns[#columns + 1] = mutator_column(cat)
 	end
-	local soon_labels = {}
-	for _, cell in ipairs(SOON.cells) do
-		soon_labels[#soon_labels + 1] = cell.label
-	end
-	local soon_line = "coming soon · " .. table.concat(soon_labels, " · ")
 	return {
 		n = G.UIT.R,
 		config = { align = "cm" },
@@ -416,12 +390,6 @@ function MP.UI.build_mutators_wall()
 				},
 			},
 			{ n = G.UIT.R, config = { align = "cm", padding = 0.04 }, nodes = columns },
-			{ n = G.UIT.R, config = { minh = 0.06 } },
-			{
-				n = G.UIT.R,
-				config = { align = "cm", padding = 0.02 },
-				nodes = { { n = G.UIT.T, config = { text = soon_line, scale = 0.3, colour = G.C.UI.TEXT_INACTIVE } } },
-			},
 		},
 	}
 end
