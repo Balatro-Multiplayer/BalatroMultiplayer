@@ -140,6 +140,7 @@ local MUTATOR_WALL = {
 		cells = {
 			{ key = "gambling_opportunity", label = "No Easy Money", desc = { "No Gold or Lucky cards." } },
 			{ key = "no_uncommons", label = "No Uncommons", desc = { "Uncommon jokers are out", "of the pool." } },
+			{ key = "no_red_seals", label = "No Red Seals", desc = { "Red seals never appear." } },
 			{ key = "bigger_shop", label = "Bigger Shop", desc = { "One extra card slot", "in the shop." } },
 			{
 				key = "chip_cap",
