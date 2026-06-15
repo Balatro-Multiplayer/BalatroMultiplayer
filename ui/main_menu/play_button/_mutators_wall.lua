@@ -34,20 +34,21 @@ G.FUNCS.mp_timer_blurb = function(e)
 	end
 end
 
-
 -- Each cycle is one table: label / mod / blurb on the same line. mod = nil means
 -- "no modifier" (the cycle's default, inherits whatever the ruleset does).
 local GLASS_VARIANTS = {
-	{ label = "Inherit",      mod = nil,                  blurb = "Inherit the main ruleset." },
-	{ label = "Vanilla",      mod = "glass_vanilla",      blurb = "x2 mult." },
-	{ label = "Standard",     mod = "glass_standard",     blurb = "x1.5 (Justice Disabled)." },
-	{ label = "Legacy",       mod = "glass_legacy",       blurb = "x1.5 (Justice Enabled)." },
+	{ label = "Inherit", mod = nil, blurb = "Inherit the main ruleset." },
+	{ label = "Vanilla", mod = "glass_vanilla", blurb = "x2 mult." },
+	{ label = "Standard", mod = "glass_standard", blurb = "x1.5 (Justice Disabled)." },
+	{ label = "Legacy", mod = "glass_legacy", blurb = "x1.5 (Justice Enabled)." },
 	{ label = "Experimental", mod = "glass_experimental", blurb = "x2 (Grim/Familiar/Incantation only)." },
 }
 
 local function variant_labels(variants)
 	local labels = {}
-	for i, v in ipairs(variants) do labels[i] = v.label end
+	for i, v in ipairs(variants) do
+		labels[i] = v.label
+	end
 	return labels
 end
 
@@ -76,7 +77,9 @@ local function variant_blurb_func(variants)
 	end
 end
 
-G.FUNCS.change_glass_variant = function(args) pick_variant(GLASS_VARIANTS, args.to_key) end
+G.FUNCS.change_glass_variant = function(args)
+	pick_variant(GLASS_VARIANTS, args.to_key)
+end
 G.FUNCS.mp_glass_blurb = variant_blurb_func(GLASS_VARIANTS)
 
 local MUTATOR_WALL = {
@@ -84,10 +87,23 @@ local MUTATOR_WALL = {
 		name = "ECONOMY",
 		colour = G.C.MONEY,
 		cells = {
-			{ key = "inflation", label = "Inflation", desc = { "Shop prices creep up $1 with", "every card you buy." } },
-			{ key = "no_interest", label = "No Interest", desc = { "Savings earn nothing.", "Spend it or lose the edge." } },
+			{
+				key = "inflation",
+				label = "Inflation",
+				desc = { "Shop prices creep up $1 with", "every card you buy." },
+			},
+			{
+				key = "no_interest",
+				label = "No Interest",
+				desc = { "Savings earn nothing.", "Spend it or lose the edge." },
+			},
 			{ key = "discard_tax", label = "Discard Tax", desc = { "Every discard costs $1." } },
-			{ key = "frugal", label = "Frugal", desc = { "Unspent discards pay out $1."} },
+			{ key = "frugal", label = "Frugal", desc = { "Unspent discards pay out $1." } },
+			{
+				key = "wraith_rework",
+				label = "Kind Wraith",
+				desc = { "Wraith spawns an Uncommon and", "pays $5 (was Rare, money to $0)." },
+			},
 		},
 	},
 	{
@@ -95,9 +111,27 @@ local MUTATOR_WALL = {
 		colour = G.C.PURPLE,
 		cells = {
 			{ key = "flipped_cards", label = "Blind Poker", desc = { "Your hand is dealt face-down." } },
-			{ key = "debuff_played_cards", label = "Dead Cards", desc = { "Playing cards are debuffed.", "Jokers are the whole engine." } },
+			{
+				key = "debuff_played_cards",
+				label = "Dead Cards",
+				desc = { "Playing cards are debuffed.", "Jokers are the whole engine." },
+			},
 			{ key = "all_eternal", label = "No Takebacks", desc = { "Every joker is eternal." } },
-			{ key = "shrinking_hand", label = "Heavy Pockets", desc = { "-1 hand size for every $10", "you're holding." } },
+			{
+				key = "shrinking_hand",
+				label = "Heavy Pockets",
+				desc = { "-1 hand size for every $10", "you're holding." },
+			},
+			{
+				key = "shared_pockets",
+				label = "Shared Pockets",
+				desc = { "Hand, jokers and consumables", "share one pool of slots." },
+			},
+			{
+				key = "score_instability",
+				label = "Instability",
+				desc = { "After scoring, chips and mult", "are dragged toward each other." },
+			},
 		},
 	},
 	{
@@ -107,17 +141,39 @@ local MUTATOR_WALL = {
 			{ key = "gambling_opportunity", label = "No Easy Money", desc = { "No Gold or Lucky cards." } },
 			{ key = "no_uncommons", label = "No Uncommons", desc = { "Uncommon jokers are out", "of the pool." } },
 			{ key = "bigger_shop", label = "Bigger Shop", desc = { "One extra card slot", "in the shop." } },
-			{ key = "chip_cap", label = "Cash Ceiling", desc = { "Chip score can't exceed your", "cash. Greed is the only way up." } },
+			{
+				key = "chip_cap",
+				label = "Cash Ceiling",
+				desc = { "Chip score can't exceed your", "cash. Greed is the only way up." },
+			},
 		},
 	},
 	{
 		name = "CHAOS",
 		colour = G.C.ORANGE,
 		cells = {
-			{ key = "glass_cannon", label = "Glass Cannon", desc = { "Only 2 hands a round — but", "every hand hits for 4x mult." } },
-			{ key = "smallworld", label = "Small World", desc = { "75% of the pool banned at", "random. Showman always on." } },
+			{
+				key = "glass_cannon",
+				label = "Glass Cannon",
+				desc = { "Only 2 hands a round — but", "every hand hits for 4x mult." },
+			},
+			{
+				key = "smallworld",
+				label = "Small World",
+				desc = { "75% of the pool banned at", "random. Showman always on." },
+			},
 			{ key = "spartan", label = "Spartan", desc = { "No cash from Small or Big", "blinds." } },
-			{ key = "pricey_packs", label = "Pricey Packs", desc = { "Booster packs cost more", "for each ante you reach." } },
+			{
+				key = "pricey_packs",
+				label = "Pricey Packs",
+				desc = { "Booster packs cost more", "for each ante you reach." },
+			},
+			{
+				key = "polymorph_spam",
+				label = "Polymorph",
+				desc = { "Every blind, your jokers and", "consumables re-roll." },
+			},
+			{ key = "eeeee", label = "Eeeee", desc = { "~40% of random rolls lock to", "a fixed value each ante." } },
 		},
 	},
 }
@@ -125,9 +181,21 @@ local MUTATOR_WALL = {
 local SOON = {
 	colour = G.C.GREY,
 	cells = {
-		{ key = "pvp_reward_draft", label = "Reward Draft", desc = { "Win a PvP blind, draft 1 of 3", "rewards.", "(coming soon)" } },
-		{ key = "rubber_band", label = "Rubber Band", desc = { "Falling behind grants", "escalating buffs.", "(coming soon)" } },
-		{ key = "score_tax", label = "Score Tax", desc = { "Each hand you play raises", "your opponent's target.", "(coming soon)" } },
+		{
+			key = "pvp_reward_draft",
+			label = "Reward Draft",
+			desc = { "Win a PvP blind, draft 1 of 3", "rewards.", "(coming soon)" },
+		},
+		{
+			key = "rubber_band",
+			label = "Rubber Band",
+			desc = { "Falling behind grants", "escalating buffs.", "(coming soon)" },
+		},
+		{
+			key = "score_tax",
+			label = "Score Tax",
+			desc = { "Each hand you play raises", "your opponent's target.", "(coming soon)" },
+		},
 	},
 }
 
@@ -307,7 +375,6 @@ function MP.UI.build_glass_cycle()
 	})
 end
 
-
 -- The MUTATORS wall block: header + subtitle + themed columns + coming-soon line.
 -- Returns one node (rows stack vertically since they're R children).
 function MP.UI.build_mutators_wall()
@@ -327,12 +394,26 @@ function MP.UI.build_mutators_wall()
 			{
 				n = G.UIT.R,
 				config = { align = "cm", padding = 0.02 },
-				nodes = { { n = G.UIT.T, config = { text = "MUTATORS", scale = 0.5, colour = G.C.UI.TEXT_LIGHT, shadow = true } } },
+				nodes = {
+					{
+						n = G.UIT.T,
+						config = { text = "MUTATORS", scale = 0.5, colour = G.C.UI.TEXT_LIGHT, shadow = true },
+					},
+				},
 			},
 			{
 				n = G.UIT.R,
 				config = { align = "cm", padding = 0.02 },
-				nodes = { { n = G.UIT.T, config = { text = "stack freely · hover for details", scale = 0.3, colour = G.C.UI.TEXT_INACTIVE } } },
+				nodes = {
+					{
+						n = G.UIT.T,
+						config = {
+							text = "stack freely · hover for details",
+							scale = 0.3,
+							colour = G.C.UI.TEXT_INACTIVE,
+						},
+					},
+				},
 			},
 			{ n = G.UIT.R, config = { align = "cm", padding = 0.04 }, nodes = columns },
 			{ n = G.UIT.R, config = { minh = 0.06 } },
