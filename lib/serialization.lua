@@ -44,8 +44,20 @@ function MP.UTILS.str_pack_and_encode(data)
 	return str_encoded
 end
 
+-- A legitimately serialized object (a saved joker, a nemesis deck) is at most a
+-- few KB once gzipped and base64-encoded. Reject anything far larger BEFORE we
+-- spend CPU decoding/decompressing it: this is the client-side defense against
+-- zip-bomb payloads relayed through actions like magnetResponse /
+-- receiveEndGameJokers / receiveNemesisDeck. The relay also caps message size,
+-- so this is defense-in-depth.
+MP.UTILS.MAX_ENCODED_BYTES = 32 * 1024
+
 function MP.UTILS.str_decode_and_unpack(str)
 	local success, str_decoded, str_decompressed, str_unpacked
+	if type(str) ~= "string" then return nil, "expected string payload" end
+	if #str > MP.UTILS.MAX_ENCODED_BYTES then
+		return nil, string.format("payload too large (%d > %d bytes)", #str, MP.UTILS.MAX_ENCODED_BYTES)
+	end
 	success, str_decoded = pcall(love.data.decode, "string", "base64", str)
 	if not success then return nil, str_decoded end
 	success, str_decompressed = pcall(love.data.decompress, "string", "gzip", str_decoded)
