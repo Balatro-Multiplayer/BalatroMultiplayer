@@ -245,33 +245,97 @@ function MP.UTILS.version_mismatches()
 	return results
 end
 
+-- Mod-policy keys are matched case- and punctuation-insensitively, so staff can
+-- key the banned/approved lists by display name (e.g. "Joker Display") and still
+-- match the wire-reported SMODS id (e.g. "JokerDisplay" or "jokerdisplay").
+function MP.UTILS.normalize_mod_name(name)
+	if type(name) ~= "string" then return "" end
+	return (name:lower():gsub("[^%w]", ""))
+end
+
+-- Cache the normalized index per source table; keyed weakly by table identity so
+-- it auto-refreshes when the server replaces MP.BANNED_MODS / MP.APPROVED_MODS.
+local _norm_index_cache = setmetatable({}, { __mode = "k" })
+local function normalized_index(map)
+	if type(map) ~= "table" then return {} end
+	local cached = _norm_index_cache[map]
+	if cached then return cached end
+	local idx = {}
+	for k, v in pairs(map) do
+		idx[MP.UTILS.normalize_mod_name(k)] = v
+	end
+	_norm_index_cache[map] = idx
+	return idx
+end
+
+-- A rule version matches the wire version on exact string OR on the X.Y.Z
+-- (clean semver) prefix, so a rule like "1.0.0" still matches "1.0.0~BETA-1620a"
+-- or "1.0.0-DEV". version_prefix is defined earlier in this file.
+local function version_matches(rule_version, version)
+	if version == rule_version then return true end
+	local rp = MP.UTILS.version_prefix(rule_version)
+	local vp = MP.UTILS.version_prefix(version)
+	return rp ~= nil and rp == vp
+end
+
+-- A rule is true (any version), an exact version string, or a list of versions.
+local function rule_matches(rule, version)
+	if rule == nil then return false end
+	if type(rule) == "boolean" then return rule end
+	if type(rule) == "string" then return version_matches(rule, version) end
+	if type(rule) == "table" then
+		for _, v in ipairs(rule) do
+			if version_matches(v, version) then return true end
+		end
+	end
+	return false
+end
+
+-- A version-like segment starts with a digit, 'v', or '~' (e.g. "0.2.2", "v1",
+-- "~BETA"). Used to guess where a mod id ends and its version begins.
+local function looks_like_version(seg)
+	return seg ~= nil and seg:match("^[%dv~]") ~= nil
+end
+
+-- Matches a parsed mod entry against a normalized index. A mod's version can
+-- contain dashes (e.g. Saturn "0.2.2-E-ALPHA"), and parse_modlist splits on the
+-- last dash, so mod_name can arrive with version fragments glued on
+-- ("Saturn-0.2.2-E"). Walk the dash-delimited prefixes and treat a prefix as the
+-- id only when the next segment looks like a version — so "Saturn|0.2.2" splits
+-- but a genuinely dashed id like "Saturn-Extras|1.0" stays intact. First (shortest)
+-- valid match wins. Heuristic, not airtight; special-case real collisions if any
+-- ever show up.
+local function index_match(idx, mod_name, mod_version)
+	local segs = {}
+	for seg in tostring(mod_name):gmatch("[^%-]+") do
+		segs[#segs + 1] = seg
+	end
+	local candidate
+	for i = 1, #segs do
+		candidate = candidate and (candidate .. "-" .. segs[i]) or segs[i]
+		if segs[i + 1] == nil or looks_like_version(segs[i + 1]) then
+			if rule_matches(idx[MP.UTILS.normalize_mod_name(candidate)], mod_version) then return true end
+		end
+	end
+	return false
+end
+
+-- Returns "banned" | "approved" | "unknown". Banned takes precedence.
+function MP.UTILS.classify_mod(mod_name, mod_version)
+	if index_match(normalized_index(MP.BANNED_MODS), mod_name, mod_version) then return "banned" end
+	if index_match(normalized_index(MP.APPROVED_MODS), mod_name, mod_version) then return "approved" end
+	return "unknown"
+end
+
 function MP.UTILS.get_banned_mods(mods)
 	local banned_mods = {}
 	if not mods then return banned_mods end
 
+	local idx = normalized_index(MP.BANNED_MODS)
 	for mod_name, mod_version in pairs(mods) do
-		local ban_info = MP.BANNED_MODS[mod_name]
-		local is_banned = false
-
-		if ban_info then
-			if type(ban_info) == "boolean" then
-				-- Old format: ban all versions
-				is_banned = ban_info
-			elseif type(ban_info) == "string" then
-				-- New format: ban specific version
-				is_banned = (mod_version == ban_info)
-			elseif type(ban_info) == "table" then
-				-- Table format: ban multiple specific versions
-				for _, banned_version in ipairs(ban_info) do
-					if mod_version == banned_version then
-						is_banned = true
-						break
-					end
-				end
-			end
+		if index_match(idx, mod_name, mod_version) then
+			table.insert(banned_mods, mod_name)
 		end
-
-		if is_banned then table.insert(banned_mods, mod_name) end
 	end
 
 	return banned_mods

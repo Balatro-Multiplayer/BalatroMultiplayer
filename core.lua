@@ -11,6 +11,16 @@ MP.BANNED_MODS = {
 	["FantomsPreview"] = true,
 }
 
+-- Approved (allowed) mods, shown green in the lobby mod list. Mods in neither
+-- list show white (unknown). Both lists are normally replaced by the server's
+-- setModPolicy message on connect; these are fallbacks for older/offline servers.
+MP.APPROVED_MODS = {
+	["Lovely"] = true,
+	["Steamodded"] = true,
+	["Multiplayer"] = true,
+	["Preview"] = true,
+}
+
 MP.LOBBY = {
 	connected = false,
 	temp_code = "",

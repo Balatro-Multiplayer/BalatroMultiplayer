@@ -1319,6 +1319,15 @@ local last_game_seed = nil
 
 local function noop() end
 
+-- Server-authoritative mod policy. The server sends this on connect (and again
+-- via the admin setModPolicy command), overriding the hardcoded fallbacks in
+-- core.lua so staff can update bans/approvals without a mod release. If the
+-- server never sends it (older server), the core.lua defaults remain.
+local function action_set_mod_policy(p)
+	if type(p.banned) == "table" then MP.BANNED_MODS = p.banned end
+	if type(p.approved) == "table" then MP.APPROVED_MODS = p.approved end
+end
+
 local HANDLERS = {
 	connected = action_connected,
 	version = action_version,
@@ -1329,6 +1338,7 @@ local HANDLERS = {
 	enemyDisconnected = action_enemyDisconnected,
 	enemyReconnected = action_enemyReconnected,
 	lobbyInfo = action_lobbyInfo,
+	setModPolicy = action_set_mod_policy,
 	startGame = action_start_game,
 	startBlind = action_start_blind,
 	enemyInfo = action_enemy_info,

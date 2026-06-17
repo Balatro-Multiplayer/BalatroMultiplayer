@@ -81,7 +81,7 @@ local function get_warnings()
 	if #host_banned_mods > 0 or #guest_banned_mods > 0 then
 		table.insert(warnings, {
 			localize("k_warning_banned_mods"),
-			G.C.RED,
+			G.C.UI.TEXT_LIGHT, -- white reads better than red on the lobby background
 			0.4,
 		})
 	end

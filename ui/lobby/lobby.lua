@@ -236,7 +236,9 @@ function MP.UI.modlist_to_view(mods, text_colour)
 
 	local function add_mod_row(mod)
 		local mod_name, mod_version = MP.UTILS.resolve_mod_name_and_version(mod.name, mod.version)
-		local color = MP.BANNED_MODS[mod.name] and G.C.RED or text_colour
+		-- red = banned, green = approved, default (white) = unknown
+		local class = MP.UTILS.classify_mod(mod.name, mod_version)
+		local color = (class == "banned" and G.C.RED) or (class == "approved" and G.C.GREEN) or text_colour
 		table.insert(t, {
 			n = G.UIT.R,
 			config = {
