@@ -34,20 +34,21 @@ G.FUNCS.mp_timer_blurb = function(e)
 	end
 end
 
-
 -- Each cycle is one table: label / mod / blurb on the same line. mod = nil means
 -- "no modifier" (the cycle's default, inherits whatever the ruleset does).
 local GLASS_VARIANTS = {
-	{ label = "Inherit",      mod = nil,                  blurb = "Inherit the main ruleset." },
-	{ label = "Vanilla",      mod = "glass_vanilla",      blurb = "x2 mult." },
-	{ label = "Standard",     mod = "glass_standard",     blurb = "x1.5 (Justice Disabled)." },
-	{ label = "Legacy",       mod = "glass_legacy",       blurb = "x1.5 (Justice Enabled)." },
+	{ label = "Inherit", mod = nil, blurb = "Inherit the main ruleset." },
+	{ label = "Vanilla", mod = "glass_vanilla", blurb = "x2 mult." },
+	{ label = "Standard", mod = "glass_standard", blurb = "x1.5 (Justice Disabled)." },
+	{ label = "Legacy", mod = "glass_legacy", blurb = "x1.5 (Justice Enabled)." },
 	{ label = "Experimental", mod = "glass_experimental", blurb = "x2 (Grim/Familiar/Incantation only)." },
 }
 
 local function variant_labels(variants)
 	local labels = {}
-	for i, v in ipairs(variants) do labels[i] = v.label end
+	for i, v in ipairs(variants) do
+		labels[i] = v.label
+	end
 	return labels
 end
 
@@ -76,7 +77,9 @@ local function variant_blurb_func(variants)
 	end
 end
 
-G.FUNCS.change_glass_variant = function(args) pick_variant(GLASS_VARIANTS, args.to_key) end
+G.FUNCS.change_glass_variant = function(args)
+	pick_variant(GLASS_VARIANTS, args.to_key)
+end
 G.FUNCS.mp_glass_blurb = variant_blurb_func(GLASS_VARIANTS)
 
 local MUTATOR_WALL = {
@@ -84,50 +87,132 @@ local MUTATOR_WALL = {
 		name = "ECONOMY",
 		colour = G.C.MONEY,
 		cells = {
-			{ key = "inflation", label = "Inflation", desc = { "Shop prices creep up $1 with", "every card you buy." } },
-			{ key = "no_interest", label = "No Interest", desc = { "Savings earn nothing.", "Spend it or lose the edge." } },
-			{ key = "discard_tax", label = "Discard Tax", desc = { "Every discard costs $1." } },
-			{ key = "frugal", label = "Frugal", desc = { "Unspent discards pay out $1."} },
+			{
+				key = "inflation",
+				label = "Inflation",
+				desc = { "Shop prices creep up $1 with", "every card you buy." },
+				soon = true,
+				credits = { idea = { "Kars" } },
+			},
+			{
+				key = "no_interest",
+				label = "No Interest",
+				desc = { "Savings earn nothing.", "Spend it or lose the edge." },
+				soon = true,
+			},
+			{ key = "discard_tax", label = "Discard Tax", desc = { "Every discard costs $1." }, soon = true },
+			{ key = "frugal", label = "Frugal", desc = { "Unspent discards pay out $1." }, soon = true },
+			{
+				key = "wraith_rework",
+				label = "Kind Wraith",
+				desc = { "Wraith spawns an Uncommon and", "pays $5 (was Rare, money to $0)." },
+				credits = { code = { "steph" } },
+			},
+			{
+				key = "pvp_reward_draft",
+				label = "Reward Draft",
+				desc = { "Win a PvP blind, then draft", "1 of several rewards." },
+				soon = true,
+			},
 		},
 	},
 	{
 		name = "MAYHEM",
 		colour = G.C.PURPLE,
 		cells = {
-			{ key = "flipped_cards", label = "Blind Poker", desc = { "Your hand is dealt face-down." } },
-			{ key = "debuff_played_cards", label = "Dead Cards", desc = { "Playing cards are debuffed.", "Jokers are the whole engine." } },
-			{ key = "all_eternal", label = "No Takebacks", desc = { "Every joker is eternal." } },
-			{ key = "shrinking_hand", label = "Heavy Pockets", desc = { "-1 hand size for every $10", "you're holding." } },
+			{ key = "flipped_cards", label = "Blind Poker", desc = { "Your hand is dealt face-down." }, soon = true },
+			{
+				key = "debuff_played_cards",
+				label = "Dead Cards",
+				desc = { "Playing cards are debuffed.", "Jokers are the whole engine." },
+			},
+			{ key = "all_eternal", label = "No Takebacks", desc = { "Every joker is eternal." }, soon = true },
+			{
+				key = "shrinking_hand",
+				label = "Heavy Pockets",
+				desc = { "-1 hand size for every $10", "you're holding." },
+				soon = true,
+			},
+			{
+				key = "shared_pockets",
+				label = "Shared Pockets",
+				desc = { "Hand, jokers and consumables", "share one pool of slots." },
+			},
+			{
+				key = "score_instability",
+				label = "Instability",
+				desc = { "After scoring, chips and mult", "are dragged toward each other." },
+				credits = { code = { "Toneblock" } },
+			},
+			{
+				key = "rubber_band",
+				label = "Rubber Band",
+				desc = { "Losing a life grants an", "escalating comeback buff." },
+				soon = true,
+			},
 		},
 	},
 	{
 		name = "HAZARDS",
 		colour = G.C.RED,
 		cells = {
-			{ key = "gambling_opportunity", label = "No Easy Money", desc = { "No Gold or Lucky cards." } },
+			{
+				key = "gambling_opportunity",
+				label = "No Easy Money",
+				desc = { "No Gold or Lucky cards." },
+				credits = { idea = { "Kars" } },
+			},
 			{ key = "no_uncommons", label = "No Uncommons", desc = { "Uncommon jokers are out", "of the pool." } },
+			{ key = "no_red_seals", label = "No Red Seals", desc = { "Red seals never appear." } },
 			{ key = "bigger_shop", label = "Bigger Shop", desc = { "One extra card slot", "in the shop." } },
-			{ key = "chip_cap", label = "Cash Ceiling", desc = { "Chip score can't exceed your", "cash. Greed is the only way up." } },
+			{
+				key = "chip_cap",
+				label = "Cash Ceiling",
+				desc = { "Chip score can't exceed your", "cash. Greed is the only way up." },
+				soon = true,
+			},
+			{
+				key = "score_tax",
+				label = "Score Tax",
+				desc = { "Each hand you play nudges your", "opponent's target upward." },
+				soon = true,
+			},
 		},
 	},
 	{
 		name = "CHAOS",
 		colour = G.C.ORANGE,
 		cells = {
-			{ key = "glass_cannon", label = "Glass Cannon", desc = { "Only 2 hands a round — but", "every hand hits for 4x mult." } },
-			{ key = "smallworld", label = "Small World", desc = { "75% of the pool banned at", "random. Showman always on." } },
-			{ key = "spartan", label = "Spartan", desc = { "No cash from Small or Big", "blinds." } },
-			{ key = "pricey_packs", label = "Pricey Packs", desc = { "Booster packs cost more", "for each ante you reach." } },
+			{
+				key = "glass_cannon",
+				label = "Glass Cannon",
+				desc = { "Only 2 hands a round — but", "every hand hits for 4x mult." },
+			},
+			{
+				key = "smallworld",
+				label = "Small World",
+				desc = { "75% of the pool banned at", "random. Showman always on." },
+				credits = { code = { "Toneblock" } },
+			},
+			{ key = "spartan", label = "Spartan", desc = { "No cash from Small or Big", "blinds." }, soon = true },
+			{
+				key = "pricey_packs",
+				label = "Pricey Packs",
+				desc = { "Booster packs cost more", "for each ante you reach." },
+				soon = true,
+			},
+			{
+				key = "polymorph_spam",
+				label = "Polymorph",
+				desc = { "Every blind, your jokers and", "consumables re-roll." },
+			},
+			{
+				key = "eeeee",
+				label = "Eeeee",
+				desc = { "~40% of random rolls lock to", "a fixed value each ante." },
+				credits = { code = { "Tonebleee" } },
+			},
 		},
-	},
-}
-
-local SOON = {
-	colour = G.C.GREY,
-	cells = {
-		{ key = "pvp_reward_draft", label = "Reward Draft", desc = { "Win a PvP blind, draft 1 of 3", "rewards.", "(coming soon)" } },
-		{ key = "rubber_band", label = "Rubber Band", desc = { "Falling behind grants", "escalating buffs.", "(coming soon)" } },
-		{ key = "score_tax", label = "Score Tax", desc = { "Each hand you play raises", "your opponent's target.", "(coming soon)" } },
 	},
 }
 
@@ -157,7 +242,7 @@ local function roll_mutators()
 	for _, cat in ipairs(MUTATOR_WALL) do
 		for _, cell in ipairs(cat.cells) do
 			MP.remove_modifier(cell.key)
-			if math.random() < 0.35 then MP.add_modifier(cell.key) end
+			if not cell.soon and math.random() < 0.35 then MP.add_modifier(cell.key) end
 		end
 	end
 end
@@ -176,9 +261,100 @@ G.FUNCS.mp_blind_random_mutators = function(e)
 	e:juice_up(0.3, 0.1)
 end
 
+-- TODO(rewire): fold this and mod_badges.lua's inline builder into one shared
+-- MP.UI.credit_badge(credits) so we can use it anywhere we like :)
+local function mutator_credit_badge(credits)
+	credits.art = credits.art or {}
+	credits.idea = credits.idea or {}
+	credits.code = credits.code or {}
+
+	local function calc_scale_fac(text)
+		local size = 0.9
+		local font = G.LANG.font
+		local max_text_width = 2 - 2 * 0.05 - 4 * 0.03 * size - 2 * 0.03
+		local calced_text_width = 0
+		for _, c in utf8.chars(text) do
+			local tx = font.FONT:getWidth(c) * (0.33 * size) * G.TILESCALE * font.FONTSCALE
+				+ 2.7 * 1 * G.TILESCALE * font.FONTSCALE
+			calced_text_width = calced_text_width + tx / (G.TILESIZE * G.TILESCALE)
+		end
+		return calced_text_width > max_text_width and max_text_width / calced_text_width or 1
+	end
+
+	local strings = {}
+	for _, v in ipairs({ "art", "idea", "code" }) do
+		for i = 1, #credits[v] do
+			strings[#strings + 1] = localize({ type = "variable", key = "a_mp_" .. v, vars = { credits[v][i] } })[1]
+		end
+	end
+
+	-- fallback if {}
+	if #strings == 0 then return { n = G.UIT.R, config = { align = "cm" }, nodes = {} } end
+
+	local min_scale_fac = 1
+	for i = 1, #strings do
+		min_scale_fac = math.min(min_scale_fac, calc_scale_fac(strings[i]))
+	end
+
+	local ct = {}
+	for i = 1, #strings do
+		ct[i] = { string = strings[i] }
+	end
+
+	return {
+		n = G.UIT.R,
+		config = { align = "cm" },
+		nodes = {
+			{
+				n = G.UIT.R,
+				config = {
+					align = "cm",
+					colour = G.C.MULTIPLAYER,
+					r = 0.1,
+					minw = 2 / min_scale_fac,
+					minh = 0.36,
+					emboss = 0.05,
+					padding = 0.03 * 0.9,
+				},
+				nodes = {
+					{ n = G.UIT.B, config = { h = 0.1, w = 0.03 } },
+					{
+						n = G.UIT.O,
+						config = {
+							object = DynaText({
+								string = ct,
+								colours = { credits.text_colour or G.C.WHITE },
+								silent = true,
+								float = true,
+								shadow = true,
+								offset_y = -0.03,
+								spacing = 1,
+								scale = 0.33 * 0.9,
+							}),
+						},
+					},
+					{ n = G.UIT.B, config = { h = 0.1, w = 0.03 } },
+				},
+			},
+		},
+	}
+end
+
 local function mutator_cell(cell, colour, disabled)
 	local on = colour
 	local off = darken(colour, 0.72)
+	-- Disabled cells keep their real description with a "(Coming soon)" line appended
+	local tooltip_text = cell.desc
+	if disabled then
+		tooltip_text = {}
+		for _, line in ipairs(cell.desc) do
+			tooltip_text[#tooltip_text + 1] = line
+		end
+		tooltip_text[#tooltip_text + 1] = "(Coming soon)"
+	end
+
+	local tooltip = { title = cell.label, text = tooltip_text }
+	if cell.credits then tooltip.filler = { func = mutator_credit_badge, args = cell.credits } end
 	return {
 		n = G.UIT.R,
 		config = { align = "cm", padding = 0.035 },
@@ -198,7 +374,7 @@ local function mutator_cell(cell, colour, disabled)
 					button = not disabled and "mp_toggle_mutator" or nil,
 					func = not disabled and "mp_mutator_cell_colour" or nil,
 					ref_table = { key = cell.key, on = on, off = off },
-					tooltip = { title = cell.label, text = cell.desc },
+					tooltip = tooltip,
 				},
 				nodes = {
 					{
@@ -224,15 +400,11 @@ local function mutator_column(cat)
 		},
 	}
 	for _, cell in ipairs(cat.cells) do
-		nodes[#nodes + 1] = mutator_cell(cell, cat.colour)
+		nodes[#nodes + 1] = mutator_cell(cell, cat.colour, cell.soon)
 	end
 	return { n = G.UIT.C, config = { align = "tm", padding = 0.06 }, nodes = nodes }
 end
 
--- ---------------------------------------------------------------------------
--- Reusable builders (shared by overlays and the inline custom-ruleset editor —
--- one source of truth for the wall + timer controls).
--- ---------------------------------------------------------------------------
 function MP.UI.build_timer_modifier_cycle()
 	return MP.UI.Disableable_Option_Cycle({
 		id = "modifier_timer_option",
@@ -307,19 +479,11 @@ function MP.UI.build_glass_cycle()
 	})
 end
 
-
--- The MUTATORS wall block: header + subtitle + themed columns + coming-soon line.
--- Returns one node (rows stack vertically since they're R children).
 function MP.UI.build_mutators_wall()
 	local columns = {}
 	for _, cat in ipairs(MUTATOR_WALL) do
 		columns[#columns + 1] = mutator_column(cat)
 	end
-	local soon_labels = {}
-	for _, cell in ipairs(SOON.cells) do
-		soon_labels[#soon_labels + 1] = cell.label
-	end
-	local soon_line = "coming soon · " .. table.concat(soon_labels, " · ")
 	return {
 		n = G.UIT.R,
 		config = { align = "cm" },
@@ -327,20 +491,28 @@ function MP.UI.build_mutators_wall()
 			{
 				n = G.UIT.R,
 				config = { align = "cm", padding = 0.02 },
-				nodes = { { n = G.UIT.T, config = { text = "MUTATORS", scale = 0.5, colour = G.C.UI.TEXT_LIGHT, shadow = true } } },
+				nodes = {
+					{
+						n = G.UIT.T,
+						config = { text = "MUTATORS", scale = 0.5, colour = G.C.UI.TEXT_LIGHT, shadow = true },
+					},
+				},
 			},
 			{
 				n = G.UIT.R,
 				config = { align = "cm", padding = 0.02 },
-				nodes = { { n = G.UIT.T, config = { text = "stack freely · hover for details", scale = 0.3, colour = G.C.UI.TEXT_INACTIVE } } },
+				nodes = {
+					{
+						n = G.UIT.T,
+						config = {
+							text = "stack freely · hover for details",
+							scale = 0.3,
+							colour = G.C.UI.TEXT_INACTIVE,
+						},
+					},
+				},
 			},
 			{ n = G.UIT.R, config = { align = "cm", padding = 0.04 }, nodes = columns },
-			{ n = G.UIT.R, config = { minh = 0.06 } },
-			{
-				n = G.UIT.R,
-				config = { align = "cm", padding = 0.02 },
-				nodes = { { n = G.UIT.T, config = { text = soon_line, scale = 0.3, colour = G.C.UI.TEXT_INACTIVE } } },
-			},
 		},
 	}
 end
