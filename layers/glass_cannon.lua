@@ -1,19 +1,10 @@
--- Glass Cannon (built, not stubbed).
---
--- Fragile but devastating: far fewer hands per round, but a flat global multiplier
--- on every hand's final score. Two halves:
---   1. data  — `starting_params.hands` (the applier sets this at run start)
---   2. hook  — a global xmult applied once per hand, gated on the layer
---
--- The mult lever is deterministic (no RNG, same hand -> same score) and rides the
--- existing score sync, so it's MP-safe.
-
 -- Balance knobs (provisional — tune freely).
-local GLASS_CANNON_HANDS = 2
+-- TODO XMult works, but hand size change doesn't work
+local GLASS_CANNON_HANDS = 2 -- doesn't work
 local GLASS_CANNON_XMULT = 4
 
 MP.Layer("glass_cannon", {
-	starting_params = { hands = GLASS_CANNON_HANDS },
+	starting_params = { hands = GLASS_CANNON_HANDS }, -- doesn't work
 })
 
 -- final_scoring_step is the canonical once-per-hand seam: vanilla calls it after

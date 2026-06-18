@@ -198,7 +198,21 @@ local function soon_pill(label)
 	}
 end
 
+-- The editor is local-only for now: custom card bans aren't wired into ApplyBans
+-- or the lobby modifier sync yet, so on the lobby (mp) path we stub the tab.
+-- It stays fully functional in sp / practice.
+local function coming_soon_root()
+	return {
+		n = G.UIT.ROOT,
+		config = { align = "cm", colour = G.C.CLEAR, minh = 6, minw = 15 },
+		nodes = {
+			{ n = G.UIT.R, config = { align = "cm" }, nodes = { soon_pill("Custom ruleset") } },
+		},
+	}
+end
+
 function MP.UI.build_custom_ruleset_editor(mode)
+	if mode == "mp" then return coming_soon_root() end
 	MP.CUSTOM.editor_mode = mode -- so the ban picker's Back knows where to return
 	MP.CUSTOM.draft = MP.CUSTOM.draft or MP.CUSTOM.new_draft()
 	local d = MP.CUSTOM.draft
