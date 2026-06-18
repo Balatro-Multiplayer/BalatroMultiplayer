@@ -161,6 +161,7 @@ local MUTATOR_WALL = {
 				key = "chip_cap",
 				label = "Cash Ceiling",
 				desc = { "Chip score can't exceed your", "cash. Greed is the only way up." },
+				soon = true,
 			},
 			{
 				key = "score_tax",
