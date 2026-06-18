@@ -1330,6 +1330,8 @@ return {
 			k_majorleague_description = "Official Major League Balatro ruleset.\n\nVanilla cards with competitive settings:\n- 180 second timer\n- The Order disabled\n- First timeout forgiven\n- Attrition gamemode",
 			k_minorleague = "Minor League",
 			k_minorleague_description = "Official Minor League Balatro ruleset.\n\nVanilla cards with competitive settings:\n- 210 second timer\n- The Order enabled\n- First timeout forgiven\n- Attrition gamemode",
+			k_wsob = "WSOB",
+			k_wsob_description = "World Series of Balatro ruleset.\n\nNear-vanilla card pool with minimal balance changes:\n- Hanging Chad, Bloodstone, and Glass reworked\n- Justice banned\n- No Multiplayer-original content\n\n(See bans and reworks tabs for details)",
 			k_standard_ranked = "Standard Ranked",
 			k_standard_ranked_description = "The official competitive ruleset.\n\nStandard ruleset with locked settings:\n- Attrition gamemode\n- The Order enabled\n- Requires recommended Steamodded version",
 			k_legacy_ranked = "Legacy Ranked",
