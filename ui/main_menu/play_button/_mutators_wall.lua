@@ -92,6 +92,7 @@ local MUTATOR_WALL = {
 				label = "Inflation",
 				desc = { "Shop prices creep up $1 with", "every card you buy." },
 				soon = true,
+				credits = { idea = { "Kars" } },
 			},
 			{
 				key = "no_interest",
@@ -105,6 +106,7 @@ local MUTATOR_WALL = {
 				key = "wraith_rework",
 				label = "Kind Wraith",
 				desc = { "Wraith spawns an Uncommon and", "pays $5 (was Rare, money to $0)." },
+				credits = { code = { "steph" } },
 			},
 			{
 				key = "pvp_reward_draft",
@@ -140,6 +142,7 @@ local MUTATOR_WALL = {
 				key = "score_instability",
 				label = "Instability",
 				desc = { "After scoring, chips and mult", "are dragged toward each other." },
+				credits = { code = { "Toneblock" } },
 			},
 			{
 				key = "rubber_band",
@@ -153,7 +156,12 @@ local MUTATOR_WALL = {
 		name = "HAZARDS",
 		colour = G.C.RED,
 		cells = {
-			{ key = "gambling_opportunity", label = "No Easy Money", desc = { "No Gold or Lucky cards." } },
+			{
+				key = "gambling_opportunity",
+				label = "No Easy Money",
+				desc = { "No Gold or Lucky cards." },
+				credits = { idea = { "Kars" } },
+			},
 			{ key = "no_uncommons", label = "No Uncommons", desc = { "Uncommon jokers are out", "of the pool." } },
 			{ key = "no_red_seals", label = "No Red Seals", desc = { "Red seals never appear." } },
 			{ key = "bigger_shop", label = "Bigger Shop", desc = { "One extra card slot", "in the shop." } },
@@ -184,6 +192,7 @@ local MUTATOR_WALL = {
 				key = "smallworld",
 				label = "Small World",
 				desc = { "75% of the pool banned at", "random. Showman always on." },
+				credits = { code = { "Toneblock" } },
 			},
 			{ key = "spartan", label = "Spartan", desc = { "No cash from Small or Big", "blinds." }, soon = true },
 			{
@@ -197,7 +206,12 @@ local MUTATOR_WALL = {
 				label = "Polymorph",
 				desc = { "Every blind, your jokers and", "consumables re-roll." },
 			},
-			{ key = "eeeee", label = "Eeeee", desc = { "~40% of random rolls lock to", "a fixed value each ante." } },
+			{
+				key = "eeeee",
+				label = "Eeeee",
+				desc = { "~40% of random rolls lock to", "a fixed value each ante." },
+				credits = { code = { "Tonebleee" } },
+			},
 		},
 	},
 }
@@ -247,11 +261,89 @@ G.FUNCS.mp_blind_random_mutators = function(e)
 	e:juice_up(0.3, 0.1)
 end
 
+-- TODO(rewire): fold this and mod_badges.lua's inline builder into one shared
+-- MP.UI.credit_badge(credits) so we can use it anywhere we like :)
+local function mutator_credit_badge(credits)
+	credits.art = credits.art or {}
+	credits.idea = credits.idea or {}
+	credits.code = credits.code or {}
+
+	local function calc_scale_fac(text)
+		local size = 0.9
+		local font = G.LANG.font
+		local max_text_width = 2 - 2 * 0.05 - 4 * 0.03 * size - 2 * 0.03
+		local calced_text_width = 0
+		for _, c in utf8.chars(text) do
+			local tx = font.FONT:getWidth(c) * (0.33 * size) * G.TILESCALE * font.FONTSCALE
+				+ 2.7 * 1 * G.TILESCALE * font.FONTSCALE
+			calced_text_width = calced_text_width + tx / (G.TILESIZE * G.TILESCALE)
+		end
+		return calced_text_width > max_text_width and max_text_width / calced_text_width or 1
+	end
+
+	local strings = {}
+	for _, v in ipairs({ "art", "idea", "code" }) do
+		for i = 1, #credits[v] do
+			strings[#strings + 1] = localize({ type = "variable", key = "a_mp_" .. v, vars = { credits[v][i] } })[1]
+		end
+	end
+
+	-- fallback if {}
+	if #strings == 0 then return { n = G.UIT.R, config = { align = "cm" }, nodes = {} } end
+
+	local min_scale_fac = 1
+	for i = 1, #strings do
+		min_scale_fac = math.min(min_scale_fac, calc_scale_fac(strings[i]))
+	end
+
+	local ct = {}
+	for i = 1, #strings do
+		ct[i] = { string = strings[i] }
+	end
+
+	return {
+		n = G.UIT.R,
+		config = { align = "cm" },
+		nodes = {
+			{
+				n = G.UIT.R,
+				config = {
+					align = "cm",
+					colour = G.C.MULTIPLAYER,
+					r = 0.1,
+					minw = 2 / min_scale_fac,
+					minh = 0.36,
+					emboss = 0.05,
+					padding = 0.03 * 0.9,
+				},
+				nodes = {
+					{ n = G.UIT.B, config = { h = 0.1, w = 0.03 } },
+					{
+						n = G.UIT.O,
+						config = {
+							object = DynaText({
+								string = ct,
+								colours = { credits.text_colour or G.C.WHITE },
+								silent = true,
+								float = true,
+								shadow = true,
+								offset_y = -0.03,
+								spacing = 1,
+								scale = 0.33 * 0.9,
+							}),
+						},
+					},
+					{ n = G.UIT.B, config = { h = 0.1, w = 0.03 } },
+				},
+			},
+		},
+	}
+end
+
 local function mutator_cell(cell, colour, disabled)
 	local on = colour
 	local off = darken(colour, 0.72)
-	-- Disabled cells keep their real description, with a "(Coming soon)" line
-	-- appended (built fresh so we never mutate the shared cell.desc table).
+	-- Disabled cells keep their real description with a "(Coming soon)" line appended
 	local tooltip_text = cell.desc
 	if disabled then
 		tooltip_text = {}
@@ -260,6 +352,9 @@ local function mutator_cell(cell, colour, disabled)
 		end
 		tooltip_text[#tooltip_text + 1] = "(Coming soon)"
 	end
+
+	local tooltip = { title = cell.label, text = tooltip_text }
+	if cell.credits then tooltip.filler = { func = mutator_credit_badge, args = cell.credits } end
 	return {
 		n = G.UIT.R,
 		config = { align = "cm", padding = 0.035 },
@@ -279,7 +374,7 @@ local function mutator_cell(cell, colour, disabled)
 					button = not disabled and "mp_toggle_mutator" or nil,
 					func = not disabled and "mp_mutator_cell_colour" or nil,
 					ref_table = { key = cell.key, on = on, off = off },
-					tooltip = { title = cell.label, text = tooltip_text },
+					tooltip = tooltip,
 				},
 				nodes = {
 					{
@@ -310,10 +405,6 @@ local function mutator_column(cat)
 	return { n = G.UIT.C, config = { align = "tm", padding = 0.06 }, nodes = nodes }
 end
 
--- ---------------------------------------------------------------------------
--- Reusable builders (shared by overlays and the inline custom-ruleset editor —
--- one source of truth for the wall + timer controls).
--- ---------------------------------------------------------------------------
 function MP.UI.build_timer_modifier_cycle()
 	return MP.UI.Disableable_Option_Cycle({
 		id = "modifier_timer_option",
@@ -388,8 +479,6 @@ function MP.UI.build_glass_cycle()
 	})
 end
 
--- The MUTATORS wall block: header + subtitle + themed columns + coming-soon line.
--- Returns one node (rows stack vertically since they're R children).
 function MP.UI.build_mutators_wall()
 	local columns = {}
 	for _, cat in ipairs(MUTATOR_WALL) do
