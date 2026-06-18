@@ -165,11 +165,12 @@ local MUTATOR_WALL = {
 				label = "Small World",
 				desc = { "75% of the pool banned at", "random. Showman always on." },
 			},
-			{ key = "spartan", label = "Spartan", desc = { "No cash from Small or Big", "blinds." } },
+			{ key = "spartan", label = "Spartan", desc = { "No cash from Small or Big", "blinds." }, soon = true },
 			{
 				key = "pricey_packs",
 				label = "Pricey Packs",
 				desc = { "Booster packs cost more", "for each ante you reach." },
+				soon = true,
 			},
 			{
 				key = "polymorph_spam",
