@@ -1,33 +1,3 @@
-local ruleset_buttons_data = {
-	{
-		name = "k_matchmaking",
-		buttons = {
-			{ button_id = "standard_ranked_ruleset_button", button_localize_key = "k_standard_ranked" },
-			{ button_id = "legacy_ranked_ruleset_button", button_localize_key = "k_legacy_ranked" },
-			{ button_id = "smallworld_ruleset_button", button_localize_key = "k_smallworld" },
-			{ button_id = "sandbox_ruleset_button", button_localize_key = "k_sandbox" },
-		},
-	},
-	{
-		name = "k_custom",
-		buttons = {
-			{ button_id = "blitz_ruleset_button", button_localize_key = "k_blitz" },
-			{ button_id = "traditional_ruleset_button", button_localize_key = "k_traditional" },
-			{ button_id = "vanilla_ruleset_button", button_localize_key = "k_vanilla" },
-			{ button_id = "badlatro_ruleset_button", button_localize_key = "k_badlatro" },
-			{ button_id = "speedlatro_ruleset_button", button_localize_key = "k_speedlatro" },
-			{ button_id = "chaos_ruleset_button", button_localize_key = "k_chaos" },
-		},
-	},
-	{
-		name = "k_tournament",
-		buttons = {
-			{ button_id = "majorleague_ruleset_button", button_localize_key = "k_majorleague" },
-			{ button_id = "minorleague_ruleset_button", button_localize_key = "k_minorleague" },
-		},
-	},
-}
-
 local rulesets_tabs = {
 	default = {
 		{
@@ -60,6 +30,7 @@ local rulesets_tabs = {
 					buttons = {
 						{ button_id = "majorleague_ruleset_button", button_localize_key = "k_majorleague" },
 						{ button_id = "minorleague_ruleset_button", button_localize_key = "k_minorleague" },
+						{ button_id = "wsob_ruleset_button", button_localize_key = "k_wsob" },
 					},
 				},
 				{
