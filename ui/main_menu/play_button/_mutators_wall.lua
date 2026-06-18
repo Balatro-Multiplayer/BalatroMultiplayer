@@ -124,11 +124,12 @@ local MUTATOR_WALL = {
 				label = "Dead Cards",
 				desc = { "Playing cards are debuffed.", "Jokers are the whole engine." },
 			},
-			{ key = "all_eternal", label = "No Takebacks", desc = { "Every joker is eternal." } },
+			{ key = "all_eternal", label = "No Takebacks", desc = { "Every joker is eternal." }, soon = true },
 			{
 				key = "shrinking_hand",
 				label = "Heavy Pockets",
 				desc = { "-1 hand size for every $10", "you're holding." },
+				soon = true,
 			},
 			{
 				key = "shared_pockets",
@@ -248,6 +249,16 @@ end
 local function mutator_cell(cell, colour, disabled)
 	local on = colour
 	local off = darken(colour, 0.72)
+	-- Disabled cells keep their real description, with a "(Coming soon)" line
+	-- appended (built fresh so we never mutate the shared cell.desc table).
+	local tooltip_text = cell.desc
+	if disabled then
+		tooltip_text = {}
+		for _, line in ipairs(cell.desc) do
+			tooltip_text[#tooltip_text + 1] = line
+		end
+		tooltip_text[#tooltip_text + 1] = "(Coming soon)"
+	end
 	return {
 		n = G.UIT.R,
 		config = { align = "cm", padding = 0.035 },
@@ -267,8 +278,7 @@ local function mutator_cell(cell, colour, disabled)
 					button = not disabled and "mp_toggle_mutator" or nil,
 					func = not disabled and "mp_mutator_cell_colour" or nil,
 					ref_table = { key = cell.key, on = on, off = off },
-					tooltip = disabled and { title = cell.label, text = { "Coming soon." } }
-						or { title = cell.label, text = cell.desc },
+					tooltip = { title = cell.label, text = tooltip_text },
 				},
 				nodes = {
 					{
