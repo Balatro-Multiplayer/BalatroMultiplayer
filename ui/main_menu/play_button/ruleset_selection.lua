@@ -60,6 +60,7 @@ local rulesets_tabs = {
 					buttons = {
 						{ button_id = "majorleague_ruleset_button", button_localize_key = "k_majorleague" },
 						{ button_id = "minorleague_ruleset_button", button_localize_key = "k_minorleague" },
+						{ button_id = "wsob_ruleset_button", button_localize_key = "k_wsob" },
 					},
 				},
 				{
