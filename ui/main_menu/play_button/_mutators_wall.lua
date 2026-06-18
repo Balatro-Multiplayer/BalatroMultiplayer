@@ -91,14 +91,16 @@ local MUTATOR_WALL = {
 				key = "inflation",
 				label = "Inflation",
 				desc = { "Shop prices creep up $1 with", "every card you buy." },
+				soon = true,
 			},
 			{
 				key = "no_interest",
 				label = "No Interest",
 				desc = { "Savings earn nothing.", "Spend it or lose the edge." },
+				soon = true,
 			},
-			{ key = "discard_tax", label = "Discard Tax", desc = { "Every discard costs $1." } },
-			{ key = "frugal", label = "Frugal", desc = { "Unspent discards pay out $1." } },
+			{ key = "discard_tax", label = "Discard Tax", desc = { "Every discard costs $1." }, soon = true },
+			{ key = "frugal", label = "Frugal", desc = { "Unspent discards pay out $1." }, soon = true },
 			{
 				key = "wraith_rework",
 				label = "Kind Wraith",
@@ -110,7 +112,7 @@ local MUTATOR_WALL = {
 		name = "MAYHEM",
 		colour = G.C.PURPLE,
 		cells = {
-			{ key = "flipped_cards", label = "Blind Poker", desc = { "Your hand is dealt face-down." } },
+			{ key = "flipped_cards", label = "Blind Poker", desc = { "Your hand is dealt face-down." }, soon = true },
 			{
 				key = "debuff_played_cards",
 				label = "Dead Cards",
@@ -205,7 +207,7 @@ local function roll_mutators()
 	for _, cat in ipairs(MUTATOR_WALL) do
 		for _, cell in ipairs(cat.cells) do
 			MP.remove_modifier(cell.key)
-			if math.random() < 0.35 then MP.add_modifier(cell.key) end
+			if not cell.soon and math.random() < 0.35 then MP.add_modifier(cell.key) end
 		end
 	end
 end
@@ -246,7 +248,8 @@ local function mutator_cell(cell, colour, disabled)
 					button = not disabled and "mp_toggle_mutator" or nil,
 					func = not disabled and "mp_mutator_cell_colour" or nil,
 					ref_table = { key = cell.key, on = on, off = off },
-					tooltip = { title = cell.label, text = cell.desc },
+					tooltip = disabled and { title = cell.label, text = { "Coming soon." } }
+						or { title = cell.label, text = cell.desc },
 				},
 				nodes = {
 					{
@@ -272,7 +275,7 @@ local function mutator_column(cat)
 		},
 	}
 	for _, cell in ipairs(cat.cells) do
-		nodes[#nodes + 1] = mutator_cell(cell, cat.colour)
+		nodes[#nodes + 1] = mutator_cell(cell, cat.colour, cell.soon)
 	end
 	return { n = G.UIT.C, config = { align = "tm", padding = 0.06 }, nodes = nodes }
 end
