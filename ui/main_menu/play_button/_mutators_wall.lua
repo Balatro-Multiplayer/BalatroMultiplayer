@@ -106,6 +106,12 @@ local MUTATOR_WALL = {
 				label = "Kind Wraith",
 				desc = { "Wraith spawns an Uncommon and", "pays $5 (was Rare, money to $0)." },
 			},
+			{
+				key = "pvp_reward_draft",
+				label = "Reward Draft",
+				desc = { "Win a PvP blind, then draft", "1 of several rewards." },
+				soon = true,
+			},
 		},
 	},
 	{
@@ -134,6 +140,12 @@ local MUTATOR_WALL = {
 				label = "Instability",
 				desc = { "After scoring, chips and mult", "are dragged toward each other." },
 			},
+			{
+				key = "rubber_band",
+				label = "Rubber Band",
+				desc = { "Losing a life grants an", "escalating comeback buff." },
+				soon = true,
+			},
 		},
 	},
 	{
@@ -148,6 +160,12 @@ local MUTATOR_WALL = {
 				key = "chip_cap",
 				label = "Cash Ceiling",
 				desc = { "Chip score can't exceed your", "cash. Greed is the only way up." },
+			},
+			{
+				key = "score_tax",
+				label = "Score Tax",
+				desc = { "Each hand you play nudges your", "opponent's target upward." },
+				soon = true,
 			},
 		},
 	},
