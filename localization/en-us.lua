@@ -958,6 +958,14 @@ return {
 					"{C:attention}-1{} hand size",
 				},
 			},
+			mp_sticker_balanced_c_mp_wraith = {
+				name = "Balanced",
+				text = {
+					"Creates an {C:green}Uncommon{} instead of a",
+					"{C:red}Rare{}, and gains {C:money}$5{} instead of",
+					"setting your money to {C:money}$0{}",
+				},
+			},
 			mp_sticker_balanced_m_gold = {
 				name = "Balanced",
 				text = {
@@ -1139,6 +1147,13 @@ return {
 					"a random {C:attention}Joker,",
 					"Randomly apply one of:",
 					"{C:red}-1{} hand, {C:red}-1{} discard, or {C:red}-1{} hand size",
+				},
+			},
+			c_mp_wraith = {
+				name = "Wraith",
+				text = {
+					"Creates a random {C:green}Uncommon{} Joker",
+					"Gain {C:money}$#1#{}",
 				},
 			},
 		},
