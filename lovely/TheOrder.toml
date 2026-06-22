@@ -204,3 +204,19 @@ if MP.should_use_the_order() then
 end
 '''
 match_indent = true
+
+# STEAMODDED BUG - fix for certificate calling pseudorandom for no reason
+[[patches]]
+[patches.pattern]
+target = '''=[SMODS _ "src/utils.lua"]'''
+pattern = '''
+local seal_poll = pseudorandom(pseudoseed(key or 'stdseal'..G.GAME.round_resets.ante))
+if seal_poll > 1 - (type_weight*mod / total_weight) or guaranteed then -- is a seal generated
+'''
+position = 'at'
+payload = '''
+local seal_poll = guaranteed and 1 or pseudorandom(pseudoseed(key or 'stdseal'..G.GAME.round_resets.ante))
+if seal_poll > 1 - (type_weight*mod / total_weight) then -- is a seal generated
+'''
+match_indent = true
+times = 1
