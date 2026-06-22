@@ -305,7 +305,7 @@ function MP.UI.create_UIBox_mp_game_end(has_won)
 													{
 														n = G.UIT.T,
 														config = {
-															text = localize("ml_mp_kofi_message")[3] .. " " .. localize("ml_mp_kofi_message")[4],
+															text = localize("ml_mp_kofi_message")[3] .. (localize("ml_mp_kofi_message")[4] and (" " .. localize("ml_mp_kofi_message")[4]) or ""),
 															scale = 0.35,
 															colour = G.C.UI.TEXT_LIGHT,
 															col = true,
