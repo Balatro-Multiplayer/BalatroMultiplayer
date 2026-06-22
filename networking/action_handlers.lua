@@ -1377,13 +1377,15 @@ function MP.register_action(name, cb)
 	HANDLERS[name] = cb
 end
 
+local network_to_ui_channel = love.thread.getChannel("networkToUi")
+
 local game_update_ref = Game.update
 ---@diagnostic disable-next-line: duplicate-set-field
 function Game:update(dt)
 	game_update_ref(self, dt)
 
 	repeat
-		local msg = love.thread.getChannel("networkToUi"):pop()
+		local msg = network_to_ui_channel:pop()
 		if msg then
 			-- horribly messy catch
 			if string.sub(msg, 1, 1) == "a" then
@@ -1398,28 +1400,34 @@ function Game:update(dt)
 				return
 			end
 
-			local parsedAction = json.decode(msg)
-
-			if not ((parsedAction.action == "keepAlive") or (parsedAction.action == "keepAliveAck")) then
-				local log = string.format("Client got %s message: ", parsedAction.action)
-				for k, v in pairs(parsedAction) do
-					if parsedAction.action == "startGame" and k == "seed" then
-						last_game_seed = v
-					else
-						log = log .. string.format(" (%s: %s) ", k, v)
-					end
-				end
-				if
-					(parsedAction.action == "receiveEndGameJokers" or parsedAction.action == "stopGame")
-					and last_game_seed
-				then
-					log = log .. string.format(" (seed: %s) ", last_game_seed)
-				end
-				sendTraceMessage(log, "MULTIPLAYER")
-			end
-
-			local handler = HANDLERS[parsedAction.action]
-			if handler then handler(parsedAction) end
+			local ok, parsedAction = pcall(json.decode, msg)
+            if ok then
+                if not ((parsedAction.action == "keepAlive") or (parsedAction.action == "keepAliveAck")) then
+                    local log = string.format("Client got %s message: ", parsedAction.action)
+                    for k, v in pairs(parsedAction) do
+                        if parsedAction.action == "startGame" and k == "seed" then
+                            last_game_seed = v
+                        else
+                            log = log .. string.format(" (%s: %s) ", k, v)
+                        end
+                    end
+                    if
+                        (parsedAction.action == "receiveEndGameJokers" or parsedAction.action == "stopGame")
+                        and last_game_seed
+                    then
+                        log = log .. string.format(" (seed: %s) ", last_game_seed)
+                    end
+                    sendTraceMessage(log, "MULTIPLAYER")
+                end
+    
+                local handler = HANDLERS[parsedAction.action]
+                if handler then handler(parsedAction) end
+            else
+                sendWarnMessage(
+                    "Invalid server response: " .. msg,
+                    "MULTIPLAYER"
+                )
+            end
 		end
 	until not msg
 end
