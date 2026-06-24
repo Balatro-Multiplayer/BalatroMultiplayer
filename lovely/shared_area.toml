@@ -13,7 +13,7 @@ payload = '''if MP.LOBBY.code then
 		0, CAI.consumeable_H + 0.3,
 		CAI.consumeable_W / 2,
 		CAI.consumeable_H, 
-		{card_limit = 0, type = 'joker', highlight_limit = 1})
+		{card_limit = 0, type = 'joker', highlight_limit = 1, fixed_limit = true})
 		elseif MP.shared then
 			MP.shared:remove()
 			MP.shared = nil
@@ -29,6 +29,7 @@ position = 'after'
 payload = '''if MP.shared then
   MP.shared.T.x = G.consumeables.T.x + (G.consumeables.T.w / 2)
   MP.shared.T.y = G.consumeables.T.y + G.consumeables.T.h + 0.4
+  MP.shared:hard_set_T()
 end
 '''
 match_indent = true

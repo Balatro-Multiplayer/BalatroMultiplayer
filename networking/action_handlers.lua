@@ -756,7 +756,7 @@ function G.FUNCS.load_end_game_jokers()
 			0,
 			5 * G.CARD_W,
 			G.CARD_H,
-			{ card_limit = G.GAME.starting_params.joker_slots, type = "joker", highlight_limit = 1 }
+			{ card_limit = G.GAME.starting_params.joker_slots, type = "joker", highlight_limit = 1, fixed_limit = true }
 		)
 		return
 	end
