@@ -43,6 +43,15 @@ RLOG._run_active = false
 RLOG._manifest = nil
 RLOG._force_active = false -- test hook: bypass the lobby gate
 
+-- Live streaming: carbon lines are pushed to the server in batches as the game
+-- plays, so a crashed/abandoned game still leaves a partial record server-side.
+-- On a clean end the server swaps that partial for the full hashed package.
+RLOG._game_id = nil -- per-game grouping key, generated in begin_run
+RLOG._pending = {} -- carbon lines buffered since the last flush
+RLOG._last_flush = 0 -- love.timer.getTime() of the last flush (0 if unavailable)
+RLOG.STREAM_FLUSH_LINES = 25 -- flush once this many lines are buffered, or...
+RLOG.STREAM_FLUSH_SECS = 2 -- ...this many seconds have passed since the last flush
+
 -------------------------------------------------------------------------------
 -- Gate
 -------------------------------------------------------------------------------
@@ -85,12 +94,50 @@ local function emit(msg)
 	sendTraceMessage(msg, "MULTIPLAYER")
 end
 
--- Emit a carbon-stream line: tee to the Lovely log AND accumulate it into the
--- full block we ship to the server at end_run (so the server keeps the whole
--- viewable/replayable action log, not just its hash).
+-- Per-game grouping key for the live stream. Lets the server group a game's
+-- streamed lines and delete them once the final package lands.
+local function new_game_id(manifest)
+	local lobby = (manifest and manifest.lobby_code) or "nolobby"
+	local who = (manifest and manifest.player) or "?"
+	return string.format("%s-%s-%d-%d", tostring(lobby), tostring(who), os.time(), math.random(100000, 999999))
+end
+
+-- Best-effort wall clock for flush pacing; 0 when love.timer is unavailable
+-- (e.g. under the headless test harness), in which case flushing falls back to
+-- the line-count trigger plus the end-of-run flush.
+local function stream_now()
+	if love and love.timer and love.timer.getTime then return love.timer.getTime() end
+	return 0
+end
+
+-- Send any buffered carbon lines to the server as one batch. No-ops cleanly if
+-- there's no transport yet (e.g. tests) -- the lines are still kept in the full
+-- carbon block submitted at end_run.
+function RLOG.flush()
+	if #RLOG._pending == 0 then return end
+	if not (RLOG._game_id and MP.ACTIONS and MP.ACTIONS.stream_log_lines) then return end
+	local batch = RLOG._pending
+	RLOG._pending = {}
+	RLOG._last_flush = stream_now()
+	MP.ACTIONS.stream_log_lines(RLOG._game_id, batch)
+end
+
+-- Flush once the batch is big enough or enough time has elapsed since the last.
+local function maybe_flush()
+	if #RLOG._pending >= RLOG.STREAM_FLUSH_LINES then
+		RLOG.flush()
+	elseif (stream_now() - RLOG._last_flush) >= RLOG.STREAM_FLUSH_SECS then
+		RLOG.flush()
+	end
+end
+
+-- Emit a carbon-stream line: tee to the Lovely log, accumulate it into the full
+-- block we ship to the server at end_run, AND queue it for live streaming.
 local function emit_carbon(msg)
 	RLOG._carbon_full[#RLOG._carbon_full + 1] = msg
+	RLOG._pending[#RLOG._pending + 1] = msg
 	sendTraceMessage(msg, "MULTIPLAYER")
+	maybe_flush()
 end
 
 -------------------------------------------------------------------------------
@@ -138,6 +185,12 @@ function RLOG.begin_run(manifest)
 	RLOG._manifest = manifest
 	RLOG._run_active = true
 
+	-- Open the live stream for this game: fresh id + empty batch buffer.
+	RLOG._game_id = new_game_id(manifest)
+	manifest.game_id = RLOG._game_id
+	RLOG._pending = {}
+	RLOG._last_flush = stream_now()
+
 	local json = require("json")
 	emit_carbon(RLOG.CARBON_PREFIX .. " MANIFEST " .. json.encode(manifest))
 end
@@ -158,11 +211,16 @@ function RLOG.end_run(outcome)
 
 	emit_carbon(string.format("%s CHK v1 carbon=%s human=%s bytes=%d", RLOG.CARBON_PREFIX, carbon_hash, human_hash, bytes))
 
+	-- Push any remaining streamed lines (incl. END + CHK) before the final
+	-- package, so an oversized/rejected package still leaves a complete stream.
+	RLOG.flush()
+
 	if MP.ACTIONS and MP.ACTIONS.submit_log_hashes then
 		-- The full carbon block (manifest + actions + END + CHK) so the server
-		-- keeps the complete viewable/replayable log, not just its hash.
+		-- keeps the complete viewable/replayable log, not just its hash. The
+		-- game_id lets the server drop this game's live stream in favour of it.
 		local carbon_log = table.concat(RLOG._carbon_full, "\n")
-		MP.ACTIONS.submit_log_hashes(carbon_hash, human_hash, RLOG._manifest and RLOG._manifest.seed, carbon_log)
+		MP.ACTIONS.submit_log_hashes(carbon_hash, human_hash, RLOG._manifest and RLOG._manifest.seed, carbon_log, RLOG._game_id)
 	end
 
 	RLOG._run_active = false
