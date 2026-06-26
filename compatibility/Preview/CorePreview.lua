@@ -130,9 +130,17 @@ end
 
 local orig_discard = G.FUNCS.discard_cards_from_highlighted
 function G.FUNCS.discard_cards_from_highlighted(e, is_hook_blind)
+	-- Carbon: capture which hand slots are discarded BEFORE orig_discard consumes
+	-- them. is_hook_blind means a programmatic discard (blind effect), not a click.
+	local discarded = (not is_hook_blind) and MP.UTILS.highlighted_hand_indices() or nil
 	orig_discard(e, is_hook_blind)
 
-	if not is_hook_blind then FN.PRE.stop_current_coroutine() end
+	if not is_hook_blind then
+		if discarded and #discarded > 0 then
+			MP.RLOG.record("discard", { discarded }, "action:discard,cards:" .. table.concat(discarded, "."))
+		end
+		FN.PRE.stop_current_coroutine()
+	end
 end
 
 -- USER INTERFACE ADVICE:
