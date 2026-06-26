@@ -60,16 +60,19 @@ MP.UTILS.AREA = {
 -- Map a live CardArea object to its stable AREA enum int (or nil if unknown).
 function MP.UTILS.area_enum(area)
 	if not area or not G then return nil end
-	local lookup = {
-		[G.shop_jokers] = MP.UTILS.AREA.shop_jokers,
-		[G.shop_booster] = MP.UTILS.AREA.shop_booster,
-		[G.shop_vouchers] = MP.UTILS.AREA.shop_vouchers,
-		[G.jokers] = MP.UTILS.AREA.jokers,
-		[G.consumeables] = MP.UTILS.AREA.consumeables,
-		[G.hand] = MP.UTILS.AREA.hand,
-		[G.pack_cards] = MP.UTILS.AREA.pack_cards,
-	}
-	return lookup[area]
+	-- Compare directly instead of building a lookup table keyed by the CardArea
+	-- globals: several of them are nil depending on game state (G.pack_cards
+	-- only exists while a booster is open, G.shop_* only in the shop), and a
+	-- table literal with a nil key throws "table index is nil". Comparing a
+	-- live area against a nil global is simply false, so this is crash-safe.
+	if area == G.shop_jokers then return MP.UTILS.AREA.shop_jokers end
+	if area == G.shop_booster then return MP.UTILS.AREA.shop_booster end
+	if area == G.shop_vouchers then return MP.UTILS.AREA.shop_vouchers end
+	if area == G.jokers then return MP.UTILS.AREA.jokers end
+	if area == G.consumeables then return MP.UTILS.AREA.consumeables end
+	if area == G.hand then return MP.UTILS.AREA.hand end
+	if area == G.pack_cards then return MP.UTILS.AREA.pack_cards end
+	return nil
 end
 
 -- 1-based index of a card within its CardArea's card list. `area` defaults to
