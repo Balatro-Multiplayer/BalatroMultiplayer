@@ -32,3 +32,38 @@ After `capture`, review the diff in `tests/ruleset_snapshot.lua` before committi
 - Function bodies (only whether a function is defined)
 - Runtime behavior (ApplyBans hook chains, smallworld cull logic, speedlatro timer)
 - Rework center definitions (`MP.ReworkCenter` calls)
+
+## Replay Log (MP.RLOG)
+
+`test_rlog_roundtrip.lua` and `test_rlog_checksum.lua` exercise the dual-stream
+replay logger (`lib/replay_log.lua`). They stub the game globals, capture the
+lines it emits to the Lovely log, and assert on them — no files are written.
+
+Both streams live in the ordinary Lovely log, distinguished by prefix:
+- **Carbon (positional/replay):** `MP_RLOG:` — e.g. `MP_RLOG: 5 buy 1 2`, plus
+  `MP_RLOG: MANIFEST {...}` and the `MP_RLOG: CHK v1 carbon=… human=… bytes=…`
+  trailer.
+- **Human-readable:** `Client sent message:` — the existing website-parser
+  format, e.g. `Client sent message: action:boughtCardFromShop,card:Blueprint,cost:4`.
+
+```bash
+lua tests/test_rlog_roundtrip.lua   # streams well-formed + hashes round-trip
+lua tests/test_rlog_checksum.lua    # editing one opcode changes the stored hash
+```
+
+`test_rlog_roundtrip.lua` asserts: `MP_RLOG: MANIFEST` header + `END`/`CHK`
+trailer; carbon action lines with a gapless, monotonic sequence; positional args
+including ordered index-lists (e.g. `play 1.3.5.7.8`, `use 1 2.4`) intact; a
+paired `Client sent message:` line per action; and `CHK` per-stream hashes that
+equal a recompute over the captured lines and match what `submit_log_hashes`
+sends.
+
+`test_rlog_checksum.lua` confirms the `CHK` carbon hash equals a hash of the
+carbon stream (re-extracted by prefix) and that tampering with one opcode
+changes it.
+
+### Manual end-to-end check
+
+Play one real multiplayer match, then open the Lovely log. Filter the `MP_RLOG:`
+(positional) and `Client sent message:` (human) lines and confirm they mirror
+each action event-for-event.
