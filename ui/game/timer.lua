@@ -404,7 +404,12 @@ end
 
 local old_play = G.FUNCS.play_cards_from_highlighted
 function G.FUNCS.play_cards_from_highlighted(...)
+    -- Carbon: capture which hand slots are played BEFORE old_play consumes them.
+    local played = MP.UTILS.highlighted_hand_indices()
     old_play(...)
+    if #played > 0 then
+        MP.RLOG.record("play", { played }, "action:play,cards:" .. table.concat(played, "."))
+    end
     if G.play and G.play.cards[1] then return end
     if MP.LOBBY.code and MP.LOBBY.config.timer and not MP.GAME.timer_consumed then
         if MP.is_pvp_boss() then
