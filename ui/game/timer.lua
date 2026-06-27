@@ -340,7 +340,7 @@ function Game:update(dt)
 	else
         -- Old timer: tick when opponent timering, not in pvp
         if is_pvp_boss then return end
-        if MP.GAME.pvp_reached and MP.GAME.ready_blind then return end
+        if MP.GAME.pvp_reached and MP.GAME.ready_blind and not MP.GAME.timer_started then return end
 		if not (MP.GAME.timer_started or MP.GAME.nemesis_timer_started) then return end
 	end
 
