@@ -201,7 +201,14 @@ G.FUNCS.multiplayer_blind_chip_UI_scale = function(e)
 	-- Hide the opponent's score until we have played a hand this PvP blind, so
 	-- a player can't watch the enemy score before committing their own hand.
 	-- (The server also withholds the score, this is the matching display.)
-	if MP.is_pvp_boss() and G.GAME.current_round and G.GAME.current_round.hands_played == 0 then
+	-- Gated by the hide_score_until_played lobby option (on by default only on
+	-- standard-layer rulesets; host-toggleable in non-forcing lobbies).
+	if
+		MP.LOBBY.config.hide_score_until_played
+		and MP.is_pvp_boss()
+		and G.GAME.current_round
+		and G.GAME.current_round.hands_played == 0
+	then
 		MP.GAME.enemy.score_text = "???"
 		return
 	end
