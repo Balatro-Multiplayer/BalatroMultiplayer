@@ -198,6 +198,13 @@ function Blind:disable()
 end
 
 G.FUNCS.multiplayer_blind_chip_UI_scale = function(e)
+	-- Hide the opponent's score until we have played a hand this PvP blind, so
+	-- a player can't watch the enemy score before committing their own hand.
+	-- (The server also withholds the score, this is the matching display.)
+	if MP.is_pvp_boss() and G.GAME.current_round and G.GAME.current_round.hands_played == 0 then
+		MP.GAME.enemy.score_text = "???"
+		return
+	end
 	local new_score_text = MP.INSANE_INT.to_string(MP.GAME.enemy.score)
 	if G.GAME.blind and MP.GAME.enemy.score and MP.GAME.enemy.score_text ~= new_score_text then
 		if not MP.INSANE_INT.greater_than(MP.GAME.enemy.score, MP.INSANE_INT.create(0, G.E_SWITCH_POINT, 0)) then
