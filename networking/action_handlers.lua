@@ -312,6 +312,10 @@ end
 
 local function action_start_blind(p)
 	local first_player = p.firstPlayer
+	-- Reset the stored opponent score each blind so the first frame after we
+	-- play (which lifts the "???" mask) shows 0, not last blind's stale score.
+	MP.GAME.enemy.score = MP.INSANE_INT.empty()
+	MP.GAME.enemy.score_text = "0"
 	MP.GAME.ready_blind = false
 	MP.GAME.pvp_reached = false
 	MP.GAME.timer_started = false
