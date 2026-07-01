@@ -197,6 +197,8 @@ function MP.reset_lobby_config(persist_ruleset_and_gamemode)
 		forced_config = false,
 		preview_disabled = false,
 		legacy_smallworld = false,
+		-- Baseline off; start_lobby sets it on for standard-layer rulesets.
+		hide_score_until_played = false,
 	}
 end
 MP.reset_lobby_config()
@@ -217,6 +219,10 @@ function MP.reset_game_states()
 			score = MP.INSANE_INT.empty(),
 			score_text = "0",
 			hands = 4,
+			hands_text = "4",
+			-- Whether an enemyInfo message has arrived this blind. Used to mask
+			-- the opponent's hands as "?" until we hear from them.
+			info_received = false,
 			location = localize("loc_selecting"),
 			skips = 0,
 			lives = MP.LOBBY.config.starting_lives,

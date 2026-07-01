@@ -841,7 +841,7 @@ return {
 			},
 			ml_mp_kofi_message = {
 				"Este mod y sus servidores son",
-				"desarrollados y mantenidos por ",
+				"desarrollados y mantenidos por",
 				"una sola persona, si te gusta",
 				"puedes considerar",
 			},

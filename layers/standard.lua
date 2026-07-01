@@ -9,6 +9,11 @@ MP.Layer("standard", {
 		"j_bloodstone",
 		"c_ouija",
 	},
+	banned_jokers = {
+		"j_mp_speedrun",
+		"j_mp_conjoined_joker",
+		"j_mp_defensive_joker",
+	},
 	banned_consumables = {
 		"c_justice",
 	},
