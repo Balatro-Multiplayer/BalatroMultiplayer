@@ -315,6 +315,7 @@ local function action_start_blind(p)
 	-- Reset the stored opponent score each blind so the first frame after we
 	-- play (which lifts the "???" mask) shows 0, not last blind's stale score.
 	MP.GAME.enemy.score = MP.INSANE_INT.empty()
+	MP.GAME.enemy.real_score = MP.INSANE_INT.empty()
 	MP.GAME.enemy.score_text = "0"
 	-- Re-mask the opponent's hands until the first enemyInfo of the new blind.
 	MP.GAME.enemy.info_received = false
@@ -421,6 +422,7 @@ local function action_enemy_info(p)
 		play_sound("gong", 0.765, 0.4)
 	end
 
+    MP.GAME.enemy.real_score = score
 	MP.GAME.enemy.hands = hands_left
 	MP.GAME.enemy.skips = skips
 	MP.GAME.enemy.lives = lives

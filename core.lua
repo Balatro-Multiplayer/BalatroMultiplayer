@@ -217,6 +217,7 @@ function MP.reset_game_states()
 		end_pvp = false,
 		enemy = {
 			score = MP.INSANE_INT.empty(),
+			real_score = MP.INSANE_INT.empty(),
 			score_text = "0",
 			hands = 4,
 			hands_text = "4",
