@@ -319,7 +319,6 @@ local function action_start_blind(p)
 	-- Re-mask the opponent's hands until the first enemyInfo of the new blind.
 	MP.GAME.enemy.info_received = false
 	MP.GAME.ready_blind = false
-	MP.GAME.post_pvp = false
 	MP.GAME.pvp_reached = false
 	MP.GAME.timer_started = false
 	MP.GAME.nemesis_timer_started = false
@@ -450,7 +449,6 @@ local function action_end_pvp(p)
 		end
 	end
 	MP.GAME.end_pvp = true
-	MP.GAME.post_pvp = true
 	MP.GAME.timer = MP.UTILS.timer_base()
 	MP.GAME.timer_consumed = false
 	MP.GAME.timer_started = false
@@ -959,8 +957,6 @@ end
 -- Dual-call: dispatched from network (fromNemesis defaults to true) or self-triggered
 -- by MP.ACTIONS.start_ante_timer (passes fromNemesis = false explicitly).
 local function action_start_ante_timer(p)
-	if MP.GAME.post_pvp then return end
-
 	local time = p.time
 	local from_nemesis = p.fromNemesis
 	if from_nemesis == nil then from_nemesis = true end

@@ -20,7 +20,6 @@ function G.FUNCS.mp_toggle_ready(e)
     MP.GAME.pvp_reached = true
 
 	if MP.GAME.ready_blind then
-		MP.GAME.post_pvp = false
 		MP.ACTIONS.set_location("loc_ready")
 		MP.ACTIONS.ready_blind(e)
 	else
