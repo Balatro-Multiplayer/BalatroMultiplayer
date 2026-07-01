@@ -145,6 +145,9 @@ local function action_enemyDisconnected(p)
 	local timeout = p.timeout or 60
 	sendWarnMessage("Opponent disconnected, waiting for reconnection...", "MULTIPLAYER")
 
+	MP.GAME.timer_started = false
+	MP.GAME.nemesis_timer_started = false
+
 	MP.enemy_disconnect_countdown = {
 		end_time = love.timer.getTime() + timeout,
 		display = timeout .. "s remaining",
