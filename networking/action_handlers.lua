@@ -94,6 +94,8 @@ local function action_rejoinedLobby(p)
 	reconnectToken = token
 	lastLobbyCode = code
 	MP.self_reconnect_countdown = nil
+	MP.GAME.timer_started = false
+	MP.GAME.nemesis_timer_started = false
 	MP.ACTIONS.sync_client()
 	MP.ACTIONS.lobby_info()
 	MP.UI.update_connection_status()
@@ -144,6 +146,9 @@ end
 local function action_enemyDisconnected(p)
 	local timeout = p.timeout or 60
 	sendWarnMessage("Opponent disconnected, waiting for reconnection...", "MULTIPLAYER")
+
+	MP.GAME.timer_started = false
+	MP.GAME.nemesis_timer_started = false
 
 	MP.enemy_disconnect_countdown = {
 		end_time = love.timer.getTime() + timeout,
@@ -242,6 +247,8 @@ local function action_reconnecting()
 	-- Only show if we were in a lobby and don't already have a countdown running
 	if reconnectToken and lastLobbyCode and not MP.self_reconnect_countdown then
 		MP.LOBBY.connected = false
+		MP.GAME.timer_started = false
+		MP.GAME.nemesis_timer_started = false
 		MP.UI.update_connection_status()
 		sendWarnMessage("Connection lost, attempting to reconnect...", "MULTIPLAYER")
 
