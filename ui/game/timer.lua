@@ -4,6 +4,7 @@ function MP.UI.cam_timer_opponent()
 	if not MP.LOBBY.config.timer then return false end
     if MP.GAME.pvp_countdown_in_progress then return false end
     if MP.GAME.timer <= 0 then return false end
+    if MP.GAME.nemesis_timer_started then return false end
 	if MP.is_pvp_boss() and MP.is_layer_active("pvp_timer") then
 		if G.STATE == G.STATES.ROUND_EVAL or G.STATE == G.STATES.NEW_ROUND then return false end
 		if MP.INSANE_INT.greater_than(MP.GAME.score, MP.GAME.enemy.score) then return true end
@@ -339,6 +340,7 @@ function Game:update(dt)
 	else
         -- Old timer: tick when opponent timering, not in pvp
         if is_pvp_boss then return end
+        if MP.GAME.pvp_reached and MP.GAME.ready_blind and not MP.GAME.timer_started then return end
 		if not (MP.GAME.timer_started or MP.GAME.nemesis_timer_started) then return end
 	end
 

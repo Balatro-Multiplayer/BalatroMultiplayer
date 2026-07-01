@@ -1419,7 +1419,7 @@ return {
 			k_timer_sfx = "Timer Sound Effects",
 			ml_mp_kofi_message = {
 				"This mod and game server is",
-				"developed and maintained by ",
+				"developed and maintained by",
 				"one person, if",
 				"you like it consider",
 			},
