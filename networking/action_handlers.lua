@@ -957,7 +957,7 @@ end
 -- Dual-call: dispatched from network (fromNemesis defaults to true) or self-triggered
 -- by MP.ACTIONS.start_ante_timer (passes fromNemesis = false explicitly).
 local function action_start_ante_timer(p)
-	if p.isPvP and (MP.GAME.end_pvp or not MP.is_pvp_boss()) then return end
+	if p.isPvP and (MP.GAME.end_pvp or not MP.is_pvp_boss() or G.GAME.current_round.hands_left <= 0) then return end
 
 	local time = p.time
 	local from_nemesis = p.fromNemesis
