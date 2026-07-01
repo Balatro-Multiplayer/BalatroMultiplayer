@@ -247,6 +247,8 @@ local function action_reconnecting()
 	-- Only show if we were in a lobby and don't already have a countdown running
 	if reconnectToken and lastLobbyCode and not MP.self_reconnect_countdown then
 		MP.LOBBY.connected = false
+		MP.GAME.timer_started = false
+		MP.GAME.nemesis_timer_started = false
 		MP.UI.update_connection_status()
 		sendWarnMessage("Connection lost, attempting to reconnect...", "MULTIPLAYER")
 
