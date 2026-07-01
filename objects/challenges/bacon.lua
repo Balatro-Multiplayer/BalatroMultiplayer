@@ -43,7 +43,7 @@ SMODS.Challenge({
 					"p_arcana_mega_2",
 				},
 			},
-		}
+		},
 	},
 
 	apply = function(self)

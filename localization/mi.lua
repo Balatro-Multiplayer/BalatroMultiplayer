@@ -243,7 +243,7 @@ return {
 			},
 			ml_mp_kofi_message = {
 				"Kōtahi anake te tāngata e",
-				"whakahaere, e tuarā ana ",
+				"whakahaere, e tuarā ana",
 				"i te Balatro Multiplayer.",
 				"Mēnā e pīrangi ana,",
 			},

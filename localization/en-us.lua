@@ -803,7 +803,8 @@ return {
 				name = "Phantom",
 				text = {
 					"{C:attention}Eternal{} and {C:dark_edition}Negative{}",
-					"Created and destroyed by your {X:purple,C:white}Nemesis{}",
+					"Created when your {X:purple,C:white}Nemesis{} has this Joker",
+					"Only affects your {X:purple,C:white}Nemesis{} and is destroyed by them.",
 				},
 			},
 		},
@@ -956,6 +957,14 @@ return {
 					"Destroys {C:attention}3{} cards instead of",
 					"converting all cards and losing",
 					"{C:attention}-1{} hand size",
+				},
+			},
+			mp_sticker_balanced_c_mp_wraith = {
+				name = "Balanced",
+				text = {
+					"Creates an {C:green}Uncommon{} instead of a",
+					"{C:red}Rare{}, and gains {C:money}$5{} instead of",
+					"setting your money to {C:money}$0{}",
 				},
 			},
 			mp_sticker_balanced_m_gold = {
@@ -1141,6 +1150,13 @@ return {
 					"{C:red}-1{} hand, {C:red}-1{} discard, or {C:red}-1{} hand size",
 				},
 			},
+			c_mp_wraith = {
+				name = "Wraith",
+				text = {
+					"Creates a random {C:green}Uncommon{} Joker",
+					"Gain {C:money}$#1#{}",
+				},
+			},
 		},
 	},
 	misc = {
@@ -1198,6 +1214,7 @@ return {
 			b_opts_player_diff_deck = "Players have different decks",
 			b_opts_random_loadout = "Randomize deck & stake",
 			b_opts_normal_bosses = "Enable Boss Blind effects",
+			b_opts_hide_score = "Hide opponent score until you play",
 			b_opts_timer = "Enable Timer",
 			b_opts_disable_preview = "Disable Score Preview",
 			b_opts_the_order = "Enable The Order",
@@ -1330,6 +1347,8 @@ return {
 			k_majorleague_description = "Official Major League Balatro ruleset.\n\nVanilla cards with competitive settings:\n- 180 second timer\n- The Order disabled\n- First timeout forgiven\n- Attrition gamemode",
 			k_minorleague = "Minor League",
 			k_minorleague_description = "Official Minor League Balatro ruleset.\n\nVanilla cards with competitive settings:\n- 210 second timer\n- The Order enabled\n- First timeout forgiven\n- Attrition gamemode",
+			k_wsob = "WSOB",
+			k_wsob_description = "World Series of Balatro ruleset.\n\nNear-vanilla card pool with minimal balance changes:\n- Hanging Chad, Bloodstone, and Glass reworked\n- Justice banned\n- No Multiplayer-original content\n\n(See bans and reworks tabs for details)",
 			k_standard_ranked = "Standard Ranked",
 			k_standard_ranked_description = "The official competitive ruleset.\n\nStandard ruleset with locked settings:\n- Attrition gamemode\n- The Order enabled\n- Requires recommended Steamodded version",
 			k_legacy_ranked = "Legacy Ranked",
@@ -1401,7 +1420,7 @@ return {
 			k_timer_sfx = "Timer Sound Effects",
 			ml_mp_kofi_message = {
 				"This mod and game server is",
-				"developed and maintained by ",
+				"developed and maintained by",
 				"one person, if",
 				"you like it consider",
 			},

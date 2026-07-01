@@ -1,33 +1,23 @@
--- Economy mutator layers (the "big bag" — green knobs).
---
--- Pure data. Each declares `game_modifiers` (copied onto G.GAME.modifiers at run
--- start by the generic applier) and/or `banned_*` arrays (merged via
--- current_ruleset). No runtime code lives here — these are all engine-native
--- modifier fields Balatro already reads, so they're deterministic across both
--- clients (set once at run start).
---
--- Contract with the applier: a layer's `game_modifiers = { <id> = value }` is
--- written to G.GAME.modifiers[<id>]; `starting_params = { <id> = value }` to
--- G.GAME.starting_params[<id>] (with round_resets propagation handled there).
+-- TODO barely anything here is properly wired up now, just stubbed
 
 -- Shop prices climb +$1 per purchase, compounding across the run.
 -- (card.lua: `if G.GAME.modifiers.inflation then G.GAME.inflation = ... + 1`)
+
 MP.Layer("inflation", {
 	game_modifiers = { inflation = true },
 })
 
--- No interest paid on held money. Pure economic pressure.
+-- No interest paid on held money
 MP.Layer("no_interest", {
 	game_modifiers = { no_interest = true },
 })
 
--- Every discard costs $1. (state_events.lua: ease_dollars(-discard_cost) per discard)
+-- Every discard costs $1
 MP.Layer("discard_tax", {
 	game_modifiers = { discard_cost = 1 },
 })
 
--- Leftover discards pay out at end of round, like unused hands do. A positive
--- knob to pair against the punishing ones. (default money_per_discard is 0)
+-- Leftover discards pay out at end of round
 MP.Layer("frugal", {
 	game_modifiers = { money_per_discard = 1 },
 })
