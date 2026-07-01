@@ -6,6 +6,7 @@ function MP.UI.cam_timer_opponent()
     if MP.GAME.timer <= 0 then return false end
     if MP.GAME.nemesis_timer_started then return false end
 	if MP.is_pvp_boss() and MP.is_layer_active("pvp_timer") then
+        if MP.GAME.end_pvp then return false end
 		if G.STATE == G.STATES.ROUND_EVAL or G.STATE == G.STATES.NEW_ROUND then return false end
         if MP.LOBBY.config.hide_score_until_played and not MP.GAME.enemy.info_received then return false end
 		if MP.INSANE_INT.greater_than(MP.GAME.score, MP.GAME.enemy.real_score) then return true end
