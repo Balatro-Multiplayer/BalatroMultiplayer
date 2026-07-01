@@ -47,7 +47,7 @@ function MP.UI.create_UIBox_mp_game_end(has_won)
 		0,
 		5 * G.CARD_W,
 		G.CARD_H,
-		{ card_limit = G.GAME.starting_params.joker_slots, type = "joker", highlight_limit = 1 }
+		{ card_limit = G.GAME.starting_params.joker_slots, type = "joker", highlight_limit = 1, fixed_limit = true }
 	)
 	if not MP.end_game_jokers_received then
 		MP.ACTIONS.get_end_game_jokers()
@@ -305,7 +305,7 @@ function MP.UI.create_UIBox_mp_game_end(has_won)
 													{
 														n = G.UIT.T,
 														config = {
-															text = localize("ml_mp_kofi_message")[3] .. " " .. localize("ml_mp_kofi_message")[4],
+															text = localize("ml_mp_kofi_message")[3] .. (localize("ml_mp_kofi_message")[4] and (" " .. localize("ml_mp_kofi_message")[4]) or ""),
 															scale = 0.35,
 															colour = G.C.UI.TEXT_LIGHT,
 															col = true,

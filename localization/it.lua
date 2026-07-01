@@ -647,7 +647,6 @@ return {
 			},
 			ml_mp_kofi_message = {
 				" ",
-				" ",
 				"Questa mod e server è sviluppata e mantenuta",
 				"da una persona, se ti è piaciuta considera",
 			},

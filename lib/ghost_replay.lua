@@ -60,6 +60,7 @@ function MP.GHOST.init_playback(ante)
 		MP.GAME.enemy.score = score
 		MP.GAME.enemy.score_text = MP.INSANE_INT.to_string(score)
 		MP.GAME.enemy.hands = hands[1].hands_left or 0
+		MP.GAME.enemy.info_received = true
 		return true
 	end
 	return false
@@ -97,6 +98,7 @@ function MP.GHOST.advance_hand()
 	}))
 
 	MP.GAME.enemy.hands = entry.hands_left or 0
+	MP.GAME.enemy.info_received = true
 	if MP.UI.juice_up_pvp_hud then MP.UI.juice_up_pvp_hud() end
 	return true
 end

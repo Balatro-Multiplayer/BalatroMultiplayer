@@ -10,7 +10,7 @@ SMODS.Challenge({
 	restrictions = {
 		banned_cards = {
 			{ id = "v_planet_merchant", ids = { "v_planet_tycoon" } },
-		}
+		},
 	},
 	apply = function(self)
 		G.GAME.planet_rate = 360
