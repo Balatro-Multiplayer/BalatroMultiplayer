@@ -957,6 +957,8 @@ end
 -- Dual-call: dispatched from network (fromNemesis defaults to true) or self-triggered
 -- by MP.ACTIONS.start_ante_timer (passes fromNemesis = false explicitly).
 local function action_start_ante_timer(p)
+	if p.isPvP and not (MP.is_pvp_boss() and MP.is_layer_active("pvp_timer")) then return end
+
 	local time = p.time
 	local from_nemesis = p.fromNemesis
 	if from_nemesis == nil then from_nemesis = true end
@@ -1290,9 +1292,11 @@ function MP.ACTIONS.request_nemesis_stats()
 end
 
 function MP.ACTIONS.start_ante_timer()
+	local is_pvp = MP.is_pvp_boss() and MP.is_layer_active("pvp_timer")
 	Client.send({
 		action = "startAnteTimer",
 		time = MP.GAME.timer,
+		isPvP = is_pvp or nil,
 	})
 	action_start_ante_timer({ time = MP.GAME.timer, fromNemesis = false })
 end
