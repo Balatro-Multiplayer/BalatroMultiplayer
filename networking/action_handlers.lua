@@ -94,6 +94,8 @@ local function action_rejoinedLobby(p)
 	reconnectToken = token
 	lastLobbyCode = code
 	MP.self_reconnect_countdown = nil
+	MP.GAME.timer_started = false
+	MP.GAME.nemesis_timer_started = false
 	MP.ACTIONS.sync_client()
 	MP.ACTIONS.lobby_info()
 	MP.UI.update_connection_status()
