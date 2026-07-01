@@ -1213,6 +1213,7 @@ return {
 			b_opts_player_diff_deck = "Players have different decks",
 			b_opts_random_loadout = "Randomize deck & stake",
 			b_opts_normal_bosses = "Enable Boss Blind effects",
+			b_opts_hide_score = "Hide opponent score until you play",
 			b_opts_timer = "Enable Timer",
 			b_opts_disable_preview = "Disable Score Preview",
 			b_opts_the_order = "Enable The Order",

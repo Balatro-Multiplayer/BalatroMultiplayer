@@ -43,7 +43,7 @@ function MP.UI.update_blind_HUD(blind, reset, silent)
         -- Setup enemy hands
         G.HUD_blind:get_UIE_by_ID("dollars_to_be_earned").parent.parent.states.visible = false
         G.HUD_blind:get_UIE_by_ID("dollars_to_be_earned").config.object.config.string =
-            { { ref_table = MP.GAME.enemy, ref_value = "hands" } }
+            { { ref_table = MP.GAME.enemy, ref_value = "hands_text" } }
         G.HUD_blind:get_UIE_by_ID("dollars_to_be_earned").config.object:update_text()
 
         G.HUD_blind.alignment.offset.y = 0
@@ -198,6 +198,32 @@ function Blind:disable()
 end
 
 G.FUNCS.multiplayer_blind_chip_UI_scale = function(e)
+	-- Mask the opponent's hands as "?" until the first enemyInfo arrives this
+	-- blind (same gating as the hidden score), otherwise mirror the real count.
+	if
+		MP.LOBBY.config.hide_score_until_played
+		and MP.is_pvp_boss()
+		and not MP.GAME.enemy.info_received
+	then
+		MP.GAME.enemy.hands_text = "?"
+	else
+		MP.GAME.enemy.hands_text = tostring(MP.GAME.enemy.hands)
+	end
+
+	-- Hide the opponent's score until we have played a hand this PvP blind, so
+	-- a player can't watch the enemy score before committing their own hand.
+	-- (The server also withholds the score, this is the matching display.)
+	-- Gated by the hide_score_until_played lobby option (on by default only on
+	-- standard-layer rulesets; host-toggleable in non-forcing lobbies).
+	if
+		MP.LOBBY.config.hide_score_until_played
+		and MP.is_pvp_boss()
+		and G.GAME.current_round
+		and G.GAME.current_round.hands_played == 0
+	then
+		MP.GAME.enemy.score_text = "???"
+		return
+	end
 	local new_score_text = MP.INSANE_INT.to_string(MP.GAME.enemy.score)
 	if G.GAME.blind and MP.GAME.enemy.score and MP.GAME.enemy.score_text ~= new_score_text then
 		if not MP.INSANE_INT.greater_than(MP.GAME.enemy.score, MP.INSANE_INT.create(0, G.E_SWITCH_POINT, 0)) then
