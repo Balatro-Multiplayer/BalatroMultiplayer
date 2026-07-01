@@ -110,6 +110,10 @@ function G.FUNCS.start_lobby(e)
 
 	MP.LOBBY.config.multiplayer_jokers = MP.current_ruleset().multiplayer_content
 
+	-- Hide opponent score until you play: default on for standard-layer rulesets
+	-- only. Set before force_lobby_options() so a forcing ruleset can override it.
+	MP.LOBBY.config.hide_score_until_played = MP.current_ruleset().standard == true
+
 	MP.LOBBY.config.forced_config = MP.current_ruleset():force_lobby_options()
 
 	MP.LOBBY.config.modifier_layers = MP.modifiers_serialize()
