@@ -286,7 +286,7 @@ return {
 			},
 			ml_mp_kofi_message = {
 				"Ce mod et serveur de jeu est",
-				"développé et maintenu par ",
+				"développé et maintenu par",
 				"une seule personne, si",
 				"vous l'aimez, n'hésitez pas à",
 			},
