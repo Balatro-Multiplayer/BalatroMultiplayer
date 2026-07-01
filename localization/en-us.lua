@@ -803,7 +803,8 @@ return {
 				name = "Phantom",
 				text = {
 					"{C:attention}Eternal{} and {C:dark_edition}Negative{}",
-					"Created and destroyed by your {X:purple,C:white}Nemesis{}",
+					"Created when your {X:purple,C:white}Nemesis{} has this Joker",
+					"Only affects your {X:purple,C:white}Nemesis{} and is destroyed by them.",
 				},
 			},
 		},
