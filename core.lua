@@ -219,6 +219,10 @@ function MP.reset_game_states()
 			score = MP.INSANE_INT.empty(),
 			score_text = "0",
 			hands = 4,
+			hands_text = "4",
+			-- Whether an enemyInfo message has arrived this blind. Used to mask
+			-- the opponent's hands as "?" until we hear from them.
+			info_received = false,
 			location = localize("loc_selecting"),
 			skips = 0,
 			lives = MP.LOBBY.config.starting_lives,
