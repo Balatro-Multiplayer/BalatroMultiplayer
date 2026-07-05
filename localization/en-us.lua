@@ -1446,6 +1446,8 @@ return {
 			loc_selecting = "Selecting",
 			loc_shop = "Shopping before",
 			loc_playing = "Playing",
+            b_get_log_file = "Get Logs",
+            b_open_log_parser = "Log Parser",
 		},
 		v_dictionary = {
 			a_mp_art = {

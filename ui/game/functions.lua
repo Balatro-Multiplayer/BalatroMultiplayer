@@ -416,6 +416,47 @@ function MP.UI.show_asteroid_hand_level_up()
 	SMODS.upgrade_poker_hands({ hands = hand_type, level_up = -1 })
 end
 
+function G.FUNCS.mp_open_log_parser(e)
+    love.system.openURL("https://balatromp.com/log-parser")
+end
+
+function G.FUNCS.mp_get_lovely_log_file(e)
+    local file_path = require("lovely").log_path
+    local os_name = love.system.getOS()
+
+    local function shellQuote(s)
+        return "'" .. tostring(s):gsub("'", "'\\''") .. "'"
+    end
+
+    local function fileUri(path)
+        path = path:gsub("\\", "/")
+        return "file://" .. path:gsub("([^A-Za-z0-9%-%._~/%:/])", function(c)
+            return string.format("%%%02X", c:byte())
+        end)
+    end
+
+    local ok
+    if os_name == "Windows" then
+        ok = os.execute('explorer.exe /select,"' .. file_path:gsub("/", "\\") .. '"')
+    elseif os_name == "OS X" then
+        os.execute("open -R " .. shellQuote(file_path))
+    elseif os_name == "Linux" then
+        local cmd =
+            "dbus-send --session " ..
+            "--dest=org.freedesktop.FileManager1 " ..
+            "--type=method_call " ..
+            "/org/freedesktop/FileManager1 " ..
+            "org.freedesktop.FileManager1.ShowItems " ..
+            "array:string:" .. shellQuote(fileUri(file_path)) .. " string:''"
+
+        ok = os.execute(cmd)
+    end
+    if not ok then
+        local parent_dir = file_path:match("^(.*)[/\\][^/\\]*$") or "."
+        love.system.openURL(fileUri(parent_dir))
+    end
+end
+
 --[[
 function MP.UI.create_UIBox_Misprint_Display()
 	return {
