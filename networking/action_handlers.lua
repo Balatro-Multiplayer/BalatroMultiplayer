@@ -312,6 +312,11 @@ end
 local function begin_pvp_blind()
 	if MP.GAME.next_blind_context then
 		G.FUNCS.select_blind(MP.GAME.next_blind_context)
+        MP.GAME.timer_started = false
+        MP.GAME.nemesis_timer_started = false
+        MP.GAME.nemesis_timer_was_started = false
+        MP.GAME.timer_consumed = false
+        MP.GAME.timer = MP.UTILS.pvp_timer_base()
 	else
 		sendErrorMessage("No next blind context", "MULTIPLAYER")
 	end
@@ -328,10 +333,6 @@ local function action_start_blind(p)
 	MP.GAME.enemy.info_received = false
 	MP.GAME.ready_blind = false
 	MP.GAME.pvp_reached = false
-	MP.GAME.timer_started = false
-	MP.GAME.nemesis_timer_started = false
-	MP.GAME.timer_consumed = false
-	MP.GAME.timer = MP.UTILS.pvp_timer_base()
 	MP.GAME.pvp_reached_first = (MP.LOBBY.is_host and "host" or "guest") == first_player
 	MP.UI.start_pvp_countdown(begin_pvp_blind)
 end
@@ -462,6 +463,7 @@ local function action_end_pvp(p)
 	MP.GAME.timer_consumed = false
 	MP.GAME.timer_started = false
 	MP.GAME.nemesis_timer_started = false
+    MP.GAME.nemesis_timer_was_started = false
 	MP.GAME.ready_blind = false
 	MP.GAME.pvp_reached = false
     MP.GAME.pvp_reached_first = false
@@ -999,6 +1001,7 @@ local function action_start_ante_timer(p)
 	end
 	if from_nemesis then
 		MP.GAME.nemesis_timer_started = true
+        MP.GAME.nemesis_timer_was_started = true
 	else
 		MP.GAME.timer_started = true
 	end

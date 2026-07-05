@@ -89,6 +89,7 @@ G.FUNCS.skip_blind = function(e)
 			and not MP.GAME.timer_started
 			and not MP.GAME.nemesis_timer_started
             and not MP.GAME.timer_consumed
+            and not MP.GAME.nemesis_timer_was_started
             and not MP.is_any_layer_active({ "no_animation_timer", "pressure_timer" })
 			and (MP.LOBBY.config.timer_increment_seconds or 0) > 0
         then

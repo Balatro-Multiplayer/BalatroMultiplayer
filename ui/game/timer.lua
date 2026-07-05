@@ -5,6 +5,7 @@ function MP.UI.cam_timer_opponent()
     if MP.GAME.pvp_countdown_in_progress then return false end
     if MP.GAME.timer <= 0 then return false end
     if MP.GAME.nemesis_timer_started then return false end
+    if MP.GAME.enemy.location_type == "loc_ready" then return false end
 	if MP.is_pvp_boss() and MP.is_layer_active("pvp_timer") then
         if MP.GAME.end_pvp then return false end
 		if G.STATE == G.STATES.ROUND_EVAL or G.STATE == G.STATES.NEW_ROUND then return false end
@@ -21,9 +22,7 @@ function G.FUNCS.mp_timer_button(e)
 	-- but the button still needs to fire — pressing it broadcasts startAnteTimer,
 	-- which is what flips the opponent's nemesis_timer_started and triggers 2x.
 	if MP.UI.cam_timer_opponent() then
-		if MP.GAME.timer <= 0 then
-			return
-		elseif not MP.GAME.timer_started then
+		if not MP.GAME.timer_started then
 			MP.ACTIONS.start_ante_timer()
 		else
 			MP.ACTIONS.pause_ante_timer()
@@ -308,6 +307,7 @@ function Game:update(dt)
 	if not MP.LOBBY.code then return end
 	if not MP.LOBBY.config.timer then return end
 	if MP.GAME.timer_consumed then return end
+    if MP.GAME.pvp_countdown_in_progress then return end
 	if not MP.GAME.timer or MP.GAME.timer <= 0 then return end
 	if MP.is_layer_active("speedlatro_timer") then return end
 
