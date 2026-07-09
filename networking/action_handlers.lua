@@ -338,8 +338,7 @@ local function action_start_blind(p)
 end
 
 local function action_enemy_info(p)
-	local score = MP.INSANE_INT.from_string(p.score)
-
+    local score
 	local hands_left = tonumber(p.handsLeft)
 	local skips = tonumber(p.skips)
 	local lives = tonumber(p.lives)
@@ -362,64 +361,68 @@ local function action_enemy_info(p)
 		end
 	end
 
-	if score == nil or hands_left == nil then
-		sendDebugMessage("Invalid score or hands_left", "MULTIPLAYER")
-		return
-	end
+    if not p.noScore then
+        score = MP.INSANE_INT.from_string(p.score)
+    end
 
-	if MP.INSANE_INT.greater_than(score, MP.GAME.enemy.highest_score) then MP.GAME.enemy.highest_score = score end
+    if score then
+        if MP.INSANE_INT.greater_than(score, MP.GAME.enemy.highest_score) then MP.GAME.enemy.highest_score = score end
 
-	-- PvP timer: stop timer according to score
-	if MP.is_pvp_boss() and MP.is_layer_active("pvp_timer") then
-		if MP.INSANE_INT.greater_than(MP.GAME.score, score) then
-			MP.GAME.nemesis_timer_started = false
-        elseif MP.INSANE_INT.equal(MP.GAME.score, score) and MP.GAME.pvp_reached_first then
-            MP.GAME.nemesis_timer_started = false
-        else
-			MP.GAME.timer_started = false
-		end
-	end
+        -- PvP timer: stop timer according to score
+        if MP.is_pvp_boss() and MP.is_layer_active("pvp_timer") then
+            if MP.INSANE_INT.greater_than(MP.GAME.score, score) then
+                MP.GAME.nemesis_timer_started = false
+            elseif MP.INSANE_INT.equal(MP.GAME.score, score) and MP.GAME.pvp_reached_first then
+                MP.GAME.nemesis_timer_started = false
+            else
+                MP.GAME.timer_started = false
+            end
+        end
 
-	G.E_MANAGER:add_event(Event({
-		blockable = false,
-		blocking = false,
-		trigger = "ease",
-		delay = 3,
-		ref_table = MP.GAME.enemy.score,
-		ref_value = "e_count",
-		ease_to = score.e_count,
-		func = function(t)
-			return math.floor(t)
-		end,
-	}))
+        G.E_MANAGER:add_event(Event({
+            blockable = false,
+            blocking = false,
+            trigger = "ease",
+            delay = 3,
+            ref_table = MP.GAME.enemy.score,
+            ref_value = "e_count",
+            ease_to = score.e_count,
+            func = function(t)
+                return math.floor(t)
+            end,
+        }))
 
-	G.E_MANAGER:add_event(Event({
-		blockable = false,
-		blocking = false,
-		trigger = "ease",
-		delay = 3,
-		ref_table = MP.GAME.enemy.score,
-		ref_value = "coeffiocient", -- why is this misspelled
-		ease_to = score.coeffiocient,
-		func = function(t)
-			local mult = 1
-			if score.exponent > 0 then mult = 100 end
-			return math.floor(t * mult) / mult
-		end,
-	}))
+        G.E_MANAGER:add_event(Event({
+            blockable = false,
+            blocking = false,
+            trigger = "ease",
+            delay = 3,
+            ref_table = MP.GAME.enemy.score,
+            ref_value = "coeffiocient", -- why is this misspelled
+            ease_to = score.coeffiocient,
+            func = function(t)
+                local mult = 1
+                if score.exponent > 0 then mult = 100 end
+                return math.floor(t * mult) / mult
+            end,
+        }))
 
-	G.E_MANAGER:add_event(Event({
-		blockable = false,
-		blocking = false,
-		trigger = "ease",
-		delay = 3,
-		ref_table = MP.GAME.enemy.score,
-		ref_value = "exponent",
-		ease_to = score.exponent,
-		func = function(t)
-			return math.floor(t)
-		end,
-	}))
+        G.E_MANAGER:add_event(Event({
+            blockable = false,
+            blocking = false,
+            trigger = "ease",
+            delay = 3,
+            ref_table = MP.GAME.enemy.score,
+            ref_value = "exponent",
+            ease_to = score.exponent,
+            func = function(t)
+                return math.floor(t)
+            end,
+        }))
+
+        MP.GAME.enemy.real_score = score
+        MP.GAME.enemy.info_received = true
+    end
 
 	if MP.GAME.enemy.lives > lives then
 		play_sound("holo1", 0.865, 0.9)
@@ -430,12 +433,9 @@ local function action_enemy_info(p)
 		play_sound("gong", 0.765, 0.4)
 	end
 
-    MP.GAME.enemy.real_score = score
-	MP.GAME.enemy.hands = hands_left
-	MP.GAME.enemy.skips = skips
-	MP.GAME.enemy.lives = lives
-	-- We've now heard from the opponent this blind: unmask their hands count.
-	MP.GAME.enemy.info_received = true
+	MP.GAME.enemy.hands = hands_left or 0
+	MP.GAME.enemy.skips = skips or 0
+	MP.GAME.enemy.lives = lives or 0
 	if MP.UI.juice_up_pvp_hud then MP.UI.juice_up_pvp_hud() end
 end
 
