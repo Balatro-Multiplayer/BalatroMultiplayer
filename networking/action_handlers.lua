@@ -334,6 +334,7 @@ local function action_start_blind(p)
 	MP.GAME.ready_blind = false
 	MP.GAME.pvp_reached = false
     MP.GAME.pvp_timer_order = nil
+    MP.GAME.pvp_timer_activated = false
 	MP.GAME.pvp_reached_first = (MP.LOBBY.is_host and "host" or "guest") == first_player
 	MP.UI.start_pvp_countdown(begin_pvp_blind)
 end
@@ -414,18 +415,21 @@ local function action_enemy_info(p)
         MP.GAME.enemy.info_received = true
     end
 
-    if p.pvpTimerOrder ~= nil then
+    -- PvP timer: server determines who and when can activate pvp timer
+    if p.pvpTimerOrder ~= nil and MP.is_pvp_boss() and MP.is_layer_active("pvp_timer") then
         MP.GAME.pvp_timer_order = p.pvpTimerOrder
-        -- PvP timer: server determines who and when can activate pvp timer
-        if MP.is_pvp_boss() and MP.is_layer_active("pvp_timer") then
-            if (MP.LOBBY.is_host and "host" or "guest") == MP.GAME.pvp_timer_order then
-                MP.GAME.nemesis_timer_started = false
-                if not MP.GAME.timer_started and MP.UI.can_timer_opponent() then
-                    -- TODO: auto-timer activation
-                end
-            else
-                MP.GAME.timer_started = false
+        if (MP.LOBBY.is_host and "host" or "guest") == MP.GAME.pvp_timer_order then
+            MP.GAME.nemesis_timer_started = false
+            if
+                not MP.GAME.timer_started
+                and MP.UI.can_timer_opponent()
+                and MP.GAME.pvp_timer_activated
+                and SMODS.Mods["Multiplayer"].config.automatic_pvp_timer
+            then
+                MP.ACTIONS.start_ante_timer()
             end
+        else
+            MP.GAME.timer_started = false
         end
     end
 
@@ -472,7 +476,25 @@ local function action_end_pvp(p)
 	MP.GAME.ready_blind = false
 	MP.GAME.pvp_reached = false
     MP.GAME.pvp_reached_first = false
+    MP.GAME.pvp_timer_activated = false
 	MP.GAME.score = nil
+
+    -- Sanity check
+    G.E_MANAGER:add_event(Event({
+        func = function()
+            G.E_MANAGER:add_event(Event({
+                func = function()
+                    MP.GAME.timer = MP.UTILS.timer_base()
+                    MP.GAME.timer_started = false
+                    MP.GAME.nemesis_timer_started = false
+                    MP.GAME.nemesis_timer_was_started = false
+                    MP.GAME.pvp_timer_activated = false
+                    return true
+                end,
+            }))
+            return true
+        end,
+    }))
 end
 
 local function action_player_info(p)

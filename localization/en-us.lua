@@ -1417,6 +1417,11 @@ return {
 			k_ghost = "Ghost",
 			k_hide_mp_content = "Hide Multiplayer content*",
 			k_applies_singleplayer_vanilla_rulesets = "*Applies in singleplayer and vanilla rulesets",
+            k_automatic_pvp_timer = "Automatic PvP timer",
+            k_automatic_pvp_timer_description = {
+                "Reactivate PvP timer when became available",
+                "(Must be activated manually first)"
+            },
 			k_timer_sfx = "Timer Sound Effects",
 			ml_mp_kofi_message = {
 				"This mod and game server is",

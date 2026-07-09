@@ -9,6 +9,24 @@ function MP.UI.create_config_tab()
 			colour = G.C.BLACK,
 		},
 		nodes = {
+            {
+				n = G.UIT.R,
+				config = {
+					padding = 0,
+					align = "cm",
+                    on_demand_tooltip = {
+						text = localize("k_automatic_pvp_timer_description"),
+					},
+				},
+				nodes = {
+					create_toggle({
+						id = "multiplayer_automatic_pvp_timer",
+						label = localize("k_automatic_pvp_timer"),
+						ref_table = SMODS.Mods["Multiplayer"].config,
+						ref_value = "automatic_pvp_timer",
+					}),
+				},
+			},
 			{
 				n = G.UIT.R,
 				config = {

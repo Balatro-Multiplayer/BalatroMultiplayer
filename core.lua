@@ -267,6 +267,7 @@ function MP.reset_game_states()
 			-- Add more stats here in the future
 		},
         pvp_timer_order = nil,
+        pvp_timer_activated = false,
 	}
 end
 MP.reset_game_states()
