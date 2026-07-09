@@ -6,6 +6,7 @@ function MP.UI.can_timer_opponent()
     if MP.GAME.timer <= 0 then return false end
     if MP.GAME.nemesis_timer_started then return false end
     if MP.GAME.enemy.location_type == "loc_ready" then return false end
+	if G.STATE == G.STATES.GAME_OVER or MP.GAME.won then return false end
 	if MP.is_pvp_boss() and MP.is_layer_active("pvp_timer") then
         if MP.GAME.end_pvp then return false end
 		if G.STATE == G.STATES.ROUND_EVAL or G.STATE == G.STATES.NEW_ROUND then return false end
@@ -307,7 +308,7 @@ function Game:update(dt)
 		math.min(animation_budget_capacity, MP.TIMER_ANIMATION_BUDGET + timer_dt * animation_budget_restore_rate)
 
 	-- Bail fast: not an MP PvP-timer context
-	if G.STATE == G.STATES.GAME_OVER then return end
+	if G.STATE == G.STATES.GAME_OVER or MP.GAME.won then return end
 	if not MP.LOBBY.code then return end
 	if not MP.LOBBY.config.timer then return end
 	if MP.GAME.timer_consumed then return end
