@@ -333,6 +333,7 @@ local function action_start_blind(p)
 	MP.GAME.enemy.info_received = false
 	MP.GAME.ready_blind = false
 	MP.GAME.pvp_reached = false
+    MP.GAME.pvp_timer_order = nil
 	MP.GAME.pvp_reached_first = (MP.LOBBY.is_host and "host" or "guest") == first_player
 	MP.UI.start_pvp_countdown(begin_pvp_blind)
 end
@@ -367,17 +368,6 @@ local function action_enemy_info(p)
 
     if score then
         if MP.INSANE_INT.greater_than(score, MP.GAME.enemy.highest_score) then MP.GAME.enemy.highest_score = score end
-
-        -- PvP timer: stop timer according to score
-        if MP.is_pvp_boss() and MP.is_layer_active("pvp_timer") then
-            if MP.INSANE_INT.greater_than(MP.GAME.score, score) then
-                MP.GAME.nemesis_timer_started = false
-            elseif MP.INSANE_INT.equal(MP.GAME.score, score) and MP.GAME.pvp_reached_first then
-                MP.GAME.nemesis_timer_started = false
-            else
-                MP.GAME.timer_started = false
-            end
-        end
 
         G.E_MANAGER:add_event(Event({
             blockable = false,
@@ -422,6 +412,21 @@ local function action_enemy_info(p)
 
         MP.GAME.enemy.real_score = score
         MP.GAME.enemy.info_received = true
+    end
+
+    if p.pvpTimerOrder ~= nil then
+        MP.GAME.pvp_timer_order = p.pvpTimerOrder
+        -- PvP timer: server determines who and when can activate pvp timer
+        if MP.is_pvp_boss() and MP.is_layer_active("pvp_timer") then
+            if (MP.LOBBY.is_host and "host" or "guest") == MP.GAME.pvp_timer_order then
+                MP.GAME.nemesis_timer_started = false
+                if not MP.GAME.timer_started and MP.UI.can_timer_opponent() then
+                    -- TODO: auto-timer activation
+                end
+            else
+                MP.GAME.timer_started = false
+            end
+        end
     end
 
 	if MP.GAME.enemy.lives > lives then
@@ -1159,17 +1164,6 @@ function MP.ACTIONS.play_hand(score, hands_left)
 	MP.GAME.score = insane_int_score
 	if MP.INSANE_INT.greater_than(insane_int_score, MP.GAME.highest_score) then
 		MP.GAME.highest_score = insane_int_score
-	end
-
-	-- Stop PvP timers according to score
-	if MP.is_pvp_boss() and MP.is_layer_active("pvp_timer") then
-		if MP.INSANE_INT.greater_than(insane_int_score, MP.GAME.enemy.score) then
-			MP.GAME.nemesis_timer_started = false
-        elseif MP.INSANE_INT.equal(insane_int_score, MP.GAME.enemy.score) and MP.GAME.pvp_reached_first then
-            MP.GAME.nemesis_timer_started = false
-		else
-			MP.GAME.timer_started = false
-		end
 	end
 
 	Client.send({

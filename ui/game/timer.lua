@@ -1,6 +1,6 @@
 -- ease_round override moved to game/round.lua
 
-function MP.UI.cam_timer_opponent()
+function MP.UI.can_timer_opponent()
 	if not MP.LOBBY.config.timer then return false end
     if MP.GAME.pvp_countdown_in_progress then return false end
     if MP.GAME.timer <= 0 then return false end
@@ -9,9 +9,7 @@ function MP.UI.cam_timer_opponent()
 	if MP.is_pvp_boss() and MP.is_layer_active("pvp_timer") then
         if MP.GAME.end_pvp then return false end
 		if G.STATE == G.STATES.ROUND_EVAL or G.STATE == G.STATES.NEW_ROUND then return false end
-        if MP.LOBBY.config.hide_score_until_played and not MP.GAME.enemy.info_received then return false end
-		if MP.INSANE_INT.greater_than(MP.GAME.score, MP.GAME.enemy.real_score) then return true end
-        if MP.INSANE_INT.equal(MP.GAME.score, MP.GAME.enemy.real_score) then return MP.GAME.pvp_reached_first end
+        if (MP.LOBBY.is_host and "host" or "guest") == MP.GAME.pvp_timer_order then return true end
 		return false
 	end
 	return MP.GAME.ready_blind
@@ -21,7 +19,7 @@ function G.FUNCS.mp_timer_button(e)
 	-- Under pressure_timer the local timer auto-ticks regardless of timer_started,
 	-- but the button still needs to fire — pressing it broadcasts startAnteTimer,
 	-- which is what flips the opponent's nemesis_timer_started and triggers 2x.
-	if MP.UI.cam_timer_opponent() then
+	if MP.UI.can_timer_opponent() then
 		if not MP.GAME.timer_started then
 			MP.ACTIONS.start_ante_timer()
 		else
@@ -256,7 +254,7 @@ function G.FUNCS.set_timer_box(e)
 			}
 			return
 		end
-		if not MP.GAME.timer_started and MP.UI.cam_timer_opponent() then
+		if not MP.GAME.timer_started and MP.UI.can_timer_opponent() then
 			e.config.colour = G.C.IMPORTANT
 			e.children[1].config.object.colours = { G.C.UI.TEXT_LIGHT }
 			return
@@ -326,6 +324,7 @@ function Game:update(dt)
 	if is_pvp_timer then
         -- PvP timer: tick when opponent timering, stop when animations, state checks, pvp blind only
 		if not MP.GAME.nemesis_timer_started then return end
+        if (MP.LOBBY.is_host and "host" or "guest") == MP.GAME.pvp_timer_order then return end
         if G.GAME.current_round.hands_left <= 0 then return end
 		if G.STATE == G.STATES.NEW_ROUND or G.STATE == G.STATES.ROUND_EVAL then return end
 		should_check_animations = true

@@ -266,6 +266,7 @@ function MP.reset_game_states()
 			reroll_cost_total = 0,
 			-- Add more stats here in the future
 		},
+        pvp_timer_order = nil,
 	}
 end
 MP.reset_game_states()
