@@ -413,7 +413,9 @@ function MP.UI.show_asteroid_hand_level_up()
 			end
 		end
 	end
-	SMODS.upgrade_poker_hands({ hands = hand_type, level_up = -1 })
+    if to_big(max_level) >= to_big(1) then
+        SMODS.upgrade_poker_hands({ hands = hand_type, level_up = -1 })
+    end
 end
 
 function G.FUNCS.mp_open_log_parser(e)
