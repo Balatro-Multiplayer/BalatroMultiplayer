@@ -2,7 +2,7 @@
 
 function MP.should_hide_mp_content()
 	if (not MP.LOBBY.code) or not MP.current_ruleset().multiplayer_content then -- check for vanilla context
-		if SMODS.Mods["Multiplayer"].config.hide_mp_content then return true end
+		if MP.config.hide_mp_content then return true end
 	end
 	return false
 end

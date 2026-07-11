@@ -11,8 +11,8 @@ function MP.UI.create_customization_tab()
 		{ shader = "dissolve", shadow_height = 0.05 },
 		{ shader = "dissolve" },
 	})
-	MP.PREVIEW.text = SMODS.Mods["Multiplayer"].config.preview.text or ""
-	MP.PREVIEW.button = SMODS.Mods["Multiplayer"].config.preview.button or ""
+	MP.PREVIEW.text = MP.config.preview.text or ""
+	MP.PREVIEW.button = MP.config.preview.button or ""
 	local ret = {
 		n = G.UIT.ROOT,
 		config = {

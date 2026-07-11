@@ -25,7 +25,7 @@ function MP.UI.create_config_tab()
 					create_toggle({
 						id = "fantoms_preview_integration_toggle",
 						label = localize("b_preview_integration"),
-						ref_table = SMODS.Mods["Multiplayer"].config.integrations,
+						ref_table = MP.config.integrations,
 						ref_value = "Preview",
 					}),
 				},
@@ -79,7 +79,7 @@ function MP.UI.create_config_tab()
 					create_toggle({
 						id = "singleplayer_hide_content_toggle",
 						label = localize("k_hide_mp_content"),
-						ref_table = SMODS.Mods["Multiplayer"].config,
+						ref_table = MP.config,
 						ref_value = "hide_mp_content",
 					}),
 				},
@@ -101,7 +101,7 @@ function MP.UI.create_config_tab()
 								scale = 0.8,
 								options = localize("ml_mp_timersfx_opt"),
 								opt_callback = "mp_change_timersfx",
-								current_option = SMODS.Mods["Multiplayer"].config.timersfx or 1,
+								current_option = MP.config.timersfx or 1,
 							}),
 						},
 					},

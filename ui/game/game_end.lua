@@ -1,3 +1,16 @@
+-- Leave to the main menu from the end screen (mirrors Speed's spdrn_leave_from_game).
+-- The match is already over, so no confirm; lobby:leave() fires the DISCONNECTED handler
+-- which tears down the MP-side lobby state.
+function G.FUNCS.mp_pvp_leave_from_game()
+	G.FUNCS.exit_overlay_menu()
+	G.SETTINGS.paused = false
+	local lobby = MPAPI.get_current_lobby()
+	if lobby then
+		lobby:leave()
+	end
+	G.FUNCS.go_to_menu()
+end
+
 function MP.UI.create_UIBox_round_scores_row_nemesis()
     local label = localize({ type = "name_text", set = "Blind", key = "bl_mp_nemesis" })
     local score_tab = {}
@@ -41,6 +54,149 @@ function MP.UI.create_UIBox_round_scores_row_nemesis()
     }}
 end
 
+-- The mod-specific body of the PvP end screen, rendered inside the shared
+-- MPAPI.end_screen shell: opponent jokers + toggle/view-deck buttons, the stat block +
+-- Ko-fi, and the nemesis row + seed + lobby buttons.
+function MP.UI.end_game_body(has_won)
+	return {
+		n = G.UIT.R,
+		config = { align = "cm", padding = 0.15 },
+		nodes = {
+			{
+				n = G.UIT.C,
+				config = { align = "cm" },
+				nodes = {
+					{
+						n = G.UIT.R,
+						config = { align = "cm", padding = 0.08 },
+						nodes = {
+							{ n = G.UIT.T, config = { ref_table = MP, ref_value = "end_game_jokers_text", scale = 0.8, maxw = 5, shadow = true } },
+						},
+					},
+					{
+						n = G.UIT.R,
+						config = { align = "cm", padding = 0.08 },
+						nodes = {
+							{ n = G.UIT.O, config = { object = MP.end_game_jokers } },
+						},
+					},
+					{
+						n = G.UIT.R,
+						config = { align = "cm", padding = 0.08 },
+						nodes = {
+							{ n = G.UIT.C, config = { maxw = has_won and 0.8 or 1, minw = has_won and 0.8 or 1, minh = 0.7, colour = G.C.CLEAR, no_fill = false } },
+							{
+								n = G.UIT.C,
+								config = { button = "toggle_players_jokers", align = "cm", padding = 0.12, colour = G.C.BLUE, emboss = 0.05, minh = 0.7, minw = 2, maxw = 2, r = 0.1, shadow = true, hover = true },
+								nodes = {
+									{ n = G.UIT.T, config = { text = localize("b_toggle_jokers"), colour = G.C.UI.TEXT_LIGHT, scale = 0.65, col = true } },
+								},
+							},
+							{
+								n = G.UIT.C,
+								config = { id = "view_nemesis_deck_button", button = "view_nemesis_deck", align = "cm", padding = 0.12, colour = G.C.BLUE, emboss = 0.05, minh = 0.7, minw = 2, maxw = 2, r = 0.1, shadow = true, hover = true, focus_args = has_won and { nav = "wide" } or nil },
+								nodes = {
+									{ n = G.UIT.T, config = { text = localize("b_view_nemesis_deck"), colour = G.C.UI.TEXT_LIGHT, scale = 0.65, col = true } },
+								},
+							},
+							{ n = G.UIT.C, config = { maxw = has_won and 0.8 or 1, minw = has_won and 0.8 or 1, minh = 0.7, colour = G.C.CLEAR, no_fill = false } },
+						},
+					},
+					{
+						n = G.UIT.R,
+						config = { align = "cm" },
+						nodes = {
+							{
+								n = G.UIT.C,
+								config = { padding = 0.08 },
+								nodes = {
+									create_UIBox_round_scores_row("hand"),
+									create_UIBox_round_scores_row("poker_hand"),
+									{
+										n = G.UIT.R,
+										config = {},
+										nodes = {
+											{
+												n = G.UIT.C,
+												nodes = {
+													create_UIBox_round_scores_row('cards_purchased', G.C.MONEY),
+													{ n = G.UIT.R, config = { minh = 0.08 } },
+													create_UIBox_round_scores_row('times_rerolled', G.C.GREEN),
+												},
+											},
+											{ n = G.UIT.C, config = { minw = 0.08 } },
+											{
+												n = G.UIT.C,
+												nodes = {
+													create_UIBox_round_scores_row('furthest_ante', G.C.FILTER),
+													{ n = G.UIT.R, config = { minh = 0.08 } },
+													create_UIBox_round_scores_row('furthest_round', G.C.FILTER),
+												},
+											},
+										},
+									},
+									{ n = G.UIT.R, config = { minh = 0.01 } },
+									{
+										n = G.UIT.R,
+										config = { align = "cm", minw = 2 },
+										nodes = {
+											{ n = G.UIT.T, config = { text = localize("ml_mp_kofi_message")[1], scale = 0.35, colour = G.C.UI.TEXT_LIGHT, col = true } },
+										},
+									},
+									{
+										n = G.UIT.R,
+										config = { align = "cm", minw = 2 },
+										nodes = {
+											{ n = G.UIT.T, config = { text = localize("ml_mp_kofi_message")[2], scale = 0.35, colour = G.C.UI.TEXT_LIGHT, col = true } },
+										},
+									},
+									{
+										n = G.UIT.R,
+										config = { align = "cm", minw = 2 },
+										nodes = {
+											{ n = G.UIT.T, config = { text = localize("ml_mp_kofi_message")[3] .. (localize("ml_mp_kofi_message")[4] and (" " .. localize("ml_mp_kofi_message")[4]) or ""), scale = 0.35, colour = G.C.UI.TEXT_LIGHT, col = true } },
+										},
+									},
+									{ n = G.UIT.R, config = { minh = 0.08 } },
+									{
+										n = G.UIT.R,
+										config = { id = "ko-fi_button", align = "cm", padding = 0.1, r = 0.1, hover = true, colour = HEX("72A5F2"), button = "open_kofi", shadow = true },
+										nodes = {
+											{
+												n = G.UIT.R,
+												config = { align = "cm", padding = 0, no_fill = true, maxw = 3 },
+												nodes = {
+													{ n = G.UIT.T, config = { text = localize("b_mp_kofi_button"), scale = 0.35, colour = G.C.UI.TEXT_LIGHT } },
+												},
+											},
+										},
+									},
+								},
+							},
+							{
+								n = G.UIT.C,
+								config = { align = "tr", padding = 0.08 },
+								nodes = {
+									MP.UI.create_UIBox_round_scores_row_nemesis(),
+									create_UIBox_round_scores_row("seed", G.C.WHITE),
+									UIBox_button({ id = "copy_seed_button", button = "copy_seed", label = { localize("b_copy") }, colour = G.C.BLUE, scale = 0.3, minw = 2.5, maxw = 2.5, minh = 0.4 }),
+									{ n = G.UIT.R, config = { align = "cm", minh = 0.45, minw = 0.1 }, nodes = {} },
+									UIBox_button({ id = "from_game_won", button = "continue_in_singleplayer", label = { localize("b_continue_singleplayer") }, minw = 4, maxw = 4, minh = 0.8, focus_args = { nav = "wide", snap_to = true } }),
+									UIBox_button({ button = "mp_pvp_leave_from_game", label = { localize("b_leave_lobby") }, minw = 4, maxw = 4, minh = 0.8, focus_args = { nav = "wide" } }),
+								},
+							},
+						},
+					},
+				},
+			},
+		},
+	}
+end
+
+-- Builds the PvP win / game-over screen inside the shared MPAPI.end_screen shell. The
+-- async opponent-jokers / nemesis-deck fetches are kicked off here (the body renders
+-- them once they arrive). PvP hooks this via the create_UIBox_win/game_over overrides
+-- below rather than calling the overlay directly, so it keeps its own paused handling.
 function MP.UI.create_UIBox_mp_game_end(has_won)
 	MP.end_game_jokers = CardArea(
 		0,
@@ -68,379 +224,11 @@ function MP.UI.create_UIBox_mp_game_end(has_won)
 
 	G.SETTINGS.paused = false
 
-	local eased_bg_colour
-	if has_won then
-		eased_bg_colour = copy_table(G.C.GREEN)
-		eased_bg_colour[4] = 0
-		ease_value(eased_bg_colour, 4, 0.5, nil, nil, true)
-	else
-		eased_bg_colour = copy_table(G.C.RED)
-		eased_bg_colour[4] = 0
-		ease_value(eased_bg_colour, 4, 0.8, nil, nil, true)
-	end
-
-	local t = create_UIBox_generic_options({
-		padding = 0,
-		bg_colour = eased_bg_colour,
-		colour = has_won and G.C.BLACK or nil,
-		outline_colour = has_won and G.C.EDITION or nil,
-		no_back = true,
-		no_esc = has_won,
-		contents = {
-			{
-				n = G.UIT.R,
-				config = { align = "cm" },
-				nodes = {
-					{
-						n = G.UIT.O,
-						config = {
-							object = DynaText({
-								string = { has_won and localize("ph_you_win") or localize("ph_game_over") },
-								colours = { has_won and G.C.EDITION or G.C.RED },
-								shadow = true,
-								float = true,
-								spacing = has_won and 10 or nil,
-								rotate = has_won,
-								scale = 1.5,
-								pop_in = 0.4,
-								maxw = 6.5,
-							}),
-						},
-					},
-				},
-			},
-			{
-				n = G.UIT.R,
-				config = { align = "cm", padding = 0.15 },
-				nodes = {
-					{
-						n = G.UIT.C,
-						config = { align = "cm" },
-						nodes = {
-							{
-								n = G.UIT.R,
-								config = { align = "cm", padding = 0.08 },
-								nodes = {
-									{
-										n = G.UIT.T,
-										config = {
-											ref_table = MP,
-											ref_value = "end_game_jokers_text",
-											scale = 0.8,
-											maxw = 5,
-											shadow = true,
-										},
-									},
-								},
-							},
-							{
-								n = G.UIT.R,
-								config = { align = "cm", padding = 0.08 },
-								nodes = {
-									{ n = G.UIT.O, config = { object = MP.end_game_jokers } },
-								},
-							},
-							{
-								n = G.UIT.R,
-								config = { align = "cm", padding = 0.08 },
-								nodes = {
-									{
-										n = G.UIT.C,
-										config = {
-											maxw = has_won and 0.8 or 1,
-											minw = has_won and 0.8 or 1,
-											minh = 0.7,
-											colour = G.C.CLEAR,
-											no_fill = false,
-										},
-									},
-									{
-										n = G.UIT.C,
-										config = {
-											button = "toggle_players_jokers",
-											align = "cm",
-											padding = 0.12,
-											colour = G.C.BLUE,
-											emboss = 0.05,
-											minh = 0.7,
-											minw = 2,
-											maxw = 2,
-											r = 0.1,
-											shadow = true,
-											hover = true,
-										},
-										nodes = {
-											{
-												n = G.UIT.T,
-												config = {
-													text = localize("b_toggle_jokers"),
-													colour = G.C.UI.TEXT_LIGHT,
-													scale = 0.65,
-													col = true,
-												},
-											},
-										},
-									},
-									{
-										n = G.UIT.C,
-										config = {
-											id = "view_nemesis_deck_button",
-											button = "view_nemesis_deck",
-											align = "cm",
-											padding = 0.12,
-											colour = G.C.BLUE,
-											emboss = 0.05,
-											minh = 0.7,
-											minw = 2,
-											maxw = 2,
-											r = 0.1,
-											shadow = true,
-											hover = true,
-											focus_args = has_won and { nav = "wide" } or nil,
-										},
-										nodes = {
-											{
-												n = G.UIT.T,
-												config = {
-													text = localize("b_view_nemesis_deck"),
-													colour = G.C.UI.TEXT_LIGHT,
-													scale = 0.65,
-													col = true,
-												},
-											},
-										},
-									},
-									{
-										n = G.UIT.C,
-										config = {
-											maxw = has_won and 0.8 or 1,
-											minw = has_won and 0.8 or 1,
-											minh = 0.7,
-											colour = G.C.CLEAR,
-											no_fill = false,
-										},
-									},
-								},
-							},
-							{
-								n = G.UIT.R,
-								config = { align = "cm" },
-								nodes = {
-									{
-										n = G.UIT.C,
-										config = { padding = 0.08 },
-										nodes = {
-											create_UIBox_round_scores_row("hand"),
-											create_UIBox_round_scores_row("poker_hand"),
-                                            {
-                                                n = G.UIT.R,
-                                                config = {},
-                                                nodes = {
-                                                    {
-                                                        n = G.UIT.C,
-                                                        nodes = {
-                                                            create_UIBox_round_scores_row('cards_purchased', G.C.MONEY),
-                                                            {
-                                                                n = G.UIT.R,
-                                                                config = { minh = 0.08 },
-                                                            },
-                                                            create_UIBox_round_scores_row('times_rerolled', G.C.GREEN),
-                                                        }
-                                                    },
-                                                    {
-                                                        n = G.UIT.C,
-                                                        config = {minw = 0.08}
-                                                    },
-                                                    {
-                                                        n = G.UIT.C,
-                                                        nodes = {
-                                                            create_UIBox_round_scores_row('furthest_ante', G.C.FILTER),
-                                                            {
-                                                                n = G.UIT.R,
-                                                                config = { minh = 0.08 },
-                                                            },
-                                                            create_UIBox_round_scores_row('furthest_round', G.C.FILTER),
-                                                        }
-                                                    },
-                                                }
-                                            },
-                                            {
-                                                n = G.UIT.R,
-                                                config = { minh = 0.01 },
-                                            },
-											{
-												n = G.UIT.R,
-												config = { align = "cm", minw = 2 },
-												nodes = {
-													{
-														n = G.UIT.T,
-														config = {
-															text = localize("ml_mp_kofi_message")[1],
-															scale = 0.35,
-															colour = G.C.UI.TEXT_LIGHT,
-															col = true,
-														},
-													},
-												},
-											},
-											{
-												n = G.UIT.R,
-												config = { align = "cm", minw = 2 },
-												nodes = {
-													{
-														n = G.UIT.T,
-														config = {
-															text = localize("ml_mp_kofi_message")[2],
-															scale = 0.35,
-															colour = G.C.UI.TEXT_LIGHT,
-															col = true,
-														},
-													},
-												},
-											},
-											{
-												n = G.UIT.R,
-												config = { align = "cm", minw = 2 },
-												nodes = {
-													{
-														n = G.UIT.T,
-														config = {
-															text = localize("ml_mp_kofi_message")[3] .. (localize("ml_mp_kofi_message")[4] and (" " .. localize("ml_mp_kofi_message")[4]) or ""),
-															scale = 0.35,
-															colour = G.C.UI.TEXT_LIGHT,
-															col = true,
-														},
-													},
-												},
-											},
-                                            {
-                                                n = G.UIT.R,
-                                                config = {
-                                                    minh = 0.08
-                                                }
-                                            },
-											{
-												n = G.UIT.R,
-												config = {
-													id = "ko-fi_button",
-													align = "cm",
-													padding = 0.1,
-													r = 0.1,
-													hover = true,
-													colour = HEX("72A5F2"),
-													button = "open_kofi",
-													shadow = true,
-												},
-												nodes = {
-													{
-														n = G.UIT.R,
-														config = {
-															align = "cm",
-															padding = 0,
-															no_fill = true,
-															maxw = 3,
-														},
-														nodes = {
-															{
-																n = G.UIT.T,
-																config = {
-																	text = localize("b_mp_kofi_button"),
-																	scale = 0.35,
-																	colour = G.C.UI.TEXT_LIGHT,
-																},
-															},
-														},
-													},
-												},
-											},
-											--[[ Removed until it is fixed in a future update
-											UIBox_button({
-												id = "continue_singpleplayer_button",
-												align = "lm",
-												button = "continue_in_singleplayer",
-												label = { localize("b_continue_singleplayer") },
-												colour = G.C.GREEN,
-												toolTip = {title = "", text = localize("k_continue_singleplayer_tooltip")},
-												minw = 6,
-												minh = 1,
-												func = 'set_button_pip',
-												focus_args = { nav = "wide", button = "y" },
-											})]]
-										},
-									},
-									{
-										n = G.UIT.C,
-										config = { align = "tr", padding = 0.08 },
-										nodes = {
-											MP.UI.create_UIBox_round_scores_row_nemesis(),
-											create_UIBox_round_scores_row("seed", G.C.WHITE),
-											UIBox_button({
-												id = "copy_seed_button",
-												button = "copy_seed",
-												label = { localize("b_copy") },
-												colour = G.C.BLUE,
-												scale = 0.3,
-												minw = 2.5, maxw = 2.5,
-												minh = 0.4,
-											}),
-											{
-												n = G.UIT.R,
-												config = { align = "cm", minh = 0.45, minw = 0.1 },
-												nodes = {},
-											},
-											UIBox_button({
-												id = "from_game_won",
-												button = "mp_return_to_lobby",
-												label = { localize("b_return_lobby") },
-												minw = 4,
-												maxw = 4,
-												minh = 0.8,
-												focus_args = { nav = "wide", snap_to = true },
-											}),
-											UIBox_button({
-												button = "lobby_leave",
-												label = { localize("b_leave_lobby") },
-												minw = 4,
-												maxw = 4,
-												minh = 0.8,
-												focus_args = { nav = "wide" },
-											}),
-										},
-									},
-								},
-							},
-						},
-					},
-				},
-			},
-		},
+	return MPAPI.end_screen_uibox({
+		won = has_won,
+		id = has_won and "you_win_UI" or nil,
+		body = MP.UI.end_game_body,
 	})
-
-	t.nodes[1] = {
-		n = G.UIT.R,
-		config = { align = "cm", padding = 0.1 },
-		nodes = {
-			{
-				n = G.UIT.C,
-				config = { align = "cm", padding = 2 },
-				nodes = {
-					{
-						n = G.UIT.O,
-						config = {
-							padding = 0,
-							id = "jimbo_spot",
-							object = Moveable(0, 0, G.CARD_W * 1.1, G.CARD_H * 1.1),
-						},
-					},
-				},
-			},
-			{ n = G.UIT.C, config = { align = "cm", padding = 0.1 }, nodes = { t.nodes[1] } },
-		},
-	}
-
-	if has_won then t.config.id = "you_win_UI" end
-
-	return t
 end
 
 function G.UIDEF.view_nemesis_deck()

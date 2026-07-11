@@ -29,20 +29,11 @@ local function get_shortcuts()
 					MP.UI.UTILS.overlay_message(MP.LOBBY.code)
 				end,
 			})
-			if MP.LOBBY.is_host or MP.LOBBY.config.different_decks then
-				table.insert(shortcuts, {
-					label = localize("b_sc_choose_deck"),
-					key = "D",
-					action = function()
-						G.FUNCS.lobby_choose_deck({ config = {} })
-					end,
-				})
-			end
 			table.insert(shortcuts, {
 				label = localize("b_leave_lobby"),
 				key = "L",
 				action = function()
-					G.FUNCS.lobby_leave()
+					G.FUNCS.mp_pvp_leave_lobby()
 				end,
 			})
 		elseif connected then
@@ -50,29 +41,21 @@ local function get_shortcuts()
 				label = localize("b_join_lobby_clipboard"),
 				key = "V",
 				action = function()
-					G.FUNCS.join_from_clipboard()
+					G.FUNCS.mp_pvp_join_lobby_from_clipboard()
 				end,
 			})
 			table.insert(shortcuts, {
 				label = localize("b_join_lobby"),
 				key = "J",
 				action = function()
-					G.FUNCS.join_lobby()
+					G.FUNCS.mp_pvp_join_lobby_by_code()
 				end,
 			})
 			table.insert(shortcuts, {
 				label = localize("b_create_lobby"),
 				key = "C",
 				action = function()
-					G.FUNCS.create_lobby()
-				end,
-			})
-		else
-			table.insert(shortcuts, {
-				label = localize("b_reconnect"),
-				key = "R",
-				action = function()
-					G.FUNCS.reconnect()
+					G.FUNCS.mp_pvp_create_lobby()
 				end,
 			})
 		end

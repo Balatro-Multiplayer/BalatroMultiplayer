@@ -265,6 +265,78 @@ local function action_reconnecting()
 	end
 end
 
+-- ── Run start (relocated from the removed legacy ui/lobby/lobby.lua) ──────────────
+-- G.FUNCS.lobby_start_run is the actual multiplayer run-starter. It is called by
+-- action_start_game below and by the API bridge gamemode's (required, but never invoked)
+-- start_run in pvp_api/gamemodes.lua. The `mp_start` contract it passes to
+-- G.FUNCS.start_run is interpreted by the start_run wrapper relocated to overrides/game.lua.
+local function get_random_back_pool()
+	local names, seen = {}, {}
+	local cocktail_keys = MP.get_cocktail_decks(false)
+	for i = 1, #cocktail_keys do
+		local key = cocktail_keys[i]
+		if G.P_CENTERS[key] and not seen[key] then
+			seen[key] = true
+			names[#names + 1] = G.P_CENTERS[key].name
+		end
+	end
+	if G.P_CENTERS["b_mp_cocktail"] and not seen["b_mp_cocktail"] then
+		names[#names + 1] = G.P_CENTERS["b_mp_cocktail"].name
+	end
+	return names
+end
+
+local function scoped_random(seed, salt, max)
+	if seed then
+		math.randomseed(pseudohash(seed .. "_mp_random_" .. salt))
+	end
+	return math.random(1, max)
+end
+
+local function roll_random_back_name(seed, salt)
+	local names = get_random_back_pool()
+	if #names == 0 then return "Red Deck" end
+	return names[scoped_random(seed, "deck_" .. (salt or ""), #names)]
+end
+
+local function roll_random_stake(seed, salt)
+	local cap = MP.DECK.MAX_STAKE > 0 and MP.DECK.MAX_STAKE or 8
+	return scoped_random(seed, "stake_" .. (salt or ""), cap)
+end
+
+function G.FUNCS.copy_host_deck()
+	MP.LOBBY.deck.back = MP.LOBBY.config.back
+	MP.LOBBY.deck.cocktail = MP.LOBBY.config.cocktail
+	MP.LOBBY.deck.sleeve = MP.LOBBY.config.sleeve
+	MP.LOBBY.deck.stake = MP.LOBBY.config.stake
+	MP.LOBBY.deck.challenge = MP.LOBBY.config.challenge
+end
+
+---@type fun(e: table | nil, args: { deck: string, stake: number | nil, seed: string | nil })
+function G.FUNCS.lobby_start_run(e, args)
+	if MP.LOBBY.config.different_decks == false then G.FUNCS.copy_host_deck() end
+
+	if MP.LOBBY.config.different_decks and MP.LOBBY.config.random_loadout then
+		MP.LOBBY.deck.back = roll_random_back_name(args.seed, MP.LOBBY.username)
+		MP.LOBBY.deck.challenge = ""
+		MP.LOBBY.deck.stake = roll_random_stake(args.seed, MP.LOBBY.username)
+	end
+
+	local challenge = nil
+	if MP.LOBBY.deck.back == "Challenge Deck" then
+		challenge = G.CHALLENGES[get_challenge_int_from_id(MP.LOBBY.deck.challenge)]
+	else
+		G.GAME.viewed_back = G.P_CENTERS[MP.UTILS.get_deck_key_from_name(MP.LOBBY.deck.back)]
+	end
+
+	G.FUNCS.start_run(e, {
+		mp_start = true,
+		challenge = challenge,
+		stake = tonumber(MP.LOBBY.deck.stake),
+		seed = args.seed,
+	})
+end
+
 local function action_start_game(p)
 	local seed = p.seed
 	sendDebugMessage(string.format("Game starting — %s", os.date("%Y-%m-%dT%H:%M:%S%z")), "MULTIPLAYER")
@@ -273,6 +345,12 @@ local function action_start_game(p)
 	MP.GHOST.clear()
 
 	MP.reset_game_states()
+	-- Stamp the run start (drives the pause menu's seed-change window) and clear any
+	-- pending seed-change votes from a previous run/reseed.
+	MP._run_started_at = love.timer.getTime()
+	if MP.lobby and MP.lobby.seed_votes then
+		MP.lobby.seed_votes:reset()
+	end
 	local stake = tonumber(p.stake)
 	MP.ACTIONS.set_ante(0)
 	if not MP.LOBBY.config.different_seeds and MP.LOBBY.config.custom_seed ~= "random" then
@@ -293,7 +371,7 @@ local function action_start_game(p)
 		lobby_config = MP.LOBBY.config,
 		the_order_enabled = MP.should_use_the_order(),
 		different_seeds = MP.LOBBY.config.different_seeds,
-		mod_version = SMODS.Mods["Multiplayer"] and SMODS.Mods["Multiplayer"].version,
+		mod_version = MP and MP.version,
 		mod_hash = MP.MOD_STRING,
 		smods_version = MP.SMODS_VERSION,
 		lovely_version = MP.REQUIRED_LOVELY_VERSION,
@@ -336,107 +414,8 @@ local function action_start_blind(p)
 	MP.UI.start_pvp_countdown(begin_pvp_blind)
 end
 
-local function action_enemy_info(p)
-	local score = MP.INSANE_INT.from_string(p.score)
-
-	local hands_left = tonumber(p.handsLeft)
-	local skips = tonumber(p.skips)
-	local lives = tonumber(p.lives)
-
-	-- No-animation timer: If opponent skip, add time immediately
-	if skips and MP.GAME.enemy.skips ~= skips then
-		for i = 1, skips - MP.GAME.enemy.skips do
-			MP.GAME.enemy.spent_in_shop[#MP.GAME.enemy.spent_in_shop + 1] = 0
-			if
-				MP.GAME.enemy.skips < skips
-				and MP.LOBBY.config.timer
-				and not MP.GAME.timer_started
-				and not MP.GAME.nemesis_timer_started
-				and not MP.GAME.timer_consumed
-				and MP.is_any_layer_active({ "no_animation_timer", "pressure_timer" })
-				and (MP.LOBBY.config.timer_increment_seconds or 0) > 0
-			then
-				MP.UI.restore_timer(MP.LOBBY.config.timer_increment_seconds)
-			end
-		end
-	end
-
-	if score == nil or hands_left == nil then
-		sendDebugMessage("Invalid score or hands_left", "MULTIPLAYER")
-		return
-	end
-
-	if MP.INSANE_INT.greater_than(score, MP.GAME.enemy.highest_score) then MP.GAME.enemy.highest_score = score end
-
-	-- PvP timer: stop timer according to score
-	if MP.is_pvp_boss() and MP.is_layer_active("pvp_timer") then
-		if MP.INSANE_INT.greater_than(MP.GAME.score, score) then
-			MP.GAME.nemesis_timer_started = false
-        elseif MP.INSANE_INT.equal(MP.GAME.score, score) and MP.GAME.pvp_reached_first then
-            MP.GAME.nemesis_timer_started = false
-        else
-			MP.GAME.timer_started = false
-		end
-	end
-
-	G.E_MANAGER:add_event(Event({
-		blockable = false,
-		blocking = false,
-		trigger = "ease",
-		delay = 3,
-		ref_table = MP.GAME.enemy.score,
-		ref_value = "e_count",
-		ease_to = score.e_count,
-		func = function(t)
-			return math.floor(t)
-		end,
-	}))
-
-	G.E_MANAGER:add_event(Event({
-		blockable = false,
-		blocking = false,
-		trigger = "ease",
-		delay = 3,
-		ref_table = MP.GAME.enemy.score,
-		ref_value = "coeffiocient", -- why is this misspelled
-		ease_to = score.coeffiocient,
-		func = function(t)
-			local mult = 1
-			if score.exponent > 0 then mult = 100 end
-			return math.floor(t * mult) / mult
-		end,
-	}))
-
-	G.E_MANAGER:add_event(Event({
-		blockable = false,
-		blocking = false,
-		trigger = "ease",
-		delay = 3,
-		ref_table = MP.GAME.enemy.score,
-		ref_value = "exponent",
-		ease_to = score.exponent,
-		func = function(t)
-			return math.floor(t)
-		end,
-	}))
-
-	if MP.GAME.enemy.lives > lives then
-		play_sound("holo1", 0.865, 0.9)
-		play_sound("gong", 0.765, 0.4)
-	end
-	if MP.GAME.enemy.skips < skips then
-		play_sound("negative", 0.865, 0.4)
-		play_sound("gong", 0.765, 0.4)
-	end
-
-    MP.GAME.enemy.real_score = score
-	MP.GAME.enemy.hands = hands_left
-	MP.GAME.enemy.skips = skips
-	MP.GAME.enemy.lives = lives
-	-- We've now heard from the opponent this blind: unmask their hands count.
-	MP.GAME.enemy.info_received = true
-	if MP.UI.juice_up_pvp_hud then MP.UI.juice_up_pvp_hud() end
-end
+-- (action_enemy_info was removed: the opponent score/hands/skips/lives DISPLAY is now synced
+-- by the nemesis blind's on_sync — see objects/blinds/nemesis.lua.)
 
 local function action_stop_game()
 	MP.enemy_disconnect_countdown = nil
@@ -514,7 +493,7 @@ local function action_lobby_options(options)
 	for k, v in pairs(options) do
 		if k == "ruleset" then
 			if not MP.Rulesets[v] then
-				G.FUNCS.lobby_leave(nil)
+				G.FUNCS.mp_pvp_leave_lobby()
 				MP.UI.UTILS.overlay_message(localize({
 					type = "variable",
 					key = "k_failed_to_join_lobby",
@@ -524,7 +503,7 @@ local function action_lobby_options(options)
 			end
 			local disabled = MP.Rulesets[v].is_disabled()
 			if disabled then
-				G.FUNCS.lobby_leave(nil)
+				G.FUNCS.mp_pvp_leave_lobby()
 				MP.UI.UTILS.overlay_message(
 					localize({ type = "variable", key = "k_failed_to_join_lobby", vars = { disabled } })
 				)
@@ -596,32 +575,8 @@ local function action_remove_phantom(p)
 	end
 end
 
--- card:remove is called in an event so we have to hook the function instead of doing normal things
-local cardremove = Card.remove
-function Card:remove()
-	local menu = G.OVERLAY_MENU
-	if self.edition and self.edition.type == "mp_phantom" then G.OVERLAY_MENU = G.OVERLAY_MENU or true end
-	cardremove(self)
-	G.OVERLAY_MENU = menu
-end
-
--- and smods find card STILL needs to be patched here
-local smodsfindcard = SMODS.find_card
-function SMODS.find_card(key, count_debuffed)
-	local ret = smodsfindcard(key, count_debuffed)
-	local new_ret = {}
-	for i, v in ipairs(ret) do
-		if not v.edition or v.edition.type ~= "mp_phantom" then new_ret[#new_ret + 1] = v end
-	end
-	return new_ret
-end
-
--- don't poll edition
-local origedpoll = poll_edition
-function poll_edition(_key, _mod, _no_neg, _guaranteed, _options)
-	if G.OVERLAY_MENU then return nil end
-	return origedpoll(_key, _mod, _no_neg, _guaranteed, _options)
-end
+-- (The phantom masking patches — Card:remove / SMODS.find_card / poll_edition — moved to the
+-- synced-object framework; installed via MPAPI.configure_phantom in objects/editions/phantom.lua.)
 
 local function action_speedrun()
 	SMODS.calculate_context({ mp_speedrun = true })
@@ -972,7 +927,7 @@ local function action_start_ante_timer(p)
 	local from_nemesis = p.fromNemesis
 	if from_nemesis == nil then from_nemesis = true end
 
-	local option = SMODS.Mods["Multiplayer"].config.timersfx or 1
+	local option = MP.config.timersfx or 1
 	local timersfx = (option == 1) or (option == 2 and G.timer_ante ~= G.GAME.round_resets.ante)
 	G.timer_ante = G.GAME.round_resets.ante
 
@@ -1418,7 +1373,6 @@ local HANDLERS = {
 	lobbyInfo = action_lobbyInfo,
 	startGame = action_start_game,
 	startBlind = action_start_blind,
-	enemyInfo = action_enemy_info,
 	stopGame = action_stop_game,
 	endPvP = action_end_pvp,
 	playerInfo = action_player_info,
@@ -1452,6 +1406,18 @@ local HANDLERS = {
 	error = action_error,
 	keepAlive = action_keep_alive,
 }
+
+-- Peer dispatch: invoke a server->client action handler by its wire name. The
+-- MPAPI ActionType layer (pvp_api/) calls this from on_receive to run the existing
+-- client-side handlers when a peer action arrives, replacing the old socket pump.
+function MP.dispatch_action(name, params)
+	local handler = HANDLERS[name]
+	if handler then
+		handler(params or {})
+	else
+		sendWarnMessage("MP.dispatch_action: no handler for '" .. tostring(name) .. "'", "MULTIPLAYER")
+	end
+end
 
 function MP.register_action(name, cb)
 	if HANDLERS[name] then

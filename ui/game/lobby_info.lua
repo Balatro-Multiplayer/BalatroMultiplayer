@@ -1,4 +1,9 @@
-local Disableable_Toggle = MP.UI.Disableable_Toggle
+-- Read-only status toggles: delegate to the API's disableable widget (these calls pass
+-- no enabled_ref_value, so they render non-interactive). `.node` unwraps MPAPI's reactive
+-- el wrapper into an embeddable UI node.
+local function Disableable_Toggle(args)
+	return MPAPI.disableable_toggle(args).node
+end
 
 function G.FUNCS.lobby_info(e)
 	G.SETTINGS.paused = true
@@ -136,6 +141,11 @@ function MP.UI.create_UIBox_players()
 end
 
 function MP.UI.create_UIBox_mods_list(type)
+	-- The player's mod list comes from the legacy mod-hash system (config.Mods), which
+	-- the API-based lobby flow does not populate, so config can be nil. Guard it (an
+	-- absent list renders as an empty box) instead of indexing a nil config.
+	local player = (type == "host") and MP.LOBBY.host or MP.LOBBY.guest
+	local mods = player and player.config and player.config.Mods or nil
 	return {
 		n = G.UIT.R,
 		config = { align = "cm", colour = G.C.WHITE, r = 0.1 },
@@ -143,13 +153,99 @@ function MP.UI.create_UIBox_mods_list(type)
 			{
 				n = G.UIT.C,
 				config = { align = "cm" },
-				nodes = MP.UI.modlist_to_view(
-					type == "host" and MP.LOBBY.host.config.Mods or MP.LOBBY.guest.config.Mods,
-					G.C.UI.TEXT_DARK
-				),
+				nodes = MP.UI.modlist_to_view(mods, G.C.UI.TEXT_DARK),
 			},
 		},
 	}
+end
+
+-- Builds the mods-list view rows for a player (relocated from the removed legacy
+-- ui/lobby/lobby.lua; sole caller is create_UIBox_mods_list above). Buckets special
+-- mods (Lovely/Steamodded/Multiplayer/Preview) first, then the rest alphabetically,
+-- colouring banned mods red.
+function MP.UI.modlist_to_view(mods, text_colour)
+	local t = {}
+
+	if not mods then
+		return t
+	end
+
+	local special_mods_targets = {
+		"Steamodded",
+		"Lovely",
+		"Multiplayer",
+		"Preview",
+	}
+	local special_mods_found = {}
+	local other_mods = {}
+	for mod_name, mod_version in pairs(mods) do
+		local found = false
+		for _, id in ipairs(special_mods_targets) do
+			if not special_mods_found[id] and MP.UTILS.string_starts(mod_name, id) then
+				special_mods_found[id] = { name = mod_name, version = mod_version }
+				found = true
+				break
+			end
+		end
+		if not found then
+			table.insert(other_mods, { name = mod_name, version = mod_version })
+		end
+	end
+
+	table.sort(other_mods, function(a, b)
+		return a.name < b.name
+	end)
+
+	local function add_mod_row(mod)
+		local mod_name, mod_version = MP.UTILS.resolve_mod_name_and_version(mod.name, mod.version)
+		local color = MP.BANNED_MODS[mod.name] and G.C.RED or text_colour
+		table.insert(t, {
+			n = G.UIT.R,
+			config = {
+				padding = 0.025,
+			},
+			nodes = {
+				{
+					n = G.UIT.T,
+					config = {
+						text = mod_name,
+						scale = 0.32,
+						colour = color,
+					},
+				},
+				mod_version and {
+					n = G.UIT.T,
+					config = {
+						text = " " .. mod_version,
+						scale = 0.32,
+						colour = adjust_alpha(color, 0.6),
+					},
+				} or nil,
+			},
+		})
+	end
+	local function add_separator()
+		table.insert(t, {
+			n = G.UIT.R,
+			config = {
+				minh = 0.025,
+				colour = adjust_alpha(text_colour, 0.25),
+			},
+		})
+	end
+
+	for _, mod in pairs({ special_mods_found.Lovely, special_mods_found.Steamodded }) do
+		add_mod_row(mod)
+	end
+	add_separator()
+	for _, mod in pairs({ special_mods_found.Multiplayer, special_mods_found.Preview }) do
+		add_mod_row(mod)
+	end
+	add_separator()
+	for _, mod in ipairs(other_mods) do
+		add_mod_row(mod)
+	end
+	return t
 end
 
 function MP.UI.create_UIBox_player_row(type)

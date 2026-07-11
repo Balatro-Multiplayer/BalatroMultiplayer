@@ -5,7 +5,7 @@ SMODS.Atlas({
 	py = 95,
 })
 
-SMODS.Joker({
+MPAPI.Joker({
 	key = "lets_go_gambling",
 	atlas = "lets_go_gambling",
 	rarity = 2,
@@ -16,6 +16,17 @@ SMODS.Joker({
 	eternal_compat = true,
 	perishable_compat = true,
 	config = { extra = { odds = 4, xmult = 4, dollars = 10, nemesis_odds = 4, nemesis_dollars = 10 } },
+	-- Shows a display-only copy on the opponent's board (framework wires add/remove_from_deck).
+	phantom = true,
+	-- Opponent receives the "misfire": their showcase copy juices up and they lose dollars
+	-- (was action_lets_go_gambling_nemesis).
+	on_sync = function(self, from, d)
+		if d.event == "misfire" then
+			local copy = MP.UTILS.get_phantom_joker("j_mp_lets_go_gambling")
+			if copy then copy:juice_up() end
+			ease_dollars(copy and copy.ability and copy.ability.extra and copy.ability.extra.nemesis_dollars or 5)
+		end
+	end,
 	loc_vars = function(self, info_queue, card)
 		local numerator, denominator =
 			SMODS.get_probability_vars(card, 1, card.ability.extra.odds, "j_mp_lets_go_gambling")
@@ -58,20 +69,10 @@ SMODS.Joker({
 				)
 			then
 				returns = returns or {}
-				MP.ACTIONS.lets_go_gambling_nemesis()
+				card.config.center:sync({ event = "misfire" })
 				returns.message = localize("k_oops_ex")
 			end
 			return returns
-		end
-	end,
-	add_to_deck = function(self, card, from_debuffed)
-		if not from_debuffed and (not card.edition or card.edition.type ~= "mp_phantom") then
-			MP.ACTIONS.send_phantom("j_mp_lets_go_gambling")
-		end
-	end,
-	remove_from_deck = function(self, card, from_debuff)
-		if not from_debuff and (not card.edition or card.edition.type ~= "mp_phantom") then
-			MP.ACTIONS.remove_phantom("j_mp_lets_go_gambling")
 		end
 	end,
 	mp_credits = {

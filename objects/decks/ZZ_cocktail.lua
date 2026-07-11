@@ -215,7 +215,7 @@ function Card:click() -- i'd rather deal with the cardarea but this is fine i su
 				)
 			end
 			local decks = MP.get_cocktail_decks()
-			local cfg = SMODS.Mods["Multiplayer"].config
+			local cfg = MP.config
 			for i, v in ipairs(decks) do
 				local row = math.floor((((i - 1) / #decks) * 2) + 1)
 				G.GAME.viewed_back = G.P_CENTERS[v]
@@ -533,7 +533,7 @@ end
 G.E_MANAGER:add_event(Event({
 	func = function()
 		local decks = MP.get_cocktail_decks()
-		local cfg = SMODS.Mods["Multiplayer"].config
+		local cfg = MP.config
 		if (not cfg.cocktail) or #decks + 1 ~= #cfg.cocktail then
 			local string = ""
 			for i = 1, #decks do
@@ -542,14 +542,14 @@ G.E_MANAGER:add_event(Event({
 			string = string .. "H"
 			cfg.cocktail = string
 		end
-		SMODS.save_mod_config(SMODS.Mods["Multiplayer"])
+		SMODS.save_mod_config(MP)
 		return true
 	end,
 }))
 
 function MP.cocktail_cfg_edit(bool, deck) -- strings are easier to send, and it's just ones and zeroes
 	local decks = MP.get_cocktail_decks()
-	local cfg = SMODS.Mods["Multiplayer"].config
+	local cfg = MP.config
 	local num = (bool == 2) and "2" or (bool and "1" or "0")
 	if not deck then
 		local string = ""
@@ -572,12 +572,12 @@ function MP.cocktail_cfg_edit(bool, deck) -- strings are easier to send, and it'
 		if deck == "show" then cfg.cocktail = replace(cfg.cocktail, #cfg.cocktail, bool and "S" or "H") end
 	end
 	MP.LOBBY.config.cocktail = cfg.cocktail
-	SMODS.save_mod_config(SMODS.Mods["Multiplayer"])
+	SMODS.save_mod_config(MP)
 end
 
 function MP.cocktail_cfg_readpos(pos, construct)
 	local decks = MP.get_cocktail_decks() -- copypasted code. unsure how to make this less messy without making it more messy
-	local cfg = SMODS.Mods["Multiplayer"].config
+	local cfg = MP.config
 	if pos == "show" then pos = #cfg.cocktail end
 	if construct then return MP.cocktail_cfg_get():sub(pos, pos) end
 	return cfg.cocktail:sub(pos, pos)
@@ -587,7 +587,7 @@ function MP.cocktail_cfg_get()
 	if MP.LOBBY.code and MP.LOBBY.deck and MP.LOBBY.deck.cocktail then
 		return MP.LOBBY.deck.cocktail
 	else
-		return SMODS.Mods["Multiplayer"].config.cocktail
+		return MP.config.cocktail
 	end
 end
 
@@ -601,7 +601,7 @@ function MP.cocktail_check_edited()
 end
 
 function MP.cocktail_get_forced_num()
-	local str = SMODS.Mods["Multiplayer"].config.cocktail
+	local str = MP.config.cocktail
 	local c = 0
 	for i = 1, #str - 1 do
 		if string.sub(str, i, i) == "2" then c = c + 1 end

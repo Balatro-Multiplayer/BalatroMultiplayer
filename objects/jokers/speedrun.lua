@@ -5,7 +5,7 @@ SMODS.Atlas({
 	py = 95,
 })
 
-SMODS.Joker({
+MPAPI.Joker({
 	key = "speedrun",
 	atlas = "speedrun",
 	rarity = 2,
@@ -15,6 +15,8 @@ SMODS.Joker({
 	blueprint_compat = true,
 	eternal_compat = true,
 	perishable_compat = true,
+	-- Shows a display-only copy on the opponent's board (framework wires add/remove_from_deck).
+	phantom = true,
 	loc_vars = function(self, info_queue, card)
 		MP.UTILS.add_nemesis_info(info_queue)
 		return { vars = {} }
@@ -45,16 +47,6 @@ SMODS.Joker({
 				colour = G.C.SECONDARY_SET.Spectral,
 				card = card,
 			}
-		end
-	end,
-	add_to_deck = function(self, card, from_debuffed)
-		if not from_debuffed and (not card.edition or card.edition.type ~= "mp_phantom") then
-			MP.ACTIONS.send_phantom("j_mp_speedrun")
-		end
-	end,
-	remove_from_deck = function(self, card, from_debuff)
-		if not from_debuff and (not card.edition or card.edition.type ~= "mp_phantom") then
-			MP.ACTIONS.remove_phantom("j_mp_speedrun")
 		end
 	end,
 	mp_credits = {

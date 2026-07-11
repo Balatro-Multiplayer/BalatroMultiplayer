@@ -5,7 +5,7 @@ SMODS.Atlas({
 	py = 95,
 })
 
-SMODS.Joker({
+MPAPI.Joker({
 	key = "conjoined_joker",
 	atlas = "conjoined_joker",
 	rarity = 2,
@@ -16,22 +16,14 @@ SMODS.Joker({
 	eternal_compat = true,
 	perishable_compat = true,
 	config = { extra = { x_mult_gain = 0.5, max_x_mult = 3, x_mult = 1 } },
+	-- Shows a display-only copy on the opponent's board (framework wires add/remove_from_deck).
+	phantom = true,
 	loc_vars = function(self, info_queue, card)
 		MP.UTILS.add_nemesis_info(info_queue)
 		return { vars = { card.ability.extra.x_mult_gain, card.ability.extra.max_x_mult, card.ability.extra.x_mult } }
 	end,
 	mp_include = function(self)
 		return MP.LOBBY.code and MP.LOBBY.config.multiplayer_jokers and not MP.is_layer_active("sandbox")
-	end,
-	add_to_deck = function(self, card, from_debuffed)
-		if not from_debuffed and (not card.edition or card.edition.type ~= "mp_phantom") then
-			MP.ACTIONS.send_phantom("j_mp_conjoined_joker")
-		end
-	end,
-	remove_from_deck = function(self, card, from_debuff)
-		if not from_debuff and (not card.edition or card.edition.type ~= "mp_phantom") then
-			MP.ACTIONS.remove_phantom("j_mp_conjoined_joker")
-		end
 	end,
 	update = function(self, card, dt)
 		if MP.LOBBY.code then

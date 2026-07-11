@@ -5,7 +5,7 @@ SMODS.Atlas({
 	py = 95,
 })
 
-SMODS.Joker({
+MPAPI.Joker({
 	key = "magnet_sandbox",
 	atlas = "magnet",
 	rarity = 3,
@@ -27,15 +27,28 @@ SMODS.Joker({
 			},
 		}
 	end,
-	add_to_deck = function(self, card, from_debuffed)
-		if not from_debuffed and (not card.edition or card.edition.type ~= "mp_phantom") then
-			MP.ACTIONS.send_phantom("j_mp_magnet_sandbox")
+	-- Shows a display-only copy on the opponent's board (framework wires add/remove_from_deck).
+	phantom = true,
+	-- Magnet steal: on sell, request a joker from the opponent. on_sync_request runs on the
+	-- opponent (pick their highest-sell joker + serialize); on_sync_response runs here (rebuild
+	-- the real card into our jokers). Was action_magnet / action_magnet_response.
+	on_sync_request = function(self, from, d)
+		MP.RLOG.record("net_magnet", nil, "action:netMagnet")
+		local best = nil
+		for _, v in pairs(G.jokers.cards) do
+			if not best or v.sell_cost > best.sell_cost then best = v end
 		end
+		if not best then return nil end
+		local candidates = {}
+		for _, v in pairs(G.jokers.cards) do
+			if v.sell_cost == best.sell_cost then table.insert(candidates, v) end
+		end
+		local random_index = math.floor(pseudorandom("j_mp_magnet") * #candidates) + 1
+		local chosen_card = candidates[random_index]
+		return { card = MPAPI.serialize_card(chosen_card) }
 	end,
-	remove_from_deck = function(self, card, from_debuff)
-		if not from_debuff and (not card.edition or card.edition.type ~= "mp_phantom") then
-			MP.ACTIONS.remove_phantom("j_mp_magnet_sandbox")
-		end
+	on_sync_response = function(self, from, resp)
+		if resp and resp.card then MPAPI.rebuild_card(resp.card, G.jokers) end
 	end,
 	calculate = function(self, card, context)
 		if
@@ -92,7 +105,8 @@ SMODS.Joker({
 			and (card.ability.extra.current_rounds >= card.ability.extra.rounds)
 			and not context.blueprint
 		then
-			MP.ACTIONS.magnet()
+			local c = card.config.center
+			c:sync_request(c:opponent_id())
 		end
 	end,
 

@@ -53,12 +53,12 @@ function MP.register_mod_action(modAction, callback, modId)
 end
 
 MP.INTEGRATIONS = {
-	Preview = SMODS.Mods["Multiplayer"].config.integrations.Preview,
+	Preview = MP.config.integrations.Preview,
 }
 
 MP.PREVIEW = {
-	text = SMODS.Mods["Multiplayer"].config.preview.text,
-	button = SMODS.Mods["Multiplayer"].config.preview.button,
+	text = MP.config.preview.text,
+	button = MP.config.preview.button,
 }
 
 MP.EXPERIMENTAL = {
@@ -101,14 +101,21 @@ G.C.MULTIPLAYER = HEX("AC3232")
 MP.SMODS_VERSION = "1.0.0~BETA-1620a"
 MP.REQUIRED_LOVELY_VERSION = "0.9"
 
+-- The Order (deterministic/anti-desync RNG) engine now lives entirely in the API
+-- (BalatroMultiplayerAPI/api/the_order.lua). We delegate the gate + helpers to the
+-- API's single implementation instead of shipping our own copy (was compatibility/TheOrder.lua).
+-- The API's MPAPI.should_use_the_order carries the MP-compat branch (reads
+-- MP.LOBBY.config.the_order + is_practice_mode), so this stays behaviour-preserving.
 function MP.should_use_the_order()
-	if MP.LOBBY and MP.LOBBY.config and MP.LOBBY.config.the_order and MP.LOBBY.code then
-		return true
-	elseif MP.is_practice_mode() then -- should actually check the ruleset but okay for now
-		return true
-	end
-	return false
+	return MPAPI.should_use_the_order()
 end
+
+-- Legacy MP.* aliases for The Order queue helpers, kept because live content still calls
+-- them (objects/jokers/standard/bloodstone, objects/boosters/standard_giga, ui/game/blind_choice,
+-- layers/smallworld). They forward to the API's implementations.
+MP.ante_based = MPAPI.ante_based
+MP.order_round_based = MPAPI.order_round_based
+MP.sorted_hand_list = MPAPI.sorted_hand_list
 
 function MP.is_major_league_ruleset()
 	return MP.LOBBY and MP.LOBBY.config and MP.LOBBY.config.ruleset == "ruleset_mp_majorleague" and MP.LOBBY.code
@@ -119,7 +126,7 @@ function MP.current_ruleset()
 end
 
 function MP.load_mp_file(file)
-	local chunk, err = SMODS.load_file(file, "Multiplayer")
+	local chunk, err = SMODS.load_file(file, MP.id)
 	if chunk then
 		local ok, func = pcall(chunk)
 		if ok then
@@ -326,13 +333,56 @@ MP.load_mp_dir("objects/consumables/sandbox")
 MP.load_mp_dir("objects/boosters")
 MP.load_mp_dir("objects/challenges")
 
-local SOCKET = MP.load_mp_file("networking/socket.lua")
-MP.NETWORKING_THREAD = love.thread.newThread(SOCKET)
-local server_url = MP.ENV.server_url or SMODS.Mods["Multiplayer"].config.server_url
-local server_port = tonumber(MP.ENV.server_port) or SMODS.Mods["Multiplayer"].config.server_port
-sendInfoMessage(
-	string.format("Connecting to %s:%s", tostring(server_url), tostring(server_port)),
-	"MULTIPLAYER"
-)
-MP.NETWORKING_THREAD:start(server_url, server_port)
-MP.ACTIONS.connect()
+-- MultiplayerPvP runs on BalatroMultiplayerAPI. The API owns the connection,
+-- lobbies, matchmaking, leaderboards, and the main-menu host, so we no longer start
+-- our own TCP socket thread or call MP.ACTIONS.connect(). Instead we register with
+-- the API once it signals ready; it then lists "PvP" in its account panel and swaps
+-- in our menu (MP.build_pre_lobby_ui) when the player selects it.
+--
+-- NOTE (skeleton milestone): the in-game PvP protocol in networking/action_handlers.lua
+-- is still loaded but inert (no socket thread) — Phase 4 converts each action to an
+-- MPAPI.ActionType. The menus here are placeholders — Phase 6 builds the real
+-- Find Game / Leaderboard / Practice / Join / Create layout.
+MPAPI.on_loaded(function()
+	MPAPI.register_mod({
+		id = MP.id,
+		name = "PvP",
+		colour = G.C.RED,
+		main_menu_ui = MP.build_pre_lobby_ui,
+		lobby_ui = MP.build_in_lobby_ui,
+		-- Custom in-run pause menu (Settings + Seed Change + Forfeit), built by the API's
+		-- options_builder hook instead of the vanilla options box (see ui/pvp_run_options.lua).
+		prevent_pause = true,
+		options_builder = MP.create_run_options,
+		-- Custom title logo shown while PvP's menu is focused (atlases in ui/pvp_title.lua).
+		-- Prefixed with the mod prefix "mp" like every SMODS key.
+		title = { base = "mp_pvp_title_base", extra = "mp_pvp_title_extra" },
+	})
+
+	-- Load API-side content (bridge GameModes now; ActionTypes in Phase 4) here so
+	-- their SMODS GameObjects are tagged to this mod — per-lobby routing requires it.
+	MP.load_mp_dir("pvp_api", true)
+
+	-- Boot diagnostic: confirm the pvp_* ActionTypes actually registered.
+	local n = 0
+	for k in pairs(MPAPI.ActionTypes or {}) do
+		if tostring(k):match("^pvp_") then
+			n = n + 1
+		end
+	end
+	sendDebugMessage(
+		"[pvp] boot: pvp ActionTypes registered=" .. n .. " pvp_player_ready="
+			.. tostring(MPAPI.ActionTypes and MPAPI.ActionTypes["pvp_player_ready"] ~= nil),
+		"MULTIPLAYER"
+	)
+
+	MPAPI.on_connection_state_change(function()
+		if MP.UI and MP.UI.update_connection_status then
+			pcall(MP.UI.update_connection_status)
+		end
+		-- Refresh the reactive main-menu buttons so they enable once connected.
+		if MP.update_main_menu_buttons then
+			pcall(MP.update_main_menu_buttons)
+		end
+	end)
+end)
