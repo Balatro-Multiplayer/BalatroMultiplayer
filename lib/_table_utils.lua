@@ -51,13 +51,9 @@ function MP.UTILS.reverse_key_value_pairs(tbl, stringify_keys)
 	return reversed_tbl
 end
 
-function MP.UTILS.shallow_copy(t)
-	local copy = {}
-	for k, v in pairs(t) do
-		copy[k] = v
-	end
-	return copy
-end
+-- Defers to the API's implementation (BalatroMultiplayerAPI/lib/util.lua) rather than
+-- shipping our own copy. MPAPI is a hard dependency and is loaded before this file.
+MP.UTILS.shallow_copy = MPAPI.shallow_copy
 
 function MP.UTILS.merge_tables(t1, t2)
 	local copy = MP.UTILS.shallow_copy(t1)

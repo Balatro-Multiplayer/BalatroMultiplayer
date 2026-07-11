@@ -13,7 +13,7 @@ function MP.STATS.get_player_joker_keys()
 end
 
 function MP.STATS.record_match(won)
-	local config = SMODS.Mods["Multiplayer"].config
+	local config = MP.config
 	config.joker_stats = config.joker_stats or {}
 	config.match_history = config.match_history or {}
 
@@ -35,10 +35,10 @@ function MP.STATS.record_match(won)
 		end
 	end
 
-	SMODS.save_mod_config(SMODS.Mods["Multiplayer"])
+	SMODS.save_mod_config(MP)
 end
 
 function MP.STATS.get_joker_wins(joker_key)
-	local config = SMODS.Mods["Multiplayer"].config
+	local config = MP.config
 	return config.joker_stats and config.joker_stats[joker_key] or 0
 end
