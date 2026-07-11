@@ -41,3 +41,15 @@ function SMODS.get_card_areas(_type, _context)
 	end
 	return get_card_areas_ref(_type, _context)
 end
+
+-- Register this showcase (MP.shared) + edition with the synced-object framework so
+-- `phantom = true` jokers spawn their display copies here, and install the masking patches
+-- (find_card / poll_edition / Card:remove) that hide phantom cards from real gameplay.
+if MPAPI and MPAPI.configure_phantom then
+	MPAPI.configure_phantom({
+		area = function()
+			return MP.shared
+		end,
+		edition = "e_mp_phantom",
+	})
+end

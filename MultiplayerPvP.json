@@ -1,24 +1,26 @@
 {
-  "id": "Multiplayer",
-  "name": "Multiplayer",
-  "display_name": "Multiplayer",
+  "id": "MultiplayerPvP",
+  "name": "MultiplayerPvP",
+  "display_name": "Multiplayer PvP",
   "author": [
     "Virtualized",
     "see credits"
   ],
-  "description": "Allows players to compete with their friends!",
+  "description": "Compete head-to-head with your friends in ranked, casual, and private PvP!",
   "prefix": "mp",
   "main_file": "core.lua",
-  "priority": 10000000,
+  "priority": 0,
   "badge_colour": "AC3232",
   "badge_text_colour": "FFFFFF",
   "version": "0.5.1",
   "dependencies": [
     "Steamodded (>=1.0.0~BETA-1221a)",
     "Lovely (>=0.8)",
-    "Balatro (>=1.0.1o)"
+    "Balatro (>=1.0.1o)",
+    "MultiplayerAPI"
   ],
   "conflicts": [
+    "Multiplayer",
     "SystemClock (<<1.6.3)",
     "Cryptid (<<0.5.4)",
     "Talisman (<=2.0.2)",

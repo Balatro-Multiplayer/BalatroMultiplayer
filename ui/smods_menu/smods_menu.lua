@@ -1,8 +1,8 @@
-SMODS.Mods.Multiplayer.credits_tab = MP.UI.create_credits_tab
+MP.credits_tab = MP.UI.create_credits_tab
 
-SMODS.Mods.Multiplayer.config_tab = MP.UI.create_config_tab
+MP.config_tab = MP.UI.create_config_tab
 
-SMODS.Mods.Multiplayer.extra_tabs = MP.UI.create_extra_tabs
+MP.extra_tabs = MP.UI.create_extra_tabs
 
 function G.FUNCS.bmp_discord(e)
 	love.system.openURL("https://discord.gg/gEemz4ptuF")
@@ -37,6 +37,6 @@ function G.FUNCS.change_blind_col(args) -- all we're doing is just saving + rede
 end
 
 function G.FUNCS.mp_change_timersfx(args)
-	SMODS.Mods["Multiplayer"].config.timersfx = args.to_key
-	SMODS.save_mod_config(SMODS.Mods["Multiplayer"]) -- probably unnecessary?
+	MP.config.timersfx = args.to_key
+	SMODS.save_mod_config(MP) -- probably unnecessary?
 end

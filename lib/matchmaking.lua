@@ -27,9 +27,9 @@ function MP:generate_hash()
 	table.sort(mod_data)
 	table.insert(mod_data, 1, "serversideConnectionID=" .. tostring(MP.UTILS.server_connection_ID()))
 	table.insert(mod_data, 1, "encryptID=" .. tostring(MP.UTILS.encrypt_ID()))
-	SMODS.Mods["Multiplayer"].config.unlocked = MP.UTILS.unlock_check()
-	table.insert(mod_data, 1, "unlocked=" .. tostring(SMODS.Mods["Multiplayer"].config.unlocked))
-	table.insert(mod_data, 1, "preview=" .. tostring(SMODS.Mods["Multiplayer"].config.integrations.Preview))
+	MP.config.unlocked = MP.UTILS.unlock_check()
+	table.insert(mod_data, 1, "unlocked=" .. tostring(MP.config.unlocked))
+	table.insert(mod_data, 1, "preview=" .. tostring(MP.config.integrations.Preview))
 	local mod_string = table.concat(mod_data, ";")
 	MP.MOD_STRING = mod_string
 	MP.MOD_HASH = hash(mod_string) or "0000"
@@ -203,7 +203,7 @@ function MP.UTILS.mp_version_mismatch()
 	local other = MP.LOBBY.is_host and MP.LOBBY.guest or MP.LOBBY.host
 	local their_version = other and MP.UTILS.player_mod_version(other, "Multiplayer")
 	if not their_version then return false end
-	local our_version = SMODS.Mods["Multiplayer"].version
+	local our_version = MP.version
 	local our_prefix = MP.UTILS.version_prefix(our_version)
 	local their_prefix = MP.UTILS.version_prefix(their_version)
 	if our_prefix and their_prefix and our_prefix ~= their_prefix then

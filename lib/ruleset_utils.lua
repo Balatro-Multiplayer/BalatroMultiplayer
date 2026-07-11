@@ -1,5 +1,5 @@
 function MP.UTILS.get_weekly()
-	return SMODS.Mods["Multiplayer"].config.weekly
+	return MP.config.weekly
 end
 
 -- Base timer in seconds, accounting for the active context's timer_base_multiplier

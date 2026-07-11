@@ -1,19 +1,19 @@
 function MP.UTILS.save_username(text)
 	MP.ACTIONS.set_username(text)
-	SMODS.Mods["Multiplayer"].config.username = text
+	MP.config.username = text
 end
 
 function MP.UTILS.get_username()
-	return SMODS.Mods["Multiplayer"].config.username
+	return MP.config.username
 end
 
 function MP.UTILS.save_blind_col(num)
 	MP.ACTIONS.set_blind_col(num)
-	SMODS.Mods["Multiplayer"].config.blind_col = num
+	MP.config.blind_col = num
 end
 
 function MP.UTILS.get_blind_col()
-	return SMODS.Mods["Multiplayer"].config.blind_col
+	return MP.config.blind_col
 end
 
 function MP.UTILS.blind_col_numtokey(num)
@@ -88,12 +88,12 @@ end
 
 function MP.UTILS.save_preview(table)
 	for k, v in pairs(table) do
-		SMODS.Mods["Multiplayer"].config.preview[k] = v
+		MP.config.preview[k] = v
 	end
 end
 
 function MP.UTILS.get_preview_cfg(index)
-	local ret = SMODS.Mods["Multiplayer"].config.preview[index]
+	local ret = MP.config.preview[index]
 	if not ret or #ret < 1 then
 		if index == "text" then
 			ret = "CALCULATING"
