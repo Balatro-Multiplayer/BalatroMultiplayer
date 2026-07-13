@@ -26,9 +26,16 @@ local json = require("json")
 
 Client = {}
 
+local no_log_actions = {
+    dataSync = true,
+    keepAlive = true,
+    keepAliveAck = true,
+}
+
 function Client.send(msg)
+    local should_send_log = not (msg and msg.action and no_log_actions[msg.action])
 	msg = json.encode(msg)
-	if msg ~= '{"action":"keepAliveAck"}' then
+	if should_send_log then
 		sendTraceMessage(string.format("Client sent message: %s", msg), "MULTIPLAYER")
 	end
 	love.thread.getChannel("uiToNetwork"):push(msg)
@@ -781,6 +788,12 @@ local function action_magnet_response(p)
 	sendTraceMessage(string.format("Received magnet joker: %s", MP.UTILS.joker_to_string(card)), "MULTIPLAYER")
 end
 
+local function action_data_sync(data)
+    if data.timer then
+        MP.GAME.enemy.last_timer = data.timer or 0
+    end
+end
+
 function G.FUNCS.load_end_game_jokers()
 	local card_area_save, success, err
 
@@ -1380,6 +1393,14 @@ function MP.ACTIONS.update_player_usernames()
 	end
 end
 
+function MP.ACTIONS.data_sync()
+    local timer = (MP.is_layer_active("speedlatro_timer") and MP.speedlatro_timer and MP.speedlatro_timer.real) or MP.GAME.timer
+    Client.send({
+        action = "dataSync",
+        timer = timer
+    })
+end
+
 local function string_to_table(str)
 	local tbl = {}
 	for part in string.gmatch(str, "([^,]+)") do
@@ -1438,6 +1459,7 @@ local HANDLERS = {
 	moddedAction = action_modded_action,
 	error = action_error,
 	keepAlive = action_keep_alive,
+    dataSync = action_data_sync,
 }
 
 function MP.register_action(name, cb)
@@ -1476,7 +1498,7 @@ function Game:update(dt)
 
 			local ok, parsedAction = pcall(json.decode, msg)
             if ok then
-                if not ((parsedAction.action == "keepAlive") or (parsedAction.action == "keepAliveAck")) then
+                if not no_log_actions[parsedAction.action] then
                     local log = string.format("Client got %s message: ", parsedAction.action)
                     for k, v in pairs(parsedAction) do
                         if parsedAction.action == "startGame" and k == "seed" then
