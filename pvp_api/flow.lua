@@ -27,6 +27,14 @@ end
 
 function MP.pvp_create_private_lobby(gamemode_key)
 	gamemode_key = gamemode_key or "pvp_standard"
+	-- Block creating a lobby while in matchmaking. The replay re-enters THIS
+	-- function (not MPAPI.create_lobby) so "Leave Queue & Continue" runs the full
+	-- setup -- setup_lobby_mirror + the CONNECTED UI transition below. Replaying
+	-- the API primitive would allocate the lobby server-side but leave the client
+	-- stranded on the menu.
+	if MPAPI.matchmaking.guard_queued(function() return MP.pvp_create_private_lobby(gamemode_key) end) then
+		return
+	end
 	local gm = MPAPI.GameModes[gamemode_key]
 	local max_p = (gm and gm.get_max_players and gm:get_max_players(MPAPI.LobbyType and MPAPI.LobbyType.PRIVATE or "private")) or 2
 	local lobby = MPAPI.create_lobby(MP.id, { max_players = max_p })
@@ -55,6 +63,14 @@ function MP.pvp_join_lobby(code)
 		return
 	end
 	code = tostring(code):gsub("%s", "")
+	-- Block joining while in matchmaking. The replay re-enters THIS function (not
+	-- MPAPI.join_lobby) so "Leave Queue & Continue" runs the full setup --
+	-- setup_lobby_mirror + its CONNECTED UI transition. Replaying the API
+	-- primitive would join server-side (the host sees you) but leave your client
+	-- stranded on the PvP menu.
+	if MPAPI.matchmaking.guard_queued(function() return MP.pvp_join_lobby(code) end) then
+		return
+	end
 	local lobby = MPAPI.join_lobby(MP.id, code)
 	if not lobby then
 		sendWarnMessage("pvp_join_lobby: failed to join " .. tostring(code), "MULTIPLAYER")
