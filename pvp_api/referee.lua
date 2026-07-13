@@ -15,6 +15,7 @@ MP.REF = MP.REF
 	or {
 		players = {},
 		first_ready_at = nil,
+		match_over = false,
 		-- Nemesis-pairing (rotating no-repeat 1v1 duels, N>2): nemesis_of[id]=partner
 		-- id for the current ante (absent = bye this ante); used_pairs is the
 		-- no-repeat memory; last_bye_id lets bye assignment prefer rotating away
@@ -35,6 +36,19 @@ local function broadcast(key, params)
 	if lobby and MPAPI.ActionTypes[key] then
 		lobby:action(MPAPI.ActionTypes[key]):broadcast(params or {})
 	end
+end
+
+-- The match ends the first time a game winner is declared. Every subsequent
+-- resolution attempt (extra play_hand loopbacks, timer fails, N>2 progress-nudge
+-- re-checks, etc. that still observe <=1 alive) must NOT re-broadcast pvp_win, or
+-- clients replay the win/lose jingle and screen once per stray event instead of
+-- once per match.
+local function declare_win(winner_id)
+	if MP.REF.match_over then
+		return
+	end
+	MP.REF.match_over = true
+	broadcast("pvp_win", { winner_id = winner_id })
 end
 
 local function ref_player(id)
@@ -91,11 +105,12 @@ local function alive_ids()
 end
 
 -- Declares pvp_win once exactly one player remains alive (Royale's N-player analog
--- of the 2-player "opponent hit 0 lives" check). Returns true if it fired.
+-- of the 2-player "opponent hit 0 lives" check). Returns true if it fired (or had
+-- already fired -- see declare_win's match_over guard).
 local function check_alive_win()
 	local alive = alive_ids()
 	if #alive <= 1 then
-		broadcast("pvp_win", { winner_id = alive[1] or "*draw*" })
+		declare_win(alive[1] or "*draw*")
 		return true
 	end
 	return false
@@ -224,6 +239,7 @@ function MP.referee_reset(starting_lives)
 	MP.REF.used_pairs = {}
 	MP.REF.nemesis_ante_computed_for = 0
 	MP.REF.last_bye_id = nil
+	MP.REF.match_over = false
 	MP._result_reported = false
 	local lives = starting_lives or MP.LOBBY.config.starting_lives or 4
 	for _, id in ipairs(both_players()) do
@@ -360,6 +376,9 @@ end
 -- 2 alive -- at exactly 2 alive, floor(2/2)=1 degenerates to "the lower scorer of
 -- the pair loses a life", so the ending plays out identically to a 1v1 anyway.
 local function try_resolve_round()
+	if MP.REF.match_over then
+		return
+	end
 	local total = both_players()
 	if #total < 2 then
 		return
@@ -379,7 +398,7 @@ local function try_resolve_round()
 				local game_winner = (a.lives > b.lives) and a or b
 				winner.first_ready = false
 				loser.first_ready = false
-				broadcast("pvp_win", { winner_id = game_winner.id })
+				declare_win(game_winner.id)
 				return
 			end
 		end
