@@ -247,7 +247,11 @@ end
 function G.FUNCS:continue_in_singleplayer(e)
 	-- Detach from the multiplayer lobby (the API owns leave now; the legacy
 	-- MP.ACTIONS.leave_lobby() is a no-op here), then update UI. The run itself is kept
-	-- and reloaded below so the player continues solo.
+	-- and reloaded below so the player continues solo. lobby:leave() is async
+	-- (server round trip) for a live lobby, but its completion only clears mod
+	-- focus/UI state (see BalatroMultiplayerAPI on_lobby_disconnected) -- it
+	-- never touches G.GAME/G.ARGS, so it's safe regardless of when it lands
+	-- relative to the reload below.
 	MP.LOBBY.code = nil
 	local lobby = MPAPI.get_current_lobby()
 	if lobby then
@@ -255,22 +259,32 @@ function G.FUNCS:continue_in_singleplayer(e)
 	end
 	MP.UI.update_connection_status()
 
-	-- Allow saving, save the run, and set up for continuation
+	-- Allow saving and build the save table. save_run() synchronously fills in
+	-- G.ARGS.save_run; the disk write it queues happens later, off-thread, so we
+	-- don't wait for it (see MP.UTILS.decide_continue_singleplayer for why the
+	-- old disk round trip was racy). Deep-copy the snapshot now, before
+	-- G:delete_run() mutates the live G.GAME table it still references
+	-- (e.g. G.GAME.won = false).
 	G.F_NO_SAVING = false
 	G.SETTINGS.current_setup = "Continue"
-	G.FUNCS.wipe_on()
 	save_run()
+	local savetext = G.ARGS and G.ARGS.save_run and copy_table(G.ARGS.save_run) or nil
+
+	local decision = MP.UTILS.decide_continue_singleplayer(savetext)
+	if decision.action == "abort" then
+		sendWarnMessage(decision.reason, "MULTIPLAYER")
+		return
+	end
+
+	G.FUNCS.wipe_on()
 	G:delete_run()
 
-	-- Load the saved game and start a new run in singleplayer
+	-- Resume the captured run in-memory -- no disk round trip.
 	G.E_MANAGER:add_event(Event({
 		trigger = "immediate",
 		no_delete = true,
 		func = function()
-			local profile = G.SETTINGS.profile
-			local save_path = profile .. "/save.jkr"
-			G.SAVED_GAME = get_compressed(save_path)
-			if G.SAVED_GAME ~= nil then G.SAVED_GAME = STR_UNPACK(G.SAVED_GAME) end
+			G.SAVED_GAME = decision.savetext
 			G:start_run({ savetext = G.SAVED_GAME })
 			return true
 		end,
