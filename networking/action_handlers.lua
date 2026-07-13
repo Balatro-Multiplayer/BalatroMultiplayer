@@ -127,10 +127,21 @@ end
 local _disconnect_gupdate = Game.update
 function Game:update(dt)
 	if MP.enemy_disconnect_countdown then
-		local remaining = math.max(0, math.ceil(MP.enemy_disconnect_countdown.end_time - love.timer.getTime()))
-		MP.enemy_disconnect_countdown.display = remaining .. "s remaining"
-		-- No client-side timeout needed: the server sends stopGame
-		-- when the grace period expires, which handles the cleanup
+		local countdown = MP.enemy_disconnect_countdown
+		local remaining = math.max(0, math.ceil(countdown.end_time - love.timer.getTime()))
+		countdown.display = remaining .. "s remaining"
+		-- There is no server anymore to send stopGame on timeout (MQTT/API
+		-- framework is a relay only) -- resolve the forfeit locally, exactly
+		-- once (MP.disconnect_grace_expired is the single-fire guard).
+		if MP.disconnect_grace_expired(remaining, countdown) then
+			countdown.resolved = true
+			local departed_id = countdown.player_id
+			MP.enemy_disconnect_countdown = nil
+			G.FUNCS.exit_overlay_menu()
+			if MP.resolve_enemy_disconnect_forfeit then
+				MP.resolve_enemy_disconnect_forfeit(departed_id)
+			end
+		end
 	end
 	if MP.self_reconnect_countdown then
 		local remaining = math.max(0, math.ceil(MP.self_reconnect_countdown.end_time - love.timer.getTime()))
@@ -153,6 +164,8 @@ local function action_enemyDisconnected(p)
 	MP.enemy_disconnect_countdown = {
 		end_time = love.timer.getTime() + timeout,
 		display = timeout .. "s remaining",
+		player_id = p.player_id,
+		resolved = false,
 	}
 
 	MP.UI.UTILS.overlay_message_countdown(
