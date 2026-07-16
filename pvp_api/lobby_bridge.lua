@@ -127,7 +127,7 @@ MP.setup_lobby_mirror = function(lobby)
 		-- The gamemode's forfeit hook (host-authoritative) handles a mid-match leave.
 		local gm = lobby.get_gamemode_instance and lobby:get_gamemode_instance()
 		if gm and gm.on_player_forfeit and G.STAGE == G.STAGES.RUN then
-			gm:on_player_forfeit(player_id)
+			MPAPI._handle_gamemode_result(gm, gm:on_player_forfeit(player_id))
 		end
 		refresh()
 	end)
