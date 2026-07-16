@@ -45,6 +45,10 @@ MPAPI.Joker({
 	end,
 	-- Was action_sold_joker.
 	receive = function(self, context)
+		MP.note_target_candidate(context.from)
+		if MP.current_target_id() and context.from ~= MP.current_target_id() then
+			return
+		end
 		MP.GAME.enemy.sells = MP.GAME.enemy.sells + 1
 		MP.GAME.enemy.sells_per_ante[G.GAME.round_resets.ante] = (MP.GAME.enemy.sells_per_ante[G.GAME.round_resets.ante] or 0)
 			+ 1

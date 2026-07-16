@@ -23,6 +23,47 @@ function MP.get_opponent_id()
 	return nil
 end
 
+-- The gamemode-defined "current target": whichever player's enemy-facing state
+-- (score/hands/lives sync, HUD, joker targeting like Asteroid/Penny Pincher/the
+-- Nemesis boss blind) should be treated as "the enemy" right now.
+--  - Nemesis-pairing (rotating no-repeat duels, N>2): this ante's assigned partner,
+--    broadcast by the host each ante; nil if byed or not yet received.
+--  - Plain 1v1: the sole other lobby player, unchanged from before this existed.
+--  - Royale (N>2, no pairing): whichever sender's sync arrived first since this
+--    blind started (see MP.note_target_candidate) -- a stable per-blind choice,
+--    not a literal reroll on every hit, since a true per-hit reroll would need a
+--    client-visible alive-roster broadcast that doesn't exist today.
+function MP.current_target_id()
+	if MP.LOBBY.config.nemesis_pairing then
+		return MP.GAME.nemesis_partner_id
+	end
+	local lobby = MPAPI.get_current_lobby()
+	if not lobby then
+		return nil
+	end
+	if #lobby:get_players() == 2 then
+		return MP.get_opponent_id()
+	end
+	return MP.GAME.royale_target_id
+end
+
+-- Lets Royale's "first sync wins" strategy latch onto a target: called by the
+-- enemy-targeting receive() guard on every incoming sync, before filtering. A
+-- no-op for 1v1 (target is resolved from roster state, not a latch) and for
+-- Nemesis-pairing (target is host-assigned, not sender-latched).
+function MP.note_target_candidate(sender_id)
+	if MP.LOBBY.config.nemesis_pairing then
+		return
+	end
+	local lobby = MPAPI.get_current_lobby()
+	if not lobby or #lobby:get_players() == 2 then
+		return
+	end
+	if not MP.GAME.royale_target_id then
+		MP.GAME.royale_target_id = sender_id
+	end
+end
+
 local function player_name(lobby, player_id)
 	for _, p in ipairs(lobby:get_players()) do
 		if p.id == player_id then
@@ -51,6 +92,12 @@ local function mirror_metadata(lobby)
 			MP.LOBBY.config[k] = v
 		end
 	end
+	-- nemesis_pairing isn't part of the shared metadata schema, so it can't ride the
+	-- generic loop above -- but every client (not just the host, who's the only one
+	-- that runs pvp_nemesis's start_run) needs it set correctly, since
+	-- MP.current_target_id/attrition.lua's bye check/the joker-targeting guards all
+	-- run client-side. Derive it the same way gamemode/ruleset are derived here.
+	MP.LOBBY.config.nemesis_pairing = (def and def.nemesis_pairing) or nil
 	if meta.deck then
 		MP.LOBBY.deck.back = meta.deck
 	end
