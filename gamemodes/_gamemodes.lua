@@ -1,32 +1,23 @@
-G.P_CENTER_POOLS.Gamemode = {}
-MP.Gamemodes = {}
-MP.Gamemode = SMODS.GameObject:extend({
-	obj_table = {},
-	obj_buffer = {},
-	required_params = {
-		"key",
-		"get_blinds_by_ante", -- Define custom logic for determining Small, Big, and Boss Blind based on the ante number.
-		"banned_jokers",
-		"banned_consumables",
-		"banned_vouchers",
-		"banned_enhancements",
-		"banned_tags",
-		"banned_blinds",
-		"reworked_jokers",
-		"reworked_consumables",
-		"reworked_vouchers",
-		"reworked_enhancements",
-		"reworked_tags",
-		"reworked_blinds",
-		"create_info_menu",
-	},
-	class_prefix = "gamemode",
-	inject = function(self)
-		MP.Gamemodes[self.key] = self
-		if not G.P_CENTER_POOLS.Gamemode then G.P_CENTER_POOLS.Gamemode = {} end
-		table.insert(G.P_CENTER_POOLS.Gamemode, self)
-	end,
-	process_loc_text = function(self)
-		SMODS.process_loc_text(G.localization.descriptions["Gamemode"], self.key, self.loc_txt)
-	end,
-})
+-- Thin delegating wrapper around MPAPI.GameMode. PvP's internal Gamemode objects
+-- (survival/showdown/attrition) are content/blind-selection profiles, not run-
+-- starters -- run-starting for the public matchmaking surface is owned by the
+-- separate bridge GameModes in pvp_api/gamemodes.lua (keys like "pvp_standard").
+-- MPAPI.GameMode requires `start_run`; none of these three ever call it, so
+-- default it to a no-op rather than forcing every gamemode file to define one it
+-- doesn't need.
+--
+-- Key prefixing: PvP gamemode files pass short keys (key = "attrition") and have
+-- always relied on a "gamemode_mp_" prefix (class "gamemode" + this mod's "mp")
+-- for the full key used everywhere else in the codebase -- same reasoning as
+-- rulesets/_rulesets.lua's MP.Ruleset.
+
+MP.Gamemodes = MPAPI.GameModes
+
+local function noop_start_run() end
+
+function MP.Gamemode(init)
+	init.key = "gamemode_mp_" .. init.key
+	init.prefix_config = init.prefix_config or { key = false }
+	init.start_run = init.start_run or noop_start_run
+	return MPAPI.GameMode(init)
+end
