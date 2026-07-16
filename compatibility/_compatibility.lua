@@ -30,6 +30,26 @@ function MP.DECK.ban_blind(blind_id)
 	MP.DECK.BANNED_BLINDS[#MP.DECK.BANNED_BLINDS + 1] = blind_id
 end
 
+-- Compat-mod bans (ban_card/ban_tag/ban_blind, called from the individual
+-- compatibility/*.lua shims below) aren't part of any ruleset/gamemode's own
+-- banned_* fields, so MPAPI.ApplyBans wouldn't see them without this.
+MPAPI.register_ban_source(function()
+	local keys = {}
+	for _, list in ipairs({
+		MP.DECK.BANNED_JOKERS,
+		MP.DECK.BANNED_CONSUMABLES,
+		MP.DECK.BANNED_VOUCHERS,
+		MP.DECK.BANNED_ENHANCEMENTS,
+		MP.DECK.BANNED_TAGS,
+		MP.DECK.BANNED_BLINDS,
+	}) do
+		for _, key in ipairs(list) do
+			keys[#keys + 1] = key
+		end
+	end
+	return keys
+end)
+
 local j_broken = {
 	order = 1,
 	unlocked = true,
