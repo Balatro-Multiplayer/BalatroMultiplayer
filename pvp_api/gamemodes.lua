@@ -29,9 +29,32 @@ MP.PVP_GAMEMODES = {
 	pvp_expanded = { ruleset = "ruleset_mp_blitz", gamemode = "gamemode_mp_attrition", display = "Expanded", has_ranked = false },
 	pvp_vanilla = { ruleset = "ruleset_mp_vanilla", gamemode = "gamemode_mp_attrition", display = "Vanilla", has_ranked = false },
 	pvp_smallworld = { ruleset = "ruleset_mp_smallworld", gamemode = "gamemode_mp_attrition", display = "Small World", has_ranked = false },
+	-- Royale (2-16 players): reuses attrition's blind-selection and a plain ruleset.
+	-- Kept out of the uniform 1v1 loop below (own min/max_players, no ban_pick draft --
+	-- that schedule hardcodes exactly 2 alternating actors) but still present in this
+	-- table so lobby_bridge.lua's mirror_metadata / flow.lua's key lookup resolve
+	-- "pvp_royale" to the correct internal ruleset/gamemode. `custom_bridge` marks
+	-- entries (Royale, Nemesis) registered via their own MPAPI.GameMode call below
+	-- instead of the uniform 1v1 loop -- not "is Royale specifically".
+	pvp_royale = { ruleset = "ruleset_mp_vanilla", gamemode = "gamemode_mp_attrition", display = "Royale", has_ranked = false, custom_bridge = true },
+	-- Nemesis (2-16 players): rotating no-repeat 1v1 pairing, re-paired each ante --
+	-- same reasons as Royale for being out of the uniform loop (no ban_pick, own
+	-- max_players). The `nemesis_pairing` flag (not `gamemode`/`ruleset`, which are
+	-- shared with Royale) is what every pairing-aware piece of code branches on.
+	pvp_nemesis = {
+		ruleset = "ruleset_mp_vanilla",
+		gamemode = "gamemode_mp_attrition",
+		display = "Nemesis",
+		has_ranked = false,
+		custom_bridge = true,
+		-- Read by lobby_bridge.lua's mirror_metadata to set MP.LOBBY.config.nemesis_pairing
+		-- on EVERY client (not just the host, who's the only one that runs start_run below).
+		nemesis_pairing = true,
+	},
 }
 
 for key, def in pairs(MP.PVP_GAMEMODES) do
+	if not def.custom_bridge then
 	MPAPI.GameMode({
 		key = key,
 		-- Keep the literal `pvp_*` key (the server/web matchmaking taxonomy expects it);
@@ -73,6 +96,80 @@ for key, def in pairs(MP.PVP_GAMEMODES) do
 		on_ante_change = function(self, ante) end,
 		-- Host-authoritative: when the opponent forfeits/leaves, the last player
 		-- standing wins. The registered winner handler above performs the broadcast.
+		on_player_forfeit = function(self, player_id)
+			local winner_id = self:check_single_survivor(player_id)
+			if not winner_id then
+				return
+			end
+			return { winner = winner_id }
+		end,
+	})
+	end
+end
+
+-- Royale: same bridge shape as the loop above, but 2-16 players and no ban/pick
+-- draft (the 2-actor ban_pick schedule above doesn't generalize to N players).
+-- Elimination math (rank-and-cut bottom half) lives in pvp_api/referee.lua.
+do
+	local def = MP.PVP_GAMEMODES.pvp_royale
+	MPAPI.GameMode({
+		key = "pvp_royale",
+		prefix_config = { key = false },
+		display_name = def.display,
+		has_ranked_mode = def.has_ranked,
+		min_players = 2,
+		max_players = { public = 16, private = 16 },
+		start_run = function(self, deck_name, seed)
+			MP.LOBBY.config.ruleset = def.ruleset
+			MP.LOBBY.config.gamemode = def.gamemode
+			if deck_name then
+				MP.LOBBY.deck.back = deck_name
+			end
+			G.FUNCS.lobby_start_run(nil, { seed = seed })
+		end,
+		get_blinds_by_ante = function(self, ante)
+			return nil, nil, nil
+		end,
+		on_ante_change = function(self, ante) end,
+		on_player_forfeit = function(self, player_id)
+			local winner_id = self:check_single_survivor(player_id)
+			if not winner_id then
+				return
+			end
+			return { winner = winner_id }
+		end,
+	})
+end
+
+-- Nemesis: same bridge shape as Royale (2-16 players, no ban/pick draft). The
+-- distinguishing MP.LOBBY.config.nemesis_pairing flag (every pairing-aware piece
+-- of code -- referee.lua, MP.current_target_id, attrition.lua's bye check --
+-- branches on it, since Royale and Nemesis otherwise share the identical
+-- gamemode/ruleset pair) is set for EVERY client, host and guests alike, by
+-- lobby_bridge.lua's mirror_metadata (keyed off this mode's `nemesis_pairing =
+-- true` marker in MP.PVP_GAMEMODES.pvp_nemesis above) -- not here, since start_run
+-- only ever runs on the host. Round-robin pairing itself lives in referee.lua.
+do
+	local def = MP.PVP_GAMEMODES.pvp_nemesis
+	MPAPI.GameMode({
+		key = "pvp_nemesis",
+		prefix_config = { key = false },
+		display_name = def.display,
+		has_ranked_mode = def.has_ranked,
+		min_players = 2,
+		max_players = { public = 16, private = 16 },
+		start_run = function(self, deck_name, seed)
+			MP.LOBBY.config.ruleset = def.ruleset
+			MP.LOBBY.config.gamemode = def.gamemode
+			if deck_name then
+				MP.LOBBY.deck.back = deck_name
+			end
+			G.FUNCS.lobby_start_run(nil, { seed = seed })
+		end,
+		get_blinds_by_ante = function(self, ante)
+			return nil, nil, nil
+		end,
+		on_ante_change = function(self, ante) end,
 		on_player_forfeit = function(self, player_id)
 			local winner_id = self:check_single_survivor(player_id)
 			if not winner_id then
