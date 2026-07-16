@@ -1158,6 +1158,140 @@ return {
 				},
 			},
 		},
+		Trap = {
+			c_mp_trap_alarm = {
+				name = "Alarm",
+				text = {
+					"When your {X:purple,C:white}Nemesis{} rerolls",
+					"the shop, gain {C:attention}2{} free rerolls",
+				},
+			},
+			c_mp_trap_phase_door = {
+				name = "Phase Door",
+				text = {
+					"When your {X:purple,C:white}Nemesis{} triggers a",
+					"gold card, gain {C:money}$4{} for every",
+					"gold card in their hand",
+				},
+			},
+			c_mp_trap_fire_trap = {
+				name = "Fire Trap",
+				text = {
+					"When your {X:purple,C:white}Nemesis{} plays a",
+					"hand that contains a {C:attention}Pair{},",
+					"decrease the rank of all",
+					"scored cards by {C:attention}1{}",
+				},
+			},
+			c_mp_trap_forbiddance = {
+				name = "Forbiddance",
+				text = {
+					"When your {X:purple,C:white}Nemesis{} discards,",
+					"the cards drawn from their",
+					"deck are {C:attention}flipped{}",
+				},
+			},
+			c_mp_trap_guards_and_wards = {
+				name = "Guards and Wards",
+				text = {
+					"When your {X:purple,C:white}Nemesis{} adds a",
+					"playing card to their deck,",
+					"add {C:attention}2{} Stone Cards to",
+					"their deck",
+				},
+			},
+			c_mp_trap_faithful_hound = {
+				name = "Faithful Hound",
+				text = {
+					"When your {X:purple,C:white}Nemesis{} uses a",
+					"Planet card, gain {C:attention}3{} levels",
+					"for the same poker hand",
+				},
+			},
+			c_mp_trap_programmed_illusion = {
+				name = "Programmed Illusion",
+				text = {
+					"When your {X:purple,C:white}Nemesis{} opens a",
+					"booster pack, add a",
+					"{C:attention}fake{} card to the pack",
+				},
+			},
+			c_mp_trap_arcane_lock = {
+				name = "Arcane Lock",
+				text = {
+					"When your {X:purple,C:white}Nemesis{} uses a",
+					"{C:attention}Trap{} card, they get",
+					"trapped instead",
+				},
+			},
+			c_mp_trap_mental_prison = {
+				name = "Mental Prison",
+				text = {
+					"When your {X:purple,C:white}Nemesis{} fails to",
+					"use a {C:attention}Wheel of Fortune{}",
+					"they see, create {C:attention}2{}",
+					"Wheel of Fortunes",
+				},
+			},
+			c_mp_trap_magic_mouth = {
+				name = "Magic Mouth",
+				text = {
+					"When your {X:purple,C:white}Nemesis{} triggers a",
+					"{C:blue}Blue{} or {C:purple}Purple{} Seal,",
+					"steal the consumable",
+				},
+			},
+			c_mp_trap_explosive_runes = {
+				name = "Explosive Runes",
+				text = {
+					"When your {X:purple,C:white}Nemesis{} plays a",
+					"hand with a {C:attention}Glass{} card,",
+					"all Glass cards in the hand",
+					"are guaranteed to break",
+				},
+			},
+			c_mp_trap_sepia_snake_sigil = {
+				name = "Sepia Snake Sigil",
+				text = {
+					"When your {X:purple,C:white}Nemesis{} buys a",
+					"{C:attention}Rare{} Joker, gain a",
+					"copy of it",
+				},
+			},
+			c_mp_trap_snare = {
+				name = "Snare",
+				text = {
+					"When your {X:purple,C:white}Nemesis{} skips a",
+					"Blind, gain a copy of",
+					"the Tag",
+				},
+			},
+			c_mp_trap_symbol = {
+				name = "Symbol",
+				text = {
+					"When your {X:purple,C:white}Nemesis{} plays a",
+					"hand that contains a",
+					"{C:attention}Flush{}, convert all scored",
+					"cards to random suits",
+				},
+			},
+			c_mp_trap_glyph_of_warding = {
+				name = "Glyph of Warding",
+				text = {
+					"When your {X:purple,C:white}Nemesis{} uses a",
+					"{C:attention}Spectral{} card, open a",
+					"{C:attention}Jumbo{} Spectral pack",
+				},
+			},
+			c_mp_trap_web = {
+				name = "Web",
+				text = {
+					"When your {X:purple,C:white}Nemesis{} uses a",
+					"consumable, gain a",
+					"{C:attention}Negative{} copy of it",
+				},
+			},
+		},
 	},
 	misc = {
 		labels = {
