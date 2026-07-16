@@ -1385,6 +1385,7 @@ return {
 			k_amount_short = "Amt.",
 			k_filed_ex = "Filed!",
 			k_timer = "Timer",
+			k_nemesis_timer = "Nemesis",
 			k_mods_list = "Mods List",
 			k_enemy_jokers = "Enemy Jokers",
 			k_your_jokers = "Your Jokers",
