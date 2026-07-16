@@ -67,3 +67,22 @@ changes it.
 Play one real multiplayer match, then open the Lovely log. Filter the `MP_RLOG:`
 (positional) and `Client sent message:` (human) lines and confirm they mirror
 each action event-for-event.
+
+## Trap card utilities (lib/trap_utils.lua)
+
+`test_trap_utils.lua` covers the pure-logic pieces of the Trap framework that
+don't need the live game engine: `MP.TRAP.decrease_rank`'s suit/rank-key
+arithmetic (mirrors Strength's own rank+1 pattern, inverted, floored at 2) and
+`MP.TRAP.notify_owner`'s payload shape.
+
+```bash
+luajit tests/test_trap_utils.lua
+```
+
+### What it does not check
+
+The plant → disguise → reveal → notify-owner flow itself (network round-trip,
+`G.consumeables` placement, `facing`/reveal animation, the per-card `calculate`/
+`receive` trigger conditions) needs a running Balatro + Integration (BInt)
+instance — see the root `CLAUDE.md`'s `bint run` workflow — and isn't covered by
+this static harness.
