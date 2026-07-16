@@ -548,6 +548,9 @@ function set_main_menu_UI()
 	end
 end
 
+local data_sync_interval = 5
+local data_sync_delay = data_sync_interval
+
 local in_lobby = false
 local gameUpdateRef = Game.update
 ---@diagnostic disable-next-line: duplicate-set-field
@@ -561,6 +564,14 @@ function Game:update(dt)
 			MP.reset_game_states()
 		end
 	end
+    -- Data sync every 5 seconds
+    if MP.LOBBY.code and G.STAGE == G.STAGES.RUN then
+        data_sync_delay = data_sync_delay - dt
+        if data_sync_delay < 0 then
+            data_sync_delay = data_sync_interval
+            MP.ACTIONS.data_sync()
+        end
+    end
 	gameUpdateRef(self, dt)
 end
 
