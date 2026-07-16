@@ -9,14 +9,18 @@ MP.LobbyKind = {
 	RANKED_PREFIX = "ranked:",
 }
 
--- Host-authored shared lobby metadata. `gamemode` stays the API/queue key (e.g.
--- "pvp_standard"); the mirror (lobby_bridge) translates it to MP's own gamemode/
--- ruleset keys for blind selection + bans.
+-- Host-authored shared lobby metadata. `gamemode`/`ruleset` are MPAPI's own content
+-- keys (e.g. "gamemode_mp_attrition" / "ruleset_mp_standard_ranked") so MPAPI.ApplyBans/
+-- MPAPI.get_active_gamemode() resolve directly to the banned_*-bearing object, no
+-- translation needed. `queue_mode` carries the separate API/queue/bridge key (e.g.
+-- "pvp_standard") that the matchmaking taxonomy, ban_pick draft, and per-lobby
+-- MPAPI.GameModes[...] instance (forfeit handling) still need.
 function MP.pvp_lobby_metadata(gamemode_key, kind)
 	local def = MP.PVP_GAMEMODES[gamemode_key] or MP.PVP_GAMEMODES.pvp_standard
 	return {
-		gamemode = gamemode_key,
+		gamemode = def.gamemode,
 		ruleset = def.ruleset,
+		queue_mode = gamemode_key,
 		kind = kind or MP.LobbyKind.PRIVATE,
 		deck = MP.LOBBY.config.back or "Red Deck",
 		stake = tostring(MP.LOBBY.config.stake or 1),
@@ -75,8 +79,8 @@ function MP.pvp_start_match()
 		MP.UI.UTILS.overlay_message("Waiting for an opponent...")
 		return
 	end
-	local gamemode_key = (lobby:get_metadata() or {}).gamemode or MP._pvp_gamemode or "pvp_standard"
-	local gm_def = MPAPI.GameModes[gamemode_key]
+	local queue_mode = (lobby:get_metadata() or {}).queue_mode or MP._pvp_gamemode or "pvp_standard"
+	local gm_def = MPAPI.GameModes[queue_mode]
 	if gm_def and gm_def.new_instance then
 		lobby._gamemode_instance = gm_def:new_instance()
 	end
