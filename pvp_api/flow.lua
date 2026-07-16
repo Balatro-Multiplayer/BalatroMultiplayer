@@ -96,7 +96,7 @@ function MP.pvp_leave_lobby()
 	MP.LOBBY.connected = false
 	MP.LOBBY.code = nil
 	MP.CURRENT_LOBBY = nil
-	MP.MODIFIERS = {}
+	MPAPI.MODIFIERS = {}
 	MP._version_mismatch_shown = false
 	if G.STATE ~= G.STATES.MENU then
 		G.STATE = G.STATES.MENU
