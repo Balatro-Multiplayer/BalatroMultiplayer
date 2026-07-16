@@ -441,4 +441,72 @@ function LOG_PARSER.to_replay(game)
 	return replay
 end
 
+-------------------------------------------------------------------------------
+-- Convert a downloaded carbon event stream (Phase 6 server replay) to the same
+-- replay shape as to_replay(), so ghost_replay.lua's playback code needs no
+-- changes at all.
+-------------------------------------------------------------------------------
+
+-- `events` is an array of {t=, opcode=, args=} (already JSON-decoded from a
+-- server-downloaded matchRunLogs block -- see MP.RLOG's carbon opcode
+-- vocabulary in lib/replay_log.lua). One carbon log is inherently ONE player's
+-- own actions, so `side` ("player" or "enemy") says which side these events
+-- represent in the resulting ante_snapshots; combining both players' logs into
+-- a single two-sided replay is the caller's job (concatenate each side's
+-- per-ante hands arrays, e.g. by download.lua once it exists).
+--
+-- Ghost playback only reads ante_snapshots[ante].hands[] (side/score/
+-- hands_left) -- see ghost_replay.lua -- so that's all this builds; the richer
+-- scalar fields to_replay() fills in (player_lives, result, etc.) come from
+-- the manifest/server context instead, which downloaded carbon logs don't carry.
+function LOG_PARSER.carbon_to_replay(events, extra, side)
+	extra = extra or {}
+	side = side or "player"
+
+	local manifest, outcome = {}, nil
+	local ante_snapshots = {}
+	local current_ante = 0
+
+	for _, ev in ipairs(events or {}) do
+		local opcode = ev.opcode
+		if opcode == "manifest" then
+			manifest = ev.args or {}
+		elseif opcode == "end" then
+			outcome = ev.args
+		elseif opcode == "set_ante_key" then
+			current_ante = current_ante + 1
+		elseif opcode == "hand_result" and current_ante > 0 then
+			local args = ev.args or {}
+			local score, hands_left = args[1], args[2]
+			local snap = ante_snapshots[current_ante]
+			if not snap then
+				snap = { hands = {} }
+				ante_snapshots[current_ante] = snap
+			end
+			snap.hands[#snap.hands + 1] = {
+				side = side,
+				score = tostring(score),
+				hands_left = tonumber(hands_left) or 0,
+			}
+		end
+	end
+
+	local replay = {
+		gamemode = manifest.gamemode or "gamemode_mp_attrition",
+		final_ante = current_ante > 0 and current_ante or 1,
+		ante_snapshots = ante_snapshots,
+		winner = (outcome and outcome.result) or "unknown",
+		timestamp = os.time(),
+		ruleset = manifest.ruleset or "ruleset_mp_blitz",
+		seed = manifest.seed or "UNKNOWN",
+		deck = manifest.deck or "Red Deck",
+		stake = manifest.stake or 1,
+	}
+	if extra.player_name then replay.player_name = extra.player_name end
+	if extra.nemesis_name then replay.nemesis_name = extra.nemesis_name end
+	if extra.lobby_code then replay.lobby_code = extra.lobby_code end
+
+	return replay
+end
+
 return LOG_PARSER
