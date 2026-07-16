@@ -103,6 +103,7 @@ local function action_rejoinedLobby(p)
 	MP.self_reconnect_countdown = nil
 	MP.GAME.timer_started = false
 	MP.GAME.nemesis_timer_started = false
+	MP.GAME.timer_threshold_pending = false
 	MP.ACTIONS.sync_client()
 	MP.ACTIONS.lobby_info()
 	MP.UI.update_connection_status()
@@ -156,6 +157,7 @@ local function action_enemyDisconnected(p)
 
 	MP.GAME.timer_started = false
 	MP.GAME.nemesis_timer_started = false
+	MP.GAME.timer_threshold_pending = false
 
 	MP.enemy_disconnect_countdown = {
 		end_time = love.timer.getTime() + timeout,
@@ -256,6 +258,7 @@ local function action_reconnecting()
 		MP.LOBBY.connected = false
 		MP.GAME.timer_started = false
 		MP.GAME.nemesis_timer_started = false
+		MP.GAME.timer_threshold_pending = false
 		MP.UI.update_connection_status()
 		sendWarnMessage("Connection lost, attempting to reconnect...", "MULTIPLAYER")
 
@@ -322,6 +325,7 @@ local function begin_pvp_blind()
         MP.GAME.timer_started = false
         MP.GAME.nemesis_timer_started = false
         MP.GAME.nemesis_timer_was_started = false
+        MP.GAME.timer_threshold_pending = false
         MP.GAME.timer_consumed = false
         MP.GAME.timer = MP.UTILS.pvp_timer_base()
 	else
@@ -483,6 +487,7 @@ local function action_end_pvp(p)
 	MP.GAME.timer_started = false
 	MP.GAME.nemesis_timer_started = false
     MP.GAME.nemesis_timer_was_started = false
+	MP.GAME.timer_threshold_pending = false
 	MP.GAME.ready_blind = false
 	MP.GAME.pvp_reached = false
     MP.GAME.pvp_reached_first = false
@@ -499,6 +504,7 @@ local function action_end_pvp(p)
                     MP.GAME.nemesis_timer_started = false
                     MP.GAME.nemesis_timer_was_started = false
                     MP.GAME.pvp_timer_activated = false
+                    MP.GAME.timer_threshold_pending = false
                     return true
                 end,
             }))
@@ -1337,12 +1343,19 @@ end
 
 function MP.ACTIONS.start_ante_timer()
 	local is_pvp = MP.is_pvp_boss() and MP.is_layer_active("pvp_timer")
-	Client.send({
-		action = "startAnteTimer",
-		time = MP.GAME.timer,
-		isPvP = is_pvp or nil,
-	})
+	local threshold = MP.LOBBY.config.timer_display_threshold or 0
+
 	action_start_ante_timer({ time = MP.GAME.timer, fromNemesis = false })
+
+	if threshold > 0 and MP.GAME.timer > threshold then
+		MP.GAME.timer_threshold_pending = true
+	else
+		Client.send({
+			action = "startAnteTimer",
+			time = MP.GAME.timer,
+			isPvP = is_pvp or nil,
+		})
+	end
 end
 
 function MP.ACTIONS.pause_ante_timer()
