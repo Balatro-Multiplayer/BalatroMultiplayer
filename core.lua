@@ -245,8 +245,11 @@ function MP.reset_game_states()
 		highest_score = MP.INSANE_INT.empty(),
 		timer = MP.UTILS.timer_base(),
 		timer_started = false,
+        nemesis_timer_started = false,
+        nemesis_timer_was_started = false,
 		timer_consumed = false,
 		pvp_reached = false,
+        pvp_reached_first = false,
 		pvp_countdown = 0,
 		real_money = 0,
 		ce_cache = false,
@@ -263,6 +266,8 @@ function MP.reset_game_states()
 			reroll_cost_total = 0,
 			-- Add more stats here in the future
 		},
+        pvp_timer_order = nil,
+        pvp_timer_activated = false,
 	}
 end
 MP.reset_game_states()
