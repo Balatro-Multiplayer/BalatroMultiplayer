@@ -1,5 +1,7 @@
 MP.Layer("bigger_shop", {
-	on_apply_bans = function()
-		change_shop_size(1)
+	calculate = function(self, context)
+		if context.apply_bans then
+			change_shop_size(1)
+		end
 	end,
 })
