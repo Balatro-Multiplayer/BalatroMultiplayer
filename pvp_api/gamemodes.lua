@@ -15,6 +15,15 @@
 -- overlay is a harmless no-op; on_ante_change does nothing. The one API-side hook we
 -- do use is on_player_forfeit -> check_single_survivor (win when the opponent quits).
 
+-- The defined winning code path: a gamemode's on_player_forfeit just returns
+-- { winner = player_id } and never touches an ActionType or a lobby object.
+MPAPI.on_winner_declared(function(winner_id)
+	local lobby = MPAPI.get_current_lobby()
+	if lobby and MPAPI.ActionTypes["pvp_player_won"] then
+		lobby:action(MPAPI.ActionTypes["pvp_player_won"]):broadcast({ player_id = winner_id })
+	end
+end)
+
 MP.PVP_GAMEMODES = {
 	pvp_standard = { ruleset = "ruleset_mp_standard_ranked", gamemode = "gamemode_mp_attrition", display = "Standard", has_ranked = true },
 	pvp_expanded = { ruleset = "ruleset_mp_blitz", gamemode = "gamemode_mp_attrition", display = "Expanded", has_ranked = false },
@@ -63,16 +72,13 @@ for key, def in pairs(MP.PVP_GAMEMODES) do
 		end,
 		on_ante_change = function(self, ante) end,
 		-- Host-authoritative: when the opponent forfeits/leaves, the last player
-		-- standing wins. Broadcast handled by the PvP win action (Phase 4).
+		-- standing wins. The registered winner handler above performs the broadcast.
 		on_player_forfeit = function(self, player_id)
 			local winner_id = self:check_single_survivor(player_id)
 			if not winner_id then
 				return
 			end
-			local lobby = MPAPI.get_current_lobby()
-			if lobby and MPAPI.ActionTypes and MPAPI.ActionTypes["pvp_player_won"] then
-				lobby:action(MPAPI.ActionTypes["pvp_player_won"]):broadcast({ player_id = winner_id })
-			end
+			return { winner = winner_id }
 		end,
 	})
 end
