@@ -29,6 +29,15 @@ function Card:sell_card()
 	return sell_card_ref(self)
 end
 
+-- Carbon: cashing out of round-eval into the shop. Bare opcode like reroll --
+-- no useful positional target, the outcome is already fully determined by the
+-- preceding play/discard events.
+local cash_out_ref = G.FUNCS.cash_out
+function G.FUNCS.cash_out(e)
+	MP.RLOG.record("cashout", nil, "action:cashOut")
+	return cash_out_ref(e)
+end
+
 local reroll_shop_ref = G.FUNCS.reroll_shop
 function G.FUNCS.reroll_shop(e)
 	-- Reroll has no positional target; the shop contents it produces are
@@ -115,16 +124,18 @@ if G.FUNCS.skip_booster then
 	end
 end
 
--- Carbon: joker / hand reordering (drag-drop). There is no discrete base-game
--- callback for a reorder, so we diff each area's card order on update. This is
--- intentionally independent of the Preview integration (which has its own,
--- Preview-gated order tracker) so reorders are always logged. Detection is
--- debounced until no card in the area is mid-drag, so one drag emits one event,
--- and reorder_permutation only fires on a pure permutation (the card set is
--- unchanged) -- draws, plays and discards change the set and are ignored here.
+-- Carbon: joker / hand / consumable reordering (drag-drop). There is no
+-- discrete base-game callback for a reorder, so we diff each area's card order
+-- on update. This is intentionally independent of the Preview integration
+-- (which has its own, Preview-gated order tracker) so reorders are always
+-- logged. Detection is debounced until no card in the area is mid-drag, so one
+-- drag emits one event, and reorder_permutation only fires on a pure
+-- permutation (the card set is unchanged) -- draws, plays and discards change
+-- the set and are ignored here.
 local function rlog_reorder_area(cardarea)
 	if cardarea == G.jokers then return MP.UTILS.AREA.jokers end
 	if cardarea == G.hand then return MP.UTILS.AREA.hand end
+	if cardarea == G.consumeables then return MP.UTILS.AREA.consumeables end
 	return nil
 end
 
