@@ -71,6 +71,16 @@ function MP.TRAP.reveal_and_consume(card)
 	}))
 end
 
+-- Decrease a scored playing card's rank by 1, floored at 2 (mirrors Strength's own
+-- rank+1 pattern in card.lua, inverted).
+local RANK_SUFFIX = { [10] = "T", [11] = "J", [12] = "Q", [13] = "K", [14] = "A" }
+function MP.TRAP.decrease_rank(playing_card)
+	local suit_prefix = string.sub(playing_card.base.suit, 1, 1) .. "_"
+	local id = math.max(2, playing_card.base.id - 1)
+	local rank_suffix = RANK_SUFFIX[id] or tostring(id)
+	playing_card:set_base(G.P_CARDS[suit_prefix .. rank_suffix])
+end
+
 -- Every trap's calculate replies with this exact shape. `send` is the only thing that goes out
 -- on the wire (see BalatroMultiplayerAPI's synced_mixin.calculate). The owner id is carried
 -- explicitly -- NOT resolved via MP.current_target_id() at fire time, since a trap's rightful
