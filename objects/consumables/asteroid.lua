@@ -33,6 +33,10 @@ MPAPI.Consumable({
 		return true
 	end,
 	receive = function(self, context)
+		MP.note_target_candidate(context.from)
+		if MP.current_target_id() and context.from ~= MP.current_target_id() then
+			return
+		end
 		MP.UI.show_asteroid_hand_level_up()
 	end,
 	use = function(self, card, area, copier)

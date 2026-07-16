@@ -2,7 +2,11 @@ MP.Gamemode({
 	key = "attrition",
 	get_blinds_by_ante = function(self, ante)
 		if ante >= MP.LOBBY.config.pvp_start_round then
-			if not MP.LOBBY.config.normal_bosses then
+			-- MP.current_target_id() is practically always non-nil for 1v1/Royale, so
+			-- this is a no-op there. For Nemesis (rotating pairing), nil means byed
+			-- this ante -- the entire bye mechanism: fall through to a normal boss
+			-- blind instead of the nemesis one, no separate scoring logic needed.
+			if not MP.LOBBY.config.normal_bosses and MP.current_target_id() ~= nil then
 				return nil, nil, "bl_mp_nemesis"
 			else
 				G.GAME.round_resets.pvp_blind_choices.Boss = true
