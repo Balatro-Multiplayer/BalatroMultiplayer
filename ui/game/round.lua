@@ -36,7 +36,15 @@ end
 local ease_round_ref = ease_round
 function ease_round(mod)
 	if MP.is_mp_or_ghost() and not MP.LOBBY.config.disable_live_and_timer_hud and MP.LOBBY.config.timer then
-        G.GAME.round = G.GAME.round + mod
+        G.E_MANAGER:add_event(Event({
+            trigger = 'immediate',
+            func = function()
+                G.GAME.round = G.GAME.round + mod
+                play_sound('timpani', 0.8)
+                play_sound('generic1')
+                return true
+            end
+        }))
         return
     end
 	ease_round_ref(mod)

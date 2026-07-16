@@ -1385,6 +1385,7 @@ return {
 			k_amount_short = "Amt.",
 			k_filed_ex = "Filed!",
 			k_timer = "Timer",
+			k_nemesis_timer = "Nemesis",
 			k_mods_list = "Mods List",
 			k_enemy_jokers = "Enemy Jokers",
 			k_your_jokers = "Your Jokers",
@@ -1417,6 +1418,11 @@ return {
 			k_ghost = "Ghost",
 			k_hide_mp_content = "Hide Multiplayer content*",
 			k_applies_singleplayer_vanilla_rulesets = "*Applies in singleplayer and vanilla rulesets",
+            k_automatic_pvp_timer = "Automatic PvP timer",
+            k_automatic_pvp_timer_description = {
+                "Reactivate PvP timer when became available",
+                "(Must be activated manually first)"
+            },
 			k_timer_sfx = "Timer Sound Effects",
 			ml_mp_kofi_message = {
 				"This mod and game server is",
@@ -1446,6 +1452,8 @@ return {
 			loc_selecting = "Selecting",
 			loc_shop = "Shopping before",
 			loc_playing = "Playing",
+            b_get_log_file = "Get Logs",
+            b_open_log_parser = "Log Parser",
 		},
 		v_dictionary = {
 			a_mp_art = {
