@@ -1,7 +1,9 @@
 -- Score Instability: after scoring, chips and mult are dragged toward each other.
 MP.Layer("score_instability", {
-	on_apply_bans = function()
-		G.GAME.modifiers.mp_score_instability = true
+	calculate = function(self, context)
+		if context.apply_bans then
+			G.GAME.modifiers.mp_score_instability = true
+		end
 	end,
 })
 
