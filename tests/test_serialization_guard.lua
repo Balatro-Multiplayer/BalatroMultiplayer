@@ -4,6 +4,8 @@
   Exercises MP.UTILS.str_decode_and_unpack's size guard (lib/serialization.lua):
   an over-large encoded payload must be rejected BEFORE any base64/gzip work, a
   non-string must be rejected, and a normal small payload must still round-trip.
+  Also covers MP.UTILS.compress_str/decompress_str (the plain-string codec RLOG
+  uses for its finalized carbon block, see lib/replay_log.lua).
 
   love.data and STR_PACK are stubbed with identity codecs so the test runs under
   plain Lua (the guard logic is what we're covering, not love's real codecs).
@@ -77,6 +79,17 @@ local encoded = MP.UTILS.str_pack_and_encode(original)
 check("normal payload is under the cap", #encoded <= MP.UTILS.MAX_ENCODED_BYTES)
 local decoded = MP.UTILS.str_decode_and_unpack(encoded)
 check("normal payload round-trips", type(decoded) == "table" and decoded.name == "Blueprint" and decoded.cost == 10)
+
+-- ─── 4. compress_str/decompress_str round-trip a plain string ────────────────
+-- (no STR_PACK table-serialization step -- the input IS already a string, e.g.
+-- an RLOG carbon block, so the codec is just gzip+base64 with nothing else.)
+local carbon_block = "MP_RLOG: MANIFEST {}\nMP_RLOG: 0 select_blind 0\nMP_RLOG: 250 buy 1 2"
+local packed = MP.UTILS.compress_str(carbon_block)
+check("compress_str returns a string", type(packed) == "string")
+local unpacked, err2 = MP.UTILS.decompress_str(packed)
+check("decompress_str round-trips the exact original string", unpacked == carbon_block)
+local bad, bad_err = MP.UTILS.decompress_str({ not_a = "string" })
+check("decompress_str rejects a non-string payload", bad == nil and type(bad_err) == "string")
 
 if failures > 0 then
 	error(failures .. " check(s) failed")
