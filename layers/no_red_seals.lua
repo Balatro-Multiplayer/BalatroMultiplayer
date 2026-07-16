@@ -3,8 +3,10 @@
 -- dead spectral in the pool
 MP.Layer("no_red_seals", {
 	banned_consumables = { "c_deja_vu" },
-	on_apply_bans = function()
-		G.GAME.modifiers.mp_no_red_seals = true
+	calculate = function(self, context)
+		if context.apply_bans then
+			G.GAME.modifiers.mp_no_red_seals = true
+		end
 	end,
 })
 

@@ -167,7 +167,10 @@ MP.Layer("sandbox", {
 	reworked_consumables = { "c_mp_ouija_standard", "c_mp_ectoplasm_sandbox" },
 	reworked_enhancements = { "m_glass" },
 	reworked_tags = { "tag_mp_gambling_sandbox", "tag_mp_juggle_sandbox", "tag_mp_investment_sandbox" },
-	on_apply_bans = function()
+	calculate = function(self, context)
+		if not context.apply_bans then
+			return
+		end
 		select_random_idol()
 
 		if SMODS.Mods["extracredit"] and SMODS.Mods["extracredit"].can_load then
