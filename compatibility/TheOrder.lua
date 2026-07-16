@@ -30,9 +30,58 @@ end
 local original_reset_idol_card = reset_idol_card
 function reset_idol_card()
 	if MP.should_use_the_order() then
+
 		G.GAME.current_round.idol_card.rank = "Ace"
 		G.GAME.current_round.idol_card.suit = "Spades"
 
+		-- ----------------------------------------------------------------
+		-- Helper: enhancement / seal / edition weights
+		-- NOTE: field names below assume base-Balatro conventions:
+		--   card.ability.effect  -> "Wild Card" / "Glass Card" / "Lucky Card" / ...
+		--   card.seal            -> "Red" / "Blue" / "Gold" / "Purple" / nil
+		--   card.edition         -> { foil=true } / { holo=true } / { polychrome=true } / nil
+		-- Adjust these three helpers if your mod stores these differently.
+		-- ----------------------------------------------------------------
+		local function is_wild(card)
+			return card.ability and card.ability.effect == "Wild Card"
+		end
+
+		local function edition_weight(card)
+			local e = card.edition
+			if not e then return 0.0 end
+			if e.polychrome then return 1.05 end
+			if e.glass then return 0.95 end -- some mods track glass as an edition, not enhancement
+			if e.holo then return 0.50 end
+			if e.foil then return 0.15 end
+			return 0.0
+		end
+
+		local function enhancement_weight(card)
+			local eff = card.ability and card.ability.effect
+			if eff == "Glass Card" then return 0.95 end
+			if eff == "Lucky Card" then return 0.45 end
+			if eff == "Steel Card" then return 0.15 end
+			if eff == "Wild Card" then return 0.15 end
+			if eff == "Bonus Card" then return 0.10 end
+			if eff == "Mult Card" then return 0.10 end
+			if eff == "Gold Card" then return 0.05 end
+			return 0.0
+		end
+
+		local function seal_weight(card)
+			local s = card.seal
+			if s == "Red" then return 1.2 end
+			if s == "Purple" then return 0.15 end
+			if s == "Gold" then return 0.30 end
+			if s == "Blue" then return 0.05 end
+			return 0.0
+		end
+
+		-- ----------------------------------------------------------------
+		-- Step 1: Build count_map keyed by (value, suit), tracking every
+		-- physical card so we can later sum seal/edition/enhancement
+		-- weights and detect wild cards.
+		-- ----------------------------------------------------------------
 		local count_map = {}
 		local valid_idol_cards = {}
 
@@ -40,43 +89,233 @@ function reset_idol_card()
 			if v.ability.effect ~= "Stone Card" then
 				local key = v.base.value .. "_" .. v.base.suit
 				if not count_map[key] then
-					count_map[key] = { count = 0, card = v }
+					count_map[key] = {
+						count      = 0,
+						card       = v,
+						value      = v.base.value,
+						suit       = v.base.suit,
+						cards      = {},
+						wild_count = 0,
+					}
 					table.insert(valid_idol_cards, count_map[key])
 				end
-				count_map[key].count = count_map[key].count + 1
+				local entry = count_map[key]
+				entry.count = entry.count + 1
+				table.insert(entry.cards, v)
+				if is_wild(v) then
+					entry.wild_count = entry.wild_count + 1
+				end
 			end
 		end
-		--failsafe in case all are stone or no cards in deck. Defaults to Ace of Spades
+
 		if #valid_idol_cards == 0 then return end
 
-		local value_order = {}
-		for i, rank in ipairs(SMODS.Rank.obj_buffer) do
-			value_order[rank] = i
+		-- ----------------------------------------------------------------
+		-- Step 2: Rank / suit ordering from SMODS (positional index)
+		-- ----------------------------------------------------------------
+		local rank_index = {}
+		for i, rank_key in ipairs(SMODS.Rank.obj_buffer) do
+			rank_index[rank_key] = i
 		end
 
-		local suit_order = {}
-		for i, suit in ipairs(SMODS.Suit.obj_buffer) do
-			suit_order[suit] = i
+		local suit_index = {}
+		for i, suit_key in ipairs(SMODS.Suit.obj_buffer) do
+			suit_index[suit_key] = i
 		end
 
+		-- ----------------------------------------------------------------
+		-- Step 3: Aggregate per-rank totals (physical only) + wild-by-rank
+		-- ----------------------------------------------------------------
+		local rank_totals = {}   -- rank_key -> total physical count across all suits
+		local wild_by_rank = {}  -- rank_key -> total wild-enhanced count across all suits
+		local distinct_ranks_set = {}
+
+		for _, entry in ipairs(valid_idol_cards) do
+			local r = entry.value
+			rank_totals[r]  = (rank_totals[r] or 0) + entry.count
+			wild_by_rank[r] = (wild_by_rank[r] or 0) + entry.wild_count
+			distinct_ranks_set[r] = true
+		end
+
+		local distinct_ranks = 0
+		for _ in pairs(distinct_ranks_set) do
+			distinct_ranks = distinct_ranks + 1
+		end
+
+		local total_cards = 0
+		for _, entry in ipairs(valid_idol_cards) do
+			total_cards = total_cards + entry.count
+		end
+
+		local raw_mean_by_number = total_cards / distinct_ranks
+
+		-- ----------------------------------------------------------------
+		-- Step 4: Face / low pools + baselines (unchanged, mean-based,
+		-- rank-restricted: only face ranks / nominal 2-5 ranks qualify)
+		-- ----------------------------------------------------------------
+		local face_pool = 0
+		local low_pool  = 0
+		local face_ranks_present = 0
+		local low_ranks_present  = 0
+
+		for rank_key, total in pairs(rank_totals) do
+			local rank_obj = SMODS.Ranks[rank_key]
+			if rank_obj then
+				if rank_obj.face then
+					face_pool = face_pool + total
+					face_ranks_present = face_ranks_present + 1
+				elseif rank_obj.nominal and rank_obj.nominal >= 2 and rank_obj.nominal <= 5 then
+					low_pool = low_pool + total
+					low_ranks_present = low_ranks_present + 1
+				end
+			end
+		end
+
+		local function round_to_nearest_05(x)
+			return math.floor(x * 20 + 0.5) / 20
+		end
+
+		local face_baseline = round_to_nearest_05(raw_mean_by_number * face_ranks_present)
+		local low_baseline  = round_to_nearest_05(raw_mean_by_number * low_ranks_present)
+
+		local W_GEN = 0.05
+		local GEN_FLOOR = 0.00
+
+		local function face_score_for_rank(rank_key)
+			local rank_obj = SMODS.Ranks[rank_key]
+			if rank_obj and rank_obj.face then
+				return math.max(GEN_FLOOR, W_GEN * 1.1 * math.max(0.0, face_pool - face_baseline))
+			end
+			return 0.0
+		end
+
+		local function low_score_for_rank(rank_key)
+			local rank_obj = SMODS.Ranks[rank_key]
+			if rank_obj and rank_obj.nominal and rank_obj.nominal >= 2 and rank_obj.nominal <= 5 then
+				return math.max(GEN_FLOOR, W_GEN * math.max(0.0, low_pool - low_baseline))
+			end
+			return 0.0
+		end
+
+		-- ----------------------------------------------------------------
+		-- Step 5: Previous rank (positional wrap: index 1 -> last index)
+		-- ----------------------------------------------------------------
+		local function previous_rank_key(rank_key)
+			local idx = rank_index[rank_key]
+			if not idx then return nil end
+			if idx == 1 then
+				return SMODS.Rank.obj_buffer[#SMODS.Rank.obj_buffer]
+			else
+				return SMODS.Rank.obj_buffer[idx - 1]
+			end
+		end
+
+		-- ----------------------------------------------------------------
+		-- Step 6: Tier weights / achievability weights
+		-- ----------------------------------------------------------------
+		local TARGET_COPIES = 5   -- how many exact copies we're trying to reach
+
+		local W_EDITION_A = 1.3   -- Tier A: extra effect of enhanced cards (quality-dominant tier)
+		local W_EDITION_B = 0.7   -- Tier B: cares less about this bonus and more about quantity
+		local W_COUNT_A = 0.5     -- Tier A: reward per existing copy (quality-dominant tier)
+		local W_MAIN    = 2.0     -- Tier B: reward per existing copy (progress toward 5)
+		local W_OFF     = 1.0     -- Tier B: suit-changer potential, capped by need
+		local W_STR     = 1.0    -- Tier B: Strength potential, capped by need
+
+		-- ----------------------------------------------------------------
+		-- Step 7: Compute total score for each distinct (rank, suit) entry
+		-- ----------------------------------------------------------------
+		for _, entry in ipairs(valid_idol_cards) do
+			local rank_key = entry.value
+			local suit_key = entry.suit
+			local own_count = entry.count
+
+			-- Effective count: physical copies + wild cards of same rank, other suits
+			local wild_elsewhere = (wild_by_rank[rank_key] or 0) - entry.wild_count
+			local effective_count = own_count + wild_elsewhere
+
+			-- Quality terms (apply in both tiers)
+			local face_score = face_score_for_rank(rank_key)
+			local low_score  = low_score_for_rank(rank_key)
+			local seal_score = 0.0
+			local edition_score = 0.0
+			for _, card in ipairs(entry.cards) do
+				seal_score = seal_score + seal_weight(card)
+				edition_score = edition_score + edition_weight(card) + enhancement_weight(card)
+			end
+
+			local main_hit, off_hit, strength_adj = 0.0, 0.0, 0.0
+			local tier
+
+			if effective_count >= TARGET_COPIES then
+				-- ------------------------------------------------------
+				-- TIER A: already at/above 5 — no operations required.
+				-- Score by raw count + quality only; achievability terms
+				-- (main/off/strength) don't apply, there's no gap to close.
+				-- ------------------------------------------------------
+				tier = 1
+				entry.total_score = (W_COUNT_A * effective_count)
+					+ face_score + low_score + ((seal_score + edition_score) * W_EDITION_A)
+			else
+				-- ------------------------------------------------------
+				-- TIER B: below 5 — operations are required. Achievability
+				-- terms are capped both by their mechanical limit AND by
+				-- the actual gap remaining (closing more than the gap
+				-- doesn't make the card any easier to complete).
+				-- ------------------------------------------------------
+				tier = 0
+				local needed = TARGET_COPIES - effective_count
+
+				-- Main Hit: direct reward for existing progress
+				main_hit = W_MAIN * effective_count
+
+				-- Off Hit: suit-changer potential (non-wild, off-suit, same rank)
+				-- capped at 3 (suit-changer limit) and by remaining need
+				local convertible_pool = (rank_totals[rank_key] or 0) - own_count - wild_elsewhere
+				off_hit = W_OFF * math.min(3, math.max(0.0, convertible_pool), needed)
+
+				-- Strength Adjacent: same-suit rank-1 neighbor (+ off-suit wild
+				-- at rank-1), capped at 2 (Strength limit) and by remaining need
+				local prev_rank = previous_rank_key(rank_key)
+				local neighbor_count = 0
+				if prev_rank then
+					local neighbor_key = prev_rank .. "_" .. suit_key
+					local neighbor_entry = count_map[neighbor_key]
+					local physical_same_suit = neighbor_entry and neighbor_entry.count or 0
+					local neighbor_wild_same_suit = neighbor_entry and neighbor_entry.wild_count or 0
+					local prev_wild_total = wild_by_rank[prev_rank] or 0
+					local prev_wild_elsewhere = prev_wild_total - neighbor_wild_same_suit
+					neighbor_count = physical_same_suit + prev_wild_elsewhere
+				end
+				strength_adj = W_STR * math.min(2, neighbor_count, needed)
+
+				entry.total_score = main_hit + off_hit + strength_adj
+					+ face_score + low_score + ((seal_score + edition_score) * W_EDITION_B)
+			end
+
+			entry.tier = tier
+
+		end
+
+		-- ----------------------------------------------------------------
+		-- Step 8: Sort — tier first (A above B), then score, then
+		-- deterministic tiebreakers. Selection odds in Step 9 remain
+		-- untouched: pure count / total_weight.
+		-- ----------------------------------------------------------------
 		table.sort(valid_idol_cards, function(a, b)
-			-- Sort by count descending first
-			if a.count ~= b.count then return a.count > b.count end
-
-			local a_suit = a.card.base.suit
-			local b_suit = b.card.base.suit
-			if suit_order[a_suit] ~= suit_order[b_suit] then return suit_order[a_suit] < suit_order[b_suit] end
-
-			local a_value = a.card.base.value
-			local b_value = b.card.base.value
-			return value_order[a_value] < value_order[b_value]
+			if a.tier ~= b.tier then return a.tier > b.tier end
+			if a.total_score ~= b.total_score then return a.total_score > b.total_score end
+			if (rank_index[a.value] or 0) ~= (rank_index[b.value] or 0) then return (rank_index[a.value] or 0) > (rank_index[b.value] or 0) end
+			if suit_index[a.suit] ~= suit_index[b.suit] then return suit_index[a.suit] > suit_index[b.suit] end
+			return (rank_index[a.value] or 0) < (rank_index[b.value] or 0)
 		end)
 
-		-- Weighted random selection based on count
 		local total_weight = 0
 		for _, entry in ipairs(valid_idol_cards) do
 			total_weight = total_weight + entry.count
 		end
+
+		if total_weight <= 0 then return end
 
 		local raw_random = pseudorandom("idol" .. G.GAME.round_resets.ante)
 
@@ -86,19 +325,14 @@ function reset_idol_card()
 			if raw_random < threshold then
 				local idol_card = entry.card
 				sendDebugMessage(
-					"(Idol) Selected card "
-						.. idol_card.base.value
-						.. " of "
-						.. idol_card.base.suit
-						.. " with weight "
-						.. entry.count
-						.. " of total "
-						.. total_weight,
-					"MULTIPLAYER"
+					string.format(
+						"Selected %s of %s, with a count of %d",
+						idol_card.base.value, idol_card.base.suit, entry.count
+					), "IdolAlgo"
 				)
 				G.GAME.current_round.idol_card.rank = idol_card.base.value
 				G.GAME.current_round.idol_card.suit = idol_card.base.suit
-				G.GAME.current_round.idol_card.id = idol_card.base.id
+				G.GAME.current_round.idol_card.id   = idol_card.base.id
 				break
 			end
 		end
@@ -107,6 +341,7 @@ function reset_idol_card()
 
 	return original_reset_idol_card()
 end
+
 
 local original_reset_mail_rank = reset_mail_rank
 
