@@ -39,7 +39,7 @@ function Game:update_draw_to_hand(dt)
 						func = function()
 							if not MP.GHOST.is_active() then
 								for i = 1, MP.GAME.asteroids do
-									MP.ACTIONS.asteroid()
+									MP.broadcast_asteroid()
 								end
 							end
 							MP.GAME.asteroids = 0

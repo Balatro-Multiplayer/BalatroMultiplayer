@@ -28,11 +28,23 @@ MPAPI.Blind({
 		return false
 	end,
 
+	-- Decides whether/what to tell the opponent on a hand played or discard, dispatched via
+	-- MPAPI.calculate_blind from pvp_api/net.lua's playHand/skip routes -- the blind's own
+	-- decision now, not an external hardcoded sync call.
+	calculate = function(self, context)
+		if context.hand_played or context.discarded then
+			return {
+				send = { score = context.score, handsLeft = context.hands_left, skips = context.skips, lives = context.lives },
+			}
+		end
+	end,
+
 	-- Display-only sync of the opponent's score/hands/skips/lives (was action_enemy_info).
 	-- Runs on the OTHER player's client (self-echo suppressed by the framework); writes the
 	-- MP.GAME.enemy.* store the HUD already reads. The referee (win/lose/lives) is separate,
 	-- still driven by pvp_play_hand/pvp_skip.
-	on_sync = function(self, from, d)
+	receive = function(self, context)
+		local d = context.data
 		local score = MP.INSANE_INT.from_string(d.score)
 		local hands_left = tonumber(d.handsLeft)
 		local skips = tonumber(d.skips)
@@ -131,13 +143,6 @@ MPAPI.Blind({
 		if MP.UI.juice_up_pvp_hud then MP.UI.juice_up_pvp_hud() end
 	end,
 })
-
--- Emit the opponent-facing display state through the nemesis blind's procedural sync channel.
--- Called from the playHand/skip transport routes, which assemble the full payload.
-function MP.sync_pvp_blind(payload)
-	local b = G.GAME.blind and G.GAME.blind.config and G.GAME.blind.config.blind
-	if b and b.sync then b:sync(payload) end
-end
 
 function MP.is_pvp_boss()
 	if not G.GAME or not G.GAME.blind or not G.GAME.blind.config.blind then return false end

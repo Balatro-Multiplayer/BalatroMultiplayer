@@ -415,7 +415,7 @@ local function action_start_blind(p)
 end
 
 -- (action_enemy_info was removed: the opponent score/hands/skips/lives DISPLAY is now synced
--- by the nemesis blind's on_sync — see objects/blinds/nemesis.lua.)
+-- by the nemesis blind's calculate/receive — see objects/blinds/nemesis.lua.)
 
 local function action_stop_game()
 	MP.enemy_disconnect_countdown = nil
@@ -551,30 +551,6 @@ local function action_lobby_options(options)
 	MP.ACTIONS.update_player_usernames() -- render new DECK button state
 end
 
-local function action_send_phantom(p)
-	local key = p.key
-	-- Carbon: exogenous opponent effect. Keyed by content (not a board index),
-	-- logged in received order so a solo re-sim reproduces it faithfully.
-	MP.RLOG.record("net_phantom_add", key, "action:netPhantomAdd,key:" .. tostring(key))
-	local menu = G.OVERLAY_MENU -- we are spoofing a menu here, which disables duplicate protection
-	G.OVERLAY_MENU = G.OVERLAY_MENU or true
-	local new_card = create_card("Joker", MP.shared, false, nil, nil, nil, key)
-	new_card:set_edition("e_mp_phantom")
-	new_card:add_to_deck()
-	MP.shared:emplace(new_card)
-	G.OVERLAY_MENU = menu
-end
-
-local function action_remove_phantom(p)
-	MP.RLOG.record("net_phantom_remove", p.key, "action:netPhantomRemove,key:" .. tostring(p.key))
-	local card = MP.UTILS.get_phantom_joker(p.key)
-	if card then
-		card:remove_from_deck()
-		card:start_dissolve({ G.C.RED }, nil, 1.6)
-		MP.shared:remove_card(card)
-	end
-end
-
 -- (The phantom masking patches — Card:remove / SMODS.find_card / poll_edition — moved to the
 -- synced-object framework; installed via MPAPI.configure_phantom in objects/editions/phantom.lua.)
 
@@ -614,135 +590,6 @@ end
 
 local function action_version()
 	MP.ACTIONS.version()
-end
-
-local action_asteroid_ref = action_asteroid
-	or function()
-		if MP.UI.show_asteroid_hand_level_up then MP.UI.show_asteroid_hand_level_up() end
-	end
-local function action_asteroid(p)
-	MP.RLOG.record("net_asteroid", nil, "action:netAsteroid")
-	return action_asteroid_ref(p)
-end
-
-local function action_sold_joker()
-	-- HACK: this action is being sent when any card is being sold, since Taxes is now reworked
-	MP.GAME.enemy.sells = MP.GAME.enemy.sells + 1
-	MP.GAME.enemy.sells_per_ante[G.GAME.round_resets.ante] = (
-		(MP.GAME.enemy.sells_per_ante[G.GAME.round_resets.ante] or 0) + 1
-	)
-end
-
-local function action_lets_go_gambling_nemesis()
-	local card = MP.UTILS.get_phantom_joker("j_mp_lets_go_gambling")
-	if card then card:juice_up() end
-	ease_dollars(card and card.ability and card.ability.extra and card.ability.extra.nemesis_dollars or 5)
-end
-
-local function action_eat_pizza(p)
-	local discards = p.whole -- rename to "discards" when possible
-	MP.RLOG.record("net_pizza", discards, "action:netPizza,discards:" .. tostring(discards))
-	MP.GAME.pizza_discards = MP.GAME.pizza_discards + discards
-	G.GAME.round_resets.discards = G.GAME.round_resets.discards + discards
-	ease_discard(discards)
-end
-
-local function action_spent_last_shop(p)
-	MP.GAME.enemy.spent_in_shop[#MP.GAME.enemy.spent_in_shop + 1] = tonumber(p.amount)
-end
-
-local function action_magnet()
-	MP.RLOG.record("net_magnet", nil, "action:netMagnet")
-	local card = nil
-	for _, v in pairs(G.jokers.cards) do
-		if not card or v.sell_cost > card.sell_cost then card = v end
-	end
-
-	if card then
-		local candidates = {}
-		for _, v in pairs(G.jokers.cards) do
-			if v.sell_cost == card.sell_cost then table.insert(candidates, v) end
-		end
-
-		-- Scale the pseudo from 0 - 1 to the number of candidates
-		local random_index = math.floor(pseudorandom("j_mp_magnet") * #candidates) + 1
-		local chosen_card = candidates[random_index]
-		sendTraceMessage(
-			string.format("Sending magnet joker: %s", MP.UTILS.joker_to_string(chosen_card)),
-			"MULTIPLAYER"
-		)
-
-		local card_save = chosen_card:save()
-		local card_encoded = MP.UTILS.str_pack_and_encode(card_save)
-		MP.ACTIONS.magnet_response(card_encoded)
-	end
-end
-
-local function action_jimbo_appear(p)
-	local pos = tonumber(p.pos)
-	local text = p.text
-	if not pos or pos < 1 or pos > 4 then
-		sendDebugMessage("jimboAppear: invalid pos: " .. tostring(pos), "MULTIPLAYER")
-		return
-	end
-	if text and type(text) ~= "string" then
-		sendDebugMessage("jimboAppear: invalid text type: " .. type(text), "MULTIPLAYER")
-		return
-	end
-	MP.UI.create_jimbo(pos)
-	if text and text ~= "" then MP.UI.jimbo_say(text) end
-end
-
-local function action_jimbo_talk(p)
-	local text = p.text
-	if not text or type(text) ~= "string" or text == "" then
-		sendDebugMessage("jimboTalk: invalid or empty text", "MULTIPLAYER")
-		return
-	end
-	MP.UI.jimbo_say(text)
-end
-
-local function action_jimbo_move(p)
-	local pos = tonumber(p.pos)
-	if not pos or pos < 1 or pos > 4 then
-		sendDebugMessage("jimboMove: invalid pos: " .. tostring(pos), "MULTIPLAYER")
-		return
-	end
-	MP.UI.move_jimbo(pos)
-end
-
-local function action_jimbo_remove()
-	MP.UI.remove_jimbo()
-end
-
-local function action_magnet_response(p)
-	local card_save, success, err
-
-	card_save, err = MP.UTILS.str_decode_and_unpack(p.key)
-	if not card_save then
-		sendDebugMessage(string.format("Failed to unpack magnet joker: %s", err), "MULTIPLAYER")
-		return
-	end
-
-	local card =
-		Card(G.jokers.T.x + G.jokers.T.w / 2, G.jokers.T.y, G.CARD_W, G.CARD_H, G.P_CENTERS.j_joker, G.P_CENTERS.c_base)
-	-- Avoid crashing if the load function ends up indexing a nil value
-	success, err = pcall(card.load, card, card_save)
-	if not success then
-		sendDebugMessage(string.format("Failed to load magnet joker: %s", err), "MULTIPLAYER")
-		return
-	end
-
-	-- BALATRO BUG (version 1.0.1o): `card.VT.h` is mistakenly set to nil after calling `card:load()`
-	-- Without this call to `card:hard_set_VT()`, the game will crash later when the card is drawn
-	card:hard_set_VT()
-
-	-- Enforce "add to deck" effects (e.g. increase hand size effects)
-	card.added_to_deck = nil
-
-	card:add_to_deck()
-	G.jokers:emplace(card)
-	sendTraceMessage(string.format("Received magnet joker: %s", MP.UTILS.joker_to_string(card)), "MULTIPLAYER")
 end
 
 function G.FUNCS.load_end_game_jokers()
@@ -1171,65 +1018,6 @@ function MP.ACTIONS.skip(skips)
 	})
 end
 
-function MP.ACTIONS.send_phantom(key)
-	Client.send({
-		action = "sendPhantom",
-		key = key,
-	})
-end
-
-function MP.ACTIONS.remove_phantom(key)
-	Client.send({
-		action = "removePhantom",
-		key = key,
-	})
-end
-
-function MP.ACTIONS.asteroid()
-	Client.send({
-		action = "asteroid",
-	})
-end
-
-function MP.ACTIONS.sold_joker()
-	Client.send({
-		action = "soldJoker",
-	})
-end
-
-function MP.ACTIONS.lets_go_gambling_nemesis()
-	Client.send({
-		action = "letsGoGamblingNemesis",
-	})
-end
-
-function MP.ACTIONS.eat_pizza(discards)
-	Client.send({
-		action = "eatPizza",
-		whole = discards,
-	})
-end
-
-function MP.ACTIONS.spent_last_shop(amount)
-	Client.send({
-		action = "spentLastShop",
-		amount = amount,
-	})
-end
-
-function MP.ACTIONS.magnet()
-	Client.send({
-		action = "magnet",
-	})
-end
-
-function MP.ACTIONS.magnet_response(key)
-	Client.send({
-		action = "magnetResponse",
-		key = key,
-	})
-end
-
 function MP.ACTIONS.get_end_game_jokers()
 	Client.send({
 		action = "getEndGameJokers",
@@ -1380,16 +1168,7 @@ local HANDLERS = {
 	loseGame = action_lose_game,
 	lobbyOptions = action_lobby_options,
 	enemyLocation = enemyLocation,
-	sendPhantom = action_send_phantom,
-	removePhantom = action_remove_phantom,
 	speedrun = action_speedrun,
-	asteroid = action_asteroid,
-	soldJoker = action_sold_joker,
-	letsGoGamblingNemesis = action_lets_go_gambling_nemesis,
-	eatPizza = action_eat_pizza,
-	spentLastShop = action_spent_last_shop,
-	magnet = action_magnet,
-	magnetResponse = action_magnet_response,
 	getEndGameJokers = action_get_end_game_jokers,
 	receiveEndGameJokers = action_receive_end_game_jokers,
 	getNemesisDeck = action_get_nemesis_deck,
@@ -1398,10 +1177,6 @@ local HANDLERS = {
 	nemesisEndGameStats = noop, -- logged only, no handler
 	startAnteTimer = action_start_ante_timer,
 	pauseAnteTimer = action_pause_ante_timer,
-	jimboAppear = action_jimbo_appear,
-	jimboTalk = action_jimbo_talk,
-	jimboMove = action_jimbo_move,
-	jimboRemove = action_jimbo_remove,
 	moddedAction = action_modded_action,
 	error = action_error,
 	keepAlive = action_keep_alive,

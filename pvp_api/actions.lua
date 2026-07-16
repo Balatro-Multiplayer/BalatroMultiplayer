@@ -188,7 +188,7 @@ end)
 
 -- ── score / state resolution (referee) ───────────────────────────────────────
 -- The opponent-facing DISPLAY of score/hands/skips/lives is synced separately via the
--- nemesis blind's on_sync (see objects/blinds/nemesis.lua + MP.sync_pvp_blind); these
+-- nemesis blind's calculate/receive (see objects/blinds/nemesis.lua); these
 -- handlers now only feed the host-authoritative referee.
 A("pvp_play_hand", function(_at, from, params)
 	MP.referee_on_play_hand(from, params or {})
@@ -295,22 +295,9 @@ A("pvp_pause_ante_timer", function(_at, from, params)
 end)
 
 -- ── pure relays (opponent-only side effects) ─────────────────────────────────
-relay("pvp_send_phantom", "sendPhantom")
-relay("pvp_remove_phantom", "removePhantom")
-relay("pvp_magnet", "magnet")
-relay("pvp_magnet_response", "magnetResponse")
-relay("pvp_sold_joker", "soldJoker")
-relay("pvp_asteroid", "asteroid")
-relay("pvp_eat_pizza", "eatPizza")
-relay("pvp_spent_last_shop", "spentLastShop")
-relay("pvp_lets_go_gambling_nemesis", "letsGoGamblingNemesis")
 relay("pvp_get_end_game_jokers", "getEndGameJokers")
 relay("pvp_receive_end_game_jokers", "receiveEndGameJokers")
 relay("pvp_get_nemesis_deck", "getNemesisDeck")
 relay("pvp_receive_nemesis_deck", "receiveNemesisDeck")
 relay("pvp_end_game_stats_requested", "endGameStatsRequested")
 relay("pvp_nemesis_end_game_stats", "nemesisEndGameStats")
-relay("pvp_jimbo_appear", "jimboAppear")
-relay("pvp_jimbo_talk", "jimboTalk")
-relay("pvp_jimbo_move", "jimboMove")
-relay("pvp_jimbo_remove", "jimboRemove")

@@ -5,7 +5,14 @@ SMODS.Atlas({
 	py = 95,
 })
 
-SMODS.Joker({
+-- Leaving the shop tells the opponent's Penny Pincher how much we spent -- the trigger
+-- is a generic lovely patch on G.FUNCS.toggle_shop (lovely/game.toml), owned here.
+function MP.broadcast_spent_last_shop(amount)
+	local center = G.P_CENTERS["j_mp_penny_pincher"]
+	if center then center:sync(amount) end
+end
+
+MPAPI.Joker({
 	key = "penny_pincher",
 	atlas = "penny_pincher",
 	rarity = 1,
@@ -25,6 +32,10 @@ SMODS.Joker({
 	end,
 	mp_include = function(self)
 		return MP.LOBBY.code and MP.LOBBY.config.multiplayer_jokers
+	end,
+	-- Was action_spent_last_shop.
+	receive = function(self, context)
+		MP.GAME.enemy.spent_in_shop[#MP.GAME.enemy.spent_in_shop + 1] = tonumber(context.data)
 	end,
 	calc_dollar_bonus = function(self, card)
 		local spent = MP.GAME.enemy.spent_in_shop[MP.GAME.pincher_index]
