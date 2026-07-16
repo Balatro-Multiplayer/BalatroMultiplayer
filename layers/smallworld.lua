@@ -1,5 +1,8 @@
 MP.Layer("smallworld", {
-	on_apply_bans = function()
+	calculate = function(self, context)
+		if not context.apply_bans then
+			return
+		end
 		local tables = {}
 		local requires = {}
 		for k, v in pairs(G.P_CENTERS) do
