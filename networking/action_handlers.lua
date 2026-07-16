@@ -1082,31 +1082,12 @@ function MP.ACTIONS.sync_client()
 	})
 end
 
--- Live carbon-log stream: batches of "MP_RLOG: ..." lines pushed while the game
--- is in progress, keyed by game_id so the server can group them and drop them
--- once the final package below lands. See lib/replay_log.lua (MP.RLOG).
-function MP.ACTIONS.stream_log_lines(game_id, lines)
-	Client.send({
-		action = "streamLogLines",
-		gameId = game_id,
-		lines = lines,
-	})
-end
-
--- End-of-game replay-log fingerprints. The server stores these (keyed by
--- lobby + seed + game) so a presented log can later be re-hashed and compared
--- without a line-by-line diff, and uses game_id to delete the live stream in
--- favour of this complete package. See lib/replay_log.lua (MP.RLOG).
-function MP.ACTIONS.submit_log_hashes(carbon, human, seed, log, game_id)
-	Client.send({
-		action = "submitLogHashes",
-		carbon = carbon,
-		human = human,
-		seed = seed,
-		log = log,
-		gameId = game_id,
-	})
-end
+-- (action_stream_log_lines / action_submit_log_hashes were removed: MP.RLOG's
+-- live transport now broadcasts each event directly via the game_log_event
+-- MPAPI ActionType -- see pvp_api/replay_log_actions.lua and
+-- lib/replay_log.lua. These TCP-era Client.send actions were already silently
+-- dropped by pvp_api/net.lua's router -- unlisted actions are "owned by the
+-- API now, or deferred" per its own comment -- so nothing called them.)
 
 function MP.ACTIONS.modded(modId, modAction, params, target)
 	local msg = {

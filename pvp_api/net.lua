@@ -128,8 +128,10 @@ function MP.net_route(msg)
 		route(msg)
 	end
 	-- Unlisted actions (createLobby/joinLobby/readyLobby/leaveLobby/username/version/
-	-- lobbyInfo/lobbyOptions/syncClient/streamLogLines/submitLogHashes) are owned by
-	-- the API now, or are replay-stream features deferred for the port; drop them.
+	-- lobbyInfo/lobbyOptions/syncClient) are owned by the API now; drop them.
+	-- (streamLogLines/submitLogHashes used to be unlisted here too -- RLOG's
+	-- transport now broadcasts directly via the game_log_event MPAPI ActionType,
+	-- see pvp_api/replay_log_actions.lua, not through this legacy router at all.)
 end
 
 -- Replace the socket transport with the peer router. Client is the global table
