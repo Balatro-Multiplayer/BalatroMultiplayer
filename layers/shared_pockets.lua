@@ -14,8 +14,10 @@ MP.Layer("shared_pockets", {
 	banned_jokers = {
 		"j_stencil",
 	},
-	on_apply_bans = function()
-		MP.setup_shared_pockets()
+	calculate = function(self, context)
+		if context.apply_bans then
+			MP.setup_shared_pockets()
+		end
 	end,
 })
 

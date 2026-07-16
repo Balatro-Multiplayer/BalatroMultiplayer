@@ -1,7 +1,9 @@
 -- Eeeee: ~40% of RNG poll keys per ante return a fixed value, not the seed-derived one.
 MP.Layer("eeeee", {
-	on_apply_bans = function()
-		G.GAME.modifiers.mp_eeeee = true
+	calculate = function(self, context)
+		if context.apply_bans then
+			G.GAME.modifiers.mp_eeeee = true
+		end
 	end,
 })
 
