@@ -77,6 +77,12 @@ local ROUTES = {
 		broadcast("pvp_play_hand", { score = msg.score, handsLeft = msg.handsLeft, skips = my_skips(), lives = my_lives() }) -- referee (host-authoritative)
 		-- Display sync is the active blind's own decision now (see objects/blinds/nemesis.lua).
 		MPAPI.calculate_blind({ hand_played = true, score = msg.score, hands_left = msg.handsLeft, skips = my_skips(), lives = my_lives() })
+		-- Score-bearing RLOG event (Phase 6): this is the only point in the
+		-- codebase where "my own score after playing" is already computed for
+		-- the legacy broadcast, so it doubles as the source for a server-side
+		-- replay's ante_snapshots.hands entries (see lib/log_parser.lua's
+		-- carbon_to_replay). Carbon-only -- no human-line equivalent exists.
+		if MP.RLOG then MP.RLOG.record("hand_result", { tostring(msg.score), msg.handsLeft }) end
 	end,
 	setAnte = function(msg)
 		broadcast("pvp_set_ante", { ante = msg.ante })
@@ -91,6 +97,8 @@ local ROUTES = {
 		broadcast("pvp_skip", { skips = msg.skips, score = my_score_str(), handsLeft = my_hands(), lives = my_lives() }) -- referee (host-authoritative)
 		-- Display sync is the active blind's own decision now (see objects/blinds/nemesis.lua).
 		MPAPI.calculate_blind({ discarded = true, skips = msg.skips, score = my_score_str(), hands_left = my_hands(), lives = my_lives() })
+		-- See playHand's hand_result comment above -- same rationale, for discards.
+		if MP.RLOG then MP.RLOG.record("hand_result", { my_score_str(), my_hands() }) end
 	end,
 	startAnteTimer = function(msg)
 		broadcast("pvp_ante_timer", { time = msg.time, isPvP = msg.isPvP })
