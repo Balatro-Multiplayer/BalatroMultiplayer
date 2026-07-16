@@ -23,9 +23,9 @@ function Card:sell_card()
 		local idx = MP.UTILS.index_in_area(self)
 		if area and idx then MP.RLOG.record("sell", { area, idx }, human) end
 	end
-	-- Tell the opponent we sold a card so their Taxes joker counts it (the emit for
-	-- MP.GAME.enemy.sells_per_ante; receiver = action_sold_joker). Was orphaned.
-	if MP.LOBBY.code then MP.ACTIONS.sold_joker() end
+	-- Tell the opponent we sold a card so their Taxes joker counts it (see
+	-- objects/jokers/taxes.lua's receive).
+	if MP.LOBBY.code then MP.broadcast_sold_joker() end
 	return sell_card_ref(self)
 end
 
