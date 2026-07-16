@@ -386,7 +386,34 @@ function MP.UI.create_UIBox_mp_game_end(has_won)
 											{
 												n = G.UIT.R,
 												config = { align = "cm", minh = 0.45, minw = 0.1 },
-												nodes = {},
+												nodes = {
+                                                    UIBox_button({
+                                                        button = "mp_open_log_parser",
+                                                        label = { localize("b_open_log_parser") },
+                                                        minw = 1.75,
+                                                        maxw = 1.75,
+                                                        minh = 0.5,
+                                                        maxh = 0.5,
+                                                        col = true,
+                                                        colour = G.C.CHIPS,
+                                                        padding = 0.1,
+                                                        scale = 0.4
+                                                    }),
+                                                    { n = G.UIT.C, config = { minw = 0.1 } },
+                                                    UIBox_button({
+                                                        id = "from_game_won",
+                                                        button = "mp_get_lovely_log_file",
+                                                        label = { localize("b_get_log_file") },
+                                                        minw = 1.75,
+                                                        maxw = 1.75,
+                                                        minh = 0.5,
+                                                        maxh = 0.5,
+                                                        col = true,
+                                                        colour = G.C.CHIPS,
+                                                        padding = 0.1,
+                                                        scale = 0.4
+                                                    }),
+                                                },
 											},
 											UIBox_button({
 												id = "from_game_won",
@@ -394,7 +421,7 @@ function MP.UI.create_UIBox_mp_game_end(has_won)
 												label = { localize("b_return_lobby") },
 												minw = 4,
 												maxw = 4,
-												minh = 0.8,
+												minh = 0.75,
 												focus_args = { nav = "wide", snap_to = true },
 											}),
 											UIBox_button({
@@ -402,7 +429,7 @@ function MP.UI.create_UIBox_mp_game_end(has_won)
 												label = { localize("b_leave_lobby") },
 												minw = 4,
 												maxw = 4,
-												minh = 0.8,
+												minh = 0.75,
 												focus_args = { nav = "wide" },
 											}),
 										},
