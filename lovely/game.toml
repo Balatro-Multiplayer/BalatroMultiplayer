@@ -143,8 +143,6 @@ add_round_eval_row({dollars = G.GAME.blind.dollars, name='blind1', pitch = pitch
 match_indent = true
 times = 1
 
-# apply bans here
-# hmm...
 [[patches]]
 [patches.pattern]
 target = "game.lua"
@@ -152,7 +150,7 @@ pattern = '''G:save_settings()'''
 position = "before"
 payload = '''
 if not saveTable then -- i am 99% sure this is unnecessary but i'm checking it anyway
-	MP.calculate_layers({ apply_bans = true })
+	MPAPI.ApplyBans()
 end
 '''
 match_indent = true

@@ -31,7 +31,7 @@ MP.create_run_options = function()
 	--   * shown but disabled once SEED_CHANGE_WINDOW seconds have elapsed
 	local lobby = MPAPI.get_current_lobby()
 	local meta = lobby and lobby:get_metadata()
-	local gm = meta and meta.gamemode and MPAPI.GameModes[meta.gamemode]
+	local gm = meta and meta.queue_mode and MPAPI.GameModes[meta.queue_mode]
 	if not gm or gm.seed_change_allowed ~= false then
 		local within_window = MP._run_started_at ~= nil
 			and (love.timer.getTime() - MP._run_started_at) < MP.SEED_CHANGE_WINDOW

@@ -43,7 +43,7 @@ A("pvp_start_game", function(_at, from, params)
 
 	local lobby = MPAPI.get_current_lobby()
 	local meta = (lobby and lobby:get_metadata()) or {}
-	local gm_def = meta.gamemode and MPAPI.GameModes[meta.gamemode]
+	local gm_def = meta.queue_mode and MPAPI.GameModes[meta.queue_mode]
 
 	-- Ban-pick survivors are center KEYS (e.g. 'b_red'); MP's run start wants a deck
 	-- NAME. Resolve either form to a name, and pin it as the lobby deck so MP's
