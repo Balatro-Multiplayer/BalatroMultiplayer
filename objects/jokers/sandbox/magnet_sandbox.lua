@@ -29,26 +29,28 @@ MPAPI.Joker({
 	end,
 	-- Shows a display-only copy on the opponent's board (framework wires add/remove_from_deck).
 	phantom = true,
-	-- Magnet steal: on sell, request a joker from the opponent. on_sync_request runs on the
-	-- opponent (pick their highest-sell joker + serialize); on_sync_response runs here (rebuild
-	-- the real card into our jokers). Was action_magnet / action_magnet_response.
-	on_sync_request = function(self, from, d)
-		MP.RLOG.record("net_magnet", nil, "action:netMagnet")
-		local best = nil
-		for _, v in pairs(G.jokers.cards) do
-			if not best or v.sell_cost > best.sell_cost then best = v end
+	-- Magnet steal: on sell, request a joker from the opponent. A "request" arriving in receive
+	-- picks the opponent's highest-sell joker and replies with a "response"; a "response"
+	-- arriving in receive rebuilds it into our own jokers. Was action_magnet / action_magnet_response.
+	receive = function(self, context)
+		local d = context.data
+		if d.type == "request" then
+			MP.RLOG.record("net_magnet", nil, "action:netMagnet")
+			local best = nil
+			for _, v in pairs(G.jokers.cards) do
+				if not best or v.sell_cost > best.sell_cost then best = v end
+			end
+			if not best then return nil end
+			local candidates = {}
+			for _, v in pairs(G.jokers.cards) do
+				if v.sell_cost == best.sell_cost then table.insert(candidates, v) end
+			end
+			local random_index = math.floor(pseudorandom("j_mp_magnet") * #candidates) + 1
+			local chosen_card = candidates[random_index]
+			return { send = { type = "response", card = MPAPI.serialize_card(chosen_card) } }
+		elseif d.type == "response" then
+			if d.card then MPAPI.rebuild_card(d.card, G.jokers) end
 		end
-		if not best then return nil end
-		local candidates = {}
-		for _, v in pairs(G.jokers.cards) do
-			if v.sell_cost == best.sell_cost then table.insert(candidates, v) end
-		end
-		local random_index = math.floor(pseudorandom("j_mp_magnet") * #candidates) + 1
-		local chosen_card = candidates[random_index]
-		return { card = MPAPI.serialize_card(chosen_card) }
-	end,
-	on_sync_response = function(self, from, resp)
-		if resp and resp.card then MPAPI.rebuild_card(resp.card, G.jokers) end
 	end,
 	calculate = function(self, card, context)
 		if
@@ -105,8 +107,7 @@ MPAPI.Joker({
 			and (card.ability.extra.current_rounds >= card.ability.extra.rounds)
 			and not context.blueprint
 		then
-			local c = card.config.center
-			c:sync_request(c:opponent_id())
+			return { send = { type = "request" } }
 		end
 	end,
 

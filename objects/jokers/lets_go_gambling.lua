@@ -20,12 +20,10 @@ MPAPI.Joker({
 	phantom = true,
 	-- Opponent receives the "misfire": their showcase copy juices up and they lose dollars
 	-- (was action_lets_go_gambling_nemesis).
-	on_sync = function(self, from, d)
-		if d.event == "misfire" then
-			local copy = MP.UTILS.get_phantom_joker("j_mp_lets_go_gambling")
-			if copy then copy:juice_up() end
-			ease_dollars(copy and copy.ability and copy.ability.extra and copy.ability.extra.nemesis_dollars or 5)
-		end
+	receive = function(self, context)
+		local copy = MP.UTILS.get_phantom_joker("j_mp_lets_go_gambling")
+		if copy then copy:juice_up() end
+		ease_dollars(copy and copy.ability and copy.ability.extra and copy.ability.extra.nemesis_dollars or 5)
 	end,
 	loc_vars = function(self, info_queue, card)
 		local numerator, denominator =
@@ -69,7 +67,7 @@ MPAPI.Joker({
 				)
 			then
 				returns = returns or {}
-				card.config.center:sync({ event = "misfire" })
+				returns.send = true
 				returns.message = localize("k_oops_ex")
 			end
 			return returns
