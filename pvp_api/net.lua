@@ -98,33 +98,6 @@ local ROUTES = {
 	pauseAnteTimer = function(msg)
 		broadcast("pvp_pause_ante_timer", { time = msg.time })
 	end,
-	sendPhantom = function(msg)
-		broadcast("pvp_send_phantom", { key = msg.key })
-	end,
-	removePhantom = function(msg)
-		broadcast("pvp_remove_phantom", { key = msg.key })
-	end,
-	magnet = function(_msg)
-		broadcast("pvp_magnet", {})
-	end,
-	magnetResponse = function(msg)
-		broadcast("pvp_magnet_response", { key = msg.key })
-	end,
-	soldJoker = function(_msg)
-		broadcast("pvp_sold_joker", {})
-	end,
-	asteroid = function(_msg)
-		broadcast("pvp_asteroid", {})
-	end,
-	eatPizza = function(msg)
-		broadcast("pvp_eat_pizza", { whole = msg.whole })
-	end,
-	spentLastShop = function(msg)
-		broadcast("pvp_spent_last_shop", { amount = msg.amount })
-	end,
-	letsGoGamblingNemesis = function(_msg)
-		broadcast("pvp_lets_go_gambling_nemesis", {})
-	end,
 	getEndGameJokers = function(_msg)
 		broadcast("pvp_get_end_game_jokers", {})
 	end,
@@ -143,18 +116,6 @@ local ROUTES = {
 	end,
 	nemesisEndGameStats = function(msg)
 		broadcast("pvp_nemesis_end_game_stats", msg)
-	end,
-	jimboAppear = function(msg)
-		broadcast("pvp_jimbo_appear", msg)
-	end,
-	jimboTalk = function(msg)
-		broadcast("pvp_jimbo_talk", msg)
-	end,
-	jimboMove = function(msg)
-		broadcast("pvp_jimbo_move", msg)
-	end,
-	jimboRemove = function(_msg)
-		broadcast("pvp_jimbo_remove", {})
 	end,
 }
 

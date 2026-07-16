@@ -18,7 +18,14 @@ SMODS.Atlas({
 	py = 95,
 })
 
-SMODS.Joker({
+-- Any card sale (own joker/consumable, any joker) tells the opponent's Taxes joker to
+-- count it -- the trigger is generic (overrides/game.lua's Card:sell_card), owned here.
+function MP.broadcast_sold_joker()
+	local center = G.P_CENTERS["j_mp_taxes"]
+	if center then center:sync({}) end
+end
+
+MPAPI.Joker({
 	key = "taxes",
 	atlas = "taxes",
 	rarity = 1,
@@ -35,6 +42,12 @@ SMODS.Joker({
 	end,
 	mp_include = function(self)
 		return MP.LOBBY.code and MP.LOBBY.config.multiplayer_jokers
+	end,
+	-- Was action_sold_joker.
+	receive = function(self, context)
+		MP.GAME.enemy.sells = MP.GAME.enemy.sells + 1
+		MP.GAME.enemy.sells_per_ante[G.GAME.round_resets.ante] = (MP.GAME.enemy.sells_per_ante[G.GAME.round_resets.ante] or 0)
+			+ 1
 	end,
 	calculate = function(self, card, context)
 		if context.cardarea == G.jokers and context.joker_main then
