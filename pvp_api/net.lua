@@ -74,14 +74,9 @@ local ROUTES = {
 		broadcast("pvp_location", { location = msg.location })
 	end,
 	playHand = function(msg)
-		local payload = {
-			score = msg.score,
-			handsLeft = msg.handsLeft,
-			skips = my_skips(),
-			lives = my_lives(),
-		}
-		broadcast("pvp_play_hand", payload) -- referee (host-authoritative)
-		if MP.sync_pvp_blind then MP.sync_pvp_blind(payload) end -- display via the nemesis blind's sync channel
+		broadcast("pvp_play_hand", { score = msg.score, handsLeft = msg.handsLeft, skips = my_skips(), lives = my_lives() }) -- referee (host-authoritative)
+		-- Display sync is the active blind's own decision now (see objects/blinds/nemesis.lua).
+		MPAPI.calculate_blind({ hand_played = true, score = msg.score, hands_left = msg.handsLeft, skips = my_skips(), lives = my_lives() })
 	end,
 	setAnte = function(msg)
 		broadcast("pvp_set_ante", { ante = msg.ante })
@@ -93,14 +88,9 @@ local ROUTES = {
 		broadcast("pvp_set_furthest_blind", { furthestBlind = msg.furthestBlind })
 	end,
 	skip = function(msg)
-		local payload = {
-			skips = msg.skips,
-			score = my_score_str(),
-			handsLeft = my_hands(),
-			lives = my_lives(),
-		}
-		broadcast("pvp_skip", payload) -- referee (host-authoritative)
-		if MP.sync_pvp_blind then MP.sync_pvp_blind(payload) end -- display via the nemesis blind's sync channel
+		broadcast("pvp_skip", { skips = msg.skips, score = my_score_str(), handsLeft = my_hands(), lives = my_lives() }) -- referee (host-authoritative)
+		-- Display sync is the active blind's own decision now (see objects/blinds/nemesis.lua).
+		MPAPI.calculate_blind({ discarded = true, skips = msg.skips, score = my_score_str(), hands_left = my_hands(), lives = my_lives() })
 	end,
 	startAnteTimer = function(msg)
 		broadcast("pvp_ante_timer", { time = msg.time, isPvP = msg.isPvP })

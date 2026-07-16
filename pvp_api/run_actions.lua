@@ -32,7 +32,7 @@ MPAPI.ActionType({
 		end
 		local instance = lobby.get_gamemode_instance and lobby:get_gamemode_instance()
 		if instance and instance.on_player_forfeit then
-			instance:on_player_forfeit(from_player_id)
+			MPAPI._handle_gamemode_result(instance, instance:on_player_forfeit(from_player_id))
 		end
 	end,
 })
