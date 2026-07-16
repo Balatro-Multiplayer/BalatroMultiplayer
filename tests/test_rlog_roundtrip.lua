@@ -3,11 +3,18 @@
 
   Drives lib/replay_log.lua with stubbed globals, captures the lines it emits to
   the Lovely log, and asserts the dual stream is well-formed: a MANIFEST header
-  and END + CHK trailer under the "MP_RLOG:" carbon prefix; carbon action lines
-  with a gapless monotonic sequence; positional args (including ordered index-
-  lists) intact; a paired human "Client sent message:" line per action; and CHK
-  per-stream hashes that equal a recompute over the captured lines and match
-  what was submitted to the server.
+  (carrying schema_version/api_version/start_epoch_ms) and END + CHK trailer
+  under the "MP_RLOG:" carbon prefix; carbon action lines tagged with `t`
+  (milliseconds elapsed since the run began -- monotonically non-decreasing,
+  not necessarily gapless once a real clock is involved); positional args
+  (including ordered index-lists) intact; a paired human "Client sent message:"
+  line per action; and CHK per-stream hashes that equal a recompute over the
+  captured lines and match what was submitted to the server.
+
+  Two scenarios are run: (1) no love.timer stubbed, so `t` falls back to a
+  plain incrementing counter (1, 2, 3, ...) -- this is what most of the
+  assertions below check, since it gives predictable exact values; (2) a
+  stubbed love.timer.getTime, to confirm the real elapsed-ms math itself.
 
   Run from the repo root:
     lua tests/test_rlog_roundtrip.lua
@@ -49,9 +56,15 @@ MP = {
 dofile("lib/replay_log.lua")
 local RLOG = assert(MP.RLOG, "MP.RLOG not defined after load")
 
--- ─── Drive a run ────────────────────────────────────────────────────────────
+-- ─── Drive a run (scenario 1: no love.timer, fallback counter) ─────────────
 
 RLOG.begin_run({ seed = "ABCD", ruleset = "r", gamemode = "g", deck = "Red Deck", stake = 1 })
+
+-- begin_run must stamp these itself -- not required from the caller.
+assert(RLOG._manifest.schema_version == RLOG.SCHEMA_VERSION, "schema_version not stamped")
+assert(RLOG._manifest.start_epoch_ms and RLOG._manifest.start_epoch_ms > 0, "start_epoch_ms not stamped")
+-- api_version is nil here since SMODS.Mods isn't stubbed -- just confirm it doesn't error.
+
 RLOG.record("select_blind", 0, "action:selectBlind,blind:bl_small")
 RLOG.record("buy", { 1, 2 }, "action:boughtCardFromShop,card:Blueprint,cost:4")
 RLOG.record("play", { { 1, 3, 5, 7, 8 } }, "action:play,cards:1.3.5.7.8")
@@ -68,17 +81,19 @@ assert(
 	"bad CHK: " .. tostring(captured[#captured])
 )
 
-local A = {} -- seq -> arg string
+local A = {} -- t -> arg string
 local carbon_lines, human_lines = {}, {} -- in-order full lines (the hash domains)
-local last_seq = 0
+local last_t = 0
 for _, l in ipairs(captured) do
 	local s, rest = l:match("^MP_RLOG: (%d+) (.+)$")
 	if s then
 		s = tonumber(s)
 		A[s] = rest
 		carbon_lines[#carbon_lines + 1] = l
-		assert(s == last_seq + 1, "carbon sequence not gapless/monotonic at " .. s)
-		last_seq = s
+		-- No love.timer stubbed -> elapsed_ms() falls back to a plain incrementing
+		-- counter, so this scenario still expects exact gapless values (1, 2, 3, ...).
+		assert(s == last_t + 1, "fallback counter not gapless/monotonic at " .. s)
+		last_t = s
 	end
 	local payload = l:match("^Client sent message: (.+)$")
 	if payload then
@@ -116,5 +131,29 @@ assert(submitted.log, "carbon log not sent to server")
 assert(submitted.log:match("MP_RLOG: MANIFEST {"), "sent log missing manifest line")
 assert(submitted.log:match("MP_RLOG: 2 buy 1 2"), "sent log missing action lines")
 assert(submitted.log:match("MP_RLOG: CHK v1 "), "sent log missing CHK trailer")
+
+-- ─── Scenario 2: real elapsed-ms math via a stubbed love.timer ─────────────
+
+captured = {}
+local clock = 100.0 -- love.timer.getTime() is a monotonic float in seconds
+love = { timer = { getTime = function() return clock end } }
+
+RLOG.begin_run({ seed = "EFGH", ruleset = "r", gamemode = "g", deck = "Red Deck", stake = 1 })
+RLOG.record("select_blind", 0) -- t=0
+clock = clock + 0.25
+RLOG.record("play", nil) -- t=250
+clock = clock + 1.5
+RLOG.record("reroll", nil) -- t=1750
+RLOG.end_run({ result = "stop" })
+
+local clock_lines = {}
+for _, l in ipairs(captured) do
+	local t = l:match("^MP_RLOG: (%d+) ")
+	if t then clock_lines[#clock_lines + 1] = tonumber(t) end
+end
+assert(clock_lines[1] == 0, "expected t=0 for the first event, got " .. tostring(clock_lines[1]))
+assert(clock_lines[2] == 250, "expected t=250 (250ms later), got " .. tostring(clock_lines[2]))
+assert(clock_lines[3] == 1750, "expected t=1750 (1.5s later), got " .. tostring(clock_lines[3]))
+love = nil -- don't leak the stub into anything after this file
 
 print("test_rlog_roundtrip: OK")

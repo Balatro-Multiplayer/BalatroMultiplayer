@@ -40,23 +40,27 @@ replay logger (`lib/replay_log.lua`). They stub the game globals, capture the
 lines it emits to the Lovely log, and assert on them — no files are written.
 
 Both streams live in the ordinary Lovely log, distinguished by prefix:
-- **Carbon (positional/replay):** `MP_RLOG:` — e.g. `MP_RLOG: 5 buy 1 2`, plus
-  `MP_RLOG: MANIFEST {...}` and the `MP_RLOG: CHK v1 carbon=… human=… bytes=…`
-  trailer.
+- **Carbon (positional/replay):** `MP_RLOG:` — e.g. `MP_RLOG: 5123 buy 1 2`
+  (`5123` = ms elapsed since the run began, not a bare sequence number), plus
+  `MP_RLOG: MANIFEST {...}` (now also carrying `schema_version`, `api_version`,
+  `start_epoch_ms`) and the `MP_RLOG: CHK v1 carbon=… human=… bytes=…` trailer.
 - **Human-readable:** `Client sent message:` — the existing website-parser
   format, e.g. `Client sent message: action:boughtCardFromShop,card:Blueprint,cost:4`.
 
 ```bash
-lua tests/test_rlog_roundtrip.lua   # streams well-formed + hashes round-trip
-lua tests/test_rlog_checksum.lua    # editing one opcode changes the stored hash
+luajit tests/test_rlog_roundtrip.lua   # streams well-formed + hashes round-trip
+luajit tests/test_rlog_checksum.lua    # editing one opcode changes the stored hash
 ```
 
-`test_rlog_roundtrip.lua` asserts: `MP_RLOG: MANIFEST` header + `END`/`CHK`
-trailer; carbon action lines with a gapless, monotonic sequence; positional args
-including ordered index-lists (e.g. `play 1.3.5.7.8`, `use 1 2.4`) intact; a
-paired `Client sent message:` line per action; and `CHK` per-stream hashes that
-equal a recompute over the captured lines and match what `submit_log_hashes`
-sends.
+`test_rlog_roundtrip.lua` asserts: `MP_RLOG: MANIFEST` header (with the new
+version/epoch fields) + `END`/`CHK` trailer; carbon action lines tagged with
+`t` (elapsed ms — gapless/monotonic in the test's default scenario, since no
+`love.timer` is stubbed there and `t` falls back to a plain incrementing
+counter; a second scenario stubs `love.timer.getTime` to confirm the real
+elapsed-ms math against a known clock); positional args including ordered
+index-lists (e.g. `play 1.3.5.7.8`, `use 1 2.4`) intact; a paired `Client sent
+message:` line per action; and `CHK` per-stream hashes that equal a recompute
+over the captured lines and match what `submit_log_hashes` sends.
 
 `test_rlog_checksum.lua` confirms the `CHK` carbon hash equals a hash of the
 carbon stream (re-extracted by prefix) and that tampering with one opcode

@@ -1,15 +1,16 @@
 -- Replay Log (MP.RLOG): dual-stream, deterministic, fully-recreatable action log.
 --
 -- Two streams are emitted from the SAME instrumentation points so they stay
--- event-for-event aligned (shared monotonic sequence number). Both go into the
+-- event-for-event aligned (shared elapsed-ms timestamp). Both go into the
 -- ordinary Lovely log, distinguished only by a line prefix so parsers know what
 -- to read -- there is no separate file.
 --
 --   1. Carbon-copy (replay) stream  -- prefix "MP_RLOG:". Positional, no names:
---      "MP_RLOG: 5 buy 1 2" means "buy shop area 1, slot 2". Indiscriminate, so
---      modded content is just "slot N" and replays across mods for free. This is
---      the only truly replayable stream. The block is framed by a MANIFEST
---      header and an END + CHK trailer (also under the MP_RLOG: prefix).
+--      "MP_RLOG: 5123 buy 1 2" means "at 5.123s into the run, buy shop area 1,
+--      slot 2". Indiscriminate, so modded content is just "slot N" and replays
+--      across mods for free. This is the only truly replayable stream. The
+--      block is framed by a MANIFEST header and an END + CHK trailer (also
+--      under the MP_RLOG: prefix).
 --
 --   2. Human-readable stream  -- prefix "Client sent message:" (the existing
 --      format the website parser already reads). "Client sent message: action:
@@ -17,6 +18,17 @@
 --
 -- record() is the single emitter for both lines, so the per-action overrides no
 -- longer log the human line themselves -- they pass the payload to record().
+--
+-- Timestamps: each event's leading field is `t`, milliseconds elapsed since the
+-- manifest's `start_epoch_ms` (captured once, via a monotonic clock) -- not a
+-- bare sequence counter. This keeps per-event numbers small (a few digits for a
+-- multi-minute match, instead of repeating a 13-digit absolute epoch stamp on
+-- every line) while still being monotonically non-decreasing, so it doubles as
+-- the same ordering key a sequence number would give, and additionally carries
+-- the real elapsed-time information anti-cheat plausibility checks and
+-- reconnect tail-requests both need. Matches the MQTT design doc's own §26.1
+-- `t` field convention (ms since match start), so this format and the server's
+-- eventual event schema agree instead of diverging.
 --
 -- At end_run both streams are hashed and the hashes are sent to the server, so
 -- tamper-checking later is a cheap hash comparison instead of a line-by-line
@@ -32,11 +44,18 @@ MP.RLOG = RLOG
 RLOG.CARBON_PREFIX = "MP_RLOG:" -- positional / replay stream
 RLOG.HUMAN_PREFIX = "Client sent message:" -- human-readable stream (website-compatible)
 
--- Required manifest keys; begin_run warns if any are missing.
+-- Schema version of the MANIFEST/event format itself (bump on breaking changes
+-- to what the server/replay-parser needs to understand, independent of mod_version).
+RLOG.SCHEMA_VERSION = 1
+
+-- Required manifest keys; begin_run warns if any are missing. api_version/
+-- mod_version/start_epoch_ms are stamped by begin_run itself (see below), not
+-- required from the caller.
 RLOG.REQUIRED_MANIFEST_KEYS = { "seed", "ruleset", "gamemode", "deck", "stake" }
 
-RLOG._seq = 0
-RLOG._carbon_buffer = {} -- the action "MP_RLOG: <seq> ..." lines, hashed at end
+RLOG._start_ms = nil -- monotonic-clock ms at begin_run, source of truth for each event's `t`
+RLOG._fallback_seq = 0 -- ms-surrogate counter when no monotonic clock is available (e.g. tests)
+RLOG._carbon_buffer = {} -- the action "MP_RLOG: <t> ..." lines, hashed at end
 RLOG._carbon_full = {} -- the full carbon block (manifest + actions + END + CHK), sent to the server
 RLOG._human_buffer = {} -- the "Client sent message: ..." lines, hashed at end
 RLOG._run_active = false
@@ -110,6 +129,18 @@ local function stream_now()
 	return 0
 end
 
+-- Milliseconds elapsed since begin_run, for each event's `t`. Falls back to a
+-- plain incrementing counter (behaving like the old sequence number) when
+-- love.timer isn't available, e.g. under the headless test harness -- so
+-- `t` is still monotonically non-decreasing even without a real clock.
+local function elapsed_ms()
+	if RLOG._start_ms == nil then
+		RLOG._fallback_seq = RLOG._fallback_seq + 1
+		return RLOG._fallback_seq
+	end
+	return math.floor(love.timer.getTime() * 1000 - RLOG._start_ms + 0.5)
+end
+
 -- Send any buffered carbon lines to the server as one batch. No-ops cleanly if
 -- there's no transport yet (e.g. tests) -- the lines are still kept in the full
 -- carbon block submitted at end_run.
@@ -146,18 +177,17 @@ end
 
 -- Record one state-affecting action. Emits the carbon (positional) line and,
 -- when a human payload is provided, the mirrored human line -- both into the
--- Lovely log with the same sequence number.
+-- Lovely log tagged with the same elapsed-ms timestamp `t`.
 --   opcode : string, e.g. "buy"
 --   args   : nil | scalar | list of tokens (scalar or sub-list); see fmt_args
 --   human  : nil | string payload in the existing "action:key,..." format
 function RLOG.record(opcode, args, human)
 	if not RLOG.is_active() or not RLOG._run_active then return end
 
-	RLOG._seq = RLOG._seq + 1
-	local seq = RLOG._seq
+	local t = elapsed_ms()
 
 	local argstr = fmt_args(args)
-	local cline = RLOG.CARBON_PREFIX .. " " .. seq .. " " .. opcode .. (argstr ~= "" and (" " .. argstr) or "")
+	local cline = RLOG.CARBON_PREFIX .. " " .. t .. " " .. opcode .. (argstr ~= "" and (" " .. argstr) or "")
 	RLOG._carbon_buffer[#RLOG._carbon_buffer + 1] = cline
 	emit_carbon(cline)
 
@@ -178,7 +208,20 @@ function RLOG.begin_run(manifest)
 		end
 	end
 
-	RLOG._seq = 0
+	-- Stamped here, not required from the caller: schema/mod versions (for a
+	-- server/parser to know how to read this block) and the wall-clock epoch
+	-- each event's elapsed-ms `t` is relative to. os.time() is second-precision
+	-- (fine for a "when did this match start" record) -- per-event elapsed time
+	-- itself comes from the monotonic love.timer clock captured just below, not
+	-- from this coarser epoch stamp.
+	manifest.schema_version = manifest.schema_version or RLOG.SCHEMA_VERSION
+	if manifest.api_version == nil and SMODS and SMODS.Mods and SMODS.Mods["MultiplayerAPI"] then
+		manifest.api_version = SMODS.Mods["MultiplayerAPI"].version
+	end
+	manifest.start_epoch_ms = manifest.start_epoch_ms or (os.time() * 1000)
+
+	RLOG._start_ms = (love and love.timer and love.timer.getTime) and (love.timer.getTime() * 1000) or nil
+	RLOG._fallback_seq = 0
 	RLOG._carbon_buffer = {}
 	RLOG._carbon_full = {}
 	RLOG._human_buffer = {}
