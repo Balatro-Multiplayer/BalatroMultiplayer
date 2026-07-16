@@ -48,7 +48,10 @@ RLOG.record("sell", { 4, 2 }, "action:soldCard,card:Y")
 local carbon_hash = RLOG.end_run({ result = "stop" })
 
 -- Re-extract the carbon (positional) stream from the log by prefix: action
--- lines are "MP_RLOG: <seq> ...", excluding MANIFEST/END/CHK. This is the domain.
+-- lines are "MP_RLOG: <t> ...", excluding MANIFEST/END/CHK. This is the domain.
+-- `t` here is 1, 2, ... because love.timer isn't stubbed in this test, so
+-- RLOG falls back to a plain incrementing counter (see lib/replay_log.lua's
+-- elapsed_ms) -- same numbers as the old sequence counter, by design.
 local carbon_lines = {}
 local chk_carbon
 for _, l in ipairs(captured) do
