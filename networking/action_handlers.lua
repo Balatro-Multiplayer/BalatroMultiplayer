@@ -404,6 +404,9 @@ local function action_start_blind(p)
 	MP.GAME.enemy.score_text = "0"
 	-- Re-mask the opponent's hands until the first enemyInfo of the new blind.
 	MP.GAME.enemy.info_received = false
+	-- Royale's "first sync wins" MP.current_target_id() strategy re-latches fresh
+	-- each blind (a no-op for 1v1/Nemesis, which don't use this field).
+	MP.GAME.royale_target_id = nil
 	MP.GAME.ready_blind = false
 	MP.GAME.pvp_reached = false
 	MP.GAME.timer_started = false

@@ -44,6 +44,10 @@ MPAPI.Blind({
 	-- MP.GAME.enemy.* store the HUD already reads. The referee (win/lose/lives) is separate,
 	-- still driven by pvp_play_hand/pvp_skip.
 	receive = function(self, context)
+		MP.note_target_candidate(context.from)
+		if MP.current_target_id() and context.from ~= MP.current_target_id() then
+			return
+		end
 		local d = context.data
 		local score = MP.INSANE_INT.from_string(d.score)
 		local hands_left = tonumber(d.handsLeft)
