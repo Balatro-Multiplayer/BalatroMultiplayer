@@ -451,7 +451,7 @@ local function action_enemy_info(p)
 		play_sound("holo1", 0.865, 0.9)
 		play_sound("gong", 0.765, 0.4)
 	end
-	if MP.GAME.enemy.skips < skips then
+	if MP.GAME.enemy.skips < skips and not MP.LOBBY.config.enemy_location_disabled then
 		play_sound("negative", 0.865, 0.4)
 		play_sound("gong", 0.765, 0.4)
 	end
