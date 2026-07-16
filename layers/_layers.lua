@@ -29,23 +29,10 @@ end
 -- callers anywhere in this codebase.
 MP.modifiers_parse = MPAPI.modifiers_parse
 
--- Dispatches `context` to every active layer's own calculate(self, context) -- the PvP
--- analog of MPAPI.calculate_context, but walking MP.active_layer_chain() instead of
--- MPAPI's own. MPAPI.active_layer_chain()/get_active_ruleset() resolve the active
--- ruleset from the lobby's raw metadata key (for PvP, the public matchmaking key like
--- "pvp_standard"), which is a different key space than the translated internal key
--- ("ruleset_mp_standard_ranked") MP.active_layer_chain() correctly uses (see
--- pvp_api/lobby_bridge.lua's mirror_metadata) -- so PvP layers must be walked this way,
--- not via MPAPI.calculate_context directly, or nothing would be found.
-function MP.calculate_layers(context)
-	for _, name in ipairs(MP.active_layer_chain()) do
-		local layer = MPAPI.Layers[name]
-		if layer and type(layer.calculate) == "function" then
-			layer:calculate(context)
-		end
-	end
-end
-
+-- MP.active_layer_chain()/get_active_ruleset() (rulesets/_rulesets.lua) resolve the
+-- same lobby metadata MPAPI's own equivalents do, but additionally know about PvP's
+-- practice-mode/ghost-replay cases that MPAPI doesn't -- kept as the PvP-owned
+-- resolution layer for that reason, even though the two agree for any live lobby.
 function MP.is_layer_active(layer_name)
 	if not layer_name then return false end
 	for _, name in ipairs(MP.active_layer_chain()) do

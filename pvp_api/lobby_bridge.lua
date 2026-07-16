@@ -78,17 +78,15 @@ end
 -- fields plus PvP keys (gamemode/ruleset/kind/deck/stake).
 local function mirror_metadata(lobby)
 	local meta = lobby:get_metadata() or {}
-	-- The lobby's `gamemode` is the API/queue key (e.g. "pvp_standard"); MP's own
-	-- systems (blind selection -> nemesis, bans) are keyed by MP's gamemode/ruleset
-	-- ("gamemode_mp_attrition" / "ruleset_mp_standard_ranked"). Translate via the
-	-- bridge table so MP.get_active_gamemode()/MP.Gamemodes[...] resolve.
-	local def = meta.gamemode and MP.PVP_GAMEMODES and MP.PVP_GAMEMODES[meta.gamemode]
+	-- `gamemode`/`ruleset` in metadata are already MPAPI's own content keys
+	-- ("gamemode_mp_attrition" / "ruleset_mp_standard_ranked"), so they pass straight
+	-- through -- MPAPI.get_active_gamemode()/get_active_ruleset() read this same
+	-- metadata directly and need no translation. `queue_mode` carries the separate
+	-- API/queue/bridge key (e.g. "pvp_standard") only nemesis_pairing derivation below
+	-- still needs.
+	local def = meta.queue_mode and MP.PVP_GAMEMODES and MP.PVP_GAMEMODES[meta.queue_mode]
 	for k, v in pairs(meta) do
-		if k == "gamemode" then
-			MP.LOBBY.config.gamemode = (def and def.gamemode) or v
-		elseif k == "ruleset" then
-			MP.LOBBY.config.ruleset = (def and def.ruleset) or v
-		elseif k ~= "deck" and k ~= "kind" then
+		if k ~= "deck" and k ~= "kind" then
 			MP.LOBBY.config[k] = v
 		end
 	end
