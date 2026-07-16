@@ -22,3 +22,14 @@ MP.Layer("traps", {
 		"c_mp_trap_mental_prison",
 	},
 })
+
+-- Booster registration isn't covered by MPAPI's auto-gate (pool_gating.lua only patches
+-- Joker/Consumable/Tag:register, and get_pack()'s shop pack-type roll only consults
+-- G.GAME.banned_keys, not mp_include) -- so ban the pack keys directly whenever "traps"
+-- isn't active. See objects/boosters/traps.lua.
+MPAPI.register_ban_source(function()
+	if MP.is_layer_active("traps") then
+		return nil
+	end
+	return { "p_mp_trap_normal", "p_mp_trap_jumbo" }
+end)
