@@ -8,7 +8,14 @@ SMODS.Atlas({
 	py = 95,
 })
 
-SMODS.Consumable({
+-- Broadcasts the "an asteroid was used" event to the opponent; the receiver's
+-- receive downgrades their own best-leveled visible hand by 1 (was action_asteroid).
+function MP.broadcast_asteroid()
+	local center = G.P_CENTERS["c_mp_asteroid"]
+	if center then center:sync({}) end
+end
+
+MPAPI.Consumable({
 	key = "asteroid",
 	set = "Planet",
 	atlas = "asteroid",
@@ -24,6 +31,9 @@ SMODS.Consumable({
 	end,
 	can_use = function(self, card)
 		return true
+	end,
+	receive = function(self, context)
+		MP.UI.show_asteroid_hand_level_up()
 	end,
 	use = function(self, card, area, copier)
 		local asteroids = MP.GAME.asteroids
