@@ -38,7 +38,10 @@ MP.Layer("experimental", {
 		"unreliable",
 		"draining",
 	},
-	on_apply_bans = function()
+	calculate = function(self, context)
+		if not context.apply_bans then
+			return
+		end
 		change_shop_size(1)
         G.GAME.starting_params.ante_scaling = (G.GAME.starting_params.ante_scaling or 1) * 1.15
         G.GAME.modifiers.mp_extra_reroll_increment = 1
