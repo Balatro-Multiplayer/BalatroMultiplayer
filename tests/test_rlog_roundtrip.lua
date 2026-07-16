@@ -9,7 +9,9 @@
   not necessarily gapless once a real clock is involved); positional args
   (including ordered index-lists) intact; a paired human "Client sent message:"
   line per action; and CHK per-stream hashes that equal a recompute over the
-  captured lines and match what was submitted to the server.
+  captured lines. (The live MPAPI broadcast side of the transport --
+  RLOG.broadcast_event, installed by pvp_api/replay_log_actions.lua -- is
+  covered separately by test_rlog_stream.lua; this test is local-log-only.)
 
   Two scenarios are run: (1) no love.timer stubbed, so `t` falls back to a
   plain incrementing counter (1, 2, 3, ...) -- this is what most of the
@@ -32,14 +34,8 @@ function sendTraceMessage(msg)
 end
 function sendWarnMessage() end
 
-local submitted
 MP = {
 	LOBBY = { code = "TEST" },
-	ACTIONS = {
-		submit_log_hashes = function(c, h, seed, log)
-			submitted = { carbon = c, human = h, seed = seed, log = log }
-		end,
-	},
 	UTILS = {
 		-- Real Adler-style hash from lib/crypto.lua so the domain matches prod.
 		joker_hash = function(s)
@@ -119,18 +115,6 @@ local chk_carbon, chk_human = captured[#captured]:match("carbon=(%x+) human=(%x+
 assert(chk_carbon == MP.UTILS.joker_hash(table.concat(carbon_lines, "\n")), "carbon hash domain mismatch")
 assert(chk_human == MP.UTILS.joker_hash(table.concat(human_lines, "\n")), "human hash domain mismatch")
 assert(carbon_hash == chk_carbon and human_hash == chk_human, "end_run return != CHK trailer")
-
--- The same hashes are what we send to the server, with the seed for keying.
-assert(submitted, "hashes not submitted to server")
-assert(submitted.carbon == carbon_hash and submitted.human == human_hash, "submitted hashes mismatch")
-assert(submitted.seed == "ABCD", "seed not forwarded to server")
-
--- The full carbon block (manifest + actions + END + CHK) is shipped to the server
--- so it keeps the whole viewable/replayable log, not just the hash.
-assert(submitted.log, "carbon log not sent to server")
-assert(submitted.log:match("MP_RLOG: MANIFEST {"), "sent log missing manifest line")
-assert(submitted.log:match("MP_RLOG: 2 buy 1 2"), "sent log missing action lines")
-assert(submitted.log:match("MP_RLOG: CHK v1 "), "sent log missing CHK trailer")
 
 -- ─── Scenario 2: real elapsed-ms math via a stubbed love.timer ─────────────
 

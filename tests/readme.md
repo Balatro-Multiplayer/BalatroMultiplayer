@@ -35,9 +35,17 @@ After `capture`, review the diff in `tests/ruleset_snapshot.lua` before committi
 
 ## Replay Log (MP.RLOG)
 
-`test_rlog_roundtrip.lua` and `test_rlog_checksum.lua` exercise the dual-stream
-replay logger (`lib/replay_log.lua`). They stub the game globals, capture the
-lines it emits to the Lovely log, and assert on them — no files are written.
+`test_rlog_roundtrip.lua`, `test_rlog_checksum.lua`, and `test_rlog_stream.lua`
+exercise the dual-stream replay logger (`lib/replay_log.lua`). They stub the
+game globals, capture the lines it emits to the Lovely log, and assert on them
+— no files are written.
+
+Live transport: every event (manifest, actions, END, CHK) is also broadcast in
+real time via the `game_log_event` MPAPI ActionType (`pvp_api/replay_log_actions.lua`),
+one broadcast per event — no batching, so a server-side buffer or spectator
+sees each line as it happens. This replaced the old TCP-era `streamLogLines`/
+`submitLogHashes` actions, which had already gone dead (silently dropped by
+`pvp_api/net.lua`'s router) once PvP moved onto MPAPI.
 
 Both streams live in the ordinary Lovely log, distinguished by prefix:
 - **Carbon (positional/replay):** `MP_RLOG:` — e.g. `MP_RLOG: 5123 buy 1 2`
@@ -48,8 +56,9 @@ Both streams live in the ordinary Lovely log, distinguished by prefix:
   format, e.g. `Client sent message: action:boughtCardFromShop,card:Blueprint,cost:4`.
 
 ```bash
-luajit tests/test_rlog_roundtrip.lua   # streams well-formed + hashes round-trip
+luajit tests/test_rlog_roundtrip.lua   # local log streams well-formed + hashes round-trip
 luajit tests/test_rlog_checksum.lua    # editing one opcode changes the stored hash
+luajit tests/test_rlog_stream.lua      # every carbon line broadcasts live, one-for-one, no batching
 ```
 
 `test_rlog_roundtrip.lua` asserts: `MP_RLOG: MANIFEST` header (with the new
@@ -60,7 +69,15 @@ counter; a second scenario stubs `love.timer.getTime` to confirm the real
 elapsed-ms math against a known clock); positional args including ordered
 index-lists (e.g. `play 1.3.5.7.8`, `use 1 2.4`) intact; a paired `Client sent
 message:` line per action; and `CHK` per-stream hashes that equal a recompute
-over the captured lines and match what `submit_log_hashes` sends.
+over the captured lines. (This test is local-log-only; the live broadcast side
+is `test_rlog_stream.lua`'s job.)
+
+`test_rlog_stream.lua` stubs `RLOG.broadcast_event` directly (the hook
+`pvp_api/replay_log_actions.lua` installs in the real mod) and asserts every
+carbon-stream event — including the manifest/END/CHK frames, using the
+reserved opcodes `"manifest"`/`"end"`/`"chk"` — triggers exactly one broadcast,
+in order, with the real `(t, opcode, args)` payload, and that `t` is
+monotonically non-decreasing across the whole run.
 
 `test_rlog_checksum.lua` confirms the `CHK` carbon hash equals a hash of the
 carbon stream (re-extracted by prefix) and that tampering with one opcode
