@@ -989,6 +989,20 @@ return {
 					"{C:attention}Unskippable{}",
 				},
 			},
+			p_mp_trap_normal = {
+				name = "Trap Pack",
+				text = {
+					"Choose {C:attention}#1#{} of up to",
+					"{C:attention}#2#{} {C:attention}Trap{} cards",
+				},
+			},
+			p_mp_trap_jumbo = {
+				name = "Jumbo Trap Pack",
+				text = {
+					"Choose {C:attention}#1#{} of up to",
+					"{C:attention}#2#{} {C:attention}Trap{} cards",
+				},
+			},
 			mp_transmutations = {
 				name = "Transmutations",
 				text = {
@@ -1303,6 +1317,7 @@ return {
 			mp_sticker_draining = "Draining",
 		},
 		dictionary = {
+			k_trap_pack = "Trap Pack",
 			b_singleplayer = "Singleplayer",
 			b_sp_with_ruleset = "Practice Mode",
 			b_practice = "Practice",
