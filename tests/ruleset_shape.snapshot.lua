@@ -364,6 +364,9 @@ return {
     ["banned_consumables"] = {},
     ["banned_enhancements"] = {},
     ["banned_jokers"] = {},
+    ["banned_silent"] = {
+      "j_bloodstone",
+    },
     ["banned_tags"] = {},
     ["banned_vouchers"] = {},
     ["forced_gamemode"] = "gamemode_mp_attrition",
@@ -373,7 +376,9 @@ return {
     ["reworked_blinds"] = {},
     ["reworked_consumables"] = {},
     ["reworked_enhancements"] = {},
-    ["reworked_jokers"] = {},
+    ["reworked_jokers"] = {
+      "j_mp_bloodstone",
+    },
     ["reworked_tags"] = {},
     ["reworked_vouchers"] = {},
   },
