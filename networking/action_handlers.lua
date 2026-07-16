@@ -101,6 +101,8 @@ local function action_rejoinedLobby(p)
 	reconnectToken = token
 	lastLobbyCode = code
 	MP.self_reconnect_countdown = nil
+	MP.GAME.timer_started = false
+	MP.GAME.nemesis_timer_started = false
 	MP.ACTIONS.sync_client()
 	MP.ACTIONS.lobby_info()
 	MP.UI.update_connection_status()
@@ -151,6 +153,9 @@ end
 local function action_enemyDisconnected(p)
 	local timeout = p.timeout or 60
 	sendWarnMessage("Opponent disconnected, waiting for reconnection...", "MULTIPLAYER")
+
+	MP.GAME.timer_started = false
+	MP.GAME.nemesis_timer_started = false
 
 	MP.enemy_disconnect_countdown = {
 		end_time = love.timer.getTime() + timeout,
@@ -249,6 +254,8 @@ local function action_reconnecting()
 	-- Only show if we were in a lobby and don't already have a countdown running
 	if reconnectToken and lastLobbyCode and not MP.self_reconnect_countdown then
 		MP.LOBBY.connected = false
+		MP.GAME.timer_started = false
+		MP.GAME.nemesis_timer_started = false
 		MP.UI.update_connection_status()
 		sendWarnMessage("Connection lost, attempting to reconnect...", "MULTIPLAYER")
 
@@ -312,6 +319,11 @@ end
 local function begin_pvp_blind()
 	if MP.GAME.next_blind_context then
 		G.FUNCS.select_blind(MP.GAME.next_blind_context)
+        MP.GAME.timer_started = false
+        MP.GAME.nemesis_timer_started = false
+        MP.GAME.nemesis_timer_was_started = false
+        MP.GAME.timer_consumed = false
+        MP.GAME.timer = MP.UTILS.pvp_timer_base()
 	else
 		sendErrorMessage("No next blind context", "MULTIPLAYER")
 	end
@@ -322,22 +334,20 @@ local function action_start_blind(p)
 	-- Reset the stored opponent score each blind so the first frame after we
 	-- play (which lifts the "???" mask) shows 0, not last blind's stale score.
 	MP.GAME.enemy.score = MP.INSANE_INT.empty()
+	MP.GAME.enemy.real_score = MP.INSANE_INT.empty()
 	MP.GAME.enemy.score_text = "0"
 	-- Re-mask the opponent's hands until the first enemyInfo of the new blind.
 	MP.GAME.enemy.info_received = false
 	MP.GAME.ready_blind = false
 	MP.GAME.pvp_reached = false
-	MP.GAME.timer_started = false
-	MP.GAME.nemesis_timer_started = false
-	MP.GAME.timer_consumed = false
-	MP.GAME.timer = MP.UTILS.pvp_timer_base()
+    MP.GAME.pvp_timer_order = nil
+    MP.GAME.pvp_timer_activated = false
 	MP.GAME.pvp_reached_first = (MP.LOBBY.is_host and "host" or "guest") == first_player
 	MP.UI.start_pvp_countdown(begin_pvp_blind)
 end
 
 local function action_enemy_info(p)
-	local score = MP.INSANE_INT.from_string(p.score)
-
+    local score
 	local hands_left = tonumber(p.handsLeft)
 	local skips = tonumber(p.skips)
 	local lives = tonumber(p.lives)
@@ -360,64 +370,78 @@ local function action_enemy_info(p)
 		end
 	end
 
-	if score == nil or hands_left == nil then
-		sendDebugMessage("Invalid score or hands_left", "MULTIPLAYER")
-		return
-	end
+    if not p.noScore then
+        score = MP.INSANE_INT.from_string(p.score)
+    end
 
-	if MP.INSANE_INT.greater_than(score, MP.GAME.enemy.highest_score) then MP.GAME.enemy.highest_score = score end
+    if score then
+        if MP.INSANE_INT.greater_than(score, MP.GAME.enemy.highest_score) then MP.GAME.enemy.highest_score = score end
 
-	-- PvP timer: stop timer according to score
-	if MP.is_pvp_boss() and MP.is_layer_active("pvp_timer") then
-		if MP.INSANE_INT.greater_than(MP.GAME.score, score) then
-			MP.GAME.nemesis_timer_started = false
-        elseif MP.INSANE_INT.equal(MP.GAME.score, score) and MP.GAME.pvp_reached_first then
+        G.E_MANAGER:add_event(Event({
+            blockable = false,
+            blocking = false,
+            trigger = "ease",
+            delay = 0.75,
+            timer = "REAL",
+            ref_table = MP.GAME.enemy.score,
+            ref_value = "e_count",
+            ease_to = score.e_count,
+            func = function(t)
+                return math.floor(t)
+            end,
+        }))
+
+        G.E_MANAGER:add_event(Event({
+            blockable = false,
+            blocking = false,
+            trigger = "ease",
+            delay = 0.75,
+            timer = "REAL",
+            ref_table = MP.GAME.enemy.score,
+            ref_value = "coeffiocient", -- why is this misspelled
+            ease_to = score.coeffiocient,
+            func = function(t)
+                local mult = 1
+                if score.exponent > 0 then mult = 100 end
+                return math.floor(t * mult) / mult
+            end,
+        }))
+
+        G.E_MANAGER:add_event(Event({
+            blockable = false,
+            blocking = false,
+            trigger = "ease",
+            delay = 0.75,
+            timer = "REAL",
+            ref_table = MP.GAME.enemy.score,
+            ref_value = "exponent",
+            ease_to = score.exponent,
+            func = function(t)
+                return math.floor(t)
+            end,
+        }))
+
+        MP.GAME.enemy.real_score = score
+        MP.GAME.enemy.info_received = true
+    end
+
+    -- PvP timer: server determines who and when can activate pvp timer
+    if p.pvpTimerOrder ~= nil and MP.is_pvp_boss() and MP.is_layer_active("pvp_timer") then
+        MP.GAME.pvp_timer_order = p.pvpTimerOrder
+        if (MP.LOBBY.is_host and "host" or "guest") == MP.GAME.pvp_timer_order then
             MP.GAME.nemesis_timer_started = false
+            if
+                not MP.GAME.timer_started
+                and MP.UI.can_timer_opponent()
+                and MP.GAME.pvp_timer_activated
+                and SMODS.Mods["Multiplayer"].config.automatic_pvp_timer
+            then
+                MP.ACTIONS.start_ante_timer()
+            end
         else
-			MP.GAME.timer_started = false
-		end
-	end
-
-	G.E_MANAGER:add_event(Event({
-		blockable = false,
-		blocking = false,
-		trigger = "ease",
-		delay = 3,
-		ref_table = MP.GAME.enemy.score,
-		ref_value = "e_count",
-		ease_to = score.e_count,
-		func = function(t)
-			return math.floor(t)
-		end,
-	}))
-
-	G.E_MANAGER:add_event(Event({
-		blockable = false,
-		blocking = false,
-		trigger = "ease",
-		delay = 3,
-		ref_table = MP.GAME.enemy.score,
-		ref_value = "coeffiocient", -- why is this misspelled
-		ease_to = score.coeffiocient,
-		func = function(t)
-			local mult = 1
-			if score.exponent > 0 then mult = 100 end
-			return math.floor(t * mult) / mult
-		end,
-	}))
-
-	G.E_MANAGER:add_event(Event({
-		blockable = false,
-		blocking = false,
-		trigger = "ease",
-		delay = 3,
-		ref_table = MP.GAME.enemy.score,
-		ref_value = "exponent",
-		ease_to = score.exponent,
-		func = function(t)
-			return math.floor(t)
-		end,
-	}))
+            MP.GAME.timer_started = false
+        end
+    end
 
 	if MP.GAME.enemy.lives > lives then
 		play_sound("holo1", 0.865, 0.9)
@@ -428,11 +452,9 @@ local function action_enemy_info(p)
 		play_sound("gong", 0.765, 0.4)
 	end
 
-	MP.GAME.enemy.hands = hands_left
-	MP.GAME.enemy.skips = skips
-	MP.GAME.enemy.lives = lives
-	-- We've now heard from the opponent this blind: unmask their hands count.
-	MP.GAME.enemy.info_received = true
+	MP.GAME.enemy.hands = hands_left or 0
+	MP.GAME.enemy.skips = skips or 0
+	MP.GAME.enemy.lives = lives or 0
 	if MP.UI.juice_up_pvp_hud then MP.UI.juice_up_pvp_hud() end
 end
 
@@ -460,10 +482,29 @@ local function action_end_pvp(p)
 	MP.GAME.timer_consumed = false
 	MP.GAME.timer_started = false
 	MP.GAME.nemesis_timer_started = false
+    MP.GAME.nemesis_timer_was_started = false
 	MP.GAME.ready_blind = false
 	MP.GAME.pvp_reached = false
     MP.GAME.pvp_reached_first = false
+    MP.GAME.pvp_timer_activated = false
 	MP.GAME.score = nil
+
+    -- Sanity check
+    G.E_MANAGER:add_event(Event({
+        func = function()
+            G.E_MANAGER:add_event(Event({
+                func = function()
+                    MP.GAME.timer = MP.UTILS.timer_base()
+                    MP.GAME.timer_started = false
+                    MP.GAME.nemesis_timer_started = false
+                    MP.GAME.nemesis_timer_was_started = false
+                    MP.GAME.pvp_timer_activated = false
+                    return true
+                end,
+            }))
+            return true
+        end,
+    }))
 end
 
 local function action_player_info(p)
@@ -970,6 +1011,8 @@ end
 -- Dual-call: dispatched from network (fromNemesis defaults to true) or self-triggered
 -- by MP.ACTIONS.start_ante_timer (passes fromNemesis = false explicitly).
 local function action_start_ante_timer(p)
+	if p.isPvP and (MP.GAME.end_pvp or not MP.is_pvp_boss() or G.GAME.current_round.hands_left <= 0) then return end
+
 	local time = p.time
 	local from_nemesis = p.fromNemesis
 	if from_nemesis == nil then from_nemesis = true end
@@ -1001,6 +1044,7 @@ local function action_start_ante_timer(p)
 	end
 	if from_nemesis then
 		MP.GAME.nemesis_timer_started = true
+        MP.GAME.nemesis_timer_was_started = true
 	else
 		MP.GAME.timer_started = true
 	end
@@ -1160,17 +1204,6 @@ function MP.ACTIONS.play_hand(score, hands_left)
 		MP.GAME.highest_score = insane_int_score
 	end
 
-	-- Stop PvP timers according to score
-	if MP.is_pvp_boss() and MP.is_layer_active("pvp_timer") then
-		if MP.INSANE_INT.greater_than(insane_int_score, MP.GAME.enemy.score) then
-			MP.GAME.nemesis_timer_started = false
-        elseif MP.INSANE_INT.equal(insane_int_score, MP.GAME.enemy.score) and MP.GAME.pvp_reached_first then
-            MP.GAME.nemesis_timer_started = false
-		else
-			MP.GAME.timer_started = false
-		end
-	end
-
 	Client.send({
 		action = "playHand",
 		score = fixed_score,
@@ -1303,9 +1336,11 @@ function MP.ACTIONS.request_nemesis_stats()
 end
 
 function MP.ACTIONS.start_ante_timer()
+	local is_pvp = MP.is_pvp_boss() and MP.is_layer_active("pvp_timer")
 	Client.send({
 		action = "startAnteTimer",
 		time = MP.GAME.timer,
+		isPvP = is_pvp or nil,
 	})
 	action_start_ante_timer({ time = MP.GAME.timer, fromNemesis = false })
 end

@@ -12,6 +12,16 @@ payload = '''
 local unstuck_button = nil
 local return_to_lobby = nil
 local leave_lobby = nil
+
+if MP.LOBBY.code and G.STATE == G.STATES.MENU then
+    your_collection = UIBox_button({
+        label = { localize("b_collection") },
+        button = "your_collection",
+        minw = 5,
+        id = "your_collection",
+    })
+    mods = UIBox_button{ id = "mods_button", label = {localize('b_mods')}, button = "mods_button", minw = 5}
+end
 '''
 match_indent = true
 times = 1

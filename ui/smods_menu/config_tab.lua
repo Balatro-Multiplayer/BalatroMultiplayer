@@ -9,6 +9,24 @@ function MP.UI.create_config_tab()
 			colour = G.C.BLACK,
 		},
 		nodes = {
+            {
+				n = G.UIT.R,
+				config = {
+					padding = 0,
+					align = "cm",
+                    on_demand_tooltip = {
+						text = localize("k_automatic_pvp_timer_description"),
+					},
+				},
+				nodes = {
+					create_toggle({
+						id = "multiplayer_automatic_pvp_timer",
+						label = localize("k_automatic_pvp_timer"),
+						ref_table = SMODS.Mods["Multiplayer"].config,
+						ref_value = "automatic_pvp_timer",
+					}),
+				},
+			},
 			{
 				n = G.UIT.R,
 				config = {
@@ -105,6 +123,36 @@ function MP.UI.create_config_tab()
 							}),
 						},
 					},
+				},
+			},
+            {
+				n = G.UIT.R,
+				config = {
+					padding = 0.1,
+					align = "cm",
+				},
+				nodes = {
+					 UIBox_button({
+                        button = "mp_open_log_parser",
+                        label = { localize("b_open_log_parser") },
+                        minw = 3,
+                        maxw = 3,
+                        minh = 0.8,
+                        maxh = 0.8,
+                        col = true,
+                        colour = G.C.CHIPS,
+                    }),
+                    UIBox_button({
+                        id = "from_game_won",
+                        button = "mp_get_lovely_log_file",
+                        label = { localize("b_get_log_file") },
+                        minw = 3,
+                        maxw = 3,
+                        minh = 0.8,
+                        maxh = 0.8,
+                        col = true,
+                        colour = G.C.CHIPS,
+                    }),
 				},
 			},
 		},
