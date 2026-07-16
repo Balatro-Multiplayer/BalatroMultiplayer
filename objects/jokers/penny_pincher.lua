@@ -35,6 +35,10 @@ MPAPI.Joker({
 	end,
 	-- Was action_spent_last_shop.
 	receive = function(self, context)
+		MP.note_target_candidate(context.from)
+		if MP.current_target_id() and context.from ~= MP.current_target_id() then
+			return
+		end
 		MP.GAME.enemy.spent_in_shop[#MP.GAME.enemy.spent_in_shop + 1] = tonumber(context.data)
 	end,
 	calc_dollar_bonus = function(self, card)
