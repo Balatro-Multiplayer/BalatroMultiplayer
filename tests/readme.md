@@ -88,3 +88,31 @@ changes it.
 Play one real multiplayer match, then open the Lovely log. Filter the `MP_RLOG:`
 (positional) and `Client sent message:` (human) lines and confirm they mirror
 each action event-for-event.
+
+## Carbon Replay Parser (LOG_PARSER.carbon_to_replay)
+
+`test_log_parser_carbon.lua` exercises `lib/log_parser.lua`'s carbon-driven
+replay builder (Phase 6 of the compact action-log design): given a downloaded
+`matchRunLogs` block's events (already JSON-decoded to `{t, opcode, args}`
+tables), it reconstructs the same replay shape `LOG_PARSER.to_replay()`
+produces from a parsed Lovely log, so `lib/ghost_replay.lua`'s playback code
+needs no changes to consume either source.
+
+A single carbon log is one player's own actions, so the function takes a
+`side` ("player"/"enemy") to tag that log's `hand_result` events in the
+output; combining both players' downloaded logs into one two-sided replay is
+the caller's job. `hand_result` is a new opcode (`pvp_api/net.lua`'s
+`playHand`/`skip` routes) carrying `{score, hands_left}` -- the only
+score-bearing carbon event, needed because the rest of the action vocabulary
+(`play`, `discard`, `buy`, ...) intentionally has no score fields.
+
+```bash
+luajit tests/test_log_parser_carbon.lua
+```
+
+Asserts: manifest fields (`seed`/`ruleset`/`gamemode`/`deck`/`stake`) and the
+`end` frame's `result` map onto the replay's top-level fields with the same
+defaults `to_replay()` uses when a field is missing; `set_ante_key` events
+open a new int-keyed `ante_snapshots` entry; `hand_result` events append to
+the current ante's `hands[]` with the given `side`; a `hand_result` before any
+`set_ante_key` is dropped rather than mis-attributed to ante 1.
