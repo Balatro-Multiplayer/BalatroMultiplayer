@@ -22,17 +22,85 @@
     lua tests/test_rlog_roundtrip.lua
 ]]
 
-package.loaded["json"] = {
-	encode = function()
+-- Handles exactly what canonical_hash_input needs (scalars + positional,
+-- possibly nested, arrays -- every RLOG.record args value in this codebase,
+-- see lib/replay_log.lua's header comment); dict-shaped tables (MANIFEST/
+-- END's payloads) fall back to "{}", not asserted on by this test.
+local function json_encode(v)
+	local t = type(v)
+	if t == "number" then return tostring(v) end
+	if t == "string" then return '"' .. v .. '"' end
+	if t == "table" then
+		if #v > 0 or next(v) == nil then
+			local parts = {}
+			for _, item in ipairs(v) do
+				parts[#parts + 1] = json_encode(item)
+			end
+			return "[" .. table.concat(parts, ",") .. "]"
+		end
 		return "{}"
-	end,
-}
+	end
+	error("json_encode stub: unsupported type " .. t)
+end
+package.loaded["json"] = { encode = json_encode }
 
 local captured = {}
 function sendTraceMessage(msg)
 	captured[#captured + 1] = msg
 end
 function sendWarnMessage() end
+
+-- Deterministic stand-in for a real cryptographic hash -- this test checks
+-- wiring/canonicalization (the right bytes get hashed, into the right CHK
+-- field), not LÖVE's SHA-256 implementation itself.
+local function stub_hash_bytes(str)
+	local a, b = 1, 0
+	for i = 1, #str do
+		a = (a + str:byte(i)) % 65521
+		b = (b + a) % 65521
+	end
+	local v = b * 65536 + a
+	return string.char(
+		math.floor(v / 16777216) % 256,
+		math.floor(v / 65536) % 256,
+		math.floor(v / 256) % 256,
+		v % 256
+	)
+end
+
+-- Declared up front (not local) so scenario 2 can add .timer onto the same
+-- table without dropping .data -- RLOG.end_run needs love.data in both scenarios.
+love = {
+	data = {
+		hash = function(container, algorithm, data)
+			assert(container == "string", "expected string container")
+			assert(algorithm == "sha256", "expected sha256")
+			return stub_hash_bytes(data)
+		end,
+		encode = function(container, format, data)
+			assert(container == "string", "expected string container")
+			assert(format == "hex", "expected hex format")
+			local hex = {}
+			for i = 1, #data do
+				hex[#hex + 1] = string.format("%02x", data:byte(i))
+			end
+			return table.concat(hex)
+		end,
+	},
+}
+
+local function sha256_hex(str)
+	return love.data.encode("string", "hex", love.data.hash("string", "sha256", str))
+end
+
+local function canonical_hash_input(events)
+	local parts = {}
+	for _, ev in ipairs(events) do
+		local args_json = ev.args == nil and "null" or json_encode(ev.args)
+		parts[#parts + 1] = string.format("[%d,%s,%s]", ev.t, json_encode(ev.opcode), args_json)
+	end
+	return "[" .. table.concat(parts, ",") .. "]"
+end
 
 MP = {
 	LOBBY = { code = "TEST" },
@@ -109,10 +177,12 @@ assert(A[6] == nil, "unexpected extra carbon action line")
 assert(#human_lines == 5, "expected 5 human lines, got " .. #human_lines)
 assert(human_lines[2] == "Client sent message: action:boughtCardFromShop,card:Blueprint,cost:4", "H2=" .. human_lines[2])
 
--- Hash domains: CHK values must equal a recompute over the in-order carbon /
+-- Hash domains: carbon's CHK value must equal a recompute over
+-- RLOG._structured_events' canonical tuple JSON (not the text lines --
+-- see lib/replay_log.lua); human's must equal a recompute over the in-order
 -- human lines (exactly what gets re-extracted from a log by prefix).
 local chk_carbon, chk_human = captured[#captured]:match("carbon=(%x+) human=(%x+)")
-assert(chk_carbon == MP.UTILS.joker_hash(table.concat(carbon_lines, "\n")), "carbon hash domain mismatch")
+assert(chk_carbon == sha256_hex(canonical_hash_input(RLOG._structured_events)), "carbon hash domain mismatch")
 assert(chk_human == MP.UTILS.joker_hash(table.concat(human_lines, "\n")), "human hash domain mismatch")
 assert(carbon_hash == chk_carbon and human_hash == chk_human, "end_run return != CHK trailer")
 
@@ -120,7 +190,7 @@ assert(carbon_hash == chk_carbon and human_hash == chk_human, "end_run return !=
 
 captured = {}
 local clock = 100.0 -- love.timer.getTime() is a monotonic float in seconds
-love = { timer = { getTime = function() return clock end } }
+love.timer = { getTime = function() return clock end } -- .data stays intact, end_run still needs it
 
 RLOG.begin_run({ seed = "EFGH", ruleset = "r", gamemode = "g", deck = "Red Deck", stake = 1 })
 RLOG.record("select_blind", 0) -- t=0

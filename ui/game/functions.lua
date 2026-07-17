@@ -60,6 +60,9 @@ function G.FUNCS.select_blind(e)
 	MP.GAME.end_pvp = false
 	MP.GAME.prevent_eval = false
 	select_blind_ref(e)
+	-- Confirmed-safe checkpoint for Phase 9's reconnect tail-replay -- drains
+	-- any pending opponent catch-up queued since the last checkpoint.
+	if MP.RECONNECT_TAIL then MP.RECONNECT_TAIL.on_checkpoint() end
 	if MP.is_mp_or_ghost() then
 		MP.GAME.ante_key = tostring(math.random())
 		if not MP.GHOST.is_active() then

@@ -177,6 +177,20 @@ MP.setup_lobby_mirror = function(lobby)
 		refresh()
 	end)
 
+	-- Phase 9: reconnect tail-replay. PLAYER_RECONNECTED fires to every lobby
+	-- member (including the reconnecting player's own client, once it
+	-- re-subscribes to lobby/{code}/events) -- only act when the reconnecting
+	-- player IS us; the opponent's own client needs no catch-up, it never
+	-- disconnected. See pvp_api/reconnect_tail.lua.
+	lobby:on(MPAPI.LobbyEvent.PLAYER_RECONNECTED, function(player_id)
+		if player_id ~= lobby.player_id then return end
+		if G.STAGE ~= G.STAGES.RUN then return end
+		local opponent_id = MP.get_opponent_id()
+		if opponent_id then
+			MP.RECONNECT_TAIL.catch_up(opponent_id)
+		end
+	end)
+
 	lobby:on(MPAPI.LobbyEvent.METADATA_CHANGED, function(metadata)
 		mirror_metadata(lobby)
 		MPAPI.refresh_current_view()

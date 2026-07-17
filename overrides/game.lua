@@ -35,6 +35,9 @@ end
 local cash_out_ref = G.FUNCS.cash_out
 function G.FUNCS.cash_out(e)
 	MP.RLOG.record("cashout", nil, "action:cashOut")
+	-- Confirmed-safe checkpoint for Phase 9's reconnect tail-replay -- drains
+	-- any pending opponent catch-up queued since the last checkpoint.
+	if MP.RECONNECT_TAIL then MP.RECONNECT_TAIL.on_checkpoint() end
 	return cash_out_ref(e)
 end
 

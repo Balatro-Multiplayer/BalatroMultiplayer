@@ -25,6 +25,15 @@ function sendTraceMessage(msg)
 end
 function sendWarnMessage() end
 
+-- RLOG.end_run needs love.data.hash/encode (see lib/replay_log.lua); this
+-- test doesn't assert on hash values, just that end_run doesn't error.
+love = {
+	data = {
+		hash = function(_container, _algorithm, data) return data end,
+		encode = function(_container, _format, data) return data end,
+	},
+}
+
 local broadcasts = {} -- { {t=, opcode=, args=}, ... } in call order
 MP = {
 	LOBBY = { code = "TEST" },

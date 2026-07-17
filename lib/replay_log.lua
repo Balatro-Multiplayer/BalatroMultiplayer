@@ -30,14 +30,15 @@
 -- `t` field convention (ms since match start), so this format and the server's
 -- eventual event schema agree instead of diverging.
 --
--- At end_run both streams are hashed; the hashes are what a future result-report
--- step (see MPAPI ActionType-based anti-cheat, not yet built) would submit for
--- tamper-checking, a cheap comparison instead of a line-by-line diff. The carbon
--- stream re-derives cleanly from the log by its prefix. NOTE: MP.UTILS.joker_hash
--- (Adler-style) catches casual edits but is NOT collision-resistant -- a
--- motivated forger could edit and fix the hash. The robust defenses (server
--- sees the lines live, or full re-simulation) are future work; this hash is the
--- intended cheap first pass.
+-- At end_run both streams are hashed and broadcast in the CHK trailer. The
+-- carbon stream's hash (carbon_hash) is a real SHA-256 over a canonical JSON
+-- re-encoding of its own {t, opcode, args} events (see canonical_hash_input),
+-- not over the text lines themselves -- this is what the server independently
+-- recomputes from its own buffered events and compares against at match-
+-- resolve time (matchmaking.service.ts's evaluateAntiCheat, Phase 8) to flag a
+-- tampered log. The human stream's hash (human_hash) stays on the cheap
+-- MP.UTILS.joker_hash (Adler-style) -- it's never server-verified, just a
+-- local corruption check. Full re-simulation anti-cheat remains future work.
 --
 -- Live transport: every event (including the MANIFEST/END/CHK framing lines)
 -- is ALSO broadcast in real time via the game_log_event MPAPI ActionType (see
@@ -69,6 +70,13 @@ RLOG._fallback_seq = 0 -- ms-surrogate counter when no monotonic clock is availa
 RLOG._carbon_buffer = {} -- the action "MP_RLOG: <t> ..." lines, hashed at end
 RLOG._carbon_full = {} -- the full carbon block (manifest + actions + END + CHK), sent to the server
 RLOG._human_buffer = {} -- the "Client sent message: ..." lines, hashed at end
+-- {t, opcode, args} tuples for gameplay events only -- populated exclusively by
+-- RLOG.record, so the MANIFEST/END/CHK framing lines (emitted directly via
+-- emit_carbon, bypassing record) are never in here. Used at end_run to compute
+-- a canonical SHA-256 hash the server can independently reproduce (see
+-- canonical_hash_input below) -- kept separate from _carbon_buffer because that
+-- one holds pre-formatted text lines, not the structured values a hash needs.
+RLOG._structured_events = {}
 RLOG._run_active = false
 RLOG._manifest = nil
 RLOG._force_active = false -- test hook: bypass the lobby gate
@@ -94,6 +102,23 @@ end
 -------------------------------------------------------------------------------
 -- Internal helpers
 -------------------------------------------------------------------------------
+
+-- Mirrors pvp_api/replay_log_actions.lua's normalize_args (nil stays nil, a
+-- table stays a table, a bare scalar becomes a single-element array) --
+-- duplicated here rather than shared, since lib/ loads before pvp_api/.
+-- Applied when building _structured_events (not to args generally -- fmt_args
+-- and the carbon text line still use the original, unwrapped args) so the
+-- hash input matches EXACTLY what the wire transport sends and the server
+-- buffers. Without this, a bare-scalar opcode (select_blind, skip_blind,
+-- pack_skip, ready_blind, set_ante_key) would hash differently locally (raw
+-- scalar) than what the server observes (wrapped in a 1-element array by
+-- normalize_args before broadcast), so every clean run would spuriously flag
+-- as a hash mismatch.
+local function normalize_for_hash(args)
+	if args == nil then return nil end
+	if type(args) == "table" then return args end
+	return { args }
+end
 
 -- Format an opcode's args into the positional arg string.
 -- Each token is either a scalar -> "1" or a list -> dot-joined "1.3.5".
@@ -155,6 +180,34 @@ local function emit_carbon(msg, t, opcode, args)
 	if RLOG.broadcast_event then RLOG.broadcast_event(t, opcode, args) end
 end
 
+-- Encodes one {t, opcode, args} tuple as a JSON array literal, built manually
+-- rather than via json.encode(ev) on a Lua table -- args is sometimes nil
+-- (e.g. reroll, cashout), and a trailing nil in a positional Lua table makes
+-- `#`/array-vs-object detection undefined, which a generic table encoder can't
+-- be trusted to handle consistently. `t` and `opcode` are scalars (a number
+-- and a string), and every args value in this codebase is nil, a bare scalar,
+-- or a plain positional array/list (verified against every RLOG.record call
+-- site -- never a table with string keys), so nothing here has Lua/JS
+-- pairs()-order ambiguity to worry about; only the outer 3-element shape does.
+local function encode_event_tuple(ev)
+	local json = require("json")
+	local args_json = ev.args == nil and "null" or json.encode(ev.args)
+	return string.format("[%d,%s,%s]", ev.t, json.encode(ev.opcode), args_json)
+end
+
+-- Canonical JSON-array encoding of every gameplay event (see RLOG._structured_events),
+-- used as the SHA-256 input for RLOG.end_run's CHK line -- independently
+-- reproducible server-side (Node's JSON.stringify over the same tuple shape)
+-- without needing to match Lua's dict key-iteration order, since the whole
+-- input is array-shaped end to end.
+local function canonical_hash_input()
+	local parts = {}
+	for _, ev in ipairs(RLOG._structured_events) do
+		parts[#parts + 1] = encode_event_tuple(ev)
+	end
+	return "[" .. table.concat(parts, ",") .. "]"
+end
+
 -------------------------------------------------------------------------------
 -- Public API
 -------------------------------------------------------------------------------
@@ -173,6 +226,8 @@ function RLOG.record(opcode, args, human)
 	local argstr = fmt_args(args)
 	local cline = RLOG.CARBON_PREFIX .. " " .. t .. " " .. opcode .. (argstr ~= "" and (" " .. argstr) or "")
 	RLOG._carbon_buffer[#RLOG._carbon_buffer + 1] = cline
+	RLOG._structured_events[#RLOG._structured_events + 1] =
+		{ t = t, opcode = opcode, args = normalize_for_hash(args) }
 	emit_carbon(cline, t, opcode, args)
 
 	if human ~= nil and human ~= "" then
@@ -209,6 +264,7 @@ function RLOG.begin_run(manifest)
 	RLOG._carbon_buffer = {}
 	RLOG._carbon_full = {}
 	RLOG._human_buffer = {}
+	RLOG._structured_events = {}
 	RLOG._manifest = manifest
 	RLOG._run_active = true
 
@@ -223,9 +279,17 @@ end
 
 -- Close the current game's block: emit the END line, hash each stream, and emit
 -- the CHK trailer. The hashes are returned for a future result-report step to
--- submit (see Phase 8/anti-cheat, not yet built) -- there's no separate
--- "submit the whole block" step anymore, since the server-side buffer (once
--- built) already has every event from the live game_log_event broadcasts.
+-- submit (see Phase 8/anti-cheat) -- there's no separate "submit the whole
+-- block" step, since the server-side buffer already has every event from the
+-- live game_log_event broadcasts and independently recomputes carbon_hash
+-- itself (matchmaking.service.ts's evaluateAntiCheat) for comparison against
+-- this value. carbon_hash is a real SHA-256 (love.data.hash) over
+-- canonical_hash_input's positional-tuple JSON -- deliberately NOT over
+-- carbon_str's text lines, since a byte-identical text re-formatting is much
+-- harder to guarantee cross-language than re-encoding the same JSON tuples.
+-- human_hash stays on the cheap Adler-style MP.UTILS.joker_hash -- it's never
+-- server-verified, purely a local corruption check on the website-compatible
+-- stream.
 function RLOG.end_run(outcome)
 	if not RLOG._run_active then return end
 
@@ -235,7 +299,7 @@ function RLOG.end_run(outcome)
 
 	local carbon_str = table.concat(RLOG._carbon_buffer, "\n")
 	local human_str = table.concat(RLOG._human_buffer, "\n")
-	local carbon_hash = MP.UTILS.joker_hash(carbon_str)
+	local carbon_hash = love.data.encode("string", "hex", love.data.hash("string", "sha256", canonical_hash_input()))
 	local human_hash = MP.UTILS.joker_hash(human_str)
 	local bytes = #carbon_str + #human_str
 
