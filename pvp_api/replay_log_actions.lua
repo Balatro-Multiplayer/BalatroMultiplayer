@@ -12,11 +12,26 @@
 -- MPAPI's action-param validation only checks `type(value) == "table"`, so
 -- both shapes satisfy the same schema without a second ActionType.
 --
--- on_receive is currently a no-op: the real consumers are the server-side
--- buffering client (buffers for matchRunLogs) and, later, spectators -- a
--- fellow PLAYER's own client has nothing to do with an opponent's replay-log
--- event today. Loaded inside MPAPI.on_loaded (see core.lua's pvp_api load),
--- so this ActionType is tagged to this mod like every other one in pvp_api/.
+-- on_receive tracks the opponent's own elapsed-t high-water mark (Phase 9:
+-- reconnect tail-replay) -- MP.RLOG._last_seen_t[player_id] is how far into
+-- that player's own RLOG stream this client has observed live, so a
+-- reconnecting client knows what `since_t` to request via
+-- MPAPI.replay.get_tail after missing some broadcasts while disconnected.
+-- Keyed by the SENDER's own clock (params.t, elapsed since THEIR begin_run),
+-- not local wall-clock time, so it stays meaningful regardless of when this
+-- client itself connected/reconnected. Broadcasts loop back to the sender
+-- (see pvp_api/actions.lua's self_id() convention), so a client's own events
+-- are skipped -- there's nothing to "catch up" on for your own stream. The
+-- server-side buffering client and, later, spectators are the other
+-- consumers of this same broadcast; this is purely an additional local
+-- bookkeeping side effect, not a second dispatch path.
+MP.RLOG._last_seen_t = MP.RLOG._last_seen_t or {}
+
+local function self_id()
+	local lobby = MPAPI.get_current_lobby()
+	return lobby and lobby.player_id
+end
+
 MP.RLOG_EVENT_ACTION = MPAPI.ActionType({
 	key = "game_log_event",
 	parameters = {
@@ -24,7 +39,11 @@ MP.RLOG_EVENT_ACTION = MPAPI.ActionType({
 		{ key = "opcode", type = "string", required = true },
 		{ key = "args", type = "table", required = false },
 	},
-	on_receive = function(_at, from, params) end,
+	on_receive = function(_at, from, params)
+		if from == self_id() then return end
+		local prev = MP.RLOG._last_seen_t[from] or 0
+		if params.t and params.t > prev then MP.RLOG._last_seen_t[from] = params.t end
+	end,
 })
 
 -- Normalizes MP.RLOG.record's flexible args shape (nil | scalar | array/dict
