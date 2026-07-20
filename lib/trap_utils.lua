@@ -115,7 +115,12 @@ function MP.UI.show_trap_fired_animation(name)
 end
 
 MP.TRAP.plant_action = MPAPI.ActionType({
-	key = "mp_trap_plant",
+	key = "pvp_trap_plant",
+	-- Explicit prefix_config: "pvp_trap_plant" doesn't start with this mod's own
+	-- prefix ("mp"), so SMODS would otherwise prepend it -> "mp_pvp_trap_plant",
+	-- breaking the direct-reference capture below (still matches the wire key,
+	-- but drifts from every other pvp_* ActionType's literal-key convention).
+	prefix_config = { key = false },
 	parameters = {
 		{ key = "card", type = "string", required = true },
 		{ key = "owner", type = "string", required = true },

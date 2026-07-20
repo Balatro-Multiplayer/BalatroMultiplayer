@@ -30,7 +30,7 @@ function MP.pvp_lobby_metadata(gamemode_key, kind)
 end
 
 function MP.pvp_create_private_lobby(gamemode_key)
-	gamemode_key = gamemode_key or "pvp_standard"
+	gamemode_key = gamemode_key or MP.GamemodeKey.PVP_STANDARD
 	local gm = MPAPI.GameModes[gamemode_key]
 	local max_p = (gm and gm.get_max_players and gm:get_max_players(MPAPI.LobbyType and MPAPI.LobbyType.PRIVATE or "private")) or 2
 	local lobby = MPAPI.create_lobby(MP.id, { max_players = max_p })
@@ -79,7 +79,7 @@ function MP.pvp_start_match()
 		MP.UI.UTILS.overlay_message("Waiting for an opponent...")
 		return
 	end
-	local queue_mode = (lobby:get_metadata() or {}).queue_mode or MP._pvp_gamemode or "pvp_standard"
+	local queue_mode = (lobby:get_metadata() or {}).queue_mode or MP._pvp_gamemode or MP.GamemodeKey.PVP_STANDARD
 	local gm_def = MPAPI.GameModes[queue_mode]
 	if gm_def and gm_def.new_instance then
 		lobby._gamemode_instance = gm_def:new_instance()
@@ -113,5 +113,5 @@ end
 -- Create-lobby click (main menu). Join / ready / start / leave handlers live in the
 -- menu + lobby UI files (ui/pvp_main_menu.lua, ui/pvp_lobby.lua).
 G.FUNCS.mp_pvp_create_lobby = function(e)
-	MP.pvp_create_private_lobby("pvp_standard")
+	MP.pvp_create_private_lobby(MP.GamemodeKey.PVP_STANDARD)
 end

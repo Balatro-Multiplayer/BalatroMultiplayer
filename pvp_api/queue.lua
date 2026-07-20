@@ -18,7 +18,7 @@ function MP._is_searching()
 end
 
 function MP._join_queue(kind, gamemode_key)
-	gamemode_key = gamemode_key or "pvp_standard"
+	gamemode_key = gamemode_key or MP.GamemodeKey.PVP_STANDARD
 	MP._pvp_kind = kind
 
 	local gm = MPAPI.GameModes[gamemode_key]
@@ -155,12 +155,12 @@ end
 
 G.FUNCS.mp_pvp_queue_ranked = function()
 	G.FUNCS.exit_overlay_menu()
-	MP._join_queue(MP.LobbyKind.RANKED, "pvp_standard")
+	MP._join_queue(MP.LobbyKind.RANKED, MP.GamemodeKey.PVP_STANDARD)
 end
 
 G.FUNCS.mp_pvp_queue_casual = function()
 	G.FUNCS.exit_overlay_menu()
-	MP._join_queue(MP.LobbyKind.CASUAL, "pvp_standard")
+	MP._join_queue(MP.LobbyKind.CASUAL, MP.GamemodeKey.PVP_STANDARD)
 end
 
 G.FUNCS.mp_pvp_cancel_queue = function()

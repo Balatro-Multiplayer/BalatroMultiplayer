@@ -41,7 +41,7 @@
 -- local corruption check. Full re-simulation anti-cheat remains future work.
 --
 -- Live transport: every event (including the MANIFEST/END/CHK framing lines)
--- is ALSO broadcast in real time via the game_log_event MPAPI ActionType (see
+-- is ALSO broadcast in real time via the pvp_log_event MPAPI ActionType (see
 -- pvp_api/replay_log_actions.lua), one broadcast per event, not batched -- so a
 -- server-side buffer (or, eventually, a spectator) sees each line as it
 -- happens. This replaces the old Client.send({action="streamLogLines"/
@@ -281,7 +281,7 @@ end
 -- the CHK trailer. The hashes are returned for a future result-report step to
 -- submit (see Phase 8/anti-cheat) -- there's no separate "submit the whole
 -- block" step, since the server-side buffer already has every event from the
--- live game_log_event broadcasts and independently recomputes carbon_hash
+-- live pvp_log_event broadcasts and independently recomputes carbon_hash
 -- itself (matchmaking.service.ts's evaluateAntiCheat) for comparison against
 -- this value. carbon_hash is a real SHA-256 (love.data.hash) over
 -- canonical_hash_input's positional-tuple JSON -- deliberately NOT over
@@ -299,7 +299,7 @@ function RLOG.end_run(outcome)
 
 	local carbon_str = table.concat(RLOG._carbon_buffer, "\n")
 	local human_str = table.concat(RLOG._human_buffer, "\n")
-	local carbon_hash = love.data.encode("string", "hex", love.data.hash("string", "sha256", canonical_hash_input()))
+	local carbon_hash = love.data.encode("string", "hex", love.data.hash("sha256", canonical_hash_input()))
 	local human_hash = MP.UTILS.joker_hash(human_str)
 	local bytes = #carbon_str + #human_str
 

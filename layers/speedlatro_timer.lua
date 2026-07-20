@@ -1,7 +1,7 @@
 -- speedlatro specific timer
 -- i can't be bothered to do run_start hooks and risk that being janky so it'll be initialized in gupdate
 
-MP.Layer("speedlatro_timer", {
+MPAPI.Layer("speedlatro_timer", {
     preview_calculate_delay = 5,
     preview_calculate_cost  = 0,
     timer_speedup_multiplier = 2,
