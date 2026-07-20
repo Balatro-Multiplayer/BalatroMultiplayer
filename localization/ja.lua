@@ -559,7 +559,6 @@ return {
 			k_enemy_hands = "相手の残りハンド ",
 			k_coming_soon = "Coming Soon!",
 			k_wait_enemy = "相手のプレイが終わるまでお待ちください...",
-			k_wait_enemy_reach_this_blind = "相手の結果をお待ちください...",
 			k_lives = "ライフ",
 			k_lost_life = "ライフ減少",
 			k_total_lives_lost = " 失ったライフ数 (1つにつき$4)",
@@ -602,7 +601,6 @@ return {
 			k_lobby_advanced = "高度な設定",
 			k_opts_pvp_start_round = "PvP初戦アンティ",
 			k_opts_pvp_timer = "タイマーの秒数",
-			k_opts_showdown_starting_antes = "PvP初戦アンティ(バーサスルール限定)",
 			k_opts_pvp_timer_increment = "ブラインドスキップ時のタイマー追加秒数",
 			k_opts_pvp_countdown_seconds = "PvP開始時のカウントダウンタイマー",
 			k_bl_life = "Life",
@@ -630,11 +628,6 @@ return {
 			k_badlatro = "Badlatro",
 			k_badlatro_description = "DiscordサーバーでDr.Monty(@dr_monty_the_snek)さんが作成したルールです。\nかなり多くの強力なカードが出現しなくなっています。",
 			k_attrition = "消耗戦",
-			k_attrition_description = "アンティ2以降のボスブラインドがPvPブラインドになっている状態で戦うモードです。",
-			k_showdown = "バーサス",
-			k_showdown_description = "アンティ2のボスブラインド以降の全てのブラインドがPvPブラインドになっている状態で戦うモードです。",
-			k_survival = "サバイバル",
-			k_survival_description = "PvPブラインドがないモードです。\n通常のBalatroと同じルールで、相手がクリアしたブラインドより先のブラインドをクリアした方の勝ちです。",
 			k_weekly = "ウィークリー",
 			k_weekly_description = "1～2週間ごとに変更される特別なルールセットです。どんなルールかは見てからのお楽しみ！ 現在 ",
 			k_smallworld = "小さな世界",
@@ -711,7 +704,6 @@ return {
 			k_ruleset_disabled_smods_version = "Steammodded バージョン #1# が必須です。",
 			k_failed_to_join_lobby = "ロビーの入室に失敗しました #1#",
 			k_ante_number = "アンティ #1#",
-			k_ante_range = "アンティ #1#､#2#", -- For example, "Ante 1-2"
 			k_ante_min = "アンティ #1#以降", -- For example, "Ante 2+"
 			k_credits_list = "#1# など...", -- #1# gets replaced with a list of names
 		},

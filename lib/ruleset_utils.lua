@@ -31,10 +31,6 @@ function MP.timer_is_local()
 		or (MP.is_pvp_boss() and MP.is_layer_active("pvp_timer"))
 end
 
-function MP.UTILS.is_weekly(arg)
-	return MP.UTILS.get_weekly() == arg and MP.LOBBY.config.ruleset == "ruleset_mp_weekly"
-end
-
 function MP.UTILS.check_smods_version()
 	if SMODS.version ~= MP.SMODS_VERSION then
 		return localize({ type = "variable", key = "k_ruleset_disabled_smods_version", vars = { MP.SMODS_VERSION } })

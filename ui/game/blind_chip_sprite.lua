@@ -20,7 +20,3 @@ end
 function MP.UI.BlindChip.random()
 	return MP.UI.BlindChip.custom("blind_chips", 0, 30)
 end
-
-function MP.UI.BlindChip.nemesis()
-	return MP.UI.BlindChip.custom("mp_player_blind_col", 0, 22)
-end

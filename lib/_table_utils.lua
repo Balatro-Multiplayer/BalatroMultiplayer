@@ -34,14 +34,6 @@ function MP.UTILS.serialize_table(val, name, skipnewlines, depth)
 	return tmp
 end
 
--- Used only for some UI blob, can be moved
-function MP.UTILS.get_array_index_by_value(options, value)
-	for i, v in ipairs(options) do
-		if v == value then return i end
-	end
-	return nil
-end
-
 function MP.UTILS.reverse_key_value_pairs(tbl, stringify_keys)
 	local reversed_tbl = {}
 	for k, v in pairs(tbl) do
@@ -54,11 +46,3 @@ end
 -- Defers to the API's implementation (BalatroMultiplayerAPI/lib/util.lua) rather than
 -- shipping our own copy. MPAPI is a hard dependency and is loaded before this file.
 MP.UTILS.shallow_copy = MPAPI.shallow_copy
-
-function MP.UTILS.merge_tables(t1, t2)
-	local copy = MP.UTILS.shallow_copy(t1)
-	for k, v in pairs(t2) do
-		copy[k] = v
-	end
-	return copy
-end

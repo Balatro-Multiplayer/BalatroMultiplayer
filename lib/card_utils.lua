@@ -126,15 +126,6 @@ function MP.UTILS.reorder_permutation(old_ids, cards)
 	return perm
 end
 
--- ??? seems to be dead code
-function MP.UTILS.get_joker(key)
-	if not G.jokers or not G.jokers.cards then return nil end
-	for i = 1, #G.jokers.cards do
-		if G.jokers.cards[i].ability.name == key then return G.jokers.cards[i] end
-	end
-	return nil
-end
-
 function MP.UTILS.get_phantom_joker(key)
 	if not MP.shared or not MP.shared.cards then return nil end
 	for i = 1, #MP.shared.cards do
@@ -149,15 +140,6 @@ function MP.UTILS.get_phantom_joker(key)
 	return nil
 end
 
--- ??? seems to be dead code
-function MP.UTILS.run_for_each_joker(key, func)
-	if not G.jokers or not G.jokers.cards then return end
-	for i = 1, #G.jokers.cards do
-		if G.jokers.cards[i].ability.name == key then func(G.jokers.cards[i]) end
-	end
-end
-
--- ??? seems to be dead code
 function MP.UTILS.run_for_each_phantom_joker(key, func)
 	if not MP.shared or not MP.shared.cards then return end
 	for i = 1, #MP.shared.cards do
@@ -169,15 +151,6 @@ function MP.UTILS.get_deck_key_from_name(_name)
 	for k, v in pairs(G.P_CENTERS) do
 		if v.name == _name then return k end
 	end
-end
-
-function MP.UTILS.get_culled_pool(_type, _rarity, _legendary, _append)
-	local pool = get_current_pool(_type, _rarity, _legendary, _append)
-	local ret = {}
-	for i, v in ipairs(pool) do
-		if v ~= "UNAVAILABLE" then ret[#ret + 1] = v end
-	end
-	return ret
 end
 
 -- Drives the grim/familiar/incantation lovely patch. Returns center *objects*

@@ -535,7 +535,6 @@ return {
 			k_enemy_hands = "Mani rimanenti del Nemico: ",
 			k_coming_soon = "In Arrivo!",
 			k_wait_enemy = "Attendi che il nemico finisca...",
-			k_wait_enemy_reach_this_blind = "Attendi che il nemico arrivi a questo buio...",
 			k_lives = "Vite",
 			k_lost_life = "Hai perso una vita",
 			k_total_lives_lost = " Vite perse in totale ($4 ciascuna)",
@@ -578,7 +577,6 @@ return {
 			k_lobby_advanced = "Avanzate",
 			k_opts_pvp_start_round = "Il PVP inizia all'ante",
 			k_opts_pvp_timer = "Timer",
-			k_opts_showdown_starting_antes = "La resa dei conti inizia all'ante",
 			k_opts_pvp_timer_increment = "Incremento del timer",
 			k_opts_pvp_countdown_seconds = "Secondi del countdown PvP",
 			k_bl_life = "Vita",
@@ -605,11 +603,6 @@ return {
 			k_badlatro = "Badlatro",
 			k_badlatro_description = "Delle regole settimanali progettate da @dr_monty_the_snek nel\nserver discord, che sono state aggiunte alla mod definitivamente.\n\nQueste regole bandiscono 48 Jolly, consumabili, patti, ecc...",
 			k_attrition = "Logoramento",
-			k_attrition_description = "Dopo il primo ante ogni buio Boss è un buio Nemesi. Non c'è tempo per prepararsi. Questa modalità ti forza ad essere pronto alla battaglia sin dall'inizio.",
-			k_showdown = "Resa dei conti",
-			k_showdown_description = "Dopo i primi 2 anti, ogni buio è un buio Nemesi. Questa modalità ti dà tempo di prepararti prima della battaglia.",
-			k_survival = "Sopravvivenza",
-			k_survival_description = "Il giocatore che batte il buio più lontano vince. Non ci sono bui nemesi. Questa modalità è un test per la tua abilità per aumentare gradualmente il record di punteggio con le mani vanilla.",
 			k_weekly = "Settimanale",
 			k_weekly_description = "Delle regole speciali che cambiano ad intervallo settimanale o bisettimanale. Immagino dovrai scoprire cosa fanno! Attualmente: ",
 			k_smallworld = "Small World",
@@ -685,7 +678,6 @@ return {
 			k_ruleset_disabled_smods_version = "Versione SMODS #1# necessaria",
 			k_failed_to_join_lobby = "Errore nel connettersi alla lobby: #1#",
 			k_ante_number = "Ante #1#",
-			k_ante_range = "Ante #1#-#2#", --Per esempio, "Ante 1-2"
 			k_ante_min = "Ante #1#+", --Per esempio, "Ante 2+"
 			k_credits_list = "#1# e altri ancora!", --#1# viene rimpiazzato con una lista di nomi
 		},

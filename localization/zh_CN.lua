@@ -245,7 +245,6 @@ return {
 			k_enemy_hands = "地方剩余出牌: ",
 			k_coming_soon = "即将推出!",
 			k_wait_enemy = "正在等待敌方完成...",
-			k_wait_enemy_reach_this_blind = "正在等待敌方到达目前盲注...",
 			k_lives = "生命",
 			k_lost_life = "丢失了一条命",
 			k_total_lives_lost = "总共丢失生命 (每条命值$4)",
@@ -283,7 +282,6 @@ return {
 			k_opts_gm = "玩法修改",
 			k_opts_pvp_start_round = "PVP 开始底注",
 			k_opts_pvp_timer = "计时器",
-			k_opts_showdown_starting_antes = "最终对决开始底注",
 			k_opts_pvp_timer_increment = "计时器增量",
 			k_opts_pvp_countdown_seconds = "PVP 倒计时秒数",
 			k_bl_life = "生命",
@@ -310,11 +308,6 @@ return {
 			k_badlatro = "Badlatro",
 			k_badlatro_description = "由@dr_monty_the_snek在Discord服务器上设计的每周规则集，现已永久添加到模组中。\n\n该规则集禁止使用48张小丑牌、消耗牌、标签等。",
 			k_attrition = "消耗战",
-			k_attrition_description = "第一底注后，每个Boss盲注都是宿敌盲注。你没有任何时间准备。此玩法迫使你从开局就开始备战",
-			k_showdown = "决战",
-			k_showdown_description = "前两个底注之后，每个盲注都是宿敌盲注。次玩法会给你充足备战的时间",
-			k_survival = "生存",
-			k_survival_description = "击败最远的盲注的玩家获胜。 无宿敌盲注. 此玩法会考研你逐步构建出最高分经典牌型的能力",
 			k_weekly = "Weekly",
 			k_weekly_description = "一个每周或每两周就会更新一次的特殊规则集。我想你就得自己去发现它到底是什么~ \n目前：",
 			k_weekly_smallworld = "小世界",
@@ -386,7 +379,6 @@ return {
 			k_ruleset_disabled_smods_version = "需求 SMODS 版本 #1#",
 			k_failed_to_join_lobby = "加入房间失败: #1#",
 			k_ante_number = "底注 #1#",
-			k_ante_range = "底注 #1#-#2#", -- For example, "Ante 1-2"
 			k_ante_min = "底注 #1#+", -- For example, "Ante 2+"
 			k_credits_list = "#1# 以及更多的人!", -- #1# gets replaced with a list of names
 		},
