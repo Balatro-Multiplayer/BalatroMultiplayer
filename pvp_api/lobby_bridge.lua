@@ -61,6 +61,10 @@ function MP.note_target_candidate(sender_id)
 	end
 	if not MP.GAME.royale_target_id then
 		MP.GAME.royale_target_id = sender_id
+		-- MP.mirror_players (not the bare local) since this runs before mirror_players
+		-- is declared further down this same file -- the global table indirection
+		-- is what makes the call order-independent.
+		if MP.CURRENT_LOBBY then MP.mirror_players(MP.CURRENT_LOBBY) end
 	end
 end
 
@@ -105,10 +109,18 @@ local function mirror_metadata(lobby)
 end
 
 -- Reflect roster/host state into the MP.LOBBY.host / .guest identity slots that MP's
--- HUD and enemy tracking read. In 1v1, one slot is us, the other the opponent.
+-- HUD and enemy tracking read. Every live caller of these slots (blind_hud, game_end,
+-- blind_choice, matchmaking cancel text, Distro.lua) uses the
+-- `is_host and LOBBY.guest or LOBBY.host` idiom purely to mean "my current
+-- opponent" -- never "whichever player is the literal lobby host" -- so the
+-- non-self slot must resolve to MP.current_target_id(), not an arbitrary roster
+-- pick. In 1v1 that's still just the sole other player (current_target_id()
+-- delegates to MP.get_opponent_id() there); in Royale/Nemesis (N>2) it's nil
+-- until a target latches, same "not yet known" semantics as the masked
+-- score/hands fields elsewhere -- not a wrong name.
 local function mirror_players(lobby)
 	local self_name = player_name(lobby, lobby.player_id) or MP.LOBBY.username or "Guest"
-	local opp_id = MP.get_opponent_id()
+	local opp_id = MP.current_target_id()
 	local opp_name = opp_id and player_name(lobby, opp_id) or nil
 	MP.LOBBY.is_host = lobby.is_host and true or false
 	if lobby.is_host then
@@ -119,6 +131,7 @@ local function mirror_players(lobby)
 		MP.LOBBY.guest = { username = self_name, id = lobby.player_id }
 	end
 end
+MP.mirror_players = mirror_players
 
 MP.setup_lobby_mirror = function(lobby)
 	MP.CURRENT_LOBBY = lobby
