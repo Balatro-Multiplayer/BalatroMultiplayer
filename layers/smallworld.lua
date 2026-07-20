@@ -1,4 +1,4 @@
-MP.Layer("smallworld", {
+MPAPI.Layer("smallworld", {
 	calculate = function(self, context)
 		if not context.apply_bans then
 			return

@@ -1,5 +1,5 @@
 -- Backing modifier layers for the Glass cycle (see _mutators_wall.lua). Bodies TBD.
-MP.Layer("glass_vanilla", {})
-MP.Layer("glass_standard", {})
-MP.Layer("glass_legacy", {})
-MP.Layer("glass_experimental", {})
+MPAPI.Layer("glass_vanilla", {})
+MPAPI.Layer("glass_standard", {})
+MPAPI.Layer("glass_legacy", {})
+MPAPI.Layer("glass_experimental", {})

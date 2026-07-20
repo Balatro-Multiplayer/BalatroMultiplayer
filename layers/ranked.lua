@@ -1,4 +1,4 @@
-MP.Layer("ranked", {
+MPAPI.Layer("ranked", {
 	forced_lobby_options = true,
     is_disabled = function(self)
 		return MP.UTILS.check_smods_version() or MP.UTILS.check_lovely_version()

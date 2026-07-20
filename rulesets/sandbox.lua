@@ -1,6 +1,6 @@
 MP.Ruleset({
 	key = "sandbox",
-	layers = { "sandbox" },
+	layers = { MP.LayerKey.SANDBOX },
 
 	forced_lobby_options = true,
 

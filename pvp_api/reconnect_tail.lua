@@ -4,7 +4,7 @@
 -- network reconnect -- NOT a rebuild of this client's own game state, which
 -- is assumed to have stayed intact throughout (a mere MQTT/network drop, not
 -- a crash; MPAPI/MQTT-level reconnect already handles that case today). What
--- this covers: while disconnected, this client missed any game_log_event
+-- this covers: while disconnected, this client missed any pvp_log_event
 -- broadcasts the opponent sent -- MQTT doesn't backlog non-retained topic
 -- messages -- so its view of the opponent's score/hands is stale until the
 -- opponent's next live sync. This fetches and applies the missed events once

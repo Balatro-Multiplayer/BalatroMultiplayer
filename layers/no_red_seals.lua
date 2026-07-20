@@ -1,7 +1,7 @@
 -- No Red Seals: red seals never get applied — pack polls, Certificate, copies, etc.
 -- Deja Vu does nothing but apply a Red Seal, so ban it outright rather than leave a
 -- dead spectral in the pool
-MP.Layer("no_red_seals", {
+MPAPI.Layer("no_red_seals", {
 	banned_consumables = { "c_deja_vu" },
 	calculate = function(self, context)
 		if context.apply_bans then

@@ -29,10 +29,10 @@ function MP.WHITE.save_state()
 	save.ante = G.GAME.round_resets.ante
 	
 	local jokers_save = G.jokers:save()
-	save.jokers = MP.UTILS.str_pack_and_encode(jokers_save)
+	save.jokers = MPAPI.encode(jokers_save)
 	
 	local deck_save = G.deck:save() -- gotta be careful that every card is actually in the deck at this point
-	save.deck = MP.UTILS.str_pack_and_encode(deck_save)
+	save.deck = MPAPI.encode(deck_save)
 end
 
 function MP.WHITE.send_state()

@@ -1,11 +1,11 @@
 -- Credit to @MathIsFun_ and the Balatro Multiplayer project for the ruleset system this is based on.
 -- Thin delegating wrapper around MPAPI.Ruleset: registers PvP rulesets into the
 -- shared MPAPI.Rulesets registry (dupe-key checking, required_params validation,
--- reworked_* reverse-indexing, and `inject`'s G.P_CENTER_POOLS.Ruleset registration
--- all come from MPAPI for free) while keeping PvP's own default methods
--- (create_info_menu/is_disabled/force_lobby_options) and its own active-ruleset/
--- gamemode resolution (lobby / practice-mode / ghost-replay -- MPAPI only knows
--- about the lobby case, so this stays PvP-owned).
+-- reworked_* reverse-indexing, `inject`'s G.P_CENTER_POOLS.Ruleset registration, and
+-- the default no-op is_disabled/force_lobby_options methods all come from MPAPI's
+-- own RulesetBase for free) while keeping PvP's own active-ruleset/gamemode
+-- resolution (lobby / practice-mode / ghost-replay -- MPAPI only knows about the
+-- lobby case, so this stays PvP-owned).
 --
 -- Key prefixing: PvP ruleset files pass short keys (key = "vanilla") and have
 -- always relied on a "ruleset_mp_" prefix (class "ruleset" + this mod's "mp") to
@@ -14,40 +14,14 @@
 -- "spdrn_order", and don't want one), so PvP computes the "ruleset_" segment
 -- itself and tells SMODS not to touch the key further.
 --
--- MP.Rulesets stays as a direct alias: read elsewhere (tests/test_ruleset_shape.lua,
--- lib/ghost_replay.lua, networking/action_handlers.lua) expecting a key -> ruleset
--- lookup table, which MPAPI.Rulesets now IS.
+-- MP.Rulesets stays as a direct alias: read elsewhere (lib/ghost_replay.lua,
+-- networking/action_handlers.lua) expecting a key -> ruleset lookup table, which
+-- MPAPI.Rulesets now IS.
 MP.Rulesets = MPAPI.Rulesets
-
-function MP.create_info_menu(self)
-	local gamemode_text = nil
-	if self.forced_gamemode then
-		gamemode_text = self.forced_gamemode_text or ("k_" .. self.forced_gamemode:gsub("gamemode_mp_", ""))
-	end
-	local raw_key = self.key:gsub("^ruleset_mp_", "")
-	return MP.UI.CreateRulesetInfoMenu({
-		multiplayer_content = self.multiplayer_content,
-		forced_lobby_options = self.forced_lobby_options,
-		forced_gamemode_text = gamemode_text,
-		description_key = self.description_key or ("k_" .. raw_key .. "_description"),
-		stickers = self.stickers,
-	})
-end
-
-function MP.is_disabled(self)
-	return false
-end
-
-function MP.force_lobby_options(self)
-	return false
-end
 
 function MP.Ruleset(init)
 	init.key = "ruleset_mp_" .. init.key
 	init.prefix_config = init.prefix_config or { key = false }
-	init.create_info_menu = init.create_info_menu or MP.create_info_menu
-	init.is_disabled = init.is_disabled or MP.is_disabled
-	init.force_lobby_options = init.force_lobby_options or MP.force_lobby_options
 	return MPAPI.Ruleset(init)
 end
 
@@ -85,47 +59,14 @@ end
 -- ----------------------------------------------------------------------------
 -- Active context: the resolved view of (ruleset + active modifiers)
 -- ----------------------------------------------------------------------------
--- Reads from MPAPI's shared Rulesets/Layers/MODIFIERS tables now that MP.Ruleset/
--- MP.Layer delegate into them -- only the active-KEY resolution above stays
--- PvP-owned (lobby/practice/ghost).
-
-local _array_field_set = {}
-for _, f in ipairs(MPAPI._LAYER_ARRAY_FIELDS) do
-	_array_field_set[f] = true
-end
-
-local function resolve_field(field)
-	local ruleset_key = MP.get_active_ruleset()
-	local ruleset = ruleset_key and MPAPI.Rulesets[ruleset_key] or nil
-	if _array_field_set[field] then
-		local merged = {}
-		if ruleset and ruleset[field] then
-			for _, v in ipairs(ruleset[field]) do
-				merged[#merged + 1] = v
-			end
-		end
-		for _, mod_name in ipairs(MPAPI.MODIFIERS) do
-			local layer = MPAPI.Layers[mod_name]
-			if layer and layer[field] then
-				for _, v in ipairs(layer[field]) do
-					merged[#merged + 1] = v
-				end
-			end
-		end
-		return merged
-	end
-	-- Scalar / function / non-array: modifiers last-wins, then ruleset
-	for i = #MPAPI.MODIFIERS, 1, -1 do
-		local layer = MPAPI.Layers[MPAPI.MODIFIERS[i]]
-		if layer and layer[field] ~= nil then return layer[field] end
-	end
-	if ruleset then return ruleset[field] end
-	return nil
-end
+-- Field-kind merging delegates to MPAPI.resolve_ruleset_field (the single shared
+-- implementation, also used by Speed) -- only the active-KEY resolution above
+-- stays PvP-owned (lobby/practice/ghost), threaded through as an explicit
+-- argument since MPAPI's own equivalent only knows about the lobby case.
 
 local _resolver = setmetatable({}, {
 	__index = function(_, field)
-		return resolve_field(field)
+		return MPAPI.resolve_ruleset_field(MP.get_active_ruleset(), field)
 	end,
 })
 
@@ -140,6 +81,14 @@ end
 -- self-name, then modifiers (when target is the active ruleset). Dedup
 -- matters because not every hook is idempotent — smallworld's 75% cull
 -- would re-cull the survivors.
+--
+-- NOT delegated to MPAPI.active_layer_chain despite the walk being otherwise
+-- identical: MPAPI adds the ruleset's own KEY as its self-entry, which for
+-- MPAPI/Speed content is fine (their ruleset keys are already fully-qualified,
+-- doubling as their own layer name when one exists). PvP's ruleset keys carry
+-- the extra "ruleset_mp_" prefix (see MP.Ruleset above) while a same-named
+-- layer, when one exists, is registered under the unprefixed SHORT name --
+-- so PvP must add target_short here, not the prefixed key MPAPI would add.
 function MP.active_layer_chain(target_short)
 	local active_key = MP.get_active_ruleset()
 	local active_short = active_key and active_key:gsub("^ruleset_mp_", "") or nil

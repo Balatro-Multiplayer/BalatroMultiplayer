@@ -4,6 +4,6 @@ MP.ReworkCenter("m_glass", {
 })
 
 MP.ReworkCenter("m_glass", {
-	layers = "sandbox",
+	layers = MP.LayerKey.SANDBOX,
 	config = { Xmult = 1.5, extra = 3 },
 })

@@ -1,4 +1,4 @@
-MP.Layer("standard", {
+MPAPI.Layer("standard", {
 	multiplayer_content = true,
 	standard = true,
 	banned_silent = {

@@ -33,7 +33,8 @@ local function self_id()
 end
 
 MP.RLOG_EVENT_ACTION = MPAPI.ActionType({
-	key = "game_log_event",
+	key = "pvp_log_event",
+	prefix_config = { key = false },
 	parameters = {
 		{ key = "t", type = "number", required = true },
 		{ key = "opcode", type = "string", required = true },
@@ -47,7 +48,7 @@ MP.RLOG_EVENT_ACTION = MPAPI.ActionType({
 })
 
 -- Normalizes MP.RLOG.record's flexible args shape (nil | scalar | array/dict
--- table) into what game_log_event's `args` param actually needs: nil (omitted
+-- table) into what pvp_log_event's `args` param actually needs: nil (omitted
 -- entirely, since it's optional) or a table. A bare scalar (e.g. pack_skip's
 -- literal `0`) gets wrapped as a single-element array so it still round-trips.
 local function normalize_args(args)

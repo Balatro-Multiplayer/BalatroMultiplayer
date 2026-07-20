@@ -10,7 +10,7 @@ function MP.setup_shared_pockets()
 	G.GAME.mp_shared_pockets = { count = 0, slots = 15 }
 end
 
-MP.Layer("shared_pockets", {
+MPAPI.Layer("shared_pockets", {
 	banned_jokers = {
 		"j_stencil",
 	},

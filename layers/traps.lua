@@ -2,7 +2,7 @@
 -- MPAPI's pool-gating auto-attaches mp_include to any card listed in a layer's
 -- reworked_consumables, so they only spawn when "traps" is part of the active
 -- ruleset's layers or toggled on as a runtime modifier.
-MP.Layer("traps", {
+MPAPI.Layer("traps", {
 	reworked_consumables = {
 		"c_mp_trap_glyph_of_warding",
 		"c_mp_trap_symbol",

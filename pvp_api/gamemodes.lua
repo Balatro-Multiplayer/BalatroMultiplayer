@@ -24,6 +24,12 @@ MPAPI.on_winner_declared(function(winner_id)
 	end
 end)
 
+-- The default/fallback queue mode key, referenced as a raw string across several
+-- consumer files (flow.lua, queue.lua, pvp_leaderboard.lua) -- kept as one named
+-- constant here, next to its definition in MP.PVP_GAMEMODES below, so those call
+-- sites can't drift from this table's actual key.
+MP.GamemodeKey = { PVP_STANDARD = "pvp_standard" }
+
 MP.PVP_GAMEMODES = {
 	pvp_standard = { ruleset = "ruleset_mp_standard_ranked", gamemode = "gamemode_mp_attrition", display = "Standard", has_ranked = true },
 	pvp_expanded = { ruleset = "ruleset_mp_blitz", gamemode = "gamemode_mp_attrition", display = "Expanded", has_ranked = false },

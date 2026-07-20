@@ -23,7 +23,7 @@ MPAPI.Joker({
 		return { vars = { card.ability.extra.x_mult_gain, card.ability.extra.max_x_mult, card.ability.extra.x_mult } }
 	end,
 	mp_include = function(self)
-		return MP.LOBBY.code and MP.LOBBY.config.multiplayer_jokers and not MP.is_layer_active("sandbox")
+		return MP.LOBBY.code and MP.LOBBY.config.multiplayer_jokers and not MP.is_layer_active(MP.LayerKey.SANDBOX)
 	end,
 	update = function(self, card, dt)
 		if MP.LOBBY.code then

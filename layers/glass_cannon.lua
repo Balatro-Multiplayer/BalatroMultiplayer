@@ -2,7 +2,7 @@
 local GLASS_CANNON_HANDS = 2 -- doesn't work
 local GLASS_CANNON_XMULT = 4
 
-MP.Layer("glass_cannon", {
+MPAPI.Layer("glass_cannon", {
 	starting_params = { hands = GLASS_CANNON_HANDS }, -- doesn't work
 })
 

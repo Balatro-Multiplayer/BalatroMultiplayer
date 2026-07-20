@@ -14,7 +14,7 @@ SMODS.Joker({
 	blueprint_compat = true,
 	rarity = 1,
 	cost = 4,
-	ruleset = "sandbox",
+	ruleset = MP.LayerKey.SANDBOX,
 	config = { extra = { max = 46, min = -23, mult = "???", color = G.C.MULT }, mp_balanced = true },
 	loc_vars = function(self, info_queue, card)
 		return { vars = { card.ability.extra.mult, colours = { card.ability.extra.color } } }
