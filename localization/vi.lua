@@ -890,7 +890,6 @@ return {
 			k_enemy_hands = "Tay bài còn lại: ",
 			k_coming_soon = "Sắp ra mắt!",
 			k_wait_enemy = "Đang chờ đối thủ hoàn thành ván...",
-			k_wait_enemy_reach_this_blind = "Đang chờ đối thủ đến blind này...",
 			k_lives = "Mạng",
 			k_skips = "Bỏ Qua",
 			k_lost_life = "Mất 1 mạng",
@@ -935,7 +934,6 @@ return {
 			k_lobby_advanced = "Nâng Cao",
 			k_opts_pvp_start_round = "Đối Đầu Bắt đầu ở Ante",
 			k_opts_pvp_timer = "Đếm Ngược",
-			k_opts_showdown_starting_antes = "Showdown Bắt đầu ở Ante",
 			k_opts_pvp_timer_increment = "Tăng Đếm Ngược",
 			k_opts_pvp_countdown_seconds = "Giây Đếm Ngược Đối Đầu",
 			k_opts_modifier_timer = "Thi Triển Đếm Ngược", -- feel free to fix this text if you don't like huy, i can't find a better word for this
@@ -991,11 +989,6 @@ return {
             k_badlatro = "Badlatro",
 			k_badlatro_description = "Một thể thức tuần được thiết kế bởi @dr_monty_the_snek trong máy chủ đã được thêm vĩnh viễn vào mod.\n\nThể thức này cấm 48 joker, lá tiêu thụ, nhãn bỏ qua, v.v...",
 			k_attrition = "Hao Mòn",
-			k_attrition_description = "Sau Ante đầu tiên, mọi boss blind đều là Blind Đối Đầu. Không chuẩn bị gì hết. Thể thức này ép bạn phải sẵn sàng ngay từ đầu.",
-			k_showdown = "Hạ Màn",
-			k_showdown_description = "Sau 2 ante đầu tiên, mọi boss blind đều là Blind Đối Đầu. Thể thức này cho bạn thời gian chuẩn bị trước trận chiến",
-			k_survival = "Sinh Tồn",
-			k_survival_description = "Người chơi đánh bại blind xa nhất sẽ chiến thắng. Không có Blind Đối Đầu. Thể thức này kiểm tra khả năng xây bộ bài từ từ cho đến khi lấy được điểm cao nhất.",
 			k_weekly = "Giải Tuần",
 			k_weekly_description = "Một thể thức đặc biệt được thay đổi sau mỗi 1 hoặc 2 tuần. Có vẻ ta phải tự khám phá luật là gì rồi! Hiện tại là: ",
 			k_smallworld = "Small World",
@@ -1107,7 +1100,6 @@ return {
 			k_ruleset_disabled_smods_version = "Yêu cần phiên bản SMODS #1#",
 			k_failed_to_join_lobby = "Không thể tham gia phòng: #1#",
 			k_ante_number = "Ante #1#",
-			k_ante_range = "Ante #1#-#2#", -- For example, "Ante 1-2"
 			k_ante_min = "Ante #1#+", -- For example, "Ante 2+"
 			k_credits_list = "#1# và nhiều người nữa!", -- #1# gets replaced with a list of names
 		},

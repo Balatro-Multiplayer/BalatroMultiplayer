@@ -1405,7 +1405,6 @@ return {
 			k_enemy_hands = "Enemy hands left: ",
 			k_coming_soon = "Coming Soon!",
 			k_wait_enemy = "Waiting for enemy to finish...",
-			k_wait_enemy_reach_this_blind = "Waiting for enemy to reach this blind...",
 			k_lives = "Lives",
 			k_skips = "Skips",
 			k_lost_life = "Lost a life",
@@ -1451,7 +1450,6 @@ return {
 			k_lobby_advanced = "Advanced",
 			k_opts_pvp_start_round = "PVP Starts at Ante",
 			k_opts_pvp_timer = "Timer",
-			k_opts_showdown_starting_antes = "Showdown Starts at Ante",
 			k_opts_pvp_timer_increment = "Timer Increment",
 			k_opts_pvp_countdown_seconds = "PvP Countdown Seconds",
 			k_opts_modifier_timer = "Timer Implementation",
@@ -1509,11 +1507,6 @@ return {
 			k_badlatro = "Badlatro",
 			k_badlatro_description = "A weekly ruleset designed by @dr_monty_the_snek on the discord server\nthat has been added to the mod permanently.\n\nThis ruleset bans 48 jokers, consumables, tags, etc.",
 			k_attrition = "Attrition",
-			k_attrition_description = "After the first ante, every boss blind is a Nemesis blind. No time to prepare. This gamemode forces you to be battle-ready from the start.",
-			k_showdown = "Showdown",
-			k_showdown_description = "After the first 2 antes, every blind is a Nemesis blind. This gamemode gives you time to prepare before battle.",
-			k_survival = "Survival",
-			k_survival_description = "The player who beats the farthest blind wins. No Nemesis blinds. This gamemode is a test of your ability to gradually build-up to the highest scoring Vanilla hands.",
 			k_weekly = "Weekly",
 			k_weekly_description = "A special ruleset that changes weekly or bi-weekly. I guess you'll have to find out what it is! Currently: ",
 			k_smallworld = "Small World",
@@ -1623,7 +1616,6 @@ return {
 			k_ruleset_disabled_lovely_version = "Lovely #1# Required",
 			k_failed_to_join_lobby = "Failed to join lobby: #1#",
 			k_ante_number = "Ante #1#",
-			k_ante_range = "Ante #1#-#2#", -- For example, "Ante 1-2"
 			k_ante_min = "Ante #1#+", -- For example, "Ante 2+"
 			k_credits_list = "#1# and many more!", -- #1# gets replaced with a list of names
 		},

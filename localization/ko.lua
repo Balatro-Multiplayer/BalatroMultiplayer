@@ -811,7 +811,6 @@ return {
 
 			k_opts_pvp_start_round = "PvP가 앤티에서 시작",
 			k_opts_pvp_timer = "타이머",
-			k_opts_showdown_starting_antes = "쇼다운이 앤티에서 시작",
 			k_opts_pvp_timer_increment = "타이머 증가량",
 			k_opts_pvp_countdown_seconds = "PvP 카운트다운(초)",
 			k_bl_life = "생명",
@@ -846,13 +845,8 @@ return {
 			k_badlatro_description = "디스코드 커뮤니티에서 제작된\n주간 룰셋입니다.\n\n다수의 카드와 아이템이\n대규모로 금지됩니다.",
 
 			k_attrition = "어트리션",
-			k_attrition_description = "첫 앤티 이후부터\n모든 보스 블라인드가\n네메시스 블라인드가 됩니다.\n\n시작부터 전투를 준비해야 합니다.",
 
-			k_showdown = "쇼다운",
-			k_showdown_description = "처음 2개의 앤티 이후\n모든 블라인드가\n네메시스 블라인드가 됩니다.\n\n전투 전 준비 시간이 주어집니다.",
 
-			k_survival = "서바이벌",
-			k_survival_description = "가장 먼 블라인드를\n돌파한 플레이어가 승리합니다.\n\n네메시스 블라인드는 없으며\n점진적인 성장에 집중합니다.",
 
 			k_weekly = "위클리",
 			k_weekly_description = "주기적으로 변경되는\n특별 룰셋입니다.\n\n이번 주 규칙을 직접 확인하세요!",
@@ -942,7 +936,6 @@ return {
 		k_failed_to_join_lobby = "로비 참가 실패: #1#",
 
 		k_ante_number = "앤티 #1#",
-		k_ante_range = "앤티 #1#-#2#",
 		k_ante_min = "앤티 #1#+",
 		k_credits_list = "#1# 외 다수!",
 	},
