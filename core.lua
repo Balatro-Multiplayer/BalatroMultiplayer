@@ -121,8 +121,14 @@ function MP.is_major_league_ruleset()
 	return MP.LOBBY and MP.LOBBY.config and MP.LOBBY.config.ruleset == "ruleset_mp_majorleague" and MP.LOBBY.code
 end
 
+-- Forward-declaration stub: MP.reset_game_states() below calls MP.UTILS.timer_base(),
+-- which reads MP.current_ruleset() -- but that call happens synchronously at this
+-- file's own load time, before rulesets/_rulesets.lua (loaded later via
+-- MP.load_mp_dir("rulesets", true)) defines the real MP.current_ruleset(). Without
+-- this stub the early call crashes on a nil field. The real definition overwrites
+-- this one once rulesets load; this one is never reached again after that.
 function MP.current_ruleset()
-    return {}
+	return {}
 end
 
 function MP.load_mp_file(file)
@@ -186,7 +192,6 @@ function MP.reset_lobby_config(persist_ruleset_and_gamemode)
 		timer_base_seconds = 150,
 		timer_increment_seconds = 60,
 		pvp_countdown_seconds = 3,
-		showdown_starting_antes = 3,
 		ruleset = persist_ruleset_and_gamemode and MP.LOBBY.config.ruleset or "ruleset_mp_blitz",
 		gamemode = persist_ruleset_and_gamemode and MP.LOBBY.config.gamemode or "gamemode_mp_attrition",
 		weekly = nil,
@@ -262,7 +267,6 @@ function MP.reset_game_states()
 		pincher_unlock = false,
 		asteroids = 0,
 		pizza_discards = 0,
-		wait_for_enemys_furthest_blind = false,
 		disable_live_and_timer_hud = false,
 		timers_forgiven = 0,
 		stats = {

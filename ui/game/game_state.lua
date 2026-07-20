@@ -255,8 +255,6 @@ function Game:update_new_round(dt)
 					return
 				end
 			else
-				MP.GAME.wait_for_enemys_furthest_blind = (MP.LOBBY.config.gamemode == "gamemode_mp_survival")
-					and (tonumber(MP.GAME.lives) == 1)
 				MP.ACTIONS.fail_round(G.GAME.current_round.hands_played)
 			end
 		end
@@ -264,20 +262,7 @@ function Game:update_new_round(dt)
 		-- Prevent player from winning
 		G.GAME.win_ante = 999
 
-		if not ghost and MP.LOBBY.config.gamemode == "gamemode_mp_survival" and MP.GAME.wait_for_enemys_furthest_blind then
-			G.STATE_COMPLETE = true
-			G.FUNCS.draw_from_hand_to_discard()
-			attention_text({
-				scale = 0.8,
-				text = localize("k_wait_enemy_reach_this_blind"),
-				hold = 5,
-				align = "cm",
-				offset = { x = 0, y = -1.5 },
-				major = G.play,
-			})
-		else
-			update_new_round_ref(self, dt)
-		end
+		update_new_round_ref(self, dt)
 
 		-- Reset ante number
 		G.GAME.win_ante = 8
@@ -448,7 +433,6 @@ function MP.handle_deck_out()
 		if
 			G.GAME.current_round.hands_played == 0
 			and G.GAME.current_round.discards_used > 0
-			and MP.LOBBY.config.gamemode ~= "gamemode_mp_survival"
 		then
 			if not MP.GHOST.is_active() then
 				if MP.is_pvp_boss() then MP.ACTIONS.play_hand(0, 0) end
