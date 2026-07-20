@@ -14,7 +14,21 @@ SMODS.ConsumableType({
 		["en-us"] = {
 			name = "Trap",
 			collection = "{} Trap Cards",
-			undiscovered = "??? Trap Card",
+			-- Must be a {name=..., text={...}} table, not a bare string: SMODS.ConsumableType's
+			-- process_loc_text writes this straight into G.localization.descriptions.Other, and
+			-- the base game's init_localization (functions/misc_functions.lua) unconditionally
+			-- does `center.text_parsed = {}` on every entry there, which crashes on a string.
+			-- Every vanilla undiscovered_* entry (see Balatro/localization/en-us.lua) is shaped
+			-- this way -- Trap was the first custom ConsumableType in this mod stack to supply a
+			-- non-empty `undiscovered` at all, so nothing had hit this before.
+			undiscovered = {
+				name = "??? Trap Card",
+				text = {
+					"Drafted by an",
+					"opponent -- reacts",
+					"to something you do",
+				},
+			},
 		},
 	},
 })
