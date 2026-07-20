@@ -1,5 +1,5 @@
 -- Score Instability: after scoring, chips and mult are dragged toward each other.
-MP.Layer("score_instability", {
+MPAPI.Layer("score_instability", {
 	calculate = function(self, context)
 		if context.apply_bans then
 			G.GAME.modifiers.mp_score_instability = true

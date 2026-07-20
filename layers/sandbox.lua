@@ -1,5 +1,10 @@
 MP.SANDBOX = {}
 
+-- The sandbox layer's key, referenced as a raw string across several consumer
+-- files (jokers, rulesets, enhancements) -- kept as one named constant here, next
+-- to this layer's own registration below, so those call sites can't drift from it.
+MP.LayerKey = { SANDBOX = "sandbox" }
+
 -- Centralized joker mappings: defines sandbox variants, their vanilla counterparts, and rotation status
 MP.SANDBOX.joker_mappings = {
 	-- Active jokers in rotation
@@ -89,7 +94,7 @@ end
 --- @param joker_key string The key of the joker to check (e.g., "j_mp_mail_sandbox")
 --- @return boolean true if the joker is allowed in the sandbox ruleset and in a multiplayer lobby
 function MP.SANDBOX.is_joker_allowed(joker_key)
-	if not MP.is_layer_active("sandbox") then return false end
+	if not MP.is_layer_active(MP.LayerKey.SANDBOX) then return false end
 
 	for _, mapping in ipairs(MP.SANDBOX.joker_mappings) do
 		if mapping.active and mapping.sandbox == joker_key then return true end
@@ -157,7 +162,7 @@ local sandbox_reworked_jokers = (function()
 	return jokers
 end)()
 
-MP.Layer("sandbox", {
+MPAPI.Layer(MP.LayerKey.SANDBOX, {
 	multiplayer_content = true,
 	banned_jokers = { "j_hanging_chad" },
 	banned_silent = MP.SANDBOX.get_vanilla_bans(),

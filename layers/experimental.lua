@@ -1,4 +1,4 @@
-MP.Layer("experimental", {
+MPAPI.Layer("experimental", {
 	multiplayer_content = true,
 	standard = true,
 	banned_silent = {

@@ -26,8 +26,12 @@ if SMODS.Mods["HotPotato"] and SMODS.Mods["HotPotato"].can_load then
 			local temp_used_jokers = G.GAME.used_jokers
 			G.GAME.used_jokers = {}
 
-			local temp_should_use_the_order = MP.should_use_the_order
-			MP.should_use_the_order = function()
+			-- Suppress Order-mode determinism during this fake-ante reward roll: base-game
+			-- lovely patches (TheOrder.toml, now shipped from BalatroMultiplayerAPI) call
+			-- MPAPI.should_use_the_order() directly, not MP.should_use_the_order -- monkeypatch
+			-- MPAPI's function or this suppression silently does nothing.
+			local temp_should_use_the_order = MPAPI.should_use_the_order
+			MPAPI.should_use_the_order = function()
 				return false
 			end
 
@@ -35,7 +39,7 @@ if SMODS.Mods["HotPotato"] and SMODS.Mods["HotPotato"].can_load then
 
 			G.GAME.round_resets.ante = temp_ante
 			G.GAME.used_jokers = temp_used_jokers
-			MP.should_use_the_order = temp_should_use_the_order
+			MPAPI.should_use_the_order = temp_should_use_the_order
 
 			return results
 		end
@@ -80,8 +84,9 @@ if SMODS.Mods["HotPotato"] and SMODS.Mods["HotPotato"].can_load then
 		local temp_ante = G.GAME.round_resets.ante
 		G.GAME.round_resets.ante = 78
 
-		local temp_should_use_the_order = MP.should_use_the_order
-		MP.should_use_the_order = function()
+		-- See the hook() function above for why this targets MPAPI's function, not MP's.
+		local temp_should_use_the_order = MPAPI.should_use_the_order
+		MPAPI.should_use_the_order = function()
 			return false
 		end
 
@@ -89,7 +94,7 @@ if SMODS.Mods["HotPotato"] and SMODS.Mods["HotPotato"].can_load then
 
 		G.GAME.round_resets.ante = temp_ante
 		G.GAME.used_jokers = temp_used_jokers
-		MP.should_use_the_order = temp_should_use_the_order
+		MPAPI.should_use_the_order = temp_should_use_the_order
 
 		return ret
 	end

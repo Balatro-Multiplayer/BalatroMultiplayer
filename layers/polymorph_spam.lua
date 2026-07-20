@@ -1,5 +1,5 @@
 -- Polymorph Spam: every blind, your jokers and consumables re-roll into other centers.
-MP.Layer("polymorph_spam", {
+MPAPI.Layer("polymorph_spam", {
 	calculate = function(self, context)
 		if context.apply_bans then
 			G.GAME.modifiers.mp_polymorph_spam = true

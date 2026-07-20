@@ -324,6 +324,32 @@ function MP.referee_on_unready_blind(from)
 	ref_player(from).is_ready = false
 end
 
+-- Pure: given the 2-player round-end state, decides whether the round is over
+-- yet and, if so, who's ahead. Returns nil if the trailing player still has
+-- hands left (round not over). roundWinner = the higher score; on an exact tie
+-- the FIRST player (a) is the nominal winner (a_lt_b is false when scores are
+-- equal) but no life is lost either way (see the equal-handling in
+-- try_resolve_round below) -- extracted from try_resolve_round so this
+-- decision is independently testable without a live lobby (see
+-- ClaudeControl/suites/pvp/referee.lua, which verified this tie-break
+-- direction live against the actual expression below).
+function MP.referee_resolve_2p_round(a, b)
+	local a_lt_b = MP.INSANE_INT.greater_than(b.score, a.score) -- a.score < b.score
+	local b_lt_a = MP.INSANE_INT.greater_than(a.score, b.score)
+	local equal = MP.INSANE_INT.equal(a.score, b.score)
+
+	local trigger = (a.hands_left < 1 and a_lt_b)
+		or (b.hands_left < 1 and b_lt_a)
+		or (a.hands_left < 1 and b.hands_left < 1)
+	if not trigger then
+		return nil
+	end
+
+	local winner = a_lt_b and b or a
+	local loser = (winner.id == a.id) and b or a
+	return { winner = winner, loser = loser, equal = equal }
+end
+
 -- The score-comparison round resolution (playHand path). Called after a player's
 -- score/hands are updated. Ends the round when the trailing player is out of hands
 -- or both are, decided by InsaneInt score with exact-equality = draw.
@@ -341,21 +367,11 @@ local function try_resolve_round()
 
 	if #total == 2 then
 		local a, b = ref_player(total[1]), ref_player(total[2])
-		local a_lt_b = MP.INSANE_INT.greater_than(b.score, a.score) -- a.score < b.score
-		local b_lt_a = MP.INSANE_INT.greater_than(a.score, b.score)
-		local equal = MP.INSANE_INT.equal(a.score, b.score)
-
-		local trigger = (a.hands_left < 1 and a_lt_b)
-			or (b.hands_left < 1 and b_lt_a)
-			or (a.hands_left < 1 and b.hands_left < 1)
-		if not trigger then
+		local outcome = MP.referee_resolve_2p_round(a, b)
+		if not outcome then
 			return
 		end
-
-		-- roundWinner = the higher score; on a tie the second player is nominal winner
-		-- but no life is lost and both get lost=false.
-		local winner = a_lt_b and b or a
-		local loser = (winner.id == a.id) and b or a
+		local winner, loser, equal = outcome.winner, outcome.loser, outcome.equal
 
 		if not equal then
 			lose_life(loser)
@@ -497,20 +513,12 @@ function MP.referee_on_set_ante(from, params)
 	end
 end
 
--- setFurthestBlind: survival-mode win check (opponent already at 0 lives and behind).
 function MP.referee_on_set_furthest_blind(from, params)
 	if not is_host() then
 		return
 	end
 	local pl = ref_player(from)
 	pl.furthest_blind = tonumber(params.furthestBlind) or pl.furthest_blind
-	if MP.LOBBY.config.gamemode == "gamemode_mp_survival" then
-		local opp = opponent_of(from)
-		local enemy = opp and ref_player(opp)
-		if enemy and enemy.lives == 0 and pl.furthest_blind > enemy.furthest_blind then
-			broadcast("pvp_win", { winner_id = from })
-		end
-	end
 end
 
 -- newRound: re-arm loseLife for the next round (resetBlocker).
@@ -523,10 +531,9 @@ end
 
 -- failRound: mode-dependent life loss (death_on_round_loss) and match end.
 --
--- Survival's own win check stays 2-player (opponent_of), gated to gamemode_mp_survival
--- as before. The general (attrition/Royale/Nemesis) path used to declare pvp_win
--- against opponent_of(from) unconditionally -- at N>2 that's an arbitrary bystander,
--- not necessarily the actual sole survivor, since death_on_round_loss fires on any
+-- The general (attrition/Royale/Nemesis) path used to declare pvp_win against
+-- opponent_of(from) unconditionally -- at N>2 that's an arbitrary bystander, not
+-- necessarily the actual sole survivor, since death_on_round_loss fires on any
 -- failed blind, not just nemesis-boss rounds. Fixed to the same "exactly 1 alive"
 -- check try_resolve_round uses. For N>2, whether or not this failure eliminated
 -- them, force their hands_left to 0 and re-run try_resolve_round(): the batch-wait
@@ -543,17 +550,6 @@ function MP.referee_on_fail_round(from)
 		lose_life(pl)
 	end
 	if pl.lives == 0 then
-		if MP.LOBBY.config.gamemode == "gamemode_mp_survival" then
-			local opp = opponent_of(from)
-			local enemy = opp and ref_player(opp)
-			if enemy and pl.furthest_blind == enemy.furthest_blind then
-				broadcast("pvp_win", { winner_id = "*draw*" })
-			else
-				local winner = (enemy and pl.furthest_blind < enemy.furthest_blind) and opp or from
-				broadcast("pvp_win", { winner_id = winner })
-			end
-			return
-		end
 		if check_alive_win() then
 			return
 		end

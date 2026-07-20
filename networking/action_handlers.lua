@@ -407,6 +407,7 @@ local function action_start_blind(p)
 	-- Royale's "first sync wins" MP.current_target_id() strategy re-latches fresh
 	-- each blind (a no-op for 1v1/Nemesis, which don't use this field).
 	MP.GAME.royale_target_id = nil
+	if MP.CURRENT_LOBBY then MP.mirror_players(MP.CURRENT_LOBBY) end
 	MP.GAME.ready_blind = false
 	MP.GAME.pvp_reached = false
 	MP.GAME.timer_started = false
@@ -537,7 +538,6 @@ local function action_lobby_options(options)
 			or k == "pvp_start_round"
 			or k == "timer_base_seconds"
 			or k == "timer_increment_seconds"
-			or k == "showdown_starting_antes"
 			or k == "pvp_countdown_seconds"
 			or k == "timer_forgiveness"
 		then
@@ -600,7 +600,7 @@ function G.FUNCS.load_end_game_jokers()
 
 	if not MP.end_game_jokers or not MP.end_game_jokers_payload then return end
 
-	card_area_save, err = MP.UTILS.str_decode_and_unpack(MP.end_game_jokers_payload)
+	card_area_save, err = MPAPI.decode(MP.end_game_jokers_payload)
 	if not card_area_save then
 		sendDebugMessage(string.format("Failed to unpack enemy jokers: %s", err), "MULTIPLAYER")
 		return
@@ -656,7 +656,7 @@ local function action_get_end_game_jokers()
 	sendTraceMessage(string.format("Sending end game jokers: %s", jokers_str), "MULTIPLAYER")
 
 	local jokers_save = G.jokers:save()
-	local jokers_encoded = MP.UTILS.str_pack_and_encode(jokers_save)
+	local jokers_encoded = MPAPI.encode(jokers_save)
 
 	Client.send({
 		action = "receiveEndGameJokers",
@@ -1083,7 +1083,7 @@ function MP.ACTIONS.sync_client()
 end
 
 -- (action_stream_log_lines / action_submit_log_hashes were removed: MP.RLOG's
--- live transport now broadcasts each event directly via the game_log_event
+-- live transport now broadcasts each event directly via the pvp_log_event
 -- MPAPI ActionType -- see pvp_api/replay_log_actions.lua and
 -- lib/replay_log.lua. These TCP-era Client.send actions were already silently
 -- dropped by pvp_api/net.lua's router -- unlisted actions are "owned by the
@@ -1191,55 +1191,69 @@ end
 
 local network_to_ui_channel = love.thread.getChannel("networkToUi")
 
+-- Pops and decodes the next queued network message, if any:
+--   nil                        no message queued (loop should stop)
+--   "legacy_server", raw_msg   the pre-JSON "action:..." wire format (an outdated
+--                              server) -- caller reports+disconnects and stops
+--                              draining this frame's queue entirely
+--   "invalid", raw_msg         message failed to json-decode
+--   "ok", parsedAction         successfully decoded
+local function pull_next_network_message()
+	local msg = network_to_ui_channel:pop()
+	if not msg then
+		return nil
+	end
+	if string.sub(msg, 1, 1) == "a" then
+		return "legacy_server", msg
+	end
+	local ok, parsedAction = pcall(json.decode, msg)
+	if ok then
+		return "ok", parsedAction
+	end
+	return "invalid", msg
+end
+
 local game_update_ref = Game.update
 ---@diagnostic disable-next-line: duplicate-set-field
 function Game:update(dt)
 	game_update_ref(self, dt)
 
 	repeat
-		local msg = network_to_ui_channel:pop()
-		if msg then
-			-- horribly messy catch
-			if string.sub(msg, 1, 1) == "a" then
-				if msg ~= "action:keepAlive" then
-					local networkToUiChannel = love.thread.getChannel("networkToUi")
-					networkToUiChannel:push(json.encode({
-						action = "error",
-						message = "Attempting to connect to outdated server",
-					}))
-					networkToUiChannel:push('{"action":"disconnected"}')
+		local kind, payload = pull_next_network_message()
+		if kind == "legacy_server" then
+			if payload ~= "action:keepAlive" then
+				local networkToUiChannel = love.thread.getChannel("networkToUi")
+				networkToUiChannel:push(json.encode({
+					action = "error",
+					message = "Attempting to connect to outdated server",
+				}))
+				networkToUiChannel:push('{"action":"disconnected"}')
+			end
+			return
+		elseif kind == "ok" then
+			local parsedAction = payload
+			if not ((parsedAction.action == "keepAlive") or (parsedAction.action == "keepAliveAck")) then
+				local log = string.format("Client got %s message: ", parsedAction.action)
+				for k, v in pairs(parsedAction) do
+					if parsedAction.action == "startGame" and k == "seed" then
+						last_game_seed = v
+					else
+						log = log .. string.format(" (%s: %s) ", k, v)
+					end
 				end
-				return
+				if
+					(parsedAction.action == "receiveEndGameJokers" or parsedAction.action == "stopGame")
+					and last_game_seed
+				then
+					log = log .. string.format(" (seed: %s) ", last_game_seed)
+				end
+				sendTraceMessage(log, "MULTIPLAYER")
 			end
 
-			local ok, parsedAction = pcall(json.decode, msg)
-            if ok then
-                if not ((parsedAction.action == "keepAlive") or (parsedAction.action == "keepAliveAck")) then
-                    local log = string.format("Client got %s message: ", parsedAction.action)
-                    for k, v in pairs(parsedAction) do
-                        if parsedAction.action == "startGame" and k == "seed" then
-                            last_game_seed = v
-                        else
-                            log = log .. string.format(" (%s: %s) ", k, v)
-                        end
-                    end
-                    if
-                        (parsedAction.action == "receiveEndGameJokers" or parsedAction.action == "stopGame")
-                        and last_game_seed
-                    then
-                        log = log .. string.format(" (seed: %s) ", last_game_seed)
-                    end
-                    sendTraceMessage(log, "MULTIPLAYER")
-                end
-    
-                local handler = HANDLERS[parsedAction.action]
-                if handler then handler(parsedAction) end
-            else
-                sendWarnMessage(
-                    "Invalid server response: " .. msg,
-                    "MULTIPLAYER"
-                )
-            end
+			local handler = HANDLERS[parsedAction.action]
+			if handler then handler(parsedAction) end
+		elseif kind == "invalid" then
+			sendWarnMessage("Invalid server response: " .. payload, "MULTIPLAYER")
 		end
-	until not msg
+	until not kind
 end
