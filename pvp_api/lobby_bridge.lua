@@ -162,6 +162,15 @@ PVP.setup_lobby_mirror = function(lobby)
 	PVP.LOBBY.code = lobby.code
 	PVP.LOBBY.connected = true
 	PVP.LOBBY.is_host = lobby.is_host and true or false
+	-- Manhunt/Teams role state must NOT carry over from a previous lobby: the
+	-- same two players reconnecting into a different lobby (any gamemode, not
+	-- just another Manhunt/Teams match) would otherwise inherit a stale
+	-- "HUNTER"/"RUNNER"/"A"/"B" roster entry, which -- since referee_reset's
+	-- team_based default ("pl.team_id or 'A'") only fires when team_id is still
+	-- nil -- can silently stick as an invalid team_id for the new mode instead of
+	-- being freshly assigned.
+	PVP.LOBBY.roster = {}
+	PVP.LOBBY.team_id = nil
 	PVP.reset_game_states()
 	-- Speed-style lobby view state: player-card grid + fresh ready tracker + buttons.
 	if PVP.lobby then
