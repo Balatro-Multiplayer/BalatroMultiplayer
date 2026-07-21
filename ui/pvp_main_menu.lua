@@ -90,6 +90,32 @@ function PVP.main_menu.create_buttons()
 			return MPAPI.is_connected()
 		end,
 	})
+	b.manhunt = MPAPI.disableable_button({
+		id = "mp_pvp_create_manhunt_lobby",
+		button = "mp_pvp_create_manhunt_lobby",
+		colour = G.C.RED,
+		minw = 2.65,
+		minh = 1.35,
+		label = { "Manhunt" },
+		scale = 0.54,
+		col = true,
+		enabled = function()
+			return MPAPI.is_connected()
+		end,
+	})
+	b.teams = MPAPI.disableable_button({
+		id = "mp_pvp_create_teams_lobby",
+		button = "mp_pvp_create_teams_lobby",
+		colour = G.C.BLUE,
+		minw = 2.65,
+		minh = 1.35,
+		label = { "Teams" },
+		scale = 0.54,
+		col = true,
+		enabled = function()
+			return MPAPI.is_connected()
+		end,
+	})
 
 	M.initialized = true
 end
@@ -104,6 +130,8 @@ PVP.update_main_menu_buttons = function()
 	M.buttons.join_by_code:update()
 	M.buttons.join_from_clipboard:update()
 	M.buttons.leaderboard:update()
+	M.buttons.manhunt:update()
+	M.buttons.teams:update()
 end
 
 -- Swap the Find Game button between search / cancel (called by queue.lua).
@@ -175,10 +203,26 @@ PVP.build_pre_lobby_ui = function()
 							b.create_lobby.node,
 						},
 					},
+					{
+						n = G.UIT.R,
+						config = { align = "cm", padding = 0.1 },
+						nodes = {
+							{ n = G.UIT.C, config = { align = "cm", padding = 0.05 }, nodes = { b.manhunt.node } },
+							{ n = G.UIT.C, config = { align = "cm", padding = 0.05 }, nodes = { b.teams.node } },
+						},
+					},
 				},
 			},
 		},
 	}
+end
+
+G.FUNCS.mp_pvp_create_manhunt_lobby = function()
+	PVP.pvp_create_private_lobby("pvp_manhunt")
+end
+
+G.FUNCS.mp_pvp_create_teams_lobby = function()
+	PVP.pvp_create_private_lobby("pvp_teams")
 end
 
 -- ── Join overlays (copied from Speed's join.lua) ─────────────────────────────

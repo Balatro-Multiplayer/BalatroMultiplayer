@@ -57,6 +57,30 @@ PVP.PVP_GAMEMODES = {
 		-- on EVERY client (not just the host, who's the only one that runs start_run below).
 		nemesis_pairing = true,
 	},
+	-- Manhunt (2-16 players): one Runner (1 life) vs N Hunters (manhunt_hunter_lives
+	-- each). Asymmetric best-hunter-vs-runner comparison, not a rotating pairing --
+	-- lives here in pvp_api/referee.lua. `manhunt` (not `gamemode`/`ruleset`, shared
+	-- with every other vanilla-ruleset mode) is what every manhunt-aware piece of
+	-- code branches on, same pattern as `nemesis_pairing` above.
+	pvp_manhunt = {
+		ruleset = "ruleset_mp_vanilla",
+		gamemode = "gamemode_mp_attrition",
+		display = "Manhunt",
+		has_ranked = false,
+		custom_bridge = true,
+		manhunt = true,
+	},
+	-- Teams (2-16 players): two teams ("A"/"B"), each with a shared life pool.
+	-- Round resolution sums each team's scores and decrements the losing team's
+	-- pool once (never per-player) -- see referee.lua.
+	pvp_teams = {
+		ruleset = "ruleset_mp_vanilla",
+		gamemode = "gamemode_mp_attrition",
+		display = "Teams",
+		has_ranked = false,
+		custom_bridge = true,
+		team_based = true,
+	},
 }
 
 for key, def in pairs(PVP.PVP_GAMEMODES) do
@@ -182,6 +206,74 @@ do
 				return
 			end
 			return { winner = winner_id }
+		end,
+	})
+end
+
+-- Manhunt: same bridge shape as Royale/Nemesis (2-16 players, no ban/pick draft).
+-- Win/loss is asymmetric (Runner vs best-Hunter, not "last one standing"), so
+-- forfeit handling calls the dedicated referee helper instead of the generic
+-- check_single_survivor -- a Hunter leaving doesn't end the match by itself.
+do
+	local def = PVP.PVP_GAMEMODES.pvp_manhunt
+	MPAPI.GameMode({
+		key = "pvp_manhunt",
+		prefix_config = { key = false },
+		display_name = def.display,
+		has_ranked_mode = def.has_ranked,
+		min_players = 2,
+		max_players = { public = 16, private = 16 },
+		start_run = function(self, deck_name, seed)
+			PVP.LOBBY.config.ruleset = def.ruleset
+			PVP.LOBBY.config.gamemode = def.gamemode
+			if deck_name then
+				PVP.LOBBY.deck.back = deck_name
+			end
+			G.FUNCS.lobby_start_run(nil, { seed = seed })
+		end,
+		get_blinds_by_ante = function(self, ante)
+			return nil, nil, nil
+		end,
+		on_ante_change = function(self, ante) end,
+		-- Broadcasts pvp_win (winner_team_id) itself -- unlike check_single_survivor's
+		-- callers above, NOT returned as { winner = ... }: MPAPI._handle_gamemode_result
+		-- would hand a team_id string ("HUNTER") to the generic on_winner_declared
+		-- handler above, which broadcasts pvp_player_won with THAT as player_id -- a
+		-- string no real client id ever matches, so every client would wrongly resolve
+		-- to "I lost".
+		on_player_forfeit = function(self, player_id)
+			PVP.referee_manhunt_on_forfeit(player_id)
+		end,
+	})
+end
+
+-- Teams: same bridge shape. A whole team's roster leaving ends the match for the
+-- other team; a single member leaving does not (see PVP.referee_teams_on_forfeit).
+do
+	local def = PVP.PVP_GAMEMODES.pvp_teams
+	MPAPI.GameMode({
+		key = "pvp_teams",
+		prefix_config = { key = false },
+		display_name = def.display,
+		has_ranked_mode = def.has_ranked,
+		min_players = 2,
+		max_players = { public = 16, private = 16 },
+		start_run = function(self, deck_name, seed)
+			PVP.LOBBY.config.ruleset = def.ruleset
+			PVP.LOBBY.config.gamemode = def.gamemode
+			if deck_name then
+				PVP.LOBBY.deck.back = deck_name
+			end
+			G.FUNCS.lobby_start_run(nil, { seed = seed })
+		end,
+		get_blinds_by_ante = function(self, ante)
+			return nil, nil, nil
+		end,
+		on_ante_change = function(self, ante) end,
+		-- Same reason as Manhunt's forfeit hook above: broadcasts pvp_win itself,
+		-- not returned as { winner = ... }.
+		on_player_forfeit = function(self, player_id)
+			PVP.referee_teams_on_forfeit(player_id)
 		end,
 	})
 end

@@ -48,6 +48,16 @@ function PVP.UTILS.blind_col_numtokey(num)
 end
 
 function PVP.UTILS.get_nemesis_key(own) -- calling this function assumes the user is currently in a multiplayer game
+	-- Manhunt: the boss blind is a reskin target, same "one shared blind object,
+	-- just repainted" trick every other call site already relies on (bl_mp_nemesis
+	-- itself is untouched -- only its sprite/colour changes, so timers/jokers/HUD
+	-- lookups need no changes). Every call site above passes no `own` arg, which
+	-- (per the existing xor below) always resolves to "the blind representing my
+	-- OPPONENT" -- so a Hunter (facing the Runner) sees the Runner sprite, and the
+	-- Runner (facing a/the best Hunter) sees the Hunter sprite.
+	if PVP.LOBBY.config.manhunt then
+		return (PVP.LOBBY.team_id == "RUNNER") and "bl_mp_manhunt_hunter" or "bl_mp_manhunt_runner"
+	end
 	local num = ((not own) ~= (not PVP.LOBBY.is_host) and PVP.LOBBY.guest.blind_col or PVP.LOBBY.host.blind_col) or 1 -- cryptic xor fuckery
 	local ret = PVP.UTILS.blind_col_numtokey(num)
 	if tonumber(PVP.GAME.enemy.lives) <= 1 and tonumber(PVP.GAME.lives) <= 1 then

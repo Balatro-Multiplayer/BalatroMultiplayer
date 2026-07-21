@@ -44,6 +44,13 @@ function PVP.current_target_id()
 	if #lobby:get_players() == 2 then
 		return PVP.get_opponent_id()
 	end
+	-- Manhunt/Teams (N>2): same "first sync wins" per-blind latch Royale uses
+	-- below, but restricted to an opposing-team sender (see note_target_candidate)
+	-- so a Hunter's HUD/joker-targeting never latches onto a fellow Hunter, and a
+	-- Teams player's never latches onto a teammate.
+	if PVP.LOBBY.config.manhunt or PVP.LOBBY.config.team_based then
+		return PVP.GAME.team_target_id
+	end
 	return PVP.GAME.royale_target_id
 end
 
@@ -57,6 +64,18 @@ function PVP.note_target_candidate(sender_id)
 	end
 	local lobby = MPAPI.get_current_lobby()
 	if not lobby or #lobby:get_players() == 2 then
+		return
+	end
+	if PVP.LOBBY.config.manhunt or PVP.LOBBY.config.team_based then
+		if PVP.GAME.team_target_id then
+			return
+		end
+		local my_team = PVP.LOBBY.roster and PVP.LOBBY.roster[lobby.player_id]
+		local their_team = PVP.LOBBY.roster and PVP.LOBBY.roster[sender_id]
+		if my_team and their_team and my_team ~= their_team then
+			PVP.GAME.team_target_id = sender_id
+			if PVP.CURRENT_LOBBY then PVP.mirror_players(PVP.CURRENT_LOBBY) end
+		end
 		return
 	end
 	if not PVP.GAME.royale_target_id then
@@ -100,6 +119,11 @@ local function mirror_metadata(lobby)
 	-- PVP.current_target_id/attrition.lua's bye check/the joker-targeting guards all
 	-- run client-side. Derive it the same way gamemode/ruleset are derived here.
 	PVP.LOBBY.config.nemesis_pairing = (def and def.nemesis_pairing) or nil
+	-- Same derivation for Manhunt/Teams -- every client (not just the host) needs
+	-- these to resolve PVP.current_target_id(), the referee's mode branch, and the
+	-- lobby-options picker, since none of them ride the generic per-key loop above.
+	PVP.LOBBY.config.manhunt = (def and def.manhunt) or nil
+	PVP.LOBBY.config.team_based = (def and def.team_based) or nil
 	if meta.deck then
 		PVP.LOBBY.deck.back = meta.deck
 	end

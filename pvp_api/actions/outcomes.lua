@@ -31,17 +31,22 @@ end)
 
 A("pvp_win", function(_at, _from, params)
 	local sid = self_id()
-	if params.winner_id == "*draw*" then
-		PVP.dispatch_action("winGame")
-	elseif params.winner_id == sid then
-		PVP.dispatch_action("winGame")
+	local i_won
+	if params.winner_team_id then
+		-- Manhunt/Teams: the referee declares a TEAM the winner (winner_id is left
+		-- empty, see referee.lua) -- resolve against my own roster assignment
+		-- instead of comparing player ids.
+		i_won = PVP.LOBBY.roster and PVP.LOBBY.roster[sid] == params.winner_team_id
+	elseif params.winner_id == "*draw*" then
+		i_won = true
 	else
-		PVP.dispatch_action("loseGame")
+		i_won = params.winner_id == sid
 	end
+	PVP.dispatch_action(i_won and "winGame" or "loseGame")
 	-- Host reports the matchmaking result (ELO + leaderboard) once per match.
 	local lobby = MPAPI.get_current_lobby()
 	if lobby and lobby.is_host and PVP.report_match_result then
-		PVP.report_match_result(params.winner_id)
+		PVP.report_match_result(params.winner_team_id or params.winner_id)
 	end
 end)
 

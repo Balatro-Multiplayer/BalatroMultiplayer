@@ -189,6 +189,9 @@ function PVP.reset_lobby_config(persist_ruleset_and_gamemode)
 		the_order = true,
 		starting_lives = 4,
 		pvp_start_round = 2,
+		-- Manhunt only: each Hunter's individual life count (Runner is always
+		-- fixed at 1, not configurable -- see PVP.referee_reset).
+		manhunt_hunter_lives = 7,
 		timer_base_seconds = 150,
 		timer_increment_seconds = 60,
 		pvp_countdown_seconds = 3,
@@ -336,6 +339,7 @@ PVP.load_mp_dir("objects/consumables")
 PVP.load_mp_dir("objects/consumables/sandbox")
 PVP.load_mp_dir("objects/boosters")
 PVP.load_mp_dir("objects/challenges")
+PVP.load_mp_dir("objects/vouchers")
 
 -- MultiplayerPvP runs on BalatroMultiplayerAPI. The API owns the connection,
 -- lobbies, matchmaking, leaderboards, and the main-menu host, so we no longer start
