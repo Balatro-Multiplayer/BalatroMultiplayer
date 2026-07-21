@@ -56,4 +56,6 @@ G.FUNCS.mp_pvp_leave_lobby = function()
 	end
 end
 
-G.FUNCS.mp_pvp_lobby_options = function() end -- placeholder (Phase 6+)
+G.FUNCS.mp_pvp_lobby_options = function()
+	G.FUNCS.overlay_menu({ definition = PVP.build_manhunt_teams_options() })
+end

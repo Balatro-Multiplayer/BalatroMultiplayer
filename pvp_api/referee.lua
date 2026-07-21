@@ -23,6 +23,10 @@ PVP.REF = PVP.REF
 		used_pairs = {},
 		nemesis_ante_computed_for = 0,
 		last_bye_id = nil,
+		-- Teams: shared per-team life pools ({A=n, B=n}). Unused by Manhunt, which
+		-- keeps asymmetric per-player lives (Runner=1, Hunter=manhunt_hunter_lives)
+		-- on the existing pl.lives field -- no pool needed there.
+		team_lives = {},
 	}
 
 local function is_host()
@@ -52,6 +56,9 @@ local function ref_player(id)
 			is_ready = false,
 			first_ready = false,
 			lives_blocker = false,
+			-- Manhunt ("HUNTER"/"RUNNER") or Teams ("A"/"B"); nil for every other mode.
+			-- Stamped from PVP.LOBBY.roster in PVP.referee_reset.
+			team_id = nil,
 		}
 	return PVP.REF.players[id]
 end
@@ -99,6 +106,53 @@ local function check_alive_win()
 		return true
 	end
 	return false
+end
+
+-- Manhunt/Teams analog of check_alive_win(): the generic "last player standing"
+-- rule doesn't apply to either -- Manhunt's Runner has exactly 1 life and dying
+-- ends the match for the WHOLE Hunter team regardless of remaining Hunter
+-- headcount (not "last person standing"), and Teams' shared pool hitting 0 ends
+-- the match regardless of individual teammates' states. Returns true if a win
+-- fired. A no-op (and returns false) when neither mode is active.
+local function check_team_win()
+	if PVP.LOBBY.config.manhunt then
+		local any_hunter_alive = false
+		for _, id in ipairs(both_players()) do
+			local pl = ref_player(id)
+			if pl.team_id == "RUNNER" and pl.lives <= 0 then
+				broadcast("pvp_win", { winner_id = "", winner_team_id = "HUNTER" })
+				return true
+			end
+			if pl.team_id == "HUNTER" and pl.lives > 0 then
+				any_hunter_alive = true
+			end
+		end
+		if not any_hunter_alive then
+			broadcast("pvp_win", { winner_id = "", winner_team_id = "RUNNER" })
+			return true
+		end
+		return false
+	end
+	if PVP.LOBBY.config.team_based then
+		if (PVP.REF.team_lives.A or 1) <= 0 then
+			broadcast("pvp_win", { winner_id = "", winner_team_id = "B" })
+			return true
+		end
+		if (PVP.REF.team_lives.B or 1) <= 0 then
+			broadcast("pvp_win", { winner_id = "", winner_team_id = "A" })
+			return true
+		end
+		return false
+	end
+	return false
+end
+
+-- Dispatches to whichever win-check applies to the active mode.
+local function check_any_win()
+	if PVP.LOBBY.config.manhunt or PVP.LOBBY.config.team_based then
+		return check_team_win()
+	end
+	return check_alive_win()
 end
 
 local function pair_key(a, b)
@@ -224,9 +278,11 @@ function PVP.referee_reset(starting_lives)
 	PVP.REF.used_pairs = {}
 	PVP.REF.nemesis_ante_computed_for = 0
 	PVP.REF.last_bye_id = nil
+	PVP.REF.team_lives = {}
 	PVP._result_reported = false
 	local lives = starting_lives or PVP.LOBBY.config.starting_lives or 4
-	for _, id in ipairs(both_players()) do
+	local total = both_players()
+	for _, id in ipairs(total) do
 		local pl = ref_player(id)
 		pl.lives = lives
 		pl.score = PVP.INSANE_INT.empty()
@@ -235,9 +291,57 @@ function PVP.referee_reset(starting_lives)
 		pl.is_ready = false
 		pl.first_ready = false
 		pl.lives_blocker = false
+		pl.team_id = PVP.LOBBY.roster and PVP.LOBBY.roster[id] or nil
 	end
-	-- Authoritative starting lives to both clients.
-	broadcast("pvp_player_lives", { player_id = "*all*", lives = lives })
+
+	if PVP.LOBBY.config.manhunt then
+		-- Exactly one Runner: the first player who actually claimed the slot (roster
+		-- order isn't meaningful, so pick deterministically off both_players()'s
+		-- order), else the first player by default so the mode never ends up with
+		-- zero Runners (e.g. a fabricated test roster, or nobody having opened the
+		-- picker). Any extra Runner claims (a UI race) are demoted to Hunter.
+		local runner_id = nil
+		for _, id in ipairs(total) do
+			if ref_player(id).team_id == "RUNNER" and not runner_id then
+				runner_id = id
+			end
+		end
+		runner_id = runner_id or total[1]
+		for _, id in ipairs(total) do
+			local pl = ref_player(id)
+			pl.team_id = (id == runner_id) and "RUNNER" or "HUNTER"
+			pl.lives = (pl.team_id == "RUNNER") and 1 or (PVP.LOBBY.config.manhunt_hunter_lives or 7)
+			broadcast("pvp_player_lives", { player_id = id, lives = pl.lives })
+		end
+	elseif PVP.LOBBY.config.team_based then
+		for _, id in ipairs(total) do
+			local pl = ref_player(id)
+			pl.team_id = pl.team_id or "A"
+		end
+		PVP.REF.team_lives = { A = lives, B = lives }
+		broadcast("pvp_player_lives", { player_id = "*all*", lives = lives })
+		broadcast("pvp_team_lives", { team_id = "A", lives = lives })
+		broadcast("pvp_team_lives", { team_id = "B", lives = lives })
+	else
+		-- Authoritative starting lives to both clients.
+		broadcast("pvp_player_lives", { player_id = "*all*", lives = lives })
+	end
+
+	if PVP.LOBBY.config.manhunt or PVP.LOBBY.config.team_based then
+		-- Authoritative final roster snapshot: a player who never opened the picker
+		-- (accepting the server-computed default above) never broadcast their own
+		-- pvp_set_team, so PVP.LOBBY.roster/team_id on EVERY client (including
+		-- their own) would otherwise never reflect it -- breaking blind reskin
+		-- (get_nemesis_key), Teams' cross-team targeting latch, and the pvp_win
+		-- winner_team_id resolution in outcomes.lua. Broadcasting the real
+		-- assignments once here (not the best-effort pvp_set_team mirror) is what
+		-- makes them authoritative.
+		local final_roster = {}
+		for _, id in ipairs(total) do
+			final_roster[id] = ref_player(id).team_id
+		end
+		broadcast("pvp_team_roster", { roster = final_roster })
+	end
 
 	if PVP.LOBBY.config.nemesis_pairing then
 		compute_nemesis_pairing(alive_ids())
@@ -255,6 +359,33 @@ local function lose_life(pl)
 	pl.lives = pl.lives - 1
 	pl.lives_blocker = true
 	broadcast("pvp_player_lives", { player_id = pl.id, lives = pl.lives })
+end
+
+-- Teams-aware life loss for the fail_round/fail_timer/fail_pvp_timer paths below
+-- (non-PvP-round failures: a vanilla boss blind loss, an ante timer expiry, a PvP
+-- round timer expiry). Manhunt keeps ordinary per-player lives (lose_life
+-- unchanged); Teams must decrement its SHARED pool once and mirror the new value
+-- onto every teammate, or these paths would desync an individual's pl.lives from
+-- their team's actual pool (the pool is the only thing check_team_win reads).
+local function team_lose_life(pl)
+	if not PVP.LOBBY.config.team_based then
+		lose_life(pl)
+		return
+	end
+	if pl.lives_blocker then
+		return
+	end
+	pl.lives_blocker = true
+	local team = pl.team_id
+	PVP.REF.team_lives[team] = (PVP.REF.team_lives[team] or 1) - 1
+	broadcast("pvp_team_lives", { team_id = team, lives = PVP.REF.team_lives[team] })
+	for _, id in ipairs(both_players()) do
+		local other = ref_player(id)
+		if other.team_id == team then
+			other.lives = PVP.REF.team_lives[team]
+			broadcast("pvp_player_lives", { player_id = id, lives = other.lives })
+		end
+	end
 end
 
 -- readyBlind: both ready -> compute firstPlayer, reset per-blind state, start blind.
@@ -350,6 +481,120 @@ function PVP.referee_resolve_2p_round(a, b)
 	return { winner = winner, loser = loser, equal = equal }
 end
 
+-- Pure: given the Runner's ref_player table and an array of alive Hunters' ref_player
+-- tables, decides which Hunters lose a life and whether the Runner is caught this
+-- round. Ported from BalatroMultiplayerManhuntServer's BRModeManhunt.checkPVPDone --
+-- NOT a rotating pairwise system like Nemesis: the Runner is compared once against
+-- the single BEST Hunter score (they only have one life, so only the worst case
+-- matters), while each Hunter is compared individually against the Runner (so
+-- several Hunters can lose a life in the same round). A Hunter must STRICTLY beat
+-- the Runner to survive; ties favor the Runner (they "evade" unless decisively
+-- caught) UNLESS the Runner scored exactly 0, in which case a tied (0-0) Hunter is
+-- not penalized.
+function PVP.referee_resolve_manhunt_round(runner, hunters)
+	local highest_hunter_score = PVP.INSANE_INT.empty()
+	for _, h in ipairs(hunters) do
+		if PVP.INSANE_INT.greater_than(h.score, highest_hunter_score) then
+			highest_hunter_score = h.score
+		end
+	end
+
+	local hunter_losers = {}
+	for _, h in ipairs(hunters) do
+		local hunter_behind = PVP.INSANE_INT.greater_than(runner.score, h.score)
+		local tied = PVP.INSANE_INT.equal(h.score, runner.score)
+		local runner_scored = not PVP.INSANE_INT.equal(runner.score, PVP.INSANE_INT.empty())
+		if hunter_behind or (tied and runner_scored) then
+			hunter_losers[#hunter_losers + 1] = h
+		end
+	end
+
+	return {
+		hunter_losers = hunter_losers,
+		runner_caught = PVP.INSANE_INT.greater_than(highest_hunter_score, runner.score),
+	}
+end
+
+-- Pure: sums each team's scores this round and returns the losing team ("A"/"B"),
+-- or equal=true on an exact tie (mirrors the 1v1/Royale "nobody loses on a tie" rule).
+function PVP.referee_resolve_teams_round(team_a, team_b)
+	local sum_a, sum_b = PVP.INSANE_INT.empty(), PVP.INSANE_INT.empty()
+	for _, pl in ipairs(team_a) do
+		sum_a = PVP.INSANE_INT.add(sum_a, pl.score)
+	end
+	for _, pl in ipairs(team_b) do
+		sum_b = PVP.INSANE_INT.add(sum_b, pl.score)
+	end
+	if PVP.INSANE_INT.equal(sum_a, sum_b) then
+		return { equal = true }
+	end
+	return { equal = false, loser_team = PVP.INSANE_INT.greater_than(sum_b, sum_a) and "A" or "B" }
+end
+
+-- Effects wrapper for the Manhunt branch of try_resolve_round: splits the alive
+-- roster into the Runner + Hunters, applies PVP.referee_resolve_manhunt_round's
+-- outcome, and declares the match over via check_team_win() once appropriate.
+local function resolve_manhunt_round(alive)
+	local runner, hunters = nil, {}
+	for _, id in ipairs(alive) do
+		local pl = ref_player(id)
+		pl.first_ready = false
+		if pl.team_id == "RUNNER" then
+			runner = pl
+		else
+			hunters[#hunters + 1] = pl
+		end
+	end
+	if not runner then
+		-- Runner already eliminated/disconnected this round -- forfeit handling
+		-- (PVP.referee_manhunt_on_forfeit) already resolved the match.
+		return
+	end
+
+	local outcome = PVP.referee_resolve_manhunt_round(runner, hunters)
+	for _, h in ipairs(outcome.hunter_losers) do
+		lose_life(h)
+	end
+	if outcome.runner_caught then
+		lose_life(runner)
+	end
+
+	if not check_team_win() then
+		broadcast("pvp_end_pvp", { loser_id = "", pvp_timer_lost = false })
+	end
+end
+
+-- Effects wrapper for the Teams branch of try_resolve_round: sums each team's
+-- scores, decrements the losing team's SHARED pool once (not once per member), and
+-- keeps every teammate's individual pl.lives mirrored to that pool so the existing
+-- per-player lives-reading code (HUD, jokers) keeps working unmodified.
+local function resolve_teams_round(alive)
+	local by_team = { A = {}, B = {} }
+	for _, id in ipairs(alive) do
+		local pl = ref_player(id)
+		pl.first_ready = false
+		if by_team[pl.team_id] then
+			table.insert(by_team[pl.team_id], pl)
+		end
+	end
+	local outcome = PVP.referee_resolve_teams_round(by_team.A, by_team.B)
+	if not outcome.equal then
+		local loser = outcome.loser_team
+		PVP.REF.team_lives[loser] = (PVP.REF.team_lives[loser] or 1) - 1
+		broadcast("pvp_team_lives", { team_id = loser, lives = PVP.REF.team_lives[loser] })
+		for _, id in ipairs(both_players()) do
+			local pl = ref_player(id)
+			if pl.team_id == loser then
+				pl.lives = PVP.REF.team_lives[loser]
+				broadcast("pvp_player_lives", { player_id = id, lives = pl.lives })
+			end
+		end
+	end
+	if not check_team_win() then
+		broadcast("pvp_end_pvp", { loser_id = "", pvp_timer_lost = false })
+	end
+end
+
 -- The score-comparison round resolution (playHand path). Called after a player's
 -- score/hands are updated. Ends the round when the trailing player is out of hands
 -- or both are, decided by InsaneInt score with exact-equality = draw.
@@ -362,6 +607,27 @@ end
 local function try_resolve_round()
 	local total = both_players()
 	if #total < 2 then
+		return
+	end
+
+	-- Manhunt/Teams are gated BEFORE the #total==2 check below: both can have
+	-- exactly 2 total players (1 Runner+1 Hunter, or a degenerate 1v1 Teams match)
+	-- where the generic symmetric pairwise rule would otherwise wrongly apply.
+	if PVP.LOBBY.config.manhunt or PVP.LOBBY.config.team_based then
+		local alive = alive_ids()
+		if #alive < 2 then
+			return
+		end
+		for _, id in ipairs(alive) do
+			if ref_player(id).hands_left >= 1 then
+				return
+			end
+		end
+		if PVP.LOBBY.config.manhunt then
+			resolve_manhunt_round(alive)
+		else
+			resolve_teams_round(alive)
+		end
 		return
 	end
 
@@ -495,7 +761,19 @@ function PVP.referee_on_set_ante(from, params)
 	if not is_host() then
 		return
 	end
-	ref_player(from).ante = tonumber(params.ante) or ref_player(from).ante
+	local pl = ref_player(from)
+	pl.ante = tonumber(params.ante) or pl.ante
+
+	-- Manhunt: the Runner "escapes" by clearing ante 8 (reaching ante 9) without
+	-- ever being caught -- an immediate win, mirroring the ante>8 natural-stop
+	-- precedent already used by PvP practice mode.
+	if PVP.LOBBY.config.manhunt and pl.team_id == "RUNNER" then
+		local ante = tonumber(params.ante)
+		if ante and ante > 8 then
+			broadcast("pvp_win", { winner_id = "", winner_team_id = "RUNNER" })
+			return
+		end
+	end
 
 	-- Nemesis-pairing: recompute once per ante, triggered by whichever alive
 	-- player's ease_ante() reports it first. Safe against overlapping with an
@@ -509,6 +787,25 @@ function PVP.referee_on_set_ante(from, params)
 			PVP.REF.nemesis_ante_computed_for = ante
 			compute_nemesis_pairing(alive_ids())
 			broadcast_nemesis_pairing()
+		end
+	end
+end
+
+-- Manhunt: the Runner redeemed an ante-skip voucher (manhunt_vouchers.lua) --
+-- every Hunter gains +1 life as compensation. A no-op if `from` isn't the Runner
+-- (defensive; the vouchers themselves only ever call this for the Runner).
+function PVP.referee_on_redeem_ante_voucher(from)
+	if not is_host() then
+		return
+	end
+	if ref_player(from).team_id ~= "RUNNER" then
+		return
+	end
+	for _, id in ipairs(both_players()) do
+		local pl = ref_player(id)
+		if pl.team_id == "HUNTER" then
+			pl.lives = pl.lives + 1
+			broadcast("pvp_player_lives", { player_id = id, lives = pl.lives })
 		end
 	end
 end
@@ -547,14 +844,14 @@ function PVP.referee_on_fail_round(from)
 	end
 	local pl = ref_player(from)
 	if PVP.LOBBY.config.death_on_round_loss then
-		lose_life(pl)
+		team_lose_life(pl)
 	end
 	if pl.lives == 0 then
-		if check_alive_win() then
+		if check_any_win() then
 			return
 		end
 	end
-	if #both_players() > 2 then
+	if PVP.LOBBY.config.manhunt or PVP.LOBBY.config.team_based or #both_players() > 2 then
 		pl.hands_left = 0
 		try_resolve_round()
 	end
@@ -567,11 +864,11 @@ function PVP.referee_on_fail_timer(from)
 		return
 	end
 	local pl = ref_player(from)
-	lose_life(pl)
-	if pl.lives == 0 and check_alive_win() then
+	team_lose_life(pl)
+	if pl.lives == 0 and check_any_win() then
 		return
 	end
-	if #both_players() > 2 then
+	if PVP.LOBBY.config.manhunt or PVP.LOBBY.config.team_based or #both_players() > 2 then
 		pl.hands_left = 0
 		try_resolve_round()
 	end
@@ -589,8 +886,8 @@ function PVP.referee_on_fail_pvp_timer(from)
 		return
 	end
 	local pl = ref_player(from)
-	lose_life(pl)
-	if pl.lives == 0 and check_alive_win() then
+	team_lose_life(pl)
+	if pl.lives == 0 and check_any_win() then
 		return
 	end
 	if #both_players() == 2 then
@@ -604,4 +901,44 @@ function PVP.referee_on_fail_pvp_timer(from)
 	end
 	pl.hands_left = 0
 	try_resolve_round()
+end
+
+-- Manhunt's on_player_forfeit: the Runner leaving ends the match immediately in
+-- the Hunters' favor (there is nothing left to "escape" against). A Hunter
+-- leaving doesn't end the match by itself -- try_resolve_round's own
+-- hunters-all-eliminated check (via check_team_win) handles "last Hunter left"
+-- naturally once the remaining Hunters' next round resolves. Returns the winning
+-- team_id if this call ended the match, else nil.
+function PVP.referee_manhunt_on_forfeit(player_id)
+	if not is_host() then
+		return nil
+	end
+	local pl = ref_player(player_id)
+	if pl.team_id == "RUNNER" then
+		broadcast("pvp_win", { winner_id = "", winner_team_id = "HUNTER" })
+		return "HUNTER"
+	end
+	return nil
+end
+
+-- Teams' on_player_forfeit: if the leaver's whole team roster is now gone, the
+-- other team wins immediately. Returns the winning team_id if this call ended
+-- the match, else nil.
+function PVP.referee_teams_on_forfeit(player_id)
+	if not is_host() then
+		return nil
+	end
+	local pl = ref_player(player_id)
+	local team = pl.team_id
+	if not team then
+		return nil
+	end
+	for _, id in ipairs(both_players()) do
+		if id ~= player_id and ref_player(id).team_id == team then
+			return nil -- a teammate remains
+		end
+	end
+	local winner = (team == "A") and "B" or "A"
+	broadcast("pvp_win", { winner_id = "", winner_team_id = winner })
+	return winner
 end

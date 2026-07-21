@@ -26,6 +26,7 @@ function PVP.pvp_lobby_metadata(gamemode_key, kind)
 		stake = tostring(PVP.LOBBY.config.stake or 1),
 		starting_lives = PVP.LOBBY.config.starting_lives or 4,
 		pvp_start_round = PVP.LOBBY.config.pvp_start_round or 2,
+		manhunt_hunter_lives = PVP.LOBBY.config.manhunt_hunter_lives or 7,
 	}
 end
 
