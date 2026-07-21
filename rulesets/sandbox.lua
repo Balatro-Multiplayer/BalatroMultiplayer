@@ -1,13 +1,13 @@
-MP.Ruleset({
+PVP.Ruleset({
 	key = "sandbox",
-	layers = { MP.LayerKey.SANDBOX },
+	layers = { PVP.LayerKey.SANDBOX },
 
 	forced_lobby_options = true,
 
 	force_lobby_options = function(self)
-		MP.LOBBY.config.preview_disabled = true
-		MP.LOBBY.config.the_order = true
-		MP.LOBBY.config.starting_lives = 4
+		PVP.LOBBY.config.preview_disabled = true
+		PVP.LOBBY.config.the_order = true
+		PVP.LOBBY.config.starting_lives = 4
 		return false
 	end,
 }):inject()

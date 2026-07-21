@@ -10,14 +10,14 @@
 -- overhead (~20-byte header/footer) would dominate a 10-30 byte event and
 -- defeat the point -- live-streamed individual events stay uncompressed, only
 -- the at-rest/download artifact goes through this.
-function MP.UTILS.compress_str(str)
+function PVP.UTILS.compress_str(str)
 	local compressed = love.data.compress("string", "gzip", str)
 	return love.data.encode("string", "base64", compressed)
 end
 
 -- Inverse of compress_str. No STR_UNPACK_CHECKED step (there's no Lua table to
 -- reconstruct) -- the caller gets the original plain string back.
-function MP.UTILS.decompress_str(str)
+function PVP.UTILS.decompress_str(str)
 	if type(str) ~= "string" then return nil, "expected string payload" end
 	local success, decoded = pcall(love.data.decode, "string", "base64", str)
 	if not success then return nil, decoded end

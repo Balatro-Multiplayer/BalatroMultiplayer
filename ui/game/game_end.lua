@@ -1,6 +1,6 @@
 -- Leave to the main menu from the end screen (mirrors Speed's spdrn_leave_from_game).
 -- The match is already over, so no confirm; lobby:leave() fires the DISCONNECTED handler
--- which tears down the MP-side lobby state.
+-- which tears down the PVP-side lobby state.
 function G.FUNCS.mp_pvp_leave_from_game()
 	G.FUNCS.exit_overlay_menu()
 	G.SETTINGS.paused = false
@@ -11,19 +11,19 @@ function G.FUNCS.mp_pvp_leave_from_game()
 	G.FUNCS.go_to_menu()
 end
 
-function MP.UI.create_UIBox_round_scores_row_nemesis()
+function PVP.UI.create_UIBox_round_scores_row_nemesis()
     local label = localize({ type = "name_text", set = "Blind", key = "bl_mp_nemesis" })
     local score_tab = {}
     local label_w, score_w, h = 2.9, 1, 0.5
 
     local blind_name_string
-    if MP.GHOST.is_active() then
-        blind_name_string = MP.GHOST.get_blind_name_ui() or "ERROR"
+    if PVP.GHOST.is_active() then
+        blind_name_string = PVP.GHOST.get_blind_name_ui() or "ERROR"
     else
-        blind_name_string = (MP.LOBBY.is_host and MP.LOBBY.guest or MP.LOBBY.host or {})["username"] or "ERROR"
+        blind_name_string = (PVP.LOBBY.is_host and PVP.LOBBY.guest or PVP.LOBBY.host or {})["username"] or "ERROR"
     end
 
-    local nemesis_blind_col = MP.UTILS.get_nemesis_key()
+    local nemesis_blind_col = PVP.UTILS.get_nemesis_key()
     local blind_choice = {}
     blind_choice.animation = AnimatedSprite(0,0, 0.5, 0.5, G.ANIMATION_ATLAS["mp_player_blind_col"], G.P_BLINDS[nemesis_blind_col].pos)
     blind_choice.animation:define_draw_steps({
@@ -57,7 +57,7 @@ end
 -- The mod-specific body of the PvP end screen, rendered inside the shared
 -- MPAPI.end_screen shell: opponent jokers + toggle/view-deck buttons, the stat block +
 -- Ko-fi, and the nemesis row + seed + lobby buttons.
-function MP.UI.end_game_body(has_won)
+function PVP.UI.end_game_body(has_won)
 	return {
 		n = G.UIT.R,
 		config = { align = "cm", padding = 0.15 },
@@ -70,14 +70,14 @@ function MP.UI.end_game_body(has_won)
 						n = G.UIT.R,
 						config = { align = "cm", padding = 0.08 },
 						nodes = {
-							{ n = G.UIT.T, config = { ref_table = MP, ref_value = "end_game_jokers_text", scale = 0.8, maxw = 5, shadow = true } },
+							{ n = G.UIT.T, config = { ref_table = PVP, ref_value = "end_game_jokers_text", scale = 0.8, maxw = 5, shadow = true } },
 						},
 					},
 					{
 						n = G.UIT.R,
 						config = { align = "cm", padding = 0.08 },
 						nodes = {
-							{ n = G.UIT.O, config = { object = MP.end_game_jokers } },
+							{ n = G.UIT.O, config = { object = PVP.end_game_jokers } },
 						},
 					},
 					{
@@ -177,7 +177,7 @@ function MP.UI.end_game_body(has_won)
 								n = G.UIT.C,
 								config = { align = "tr", padding = 0.08 },
 								nodes = {
-									MP.UI.create_UIBox_round_scores_row_nemesis(),
+									PVP.UI.create_UIBox_round_scores_row_nemesis(),
 									create_UIBox_round_scores_row("seed", G.C.WHITE),
 									UIBox_button({ id = "copy_seed_button", button = "copy_seed", label = { localize("b_copy") }, colour = G.C.BLUE, scale = 0.3, minw = 2.5, maxw = 2.5, minh = 0.4 }),
 									{ n = G.UIT.R, config = { align = "cm", minh = 0.45, minw = 0.1 }, nodes = {} },
@@ -197,27 +197,27 @@ end
 -- async opponent-jokers / nemesis-deck fetches are kicked off here (the body renders
 -- them once they arrive). PvP hooks this via the create_UIBox_win/game_over overrides
 -- below rather than calling the overlay directly, so it keeps its own paused handling.
-function MP.UI.create_UIBox_mp_game_end(has_won)
-	MP.end_game_jokers = CardArea(
+function PVP.UI.create_UIBox_mp_game_end(has_won)
+	PVP.end_game_jokers = CardArea(
 		0,
 		0,
 		5 * G.CARD_W,
 		G.CARD_H,
 		{ card_limit = G.GAME.starting_params.joker_slots, type = "joker", highlight_limit = 1, fixed_limit = true }
 	)
-	if not MP.end_game_jokers_received then
-		MP.ACTIONS.get_end_game_jokers()
+	if not PVP.end_game_jokers_received then
+		PVP.ACTIONS.get_end_game_jokers()
 	else
 		G.FUNCS.load_end_game_jokers()
 	end
-	MP.end_game_jokers_text = localize("k_enemy_jokers")
+	PVP.end_game_jokers_text = localize("k_enemy_jokers")
 
-	MP.ACTIONS.request_nemesis_stats()
+	PVP.ACTIONS.request_nemesis_stats()
 
-	MP.nemesis_deck = CardArea(-100, -100, G.CARD_W, G.CARD_H, { type = "deck" })
-	MP.nemesis_cards = {}
-	if not MP.nemesis_deck_received then
-		MP.ACTIONS.get_nemesis_deck()
+	PVP.nemesis_deck = CardArea(-100, -100, G.CARD_W, G.CARD_H, { type = "deck" })
+	PVP.nemesis_cards = {}
+	if not PVP.nemesis_deck_received then
+		PVP.ACTIONS.get_nemesis_deck()
 	else
 		G.FUNCS.load_nemesis_deck()
 	end
@@ -227,13 +227,13 @@ function MP.UI.create_UIBox_mp_game_end(has_won)
 	return MPAPI.end_screen_uibox({
 		won = has_won,
 		id = has_won and "you_win_UI" or nil,
-		body = MP.UI.end_game_body,
+		body = PVP.UI.end_game_body,
 	})
 end
 
 function G.UIDEF.view_nemesis_deck()
 	local playing_cards_ref = G.playing_cards
-	G.playing_cards = MP.nemesis_cards
+	G.playing_cards = PVP.nemesis_cards
 	local t = G.UIDEF.view_deck()
 	G.playing_cards = playing_cards_ref
 	return t
@@ -267,14 +267,14 @@ end
 
 local create_UIBox_game_over_ref = create_UIBox_game_over
 function create_UIBox_game_over()
-	if not MP.LOBBY.code then return create_UIBox_game_over_ref() end
-	return MP.UI.create_UIBox_mp_game_end(false)
+	if not PVP.LOBBY.code then return create_UIBox_game_over_ref() end
+	return PVP.UI.create_UIBox_mp_game_end(false)
 end
 
 local create_UIBox_win_ref = create_UIBox_win
 function create_UIBox_win()
-	if not MP.LOBBY.code then return create_UIBox_win_ref() end
-	return MP.UI.create_UIBox_mp_game_end(true)
+	if not PVP.LOBBY.code then return create_UIBox_win_ref() end
+	return PVP.UI.create_UIBox_mp_game_end(true)
 end
 
 local exit_overlay_menu_ref = G.FUNCS.exit_overlay_menu
@@ -282,7 +282,7 @@ local exit_overlay_menu_ref = G.FUNCS.exit_overlay_menu
 function G.FUNCS:exit_overlay_menu()
 	-- Saves username if user presses ESC instead of Enter
 	if G.OVERLAY_MENU and G.OVERLAY_MENU:get_UIE_by_ID("username_input_box") ~= nil then
-		MP.UTILS.save_username(MP.LOBBY.username)
+		PVP.UTILS.save_username(PVP.LOBBY.username)
 	end
 
 	exit_overlay_menu_ref(self)
@@ -291,7 +291,7 @@ end
 local mods_button_ref = G.FUNCS.mods_button
 function G.FUNCS.mods_button(arg_736_0)
 	if G.OVERLAY_MENU and G.OVERLAY_MENU:get_UIE_by_ID("username_input_box") ~= nil then
-		MP.UTILS.save_username(MP.LOBBY.username)
+		PVP.UTILS.save_username(PVP.LOBBY.username)
 	end
 
 	mods_button_ref(arg_736_0)
@@ -299,7 +299,7 @@ end
 
 function G.UIDEF.multiplayer_deck()
 	return G.UIDEF.challenge_description(
-		get_challenge_int_from_id(MP.current_ruleset().challenge_deck),
+		get_challenge_int_from_id(PVP.current_ruleset().challenge_deck),
 		nil,
 		false
 	)

@@ -8,11 +8,11 @@ end
 function G.FUNCS.lobby_info(e)
 	G.SETTINGS.paused = true
 	G.FUNCS.overlay_menu({
-		definition = MP.UI.lobby_info(),
+		definition = PVP.UI.lobby_info(),
 	})
 end
 
-function MP.UI.lobby_info()
+function PVP.UI.lobby_info()
 	return create_UIBox_generic_options({
 		contents = {
 			create_tabs({
@@ -20,12 +20,12 @@ function MP.UI.lobby_info()
 					{
 						label = localize("b_players"),
 						chosen = true,
-						tab_definition_function = MP.UI.create_UIBox_players,
+						tab_definition_function = PVP.UI.create_UIBox_players,
 					},
 					{
 						label = localize("b_lobby_info"),
 						chosen = false,
-						tab_definition_function = MP.UI.create_UIBox_settings, -- saying settings because _options is used in lobby
+						tab_definition_function = PVP.UI.create_UIBox_settings, -- saying settings because _options is used in lobby
 					},
 				},
 				tab_h = 8,
@@ -35,10 +35,10 @@ function MP.UI.lobby_info()
 	})
 end
 
-function MP.UI.create_UIBox_settings() -- optimize this please
-	local ruleset = string.sub(MP.LOBBY.config.ruleset, 12, -1)
-	local gamemode = string.sub(MP.LOBBY.config.gamemode, 13, -1)
-	local seed = MP.LOBBY.config.custom_seed == "random" and localize("k_random") or MP.LOBBY.config.custom_seed
+function PVP.UI.create_UIBox_settings() -- optimize this please
+	local ruleset = string.sub(PVP.LOBBY.config.ruleset, 12, -1)
+	local gamemode = string.sub(PVP.LOBBY.config.gamemode, 13, -1)
+	local seed = PVP.LOBBY.config.custom_seed == "random" and localize("k_random") or PVP.LOBBY.config.custom_seed
 	return {
 		n = G.UIT.ROOT,
 		config = {
@@ -51,71 +51,71 @@ function MP.UI.create_UIBox_settings() -- optimize this please
 			colour = G.C.BLACK,
 		},
 		nodes = {
-			MP.UI.UTILS.create_row({ align = "cm", padding = 0.05 }, {
-				MP.UI.UTILS.create_text_node((localize("k_" .. ruleset) .. " " .. localize("k_" .. gamemode)), {
+			PVP.UI.UTILS.create_row({ align = "cm", padding = 0.05 }, {
+				PVP.UI.UTILS.create_text_node((localize("k_" .. ruleset) .. " " .. localize("k_" .. gamemode)), {
 					colour = G.C.UI.TEXT_LIGHT,
 					scale = 0.6,
 				}),
 			}),
-			MP.UI.UTILS.create_row({ align = "cm", padding = 0.05 }, {
-				MP.UI.UTILS.create_text_node((localize("k_current_seed") .. seed), {
+			PVP.UI.UTILS.create_row({ align = "cm", padding = 0.05 }, {
+				PVP.UI.UTILS.create_text_node((localize("k_current_seed") .. seed), {
 					colour = G.C.UI.TEXT_LIGHT,
 					scale = 0.6,
 				}),
 			}),
-			MP.UI.UTILS.create_row({ padding = 0, align = "cr" }, {
+			PVP.UI.UTILS.create_row({ padding = 0, align = "cr" }, {
 				Disableable_Toggle({
-					enabled_ref_table = MP.LOBBY,
+					enabled_ref_table = PVP.LOBBY,
 					label = localize("b_opts_cb_money"),
-					ref_table = MP.LOBBY.config,
+					ref_table = PVP.LOBBY.config,
 					ref_value = "gold_on_life_loss",
 				}),
 			}),
-			MP.UI.UTILS.create_row({ padding = 0, align = "cr" }, {
+			PVP.UI.UTILS.create_row({ padding = 0, align = "cr" }, {
 				Disableable_Toggle({
-					enabled_ref_table = MP.LOBBY,
+					enabled_ref_table = PVP.LOBBY,
 					label = localize("b_opts_no_gold_on_loss"),
-					ref_table = MP.LOBBY.config,
+					ref_table = PVP.LOBBY.config,
 					ref_value = "no_gold_on_round_loss",
 				}),
 			}),
-			MP.UI.UTILS.create_row({ padding = 0, align = "cr" }, {
+			PVP.UI.UTILS.create_row({ padding = 0, align = "cr" }, {
 				Disableable_Toggle({
-					enabled_ref_table = MP.LOBBY,
+					enabled_ref_table = PVP.LOBBY,
 					label = localize("b_opts_death_on_loss"),
-					ref_table = MP.LOBBY.config,
+					ref_table = PVP.LOBBY.config,
 					ref_value = "death_on_round_loss",
 				}),
 			}),
-			MP.UI.UTILS.create_row({ padding = 0, align = "cr" }, {
+			PVP.UI.UTILS.create_row({ padding = 0, align = "cr" }, {
 				Disableable_Toggle({
-					enabled_ref_table = MP.LOBBY,
+					enabled_ref_table = PVP.LOBBY,
 					label = localize("b_opts_diff_seeds"),
-					ref_table = MP.LOBBY.config,
+					ref_table = PVP.LOBBY.config,
 					ref_value = "different_seeds",
 				}),
 			}),
-			MP.UI.UTILS.create_row({ padding = 0, align = "cr" }, {
+			PVP.UI.UTILS.create_row({ padding = 0, align = "cr" }, {
 				Disableable_Toggle({
-					enabled_ref_table = MP.LOBBY,
+					enabled_ref_table = PVP.LOBBY,
 					label = localize("b_opts_player_diff_deck"),
-					ref_table = MP.LOBBY.config,
+					ref_table = PVP.LOBBY.config,
 					ref_value = "different_decks",
 				}),
 			}),
-			MP.UI.UTILS.create_row({ padding = 0, align = "cr" }, {
+			PVP.UI.UTILS.create_row({ padding = 0, align = "cr" }, {
 				Disableable_Toggle({
-					enabled_ref_table = MP.LOBBY,
+					enabled_ref_table = PVP.LOBBY,
 					label = localize("b_opts_multiplayer_jokers"),
-					ref_table = MP.LOBBY.config,
+					ref_table = PVP.LOBBY.config,
 					ref_value = "multiplayer_jokers",
 				}),
 			}),
-			MP.UI.UTILS.create_row({ padding = 0, align = "cr" }, {
+			PVP.UI.UTILS.create_row({ padding = 0, align = "cr" }, {
 				Disableable_Toggle({
-					enabled_ref_table = MP.LOBBY,
+					enabled_ref_table = PVP.LOBBY,
 					label = localize("b_opts_normal_bosses"),
-					ref_table = MP.LOBBY.config,
+					ref_table = PVP.LOBBY.config,
 					ref_value = "normal_bosses",
 				}),
 			}),
@@ -123,28 +123,28 @@ function MP.UI.create_UIBox_settings() -- optimize this please
 	}
 end
 
-function MP.UI.create_UIBox_players()
+function PVP.UI.create_UIBox_players()
 	local players = {
-		MP.UI.create_UIBox_player_row("host"),
-		MP.UI.create_UIBox_player_row("guest"),
+		PVP.UI.create_UIBox_player_row("host"),
+		PVP.UI.create_UIBox_player_row("guest"),
 	}
 
 	local t = {
 		n = G.UIT.ROOT,
 		config = { align = "cm", minw = 3, padding = 0.1, r = 0.1, colour = G.C.CLEAR },
 		nodes = {
-			MP.UI.UTILS.create_row({ align = "cm", padding = 0.04 }, players),
+			PVP.UI.UTILS.create_row({ align = "cm", padding = 0.04 }, players),
 		},
 	}
 
 	return t
 end
 
-function MP.UI.create_UIBox_mods_list(type)
+function PVP.UI.create_UIBox_mods_list(type)
 	-- The player's mod list comes from the legacy mod-hash system (config.Mods), which
 	-- the API-based lobby flow does not populate, so config can be nil. Guard it (an
 	-- absent list renders as an empty box) instead of indexing a nil config.
-	local player = (type == "host") and MP.LOBBY.host or MP.LOBBY.guest
+	local player = (type == "host") and PVP.LOBBY.host or PVP.LOBBY.guest
 	local mods = player and player.config and player.config.Mods or nil
 	return {
 		n = G.UIT.R,
@@ -153,7 +153,7 @@ function MP.UI.create_UIBox_mods_list(type)
 			{
 				n = G.UIT.C,
 				config = { align = "cm" },
-				nodes = MP.UI.modlist_to_view(mods, G.C.UI.TEXT_DARK),
+				nodes = PVP.UI.modlist_to_view(mods, G.C.UI.TEXT_DARK),
 			},
 		},
 	}
@@ -163,7 +163,7 @@ end
 -- ui/lobby/lobby.lua; sole caller is create_UIBox_mods_list above). Buckets special
 -- mods (Lovely/Steamodded/Multiplayer/Preview) first, then the rest alphabetically,
 -- colouring banned mods red.
-function MP.UI.modlist_to_view(mods, text_colour)
+function PVP.UI.modlist_to_view(mods, text_colour)
 	local t = {}
 
 	if not mods then
@@ -181,7 +181,7 @@ function MP.UI.modlist_to_view(mods, text_colour)
 	for mod_name, mod_version in pairs(mods) do
 		local found = false
 		for _, id in ipairs(special_mods_targets) do
-			if not special_mods_found[id] and MP.UTILS.string_starts(mod_name, id) then
+			if not special_mods_found[id] and PVP.UTILS.string_starts(mod_name, id) then
 				special_mods_found[id] = { name = mod_name, version = mod_version }
 				found = true
 				break
@@ -197,8 +197,8 @@ function MP.UI.modlist_to_view(mods, text_colour)
 	end)
 
 	local function add_mod_row(mod)
-		local mod_name, mod_version = MP.UTILS.resolve_mod_name_and_version(mod.name, mod.version)
-		local color = MP.BANNED_MODS[mod.name] and G.C.RED or text_colour
+		local mod_name, mod_version = PVP.UTILS.resolve_mod_name_and_version(mod.name, mod.version)
+		local color = PVP.BANNED_MODS[mod.name] and G.C.RED or text_colour
 		table.insert(t, {
 			n = G.UIT.R,
 			config = {
@@ -248,14 +248,14 @@ function MP.UI.modlist_to_view(mods, text_colour)
 	return t
 end
 
-function MP.UI.create_UIBox_player_row(type)
-	local player_name = type == "host" and MP.LOBBY.host.username or MP.LOBBY.guest.username
-	local lives = MP.GAME.enemy.lives
-	local highest_score = MP.GAME.enemy.highest_score
-	local skips = MP.GAME.enemy.skips or 0
-	if (type == "host" and MP.LOBBY.is_host) or (type == "guest" and not MP.LOBBY.is_host) then
-		lives = MP.GAME.lives
-		highest_score = MP.GAME.highest_score
+function PVP.UI.create_UIBox_player_row(type)
+	local player_name = type == "host" and PVP.LOBBY.host.username or PVP.LOBBY.guest.username
+	local lives = PVP.GAME.enemy.lives
+	local highest_score = PVP.GAME.enemy.highest_score
+	local skips = PVP.GAME.enemy.skips or 0
+	if (type == "host" and PVP.LOBBY.is_host) or (type == "guest" and not PVP.LOBBY.is_host) then
+		lives = PVP.GAME.lives
+		highest_score = PVP.GAME.highest_score
 		skips = G.GAME.skips or 0
 	end
 	return {
@@ -270,7 +270,7 @@ function MP.UI.create_UIBox_player_row(type)
 			force_focus = true,
 			on_demand_tooltip = {
 				text = { localize("k_mods_list") },
-				filler = { func = MP.UI.create_UIBox_mods_list, args = type },
+				filler = { func = PVP.UI.create_UIBox_mods_list, args = type },
 			},
 		},
 		nodes = {
@@ -395,7 +395,7 @@ function MP.UI.create_UIBox_player_row(type)
 					{
 						n = G.UIT.T,
 						config = {
-							text = MP.INSANE_INT.to_string(highest_score),
+							text = PVP.INSANE_INT.to_string(highest_score),
 							scale = 0.425,
 							colour = G.C.FILTER,
 							shadow = true,

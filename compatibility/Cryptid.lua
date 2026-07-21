@@ -1,18 +1,18 @@
 if SMODS.Mods["Cryptid"] and SMODS.Mods["Cryptid"].can_load then
 	sendDebugMessage("Cryptid compatibility detected", "MULTIPLAYER")
-	MP.DECK.ban_card("j_cry_fleshpanopticon")
-	MP.DECK.ban_card("j_cry_candy_sticks")
-	MP.DECK.ban_card("j_cry_redeo")
-	MP.DECK.ban_card("j_cry_chocolate_dice")
-	MP.DECK.ban_card("j_cry_carved_pumpkin")
-	MP.DECK.ban_card("j_cry_pumpkin")
-	MP.DECK.ban_card("v_cry_asteroglyph")
-	MP.DECK.ban_card("c_cry_semicolon")
-	MP.DECK.ban_card("c_cry_crash")
-	MP.DECK.ban_card("c_cry_revert")
-	MP.DECK.ban_card("c_cry_analog")
-	MP.DECK.ban_card("c_cry_reboot")
-	MP.DECK.ban_blind("bl_cry_joke")
+	PVP.DECK.ban_card("j_cry_fleshpanopticon")
+	PVP.DECK.ban_card("j_cry_candy_sticks")
+	PVP.DECK.ban_card("j_cry_redeo")
+	PVP.DECK.ban_card("j_cry_chocolate_dice")
+	PVP.DECK.ban_card("j_cry_carved_pumpkin")
+	PVP.DECK.ban_card("j_cry_pumpkin")
+	PVP.DECK.ban_card("v_cry_asteroglyph")
+	PVP.DECK.ban_card("c_cry_semicolon")
+	PVP.DECK.ban_card("c_cry_crash")
+	PVP.DECK.ban_card("c_cry_revert")
+	PVP.DECK.ban_card("c_cry_analog")
+	PVP.DECK.ban_card("c_cry_reboot")
+	PVP.DECK.ban_blind("bl_cry_joke")
 
 	local defeat_ref = Blind.defeat
 	function Blind:defeat(silent)
@@ -32,7 +32,7 @@ if SMODS.Mods["Cryptid"] and SMODS.Mods["Cryptid"].can_load then
 
 	local get_random_consumable_ref = get_random_consumable
 	function get_random_consumable(seed, excluded_flags, banned_card, pool, no_undiscovered)
-		if not MP.LOBBY.code then
+		if not PVP.LOBBY.code then
 			return get_random_consumable_ref(seed, excluded_flags, banned_card, pool, no_undiscovered)
 		end
 		local tries = 5
@@ -41,7 +41,7 @@ if SMODS.Mods["Cryptid"] and SMODS.Mods["Cryptid"].can_load then
 			card = get_random_consumable_ref(seed, excluded_flags, banned_card, pool, no_undiscovered)
 			local is_banned = false
 
-			for _, banned in ipairs(MP.DECK.BANNED_CARDS) do
+			for _, banned in ipairs(PVP.DECK.BANNED_CARDS) do
 				if card.key == banned.id then
 					sendWarnMessage("Attempted to create banned card: " .. card.key .. ", trying again", "MULTIPLAYER")
 					tries = tries - 1
@@ -57,5 +57,5 @@ if SMODS.Mods["Cryptid"] and SMODS.Mods["Cryptid"].can_load then
 		return card
 	end
 
-	MP.set_max_stake("stake_cry_emerald")
+	PVP.set_max_stake("stake_cry_emerald")
 end

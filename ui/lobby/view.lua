@@ -1,5 +1,5 @@
-MP.build_in_lobby_ui = function()
-	local L = MP.lobby
+PVP.build_in_lobby_ui = function()
+	local L = PVP.lobby
 	local lobby = MPAPI.get_current_lobby()
 
 	if lobby and not L.ui_ref then
@@ -7,7 +7,7 @@ MP.build_in_lobby_ui = function()
 		L.ui_ref = MPAPI.create_lobby_ui(lobby)
 	end
 	if not L.ui_ref then
-		return MP.build_pre_lobby_ui()
+		return PVP.build_pre_lobby_ui()
 	end
 
 	L.create_buttons()

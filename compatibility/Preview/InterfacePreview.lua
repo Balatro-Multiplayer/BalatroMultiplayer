@@ -5,10 +5,10 @@ local orig_hud = create_UIBox_HUD
 function create_UIBox_HUD()
 	local contents = orig_hud()
 
-	if not MP.INTEGRATIONS.Preview then return contents end
+	if not PVP.INTEGRATIONS.Preview then return contents end
 
 	-- Check if preview is disabled in lobby options
-	if MP.LOBBY.config and MP.LOBBY.config.preview_disabled then return contents end
+	if PVP.LOBBY.config and PVP.LOBBY.config.preview_disabled then return contents end
 
 	local score_node_wrap =
 		{ n = G.UIT.R, config = { id = "fn_pre_score_wrap", align = "cm", padding = 0.1 }, nodes = {} }
@@ -55,7 +55,7 @@ function FN.PRE.get_calculate_score_button()
 					{
 						n = G.UIT.T,
 						config = {
-							text = MP.UTILS.get_preview_cfg("button"),
+							text = PVP.UTILS.get_preview_cfg("button"),
 							colour = G.C.UI.TEXT_LIGHT,
 							shadow = true,
 							scale = 0.36,

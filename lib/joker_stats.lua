@@ -1,6 +1,6 @@
-MP.STATS = {}
+PVP.STATS = {}
 
-function MP.STATS.get_player_joker_keys()
+function PVP.STATS.get_player_joker_keys()
 	local keys = {}
 	if not G.jokers or not G.jokers.cards then return keys end
 	for i = 1, #G.jokers.cards do
@@ -12,18 +12,18 @@ function MP.STATS.get_player_joker_keys()
 	return keys
 end
 
-function MP.STATS.record_match(won)
-	local config = MP.config
+function PVP.STATS.record_match(won)
+	local config = PVP.config
 	config.joker_stats = config.joker_stats or {}
 	config.match_history = config.match_history or {}
 
-	local joker_keys = MP.STATS.get_player_joker_keys()
+	local joker_keys = PVP.STATS.get_player_joker_keys()
 
 	local entry = {
 		won = won,
 		joker_keys = joker_keys,
-		gamemode = MP.LOBBY.config.gamemode,
-		ruleset = MP.LOBBY.config.ruleset,
+		gamemode = PVP.LOBBY.config.gamemode,
+		ruleset = PVP.LOBBY.config.ruleset,
 		timestamp = os.time(),
 		ante_reached = G.GAME.round_resets and G.GAME.round_resets.ante or 1,
 	}
@@ -35,10 +35,10 @@ function MP.STATS.record_match(won)
 		end
 	end
 
-	SMODS.save_mod_config(MP)
+	SMODS.save_mod_config(PVP)
 end
 
-function MP.STATS.get_joker_wins(joker_key)
-	local config = MP.config
+function PVP.STATS.get_joker_wins(joker_key)
+	local config = PVP.config
 	return config.joker_stats and config.joker_stats[joker_key] or 0
 end

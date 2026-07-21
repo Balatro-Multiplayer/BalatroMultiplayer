@@ -1,5 +1,5 @@
-MP.Ruleset({
+PVP.Ruleset({
 	key = "chaos",
-	layers = { "standard", MP.LayerKey.SANDBOX, "smallworld", "speedlatro_timer"
+	layers = { "standard", PVP.LayerKey.SANDBOX, "smallworld", "speedlatro_timer"
     },
 }):inject()

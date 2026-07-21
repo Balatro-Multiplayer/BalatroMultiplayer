@@ -5,34 +5,34 @@ G.FUNCS.pvp_ready_button = function(e)
 	if e.children[1].config.ref_table[e.children[1].config.ref_value] == localize("Select", "blind_states") then
 		e.config.button = "mp_toggle_ready"
 		e.config.one_press = false
-		e.children[1].config.ref_table = MP.GAME
+		e.children[1].config.ref_table = PVP.GAME
 		e.children[1].config.ref_value = "ready_blind_text"
 	end
-	if e.config.button == "mp_toggle_ready" then e.config.colour = (MP.GAME.ready_blind and G.C.GREEN) or G.C.RED end
+	if e.config.button == "mp_toggle_ready" then e.config.colour = (PVP.GAME.ready_blind and G.C.GREEN) or G.C.RED end
 end
 
 function G.FUNCS.mp_toggle_ready(e)
 	sendTraceMessage("Toggling Ready", "MULTIPLAYER")
-	MP.GAME.ready_blind = not MP.GAME.ready_blind
-	MP.GAME.ready_blind_text = MP.GAME.ready_blind and localize("b_unready") or localize("b_ready")
-	MP.RLOG.record("ready_blind", MP.GAME.ready_blind and 1 or 0)
+	PVP.GAME.ready_blind = not PVP.GAME.ready_blind
+	PVP.GAME.ready_blind_text = PVP.GAME.ready_blind and localize("b_unready") or localize("b_ready")
+	PVP.RLOG.record("ready_blind", PVP.GAME.ready_blind and 1 or 0)
 
-    MP.GAME.pvp_reached = true
+    PVP.GAME.pvp_reached = true
 
-	if MP.GAME.ready_blind then
-		MP.ACTIONS.set_location("loc_ready")
-		MP.ACTIONS.ready_blind(e)
+	if PVP.GAME.ready_blind then
+		PVP.ACTIONS.set_location("loc_ready")
+		PVP.ACTIONS.ready_blind(e)
 	else
-		MP.ACTIONS.set_location("loc_selecting")
-		MP.ACTIONS.pause_ante_timer()
-		MP.ACTIONS.unready_blind()
+		PVP.ACTIONS.set_location("loc_selecting")
+		PVP.ACTIONS.pause_ante_timer()
+		PVP.ACTIONS.unready_blind()
 	end
 end
 
 local old_skip_blind = G.FUNCS.skip_blind
 function G.FUNCS.skip_blind(...)
 	old_skip_blind(...)
-	MP.ACTIONS.update_location()
+	PVP.ACTIONS.update_location()
 end
 
 local can_play_ref = G.FUNCS.can_play
@@ -47,7 +47,7 @@ end
 
 local can_open_ref = G.FUNCS.can_open
 G.FUNCS.can_open = function(e)
-	if MP.GAME.ready_blind then
+	if PVP.GAME.ready_blind then
 		e.config.colour = G.C.UI.BACKGROUND_INACTIVE
 		e.config.button = nil
 		return
@@ -57,27 +57,27 @@ end
 
 local select_blind_ref = G.FUNCS.select_blind
 function G.FUNCS.select_blind(e)
-	MP.GAME.end_pvp = false
-	MP.GAME.prevent_eval = false
+	PVP.GAME.end_pvp = false
+	PVP.GAME.prevent_eval = false
 	select_blind_ref(e)
 	-- Confirmed-safe checkpoint for Phase 9's reconnect tail-replay -- drains
 	-- any pending opponent catch-up queued since the last checkpoint.
-	if MP.RECONNECT_TAIL then MP.RECONNECT_TAIL.on_checkpoint() end
-	if MP.is_mp_or_ghost() then
-		MP.GAME.ante_key = tostring(math.random())
-		if not MP.GHOST.is_active() then
+	if PVP.RECONNECT_TAIL then PVP.RECONNECT_TAIL.on_checkpoint() end
+	if PVP.is_mp_or_ghost() then
+		PVP.GAME.ante_key = tostring(math.random())
+		if not PVP.GHOST.is_active() then
 			-- Carbon: log the freshly-rolled (non-deterministic) ante_key first so
 			-- a replay can restore it, then the blind selection itself.
-			MP.RLOG.record("set_ante_key", MP.GAME.ante_key)
-			MP.RLOG.record(
+			PVP.RLOG.record("set_ante_key", PVP.GAME.ante_key)
+			PVP.RLOG.record(
 				"select_blind",
 				0,
 				string.format("action:selectBlind,blind:%s", tostring(e.config.ref_table.key or e.config.ref_table.name))
 			)
-			MP.ACTIONS.play_hand(0, G.GAME.round_resets.hands)
-			MP.ACTIONS.new_round()
-			MP.ACTIONS.set_location("loc_playing", (e.config.ref_table.key or e.config.ref_table.name))
-			if MP.UI.hide_enemy_location then MP.UI.hide_enemy_location() end
+			PVP.ACTIONS.play_hand(0, G.GAME.round_resets.hands)
+			PVP.ACTIONS.new_round()
+			PVP.ACTIONS.set_location("loc_playing", (e.config.ref_table.key or e.config.ref_table.name))
+			if PVP.UI.hide_enemy_location then PVP.UI.hide_enemy_location() end
 		end
 	end
 end
@@ -85,21 +85,21 @@ end
 local skip_blind_ref = G.FUNCS.skip_blind
 G.FUNCS.skip_blind = function(e)
 	skip_blind_ref(e)
-	if MP.LOBBY.code then
+	if PVP.LOBBY.code then
 		-- Old timer: add time from skipping to own timer when not timered and not timering
 		if
-            MP.LOBBY.config.timer
-			and not MP.GAME.timer_started
-			and not MP.GAME.nemesis_timer_started
-            and not MP.GAME.timer_consumed
-            and not MP.is_any_layer_active({ "no_animation_timer", "pressure_timer" })
-			and (MP.LOBBY.config.timer_increment_seconds or 0) > 0
+            PVP.LOBBY.config.timer
+			and not PVP.GAME.timer_started
+			and not PVP.GAME.nemesis_timer_started
+            and not PVP.GAME.timer_consumed
+            and not PVP.is_any_layer_active({ "no_animation_timer", "pressure_timer" })
+			and (PVP.LOBBY.config.timer_increment_seconds or 0) > 0
         then
-            MP.UI.restore_timer(MP.LOBBY.config.timer_increment_seconds)
+            PVP.UI.restore_timer(PVP.LOBBY.config.timer_increment_seconds)
 		end
 
-		MP.ACTIONS.skip(G.GAME.skips)
-		MP.RLOG.record("skip_blind", 0, "action:skipBlind")
+		PVP.ACTIONS.skip(G.GAME.skips)
+		PVP.RLOG.record("skip_blind", 0, "action:skipBlind")
 
 		--Update the furthest blind
 		local temp_furthest_blind = 0
@@ -109,37 +109,37 @@ G.FUNCS.skip_blind = function(e)
 			temp_furthest_blind = G.GAME.round_resets.ante * 10 + 1
 		end
 
-		MP.GAME.pincher_index = MP.GAME.pincher_index + 1
+		PVP.GAME.pincher_index = PVP.GAME.pincher_index + 1
 
-		MP.GAME.furthest_blind = (temp_furthest_blind > MP.GAME.furthest_blind) and temp_furthest_blind
-			or MP.GAME.furthest_blind
+		PVP.GAME.furthest_blind = (temp_furthest_blind > PVP.GAME.furthest_blind) and temp_furthest_blind
+			or PVP.GAME.furthest_blind
 
-		MP.ACTIONS.set_furthest_blind(MP.GAME.furthest_blind)
+		PVP.ACTIONS.set_furthest_blind(PVP.GAME.furthest_blind)
 	end
 end
 
 function G.FUNCS.toggle_players_jokers()
-	if not G.jokers or not MP.end_game_jokers then return end
+	if not G.jokers or not PVP.end_game_jokers then return end
 
 	-- Avoid Jokers being removed from activating removal abilities (e.g. Negatives)
-	if MP.end_game_jokers.cards then
-		for _, card in pairs(MP.end_game_jokers.cards) do
+	if PVP.end_game_jokers.cards then
+		for _, card in pairs(PVP.end_game_jokers.cards) do
 			card.added_to_deck = false
 		end
 	end
 
-	if MP.end_game_jokers_text == localize("k_enemy_jokers") then
+	if PVP.end_game_jokers_text == localize("k_enemy_jokers") then
 		local your_jokers_save = copy_table(G.jokers:save())
-		MP.end_game_jokers:load(your_jokers_save)
-		MP.end_game_jokers_text = localize("k_your_jokers")
+		PVP.end_game_jokers:load(your_jokers_save)
+		PVP.end_game_jokers_text = localize("k_your_jokers")
 	else
-		if MP.end_game_jokers_received then
+		if PVP.end_game_jokers_received then
 			G.FUNCS.load_end_game_jokers()
 		else
-			if MP.end_game_jokers.cards then remove_all(MP.end_game_jokers.cards) end
-			MP.end_game_jokers.cards = {}
+			if PVP.end_game_jokers.cards then remove_all(PVP.end_game_jokers.cards) end
+			PVP.end_game_jokers.cards = {}
 		end
-		MP.end_game_jokers_text = localize("k_enemy_jokers")
+		PVP.end_game_jokers_text = localize("k_enemy_jokers")
 	end
 end
 
@@ -246,14 +246,14 @@ end
 
 function G.FUNCS:continue_in_singleplayer(e)
 	-- Detach from the multiplayer lobby (the API owns leave now; the legacy
-	-- MP.ACTIONS.leave_lobby() is a no-op here), then update UI. The run itself is kept
+	-- PVP.ACTIONS.leave_lobby() is a no-op here), then update UI. The run itself is kept
 	-- and reloaded below so the player continues solo.
-	MP.LOBBY.code = nil
+	PVP.LOBBY.code = nil
 	local lobby = MPAPI.get_current_lobby()
 	if lobby then
 		lobby:leave()
 	end
-	MP.UI.update_connection_status()
+	PVP.UI.update_connection_status()
 
 	-- Allow saving, save the run, and set up for continuation
 	G.F_NO_SAVING = false
@@ -413,7 +413,7 @@ end
 
 function G.FUNCS.overlay_endgame_menu()
 	G.FUNCS.overlay_menu({
-		definition = MP.GAME.won and create_UIBox_win() or create_UIBox_game_over(),
+		definition = PVP.GAME.won and create_UIBox_win() or create_UIBox_game_over(),
 		config = { no_esc = true },
 	})
 	G.E_MANAGER:add_event(Event({
@@ -427,7 +427,7 @@ function G.FUNCS.overlay_endgame_menu()
 				spot.config.object:remove()
 				spot.config.object = Jimbo
 				Jimbo.ui_object_updated = true
-				local jimbo_words = MP.GAME.won and "wq_" .. math.random(1, 7) or "lq_" .. math.random(1, 10)
+				local jimbo_words = PVP.GAME.won and "wq_" .. math.random(1, 7) or "lq_" .. math.random(1, 10)
 				Jimbo:add_speech_bubble(jimbo_words, nil, { quip = true })
 				Jimbo:say_stuff(5)
 			end
@@ -436,14 +436,14 @@ function G.FUNCS.overlay_endgame_menu()
 	}))
 end
 
-function MP.UI.ease_lives(mod, instant)
+function PVP.UI.ease_lives(mod, instant)
 	G.E_MANAGER:add_event(Event({
 		trigger = "immediate",
         blockable = not instant,
 		func = function()
 			if not G.hand_text_area then return end
 
-			if MP.LOBBY.config.disable_live_and_timer_hud then
+			if PVP.LOBBY.config.disable_live_and_timer_hud then
 				return true -- Returning nothing hangs the game because it's a part of an event
 			end
 
@@ -474,7 +474,7 @@ function MP.UI.ease_lives(mod, instant)
 	}))
 end
 
-function MP.UI.show_asteroid_hand_level_up()
+function PVP.UI.show_asteroid_hand_level_up()
 	local hand_priority = {
 		["Flush Five"] = 1,
 		["Flush House"] = 2,
@@ -510,7 +510,7 @@ function MP.UI.show_asteroid_hand_level_up()
 end
 
 --[[
-function MP.UI.create_UIBox_Misprint_Display()
+function PVP.UI.create_UIBox_Misprint_Display()
 	return {
 		n = G.UIT.ROOT,
 		config = { align = "cm", padding = 0.03, colour = G.C.CLEAR },
@@ -525,7 +525,7 @@ function MP.UI.create_UIBox_Misprint_Display()
 							id = "misprint_display",
 							func = "misprint_display_set",
 							object = DynaText({
-								string = { { ref_table = MP.GAME, ref_value = "misprint_display" } },
+								string = { { ref_table = PVP.GAME, ref_value = "misprint_display" } },
 								colours = { G.C.UI.TEXT_LIGHT },
 								shadow = true,
 								float = true,
@@ -578,7 +578,7 @@ function G.FUNCS.misprint_display_set(e)
 	})
 
 	-- Yes I know this is stupid
-	MP.GAME.misprint_display = localized_card[1][2].config.text .. localized_card[1][3].config.text
+	PVP.GAME.misprint_display = localized_card[1][2].config.text .. localized_card[1][3].config.text
 	e.config.object.colours = { G.C.SUITS[suit_full[suit]]
 --}
 --end

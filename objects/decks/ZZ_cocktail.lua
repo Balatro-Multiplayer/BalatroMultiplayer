@@ -23,7 +23,7 @@ SMODS.Back({
 		G.GAME.pseudorandom.seed = seed or generate_starting_seed()
 		G.GAME.modifiers.mp_cocktail = {}
 		G.GAME.modifiers.mp_cocktail_sticker = {}
-		local decks, forced = MP.get_cocktail_decks(true)
+		local decks, forced = PVP.get_cocktail_decks(true)
 		pseudoshuffle(decks, pseudoseed("mp_cocktail"))
 		local back = G.GAME.selected_back
 
@@ -47,7 +47,7 @@ SMODS.Back({
 			add_deck(i, forced[i], true)
 		end
 		for i = 1 + #forced, math.min(3, #decks) do
-			add_deck(i, decks[i], MP.cocktail_cfg_readpos("show", true) ~= "H" and true or false)
+			add_deck(i, decks[i], PVP.cocktail_cfg_readpos("show", true) ~= "H" and true or false)
 		end
 		local function merge(t1, t2, safe)
 			local t3 = {}
@@ -99,9 +99,9 @@ SMODS.Back({
 				G.GAME.modifiers.b_aij_patchwork = true
 			end
 		end
-		if MP.is_layer_active("smallworld") then MP.apply_fake_back_vouchers(back) end
+		if PVP.is_layer_active("smallworld") then PVP.apply_fake_back_vouchers(back) end
 		back.effect.mp_cocktailed = true
-		if MP.cocktail_check_edited() then G.GAME.seeded = true end
+		if PVP.cocktail_check_edited() then G.GAME.seeded = true end
 	end,
 	calculate = function(self, back, context)
 		for i = 1, #G.GAME.modifiers.mp_cocktail do
@@ -142,7 +142,7 @@ local sticker_x_pos = {
 	b_mp_echodeck = 22,
 }
 
-function MP.get_cocktail_decks(cull)
+function PVP.get_cocktail_decks(cull)
 	local ret = {}
 	local forced = {}
 	for k, v in pairs(G.P_CENTERS) do
@@ -156,9 +156,9 @@ function MP.get_cocktail_decks(cull)
 	if cull then
 		local _ret = {}
 		for i, v in ipairs(ret) do
-			if MP.cocktail_cfg_readpos(i, true) == "1" then
+			if PVP.cocktail_cfg_readpos(i, true) == "1" then
 				_ret[#_ret + 1] = ret[i]
-			elseif MP.cocktail_cfg_readpos(i, true) == "2" then
+			elseif PVP.cocktail_cfg_readpos(i, true) == "2" then
 				forced[#forced + 1] = ret[i]
 			end
 		end
@@ -214,8 +214,8 @@ function Card:click() -- i'd rather deal with the cardarea but this is fine i su
 					{ card_limit = 5, type = "title", highlight_limit = 999, collection = true }
 				)
 			end
-			local decks = MP.get_cocktail_decks()
-			local cfg = MP.config
+			local decks = PVP.get_cocktail_decks()
+			local cfg = PVP.config
 			for i, v in ipairs(decks) do
 				local row = math.floor((((i - 1) / #decks) * 2) + 1)
 				G.GAME.viewed_back = G.P_CENTERS[v]
@@ -232,12 +232,12 @@ function Card:click() -- i'd rather deal with the cardarea but this is fine i su
 				card.sprite_facing = "back"
 				card.facing = "back"
 				card.mp_cocktail_select = v
-				local num = MP.cocktail_cfg_readpos(i)
+				local num = PVP.cocktail_cfg_readpos(i)
 				card.highlighted = tonumber(num) >= 1 and true or false
 				card.mp_cocktail_forced = num == "2" and true or false
 			end
 			G.GAME.viewed_back = G.P_CENTERS["b_mp_cocktail"]
-			MP.show_cocktail_decks = MP.cocktail_cfg_readpos("show") ~= "H" and true or false
+			PVP.show_cocktail_decks = PVP.cocktail_cfg_readpos("show") ~= "H" and true or false
 			deck_tables = {}
 			for i = 1, #G.cocktail_select do
 				deck_tables[i] = {
@@ -262,10 +262,10 @@ function Card:click() -- i'd rather deal with the cardarea but this is fine i su
 							create_toggle({
 								id = "show_cocktail_decks",
 								label = "Show active decks during run",
-								ref_table = MP,
+								ref_table = PVP,
 								ref_value = "show_cocktail_decks",
 								callback = function(bool)
-									MP.cocktail_cfg_edit(bool, "show")
+									PVP.cocktail_cfg_edit(bool, "show")
 								end,
 							}),
 						},
@@ -486,7 +486,7 @@ function Card:highlight(is_highlighted)
 			self.mp_cocktail_forced = false
 		elseif shift then
 			is_highlighted = true
-			if MP.cocktail_get_forced_num() < 3 then
+			if PVP.cocktail_get_forced_num() < 3 then
 				self.mp_cocktail_forced = true
 				play_sound("foil1", 1.5, 0.3)
 			else
@@ -494,7 +494,7 @@ function Card:highlight(is_highlighted)
 				play_sound("timpani", 1.2, 0.7)
 			end
 		end
-		MP.cocktail_cfg_edit(self.mp_cocktail_forced and 2 or is_highlighted, self.mp_cocktail_select)
+		PVP.cocktail_cfg_edit(self.mp_cocktail_forced and 2 or is_highlighted, self.mp_cocktail_select)
 	end
 	return highlight_ref(self, is_highlighted)
 end
@@ -524,7 +524,7 @@ function Controller:queue_R_cursor_press(x, y)
 		else
 			play_sound("cardSlide2", nil, 0.3)
 		end
-		MP.cocktail_cfg_edit(highlight)
+		PVP.cocktail_cfg_edit(highlight)
 	end
 	return ret
 end
@@ -532,8 +532,8 @@ end
 -- kill me
 G.E_MANAGER:add_event(Event({
 	func = function()
-		local decks = MP.get_cocktail_decks()
-		local cfg = MP.config
+		local decks = PVP.get_cocktail_decks()
+		local cfg = PVP.config
 		if (not cfg.cocktail) or #decks + 1 ~= #cfg.cocktail then
 			local string = ""
 			for i = 1, #decks do
@@ -542,21 +542,21 @@ G.E_MANAGER:add_event(Event({
 			string = string .. "H"
 			cfg.cocktail = string
 		end
-		SMODS.save_mod_config(MP)
+		SMODS.save_mod_config(PVP)
 		return true
 	end,
 }))
 
-function MP.cocktail_cfg_edit(bool, deck) -- strings are easier to send, and it's just ones and zeroes
-	local decks = MP.get_cocktail_decks()
-	local cfg = MP.config
+function PVP.cocktail_cfg_edit(bool, deck) -- strings are easier to send, and it's just ones and zeroes
+	local decks = PVP.get_cocktail_decks()
+	local cfg = PVP.config
 	local num = (bool == 2) and "2" or (bool and "1" or "0")
 	if not deck then
 		local string = ""
 		for i = 1, #decks do
 			string = string .. num
 		end
-		local show = MP.cocktail_cfg_readpos("show")
+		local show = PVP.cocktail_cfg_readpos("show")
 		string = string .. show
 		cfg.cocktail = string
 	else
@@ -571,28 +571,28 @@ function MP.cocktail_cfg_edit(bool, deck) -- strings are easier to send, and it'
 		end
 		if deck == "show" then cfg.cocktail = replace(cfg.cocktail, #cfg.cocktail, bool and "S" or "H") end
 	end
-	MP.LOBBY.config.cocktail = cfg.cocktail
-	SMODS.save_mod_config(MP)
+	PVP.LOBBY.config.cocktail = cfg.cocktail
+	SMODS.save_mod_config(PVP)
 end
 
-function MP.cocktail_cfg_readpos(pos, construct)
-	local decks = MP.get_cocktail_decks() -- copypasted code. unsure how to make this less messy without making it more messy
-	local cfg = MP.config
+function PVP.cocktail_cfg_readpos(pos, construct)
+	local decks = PVP.get_cocktail_decks() -- copypasted code. unsure how to make this less messy without making it more messy
+	local cfg = PVP.config
 	if pos == "show" then pos = #cfg.cocktail end
-	if construct then return MP.cocktail_cfg_get():sub(pos, pos) end
+	if construct then return PVP.cocktail_cfg_get():sub(pos, pos) end
 	return cfg.cocktail:sub(pos, pos)
 end
 
-function MP.cocktail_cfg_get()
-	if MP.LOBBY.code and MP.LOBBY.deck and MP.LOBBY.deck.cocktail then
-		return MP.LOBBY.deck.cocktail
+function PVP.cocktail_cfg_get()
+	if PVP.LOBBY.code and PVP.LOBBY.deck and PVP.LOBBY.deck.cocktail then
+		return PVP.LOBBY.deck.cocktail
 	else
-		return MP.config.cocktail
+		return PVP.config.cocktail
 	end
 end
 
-function MP.cocktail_check_edited()
-	local str = MP.cocktail_cfg_get()
+function PVP.cocktail_check_edited()
+	local str = PVP.cocktail_cfg_get()
 	for i = 1, #str - 1 do
 		if string.sub(str, i, i) ~= "1" then return true end
 	end
@@ -600,8 +600,8 @@ function MP.cocktail_check_edited()
 	return false
 end
 
-function MP.cocktail_get_forced_num()
-	local str = MP.config.cocktail
+function PVP.cocktail_get_forced_num()
+	local str = PVP.config.cocktail
 	local c = 0
 	for i = 1, #str - 1 do
 		if string.sub(str, i, i) == "2" then c = c + 1 end
@@ -615,7 +615,7 @@ function localize(args, misc_cat)
 		local ret = localize_ref(args, misc_cat)
 		local key = args.key or args.node and args.node.config.center.key or "NULL"
 		if args.type == "name_text" and key == "b_mp_cocktail" then
-			if MP.cocktail_check_edited() then return ret .. "*" end
+			if PVP.cocktail_check_edited() then return ret .. "*" end
 		end
 		return ret
 	else

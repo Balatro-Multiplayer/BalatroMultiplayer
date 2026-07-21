@@ -1,10 +1,15 @@
 -- small file because it feels wrong to add it somewhere else
 
-function MP.should_hide_mp_content()
-	if (not MP.LOBBY.code) or not MP.current_ruleset().multiplayer_content then -- check for vanilla context
-		if MP.config.hide_mp_content then return true end
+-- Default-deny, consistent with the joker/consumable pool mechanism
+-- (MPAPI.should_exclude_from_pool): PvP's own Stakes/Decks/Challenges are hidden
+-- from the picker unless we're actually in a real PvP lobby whose ruleset uses MP
+-- content (same positive-case condition as before), or the player has explicitly
+-- opted into seeing them anyway.
+function PVP.should_hide_mp_content()
+	if PVP.LOBBY.code and PVP.current_ruleset().multiplayer_content then
+		return false
 	end
-	return false
+	return not PVP.config.show_mp_content_anyway
 end
 
 local hidden_tbl = { "Stake", "Back" } -- Challenges are at bottom of file
@@ -15,12 +20,12 @@ function SMODS.injectItems()
 	for _, hidden in ipairs(hidden_tbl) do
 		G.P_CENTER_POOLS[hidden .. "_non_mp"] = {}
 		for i, v in ipairs(G.P_CENTER_POOLS[hidden]) do
-			if not v.mod or v.mod.id ~= "Multiplayer" then table.insert(G.P_CENTER_POOLS[hidden .. "_non_mp"], v) end
+			if not v.mod or v.mod.id ~= PVP.id then table.insert(G.P_CENTER_POOLS[hidden .. "_non_mp"], v) end
 		end
 	end
 	G.CHALLENGES_non_mp = {}
 	for i, v in ipairs(G.CHALLENGES) do
-		if not v.mod or v.mod.id ~= "Multiplayer" then table.insert(G.CHALLENGES_non_mp, v) end
+		if not v.mod or v.mod.id ~= PVP.id then table.insert(G.CHALLENGES_non_mp, v) end
 	end
 	return ret
 end
@@ -28,7 +33,7 @@ end
 local function hook(orig, type)
 	return function(...)
 		local temp = G.P_CENTER_POOLS[type]
-		if MP.should_hide_mp_content() then G.P_CENTER_POOLS[type] = G.P_CENTER_POOLS[type .. "_non_mp"] end
+		if PVP.should_hide_mp_content() then G.P_CENTER_POOLS[type] = G.P_CENTER_POOLS[type .. "_non_mp"] end
 		local results = orig(...)
 		G.P_CENTER_POOLS[type] = temp
 		return results
@@ -67,7 +72,7 @@ local ch_hooks = {
 local function ch_hook(orig)
 	return function(...)
 		local temp = G.CHALLENGES
-		if MP.should_hide_mp_content() then G.CHALLENGES = G.CHALLENGES_non_mp end
+		if PVP.should_hide_mp_content() then G.CHALLENGES = G.CHALLENGES_non_mp end
 		local results = orig(...)
 		G.CHALLENGES = temp
 		return results

@@ -2,13 +2,13 @@
 -- and rewired to PvP. Same layout: a big Find Game, a Leaderboard/Practice stack, a
 -- Join Lobby column (by-code / from-clipboard), and a big Create Lobby.
 
-MP.main_menu = MP.main_menu or { buttons = {}, initialized = false }
+PVP.main_menu = PVP.main_menu or { buttons = {}, initialized = false }
 
 -- Distinct teal for the Leaderboard button (matches Speed).
 local _leaderboard_colour = { 0.20, 0.74, 0.72, 1 }
 
-function MP.main_menu.create_buttons()
-	local M = MP.main_menu
+function PVP.main_menu.create_buttons()
+	local M = PVP.main_menu
 	if M.initialized then
 		return
 	end
@@ -74,8 +74,8 @@ function MP.main_menu.create_buttons()
 		label = { localize("b_practice_cap") },
 		scale = 0.54,
 		col = true,
-		-- Disabled for now (Phase 6): practice mode is not wired yet.
-		enabled = false,
+		-- Practice is fully local (MPAPI.create_local_lobby) -- no server needed.
+		enabled = true,
 	})
 	b.leaderboard = MPAPI.disableable_button({
 		id = "mp_pvp_leaderboard",
@@ -94,8 +94,8 @@ function MP.main_menu.create_buttons()
 	M.initialized = true
 end
 
-MP.update_main_menu_buttons = function()
-	local M = MP.main_menu
+PVP.update_main_menu_buttons = function()
+	local M = PVP.main_menu
 	if not M.initialized then
 		return
 	end
@@ -107,8 +107,8 @@ MP.update_main_menu_buttons = function()
 end
 
 -- Swap the Find Game button between search / cancel (called by queue.lua).
-MP._show_searching_state = function(searching)
-	local M = MP.main_menu
+PVP._show_searching_state = function(searching)
+	local M = PVP.main_menu
 	if not M.initialized or not M.find_game_args then
 		return
 	end
@@ -124,10 +124,10 @@ MP._show_searching_state = function(searching)
 	M.buttons.find_game:update()
 end
 
-MP.build_pre_lobby_ui = function()
-	MP.main_menu.create_buttons()
+PVP.build_pre_lobby_ui = function()
+	PVP.main_menu.create_buttons()
 	MPAPI.set_logo_offset(0, true)
-	local b = MP.main_menu.buttons
+	local b = PVP.main_menu.buttons
 	return {
 		n = G.UIT.ROOT,
 		config = { align = "cm", colour = G.C.CLEAR },
@@ -214,7 +214,7 @@ G.FUNCS.mp_pvp_join_lobby_confirm = function()
 		text = text:match("^%s*(.-)%s*$") or ""
 		if #text > 0 then
 			G.FUNCS.exit_overlay_menu()
-			MP.pvp_join_lobby(text)
+			PVP.pvp_join_lobby(text)
 		end
 	end
 end
@@ -223,8 +223,67 @@ G.FUNCS.mp_pvp_join_lobby_from_clipboard = function()
 	local code = (love.system.getClipboardText and love.system.getClipboardText()) or ""
 	code = code:match("^%s*(.-)%s*$") or ""
 	if #code > 0 then
-		MP.pvp_join_lobby(code)
+		PVP.pvp_join_lobby(code)
 	end
 end
 
-G.FUNCS.mp_pvp_practice = function() end -- disabled placeholder
+-- ── Practice overlay ─────────────────────────────────────────────────────────
+-- Ruleset picker, not a gamemode picker: Royale/Nemesis both resolve to the same
+-- ruleset_mp_vanilla + gamemode_mp_attrition as plain Vanilla and have no distinguishing
+-- mechanic with a single practice player (see PVP._start_practice's header comment), so
+-- they're intentionally not offered here.
+G.FUNCS.mp_pvp_practice = function()
+	G.FUNCS.overlay_menu({
+		definition = create_UIBox_generic_options({
+			contents = {
+				{ n = G.UIT.R, config = { align = "cm", padding = 0.1 }, nodes = {
+					{ n = G.UIT.T, config = { text = "Practice", scale = 0.6, colour = G.C.UI.TEXT_LIGHT, shadow = true } },
+				} },
+				{
+					n = G.UIT.R,
+					config = { align = "cm", padding = 0.1 },
+					nodes = {
+						{ n = G.UIT.C, config = { align = "cm", padding = 0.08 }, nodes = {
+							UIBox_button({ button = "mp_pvp_practice_chocolate", label = { "Chocolate" }, colour = G.C.BLUE, minw = 2.5, minh = 2.0, scale = 0.5, col = true }),
+						} },
+						{ n = G.UIT.C, config = { align = "cm", padding = 0.08 }, nodes = {
+							UIBox_button({ button = "mp_pvp_practice_strawberry", label = { "Strawberry" }, colour = G.C.PURPLE, minw = 2.5, minh = 2.0, scale = 0.5, col = true }),
+						} },
+					},
+				},
+				{
+					n = G.UIT.R,
+					config = { align = "cm", padding = 0.1 },
+					nodes = {
+						{ n = G.UIT.C, config = { align = "cm", padding = 0.08 }, nodes = {
+							UIBox_button({ button = "mp_pvp_practice_vanilla", label = { "Vanilla" }, colour = G.C.GREEN, minw = 2.5, minh = 2.0, scale = 0.5, col = true }),
+						} },
+						{ n = G.UIT.C, config = { align = "cm", padding = 0.08 }, nodes = {
+							UIBox_button({ button = "mp_pvp_practice_smallworld", label = { "Small", "World" }, colour = G.C.RED, minw = 2.5, minh = 2.0, scale = 0.5, col = true }),
+						} },
+					},
+				},
+			},
+		}),
+	})
+end
+
+G.FUNCS.mp_pvp_practice_chocolate = function()
+	G.FUNCS.exit_overlay_menu()
+	PVP._start_practice("pvp_chocolate")
+end
+
+G.FUNCS.mp_pvp_practice_strawberry = function()
+	G.FUNCS.exit_overlay_menu()
+	PVP._start_practice("pvp_strawberry")
+end
+
+G.FUNCS.mp_pvp_practice_vanilla = function()
+	G.FUNCS.exit_overlay_menu()
+	PVP._start_practice("pvp_vanilla")
+end
+
+G.FUNCS.mp_pvp_practice_smallworld = function()
+	G.FUNCS.exit_overlay_menu()
+	PVP._start_practice("pvp_smallworld")
+end

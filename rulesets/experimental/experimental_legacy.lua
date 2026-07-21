@@ -1,8 +1,8 @@
-MP.Ruleset({
+PVP.Ruleset({
 	key = "experimental_legacy",
 	layers = { "classic" },
 	forced_gamemode = "gamemode_mp_attrition",
-	-- Let MP jokers through but ban everything but LGG
+	-- Let PVP jokers through but ban everything but LGG
 	multiplayer_content = true,
 	banned_silent = {
 		"j_mp_pizza",
@@ -24,7 +24,7 @@ MP.Ruleset({
 		"j_mp_lets_go_gambling",
 	},
 	force_lobby_options = function(self)
-		MP.LOBBY.config.the_order = true
+		PVP.LOBBY.config.the_order = true
 		return false
 	end,
 }):inject()

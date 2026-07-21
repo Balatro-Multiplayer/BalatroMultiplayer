@@ -1,11 +1,11 @@
 -- Outgoing transport bridge.
 --
--- The whole MP codebase emits network messages through Client.send({action=..., ...})
+-- The whole PVP codebase emits network messages through Client.send({action=..., ...})
 -- (defined in networking/action_handlers.lua). In the old model those went to the
 -- TCP server, which relayed/transformed them to the opponent. Here we override
 -- Client.send to translate each legacy message into the equivalent pvp_* ActionType
 -- broadcast over the API lobby (see actions.lua). All the per-action LOCAL work in
--- MP.ACTIONS.* still runs unchanged; only the transport + the server's transforms
+-- PVP.ACTIONS.* still runs unchanged; only the transport + the server's transforms
 -- move here.
 --
 -- Loaded inside MPAPI.on_loaded, after action_handlers.lua, so this override wins.
@@ -23,7 +23,7 @@ end
 
 -- Local player's live game state, for payloads the old server used to fill in.
 local function my_score_str()
-	return (MP.GAME.score and MP.INSANE_INT.to_string(MP.GAME.score)) or "0"
+	return (PVP.GAME.score and PVP.INSANE_INT.to_string(PVP.GAME.score)) or "0"
 end
 local function my_hands()
 	return (G.GAME and G.GAME.current_round and G.GAME.current_round.hands_left) or 0
@@ -32,15 +32,15 @@ local function my_skips()
 	return (G.GAME and G.GAME.skips) or 0
 end
 local function my_lives()
-	return MP.GAME.lives or 0
+	return PVP.GAME.lives or 0
 end
 
 local function gen_seed()
-	local cfg = MP.LOBBY.config
+	local cfg = PVP.LOBBY.config
 	if cfg.custom_seed and cfg.custom_seed ~= "random" and cfg.custom_seed ~= "" then
 		return cfg.custom_seed
 	end
-	return MP.generate_seed()
+	return PVP.generate_seed()
 end
 
 -- Map each legacy action to its peer broadcast. Anything not listed (lobby/auth/
@@ -49,7 +49,7 @@ local ROUTES = {
 	startGame = function(_msg)
 		-- Host generates the shared seed and starts everyone (host included via loopback).
 		local seed = gen_seed()
-		local stake = MP.LOBBY.deck.stake or MP.LOBBY.config.stake or 1
+		local stake = PVP.LOBBY.deck.stake or PVP.LOBBY.config.stake or 1
 		broadcast("pvp_start_game", { seed = seed, stake = tostring(stake) })
 	end,
 	stopGame = function(_msg)
@@ -82,7 +82,7 @@ local ROUTES = {
 		-- the legacy broadcast, so it doubles as the source for a server-side
 		-- replay's ante_snapshots.hands entries (see lib/log_parser.lua's
 		-- carbon_to_replay). Carbon-only -- no human-line equivalent exists.
-		if MP.RLOG then MP.RLOG.record("hand_result", { tostring(msg.score), msg.handsLeft }) end
+		if PVP.RLOG then PVP.RLOG.record("hand_result", { tostring(msg.score), msg.handsLeft }) end
 	end,
 	setAnte = function(msg)
 		broadcast("pvp_set_ante", { ante = msg.ante })
@@ -98,7 +98,7 @@ local ROUTES = {
 		-- Display sync is the active blind's own decision now (see objects/blinds/nemesis.lua).
 		MPAPI.calculate_blind({ discarded = true, skips = msg.skips, score = my_score_str(), hands_left = my_hands(), lives = my_lives() })
 		-- See playHand's hand_result comment above -- same rationale, for discards.
-		if MP.RLOG then MP.RLOG.record("hand_result", { my_score_str(), my_hands() }) end
+		if PVP.RLOG then PVP.RLOG.record("hand_result", { my_score_str(), my_hands() }) end
 	end,
 	startAnteTimer = function(msg)
 		broadcast("pvp_ante_timer", { time = msg.time, isPvP = msg.isPvP })
@@ -127,7 +127,7 @@ local ROUTES = {
 	end,
 }
 
-function MP.net_route(msg)
+function PVP.net_route(msg)
 	if type(msg) ~= "table" or not msg.action then
 		return
 	end
@@ -146,6 +146,6 @@ end
 -- defined in networking/action_handlers.lua.
 if Client then
 	Client.send = function(msg)
-		MP.net_route(msg)
+		PVP.net_route(msg)
 	end
 end

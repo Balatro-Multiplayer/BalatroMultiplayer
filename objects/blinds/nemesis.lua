@@ -41,33 +41,33 @@ MPAPI.Blind({
 
 	-- Display-only sync of the opponent's score/hands/skips/lives (was action_enemy_info).
 	-- Runs on the OTHER player's client (self-echo suppressed by the framework); writes the
-	-- MP.GAME.enemy.* store the HUD already reads. The referee (win/lose/lives) is separate,
+	-- PVP.GAME.enemy.* store the HUD already reads. The referee (win/lose/lives) is separate,
 	-- still driven by pvp_play_hand/pvp_skip.
 	receive = function(self, context)
-		MP.note_target_candidate(context.from)
-		if MP.current_target_id() and context.from ~= MP.current_target_id() then
+		PVP.note_target_candidate(context.from)
+		if PVP.current_target_id() and context.from ~= PVP.current_target_id() then
 			return
 		end
 		local d = context.data
-		local score = MP.INSANE_INT.from_string(d.score)
+		local score = PVP.INSANE_INT.from_string(d.score)
 		local hands_left = tonumber(d.handsLeft)
 		local skips = tonumber(d.skips)
 		local lives = tonumber(d.lives)
 
 		-- No-animation timer: opponent skip adds time immediately.
-		if skips and MP.GAME.enemy.skips ~= skips then
-			for _ = 1, skips - MP.GAME.enemy.skips do
-				MP.GAME.enemy.spent_in_shop[#MP.GAME.enemy.spent_in_shop + 1] = 0
+		if skips and PVP.GAME.enemy.skips ~= skips then
+			for _ = 1, skips - PVP.GAME.enemy.skips do
+				PVP.GAME.enemy.spent_in_shop[#PVP.GAME.enemy.spent_in_shop + 1] = 0
 				if
-					MP.GAME.enemy.skips < skips
-					and MP.LOBBY.config.timer
-					and not MP.GAME.timer_started
-					and not MP.GAME.nemesis_timer_started
-					and not MP.GAME.timer_consumed
-					and MP.is_any_layer_active({ "no_animation_timer", "pressure_timer" })
-					and (MP.LOBBY.config.timer_increment_seconds or 0) > 0
+					PVP.GAME.enemy.skips < skips
+					and PVP.LOBBY.config.timer
+					and not PVP.GAME.timer_started
+					and not PVP.GAME.nemesis_timer_started
+					and not PVP.GAME.timer_consumed
+					and PVP.is_any_layer_active({ "no_animation_timer", "pressure_timer" })
+					and (PVP.LOBBY.config.timer_increment_seconds or 0) > 0
 				then
-					MP.UI.restore_timer(MP.LOBBY.config.timer_increment_seconds)
+					PVP.UI.restore_timer(PVP.LOBBY.config.timer_increment_seconds)
 				end
 			end
 		end
@@ -77,16 +77,16 @@ MPAPI.Blind({
 			return
 		end
 
-		if MP.INSANE_INT.greater_than(score, MP.GAME.enemy.highest_score) then MP.GAME.enemy.highest_score = score end
+		if PVP.INSANE_INT.greater_than(score, PVP.GAME.enemy.highest_score) then PVP.GAME.enemy.highest_score = score end
 
 		-- PvP timer: stop timer according to score.
-		if MP.is_pvp_boss() and MP.is_layer_active("pvp_timer") then
-			if MP.INSANE_INT.greater_than(MP.GAME.score, score) then
-				MP.GAME.nemesis_timer_started = false
-			elseif MP.INSANE_INT.equal(MP.GAME.score, score) and MP.GAME.pvp_reached_first then
-				MP.GAME.nemesis_timer_started = false
+		if PVP.is_pvp_boss() and PVP.is_layer_active("pvp_timer") then
+			if PVP.INSANE_INT.greater_than(PVP.GAME.score, score) then
+				PVP.GAME.nemesis_timer_started = false
+			elseif PVP.INSANE_INT.equal(PVP.GAME.score, score) and PVP.GAME.pvp_reached_first then
+				PVP.GAME.nemesis_timer_started = false
 			else
-				MP.GAME.timer_started = false
+				PVP.GAME.timer_started = false
 			end
 		end
 
@@ -95,7 +95,7 @@ MPAPI.Blind({
 			blocking = false,
 			trigger = "ease",
 			delay = 3,
-			ref_table = MP.GAME.enemy.score,
+			ref_table = PVP.GAME.enemy.score,
 			ref_value = "e_count",
 			ease_to = score.e_count,
 			func = function(t)
@@ -107,7 +107,7 @@ MPAPI.Blind({
 			blocking = false,
 			trigger = "ease",
 			delay = 3,
-			ref_table = MP.GAME.enemy.score,
+			ref_table = PVP.GAME.enemy.score,
 			ref_value = "coeffiocient", -- misspelled in InsaneInt
 			ease_to = score.coeffiocient,
 			func = function(t)
@@ -121,7 +121,7 @@ MPAPI.Blind({
 			blocking = false,
 			trigger = "ease",
 			delay = 3,
-			ref_table = MP.GAME.enemy.score,
+			ref_table = PVP.GAME.enemy.score,
 			ref_value = "exponent",
 			ease_to = score.exponent,
 			func = function(t)
@@ -129,26 +129,26 @@ MPAPI.Blind({
 			end,
 		}))
 
-		if MP.GAME.enemy.lives > lives then
+		if PVP.GAME.enemy.lives > lives then
 			play_sound("holo1", 0.865, 0.9)
 			play_sound("gong", 0.765, 0.4)
 		end
-		if MP.GAME.enemy.skips < skips then
+		if PVP.GAME.enemy.skips < skips then
 			play_sound("negative", 0.865, 0.4)
 			play_sound("gong", 0.765, 0.4)
 		end
 
-		MP.GAME.enemy.real_score = score
-		MP.GAME.enemy.hands = hands_left
-		MP.GAME.enemy.skips = skips
-		MP.GAME.enemy.lives = lives
+		PVP.GAME.enemy.real_score = score
+		PVP.GAME.enemy.hands = hands_left
+		PVP.GAME.enemy.skips = skips
+		PVP.GAME.enemy.lives = lives
 		-- We've now heard from the opponent this blind: unmask their hands count.
-		MP.GAME.enemy.info_received = true
-		if MP.UI.juice_up_pvp_hud then MP.UI.juice_up_pvp_hud() end
+		PVP.GAME.enemy.info_received = true
+		if PVP.UI.juice_up_pvp_hud then PVP.UI.juice_up_pvp_hud() end
 	end,
 })
 
-function MP.is_pvp_boss()
+function PVP.is_pvp_boss()
 	if not G.GAME or not G.GAME.blind or not G.GAME.blind.config.blind then return false end
 	return G.GAME.blind.config.blind.key == "bl_mp_nemesis" or G.GAME.blind.pvp
 end

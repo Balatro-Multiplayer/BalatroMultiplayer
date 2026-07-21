@@ -1,13 +1,13 @@
 --[[ gotta redefine the logic
-MP.ReworkCenter({
+PVP.ReworkCenter({
 	key = "c_judgement",
-	ruleset = MP.UTILS.get_standard_rulesets({'minorleague'}),
+	ruleset = PVP.UTILS.get_standard_rulesets({'minorleague'}),
 	silent = true,
 	use = function(self, card, area, copier)
 		local _card = copier or card
 		G.E_MANAGER:add_event(Event({trigger = 'after', delay = 0.4, func = function()
 			play_sound('timpani')
-			if MP.INTEGRATIONS.TheOrder then -- this only matters if order exists
+			if PVP.INTEGRATIONS.TheOrder then -- this only matters if order exists
 				local done = false
 				while not done do -- AHHH we have to do so much boilerplate
 					done = true

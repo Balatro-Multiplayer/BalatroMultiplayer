@@ -1,4 +1,4 @@
-function MP.UI.create_spacer(size, row)
+function PVP.UI.create_spacer(size, row)
 	size = size or 0.2
 
 	return row and {

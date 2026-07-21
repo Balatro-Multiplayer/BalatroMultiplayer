@@ -19,17 +19,17 @@ MPAPI.Joker({
 	-- Shows a display-only copy on the opponent's board (framework wires add/remove_from_deck).
 	phantom = true,
 	loc_vars = function(self, info_queue, card)
-		MP.UTILS.add_nemesis_info(info_queue)
+		PVP.UTILS.add_nemesis_info(info_queue)
 		return { vars = { card.ability.extra.x_mult_gain, card.ability.extra.max_x_mult, card.ability.extra.x_mult } }
 	end,
 	mp_include = function(self)
-		return MP.LOBBY.code and MP.LOBBY.config.multiplayer_jokers and not MP.is_layer_active(MP.LayerKey.SANDBOX)
+		return MPAPI.mod_isolation_active(PVP.id) and not PVP.is_layer_active(PVP.LayerKey.SANDBOX)
 	end,
 	update = function(self, card, dt)
-		if MP.LOBBY.code then
+		if PVP.LOBBY.code then
 			if G.STAGE == G.STAGES.RUN then
 				card.ability.extra.x_mult = math.max(
-					math.min(1 + (MP.GAME.enemy.hands * card.ability.extra.x_mult_gain), card.ability.extra.max_x_mult),
+					math.min(1 + (PVP.GAME.enemy.hands * card.ability.extra.x_mult_gain), card.ability.extra.max_x_mult),
 					1
 				)
 			end
@@ -41,7 +41,7 @@ MPAPI.Joker({
 		if
 			context.cardarea == G.jokers
 			and context.joker_main
-			and MP.is_pvp_boss()
+			and PVP.is_pvp_boss()
 			and (not card.edition or card.edition.type ~= "mp_phantom")
 		then
 			return {

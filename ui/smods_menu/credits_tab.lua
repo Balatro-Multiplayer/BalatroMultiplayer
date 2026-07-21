@@ -1,4 +1,4 @@
-function MP.UI.create_credits_tab()
+function PVP.UI.create_credits_tab()
 	local scale = 0.75
 	return {
 		n = G.UIT.ROOT,
@@ -12,24 +12,24 @@ function MP.UI.create_credits_tab()
 			colour = G.C.BLACK,
 		},
 		nodes = {
-			MP.UI.UTILS.create_row({ padding = 0.2, align = "cm" }, {
-				MP.UI.UTILS.create_text_node(localize("k_created_by"), {
+			PVP.UI.UTILS.create_row({ padding = 0.2, align = "cm" }, {
+				PVP.UI.UTILS.create_text_node(localize("k_created_by"), {
 					scale = scale * 0.8,
 					colour = G.C.UI.TEXT_LIGHT,
 				}),
-				MP.UI.UTILS.create_text_node("Virtualized", {
+				PVP.UI.UTILS.create_text_node("Virtualized", {
 					scale = scale * 0.8,
 					colour = G.C.DARK_EDITION,
 				}),
 			}),
-			MP.UI.UTILS.create_row({ align = "cm", padding = 0 }, {
-				MP.UI.UTILS.create_text_node(localize("k_major_contributors"), {
+			PVP.UI.UTILS.create_row({ align = "cm", padding = 0 }, {
+				PVP.UI.UTILS.create_text_node(localize("k_major_contributors"), {
 					scale = scale * 0.8,
 					colour = G.C.UI.TEXT_LIGHT,
 				}),
 			}),
-			MP.UI.UTILS.create_row({ align = "cm", padding = 0.2 }, {
-				MP.UI.UTILS.create_text_node(
+			PVP.UI.UTILS.create_row({ align = "cm", padding = 0.2 }, {
+				PVP.UI.UTILS.create_text_node(
 					localize({
 						type = "variable",
 						key = "k_credits_list",
@@ -41,14 +41,14 @@ function MP.UI.create_credits_tab()
 					}
 				),
 			}),
-			MP.UI.UTILS.create_row({ align = "cm", padding = 0 }, {
+			PVP.UI.UTILS.create_row({ align = "cm", padding = 0 }, {
 				UIBox_button({
 					minw = 3.85,
 					button = "bmp_github",
 					label = { localize("b_github_project") },
 				}),
 			}),
-			MP.UI.UTILS.create_row({ align = "cm", padding = 0 }, {
+			PVP.UI.UTILS.create_row({ align = "cm", padding = 0 }, {
 				UIBox_button({
 					minw = 3.85 * 2,
 					button = "bmp_discord",

@@ -1,5 +1,5 @@
 -- Credit to Steamo (https://github.com/Steamopollys/Steamodded/blob/main/core/core.lua)
-function MP.UTILS.wrapText(text, maxChars)
+function PVP.UTILS.wrapText(text, maxChars)
 	local wrappedText = ""
 	local currentLineLength = 0
 
@@ -16,7 +16,7 @@ function MP.UTILS.wrapText(text, maxChars)
 	return wrappedText
 end
 
-function MP.UTILS.string_split(inputstr, sep)
+function PVP.UTILS.string_split(inputstr, sep)
 	if sep == nil then sep = "%s" end
 	local t = {}
 	for str in string.gmatch(inputstr, "([^" .. sep .. "]+)") do
@@ -25,6 +25,6 @@ function MP.UTILS.string_split(inputstr, sep)
 	return t
 end
 
-function MP.UTILS.string_starts(str, prefix)
+function PVP.UTILS.string_starts(str, prefix)
     return str:sub(1, #prefix) == prefix
 end

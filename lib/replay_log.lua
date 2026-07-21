@@ -1,4 +1,4 @@
--- Replay Log (MP.RLOG): dual-stream, deterministic, fully-recreatable action log.
+-- Replay Log (PVP.RLOG): dual-stream, deterministic, fully-recreatable action log.
 --
 -- Two streams are emitted from the SAME instrumentation points so they stay
 -- event-for-event aligned (shared elapsed-ms timestamp). Both go into the
@@ -37,7 +37,7 @@
 -- recomputes from its own buffered events and compares against at match-
 -- resolve time (matchmaking.service.ts's evaluateAntiCheat, Phase 8) to flag a
 -- tampered log. The human stream's hash (human_hash) stays on the cheap
--- MP.UTILS.joker_hash (Adler-style) -- it's never server-verified, just a
+-- PVP.UTILS.joker_hash (Adler-style) -- it's never server-verified, just a
 -- local corruption check. Full re-simulation anti-cheat remains future work.
 --
 -- Live transport: every event (including the MANIFEST/END/CHK framing lines)
@@ -51,7 +51,7 @@
 -- no-op (no lobby, practice mode, tests) without breaking local logging.
 
 local RLOG = {}
-MP.RLOG = RLOG
+PVP.RLOG = RLOG
 
 RLOG.CARBON_PREFIX = "MP_RLOG:" -- positional / replay stream
 RLOG.HUMAN_PREFIX = "Client sent message:" -- human-readable stream (website-compatible)
@@ -94,8 +94,8 @@ RLOG._game_id = nil -- generated in begin_run
 -- simulation have no lobby code, so they never emit.
 function RLOG.is_active()
 	if RLOG._force_active then return true end
-	if not (MP.LOBBY and MP.LOBBY.code) then return false end
-	if MP.GHOST and MP.GHOST.is_active and MP.GHOST.is_active() then return false end
+	if not (PVP.LOBBY and PVP.LOBBY.code) then return false end
+	if PVP.GHOST and PVP.GHOST.is_active and PVP.GHOST.is_active() then return false end
 	return true
 end
 
@@ -287,7 +287,7 @@ end
 -- canonical_hash_input's positional-tuple JSON -- deliberately NOT over
 -- carbon_str's text lines, since a byte-identical text re-formatting is much
 -- harder to guarantee cross-language than re-encoding the same JSON tuples.
--- human_hash stays on the cheap Adler-style MP.UTILS.joker_hash -- it's never
+-- human_hash stays on the cheap Adler-style PVP.UTILS.joker_hash -- it's never
 -- server-verified, purely a local corruption check on the website-compatible
 -- stream.
 function RLOG.end_run(outcome)
@@ -300,7 +300,7 @@ function RLOG.end_run(outcome)
 	local carbon_str = table.concat(RLOG._carbon_buffer, "\n")
 	local human_str = table.concat(RLOG._human_buffer, "\n")
 	local carbon_hash = love.data.encode("string", "hex", love.data.hash("sha256", canonical_hash_input()))
-	local human_hash = MP.UTILS.joker_hash(human_str)
+	local human_hash = PVP.UTILS.joker_hash(human_str)
 	local bytes = #carbon_str + #human_str
 
 	local chk_args = { carbon = carbon_hash, human = human_hash, bytes = bytes }

@@ -1,4 +1,4 @@
-MP.Ruleset({
+PVP.Ruleset({
 	key = "traditional",
 	layers = { "standard" },
 	banned_jokers = {
@@ -6,7 +6,7 @@ MP.Ruleset({
 		"j_mp_conjoined_joker",
 	},
 	force_lobby_options = function(self)
-		MP.LOBBY.config.timer = false
+		PVP.LOBBY.config.timer = false
 		return false
 	end,
 }):inject()

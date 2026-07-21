@@ -11,7 +11,7 @@ MPAPI.Layer("smallworld", {
 				and not G.GAME.banned_keys[k]
 				and not (v.requires or v.hidden)
 				and k ~= "j_cavendish"
-				and (not v.mp_include or v:mp_include())
+				and not MPAPI.should_exclude_from_pool(v)
 			then
 				local index = v.set .. (v.rarity or "")
 				tables[index] = tables[index] or {}
@@ -21,7 +21,7 @@ MPAPI.Layer("smallworld", {
 			if v.set == "Voucher" and v.requires then requires[#requires + 1] = k end
 		end
 		for k, v in pairs(G.P_TAGS) do -- tag exemption
-			if not G.GAME.banned_keys[k] and (not v.mp_include or v:mp_include()) then
+			if not G.GAME.banned_keys[k] and not MPAPI.should_exclude_from_pool(v) then
 				tables["Tag"] = tables["Tag"] or {}
 				local t = tables["Tag"]
 				t[#t + 1] = k
@@ -33,7 +33,7 @@ MPAPI.Layer("smallworld", {
 				pseudoshuffle(v, pseudoseed(k .. "_mp_smallworld"))
 				local threshold = math.floor(0.5 + (#v * 0.75))
 				local ii = 1
-				if k == "Voucher" and not MP.legacy_smallworld() then ii = ii + 1 end
+				if k == "Voucher" and not PVP.legacy_smallworld() then ii = ii + 1 end
 				for i, vv in ipairs(v) do
 					if ii <= threshold then
 						G.GAME.banned_keys[vv] = true
@@ -54,7 +54,7 @@ MPAPI.Layer("smallworld", {
 
 local showman_ref = SMODS.showman
 function SMODS.showman(card_key)
-	if MP.is_layer_active("smallworld") then return true end
+	if PVP.is_layer_active("smallworld") then return true end
 	return showman_ref(card_key)
 end
 
@@ -63,11 +63,11 @@ local tag_init_ref = Tag.init
 function Tag:init(_tag, for_collection, _blind_type)
 	local orbital = false
 	local old = G.orbital_hand -- i think this is always nil here but just to be safe
-	if MP.is_layer_active("smallworld") and not MP.legacy_smallworld() then
+	if PVP.is_layer_active("smallworld") and not PVP.legacy_smallworld() then
 		if G.GAME.banned_keys[_tag] and not G.OVERLAY_MENU then
 			local a = G.GAME.round_resets.ante
 
-			if MP.should_use_the_order() then G.GAME.round_resets.ante = 10 end
+			if PVP.should_use_the_order() then G.GAME.round_resets.ante = 10 end
 
 			_tag = get_next_tag_key("replace")
 			if _tag == "tag_orbital" then orbital = true end
@@ -75,18 +75,18 @@ function Tag:init(_tag, for_collection, _blind_type)
 			G.GAME.round_resets.ante = a
 		end
 	end
-	if orbital then G.orbital_hand = pseudorandom_element(MP.sorted_hand_list(), pseudoseed("orbital_replace")) end
+	if orbital then G.orbital_hand = pseudorandom_element(PVP.sorted_hand_list(), pseudoseed("orbital_replace")) end
 	tag_init_ref(self, _tag, for_collection, _blind_type)
 	G.orbital_hand = old
 end
 
 local apply_to_run_ref = Back.apply_to_run
 function Back:apply_to_run()
-	if MP.is_layer_active("smallworld") and not MP.legacy_smallworld() then MP.apply_fake_back_vouchers(self) end
+	if PVP.is_layer_active("smallworld") and not PVP.legacy_smallworld() then PVP.apply_fake_back_vouchers(self) end
 	return apply_to_run_ref(self)
 end
 
-function MP.apply_fake_back_vouchers(back)
+function PVP.apply_fake_back_vouchers(back)
 	local vouchers = {}
 	if back.effect.config.voucher then vouchers = { back.effect.config.voucher } end
 	if back.effect.config.vouchers or #vouchers > 0 then
@@ -114,7 +114,7 @@ end
 
 local add_joker_ref = add_joker
 function add_joker(joker, edition, silent, eternal)
-	if MP.is_layer_active("smallworld") and G.GAME.banned_keys[joker] then
+	if PVP.is_layer_active("smallworld") and G.GAME.banned_keys[joker] then
 		local _pool = nil
 		local _pool_key = nil
 		local rarities = { [1] = 0, [2] = 0.9, [3] = 1, [4] = 1 }
@@ -133,7 +133,7 @@ function add_joker(joker, edition, silent, eternal)
 			it = it + 1
 			center = pseudorandom_element(
 				_pool,
-				pseudoseed(_pool_key .. (MP.should_use_the_order() and "" or ("_resample" .. it)))
+				pseudoseed(_pool_key .. (PVP.should_use_the_order() and "" or ("_resample" .. it)))
 			)
 		end
 		joker = center
@@ -143,7 +143,7 @@ end
 
 local card_apply_to_run_ref = Card.apply_to_run
 function Card:apply_to_run(center)
-	if MP.is_layer_active("smallworld") then
+	if PVP.is_layer_active("smallworld") then
 		if not self and center and G.GAME.banned_keys[center.key] then
 			G.GAME.used_vouchers[center.key] = nil
 			center = G.P_CENTERS[get_next_voucher_key()]
@@ -153,6 +153,6 @@ function Card:apply_to_run(center)
 	return card_apply_to_run_ref(self, center)
 end
 
-function MP.legacy_smallworld()
-	return MP.LOBBY.code and MP.LOBBY.config and MP.LOBBY.config.legacy_smallworld
+function PVP.legacy_smallworld()
+	return PVP.LOBBY.code and PVP.LOBBY.config and PVP.LOBBY.config.legacy_smallworld
 end

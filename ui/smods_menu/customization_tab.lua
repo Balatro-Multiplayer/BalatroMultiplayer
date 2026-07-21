@@ -1,18 +1,18 @@
-function MP.UI.create_customization_tab()
+function PVP.UI.create_customization_tab()
 	local blind_anim = AnimatedSprite(
 		0,
 		0,
 		1.4,
 		1.4,
 		G.ANIMATION_ATLAS["mp_player_blind_col"],
-		G.P_BLINDS[MP.UTILS.blind_col_numtokey(MP.LOBBY.blind_col)].pos
+		G.P_BLINDS[PVP.UTILS.blind_col_numtokey(PVP.LOBBY.blind_col)].pos
 	)
 	blind_anim:define_draw_steps({
 		{ shader = "dissolve", shadow_height = 0.05 },
 		{ shader = "dissolve" },
 	})
-	MP.PREVIEW.text = MP.config.preview.text or ""
-	MP.PREVIEW.button = MP.config.preview.button or ""
+	PVP.PREVIEW.text = PVP.config.preview.text or ""
+	PVP.PREVIEW.button = PVP.config.preview.button or ""
 	local ret = {
 		n = G.UIT.ROOT,
 		config = {
@@ -23,7 +23,7 @@ function MP.UI.create_customization_tab()
 			colour = G.C.BLACK,
 		},
 		nodes = {
-			MP.INTEGRATIONS.Preview and {
+			PVP.INTEGRATIONS.Preview and {
 				n = G.UIT.R,
 				config = {
 					padding = 0.10,
@@ -41,7 +41,7 @@ function MP.UI.create_customization_tab()
 					},
 				},
 			} or nil,
-			MP.INTEGRATIONS.Preview and {
+			PVP.INTEGRATIONS.Preview and {
 				n = G.UIT.R,
 				config = {
 					padding = 0,
@@ -59,7 +59,7 @@ function MP.UI.create_customization_tab()
 					},
 				},
 			} or nil,
-			MP.INTEGRATIONS.Preview
+			PVP.INTEGRATIONS.Preview
 					and {
 						n = G.UIT.R,
 						config = {
@@ -75,12 +75,12 @@ function MP.UI.create_customization_tab()
 								prompt_text = "CALCULATING", -- raw string but this doesn't need localization
 								colour = copy_table(G.C.BLACK),
 								hooked_colour = darken(copy_table(G.C.BLACK), 0.3),
-								ref_table = MP.PREVIEW,
+								ref_table = PVP.PREVIEW,
 								ref_value = "text",
 								extended_corpus = true,
 								keyboard_offset = -3,
 								callback = function(val)
-									MP.UTILS.save_preview(MP.PREVIEW)
+									PVP.UTILS.save_preview(PVP.PREVIEW)
 								end,
 							}),
 							create_text_input({
@@ -90,12 +90,12 @@ function MP.UI.create_customization_tab()
 								prompt_text = "Calculate Score",
 								colour = copy_table(G.C.RED),
 								hooked_colour = darken(copy_table(G.C.RED), 0.3),
-								ref_table = MP.PREVIEW,
+								ref_table = PVP.PREVIEW,
 								ref_value = "button",
 								extended_corpus = true,
 								keyboard_offset = -3,
 								callback = function(val)
-									MP.UTILS.save_preview(MP.PREVIEW)
+									PVP.UTILS.save_preview(PVP.PREVIEW)
 								end,
 							}),
 						},
@@ -122,12 +122,12 @@ function MP.UI.create_customization_tab()
 						w = 4,
 						max_length = 25,
 						prompt_text = localize("k_enter_username"),
-						ref_table = MP.LOBBY,
+						ref_table = PVP.LOBBY,
 						ref_value = "username",
 						extended_corpus = true,
 						keyboard_offset = -3,
 						callback = function(val)
-							MP.UTILS.save_username(MP.LOBBY.username)
+							PVP.UTILS.save_username(PVP.LOBBY.username)
 						end,
 					}),
 					{
@@ -163,7 +163,7 @@ function MP.UI.create_customization_tab()
 								id = "blind_col_changer_option",
 								label = localize({
 									type = "name_text",
-									key = MP.UTILS.blind_col_numtokey(MP.LOBBY.blind_col),
+									key = PVP.UTILS.blind_col_numtokey(PVP.LOBBY.blind_col),
 									set = "Blind",
 								}),
 								scale = 0.8,
@@ -195,7 +195,7 @@ function MP.UI.create_customization_tab()
 									25,
 								}, -- blind_cols are being saved as numbers because of this option cycle. if this is changed then we should probably change to keys
 								opt_callback = "change_blind_col",
-								current_option = MP.LOBBY.blind_col,
+								current_option = PVP.LOBBY.blind_col,
 							}),
 						},
 					},
@@ -206,11 +206,11 @@ function MP.UI.create_customization_tab()
 	return ret
 end
 
-function MP.UI.create_extra_tabs()
+function PVP.UI.create_extra_tabs()
 	return {
 		{
 			label = localize("k_customization"),
-			tab_definition_function = MP.UI.create_customization_tab,
+			tab_definition_function = PVP.UI.create_customization_tab,
 		},
 	}
 end

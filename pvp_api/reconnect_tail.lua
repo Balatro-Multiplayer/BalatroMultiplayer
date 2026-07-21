@@ -16,14 +16,14 @@
 -- full sync payload (score, handsLeft, skips, lives together) and is designed
 -- for one-shot live transitions; the buffered hand_result carbon event only
 -- carries {score, hands_left} (see pvp_api/net.lua). Writes directly to the
--- same MP.GAME.enemy.* fields `receive` writes instead. skips/lives are a
+-- same PVP.GAME.enemy.* fields `receive` writes instead. skips/lives are a
 -- known, accepted gap -- bounded to the grace-period window and
 -- self-correcting via the opponent's next live sync (see the design plan).
-MP.RECONNECT_TAIL = MP.RECONNECT_TAIL or {}
+PVP.RECONNECT_TAIL = PVP.RECONNECT_TAIL or {}
 
 -- At most one pending catch-up -- a second reconnect before the first drains
 -- just replaces it; fetch_and_apply always asks since the last APPLIED `t`
--- (MP.RLOG._last_seen_t), so nothing is lost by collapsing to one.
+-- (PVP.RLOG._last_seen_t), so nothing is lost by collapsing to one.
 local pending_opponent_id = nil
 
 local function apply_hand_result(ev)
@@ -31,30 +31,30 @@ local function apply_hand_result(ev)
 	local score_str, hands_left = args[1], args[2]
 
 	if score_str ~= nil then
-		local score = MP.INSANE_INT.from_string(tostring(score_str))
+		local score = PVP.INSANE_INT.from_string(tostring(score_str))
 		-- .score (not just .real_score) is what blind_hud.lua's score_text
 		-- actually renders from -- set both so the visible number, not just
 		-- comparisons like highest_score, catches up. An instant snap (no
 		-- easing event, unlike nemesis.lua's live-sync animation) is fine here:
 		-- this is a one-time catch-up after a gap, not an incremental update.
-		MP.GAME.enemy.score = score
-		MP.GAME.enemy.real_score = score
-		if MP.INSANE_INT.greater_than(score, MP.GAME.enemy.highest_score) then
-			MP.GAME.enemy.highest_score = score
+		PVP.GAME.enemy.score = score
+		PVP.GAME.enemy.real_score = score
+		if PVP.INSANE_INT.greater_than(score, PVP.GAME.enemy.highest_score) then
+			PVP.GAME.enemy.highest_score = score
 		end
 	end
 
 	if hands_left ~= nil then
-		MP.GAME.enemy.hands = tonumber(hands_left) or MP.GAME.enemy.hands
+		PVP.GAME.enemy.hands = tonumber(hands_left) or PVP.GAME.enemy.hands
 	end
 
 	-- We've now heard from the opponent (even if only via the buffered tail,
 	-- not a live sync) -- unmask their hands/score same as a real receive().
-	MP.GAME.enemy.info_received = true
+	PVP.GAME.enemy.info_received = true
 end
 
 local function apply_tail(opponent_id, events)
-	local last_t = MP.RLOG._last_seen_t[opponent_id] or 0
+	local last_t = PVP.RLOG._last_seen_t[opponent_id] or 0
 	for _, ev in ipairs(events or {}) do
 		if ev.opcode == "hand_result" then
 			apply_hand_result(ev)
@@ -63,15 +63,15 @@ local function apply_tail(opponent_id, events)
 			last_t = ev.t
 		end
 	end
-	MP.RLOG._last_seen_t[opponent_id] = last_t
-	if MP.UI and MP.UI.juice_up_pvp_hud then
-		pcall(MP.UI.juice_up_pvp_hud)
+	PVP.RLOG._last_seen_t[opponent_id] = last_t
+	if PVP.UI and PVP.UI.juice_up_pvp_hud then
+		pcall(PVP.UI.juice_up_pvp_hud)
 	end
 end
 
 local function fetch_and_apply(opponent_id)
-	local since_t = MP.RLOG._last_seen_t[opponent_id] or 0
-	MPAPI.replay.get_tail(MP.LOBBY.code, opponent_id, since_t, function(err, data)
+	local since_t = PVP.RLOG._last_seen_t[opponent_id] or 0
+	MPAPI.replay.get_tail(PVP.LOBBY.code, opponent_id, since_t, function(err, data)
 		if err or not data or not data.events then
 			sendWarnMessage("RECONNECT_TAIL: get_tail failed: " .. tostring(err), "MULTIPLAYER")
 			return
@@ -82,10 +82,10 @@ end
 
 -- Called from PLAYER_RECONNECTED when THIS client is the one that just
 -- reconnected (see pvp_api/lobby_bridge.lua). Never applies inline -- always
--- queues for the next confirmed-safe checkpoint (MP.RECONNECT_TAIL.on_checkpoint,
+-- queues for the next confirmed-safe checkpoint (PVP.RECONNECT_TAIL.on_checkpoint,
 -- called from the select_blind/cash_out hooks), since "reconnect just
 -- happened" carries no guarantee about what's currently animating on screen.
-function MP.RECONNECT_TAIL.catch_up(opponent_id)
+function PVP.RECONNECT_TAIL.catch_up(opponent_id)
 	if not opponent_id then return end
 	pending_opponent_id = opponent_id
 end
@@ -95,7 +95,7 @@ end
 -- checkpoint ("pack resolved") has no confirmed discrete hook in this repo
 -- (base-game Lua, not visible here) -- not added; a mid-pack reconnect simply
 -- waits for the next select_blind/cash_out, never applies mid-pack.
-function MP.RECONNECT_TAIL.on_checkpoint()
+function PVP.RECONNECT_TAIL.on_checkpoint()
 	if not pending_opponent_id then return end
 	local opponent_id = pending_opponent_id
 	pending_opponent_id = nil

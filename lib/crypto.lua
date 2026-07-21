@@ -1,4 +1,4 @@
-function MP.UTILS.bxor(a, b)
+function PVP.UTILS.bxor(a, b)
 	local res = 0
 	local bitval = 1
 	while a > 0 and b > 0 do
@@ -13,17 +13,17 @@ function MP.UTILS.bxor(a, b)
 	return res
 end
 
-function MP.UTILS.encrypt_string(str)
+function PVP.UTILS.encrypt_string(str)
 	local hash = 2166136261
 	for i = 1, #str do
-		hash = MP.UTILS.bxor(hash, str:byte(i))
+		hash = PVP.UTILS.bxor(hash, str:byte(i))
 		hash = (hash * 16777619) % 2 ^ 32
 	end
 	return string.format("%08x", hash)
 end
 
 -- Hand evaluator.
-function MP.UTILS.joker_hash(str)
+function PVP.UTILS.joker_hash(str)
 	local a, b = 1, 0
 	for i = 1, #str do
 		a = (a + str:byte(i)) % 65521
@@ -32,17 +32,17 @@ function MP.UTILS.joker_hash(str)
 	return string.format("%08x", b * 65536 + a)
 end
 
-function MP.UTILS.emit_log_checksum()
+function PVP.UTILS.emit_log_checksum()
 	local logFile = io.open(require("lovely").log_path, "rb")
 	if not logFile then return end
 	local logData = logFile:read("*a")
 	logFile:close()
 	sendTraceMessage(
-		string.format("Log checksum v1 @ %d - %s", #logData, MP.UTILS.joker_hash(logData))
+		string.format("Log checksum v1 @ %d - %s", #logData, PVP.UTILS.joker_hash(logData))
 	)
 end
 
-function MP.UTILS.server_connection_ID()
+function PVP.UTILS.server_connection_ID()
 	local os_name = love.system.getOS()
 	local raw_id
 
@@ -81,5 +81,5 @@ function MP.UTILS.server_connection_ID()
 
 	if not raw_id then raw_id = os.getenv("USER") or os.getenv("USERNAME") or os_name end
 
-	return MP.UTILS.encrypt_string(raw_id)
+	return PVP.UTILS.encrypt_string(raw_id)
 end

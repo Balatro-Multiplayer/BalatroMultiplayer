@@ -9,7 +9,7 @@ SMODS.Joker({
 
 	unlocked = true,
 	discovered = true,
-	no_collection = MP.sandbox_no_collection,
+	no_collection = PVP.sandbox_no_collection,
 	atlas = "lucky_cat_sandbox",
 	blueprint_compat = true,
 	perishable_compat = false,
@@ -44,6 +44,6 @@ SMODS.Joker({
 	end,
 	mp_credits = { code = { "steph" } },
 	mp_include = function(self)
-		return MP.SANDBOX.is_joker_allowed(self.key)
+		return PVP.SANDBOX.is_joker_allowed(self.key)
 	end,
 })
