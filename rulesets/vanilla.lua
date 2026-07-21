@@ -1,4 +1,4 @@
-MP.Ruleset({
+PVP.Ruleset({
 	key = "vanilla",
 	multiplayer_content = false,
 	banned_jokers = {},

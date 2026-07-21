@@ -1,16 +1,16 @@
--- Bridge GameModes: thin MPAPI.GameMode entry points that delegate into MP's own
--- ruleset/gamemode/pool-gating machinery (the BRIDGE approach — MP's composition
+-- Bridge GameModes: thin MPAPI.GameMode entry points that delegate into PVP's own
+-- ruleset/gamemode/pool-gating machinery (the BRIDGE approach — PVP's composition
 -- system stays authoritative; see the plan). Each maps a server/website game-mode
--- key (pvp_standard/pvp_vanilla/pvp_expanded/pvp_smallworld — the exact keys the
+-- key (pvp_chocolate/pvp_vanilla/pvp_strawberry/pvp_smallworld — the exact keys the
 -- matchmaking server + web leaderboard expect, queried as `ranked:<key>`) onto an
--- MP ruleset + MP gamemode.
+-- PVP ruleset + PVP gamemode.
 --
 -- These MUST be loaded inside MPAPI.on_loaded so their GameObjects are tagged to
 -- this mod (per-lobby action/gamemode routing depends on the owning mod id).
 --
--- Blind selection and ante progression are intentionally NO-OPS here: MP's own
+-- Blind selection and ante progression are intentionally NO-OPS here: PVP's own
 -- ui/game/round.lua + lovely wiring drive the nemesis/showdown blinds off
--- MP.LOBBY.config, so the API's reset_blinds/ease_ante overlay (api/gamemode/hooks.lua)
+-- PVP.LOBBY.config, so the API's reset_blinds/ease_ante overlay (api/gamemode/hooks.lua)
 -- must not also mutate the blinds. get_blinds_by_ante returns nothing so the API
 -- overlay is a harmless no-op; on_ante_change does nothing. The one API-side hook we
 -- do use is on_player_forfeit -> check_single_survivor (win when the opponent quits).
@@ -26,13 +26,13 @@ end)
 
 -- The default/fallback queue mode key, referenced as a raw string across several
 -- consumer files (flow.lua, queue.lua, pvp_leaderboard.lua) -- kept as one named
--- constant here, next to its definition in MP.PVP_GAMEMODES below, so those call
+-- constant here, next to its definition in PVP.PVP_GAMEMODES below, so those call
 -- sites can't drift from this table's actual key.
-MP.GamemodeKey = { PVP_STANDARD = "pvp_standard" }
+PVP.GamemodeKey = { PVP_CHOCOLATE = "pvp_chocolate" }
 
-MP.PVP_GAMEMODES = {
-	pvp_standard = { ruleset = "ruleset_mp_standard_ranked", gamemode = "gamemode_mp_attrition", display = "Standard", has_ranked = true },
-	pvp_expanded = { ruleset = "ruleset_mp_blitz", gamemode = "gamemode_mp_attrition", display = "Expanded", has_ranked = false },
+PVP.PVP_GAMEMODES = {
+	pvp_chocolate = { ruleset = "ruleset_mp_chocolate_ranked", gamemode = "gamemode_mp_attrition", display = "Chocolate", has_ranked = true },
+	pvp_strawberry = { ruleset = "ruleset_mp_strawberry", gamemode = "gamemode_mp_attrition", display = "Strawberry", has_ranked = false },
 	pvp_vanilla = { ruleset = "ruleset_mp_vanilla", gamemode = "gamemode_mp_attrition", display = "Vanilla", has_ranked = false },
 	pvp_smallworld = { ruleset = "ruleset_mp_smallworld", gamemode = "gamemode_mp_attrition", display = "Small World", has_ranked = false },
 	-- Royale (2-16 players): reuses attrition's blind-selection and a plain ruleset.
@@ -53,13 +53,13 @@ MP.PVP_GAMEMODES = {
 		display = "Nemesis",
 		has_ranked = false,
 		custom_bridge = true,
-		-- Read by lobby_bridge.lua's mirror_metadata to set MP.LOBBY.config.nemesis_pairing
+		-- Read by lobby_bridge.lua's mirror_metadata to set PVP.LOBBY.config.nemesis_pairing
 		-- on EVERY client (not just the host, who's the only one that runs start_run below).
 		nemesis_pairing = true,
 	},
 }
 
-for key, def in pairs(MP.PVP_GAMEMODES) do
+for key, def in pairs(PVP.PVP_GAMEMODES) do
 	if not def.custom_bridge then
 	MPAPI.GameMode({
 		key = key,
@@ -83,19 +83,19 @@ for key, def in pairs(MP.PVP_GAMEMODES) do
 		-- PvP is 1v1 (attrition's single "enemy"): two players in every lobby type.
 		min_players = 2,
 		max_players = def.has_ranked and { public = 2, private = 2, ranked = 2 } or { public = 2, private = 2 },
-		-- Best-effort start: point MP's lobby config at this mode's ruleset/gamemode,
-		-- then hand off to MP's existing run-start flow. The MP.LOBBY <- API-lobby
+		-- Best-effort start: point PVP's lobby config at this mode's ruleset/gamemode,
+		-- then hand off to PVP's existing run-start flow. The PVP.LOBBY <- API-lobby
 		-- mirror (Phase 4/5) fills in deck/seed/host state; until then this is the
 		-- entry point matchmaking/private-lobby start will call.
 		start_run = function(self, deck_name, seed)
-			MP.LOBBY.config.ruleset = def.ruleset
-			MP.LOBBY.config.gamemode = def.gamemode
+			PVP.LOBBY.config.ruleset = def.ruleset
+			PVP.LOBBY.config.gamemode = def.gamemode
 			if deck_name then
-				MP.LOBBY.deck.back = deck_name
+				PVP.LOBBY.deck.back = deck_name
 			end
 			G.FUNCS.lobby_start_run(nil, { seed = seed })
 		end,
-		-- MP drives blinds itself; keep the API overlay inert (see header note).
+		-- PVP drives blinds itself; keep the API overlay inert (see header note).
 		get_blinds_by_ante = function(self, ante)
 			return nil, nil, nil
 		end,
@@ -117,7 +117,7 @@ end
 -- draft (the 2-actor ban_pick schedule above doesn't generalize to N players).
 -- Elimination math (rank-and-cut bottom half) lives in pvp_api/referee.lua.
 do
-	local def = MP.PVP_GAMEMODES.pvp_royale
+	local def = PVP.PVP_GAMEMODES.pvp_royale
 	MPAPI.GameMode({
 		key = "pvp_royale",
 		prefix_config = { key = false },
@@ -126,10 +126,10 @@ do
 		min_players = 2,
 		max_players = { public = 16, private = 16 },
 		start_run = function(self, deck_name, seed)
-			MP.LOBBY.config.ruleset = def.ruleset
-			MP.LOBBY.config.gamemode = def.gamemode
+			PVP.LOBBY.config.ruleset = def.ruleset
+			PVP.LOBBY.config.gamemode = def.gamemode
 			if deck_name then
-				MP.LOBBY.deck.back = deck_name
+				PVP.LOBBY.deck.back = deck_name
 			end
 			G.FUNCS.lobby_start_run(nil, { seed = seed })
 		end,
@@ -148,15 +148,15 @@ do
 end
 
 -- Nemesis: same bridge shape as Royale (2-16 players, no ban/pick draft). The
--- distinguishing MP.LOBBY.config.nemesis_pairing flag (every pairing-aware piece
--- of code -- referee.lua, MP.current_target_id, attrition.lua's bye check --
+-- distinguishing PVP.LOBBY.config.nemesis_pairing flag (every pairing-aware piece
+-- of code -- referee.lua, PVP.current_target_id, attrition.lua's bye check --
 -- branches on it, since Royale and Nemesis otherwise share the identical
 -- gamemode/ruleset pair) is set for EVERY client, host and guests alike, by
 -- lobby_bridge.lua's mirror_metadata (keyed off this mode's `nemesis_pairing =
--- true` marker in MP.PVP_GAMEMODES.pvp_nemesis above) -- not here, since start_run
+-- true` marker in PVP.PVP_GAMEMODES.pvp_nemesis above) -- not here, since start_run
 -- only ever runs on the host. Round-robin pairing itself lives in referee.lua.
 do
-	local def = MP.PVP_GAMEMODES.pvp_nemesis
+	local def = PVP.PVP_GAMEMODES.pvp_nemesis
 	MPAPI.GameMode({
 		key = "pvp_nemesis",
 		prefix_config = { key = false },
@@ -165,10 +165,10 @@ do
 		min_players = 2,
 		max_players = { public = 16, private = 16 },
 		start_run = function(self, deck_name, seed)
-			MP.LOBBY.config.ruleset = def.ruleset
-			MP.LOBBY.config.gamemode = def.gamemode
+			PVP.LOBBY.config.ruleset = def.ruleset
+			PVP.LOBBY.config.gamemode = def.gamemode
 			if deck_name then
-				MP.LOBBY.deck.back = deck_name
+				PVP.LOBBY.deck.back = deck_name
 			end
 			G.FUNCS.lobby_start_run(nil, { seed = seed })
 		end,

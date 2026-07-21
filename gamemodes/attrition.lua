@@ -1,19 +1,19 @@
-MP.Gamemode({
+PVP.Gamemode({
 	key = "attrition",
 	get_blinds_by_ante = function(self, ante)
-		if ante >= MP.LOBBY.config.pvp_start_round then
-			-- MP.current_target_id() is always non-nil for 1v1 (sole opponent). For
+		if ante >= PVP.LOBBY.config.pvp_start_round then
+			-- PVP.current_target_id() is always non-nil for 1v1 (sole opponent). For
 			-- Nemesis (rotating pairing), nil means byed this ante -- fall through to a
 			-- normal boss instead of the nemesis one, the entire bye mechanism. Royale
 			-- has no bye/sit-out concept (referee.lua's rank-and-cut ranks every alive
-			-- player every PvP round), and MP.GAME.royale_target_id only ever latches as
+			-- player every PvP round), and PVP.GAME.royale_target_id only ever latches as
 			-- a side effect of a multiplayer joker/consumable interaction (Asteroid/
 			-- Taxes/Penny Pincher) -- which can't happen before the first PvP blind ever
 			-- runs. Treating an unresolved Royale target as a bye would mean a match with
 			-- no multiplayer jokers owned/used never reaches a PvP blind at all, so only
 			-- Nemesis-pairing's real bye gates on it.
-			local byed = MP.LOBBY.config.nemesis_pairing and MP.current_target_id() == nil
-			if not MP.LOBBY.config.normal_bosses and not byed then
+			local byed = PVP.LOBBY.config.nemesis_pairing and PVP.current_target_id() == nil
+			if not PVP.LOBBY.config.normal_bosses and not byed then
 				return nil, nil, "bl_mp_nemesis"
 			else
 				G.GAME.round_resets.pvp_blind_choices.Boss = true

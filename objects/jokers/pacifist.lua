@@ -19,11 +19,8 @@ SMODS.Joker({
 	loc_vars = function(self, info_queue, card)
 		return { vars = { card.ability.extra.x_mult } }
 	end,
-	mp_include = function(self)
-		return MP.LOBBY.code and MP.LOBBY.config.multiplayer_jokers
-	end,
 	calculate = function(self, card, context)
-		if context.cardarea == G.jokers and context.joker_main and not MP.is_pvp_boss() then
+		if context.cardarea == G.jokers and context.joker_main and not PVP.is_pvp_boss() then
 			return {
 				x_mult = card.ability.extra.x_mult,
 			}

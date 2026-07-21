@@ -1,9 +1,9 @@
 -- World Series of Balatro Ruleset
 
--- Layerless on purpose: WSOB is *not* the standard pool (no MP-original
+-- Layerless on purpose: WSOB is *not* the standard pool (no PVP-original
 -- content, far fewer reworks), so it declares its bans/reworks directly rather
 -- than composing `standard`
-MP.Ruleset({
+PVP.Ruleset({
 	key = "wsob",
     layers = { "ranked" }, -- let's gate on version though
 	multiplayer_content = false,

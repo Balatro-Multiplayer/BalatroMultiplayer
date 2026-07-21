@@ -3,28 +3,28 @@
 
 local update_draw_to_hand_ref = Game.update_draw_to_hand
 function Game:update_draw_to_hand(dt)
-	if MP.is_mp_or_ghost() then
+	if PVP.is_mp_or_ghost() then
 		if
 			not G.STATE_COMPLETE
 			and G.GAME.current_round.hands_played == 0
 			and G.GAME.current_round.discards_used == 0
 			and G.GAME.facing_blind
 		then
-			if MP.is_pvp_boss() then
-				MP.GAME.pincher_unlock = true
+			if PVP.is_pvp_boss() then
+				PVP.GAME.pincher_unlock = true
 				G.after_pvp = true -- i can't find a reasonable way to detect end of pvp (for pizza) so i'm doing something strange instead
 
-				if MP.GAME.asteroids > 0 then -- launch asteroids, messy event garbage
+				if PVP.GAME.asteroids > 0 then -- launch asteroids, messy event garbage
 					delay(0.8)
 					update_hand_text({ sound = "button", volume = 0.7, pitch = 0.8, delay = 0.3 }, {
 						handname = localize("k_asteroids"),
 						chips = localize("k_amount_short"),
-						mult = MP.GAME.asteroids,
+						mult = PVP.GAME.asteroids,
 					})
 					delay(0.6)
 					local send = 0
-					for i = 1, MP.GAME.asteroids do
-						local perc = MP.GAME.asteroids - send
+					for i = 1, PVP.GAME.asteroids do
+						local perc = PVP.GAME.asteroids - send
 						G.E_MANAGER:add_event(Event({
 							func = function()
 								play_sound("tarot1", 0.9 + (perc / 10), 1)
@@ -32,17 +32,17 @@ function Game:update_draw_to_hand(dt)
 							end,
 						}))
 						send = send + 1
-						update_hand_text({ delay = 0 }, { mult = MP.GAME.asteroids - send })
+						update_hand_text({ delay = 0 }, { mult = PVP.GAME.asteroids - send })
 						delay(0.2)
 					end
 					G.E_MANAGER:add_event(Event({
 						func = function()
-							if not MP.GHOST.is_active() then
-								for i = 1, MP.GAME.asteroids do
-									MP.broadcast_asteroid()
+							if not PVP.GHOST.is_active() then
+								for i = 1, PVP.GAME.asteroids do
+									PVP.broadcast_asteroid()
 								end
 							end
-							MP.GAME.asteroids = 0
+							PVP.GAME.asteroids = 0
 							return true
 						end,
 					}))
@@ -161,8 +161,9 @@ local update_hand_played_ref = Game.update_hand_played
 ---@diagnostic disable-next-line: duplicate-set-field
 function Game:update_hand_played(dt)
 	-- Ignore for singleplayer or regular blinds
-	local ghost = MP.GHOST.is_active()
-	if (not ghost and (not MP.LOBBY.connected or not MP.LOBBY.code)) or not MP.is_pvp_boss() then
+	local ghost = PVP.GHOST.is_active()
+	local practice = PVP.is_practice_mode()
+	if (not ghost and not practice and (not PVP.LOBBY.connected or not PVP.LOBBY.code)) or not PVP.is_pvp_boss() then
 		update_hand_played_ref(self, dt)
 		return
 	end
@@ -181,13 +182,13 @@ function Game:update_hand_played(dt)
 		G.E_MANAGER:add_event(Event({
 			trigger = "immediate",
 			func = function()
-				if not ghost then
-					MP.ACTIONS.play_hand(G.GAME.chips, G.GAME.current_round.hands_left)
+				if not ghost and not practice then
+					PVP.ACTIONS.play_hand(G.GAME.chips, G.GAME.current_round.hands_left)
 				end
 
 				if G.GAME.current_round.hands_left < 1 then
 					if ghost then
-						local result = MP.GHOST.resolve_pvp_hands_exhausted(G.GAME.chips)
+						local result = PVP.GHOST.resolve_pvp_hands_exhausted(G.GAME.chips)
 						if result == "won" then
 							win_game()
 							return true
@@ -196,6 +197,10 @@ function Game:update_hand_played(dt)
 							G.STATE_COMPLETE = false
 							return true
 						end
+					elseif practice then
+						-- No referee to wait on -- always continue to the next blind,
+						-- regardless of score (see update_new_round's practice branch).
+						PVP.GAME.end_pvp = true
 					else
 						attention_text({
 							scale = 0.8,
@@ -210,14 +215,14 @@ function Game:update_hand_played(dt)
 						eval_hand_and_jokers()
 						G.FUNCS.draw_from_hand_to_discard()
 					end
-				elseif ghost and MP.GHOST.has_hand_data() then
-					MP.GHOST.resolve_pvp_mid_hand(G.GAME.chips)
+				elseif ghost and PVP.GHOST.has_hand_data() then
+					PVP.GHOST.resolve_pvp_mid_hand(G.GAME.chips)
 
-					if not MP.GAME.end_pvp and G.STATE == G.STATES.HAND_PLAYED then
+					if not PVP.GAME.end_pvp and G.STATE == G.STATES.HAND_PLAYED then
 						G.STATE_COMPLETE = false
 						G.STATE = G.STATES.DRAW_TO_HAND
 					end
-				elseif not MP.GAME.end_pvp and G.STATE == G.STATES.HAND_PLAYED then
+				elseif not PVP.GAME.end_pvp and G.STATE == G.STATES.HAND_PLAYED then
 					G.STATE_COMPLETE = false
 					G.STATE = G.STATES.DRAW_TO_HAND
 				end
@@ -226,37 +231,48 @@ function Game:update_hand_played(dt)
 		}))
 	end
 
-	if MP.GAME.end_pvp and MP.is_pvp_boss() and not (G.GAME.STOP_USE and G.GAME.STOP_USE > 0) then
+	if PVP.GAME.end_pvp and PVP.is_pvp_boss() and not (G.GAME.STOP_USE and G.GAME.STOP_USE > 0) then
 		G.STATE_COMPLETE = false
 		G.STATE = G.STATES.NEW_ROUND
-		MP.GAME.end_pvp = false
+		PVP.GAME.end_pvp = false
 	end
 end
 
 local update_new_round_ref = Game.update_new_round
 function Game:update_new_round(dt)
-	if MP.GAME.end_pvp then
+	if PVP.GAME.end_pvp then
 		if G.STATE ~= G.STATES.NEW_ROUND then
 			G.FUNCS.draw_from_hand_to_deck()
 			G.FUNCS.draw_from_discard_to_deck()
 		end
 		G.STATE = G.STATES.NEW_ROUND
-		MP.GAME.end_pvp = false
+		PVP.GAME.end_pvp = false
 	end
-	if MP.is_mp_or_ghost() and not G.STATE_COMPLETE then
-		local ghost = MP.GHOST.is_active()
+	if PVP.is_mp_or_ghost() and not G.STATE_COMPLETE then
+		local ghost = PVP.GHOST.is_active()
+		local practice = PVP.is_practice_mode()
 		-- Prevent player from losing
-		if to_big(G.GAME.chips) < to_big(G.GAME.blind.chips) and not MP.is_pvp_boss() then
+		if to_big(G.GAME.chips) < to_big(G.GAME.blind.chips) and not PVP.is_pvp_boss() then
 			G.GAME.blind.chips = -1
 			if ghost then
-				if MP.GHOST.resolve_round_fail() == "game_over" then
+				if PVP.GHOST.resolve_round_fail() == "game_over" then
 					G.STATE = G.STATES.GAME_OVER
 					G.STATE_COMPLETE = false
 					return
 				end
+			elseif practice then
+				-- Just score as much as you can -- no life, no fail, ever.
 			else
-				MP.ACTIONS.fail_round(G.GAME.current_round.hands_played)
+				PVP.ACTIONS.fail_round(G.GAME.current_round.hands_played)
 			end
+		end
+
+		if practice then
+			-- Just let this state's own transition run (no win_ante=999 suppression to
+			-- undo afterward) -- the ante-8 stop itself is forced explicitly from
+			-- ease_ante (ui/game/round.lua), not here; see that override's comment for why.
+			update_new_round_ref(self, dt)
+			return
 		end
 
 		-- Prevent player from winning
@@ -278,15 +294,15 @@ function Game:update_selecting_hand(dt)
 		and #G.hand.cards < 1
 		and #G.deck.cards < 1
 		and #G.play.cards < 1
-		and MP.is_mp_or_ghost()
+		and PVP.is_mp_or_ghost()
 	then
 		G.GAME.current_round.hands_left = 0
-		if not MP.is_pvp_boss() then
+		if not PVP.is_pvp_boss() then
 			G.STATE_COMPLETE = false
 			G.STATE = G.STATES.NEW_ROUND
 		else
-			if not MP.GHOST.is_active() then
-				MP.ACTIONS.play_hand(G.GAME.chips, 0)
+			if not PVP.GHOST.is_active() and not PVP.is_practice_mode() then
+				PVP.ACTIONS.play_hand(G.GAME.chips, 0)
 			end
 			G.STATE_COMPLETE = false
 			G.STATE = G.STATES.HAND_PLAYED
@@ -295,11 +311,11 @@ function Game:update_selecting_hand(dt)
 	end
 	update_selecting_hand_ref(self, dt)
 
-	if MP.GAME.end_pvp and MP.is_pvp_boss() and MP.is_mp_or_ghost() then
+	if PVP.GAME.end_pvp and PVP.is_pvp_boss() and PVP.is_mp_or_ghost() then
 		G.hand:unhighlight_all()
 		G.STATE_COMPLETE = false
 		G.STATE = G.STATES.NEW_ROUND
-		MP.GAME.end_pvp = false
+		PVP.GAME.end_pvp = false
 	end
 end
 
@@ -307,17 +323,17 @@ end
 local update_shop_ref = Game.update_shop
 function Game:update_shop(dt)
 	if not G.STATE_COMPLETE then
-		MP.GAME.ready_blind = false
-		MP.GAME.ready_blind_text = localize("b_ready")
-		MP.GAME.end_pvp = false
+		PVP.GAME.ready_blind = false
+		PVP.GAME.ready_blind_text = localize("b_ready")
+		PVP.GAME.end_pvp = false
 	end
 
 	local updated_location = false
-	if MP.LOBBY.code and not G.STATE_COMPLETE and not updated_location and not G.GAME.USING_RUN then
+	if PVP.LOBBY.code and not G.STATE_COMPLETE and not updated_location and not G.GAME.USING_RUN then
 		updated_location = true
-		MP.ACTIONS.set_location("loc_shop")
-		MP.GAME.spent_before_shop = to_big(MP.GAME.spent_total) + to_big(0)
-		if MP.UI.show_enemy_location then MP.UI.show_enemy_location() end
+		PVP.ACTIONS.set_location("loc_shop")
+		PVP.GAME.spent_before_shop = to_big(PVP.GAME.spent_total) + to_big(0)
+		if PVP.UI.show_enemy_location then PVP.UI.show_enemy_location() end
 	end
 	if G.STATE_COMPLETE and updated_location then updated_location = false end
 	update_shop_ref(self, dt)
@@ -326,10 +342,10 @@ end
 local update_blind_select_ref = Game.update_blind_select
 function Game:update_blind_select(dt)
 	local updated_location = false
-	if MP.LOBBY.code and not G.STATE_COMPLETE and not updated_location then
+	if PVP.LOBBY.code and not G.STATE_COMPLETE and not updated_location then
 		updated_location = true
-		MP.ACTIONS.set_location("loc_selecting")
-		if MP.UI.show_enemy_location then MP.UI.show_enemy_location() end
+		PVP.ACTIONS.set_location("loc_selecting")
+		if PVP.UI.show_enemy_location then PVP.UI.show_enemy_location() end
 	end
 	if G.STATE_COMPLETE and updated_location then updated_location = false end
 	update_blind_select_ref(self, dt)
@@ -338,13 +354,17 @@ end
 local start_run_ref = Game.start_run
 function Game:start_run(args)
 	-- Not get_active_ruleset(): the sp run flow leaves practice=false but still
-	-- sets MP.SP.ruleset, which get_active_ruleset() only honours in practice.
-	MP.LoadReworks(MP.LOBBY.config.ruleset or MP.SP.ruleset)
+	-- sets PVP.SP.ruleset, which get_active_ruleset() only honours in practice.
+	PVP.LoadReworks(PVP.LOBBY.config.ruleset or PVP.SP.ruleset)
 
 	start_run_ref(self, args)
 
-	local show_lives_hud = (MP.LOBBY.connected and MP.LOBBY.code) or MP.GHOST.is_active()
-	if not show_lives_hud or MP.LOBBY.config.disable_live_and_timer_hud then return end
+	-- Not extended to practice: this UIBox-rebuild is only ever needed to show
+	-- lives (practice has no life system, see update_new_round's practice branch) and
+	-- doing it synchronously at run start raced with other HUD setup in local-lobby
+	-- testing (no risk in a real lobby, which has natural network pacing beforehand).
+	local show_lives_hud = (PVP.LOBBY.connected and PVP.LOBBY.code) or PVP.GHOST.is_active()
+	if not show_lives_hud or PVP.LOBBY.config.disable_live_and_timer_hud then return end
 
 	local scale = 0.4
 	local hud_ante = G.HUD:get_UIE_by_ID("hud_ante")
@@ -367,7 +387,7 @@ function Game:start_run(args)
                         {
                             n = G.UIT.T,
                             config = {
-                                ref_table = MP.GAME,
+                                ref_table = PVP.GAME,
                                 ref_value = "lives",
                                 scale = 2 * scale * 0.8,
                                 colour = G.C.IMPORTANT,
@@ -389,7 +409,7 @@ function Game:start_run(args)
                         {
                             n = G.UIT.T,
                             config = {
-                                ref_table = MP.GAME.enemy,
+                                ref_table = PVP.GAME.enemy,
                                 ref_value = "lives",
                                 scale = 2 * scale * 0.8,
                                 colour = G.C.RED,
@@ -413,11 +433,11 @@ function Game:start_run(args)
 end
 
 -- This prevents duplicate execution during certain cases. e.g. Full deck discard before playing any hands.
-function MP.handle_duplicate_end()
-	if MP.is_mp_or_ghost() then
-		if MP.GAME.round_ended then
-			if not MP.GAME.duplicate_end then
-				MP.GAME.duplicate_end = true
+function PVP.handle_duplicate_end()
+	if PVP.is_mp_or_ghost() then
+		if PVP.GAME.round_ended then
+			if not PVP.GAME.duplicate_end then
+				PVP.GAME.duplicate_end = true
 				sendDebugMessage("Duplicate end_round calls prevented.", "MULTIPLAYER")
 			end
 			return true
@@ -428,15 +448,15 @@ end
 
 -- This handles an edge case where a player plays no hands, and discards the only cards in their deck.
 -- Allows opponent to advance after playing anything, and eases a life from the person who discarded their deck.
-function MP.handle_deck_out()
-	if MP.is_mp_or_ghost() then
+function PVP.handle_deck_out()
+	if PVP.is_mp_or_ghost() then
 		if
 			G.GAME.current_round.hands_played == 0
 			and G.GAME.current_round.discards_used > 0
 		then
-			if not MP.GHOST.is_active() then
-				if MP.is_pvp_boss() then MP.ACTIONS.play_hand(0, 0) end
-				MP.ACTIONS.fail_round(1)
+			if not PVP.GHOST.is_active() then
+				if PVP.is_pvp_boss() then PVP.ACTIONS.play_hand(0, 0) end
+				PVP.ACTIONS.fail_round(1)
 			end
 		end
 	end
@@ -452,8 +472,8 @@ local JIMBO_POSITIONS = {
 	[4] = { align = "cmi", offset = { x = 0, y = -1.5 }, bubble_align = "cr", bubble_offset = { x = 0, y = 0 } },
 }
 
-function MP.UI.create_jimbo(pos, text)
-	if mp_jimbo then MP.UI.remove_jimbo() end
+function PVP.UI.create_jimbo(pos, text)
+	if mp_jimbo then PVP.UI.remove_jimbo() end
 	local p = JIMBO_POSITIONS[pos] or JIMBO_POSITIONS[1]
 	mp_jimbo_pos = pos or 1
 	mp_jimbo = Card_Character({
@@ -506,11 +526,11 @@ function MP.UI.create_jimbo(pos, text)
 		type = p.align,
 		offset = p.offset,
 	})
-	if text then MP.UI.jimbo_say(text) end
+	if text then PVP.UI.jimbo_say(text) end
 	return mp_jimbo
 end
 
-function MP.UI.move_jimbo(pos)
+function PVP.UI.move_jimbo(pos)
 	if not mp_jimbo then return end
 	local p = JIMBO_POSITIONS[pos] or JIMBO_POSITIONS[1]
 	mp_jimbo_pos = pos or 1
@@ -526,11 +546,11 @@ function MP.UI.move_jimbo(pos)
 	end
 end
 
-function MP.UI.jimbo_say(text)
+function PVP.UI.jimbo_say(text)
 	if not mp_jimbo then return end
 	if mp_jimbo.children.speech_bubble then mp_jimbo.children.speech_bubble:remove() end
 	local lines = {}
-	for line in MP.UTILS.wrapText(text, 30):gmatch("[^\n]+") do
+	for line in PVP.UTILS.wrapText(text, 30):gmatch("[^\n]+") do
 		lines[#lines + 1] = line:match("^%s*(.-)%s*$")
 	end
 	local rows = {}
@@ -599,10 +619,10 @@ local practice_collection_hint_shown = false
 local your_collection_ref = G.FUNCS.your_collection
 function G.FUNCS.your_collection(e)
 	your_collection_ref(e)
-	if MP.is_practice_mode() and G.STAGE == G.STAGES.RUN and not MP.LOBBY.code and not practice_collection_hint_shown then
+	if PVP.is_practice_mode() and G.STAGE == G.STAGES.RUN and not PVP.LOBBY.code and not practice_collection_hint_shown then
 		practice_collection_hint_shown = true
 		practice_collection_jimbo = true
-		MP.UI.create_jimbo(2, localize("k_practice_collection_hint"))
+		PVP.UI.create_jimbo(2, localize("k_practice_collection_hint"))
 	end
 end
 
@@ -610,12 +630,12 @@ local exit_overlay_menu_ref_jimbo = G.FUNCS.exit_overlay_menu
 function G.FUNCS:exit_overlay_menu()
 	if practice_collection_jimbo then
 		practice_collection_jimbo = false
-		MP.UI.remove_jimbo()
+		PVP.UI.remove_jimbo()
 	end
 	exit_overlay_menu_ref_jimbo(self)
 end
 
-function MP.UI.remove_jimbo()
+function PVP.UI.remove_jimbo()
 	if not mp_jimbo then return end
 	local jimbo = mp_jimbo
 	mp_jimbo = nil

@@ -69,7 +69,7 @@ stylua .  # to format all files
 **Networking Actions**:
 ```lua
 -- Follow the established action pattern
-MP.ACTIONS.example_action = function(data)
+PVP.ACTIONS.example_action = function(data)
 	-- Validate input
 	if not data or not data.required_field then
 		return
@@ -85,7 +85,7 @@ end
 |  |  |
 |------|-------------|
 | [`ui/_common/`](ui/_common/) | Shared components. Config toggles, spacers, etc. |
-| [`ui/utils.lua`](ui/utils.lua) | Home of `MP.UI.UTILS`. Utils for creating UI nodes |
+| [`ui/utils.lua`](ui/utils.lua) | Home of `PVP.UI.UTILS`. Utils for creating UI nodes |
 | [`ui/game/`](ui/game/) | UI inside the pvp match |
 | [`ui/lobby/`](ui/lobby/) | Lobby UI |
 | [`ui/main_menu/`](ui/main_menu/) | Main menu UI |
@@ -93,7 +93,7 @@ end
 
 **Mod Injection**:
 - The entrypoint is in [`core.lua`](core.lua)
-- Files/dirs prefixed with `_` are loaded first in [`MP.load_mp_dir`](core.lua#L72)
+- Files/dirs prefixed with `_` are loaded first in [`PVP.load_mp_dir`](core.lua#L72)
 
 ## Contribution Guidelines
 

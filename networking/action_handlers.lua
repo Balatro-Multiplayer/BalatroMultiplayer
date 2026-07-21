@@ -1,11 +1,11 @@
 -- ─── DON'T PATCH THIS FILE ───────────────────────────────────────────────────
 -- This file owns the core network action dispatch. The contents move; the
 -- string literals in here are NOT an API. HANDLERS is a file-local on
--- purpose — there is no global, no MP.HANDLERS, no _G shim coming to save you.
+-- purpose — there is no global, no PVP.HANDLERS, no _G shim coming to save you.
 --
 -- If you want to handle a network action from a mod, use one of:
 --
---   MP.register_mod_action(name, cb)  -- PREFERRED. Pair with the
+--   PVP.register_mod_action(name, cb)  -- PREFERRED. Pair with the
 --                                     -- "moddedAction" envelope on the server:
 --                                     --   {action = "moddedAction",
 --                                     --    modId = …, modAction = name, …}
@@ -13,7 +13,7 @@
 --                                     -- your modId; no collisions with core
 --                                     -- or other mods.
 --
---   MP.register_action(name, cb)      -- Escape hatch for legacy server code
+--   PVP.register_action(name, cb)      -- Escape hatch for legacy server code
 --                                     -- that emits flat top-level action
 --                                     -- names. Refuses to register over an
 --                                     -- existing handler (including core) —
@@ -35,19 +35,19 @@ function Client.send(msg)
 end
 
 -- Server to Client
-function MP.ACTIONS.set_username(username)
-	MP.LOBBY.username = username or "Guest"
-	if MP.LOBBY.connected then
+function PVP.ACTIONS.set_username(username)
+	PVP.LOBBY.username = username or "Guest"
+	if PVP.LOBBY.connected then
 		Client.send({
 			action = "username",
-			username = MP.LOBBY.username .. "~" .. MP.LOBBY.blind_col,
-			modHash = MP.MOD_STRING,
+			username = PVP.LOBBY.username .. "~" .. PVP.LOBBY.blind_col,
+			modHash = PVP.MOD_STRING,
 		})
 	end
 end
 
-function MP.ACTIONS.set_blind_col(num)
-	MP.LOBBY.blind_col = num or 1
+function PVP.ACTIONS.set_blind_col(num)
+	PVP.LOBBY.blind_col = num or 1
 end
 
 -- Reconnection state (persists across connections)
@@ -55,12 +55,12 @@ local reconnectToken = nil
 local lastLobbyCode = nil
 
 local function action_connected()
-	MP.LOBBY.connected = true
-	MP.UI.update_connection_status()
+	PVP.LOBBY.connected = true
+	PVP.UI.update_connection_status()
 	Client.send({
 		action = "username",
-		username = MP.LOBBY.username .. "~" .. MP.LOBBY.blind_col,
-		modHash = MP.MOD_STRING,
+		username = PVP.LOBBY.username .. "~" .. PVP.LOBBY.blind_col,
+		modHash = PVP.MOD_STRING,
 	})
 
 	-- If we have reconnect info, attempt to rejoin the lobby
@@ -75,68 +75,68 @@ end
 
 local function action_joinedLobby(p)
 	local code, type, token = p.code, p.type, p.reconnectToken
-	MP.LOBBY.code = code
-	MP.LOBBY.type = type
-	MP.LOBBY.ready_to_start = false
+	PVP.LOBBY.code = code
+	PVP.LOBBY.type = type
+	PVP.LOBBY.ready_to_start = false
 	-- Store reconnect info for potential future reconnection
 	if token then reconnectToken = token end
 	lastLobbyCode = code
-	MP.ACTIONS.sync_client()
-	MP.ACTIONS.lobby_info()
-	MP.UI.update_connection_status()
+	PVP.ACTIONS.sync_client()
+	PVP.ACTIONS.lobby_info()
+	PVP.UI.update_connection_status()
 end
 
 local function action_rejoinedLobby(p)
 	local code, type, token = p.code, p.type, p.reconnectToken
-	MP.LOBBY.code = code
-	MP.LOBBY.type = type
+	PVP.LOBBY.code = code
+	PVP.LOBBY.type = type
 	-- Update reconnect token
 	reconnectToken = token
 	lastLobbyCode = code
-	MP.self_reconnect_countdown = nil
-	MP.GAME.timer_started = false
-	MP.GAME.nemesis_timer_started = false
-	MP.ACTIONS.sync_client()
-	MP.ACTIONS.lobby_info()
-	MP.UI.update_connection_status()
+	PVP.self_reconnect_countdown = nil
+	PVP.GAME.timer_started = false
+	PVP.GAME.nemesis_timer_started = false
+	PVP.ACTIONS.sync_client()
+	PVP.ACTIONS.lobby_info()
+	PVP.UI.update_connection_status()
 	sendWarnMessage("Reconnected to lobby!", "MULTIPLAYER")
 	G.FUNCS.exit_overlay_menu()
-	MP.UI.UTILS.overlay_message("Reconnected to lobby!")
+	PVP.UI.UTILS.overlay_message("Reconnected to lobby!")
 end
 
 -- Countdown state for disconnect overlays
-MP.enemy_disconnect_countdown = nil
-MP.self_reconnect_countdown = nil
+PVP.enemy_disconnect_countdown = nil
+PVP.self_reconnect_countdown = nil
 
 -- Shared timeout handler for both countdowns
 local function handle_reconnect_timeout(message)
 	G.FUNCS.exit_overlay_menu()
-	MP.LOBBY.connected = false
-	if MP.LOBBY.code then MP.LOBBY.code = nil end
+	PVP.LOBBY.connected = false
+	if PVP.LOBBY.code then PVP.LOBBY.code = nil end
 	reconnectToken = nil
 	lastLobbyCode = nil
-	MP.UI.update_connection_status()
+	PVP.UI.update_connection_status()
 	if G.STAGE ~= G.STAGES.MAIN_MENU then
-		MP.reset_game_states()
+		PVP.reset_game_states()
 		G.FUNCS.go_to_menu()
 	end
-	MP.UI.UTILS.overlay_message(message)
+	PVP.UI.UTILS.overlay_message(message)
 end
 
 -- Hook into Game.update to tick countdown displays
 local _disconnect_gupdate = Game.update
 function Game:update(dt)
-	if MP.enemy_disconnect_countdown then
-		local remaining = math.max(0, math.ceil(MP.enemy_disconnect_countdown.end_time - love.timer.getTime()))
-		MP.enemy_disconnect_countdown.display = remaining .. "s remaining"
+	if PVP.enemy_disconnect_countdown then
+		local remaining = math.max(0, math.ceil(PVP.enemy_disconnect_countdown.end_time - love.timer.getTime()))
+		PVP.enemy_disconnect_countdown.display = remaining .. "s remaining"
 		-- No client-side timeout needed: the server sends stopGame
 		-- when the grace period expires, which handles the cleanup
 	end
-	if MP.self_reconnect_countdown then
-		local remaining = math.max(0, math.ceil(MP.self_reconnect_countdown.end_time - love.timer.getTime()))
-		MP.self_reconnect_countdown.display = remaining .. "s remaining"
+	if PVP.self_reconnect_countdown then
+		local remaining = math.max(0, math.ceil(PVP.self_reconnect_countdown.end_time - love.timer.getTime()))
+		PVP.self_reconnect_countdown.display = remaining .. "s remaining"
 		if remaining <= 0 then
-			MP.self_reconnect_countdown = nil
+			PVP.self_reconnect_countdown = nil
 			handle_reconnect_timeout("Reconnection failed.\nReturning to main menu.")
 		end
 	end
@@ -147,34 +147,34 @@ local function action_enemyDisconnected(p)
 	local timeout = p.timeout or 60
 	sendWarnMessage("Opponent disconnected, waiting for reconnection...", "MULTIPLAYER")
 
-	MP.GAME.timer_started = false
-	MP.GAME.nemesis_timer_started = false
+	PVP.GAME.timer_started = false
+	PVP.GAME.nemesis_timer_started = false
 
-	MP.enemy_disconnect_countdown = {
+	PVP.enemy_disconnect_countdown = {
 		end_time = love.timer.getTime() + timeout,
 		display = timeout .. "s remaining",
 	}
 
-	MP.UI.UTILS.overlay_message_countdown(
+	PVP.UI.UTILS.overlay_message_countdown(
 		"Opponent disconnected,\nwaiting for reconnection...",
-		MP.enemy_disconnect_countdown,
+		PVP.enemy_disconnect_countdown,
 		true
 	)
 end
 
 local function action_enemyReconnected()
-	MP.enemy_disconnect_countdown = nil
+	PVP.enemy_disconnect_countdown = nil
 	sendWarnMessage("Opponent reconnected!", "MULTIPLAYER")
 	G.FUNCS.exit_overlay_menu()
-	MP.UI.UTILS.overlay_message("Opponent reconnected!")
+	PVP.UI.UTILS.overlay_message("Opponent reconnected!")
 end
 
 local function action_lobbyInfo(p)
 	local host, hostHash, hostCached = p.host, p.hostHash, p.hostCached
 	local guest, guestHash, guestCached, guestReady = p.guest, p.guestHash, p.guestCached, p.guestReady
 	local is_host = p.isHost
-	MP.LOBBY.players = {}
-	MP.LOBBY.is_host = is_host
+	PVP.LOBBY.players = {}
+	PVP.LOBBY.is_host = is_host
 	local function parseName(name)
 		local username, col_str = string.match(name, "([^~]+)~(%d+)")
 		username = username or "Guest"
@@ -183,8 +183,8 @@ local function action_lobbyInfo(p)
 		return username, col
 	end
 	local hostName, hostCol = parseName(host)
-	local hostConfig, hostMods = MP.UTILS.parse_Hash(hostHash)
-	MP.LOBBY.host = {
+	local hostConfig, hostMods = PVP.UTILS.parse_Hash(hostHash)
+	PVP.LOBBY.host = {
 		username = hostName,
 		blind_col = hostCol,
 		hash_str = hostMods,
@@ -195,8 +195,8 @@ local function action_lobbyInfo(p)
 
 	if guest ~= nil then
 		local guestName, guestCol = parseName(guest)
-		local guestConfig, guestMods = MP.UTILS.parse_Hash(guestHash)
-		MP.LOBBY.guest = {
+		local guestConfig, guestMods = PVP.UTILS.parse_Hash(guestHash)
+		PVP.LOBBY.guest = {
 			username = guestName,
 			blind_col = guestCol,
 			hash_str = guestMods,
@@ -205,26 +205,26 @@ local function action_lobbyInfo(p)
 			config = guestConfig,
 		}
 	else
-		MP.LOBBY.guest = {}
+		PVP.LOBBY.guest = {}
 	end
 
 	-- TODO: This should check for player count instead
 	-- once we enable more than 2 players
-	MP.LOBBY.ready_to_start = guest ~= nil and guestReady
+	PVP.LOBBY.ready_to_start = guest ~= nil and guestReady
 
-	if MP.LOBBY.is_host then MP.ACTIONS.lobby_options() end
+	if PVP.LOBBY.is_host then PVP.ACTIONS.lobby_options() end
 
-	if G.STAGE == G.STAGES.MAIN_MENU then MP.ACTIONS.update_player_usernames() end
+	if G.STAGE == G.STAGES.MAIN_MENU then PVP.ACTIONS.update_player_usernames() end
 
 	-- Re-arm the mismatch modal when all mismatches clear (opponent left or was replaced).
-	if #MP.UTILS.version_mismatches() == 0 then MP._version_mismatch_shown = false end
+	if #PVP.UTILS.version_mismatches() == 0 then PVP._version_mismatch_shown = false end
 end
 
 local function action_error(p)
 	local message = p.message
 	sendWarnMessage(message, "MULTIPLAYER")
 
-	MP.UI.UTILS.overlay_message(message)
+	PVP.UI.UTILS.overlay_message(message)
 end
 
 local function action_keep_alive()
@@ -234,32 +234,32 @@ local function action_keep_alive()
 end
 
 local function action_disconnected()
-	MP.LOBBY.connected = false
-	MP.self_reconnect_countdown = nil
-	if MP.LOBBY.code then MP.LOBBY.code = nil end
+	PVP.LOBBY.connected = false
+	PVP.self_reconnect_countdown = nil
+	if PVP.LOBBY.code then PVP.LOBBY.code = nil end
 	-- Clear reconnect state since all reconnection attempts failed
 	reconnectToken = nil
 	lastLobbyCode = nil
-	MP.UI.update_connection_status()
+	PVP.UI.update_connection_status()
 end
 
 local function action_reconnecting()
 	-- Only show if we were in a lobby and don't already have a countdown running
-	if reconnectToken and lastLobbyCode and not MP.self_reconnect_countdown then
-		MP.LOBBY.connected = false
-		MP.GAME.timer_started = false
-		MP.GAME.nemesis_timer_started = false
-		MP.UI.update_connection_status()
+	if reconnectToken and lastLobbyCode and not PVP.self_reconnect_countdown then
+		PVP.LOBBY.connected = false
+		PVP.GAME.timer_started = false
+		PVP.GAME.nemesis_timer_started = false
+		PVP.UI.update_connection_status()
 		sendWarnMessage("Connection lost, attempting to reconnect...", "MULTIPLAYER")
 
-		MP.self_reconnect_countdown = {
+		PVP.self_reconnect_countdown = {
 			end_time = love.timer.getTime() + 60,
 			display = "60s remaining",
 		}
 
-		MP.UI.UTILS.overlay_message_countdown(
+		PVP.UI.UTILS.overlay_message_countdown(
 			"Connection lost,\nattempting to reconnect...",
-			MP.self_reconnect_countdown,
+			PVP.self_reconnect_countdown,
 			true
 		)
 	end
@@ -272,7 +272,7 @@ end
 -- G.FUNCS.start_run is interpreted by the start_run wrapper relocated to overrides/game.lua.
 local function get_random_back_pool()
 	local names, seen = {}, {}
-	local cocktail_keys = MP.get_cocktail_decks(false)
+	local cocktail_keys = PVP.get_cocktail_decks(false)
 	for i = 1, #cocktail_keys do
 		local key = cocktail_keys[i]
 		if G.P_CENTERS[key] and not seen[key] then
@@ -300,39 +300,39 @@ local function roll_random_back_name(seed, salt)
 end
 
 local function roll_random_stake(seed, salt)
-	local cap = MP.DECK.MAX_STAKE > 0 and MP.DECK.MAX_STAKE or 8
+	local cap = PVP.DECK.MAX_STAKE > 0 and PVP.DECK.MAX_STAKE or 8
 	return scoped_random(seed, "stake_" .. (salt or ""), cap)
 end
 
 function G.FUNCS.copy_host_deck()
-	MP.LOBBY.deck.back = MP.LOBBY.config.back
-	MP.LOBBY.deck.cocktail = MP.LOBBY.config.cocktail
-	MP.LOBBY.deck.sleeve = MP.LOBBY.config.sleeve
-	MP.LOBBY.deck.stake = MP.LOBBY.config.stake
-	MP.LOBBY.deck.challenge = MP.LOBBY.config.challenge
+	PVP.LOBBY.deck.back = PVP.LOBBY.config.back
+	PVP.LOBBY.deck.cocktail = PVP.LOBBY.config.cocktail
+	PVP.LOBBY.deck.sleeve = PVP.LOBBY.config.sleeve
+	PVP.LOBBY.deck.stake = PVP.LOBBY.config.stake
+	PVP.LOBBY.deck.challenge = PVP.LOBBY.config.challenge
 end
 
 ---@type fun(e: table | nil, args: { deck: string, stake: number | nil, seed: string | nil })
 function G.FUNCS.lobby_start_run(e, args)
-	if MP.LOBBY.config.different_decks == false then G.FUNCS.copy_host_deck() end
+	if PVP.LOBBY.config.different_decks == false then G.FUNCS.copy_host_deck() end
 
-	if MP.LOBBY.config.different_decks and MP.LOBBY.config.random_loadout then
-		MP.LOBBY.deck.back = roll_random_back_name(args.seed, MP.LOBBY.username)
-		MP.LOBBY.deck.challenge = ""
-		MP.LOBBY.deck.stake = roll_random_stake(args.seed, MP.LOBBY.username)
+	if PVP.LOBBY.config.different_decks and PVP.LOBBY.config.random_loadout then
+		PVP.LOBBY.deck.back = roll_random_back_name(args.seed, PVP.LOBBY.username)
+		PVP.LOBBY.deck.challenge = ""
+		PVP.LOBBY.deck.stake = roll_random_stake(args.seed, PVP.LOBBY.username)
 	end
 
 	local challenge = nil
-	if MP.LOBBY.deck.back == "Challenge Deck" then
-		challenge = G.CHALLENGES[get_challenge_int_from_id(MP.LOBBY.deck.challenge)]
+	if PVP.LOBBY.deck.back == "Challenge Deck" then
+		challenge = G.CHALLENGES[get_challenge_int_from_id(PVP.LOBBY.deck.challenge)]
 	else
-		G.GAME.viewed_back = G.P_CENTERS[MP.UTILS.get_deck_key_from_name(MP.LOBBY.deck.back)]
+		G.GAME.viewed_back = G.P_CENTERS[PVP.UTILS.get_deck_key_from_name(PVP.LOBBY.deck.back)]
 	end
 
 	G.FUNCS.start_run(e, {
 		mp_start = true,
 		challenge = challenge,
-		stake = tonumber(MP.LOBBY.deck.stake),
+		stake = tonumber(PVP.LOBBY.deck.stake),
 		seed = args.seed,
 	})
 end
@@ -340,56 +340,56 @@ end
 local function action_start_game(p)
 	local seed = p.seed
 	sendDebugMessage(string.format("Game starting — %s", os.date("%Y-%m-%dT%H:%M:%S%z")), "MULTIPLAYER")
-	-- Clear any stale practice/ghost state so it can't leak into real MP
-	MP.SP.practice = false
-	MP.GHOST.clear()
+	-- Clear any stale practice/ghost state so it can't leak into real PVP
+	PVP.SP.practice = false
+	PVP.GHOST.clear()
 
-	MP.reset_game_states()
+	PVP.reset_game_states()
 	-- Stamp the run start (drives the pause menu's seed-change window) and clear any
 	-- pending seed-change votes from a previous run/reseed.
-	MP._run_started_at = love.timer.getTime()
-	if MP.lobby and MP.lobby.seed_votes then
-		MP.lobby.seed_votes:reset()
+	PVP._run_started_at = love.timer.getTime()
+	if PVP.lobby and PVP.lobby.seed_votes then
+		PVP.lobby.seed_votes:reset()
 	end
 	local stake = tonumber(p.stake)
-	MP.ACTIONS.set_ante(0)
-	if not MP.LOBBY.config.different_seeds and MP.LOBBY.config.custom_seed ~= "random" then
-		seed = MP.LOBBY.config.custom_seed
+	PVP.ACTIONS.set_ante(0)
+	if not PVP.LOBBY.config.different_seeds and PVP.LOBBY.config.custom_seed ~= "random" then
+		seed = PVP.LOBBY.config.custom_seed
 	end
 
 	-- Open a new replay-log block for this game with everything needed to
 	-- reconstruct it deterministically later. Uses the resolved seed.
-	MP.RLOG.begin_run({
+	PVP.RLOG.begin_run({
 		seed = seed,
 		stake = stake,
-		deck = MP.LOBBY.config.back,
-		sleeve = MP.LOBBY.config.sleeve,
-		challenge = MP.LOBBY.config.challenge,
-		ruleset = MP.LOBBY.config.ruleset,
-		gamemode = MP.LOBBY.config.gamemode,
-		modifier_layers = MP.LOBBY.config.modifier_layers,
-		lobby_config = MP.LOBBY.config,
-		the_order_enabled = MP.should_use_the_order(),
-		different_seeds = MP.LOBBY.config.different_seeds,
-		mod_version = MP and MP.version,
-		mod_hash = MP.MOD_STRING,
-		smods_version = MP.SMODS_VERSION,
-		lovely_version = MP.REQUIRED_LOVELY_VERSION,
-		lobby_code = MP.LOBBY.code,
-		is_host = MP.LOBBY.is_host,
-		player = MP.LOBBY.username,
-		opponent = (MP.LOBBY.is_host and MP.LOBBY.guest and MP.LOBBY.guest.username)
-			or (MP.LOBBY.host and MP.LOBBY.host.username),
+		deck = PVP.LOBBY.config.back,
+		sleeve = PVP.LOBBY.config.sleeve,
+		challenge = PVP.LOBBY.config.challenge,
+		ruleset = PVP.LOBBY.config.ruleset,
+		gamemode = PVP.LOBBY.config.gamemode,
+		modifier_layers = PVP.LOBBY.config.modifier_layers,
+		lobby_config = PVP.LOBBY.config,
+		the_order_enabled = PVP.should_use_the_order(),
+		different_seeds = PVP.LOBBY.config.different_seeds,
+		mod_version = PVP and PVP.version,
+		mod_hash = PVP.MOD_STRING,
+		smods_version = PVP.SMODS_VERSION,
+		lovely_version = PVP.REQUIRED_LOVELY_VERSION,
+		lobby_code = PVP.LOBBY.code,
+		is_host = PVP.LOBBY.is_host,
+		player = PVP.LOBBY.username,
+		opponent = (PVP.LOBBY.is_host and PVP.LOBBY.guest and PVP.LOBBY.guest.username)
+			or (PVP.LOBBY.host and PVP.LOBBY.host.username),
 		start_ts = os.date("%Y-%m-%dT%H:%M:%S%z"),
 	})
 
 	G.FUNCS.lobby_start_run(nil, { seed = seed, stake = stake })
-	MP.LOBBY.ready_to_start = false
+	PVP.LOBBY.ready_to_start = false
 end
 
 local function begin_pvp_blind()
-	if MP.GAME.next_blind_context then
-		G.FUNCS.select_blind(MP.GAME.next_blind_context)
+	if PVP.GAME.next_blind_context then
+		G.FUNCS.select_blind(PVP.GAME.next_blind_context)
 	else
 		sendErrorMessage("No next blind context", "MULTIPLAYER")
 	end
@@ -399,37 +399,37 @@ local function action_start_blind(p)
 	local first_player = p.firstPlayer
 	-- Reset the stored opponent score each blind so the first frame after we
 	-- play (which lifts the "???" mask) shows 0, not last blind's stale score.
-	MP.GAME.enemy.score = MP.INSANE_INT.empty()
-	MP.GAME.enemy.real_score = MP.INSANE_INT.empty()
-	MP.GAME.enemy.score_text = "0"
+	PVP.GAME.enemy.score = PVP.INSANE_INT.empty()
+	PVP.GAME.enemy.real_score = PVP.INSANE_INT.empty()
+	PVP.GAME.enemy.score_text = "0"
 	-- Re-mask the opponent's hands until the first enemyInfo of the new blind.
-	MP.GAME.enemy.info_received = false
-	-- Royale's "first sync wins" MP.current_target_id() strategy re-latches fresh
+	PVP.GAME.enemy.info_received = false
+	-- Royale's "first sync wins" PVP.current_target_id() strategy re-latches fresh
 	-- each blind (a no-op for 1v1/Nemesis, which don't use this field).
-	MP.GAME.royale_target_id = nil
-	if MP.CURRENT_LOBBY then MP.mirror_players(MP.CURRENT_LOBBY) end
-	MP.GAME.ready_blind = false
-	MP.GAME.pvp_reached = false
-	MP.GAME.timer_started = false
-	MP.GAME.nemesis_timer_started = false
-	MP.GAME.timer_consumed = false
-	MP.GAME.timer = MP.UTILS.pvp_timer_base()
-	MP.GAME.pvp_reached_first = (MP.LOBBY.is_host and "host" or "guest") == first_player
-	MP.UI.start_pvp_countdown(begin_pvp_blind)
+	PVP.GAME.royale_target_id = nil
+	if PVP.CURRENT_LOBBY then PVP.mirror_players(PVP.CURRENT_LOBBY) end
+	PVP.GAME.ready_blind = false
+	PVP.GAME.pvp_reached = false
+	PVP.GAME.timer_started = false
+	PVP.GAME.nemesis_timer_started = false
+	PVP.GAME.timer_consumed = false
+	PVP.GAME.timer = PVP.UTILS.pvp_timer_base()
+	PVP.GAME.pvp_reached_first = (PVP.LOBBY.is_host and "host" or "guest") == first_player
+	PVP.UI.start_pvp_countdown(begin_pvp_blind)
 end
 
 -- (action_enemy_info was removed: the opponent score/hands/skips/lives DISPLAY is now synced
 -- by the nemesis blind's calculate/receive — see objects/blinds/nemesis.lua.)
 
 local function action_stop_game()
-	MP.enemy_disconnect_countdown = nil
+	PVP.enemy_disconnect_countdown = nil
 	if G.STAGE ~= G.STAGES.MAIN_MENU then
 		G.FUNCS.go_to_menu()
-		MP.UI.update_connection_status()
-		MP.reset_game_states()
+		PVP.UI.update_connection_status()
+		PVP.reset_game_states()
 	end
-	MP.RLOG.end_run({ result = "stop" })
-	MP.UTILS.emit_log_checksum()
+	PVP.RLOG.end_run({ result = "stop" })
+	PVP.UTILS.emit_log_checksum()
 end
 
 local function action_end_pvp(p)
@@ -440,89 +440,89 @@ local function action_end_pvp(p)
 			SMODS.calculate_context({ mp_pvp_loss = true, mp_hands_left = G.GAME.current_round.hands_left })
 		end
 	end
-	MP.GAME.end_pvp = true
-	MP.GAME.timer = MP.UTILS.timer_base()
-	MP.GAME.timer_consumed = false
-	MP.GAME.timer_started = false
-	MP.GAME.nemesis_timer_started = false
-	MP.GAME.ready_blind = false
-	MP.GAME.pvp_reached = false
-    MP.GAME.pvp_reached_first = false
-	MP.GAME.score = nil
+	PVP.GAME.end_pvp = true
+	PVP.GAME.timer = PVP.UTILS.timer_base()
+	PVP.GAME.timer_consumed = false
+	PVP.GAME.timer_started = false
+	PVP.GAME.nemesis_timer_started = false
+	PVP.GAME.ready_blind = false
+	PVP.GAME.pvp_reached = false
+    PVP.GAME.pvp_reached_first = false
+	PVP.GAME.score = nil
 end
 
 local function action_player_info(p)
 	local lives = p.lives
-	if MP.GAME.lives ~= lives then
-		if MP.GAME.lives ~= 0 and MP.LOBBY.config.gold_on_life_loss then
-			MP.GAME.comeback_bonus_given = false
-			MP.GAME.comeback_bonus = MP.GAME.comeback_bonus + 1
+	if PVP.GAME.lives ~= lives then
+		if PVP.GAME.lives ~= 0 and PVP.LOBBY.config.gold_on_life_loss then
+			PVP.GAME.comeback_bonus_given = false
+			PVP.GAME.comeback_bonus = PVP.GAME.comeback_bonus + 1
 		end
-		MP.UI.ease_lives(lives - MP.GAME.lives, true)
-		if MP.LOBBY.config.no_gold_on_round_loss and (G.GAME.blind and G.GAME.blind.dollars) then
+		PVP.UI.ease_lives(lives - PVP.GAME.lives, true)
+		if PVP.LOBBY.config.no_gold_on_round_loss and (G.GAME.blind and G.GAME.blind.dollars) then
 			G.GAME.blind.dollars = 0
 		end
 	end
-	MP.GAME.lives = lives
+	PVP.GAME.lives = lives
 end
 
 local function action_win_game()
-	MP.end_game_jokers_payload = ""
-	MP.nemesis_deck_string = ""
-	MP.end_game_jokers_received = false
-	MP.nemesis_deck_received = false
-	MP.GAME.won = true
-	MP.STATS.record_match(true)
-	MP.RLOG.end_run({ result = "win" })
-	MP.UTILS.log_mem_debug_messages()
-	MP.UTILS.emit_log_checksum()
+	PVP.end_game_jokers_payload = ""
+	PVP.nemesis_deck_string = ""
+	PVP.end_game_jokers_received = false
+	PVP.nemesis_deck_received = false
+	PVP.GAME.won = true
+	PVP.STATS.record_match(true)
+	PVP.RLOG.end_run({ result = "win" })
+	PVP.UTILS.log_mem_debug_messages()
+	PVP.UTILS.emit_log_checksum()
 	win_game()
 end
 
 local function action_lose_game()
-	MP.end_game_jokers_payload = ""
-	MP.nemesis_deck_string = ""
-	MP.end_game_jokers_received = false
-	MP.nemesis_deck_received = false
-	MP.STATS.record_match(false)
+	PVP.end_game_jokers_payload = ""
+	PVP.nemesis_deck_string = ""
+	PVP.end_game_jokers_received = false
+	PVP.nemesis_deck_received = false
+	PVP.STATS.record_match(false)
 	G.STATE_COMPLETE = false
 	G.STATE = G.STATES.GAME_OVER
-	MP.RLOG.end_run({ result = "loss" })
-	MP.UTILS.log_mem_debug_messages()
-	MP.UTILS.emit_log_checksum()
+	PVP.RLOG.end_run({ result = "loss" })
+	PVP.UTILS.log_mem_debug_messages()
+	PVP.UTILS.emit_log_checksum()
 end
 
 local function action_lobby_options(options)
-	local different_decks_before = MP.LOBBY.config.different_decks
+	local different_decks_before = PVP.LOBBY.config.different_decks
 	for k, v in pairs(options) do
 		if k == "ruleset" then
-			if not MP.Rulesets[v] then
+			if not PVP.Rulesets[v] then
 				G.FUNCS.mp_pvp_leave_lobby()
-				MP.UI.UTILS.overlay_message(localize({
+				PVP.UI.UTILS.overlay_message(localize({
 					type = "variable",
 					key = "k_failed_to_join_lobby",
 					vars = { localize("k_ruleset_not_found") },
 				}))
 				return
 			end
-			local disabled = MP.Rulesets[v].is_disabled()
+			local disabled = PVP.Rulesets[v].is_disabled()
 			if disabled then
 				G.FUNCS.mp_pvp_leave_lobby()
-				MP.UI.UTILS.overlay_message(
+				PVP.UI.UTILS.overlay_message(
 					localize({ type = "variable", key = "k_failed_to_join_lobby", vars = { disabled } })
 				)
 				return
 			end
-			MP.LOBBY.config.ruleset = v
+			PVP.LOBBY.config.ruleset = v
 			goto continue
 		end
 		if k == "gamemode" then
-			MP.LOBBY.config.gamemode = v
+			PVP.LOBBY.config.gamemode = v
 			goto continue
 		end
 		if k == "modifier_layers" then
-			MP.LOBBY.config.modifier_layers = v
-			MP.modifiers_parse(v)
+			PVP.LOBBY.config.modifier_layers = v
+			PVP.modifiers_parse(v)
 			goto continue
 		end
 
@@ -544,14 +544,14 @@ local function action_lobby_options(options)
 			parsed_v = tonumber(v)
 		end
 
-		MP.LOBBY.config[k] = parsed_v
-		if MP.UI.update_lobby_option_toggle then MP.UI.update_lobby_option_toggle(k) end
+		PVP.LOBBY.config[k] = parsed_v
+		if PVP.UI.update_lobby_option_toggle then PVP.UI.update_lobby_option_toggle(k) end
 		::continue::
 	end
-	if different_decks_before ~= MP.LOBBY.config.different_decks then
+	if different_decks_before ~= PVP.LOBBY.config.different_decks then
 		G.FUNCS.exit_overlay_menu() -- throw out guest from any menu.
 	end
-	MP.ACTIONS.update_player_usernames() -- render new DECK button state
+	PVP.ACTIONS.update_player_usernames() -- render new DECK button state
 end
 
 -- (The phantom masking patches — Card:remove / SMODS.find_card / poll_edition — moved to the
@@ -584,35 +584,35 @@ local function enemyLocation(options)
 		end
 	end
 
-	MP.GAME.enemy.location = loc_location
-	MP.GAME.enemy.location_blind = value
-	MP.GAME.enemy.location_type = location
-	MP.GAME.enemy.location_full = location .. "-" .. value
-	MP.UI.update_enemy_location_render()
+	PVP.GAME.enemy.location = loc_location
+	PVP.GAME.enemy.location_blind = value
+	PVP.GAME.enemy.location_type = location
+	PVP.GAME.enemy.location_full = location .. "-" .. value
+	PVP.UI.update_enemy_location_render()
 end
 
 local function action_version()
-	MP.ACTIONS.version()
+	PVP.ACTIONS.version()
 end
 
 function G.FUNCS.load_end_game_jokers()
 	local card_area_save, success, err
 
-	if not MP.end_game_jokers or not MP.end_game_jokers_payload then return end
+	if not PVP.end_game_jokers or not PVP.end_game_jokers_payload then return end
 
-	card_area_save, err = MPAPI.decode(MP.end_game_jokers_payload)
+	card_area_save, err = MPAPI.decode(PVP.end_game_jokers_payload)
 	if not card_area_save then
 		sendDebugMessage(string.format("Failed to unpack enemy jokers: %s", err), "MULTIPLAYER")
 		return
 	end
 
 	-- Avoid crashing if the load function ends up indexing a nil value
-	success, err = pcall(MP.end_game_jokers.load, MP.end_game_jokers, card_area_save)
+	success, err = pcall(PVP.end_game_jokers.load, PVP.end_game_jokers, card_area_save)
 	if not success then
 		sendDebugMessage(string.format("Failed to load enemy jokers: %s", err), "MULTIPLAYER")
 		-- Reset the card area if loading fails to avoid inconsistent state
-		MP.end_game_jokers:remove()
-		MP.end_game_jokers:init(
+		PVP.end_game_jokers:remove()
+		PVP.end_game_jokers:init(
 			---@diagnostic disable-next-line: param-type-mismatch
 			0,
 			0,
@@ -624,18 +624,18 @@ function G.FUNCS.load_end_game_jokers()
 	end
 
 	-- Log the jokers
-	if MP.end_game_jokers.cards then
+	if PVP.end_game_jokers.cards then
 		local jokers_str = ""
-		for _, card in pairs(MP.end_game_jokers.cards) do
-			jokers_str = jokers_str .. ";" .. MP.UTILS.joker_to_string(card)
+		for _, card in pairs(PVP.end_game_jokers.cards) do
+			jokers_str = jokers_str .. ";" .. PVP.UTILS.joker_to_string(card)
 		end
 		sendTraceMessage(string.format("Received end game jokers: %s", jokers_str), "MULTIPLAYER")
 	end
 end
 
 local function action_receive_end_game_jokers(p)
-	MP.end_game_jokers_payload = p.keys
-	MP.end_game_jokers_received = true
+	PVP.end_game_jokers_payload = p.keys
+	PVP.end_game_jokers_received = true
 	G.FUNCS.load_end_game_jokers()
 end
 
@@ -651,7 +651,7 @@ local function action_get_end_game_jokers()
 	-- Log the jokers
 	local jokers_str = ""
 	for _, card in pairs(G.jokers.cards) do
-		jokers_str = jokers_str .. ";" .. MP.UTILS.joker_to_string(card)
+		jokers_str = jokers_str .. ";" .. PVP.UTILS.joker_to_string(card)
 	end
 	sendTraceMessage(string.format("Sending end game jokers: %s", jokers_str), "MULTIPLAYER")
 
@@ -667,7 +667,7 @@ end
 local function action_get_nemesis_deck()
 	local deck_str = ""
 	for _, card in ipairs(G.playing_cards) do
-		deck_str = deck_str .. ";" .. MP.UTILS.card_to_string(card)
+		deck_str = deck_str .. ";" .. PVP.UTILS.card_to_string(card)
 	end
 	Client.send({
 		action = "receiveNemesisDeck",
@@ -676,7 +676,7 @@ local function action_get_nemesis_deck()
 end
 
 local function action_send_game_stats()
-	if not MP.GAME.stats then
+	if not PVP.GAME.stats then
 		Client.send({
 			action = "nemesisEndGameStats",
 		})
@@ -685,8 +685,8 @@ local function action_send_game_stats()
 
 	local stats = {
 		action = "nemesisEndGameStats",
-		reroll_count = MP.GAME.stats.reroll_count,
-		reroll_cost_total = MP.GAME.stats.reroll_cost_total,
+		reroll_count = PVP.GAME.stats.reroll_count,
+		reroll_cost_total = PVP.GAME.stats.reroll_cost_total,
 	}
 
 	-- Extract voucher keys where value is true and join them with a dash
@@ -706,18 +706,18 @@ local function action_send_game_stats()
 end
 
 function G.FUNCS.load_nemesis_deck()
-	if not MP.nemesis_deck_string or not MP.nemesis_deck or not MP.nemesis_cards or not MP.LOBBY.code then return end
+	if not PVP.nemesis_deck_string or not PVP.nemesis_deck or not PVP.nemesis_cards or not PVP.LOBBY.code then return end
 
-	local card_strings = MP.UTILS.string_split(MP.nemesis_deck_string, ";")
+	local card_strings = PVP.UTILS.string_split(PVP.nemesis_deck_string, ";")
 
-	for k, _ in pairs(MP.nemesis_cards) do
-		MP.nemesis_cards[k] = nil
+	for k, _ in pairs(PVP.nemesis_cards) do
+		PVP.nemesis_cards[k] = nil
 	end
 
 	for _, card_str in pairs(card_strings) do
 		if card_str == "" then goto continue end
 
-		local card_params = MP.UTILS.string_split(card_str, "-")
+		local card_params = PVP.UTILS.string_split(card_str, "-")
 
 		local suit = card_params[1]
 		local rank = card_params[2]
@@ -750,34 +750,34 @@ function G.FUNCS.load_nemesis_deck()
 		local card = create_playing_card({
 			front = G.P_CARDS[front_key],
 			center = enhancement ~= "none" and G.P_CENTERS[enhancement] or nil,
-		}, MP.nemesis_deck, true, true, nil, false)
+		}, PVP.nemesis_deck, true, true, nil, false)
 		if edition ~= "none" then card:set_edition({ [edition] = true }, true, true) end
 		if seal ~= "none" then card:set_seal(seal, true, true) end
 
-		-- Remove the card from G.playing_cards and insert into MP.nemesis_cards
+		-- Remove the card from G.playing_cards and insert into PVP.nemesis_cards
 		table.remove(G.playing_cards, #G.playing_cards)
-		table.insert(MP.nemesis_cards, card)
+		table.insert(PVP.nemesis_cards, card)
 
 		::continue::
 	end
 end
 
 local function action_receive_nemesis_deck(p)
-	MP.nemesis_deck_string = p.cards
-	MP.nemesis_deck_received = true
+	PVP.nemesis_deck_string = p.cards
+	PVP.nemesis_deck_received = true
 	G.FUNCS.load_nemesis_deck()
 end
 
 -- Dual-call: dispatched from network (fromNemesis defaults to true) or self-triggered
--- by MP.ACTIONS.start_ante_timer (passes fromNemesis = false explicitly).
+-- by PVP.ACTIONS.start_ante_timer (passes fromNemesis = false explicitly).
 local function action_start_ante_timer(p)
-	if p.isPvP and (MP.GAME.end_pvp or not MP.is_pvp_boss() or G.GAME.current_round.hands_left <= 0) then return end
+	if p.isPvP and (PVP.GAME.end_pvp or not PVP.is_pvp_boss() or G.GAME.current_round.hands_left <= 0) then return end
 
 	local time = p.time
 	local from_nemesis = p.fromNemesis
 	if from_nemesis == nil then from_nemesis = true end
 
-	local option = MP.config.timersfx or 1
+	local option = PVP.config.timersfx or 1
 	local timersfx = (option == 1) or (option == 2 and G.timer_ante ~= G.GAME.round_resets.ante)
 	G.timer_ante = G.GAME.round_resets.ante
 
@@ -798,14 +798,14 @@ local function action_start_ante_timer(p)
 		end
 	end
 	-- Default timer is server-synced; pressure/no-anim/pvp timers run locally.
-	if not MP.timer_is_local() then
+	if not PVP.timer_is_local() then
 		if type(time) == "string" then time = tonumber(time) end
-		if time then MP.GAME.timer = time end
+		if time then PVP.GAME.timer = time end
 	end
 	if from_nemesis then
-		MP.GAME.nemesis_timer_started = true
+		PVP.GAME.nemesis_timer_started = true
 	else
-		MP.GAME.timer_started = true
+		PVP.GAME.timer_started = true
 	end
 end
 
@@ -815,106 +815,106 @@ local function action_pause_ante_timer(p)
 	if from_nemesis == nil then from_nemesis = true end
 
 	-- Default timer is server-synced; pressure/no-anim/pvp timers run locally.
-	if not MP.timer_is_local() then
+	if not PVP.timer_is_local() then
 		if type(time) == "string" then time = tonumber(time) end
-		if time then MP.GAME.timer = time end
+		if time then PVP.GAME.timer = time end
 	end
 	if from_nemesis then
-		MP.GAME.nemesis_timer_started = false
+		PVP.GAME.nemesis_timer_started = false
 	else
-		MP.GAME.timer_started = false
+		PVP.GAME.timer_started = false
 	end
 end
 
 local function action_modded_action(p)
-	local registry = MP.MOD_ACTIONS[p.modId]
+	local registry = PVP.MOD_ACTIONS[p.modId]
 	if registry and registry[p.modAction] then registry[p.modAction](p) end
 end
 
 -- #region Client to Server
-function MP.ACTIONS.create_lobby(gamemode)
+function PVP.ACTIONS.create_lobby(gamemode)
 	Client.send({
 		action = "createLobby",
 		gameMode = gamemode,
 	})
 end
 
-function MP.ACTIONS.join_lobby(code)
+function PVP.ACTIONS.join_lobby(code)
 	Client.send({
 		action = "joinLobby",
 		code = code,
 	})
 end
 
-function MP.ACTIONS.ready_lobby()
+function PVP.ACTIONS.ready_lobby()
 	Client.send({
 		action = "readyLobby",
 	})
 end
 
-function MP.ACTIONS.unready_lobby()
+function PVP.ACTIONS.unready_lobby()
 	Client.send({
 		action = "unreadyLobby",
 	})
 end
 
-function MP.ACTIONS.lobby_info()
+function PVP.ACTIONS.lobby_info()
 	Client.send({
 		action = "lobbyInfo",
 	})
 end
 
-function MP.ACTIONS.leave_lobby()
+function PVP.ACTIONS.leave_lobby()
 	-- Clear reconnect state on voluntary leave
 	reconnectToken = nil
 	lastLobbyCode = nil
 	Client.send({
 		action = "leaveLobby",
 	})
-	MP.UTILS.emit_log_checksum()
+	PVP.UTILS.emit_log_checksum()
 end
 
-function MP.ACTIONS.start_game()
+function PVP.ACTIONS.start_game()
 	Client.send({
 		action = "startGame",
 	})
 end
 
-function MP.ACTIONS.ready_blind(e)
-	MP.GAME.next_blind_context = e
+function PVP.ACTIONS.ready_blind(e)
+	PVP.GAME.next_blind_context = e
 	Client.send({
 		action = "readyBlind",
 	})
 end
 
-function MP.ACTIONS.unready_blind()
+function PVP.ACTIONS.unready_blind()
 	Client.send({
 		action = "unreadyBlind",
 	})
 end
 
-function MP.ACTIONS.stop_game()
+function PVP.ACTIONS.stop_game()
 	Client.send({
 		action = "stopGame",
 	})
 end
 
-function MP.ACTIONS.fail_round(hands_used)
-	if MP.LOBBY.config.no_gold_on_round_loss then G.GAME.blind.dollars = 0 end
+function PVP.ACTIONS.fail_round(hands_used)
+	if PVP.LOBBY.config.no_gold_on_round_loss then G.GAME.blind.dollars = 0 end
 	if hands_used == 0 then return end
 	Client.send({
 		action = "failRound",
 	})
 end
 
-function MP.ACTIONS.version()
+function PVP.ACTIONS.version()
 	Client.send({
 		action = "version",
 		version = MULTIPLAYER_VERSION,
 	})
 end
 
-function MP.ACTIONS.set_location(location, blind)
+function PVP.ACTIONS.set_location(location, blind)
 	local location_type = location
 	local location_blind = blind
 	if string.find(location, "-") then
@@ -925,30 +925,30 @@ function MP.ACTIONS.set_location(location, blind)
 		location_type = split[1]
 		location_blind = split[2] or ""
 	else
-		location_blind = MP.UTILS.get_blind_to_display(blind) or ""
+		location_blind = PVP.UTILS.get_blind_to_display(blind) or ""
 	end
 	location = location_type .. "-" .. location_blind
 
-	if MP.GAME.location == location then return end
-	MP.GAME.location = location
-	MP.GAME.location_type = location_type
-	MP.GAME.location_blind = location_blind
-	MP.GAME.location_full = location
+	if PVP.GAME.location == location then return end
+	PVP.GAME.location = location
+	PVP.GAME.location_type = location_type
+	PVP.GAME.location_blind = location_blind
+	PVP.GAME.location_full = location
 	Client.send({
 		action = "setLocation",
 		location = location,
 	})
 end
 
-function MP.ACTIONS.update_location(keep_blind)
-	if MP.GAME.location_type then
-		MP.ACTIONS.set_location(MP.GAME.location_type, keep_blind and MP.GAME.location_blind or nil)
+function PVP.ACTIONS.update_location(keep_blind)
+	if PVP.GAME.location_type then
+		PVP.ACTIONS.set_location(PVP.GAME.location_type, keep_blind and PVP.GAME.location_blind or nil)
 	end
 end
 
 ---@param score number
 ---@param hands_left number
-function MP.ACTIONS.play_hand(score, hands_left)
+function PVP.ACTIONS.play_hand(score, hands_left)
 	local fixed_score = tostring(to_big(score))
 	-- Credit to sidmeierscivilizationv on discord for this fix for Talisman
 	if string.match(fixed_score, "[eE]") == nil and string.match(fixed_score, "[.]") then
@@ -957,20 +957,20 @@ function MP.ACTIONS.play_hand(score, hands_left)
 	end
 	fixed_score = string.gsub(fixed_score, ",", "") -- Remove commas
 
-	local insane_int_score = MP.INSANE_INT.from_string(fixed_score)
-	MP.GAME.score = insane_int_score
-	if MP.INSANE_INT.greater_than(insane_int_score, MP.GAME.highest_score) then
-		MP.GAME.highest_score = insane_int_score
+	local insane_int_score = PVP.INSANE_INT.from_string(fixed_score)
+	PVP.GAME.score = insane_int_score
+	if PVP.INSANE_INT.greater_than(insane_int_score, PVP.GAME.highest_score) then
+		PVP.GAME.highest_score = insane_int_score
 	end
 
 	-- Stop PvP timers according to score
-	if MP.is_pvp_boss() and MP.is_layer_active("pvp_timer") then
-		if MP.INSANE_INT.greater_than(insane_int_score, MP.GAME.enemy.score) then
-			MP.GAME.nemesis_timer_started = false
-        elseif MP.INSANE_INT.equal(insane_int_score, MP.GAME.enemy.score) and MP.GAME.pvp_reached_first then
-            MP.GAME.nemesis_timer_started = false
+	if PVP.is_pvp_boss() and PVP.is_layer_active("pvp_timer") then
+		if PVP.INSANE_INT.greater_than(insane_int_score, PVP.GAME.enemy.score) then
+			PVP.GAME.nemesis_timer_started = false
+        elseif PVP.INSANE_INT.equal(insane_int_score, PVP.GAME.enemy.score) and PVP.GAME.pvp_reached_first then
+            PVP.GAME.nemesis_timer_started = false
 		else
-			MP.GAME.timer_started = false
+			PVP.GAME.timer_started = false
 		end
 	end
 
@@ -981,115 +981,115 @@ function MP.ACTIONS.play_hand(score, hands_left)
 	})
 end
 
-function MP.ACTIONS.lobby_options()
+function PVP.ACTIONS.lobby_options()
 	---@type table<string, any>
 	local msg = {
 		action = "lobbyOptions",
 	}
-	for k, v in pairs(MP.LOBBY.config) do
+	for k, v in pairs(PVP.LOBBY.config) do
 		msg[tostring(k)] = v
 	end
 	Client.send(msg)
 end
 
-function MP.ACTIONS.set_ante(ante)
+function PVP.ACTIONS.set_ante(ante)
 	Client.send({
 		action = "setAnte",
 		ante = ante,
 	})
 end
 
-function MP.ACTIONS.new_round()
-	MP.GAME.duplicate_end = false
-	MP.GAME.round_ended = false
+function PVP.ACTIONS.new_round()
+	PVP.GAME.duplicate_end = false
+	PVP.GAME.round_ended = false
 	Client.send({
 		action = "newRound",
 	})
 end
 
-function MP.ACTIONS.set_furthest_blind(furthest_blind)
+function PVP.ACTIONS.set_furthest_blind(furthest_blind)
 	Client.send({
 		action = "setFurthestBlind",
 		furthestBlind = furthest_blind,
 	})
 end
 
-function MP.ACTIONS.skip(skips)
+function PVP.ACTIONS.skip(skips)
 	Client.send({
 		action = "skip",
 		skips = skips,
 	})
 end
 
-function MP.ACTIONS.get_end_game_jokers()
+function PVP.ACTIONS.get_end_game_jokers()
 	Client.send({
 		action = "getEndGameJokers",
 	})
 end
 
-function MP.ACTIONS.get_nemesis_deck()
+function PVP.ACTIONS.get_nemesis_deck()
 	Client.send({
 		action = "getNemesisDeck",
 	})
 end
 
-function MP.ACTIONS.send_game_stats()
+function PVP.ACTIONS.send_game_stats()
 	Client.send({
 		action = "sendGameStats",
 	})
 	action_send_game_stats()
 end
 
-function MP.ACTIONS.request_nemesis_stats()
+function PVP.ACTIONS.request_nemesis_stats()
 	Client.send({
 		action = "endGameStatsRequested",
 	})
 end
 
-function MP.ACTIONS.start_ante_timer()
-	local is_pvp = MP.is_pvp_boss() and MP.is_layer_active("pvp_timer")
+function PVP.ACTIONS.start_ante_timer()
+	local is_pvp = PVP.is_pvp_boss() and PVP.is_layer_active("pvp_timer")
 	Client.send({
 		action = "startAnteTimer",
-		time = MP.GAME.timer,
+		time = PVP.GAME.timer,
 		isPvP = is_pvp or nil,
 	})
-	action_start_ante_timer({ time = MP.GAME.timer, fromNemesis = false })
+	action_start_ante_timer({ time = PVP.GAME.timer, fromNemesis = false })
 end
 
-function MP.ACTIONS.pause_ante_timer()
+function PVP.ACTIONS.pause_ante_timer()
 	Client.send({
 		action = "pauseAnteTimer",
-		time = MP.GAME.timer,
+		time = PVP.GAME.timer,
 	})
-	action_pause_ante_timer({ time = MP.GAME.timer, fromNemesis = false })
+	action_pause_ante_timer({ time = PVP.GAME.timer, fromNemesis = false })
 end
 
-function MP.ACTIONS.fail_timer()
+function PVP.ACTIONS.fail_timer()
 	Client.send({
 		action = "failTimer",
 	})
 end
-function MP.ACTIONS.fail_pvp_timer()
+function PVP.ACTIONS.fail_pvp_timer()
 	Client.send({
 		action = "failPvPTimer",
 	})
 end
 
-function MP.ACTIONS.sync_client()
+function PVP.ACTIONS.sync_client()
 	Client.send({
 		action = "syncClient",
 		isCached = _RELEASE_MODE,
 	})
 end
 
--- (action_stream_log_lines / action_submit_log_hashes were removed: MP.RLOG's
+-- (action_stream_log_lines / action_submit_log_hashes were removed: PVP.RLOG's
 -- live transport now broadcasts each event directly via the pvp_log_event
 -- MPAPI ActionType -- see pvp_api/replay_log_actions.lua and
 -- lib/replay_log.lua. These TCP-era Client.send actions were already silently
 -- dropped by pvp_api/net.lua's router -- unlisted actions are "owned by the
 -- API now, or deferred" per its own comment -- so nothing called them.)
 
-function MP.ACTIONS.modded(modId, modAction, params, target)
+function PVP.ACTIONS.modded(modId, modAction, params, target)
 	local msg = {
 		action = "moddedAction",
 		modId = modId,
@@ -1107,14 +1107,14 @@ end
 -- #endregion Client to Server
 
 -- Utils
-function MP.ACTIONS.connect()
+function PVP.ACTIONS.connect()
 	Client.send({
 		action = "connect",
 	})
 end
 
-function MP.ACTIONS.update_player_usernames()
-	if MP.LOBBY.code then
+function PVP.ACTIONS.update_player_usernames()
+	if PVP.LOBBY.code then
 		if G.MAIN_MENU_UI then G.MAIN_MENU_UI:remove() end
 		set_main_menu_UI()
 	end
@@ -1169,19 +1169,19 @@ local HANDLERS = {
 -- Peer dispatch: invoke a server->client action handler by its wire name. The
 -- MPAPI ActionType layer (pvp_api/) calls this from on_receive to run the existing
 -- client-side handlers when a peer action arrives, replacing the old socket pump.
-function MP.dispatch_action(name, params)
+function PVP.dispatch_action(name, params)
 	local handler = HANDLERS[name]
 	if handler then
 		handler(params or {})
 	else
-		sendWarnMessage("MP.dispatch_action: no handler for '" .. tostring(name) .. "'", "MULTIPLAYER")
+		sendWarnMessage("PVP.dispatch_action: no handler for '" .. tostring(name) .. "'", "MULTIPLAYER")
 	end
 end
 
-function MP.register_action(name, cb)
+function PVP.register_action(name, cb)
 	if HANDLERS[name] then
 		sendWarnMessage(
-			"MP.register_action: '" .. name .. "' already has a handler; refusing to register. Use MP.register_mod_action if possible.",
+			"PVP.register_action: '" .. name .. "' already has a handler; refusing to register. Use PVP.register_mod_action if possible.",
 			"MULTIPLAYER"
 		)
 		return

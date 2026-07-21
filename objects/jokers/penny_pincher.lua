@@ -7,7 +7,7 @@ SMODS.Atlas({
 
 -- Leaving the shop tells the opponent's Penny Pincher how much we spent -- the trigger
 -- is a generic lovely patch on G.FUNCS.toggle_shop (lovely/game.toml), owned here.
-function MP.broadcast_spent_last_shop(amount)
+function PVP.broadcast_spent_last_shop(amount)
 	local center = G.P_CENTERS["j_mp_penny_pincher"]
 	if center then center:sync(amount) end
 end
@@ -24,25 +24,22 @@ MPAPI.Joker({
 	perishable_compat = true,
 	config = { extra = { dollars = 1, nemesis_dollars = 3 } },
 	loc_vars = function(self, info_queue, card)
-		MP.UTILS.add_nemesis_info(info_queue)
+		PVP.UTILS.add_nemesis_info(info_queue)
 		return { vars = { card.ability.extra.dollars, card.ability.extra.nemesis_dollars } }
 	end,
 	in_pool = function(self)
-		return MP.GAME.pincher_unlock -- do NOT replace this with G.GAME.round_resets.ante >= 3, order sets ante to 0
-	end,
-	mp_include = function(self)
-		return MP.LOBBY.code and MP.LOBBY.config.multiplayer_jokers
+		return PVP.GAME.pincher_unlock -- do NOT replace this with G.GAME.round_resets.ante >= 3, order sets ante to 0
 	end,
 	-- Was action_spent_last_shop.
 	receive = function(self, context)
-		MP.note_target_candidate(context.from)
-		if MP.current_target_id() and context.from ~= MP.current_target_id() then
+		PVP.note_target_candidate(context.from)
+		if PVP.current_target_id() and context.from ~= PVP.current_target_id() then
 			return
 		end
-		MP.GAME.enemy.spent_in_shop[#MP.GAME.enemy.spent_in_shop + 1] = tonumber(context.data)
+		PVP.GAME.enemy.spent_in_shop[#PVP.GAME.enemy.spent_in_shop + 1] = tonumber(context.data)
 	end,
 	calc_dollar_bonus = function(self, card)
-		local spent = MP.GAME.enemy.spent_in_shop[MP.GAME.pincher_index]
+		local spent = PVP.GAME.enemy.spent_in_shop[PVP.GAME.pincher_index]
 		local money = 0
 		if spent then money = math.floor(spent / card.ability.extra.nemesis_dollars) end
 		if money > 0 then return money end

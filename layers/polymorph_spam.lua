@@ -28,10 +28,8 @@ end
 local function included(key)
 	if G.GAME.banned_keys[key] then
 		return false
-	elseif G.P_CENTERS[key].mp_include and type(G.P_CENTERS[key].mp_include) == "function" then
-		return G.P_CENTERS[key]:mp_include()
 	end
-	return true
+	return not MPAPI.should_exclude_from_pool(G.P_CENTERS[key])
 end
 
 -- i should have separated this into 2 functions but this works i suppose

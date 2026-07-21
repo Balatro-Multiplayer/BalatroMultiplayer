@@ -21,7 +21,7 @@ MPAPI.Joker({
 	-- Opponent receives the "misfire": their showcase copy juices up and they lose dollars
 	-- (was action_lets_go_gambling_nemesis).
 	receive = function(self, context)
-		local copy = MP.UTILS.get_phantom_joker("j_mp_lets_go_gambling")
+		local copy = PVP.UTILS.get_phantom_joker("j_mp_lets_go_gambling")
 		if copy then copy:juice_up() end
 		ease_dollars(copy and copy.ability and copy.ability.extra and copy.ability.extra.nemesis_dollars or 5)
 	end,
@@ -42,9 +42,6 @@ MPAPI.Joker({
 			},
 		}
 	end,
-	mp_include = function(self)
-		return MP.LOBBY.code and MP.LOBBY.config.multiplayer_jokers
-	end,
 	calculate = function(self, card, context)
 		if
 			context.cardarea == G.jokers
@@ -58,7 +55,7 @@ MPAPI.Joker({
 				returns.dollars = card.ability.extra.dollars
 			end
 			if
-				MP.is_pvp_boss()
+				PVP.is_pvp_boss()
 				and SMODS.pseudorandom_probability(
 					card,
 					"j_mp_lets_go_gambling_misfire",

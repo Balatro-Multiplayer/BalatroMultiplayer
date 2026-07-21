@@ -20,11 +20,8 @@ SMODS.Joker({
 		local chips = G.GAME.stake >= 6 and card.ability.extra.highstake or card.ability.extra.extra
 		return { vars = { chips, card.ability.t_chips } }
 	end,
-	mp_include = function(self)
-		return MP.LOBBY.code and MP.LOBBY.config.multiplayer_jokers
-	end,
 	update = function(self, card, dt)
-		if not MP.LOBBY.code then
+		if not PVP.LOBBY.code then
 			card.ability.t_chips = 0
 			return
 		end
@@ -32,7 +29,7 @@ SMODS.Joker({
 		if G.STAGE ~= G.STAGES.RUN then return end
 
 		local chips = G.GAME.stake >= 6 and card.ability.extra.highstake or card.ability.extra.extra
-		card.ability.t_chips = math.max((MP.GAME.enemy.lives - MP.GAME.lives) * chips, 0)
+		card.ability.t_chips = math.max((PVP.GAME.enemy.lives - PVP.GAME.lives) * chips, 0)
 	end,
 	calculate = function(self, card, context)
 		if context.cardarea == G.jokers and context.joker_main then

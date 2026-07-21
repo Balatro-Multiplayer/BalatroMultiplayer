@@ -1,14 +1,14 @@
 if SMODS.Mods["HotPotato"] and SMODS.Mods["HotPotato"].can_load then
 	sendDebugMessage("HotPotato compatibility detected", "MULTIPLAYER")
-	MP.DECK.ban_card("j_hpot_antidsestablishmentarianism") -- sic
-	MP.DECK.ban_card("j_hpot_brainfuck")
-	MP.DECK.ban_card("j_hpot_goldenchicot")
-	MP.DECK.ban_card("j_hpot_lockin")
-	MP.DECK.ban_card("j_joker")
-	MP.DECK.ban_card("j_hpot_lotus")
-	MP.DECK.ban_card("j_hpot_c_sharp")
+	PVP.DECK.ban_card("j_hpot_antidsestablishmentarianism") -- sic
+	PVP.DECK.ban_card("j_hpot_brainfuck")
+	PVP.DECK.ban_card("j_hpot_goldenchicot")
+	PVP.DECK.ban_card("j_hpot_lockin")
+	PVP.DECK.ban_card("j_joker")
+	PVP.DECK.ban_card("j_hpot_lotus")
+	PVP.DECK.ban_card("j_hpot_c_sharp")
 
-	MP.DECK.ban_card("j_hpot_goblin_tinkerer") -- too easy to infinite
+	PVP.DECK.ban_card("j_hpot_goblin_tinkerer") -- too easy to infinite
 
 	-- essentially we're just hooking a bunch of functions to separate and normalise rng
 	-- i was gonna hook more but it ended up only being 2 so whatever
@@ -28,7 +28,7 @@ if SMODS.Mods["HotPotato"] and SMODS.Mods["HotPotato"].can_load then
 
 			-- Suppress Order-mode determinism during this fake-ante reward roll: base-game
 			-- lovely patches (TheOrder.toml, now shipped from BalatroMultiplayerAPI) call
-			-- MPAPI.should_use_the_order() directly, not MP.should_use_the_order -- monkeypatch
+			-- MPAPI.should_use_the_order() directly, not PVP.should_use_the_order -- monkeypatch
 			-- MPAPI's function or this suppression silently does nothing.
 			local temp_should_use_the_order = MPAPI.should_use_the_order
 			MPAPI.should_use_the_order = function()
@@ -84,7 +84,7 @@ if SMODS.Mods["HotPotato"] and SMODS.Mods["HotPotato"].can_load then
 		local temp_ante = G.GAME.round_resets.ante
 		G.GAME.round_resets.ante = 78
 
-		-- See the hook() function above for why this targets MPAPI's function, not MP's.
+		-- See the hook() function above for why this targets MPAPI's function, not PVP's.
 		local temp_should_use_the_order = MPAPI.should_use_the_order
 		MPAPI.should_use_the_order = function()
 			return false

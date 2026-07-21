@@ -1,7 +1,7 @@
 -- TAB-hold shortcuts menu
 -- Shows a context-aware overlay of quick actions while TAB is held
 
-MP.SHORTCUTS = {
+PVP.SHORTCUTS = {
 	visible = false,
 	ui = nil,
 }
@@ -9,8 +9,8 @@ MP.SHORTCUTS = {
 -- Build the list of available shortcuts based on current state
 local function get_shortcuts()
 	local shortcuts = {}
-	local in_lobby = MP.LOBBY.code ~= nil
-	local connected = MP.LOBBY.connected
+	local in_lobby = PVP.LOBBY.code ~= nil
+	local connected = PVP.LOBBY.connected
 	local in_menu = G.STAGE == G.STAGES.MAIN_MENU
 
 	if in_menu then
@@ -19,14 +19,14 @@ local function get_shortcuts()
 				label = localize("b_copy_code"),
 				key = "C",
 				action = function()
-					MP.UTILS.copy_to_clipboard(MP.LOBBY.code)
+					PVP.UTILS.copy_to_clipboard(PVP.LOBBY.code)
 				end,
 			})
 			table.insert(shortcuts, {
 				label = localize("b_view_code"),
 				key = "V",
 				action = function()
-					MP.UI.UTILS.overlay_message(MP.LOBBY.code)
+					PVP.UI.UTILS.overlay_message(PVP.LOBBY.code)
 				end,
 			})
 			table.insert(shortcuts, {
@@ -181,21 +181,21 @@ end
 
 function G.FUNCS.mp_shortcut_exec(e)
 	if e.config.ref_table and e.config.ref_table.action then
-		MP.SHORTCUTS.hide()
+		PVP.SHORTCUTS.hide()
 		e.config.ref_table.action()
 	end
 end
 
-function MP.SHORTCUTS.show()
-	if MP.SHORTCUTS.visible then return end
+function PVP.SHORTCUTS.show()
+	if PVP.SHORTCUTS.visible then return end
 
 	local shortcuts = get_shortcuts()
 	if #shortcuts == 0 then return end
 
-	MP.SHORTCUTS.visible = true
-	MP.SHORTCUTS.current_shortcuts = shortcuts
+	PVP.SHORTCUTS.visible = true
+	PVP.SHORTCUTS.current_shortcuts = shortcuts
 
-	MP.SHORTCUTS.ui = UIBox({
+	PVP.SHORTCUTS.ui = UIBox({
 		definition = create_shortcuts_ui(shortcuts),
 		config = {
 			align = "cm",
@@ -206,25 +206,25 @@ function MP.SHORTCUTS.show()
 	})
 end
 
-function MP.SHORTCUTS.hide()
-	if not MP.SHORTCUTS.visible then return end
+function PVP.SHORTCUTS.hide()
+	if not PVP.SHORTCUTS.visible then return end
 
-	MP.SHORTCUTS.visible = false
-	if MP.SHORTCUTS.ui then
-		MP.SHORTCUTS.ui:remove()
-		MP.SHORTCUTS.ui = nil
+	PVP.SHORTCUTS.visible = false
+	if PVP.SHORTCUTS.ui then
+		PVP.SHORTCUTS.ui:remove()
+		PVP.SHORTCUTS.ui = nil
 	end
-	MP.SHORTCUTS.current_shortcuts = nil
+	PVP.SHORTCUTS.current_shortcuts = nil
 end
 
 -- Execute a shortcut by its key letter
-function MP.SHORTCUTS.execute_key(key)
-	if not MP.SHORTCUTS.current_shortcuts then return false end
+function PVP.SHORTCUTS.execute_key(key)
+	if not PVP.SHORTCUTS.current_shortcuts then return false end
 
 	local upper_key = string.upper(key)
-	for _, sc in ipairs(MP.SHORTCUTS.current_shortcuts) do
+	for _, sc in ipairs(PVP.SHORTCUTS.current_shortcuts) do
 		if sc.key == upper_key then
-			MP.SHORTCUTS.hide()
+			PVP.SHORTCUTS.hide()
 			sc.action()
 			return true
 		end
@@ -236,15 +236,15 @@ end
 local key_press_update_ref = Controller.key_press_update
 function Controller:key_press_update(key, dt)
 	-- Intercept shortcut key presses while menu is visible
-	if MP.SHORTCUTS.visible and #key == 1 then
-		if MP.SHORTCUTS.execute_key(key) then
+	if PVP.SHORTCUTS.visible and #key == 1 then
+		if PVP.SHORTCUTS.execute_key(key) then
 			return
 		end
 	end
 
 	if key == "tab" and not G.OVERLAY_MENU then
-		MP.SHORTCUTS.show()
-		if MP.SHORTCUTS.visible then return end
+		PVP.SHORTCUTS.show()
+		if PVP.SHORTCUTS.visible then return end
 	end
 	key_press_update_ref(self, key, dt)
 end
@@ -252,7 +252,7 @@ end
 local key_release_update_ref = Controller.key_release_update
 function Controller:key_release_update(key, dt)
 	if key == "tab" then
-		MP.SHORTCUTS.hide()
+		PVP.SHORTCUTS.hide()
 	end
 	key_release_update_ref(self, key, dt)
 end

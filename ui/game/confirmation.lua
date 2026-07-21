@@ -2,9 +2,9 @@ function G.UIDEF.confirmation_dialog()
 	return create_UIBox_generic_options({
 		back_func = "options",
 		contents = {
-			MP.UI.UTILS.create_row({ align = "cm", padding = 0 }, {
-				MP.UI.UTILS.create_row({ align = "cm", padding = 0.5 }, {
-					MP.UI.UTILS.create_text_node(localize("k_are_you_sure"), {
+			PVP.UI.UTILS.create_row({ align = "cm", padding = 0 }, {
+				PVP.UI.UTILS.create_row({ align = "cm", padding = 0.5 }, {
+					PVP.UI.UTILS.create_text_node(localize("k_are_you_sure"), {
 						scale = 0.6,
 						colour = G.C.UI.TEXT_LIGHT,
 					}),

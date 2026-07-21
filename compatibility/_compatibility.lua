@@ -1,33 +1,33 @@
-MP.DECK = {}
+PVP.DECK = {}
 
-MP.DECK.BANNED_JOKERS = {}
+PVP.DECK.BANNED_JOKERS = {}
 
-MP.DECK.BANNED_CONSUMABLES = {}
+PVP.DECK.BANNED_CONSUMABLES = {}
 
-MP.DECK.BANNED_VOUCHERS = {}
+PVP.DECK.BANNED_VOUCHERS = {}
 
-MP.DECK.BANNED_ENHANCEMENTS = {}
+PVP.DECK.BANNED_ENHANCEMENTS = {}
 
-MP.DECK.BANNED_TAGS = {}
+PVP.DECK.BANNED_TAGS = {}
 
-MP.DECK.BANNED_BLINDS = {}
+PVP.DECK.BANNED_BLINDS = {}
 
-function MP.DECK.ban_card(card_id)
+function PVP.DECK.ban_card(card_id)
 	if card_id:sub(1, 1) == "j" then
-		MP.DECK.BANNED_JOKERS[#MP.DECK.BANNED_JOKERS + 1] = card_id
+		PVP.DECK.BANNED_JOKERS[#PVP.DECK.BANNED_JOKERS + 1] = card_id
 	elseif card_id:sub(1, 1) == "v" then
-		MP.DECK.BANNED_VOUCHERS[#MP.DECK.BANNED_VOUCHERS + 1] = card_id
+		PVP.DECK.BANNED_VOUCHERS[#PVP.DECK.BANNED_VOUCHERS + 1] = card_id
 	elseif card_id:sub(1, 1) == "m" then
-		MP.DECK.BANNED_ENHANCEMENTS[#MP.DECK.BANNED_ENHANCEMENTS + 1] = card_id
+		PVP.DECK.BANNED_ENHANCEMENTS[#PVP.DECK.BANNED_ENHANCEMENTS + 1] = card_id
 	end
 end
 
-function MP.DECK.ban_tag(tag_id)
-	MP.DECK.BANNED_TAGS[#MP.DECK.BANNED_TAGS + 1] = tag_id
+function PVP.DECK.ban_tag(tag_id)
+	PVP.DECK.BANNED_TAGS[#PVP.DECK.BANNED_TAGS + 1] = tag_id
 end
 
-function MP.DECK.ban_blind(blind_id)
-	MP.DECK.BANNED_BLINDS[#MP.DECK.BANNED_BLINDS + 1] = blind_id
+function PVP.DECK.ban_blind(blind_id)
+	PVP.DECK.BANNED_BLINDS[#PVP.DECK.BANNED_BLINDS + 1] = blind_id
 end
 
 -- Compat-mod bans (ban_card/ban_tag/ban_blind, called from the individual
@@ -36,12 +36,12 @@ end
 MPAPI.register_ban_source(function()
 	local keys = {}
 	for _, list in ipairs({
-		MP.DECK.BANNED_JOKERS,
-		MP.DECK.BANNED_CONSUMABLES,
-		MP.DECK.BANNED_VOUCHERS,
-		MP.DECK.BANNED_ENHANCEMENTS,
-		MP.DECK.BANNED_TAGS,
-		MP.DECK.BANNED_BLINDS,
+		PVP.DECK.BANNED_JOKERS,
+		PVP.DECK.BANNED_CONSUMABLES,
+		PVP.DECK.BANNED_VOUCHERS,
+		PVP.DECK.BANNED_ENHANCEMENTS,
+		PVP.DECK.BANNED_TAGS,
+		PVP.DECK.BANNED_BLINDS,
 	}) do
 		for _, key in ipairs(list) do
 			keys[#keys + 1] = key
@@ -75,11 +75,11 @@ function Card:init(X, Y, W, H, card, center, params)
 	card_init_ref(self, X, Y, W, H, card, center, params)
 end
 
-MP.DECK.MAX_STAKE = 0
+PVP.DECK.MAX_STAKE = 0
 
 local stake_queue = {}
 
-function MP.set_max_stake(stake_key)
+function PVP.set_max_stake(stake_key)
 	if not SMODS.booted then
 		stake_queue[stake_key] = true
 		return
@@ -89,7 +89,7 @@ function MP.set_max_stake(stake_key)
 		local key = SMODS.stake_from_index(stake)
 		if key == stake_key then
 			sendTraceMessage("Setting max stake to " .. stake, "MULTIPLAYER")
-			MP.DECK.MAX_STAKE = math.max(stake, MP.DECK.MAX_STAKE)
+			PVP.DECK.MAX_STAKE = math.max(stake, PVP.DECK.MAX_STAKE)
 			return
 		end
 		stake = stake + 1
@@ -103,7 +103,7 @@ function Game:update(dt)
 
 	if next(stake_queue) and SMODS.booted then
 		for key, _ in pairs(stake_queue) do
-			MP.set_max_stake(key)
+			PVP.set_max_stake(key)
 			stake_queue[key] = nil
 		end
 	end

@@ -2,7 +2,7 @@
 -- Shared utility functions for Extra Credit jokers ported to Sandbox
 -- This file is prefixed with underscore to ensure it loads before the joker files
 
-MP.EC = MP.EC or {}
+PVP.EC = PVP.EC or {}
 
 -- Talisman Compatibility wrapper
 to_big = to_big or function(x)
@@ -73,12 +73,12 @@ end
 
 --- Hook into game globals reset to initialize EC round state
 --- Called at start of each round
-local original_reset_game_globals = MP.reset_game_globals
-MP.reset_game_globals = function(run_start)
+local original_reset_game_globals = PVP.reset_game_globals
+PVP.reset_game_globals = function(run_start)
 	if original_reset_game_globals then original_reset_game_globals(run_start) end
 
 	-- Only initialize EC state when sandbox ruleset is active
-	if MP.is_layer_active(MP.LayerKey.SANDBOX) then
+	if PVP.is_layer_active(PVP.LayerKey.SANDBOX) then
 		reset_tuxedo_card()
 		reset_farmer_card()
 		reset_fish_rank()
@@ -90,7 +90,7 @@ local original_ease_dollars = ease_dollars
 function ease_dollars(mod, x)
 	original_ease_dollars(mod, x)
 
-	if MP.is_layer_active(MP.LayerKey.SANDBOX) and to_big(mod) > to_big(0) and G.jokers and G.jokers.cards then
+	if PVP.is_layer_active(PVP.LayerKey.SANDBOX) and to_big(mod) > to_big(0) and G.jokers and G.jokers.cards then
 		for i = 1, #G.jokers.cards do
 			local card = G.jokers.cards[i]
 			if card.config.center.key == "j_mp_hoarder_sandbox" and not card.debuffed then

@@ -5,13 +5,13 @@
 -- declared win/loss. In the peer MQTT model there is no server adjudicator, so the
 -- HOST client runs that logic. This file is a faithful Lua port of the legacy
 -- server's src/actionHandlers.ts + Client.ts resolution rules, operating on a
--- per-player-id table (MP.REF). Every function is a no-op on non-host clients.
+-- per-player-id table (PVP.REF). Every function is a no-op on non-host clients.
 --
 -- Authoritative outcomes are broadcast as pvp_* ActionTypes (see actions.lua); all
 -- clients (including the host, via broadcast loopback) then apply them through the
 -- existing client handlers, so the host and guest stay in lockstep.
 
-MP.REF = MP.REF
+PVP.REF = PVP.REF
 	or {
 		players = {},
 		first_ready_at = nil,
@@ -38,13 +38,13 @@ local function broadcast(key, params)
 end
 
 local function ref_player(id)
-	MP.REF.players[id] = MP.REF.players[id]
+	PVP.REF.players[id] = PVP.REF.players[id]
 		or {
 			id = id,
-			score = MP.INSANE_INT.empty(),
-			highest_score = MP.INSANE_INT.empty(),
+			score = PVP.INSANE_INT.empty(),
+			highest_score = PVP.INSANE_INT.empty(),
 			hands_left = 4,
-			lives = MP.LOBBY.config.starting_lives or 4,
+			lives = PVP.LOBBY.config.starting_lives or 4,
 			skips = 0,
 			ante = 1,
 			furthest_blind = 0,
@@ -53,7 +53,7 @@ local function ref_player(id)
 			first_ready = false,
 			lives_blocker = false,
 		}
-	return MP.REF.players[id]
+	return PVP.REF.players[id]
 end
 
 -- The two participant ids (host is the local player when we are host).
@@ -126,12 +126,12 @@ local function circle_round(ids, offset)
 	return out
 end
 
--- Recomputes MP.REF.nemesis_of for the current ante from the given alive roster:
+-- Recomputes PVP.REF.nemesis_of for the current ante from the given alive roster:
 -- a no-repeat (until every possible pair has been used, at which point the cycle
 -- restarts) round-robin pairing, with a bye for odd counts that prefers not
 -- repeating whoever byed last time.
 local function compute_nemesis_pairing(alive)
-	MP.REF.nemesis_of = {}
+	PVP.REF.nemesis_of = {}
 	if #alive < 2 then
 		return
 	end
@@ -149,7 +149,7 @@ local function compute_nemesis_pairing(alive)
 	if #ids % 2 == 1 then
 		local idx = 1
 		for i, id in ipairs(ids) do
-			if id ~= MP.REF.last_bye_id then
+			if id ~= PVP.REF.last_bye_id then
 				idx = i
 				break
 			end
@@ -164,7 +164,7 @@ local function compute_nemesis_pairing(alive)
 			local candidate = circle_round(ids, offset)
 			local ok = true
 			for _, p in ipairs(candidate) do
-				if MP.REF.used_pairs[pair_key(p[1], p[2])] then
+				if PVP.REF.used_pairs[pair_key(p[1], p[2])] then
 					ok = false
 					break
 				end
@@ -177,59 +177,59 @@ local function compute_nemesis_pairing(alive)
 		if not chosen then
 			-- Every possible pair among the current alive set has already been used --
 			-- the no-repeat cycle restarts.
-			MP.REF.used_pairs = {}
+			PVP.REF.used_pairs = {}
 			chosen = circle_round(ids, 0)
 		end
 		for _, p in ipairs(chosen) do
-			MP.REF.nemesis_of[p[1]] = p[2]
-			MP.REF.nemesis_of[p[2]] = p[1]
-			MP.REF.used_pairs[pair_key(p[1], p[2])] = true
+			PVP.REF.nemesis_of[p[1]] = p[2]
+			PVP.REF.nemesis_of[p[2]] = p[1]
+			PVP.REF.used_pairs[pair_key(p[1], p[2])] = true
 		end
 	end
-	MP.REF.last_bye_id = bye_id
+	PVP.REF.last_bye_id = bye_id
 end
 
 -- Broadcasts the current ante's pairing to everyone (flat id -> partner-id-or-"" map
--- for every currently-alive id) so each client can resolve MP.current_target_id().
+-- for every currently-alive id) so each client can resolve PVP.current_target_id().
 local function broadcast_nemesis_pairing()
 	local payload = {}
 	for _, id in ipairs(alive_ids()) do
-		payload[id] = MP.REF.nemesis_of[id] or ""
+		payload[id] = PVP.REF.nemesis_of[id] or ""
 	end
 	broadcast("pvp_nemesis_pairing", { pairing = payload })
 end
 
 -- Best PvP score for a player (host referee state), as a plausibility-bounded number
 -- for the matchmaking `metric` (season-best score column). Host-only.
-function MP.pvp_score_metric(player_id)
-	local pl = MP.REF and MP.REF.players and MP.REF.players[player_id]
+function PVP.pvp_score_metric(player_id)
+	local pl = PVP.REF and PVP.REF.players and PVP.REF.players[player_id]
 	if not pl or not pl.score then
 		return 0
 	end
-	return tonumber(MP.INSANE_INT.to_string(pl.highest_score or pl.score)) or 0
+	return tonumber(PVP.INSANE_INT.to_string(pl.highest_score or pl.score)) or 0
 end
 
 -- Reset all referee state at game start and stamp starting lives (option override
 -- else the gamemode default). Mirrors Lobby.setPlayersLives + resetPlayers.
-function MP.referee_reset(starting_lives)
+function PVP.referee_reset(starting_lives)
 	if not is_host() then
 		return
 	end
-	MP.REF.players = {}
-	MP.REF.first_ready_at = nil
-	if MP.REF.ready_tracker then
-		MP.REF.ready_tracker:reset()
+	PVP.REF.players = {}
+	PVP.REF.first_ready_at = nil
+	if PVP.REF.ready_tracker then
+		PVP.REF.ready_tracker:reset()
 	end
-	MP.REF.nemesis_of = {}
-	MP.REF.used_pairs = {}
-	MP.REF.nemesis_ante_computed_for = 0
-	MP.REF.last_bye_id = nil
-	MP._result_reported = false
-	local lives = starting_lives or MP.LOBBY.config.starting_lives or 4
+	PVP.REF.nemesis_of = {}
+	PVP.REF.used_pairs = {}
+	PVP.REF.nemesis_ante_computed_for = 0
+	PVP.REF.last_bye_id = nil
+	PVP._result_reported = false
+	local lives = starting_lives or PVP.LOBBY.config.starting_lives or 4
 	for _, id in ipairs(both_players()) do
 		local pl = ref_player(id)
 		pl.lives = lives
-		pl.score = MP.INSANE_INT.empty()
+		pl.score = PVP.INSANE_INT.empty()
 		pl.hands_left = 4
 		pl.played_this_blind = false
 		pl.is_ready = false
@@ -239,9 +239,9 @@ function MP.referee_reset(starting_lives)
 	-- Authoritative starting lives to both clients.
 	broadcast("pvp_player_lives", { player_id = "*all*", lives = lives })
 
-	if MP.LOBBY.config.nemesis_pairing then
+	if PVP.LOBBY.config.nemesis_pairing then
 		compute_nemesis_pairing(alive_ids())
-		MP.REF.nemesis_ante_computed_for = 1
+		PVP.REF.nemesis_ante_computed_for = 1
 		broadcast_nemesis_pairing()
 	end
 end
@@ -263,27 +263,27 @@ end
 -- "every alive player has readied", via MPAPI.ReadyTracker()'s set/is_ready/reset
 -- primitives (checked against alive_ids() ourselves rather than its own all_ready(),
 -- which loops the full lobby roster and would stall on eliminated spectators).
-function MP.referee_on_ready_blind(from)
+function PVP.referee_on_ready_blind(from)
 	if not is_host() then
 		return
 	end
 
 	if #both_players() > 2 then
-		MP.REF.ready_tracker = MP.REF.ready_tracker or MPAPI.ReadyTracker()
-		MP.REF.ready_tracker:set(from, true)
+		PVP.REF.ready_tracker = PVP.REF.ready_tracker or MPAPI.ReadyTracker()
+		PVP.REF.ready_tracker:set(from, true)
 		local alive = alive_ids()
 		local all_ready = true
 		for _, id in ipairs(alive) do
-			if not MP.REF.ready_tracker:is_ready(id) then
+			if not PVP.REF.ready_tracker:is_ready(id) then
 				all_ready = false
 				break
 			end
 		end
 		if all_ready then
-			MP.REF.ready_tracker:reset()
+			PVP.REF.ready_tracker:reset()
 			for _, id in ipairs(alive) do
 				local pl = ref_player(id)
-				pl.score = MP.INSANE_INT.empty()
+				pl.score = PVP.INSANE_INT.empty()
 				pl.hands_left = 4
 				pl.played_this_blind = false
 			end
@@ -304,8 +304,8 @@ function MP.referee_on_ready_blind(from)
 	if enemy and me.is_ready and enemy.is_ready then
 		me.is_ready = false
 		enemy.is_ready = false
-		me.score = MP.INSANE_INT.empty()
-		enemy.score = MP.INSANE_INT.empty()
+		me.score = PVP.INSANE_INT.empty()
+		enemy.score = PVP.INSANE_INT.empty()
 		me.hands_left = 4
 		enemy.hands_left = 4
 		me.played_this_blind = false
@@ -317,7 +317,7 @@ function MP.referee_on_ready_blind(from)
 	end
 end
 
-function MP.referee_on_unready_blind(from)
+function PVP.referee_on_unready_blind(from)
 	if not is_host() then
 		return
 	end
@@ -333,10 +333,10 @@ end
 -- decision is independently testable without a live lobby (see
 -- ClaudeControl/suites/pvp/referee.lua, which verified this tie-break
 -- direction live against the actual expression below).
-function MP.referee_resolve_2p_round(a, b)
-	local a_lt_b = MP.INSANE_INT.greater_than(b.score, a.score) -- a.score < b.score
-	local b_lt_a = MP.INSANE_INT.greater_than(a.score, b.score)
-	local equal = MP.INSANE_INT.equal(a.score, b.score)
+function PVP.referee_resolve_2p_round(a, b)
+	local a_lt_b = PVP.INSANE_INT.greater_than(b.score, a.score) -- a.score < b.score
+	local b_lt_a = PVP.INSANE_INT.greater_than(a.score, b.score)
+	local equal = PVP.INSANE_INT.equal(a.score, b.score)
 
 	local trigger = (a.hands_left < 1 and a_lt_b)
 		or (b.hands_left < 1 and b_lt_a)
@@ -367,7 +367,7 @@ local function try_resolve_round()
 
 	if #total == 2 then
 		local a, b = ref_player(total[1]), ref_player(total[2])
-		local outcome = MP.referee_resolve_2p_round(a, b)
+		local outcome = PVP.referee_resolve_2p_round(a, b)
 		if not outcome then
 			return
 		end
@@ -405,7 +405,7 @@ local function try_resolve_round()
 		end
 	end
 
-	if MP.LOBBY.config.nemesis_pairing then
+	if PVP.LOBBY.config.nemesis_pairing then
 		-- Nemesis: resolve every still-live pair independently (a pair with one side
 		-- now eliminated/disconnected is skipped -- the survivor is untouched this
 		-- round, equivalent to a bye). Both sides are already guaranteed hands_left<1
@@ -414,11 +414,11 @@ local function try_resolve_round()
 		local seen = {}
 		for _, ida in ipairs(alive) do
 			ref_player(ida).first_ready = false
-			local idb = MP.REF.nemesis_of[ida]
+			local idb = PVP.REF.nemesis_of[ida]
 			if idb and not seen[ida] and not seen[idb] and ref_player(idb).lives > 0 then
 				local a, b = ref_player(ida), ref_player(idb)
-				if not MP.INSANE_INT.equal(a.score, b.score) then
-					local loser = MP.INSANE_INT.greater_than(b.score, a.score) and a or b
+				if not PVP.INSANE_INT.equal(a.score, b.score) then
+					local loser = PVP.INSANE_INT.greater_than(b.score, a.score) and a or b
 					lose_life(loser)
 				end
 				seen[ida] = true
@@ -436,7 +436,7 @@ local function try_resolve_round()
 			ranked[#ranked + 1] = ref_player(id)
 		end
 		table.sort(ranked, function(x, y)
-			return MP.INSANE_INT.greater_than(y.score, x.score)
+			return PVP.INSANE_INT.greater_than(y.score, x.score)
 		end)
 
 		local cutoff_idx = math.max(1, math.floor(#ranked / 2))
@@ -444,7 +444,7 @@ local function try_resolve_round()
 		local losers = {}
 		for _, pl in ipairs(ranked) do
 			pl.first_ready = false
-			if not MP.INSANE_INT.greater_than(pl.score, cutoff_score) then
+			if not PVP.INSANE_INT.greater_than(pl.score, cutoff_score) then
 				losers[#losers + 1] = pl
 			end
 		end
@@ -462,12 +462,12 @@ local function try_resolve_round()
 end
 
 -- playHand: store sender score/hands, then attempt resolution.
-function MP.referee_on_play_hand(from, params)
+function PVP.referee_on_play_hand(from, params)
 	if not is_host() then
 		return
 	end
 	local pl = ref_player(from)
-	pl.score = MP.INSANE_INT.from_string(tostring(params.score or "0"))
+	pl.score = PVP.INSANE_INT.from_string(tostring(params.score or "0"))
 	pl.hands_left = math.floor(tonumber(params.handsLeft) or pl.hands_left)
 	if params.skips then
 		pl.skips = tonumber(params.skips) or pl.skips
@@ -475,23 +475,23 @@ function MP.referee_on_play_hand(from, params)
 	if params.lives then
 		pl.lives = tonumber(params.lives) or pl.lives
 	end
-	if MP.INSANE_INT.greater_than(pl.score, MP.INSANE_INT.empty()) then
+	if PVP.INSANE_INT.greater_than(pl.score, PVP.INSANE_INT.empty()) then
 		pl.played_this_blind = true
 	end
-	if MP.INSANE_INT.greater_than(pl.score, pl.highest_score) then
+	if PVP.INSANE_INT.greater_than(pl.score, pl.highest_score) then
 		pl.highest_score = pl.score
 	end
 	try_resolve_round()
 end
 
-function MP.referee_on_skip(from, params)
+function PVP.referee_on_skip(from, params)
 	if not is_host() then
 		return
 	end
 	ref_player(from).skips = tonumber(params.skips) or 0
 end
 
-function MP.referee_on_set_ante(from, params)
+function PVP.referee_on_set_ante(from, params)
 	if not is_host() then
 		return
 	end
@@ -503,17 +503,17 @@ function MP.referee_on_set_ante(from, params)
 	-- ease_ante() (and thus report a new ante at all) after receiving that ante's
 	-- pvp_end_pvp/pvp_win -- which itself can't be sent until try_resolve_round's
 	-- batch-resolve for the old ante has already completed.
-	if MP.LOBBY.config.nemesis_pairing then
+	if PVP.LOBBY.config.nemesis_pairing then
 		local ante = tonumber(params.ante)
-		if ante and ante > MP.REF.nemesis_ante_computed_for then
-			MP.REF.nemesis_ante_computed_for = ante
+		if ante and ante > PVP.REF.nemesis_ante_computed_for then
+			PVP.REF.nemesis_ante_computed_for = ante
 			compute_nemesis_pairing(alive_ids())
 			broadcast_nemesis_pairing()
 		end
 	end
 end
 
-function MP.referee_on_set_furthest_blind(from, params)
+function PVP.referee_on_set_furthest_blind(from, params)
 	if not is_host() then
 		return
 	end
@@ -522,7 +522,7 @@ function MP.referee_on_set_furthest_blind(from, params)
 end
 
 -- newRound: re-arm loseLife for the next round (resetBlocker).
-function MP.referee_on_new_round(from)
+function PVP.referee_on_new_round(from)
 	if not is_host() then
 		return
 	end
@@ -541,12 +541,12 @@ end
 -- this nudge a failed-but-not-eliminated player's frozen hands_left (or a now-
 -- excluded eliminated one, whose elimination might be exactly what the gate was
 -- waiting on) would leave the rest of the lobby stuck.
-function MP.referee_on_fail_round(from)
+function PVP.referee_on_fail_round(from)
 	if not is_host() then
 		return
 	end
 	local pl = ref_player(from)
-	if MP.LOBBY.config.death_on_round_loss then
+	if PVP.LOBBY.config.death_on_round_loss then
 		lose_life(pl)
 	end
 	if pl.lives == 0 then
@@ -562,7 +562,7 @@ end
 
 -- failTimer (non-PvP ante timer): sender loses a life; match ends only when exactly
 -- one player remains alive. Same N>2 progress-nudge as referee_on_fail_round.
-function MP.referee_on_fail_timer(from)
+function PVP.referee_on_fail_timer(from)
 	if not is_host() then
 		return
 	end
@@ -584,7 +584,7 @@ end
 -- other pair/comparison still in progress -- so it defers to the same batch-wait
 -- gate as everything else via try_resolve_round(). This also fixes a pre-existing
 -- bug: this function used to broadcast pvp_end_pvp unconditionally even at N>2.
-function MP.referee_on_fail_pvp_timer(from)
+function PVP.referee_on_fail_pvp_timer(from)
 	if not is_host() then
 		return
 	end

@@ -5,7 +5,7 @@ local blind_states_to_skip = {
 }
 local blind_states_path = { "Small", "Big", "Boss" }
 
-function MP.UTILS.get_blind_to_display(blind)
+function PVP.UTILS.get_blind_to_display(blind)
 	if blind then return blind end
 	if not G.GAME then return "bl_small" end
 	local blind_to_display = "Small"

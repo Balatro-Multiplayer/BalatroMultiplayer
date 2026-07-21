@@ -414,7 +414,7 @@ function LOG_PARSER.to_replay(game)
 		ante_snapshots = snapshots,
 		winner = game.winner or "unknown",
 		timestamp = os.time(),
-		ruleset = game.ruleset or "ruleset_mp_blitz",
+		ruleset = game.ruleset or "ruleset_mp_strawberry",
 		seed = game.seed or "UNKNOWN",
 		deck = game.deck or "Red Deck",
 		stake = game.stake or 1,
@@ -448,7 +448,7 @@ end
 -------------------------------------------------------------------------------
 
 -- `events` is an array of {t=, opcode=, args=} (already JSON-decoded from a
--- server-downloaded matchRunLogs block -- see MP.RLOG's carbon opcode
+-- server-downloaded matchRunLogs block -- see PVP.RLOG's carbon opcode
 -- vocabulary in lib/replay_log.lua). One carbon log is inherently ONE player's
 -- own actions, so `side` ("player" or "enemy") says which side these events
 -- represent in the resulting ante_snapshots; combining both players' logs into
@@ -497,7 +497,7 @@ function LOG_PARSER.carbon_to_replay(events, extra, side)
 		ante_snapshots = ante_snapshots,
 		winner = (outcome and outcome.result) or "unknown",
 		timestamp = os.time(),
-		ruleset = manifest.ruleset or "ruleset_mp_blitz",
+		ruleset = manifest.ruleset or "ruleset_mp_strawberry",
 		seed = manifest.seed or "UNKNOWN",
 		deck = manifest.deck or "Red Deck",
 		stake = manifest.stake or 1,

@@ -11,11 +11,11 @@ target = "functions/state_events.lua"
 pattern = '''function end_round\(\)(?<pre>[\s\S]+?)func = function\(\)'''
 position = 'after'
 payload = '''
-if MP.handle_duplicate_end() then
+if PVP.handle_duplicate_end() then
 	return true
 end
-if MP.LOBBY.code then
-	MP.GAME.round_ended = true
+if PVP.LOBBY.code then
+	PVP.GAME.round_ended = true
 end
 '''
 times = 1
@@ -28,7 +28,7 @@ target = "functions/state_events.lua"
 pattern = '''-- context.end_of_round calculations'''
 position = 'before'
 payload = '''
-if MP.is_mp_or_ghost() then
+if PVP.is_mp_or_ghost() then
 	game_over = false
 end
 '''
@@ -42,7 +42,7 @@ target = "functions/state_events.lua"
 pattern = '''if game_over then'''
 position = 'before'
 payload = '''
-if MP.is_mp_or_ghost() then
+if PVP.is_mp_or_ghost() then
 	game_won = nil
 	G.GAME.won = nil
 end
@@ -57,7 +57,7 @@ target = "functions/state_events.lua"
 pattern = '''G.FUNCS.draw_from_discard_to_deck()'''
 position = 'after'
 payload = '''
-MP.handle_deck_out()
+PVP.handle_deck_out()
 '''
 match_indent = true
 times = 1
@@ -130,11 +130,11 @@ if G.GAME.round_resets.temp_handsize then G.hand:change_size(-G.GAME.round_reset
 '''
 position = 'before'
 payload = '''
-if MP.LOBBY.code then
-	MP.GAME.furthest_blind = (temp_furthest_blind > MP.GAME.furthest_blind) and temp_furthest_blind or MP.GAME.furthest_blind
-	MP.ACTIONS.set_furthest_blind(MP.GAME.furthest_blind)
+if PVP.LOBBY.code then
+	PVP.GAME.furthest_blind = (temp_furthest_blind > PVP.GAME.furthest_blind) and temp_furthest_blind or PVP.GAME.furthest_blind
+	PVP.ACTIONS.set_furthest_blind(PVP.GAME.furthest_blind)
 
-	MP.GAME.pincher_index = MP.GAME.pincher_index + 1
+	PVP.GAME.pincher_index = PVP.GAME.pincher_index + 1
 end
 '''
 match_indent = true
@@ -149,8 +149,8 @@ function ease_ante(mod)
 '''
 position = 'after'
 payload = '''
-if MP.is_mp_or_ghost() and not MP.LOBBY.config.disable_live_and_timer_hud then
-	MP.suppress_next_event = true
+if PVP.is_mp_or_ghost() and not PVP.LOBBY.config.disable_live_and_timer_hud then
+	PVP.suppress_next_event = true
 end
 '''
 match_indent = true

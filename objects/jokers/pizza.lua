@@ -19,23 +19,20 @@ MPAPI.Joker({
 	-- Shows a display-only copy on the opponent's board (framework wires add/remove_from_deck).
 	phantom = true,
 	loc_vars = function(self, info_queue, card)
-		MP.UTILS.add_nemesis_info(info_queue)
+		PVP.UTILS.add_nemesis_info(info_queue)
 		return { vars = { card.ability.extra.discards, card.ability.extra.discards_nemesis } }
-	end,
-	mp_include = function(self)
-		return MP.LOBBY.code and MP.LOBBY.config.multiplayer_jokers
 	end,
 	-- Opponent receives the discard count directly: gains discards this round (was action_eat_pizza).
 	receive = function(self, context)
 		local discards = context.data
-		MP.RLOG.record("net_pizza", discards, "action:netPizza,discards:" .. tostring(discards))
-		MP.GAME.pizza_discards = MP.GAME.pizza_discards + discards
+		PVP.RLOG.record("net_pizza", discards, "action:netPizza,discards:" .. tostring(discards))
+		PVP.GAME.pizza_discards = PVP.GAME.pizza_discards + discards
 		G.GAME.round_resets.discards = G.GAME.round_resets.discards + discards
 		ease_discard(discards)
 	end,
 	calculate = function(self, card, context)
 		if context.mp_end_of_pvp and not context.blueprint and (not card.edition or card.edition.type ~= "mp_phantom") then
-			MP.GAME.pizza_discards = MP.GAME.pizza_discards + card.ability.extra.discards
+			PVP.GAME.pizza_discards = PVP.GAME.pizza_discards + card.ability.extra.discards
 			G.GAME.round_resets.discards = G.GAME.round_resets.discards + card.ability.extra.discards
 			ease_discard(card.ability.extra.discards)
 			card:remove_from_deck()

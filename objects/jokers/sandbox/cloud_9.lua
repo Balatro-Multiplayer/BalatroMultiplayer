@@ -22,7 +22,7 @@ end
 
 SMODS.Joker({
 	key = "cloud_9_sandbox",
-	no_collection = MP.sandbox_no_collection,
+	no_collection = PVP.sandbox_no_collection,
 	unlocked = true,
 	discovered = true,
 	blueprint_compat = false,
@@ -46,7 +46,7 @@ SMODS.Joker({
 	end,
 	mp_credits = { code = { "steph" } },
 	mp_include = function(self)
-		return MP.SANDBOX.is_joker_allowed(self.key)
+		return PVP.SANDBOX.is_joker_allowed(self.key)
 	end,
 	calc_dollar_bonus = function(self, card)
 		return calculate_cloud_9_bonus(card)
