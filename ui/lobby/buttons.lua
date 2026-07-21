@@ -51,7 +51,9 @@ function PVP.lobby.create_buttons()
 		label = localize("b_lobby_options_cap"),
 		scale = 0.6,
 		col = true,
-		enabled = false,
+		enabled = function()
+			return PVP.LOBBY.config.manhunt or PVP.LOBBY.config.team_based
+		end,
 	})
 	b.view_code = MPAPI.disableable_button({
 		id = "mp_pvp_view_code",
