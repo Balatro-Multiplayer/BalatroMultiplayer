@@ -111,7 +111,7 @@ for i = 1, 21 do
 		end,
 
 		atlas = "error_sandbox",
-		no_collection = MP.sandbox_no_collection,
+		no_collection = PVP.sandbox_no_collection,
 		unlocked = true,
 		discovered = true,
 		mp_include = function(self)

@@ -4,9 +4,9 @@
 -- This should NOT be used as a substitute for bigints in functional coded due to how barebones it is,
 -- Instead, it should be used for graphical purposes and such
 
-MP.INSANE_INT = {}
+PVP.INSANE_INT = {}
 
-MP.INSANE_INT.empty = function()
+PVP.INSANE_INT.empty = function()
 	return {
 		coeffiocient = 0,
 		exponent = 0,
@@ -14,7 +14,7 @@ MP.INSANE_INT.empty = function()
 	}
 end
 
-MP.INSANE_INT.create = function(coeffiocient, exponent, e_count)
+PVP.INSANE_INT.create = function(coeffiocient, exponent, e_count)
 	return {
 		coeffiocient = tonumber(coeffiocient) or 0,
 		exponent = tonumber(exponent) or 0,
@@ -22,19 +22,19 @@ MP.INSANE_INT.create = function(coeffiocient, exponent, e_count)
 	}
 end
 
-MP.INSANE_INT.from_string = function(str)
+PVP.INSANE_INT.from_string = function(str)
 	local e_count = 0
 	while #str > 0 and string.lower(string.sub(str, 1, 1)) == "e" do
 		e_count = e_count + 1
 		str = string.sub(str, 2)
 	end
 
-	local parts = MP.UTILS.string_split(str, "e")
+	local parts = PVP.UTILS.string_split(str, "e")
 
-	return MP.INSANE_INT.create(parts[1], #parts > 1 and parts[2] or 0, e_count)
+	return PVP.INSANE_INT.create(parts[1], #parts > 1 and parts[2] or 0, e_count)
 end
 
-MP.INSANE_INT.to_string = function(insane_int_display)
+PVP.INSANE_INT.to_string = function(insane_int_display)
 	local e = ""
 	for i = 1, insane_int_display.e_count do
 		e = e .. "e"
@@ -50,7 +50,7 @@ end
 
 -- This doesn't really fit with the comment at the top,
 -- but I needed a way to compare highscores without storing this value seperately for no reason
-MP.INSANE_INT.greater_than = function(insane_int_display1, insane_int_display2)
+PVP.INSANE_INT.greater_than = function(insane_int_display1, insane_int_display2)
     if not insane_int_display1 or not insane_int_display2 then return false end
 	if insane_int_display1.e_count ~= insane_int_display2.e_count then
 		return tonumber(insane_int_display1.e_count) > tonumber(insane_int_display2.e_count)
@@ -63,7 +63,7 @@ MP.INSANE_INT.greater_than = function(insane_int_display1, insane_int_display2)
 	return tonumber(insane_int_display1.coeffiocient) > tonumber(insane_int_display2.coeffiocient)
 end
 
-MP.INSANE_INT.equal = function(insane_int_display1, insane_int_display2)
+PVP.INSANE_INT.equal = function(insane_int_display1, insane_int_display2)
     if not insane_int_display1 or not insane_int_display2 then return false end
 	if insane_int_display1.e_count ~= insane_int_display2.e_count then return false end
 	if insane_int_display1.exponent ~= insane_int_display2.exponent then return false end
@@ -76,7 +76,7 @@ end
 -- theoretically the talisman override only applies to their special big number types and using '^' would be fine,
 -- but we use math.pow just in case
 ---@diagnostic disable: deprecated
-MP.INSANE_INT.add = function(insane_int_display1, insane_int_display2)
+PVP.INSANE_INT.add = function(insane_int_display1, insane_int_display2)
 	local starting_e_count
 	local coeffiocient
 	local exponent
@@ -110,6 +110,6 @@ MP.INSANE_INT.add = function(insane_int_display1, insane_int_display2)
 		exponent = myExponent
 	end
 
-	return MP.INSANE_INT.create(coeffiocient, exponent, starting_e_count)
+	return PVP.INSANE_INT.create(coeffiocient, exponent, starting_e_count)
 end
 ---@diagnostic enable: deprecated

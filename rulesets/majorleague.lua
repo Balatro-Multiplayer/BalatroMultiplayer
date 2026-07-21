@@ -1,4 +1,4 @@
-MP.Ruleset({
+PVP.Ruleset({
 	key = "majorleague",
 	multiplayer_content = false,
 	banned_jokers = {},
@@ -19,10 +19,10 @@ MP.Ruleset({
 		return false
 	end,
 	force_lobby_options = function(self)
-		MP.LOBBY.config.timer_base_seconds = 180
-		MP.LOBBY.config.timer_forgiveness = 1
-		MP.LOBBY.config.the_order = false
-		MP.LOBBY.config.preview_disabled = true
+		PVP.LOBBY.config.timer_base_seconds = 180
+		PVP.LOBBY.config.timer_forgiveness = 1
+		PVP.LOBBY.config.the_order = false
+		PVP.LOBBY.config.preview_disabled = true
 		return true
 	end,
 }):inject()

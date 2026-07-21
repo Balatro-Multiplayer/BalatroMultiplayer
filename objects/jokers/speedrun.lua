@@ -18,11 +18,8 @@ MPAPI.Joker({
 	-- Shows a display-only copy on the opponent's board (framework wires add/remove_from_deck).
 	phantom = true,
 	loc_vars = function(self, info_queue, card)
-		MP.UTILS.add_nemesis_info(info_queue)
+		PVP.UTILS.add_nemesis_info(info_queue)
 		return { vars = {} }
-	end,
-	mp_include = function(self)
-		return MP.LOBBY.code and MP.LOBBY.config.multiplayer_jokers
 	end,
 	calculate = function(self, card, context)
 		if

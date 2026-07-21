@@ -1,14 +1,14 @@
 local create_UIBox_blind_choice_ref = create_UIBox_blind_choice
 ---@diagnostic disable-next-line: lowercase-global
 function create_UIBox_blind_choice(type, run_info)
-	if MP.is_mp_or_ghost() then
+	if PVP.is_mp_or_ghost() then
 		if not G.GAME.blind_on_deck then G.GAME.blind_on_deck = "Small" end
 		if not run_info then G.GAME.round_resets.blind_states[G.GAME.blind_on_deck] = "Select" end
 
 		local disabled = false
 		type = type or "Small"
 		local nemesis = G.GAME.round_resets.blind_choices[type] == "bl_mp_nemesis" and true or false
-		local nemesis_blind_col = nemesis and MP.UTILS.get_nemesis_key()
+		local nemesis_blind_col = nemesis and PVP.UTILS.get_nemesis_key()
 
 		local blind_choice = {
 			config = G.P_BLINDS[G.GAME.round_resets.blind_choices[type]],
@@ -35,8 +35,8 @@ function create_UIBox_blind_choice(type, run_info)
 
 		if not G.GAME.orbital_choices[G.GAME.round_resets.ante][type] then
 			local _poker_hands = {}
-			if MP.should_use_the_order() then
-				_poker_hands = MP.sorted_hand_list()
+			if PVP.should_use_the_order() then
+				_poker_hands = PVP.sorted_hand_list()
 			else
 				for k, v in pairs(G.GAME.hands) do
 					if SMODS.is_poker_hand_visible(k) then _poker_hands[#_poker_hands + 1] = k end
@@ -136,10 +136,10 @@ function create_UIBox_blind_choice(type, run_info)
 		})
 		local loc_name
 		if G.GAME.round_resets.blind_choices[type] == "bl_mp_nemesis" then
-			if MP.GHOST.is_active() then
-				loc_name = MP.GHOST.get_nemesis_name()
+			if PVP.GHOST.is_active() then
+				loc_name = PVP.GHOST.get_nemesis_name()
 			else
-				loc_name = MP.LOBBY.is_host and MP.LOBBY.guest.username or MP.LOBBY.host.username
+				loc_name = PVP.LOBBY.is_host and PVP.LOBBY.guest.username or PVP.LOBBY.host.username
 			end
 		else
 			loc_name = localize({ type = "name_text", key = blind_choice.config.key, set = "Blind" })
@@ -219,7 +219,7 @@ function create_UIBox_blind_choice(type, run_info)
 										hover = true,
 										one_press = true,
 										func = (
-											not MP.GHOST.is_active()
+											not PVP.GHOST.is_active()
 											and (G.GAME.round_resets.blind_choices[type] == "bl_mp_nemesis"
 												or G.GAME.round_resets.pvp_blind_choices[type])
 										)

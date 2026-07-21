@@ -3,39 +3,49 @@
 
 local ease_ante_ref = ease_ante
 function ease_ante(mod)
-	if MP.is_mp_or_ghost() and not MP.LOBBY.config.disable_live_and_timer_hud then
+	if PVP.is_mp_or_ghost() and not PVP.LOBBY.config.disable_live_and_timer_hud then
 		-- Prevents easing multiple times at once
-		if MP.GAME.antes_keyed[MP.GAME.ante_key] then return end
+		if PVP.GAME.antes_keyed[PVP.GAME.ante_key] then return end
 
 		-- pizza: remove discards
-		if MP.GAME.pizza_discards > 0 then
-			G.GAME.round_resets.discards = G.GAME.round_resets.discards - MP.GAME.pizza_discards
-			ease_discard(-MP.GAME.pizza_discards)
-			MP.GAME.pizza_discards = 0
+		if PVP.GAME.pizza_discards > 0 then
+			G.GAME.round_resets.discards = G.GAME.round_resets.discards - PVP.GAME.pizza_discards
+			ease_discard(-PVP.GAME.pizza_discards)
+			PVP.GAME.pizza_discards = 0
 		end
 
-		MP.GAME.antes_keyed[MP.GAME.ante_key] = true
-		if not MP.GHOST.is_active() then
-			MP.ACTIONS.set_ante(G.GAME.round_resets.ante + mod)
+		PVP.GAME.antes_keyed[PVP.GAME.ante_key] = true
+		if not PVP.GHOST.is_active() then
+			PVP.ACTIONS.set_ante(G.GAME.round_resets.ante + mod)
 		end
 		G.E_MANAGER:add_event(Event({
 			trigger = "immediate",
 			func = function()
 				G.GAME.round_resets.ante = G.GAME.round_resets.ante + mod
 				check_and_set_high_score("furthest_ante", G.GAME.round_resets.ante)
+				-- Practice ends after ante 8: real matches suppress vanilla's native
+				-- win_ante=8 trigger (see game_state.lua's update_new_round) to continue
+				-- past it via the lives system; practice has no lives system, so this is
+				-- the intended stop. Checked here (ease_ante, which fires unconditionally
+				-- on every ante advance) rather than update_new_round, since that hook
+				-- turned out not to reliably run with G.STATE_COMPLETE already true on
+				-- the shop-exit-to-next-ante transition -- confirmed live.
+				if PVP.is_practice_mode() and G.GAME.round_resets.ante > 8 then
+					win_game()
+				end
 				return true
 			end,
 		}))
 
 		-- technically doesn't have to be in this block, but less logspam is nicer
-		MP.UTILS.log_mem_debug_messages()
+		PVP.UTILS.log_mem_debug_messages()
 	end
 	return ease_ante_ref(mod)
 end
 
 local ease_round_ref = ease_round
 function ease_round(mod)
-	if MP.is_mp_or_ghost() and not MP.LOBBY.config.disable_live_and_timer_hud and MP.LOBBY.config.timer then
+	if PVP.is_mp_or_ghost() and not PVP.LOBBY.config.disable_live_and_timer_hud and PVP.LOBBY.config.timer then
         G.GAME.round = G.GAME.round + mod
         return
     end
@@ -47,17 +57,17 @@ function reset_blinds()
 	reset_blinds_ref()
 	G.GAME.round_resets.pvp_blind_choices = {}
 
-	local gamemode_key = MP.get_active_gamemode()
-	if gamemode_key and MP.Gamemodes[gamemode_key] then
+	local gamemode_key = PVP.get_active_gamemode()
+	if gamemode_key and PVP.Gamemodes[gamemode_key] then
 		local mp_small_choice, mp_big_choice, mp_boss_choice =
-			MP.Gamemodes[gamemode_key]:get_blinds_by_ante(G.GAME.round_resets.ante)
+			PVP.Gamemodes[gamemode_key]:get_blinds_by_ante(G.GAME.round_resets.ante)
 		G.GAME.round_resets.blind_choices.Small = mp_small_choice or G.GAME.round_resets.blind_choices.Small
 		G.GAME.round_resets.blind_choices.Big = mp_big_choice or G.GAME.round_resets.blind_choices.Big
 		G.GAME.round_resets.blind_choices.Boss = mp_boss_choice or G.GAME.round_resets.blind_choices.Boss
 	end
 
-	if MP.GHOST.is_active() then
-		MP.GHOST.init_playback(G.GAME.round_resets.ante)
+	if PVP.GHOST.is_active() then
+		PVP.GHOST.init_playback(G.GAME.round_resets.ante)
 	end
 end
 
@@ -74,8 +84,8 @@ end
 -- added event suppression for a lovely patch for ease_ante
 local add_event_ref = EventManager.add_event
 function EventManager:add_event(event, queue, front)
-	if MP.suppress_next_event then
-		MP.suppress_next_event = false
+	if PVP.suppress_next_event then
+		PVP.suppress_next_event = false
 		return
 	end
 	return add_event_ref(self, event, queue, front)

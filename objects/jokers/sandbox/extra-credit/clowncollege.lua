@@ -2,7 +2,7 @@
 
 SMODS.Joker({
 	key = "clowncollege_sandbox",
-	no_collection = MP.sandbox_no_collection,
+	no_collection = PVP.sandbox_no_collection,
 	unlocked = true,
 	discovered = true,
 	blueprint_compat = false,
@@ -56,6 +56,6 @@ SMODS.Joker({
 
 	mp_credits = { code = { "CampfireCollective" }, art = { "dottykitty" } },
 	mp_include = function(self)
-		return MP.SANDBOX.is_joker_allowed(self.key)
+		return PVP.SANDBOX.is_joker_allowed(self.key)
 	end,
 })

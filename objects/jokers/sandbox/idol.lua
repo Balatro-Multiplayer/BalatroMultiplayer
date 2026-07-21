@@ -61,7 +61,7 @@ end
 
 SMODS.Joker({
 	key = "idol_sandbox_zealot",
-	no_collection = MP.sandbox_no_collection,
+	no_collection = PVP.sandbox_no_collection,
 	unlocked = true,
 	discovered = true,
 	blueprint_compat = true,
@@ -107,7 +107,7 @@ SMODS.Joker({
 	end,
 	mp_credits = { code = { "steph" } },
 	mp_include = function(self)
-		return MP.SANDBOX.is_joker_allowed(self.key)
+		return PVP.SANDBOX.is_joker_allowed(self.key)
 	end,
 })
 
@@ -170,7 +170,7 @@ end
 
 SMODS.Joker({
 	key = "idol_sandbox_collector",
-	no_collection = MP.sandbox_no_collection,
+	no_collection = PVP.sandbox_no_collection,
 	unlocked = true,
 	discovered = true,
 	blueprint_compat = true,
@@ -220,6 +220,6 @@ SMODS.Joker({
 	end,
 	mp_credits = { code = { "steph" }, idea = { "Fantom" } },
 	mp_include = function(self)
-		return MP.SANDBOX.is_joker_allowed(self.key)
+		return PVP.SANDBOX.is_joker_allowed(self.key)
 	end,
 })

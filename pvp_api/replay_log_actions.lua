@@ -1,4 +1,4 @@
--- MPAPI transport for MP.RLOG (lib/replay_log.lua): replaces the legacy
+-- MPAPI transport for PVP.RLOG (lib/replay_log.lua): replaces the legacy
 -- Client.send({action="streamLogLines"/"submitLogHashes"}) calls, which
 -- pvp_api/net.lua's router now silently drops (both are unlisted there --
 -- "owned by the API now, or replay-stream features deferred for the port").
@@ -13,7 +13,7 @@
 -- both shapes satisfy the same schema without a second ActionType.
 --
 -- on_receive tracks the opponent's own elapsed-t high-water mark (Phase 9:
--- reconnect tail-replay) -- MP.RLOG._last_seen_t[player_id] is how far into
+-- reconnect tail-replay) -- PVP.RLOG._last_seen_t[player_id] is how far into
 -- that player's own RLOG stream this client has observed live, so a
 -- reconnecting client knows what `since_t` to request via
 -- MPAPI.replay.get_tail after missing some broadcasts while disconnected.
@@ -25,14 +25,14 @@
 -- server-side buffering client and, later, spectators are the other
 -- consumers of this same broadcast; this is purely an additional local
 -- bookkeeping side effect, not a second dispatch path.
-MP.RLOG._last_seen_t = MP.RLOG._last_seen_t or {}
+PVP.RLOG._last_seen_t = PVP.RLOG._last_seen_t or {}
 
 local function self_id()
 	local lobby = MPAPI.get_current_lobby()
 	return lobby and lobby.player_id
 end
 
-MP.RLOG_EVENT_ACTION = MPAPI.ActionType({
+PVP.RLOG_EVENT_ACTION = MPAPI.ActionType({
 	key = "pvp_log_event",
 	prefix_config = { key = false },
 	parameters = {
@@ -42,12 +42,12 @@ MP.RLOG_EVENT_ACTION = MPAPI.ActionType({
 	},
 	on_receive = function(_at, from, params)
 		if from == self_id() then return end
-		local prev = MP.RLOG._last_seen_t[from] or 0
-		if params.t and params.t > prev then MP.RLOG._last_seen_t[from] = params.t end
+		local prev = PVP.RLOG._last_seen_t[from] or 0
+		if params.t and params.t > prev then PVP.RLOG._last_seen_t[from] = params.t end
 	end,
 })
 
--- Normalizes MP.RLOG.record's flexible args shape (nil | scalar | array/dict
+-- Normalizes PVP.RLOG.record's flexible args shape (nil | scalar | array/dict
 -- table) into what pvp_log_event's `args` param actually needs: nil (omitted
 -- entirely, since it's optional) or a table. A bare scalar (e.g. pack_skip's
 -- literal `0`) gets wrapped as a single-element array so it still round-trips.
@@ -60,8 +60,8 @@ end
 -- Broadcasts one event live. No-ops cleanly with no lobby (e.g. practice mode,
 -- or the headless test harness) -- the local carbon/human text lines this
 -- pairs with (lib/replay_log.lua) are unaffected either way.
-function MP.RLOG.broadcast_event(t, opcode, args)
+function PVP.RLOG.broadcast_event(t, opcode, args)
 	local lobby = MPAPI.get_current_lobby()
 	if not lobby then return end
-	lobby:action(MP.RLOG_EVENT_ACTION):broadcast({ t = t, opcode = opcode, args = normalize_args(args) })
+	lobby:action(PVP.RLOG_EVENT_ACTION):broadcast({ t = t, opcode = opcode, args = normalize_args(args) })
 end

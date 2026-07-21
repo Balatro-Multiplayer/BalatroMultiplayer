@@ -1,4 +1,4 @@
-if MP.EXPERIMENTAL.alt_stakes then
+if PVP.EXPERIMENTAL.alt_stakes then
 	SMODS.Stake({
 		mp_alt_stake = true,
 		name = "Crystal Stake",

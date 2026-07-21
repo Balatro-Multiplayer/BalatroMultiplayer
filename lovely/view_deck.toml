@@ -12,8 +12,8 @@ pattern = '''{
         tab_definition_function = G.UIDEF.view_deck
       },'''
 position = 'after'
-payload = '''MP.LOBBY.code and {
-              label = G.localization.misc.challenge_names[MP.current_ruleset().challenge_deck],
+payload = '''PVP.LOBBY.code and {
+              label = G.localization.misc.challenge_names[PVP.current_ruleset().challenge_deck],
               tab_definition_function = G.UIDEF.multiplayer_deck,
             },'''
 match_indent = true
@@ -24,6 +24,6 @@ times = 1
 target = "functions/UI_definitions.lua"
 pattern = '''not is_row and {n=G.UIT.R, config={align = "cm", minh = 0.9}, nodes={'''
 position = 'at'
-payload = '''(not (MP.LOBBY.code and G.STAGE == G.STAGES.RUN)) and (not is_row) and {n=G.UIT.R, config={align = "cm", minh = 0.9}, nodes={'''
+payload = '''(not (PVP.LOBBY.code and G.STAGE == G.STAGES.RUN)) and (not is_row) and {n=G.UIT.R, config={align = "cm", minh = 0.9}, nodes={'''
 match_indent = true
 times = 1

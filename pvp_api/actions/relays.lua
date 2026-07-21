@@ -1,4 +1,4 @@
-local relay = MP._pvp_action_helpers.relay
+local relay = PVP._pvp_action_helpers.relay
 
 -- Pure relays (opponent-only side effects).
 relay("pvp_get_end_game_jokers", "getEndGameJokers")

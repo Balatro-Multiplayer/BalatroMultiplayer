@@ -1,5 +1,5 @@
-function MP.UI.enemy_location_blind_render()
-	local blind_key, blind_object = MP.GAME.enemy.location_blind, nil
+function PVP.UI.enemy_location_blind_render()
+	local blind_key, blind_object = PVP.GAME.enemy.location_blind, nil
 	if blind_key then blind_object = G.P_BLINDS[blind_key] end
 
 	local blind_object_render
@@ -30,7 +30,7 @@ function MP.UI.enemy_location_blind_render()
 	return blind_object_render
 end
 
-function MP.UI.round_score_definition()
+function PVP.UI.round_score_definition()
 	return {
 		n = G.UIT.C,
 		config = { align = "cm", padding = 0.1, func = "mp_setup_hover_enemy_location_display" },
@@ -106,7 +106,7 @@ function MP.UI.round_score_definition()
 		},
 	}
 end
-function MP.UI.enemy_location_definition()
+function PVP.UI.enemy_location_definition()
 	return {
 		n = G.UIT.C,
 		config = { align = "cm", padding = 0.1 },
@@ -171,7 +171,7 @@ function MP.UI.enemy_location_definition()
 							{
 								n = G.UIT.T,
 								config = {
-									ref_table = MP.GAME.enemy,
+									ref_table = PVP.GAME.enemy,
 									ref_value = "location",
 									scale = 0.35,
 									colour = G.C.WHITE,
@@ -186,7 +186,7 @@ function MP.UI.enemy_location_definition()
 					{
 						n = G.UIT.O,
 						config = {
-							object = MP.UI.enemy_location_blind_render(),
+							object = PVP.UI.enemy_location_blind_render(),
 							id = "mp_enemy_location_render",
 						},
 					},
@@ -196,30 +196,30 @@ function MP.UI.enemy_location_definition()
 	}
 end
 
-function MP.UI.show_enemy_location()
+function PVP.UI.show_enemy_location()
     if not G.HUD then return end
 	local row_dollars_chips = G.HUD:get_UIE_by_ID("row_dollars_chips")
 	if row_dollars_chips then
 		row_dollars_chips.children[1]:remove()
 		row_dollars_chips.children[1] = nil
-		G.HUD:add_child(MP.UI.enemy_location_definition(), row_dollars_chips)
+		G.HUD:add_child(PVP.UI.enemy_location_definition(), row_dollars_chips)
 	end
 end
-function MP.UI.hide_enemy_location()
+function PVP.UI.hide_enemy_location()
     if not G.HUD then return end
 	local row_dollars_chips = G.HUD:get_UIE_by_ID("row_dollars_chips")
 	if row_dollars_chips then
 		row_dollars_chips.children[1]:remove()
 		row_dollars_chips.children[1] = nil
-		G.HUD:add_child(MP.UI.round_score_definition(), row_dollars_chips)
+		G.HUD:add_child(PVP.UI.round_score_definition(), row_dollars_chips)
 	end
 end
 
-function MP.UI.update_enemy_location_render()
+function PVP.UI.update_enemy_location_render()
     if not G.HUD then return end
 	local renderer = G.HUD:get_UIE_by_ID("mp_enemy_location_render")
 	if renderer then
-		local blind_object_render = MP.UI.enemy_location_blind_render()
+		local blind_object_render = PVP.UI.enemy_location_blind_render()
 		renderer.config.object:remove()
 		renderer.config.object = blind_object_render
 		blind_object_render.parent = renderer
@@ -230,7 +230,7 @@ function MP.UI.update_enemy_location_render()
 	local hover_renderer = G.mp_enemy_location_ui and G.mp_enemy_location_ui:get_UIE_by_ID("mp_enemy_location_render")
 
 	if hover_renderer then
-		local blind_object_render = MP.UI.enemy_location_blind_render()
+		local blind_object_render = PVP.UI.enemy_location_blind_render()
 		hover_renderer.config.object:remove()
 		hover_renderer.config.object = blind_object_render
 		blind_object_render.parent = hover_renderer
@@ -253,7 +253,7 @@ G.FUNCS.mp_setup_hover_enemy_location_display = function(e)
 					n = G.UIT.ROOT,
 					config = { colour = G.C.DYN_UI.BOSS_MAIN, emboss = 0.05, r = 0.25 },
 					nodes = {
-						MP.UI.enemy_location_definition(),
+						PVP.UI.enemy_location_definition(),
 					},
 				},
 				config = {

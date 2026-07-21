@@ -26,13 +26,13 @@ function FN.PRE.start_new_coroutine()
     -- Defaults are vanilla: free preview, slow (5s) delay.
     -- Layers like pressure_timer set both via ruleset scalars.
     local timer_delay, timer_cost = 0, 0
-    if MP.LOBBY and MP.LOBBY.code and MP.LOBBY.config.timer and not MP.is_pvp_boss() then
+    if PVP.LOBBY and PVP.LOBBY.code and PVP.LOBBY.config.timer and not PVP.is_pvp_boss() then
         timer_delay = 5
         timer_cost = 0
 
-        local ruleset = MP.current_ruleset()
-        timer_delay = MP.LOBBY.config.preview_calculate_delay or ruleset.preview_calculate_delay or timer_delay
-        timer_cost  = MP.LOBBY.config.preview_calculate_cost or ruleset.preview_calculate_cost or timer_cost
+        local ruleset = PVP.current_ruleset()
+        timer_delay = PVP.LOBBY.config.preview_calculate_delay or ruleset.preview_calculate_delay or timer_delay
+        timer_cost  = PVP.LOBBY.config.preview_calculate_cost or ruleset.preview_calculate_cost or timer_cost
     end
 
     if not FN.PRE.calculate_request then
@@ -49,13 +49,13 @@ function FN.PRE.start_new_coroutine()
             if
                 timer_cost > 0
                 and FN.PRE.data and not FN.PRE.data.empty
-                and MP.LOBBY.code and not MP.is_pvp_boss()
-                and MP.LOBBY.config.timer
-                and not MP.GAME.timer_started
-                and not MP.GAME.nemesis_timer_started
-                and not MP.GAME.timer_consumed
+                and PVP.LOBBY.code and not PVP.is_pvp_boss()
+                and PVP.LOBBY.config.timer
+                and not PVP.GAME.timer_started
+                and not PVP.GAME.nemesis_timer_started
+                and not PVP.GAME.timer_consumed
             then
-                MP.UI.consume_timer(timer_cost, nil, math.max(10, timer_cost))
+                PVP.UI.consume_timer(timer_cost, nil, math.max(10, timer_cost))
             end
             return true
         end
@@ -69,7 +69,7 @@ function FN.PRE.start_new_coroutine()
 end
 
 function FN.PRE.stop_current_coroutine(no_interrupt)
-    if not MP.INTEGRATIONS.Preview then return end
+    if not PVP.INTEGRATIONS.Preview then return end
     if no_interrupt and FN.PRE.lock_updates then return end
     if FN.PRE.show_preview then
         FN.PRE.show_preview = false
@@ -97,7 +97,7 @@ function FN.PRE.start_new_coroutine()
 		FN.PRE.add_update_event("immediate") -- Force UI refresh
 
 		local start_time = os.time()
-		if MP.LOBBY.code and not MP.is_pvp_boss() then
+		if PVP.LOBBY.code and not PVP.is_pvp_boss() then
 			while os.time() - start_time < 5 do
 				FN.PRE.simulate() -- Force a simulation run
 				FN.PRE.add_update_event("immediate") -- Ensure UI updates
@@ -118,7 +118,7 @@ FN.PRE._start_up = Game.start_up
 function Game:start_up()
 	FN.PRE._start_up(self)
 
-	if not MP.INTEGRATIONS.Preview then return end
+	if not PVP.INTEGRATIONS.Preview then return end
 
 	if not G.SETTINGS.FN then G.SETTINGS.FN = {} end
 	if not G.SETTINGS.FN.PRE then

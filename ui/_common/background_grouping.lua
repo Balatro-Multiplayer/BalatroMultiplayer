@@ -1,4 +1,4 @@
-function MP.UI.BackgroundGrouping(text, nodes, config)
+function PVP.UI.BackgroundGrouping(text, nodes, config)
 	config = config or {}
 	config.text_scale = config.text_scale or 0.33
 	return {

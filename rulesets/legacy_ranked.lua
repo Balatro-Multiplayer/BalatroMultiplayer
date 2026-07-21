@@ -1,4 +1,4 @@
-MP.Ruleset({
+PVP.Ruleset({
 	key = "legacy_ranked",
 	layers = { "classic", "ranked" },
 	forced_gamemode = "gamemode_mp_attrition",

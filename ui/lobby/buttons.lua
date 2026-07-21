@@ -1,5 +1,5 @@
-function MP.lobby.create_buttons()
-	local L = MP.lobby
+function PVP.lobby.create_buttons()
+	local L = PVP.lobby
 	if L.buttons_initialized then
 		return
 	end

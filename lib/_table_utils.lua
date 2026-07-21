@@ -2,7 +2,7 @@
 --
 
 -- Credit to Henrik Ilgen (https://stackoverflow.com/a/6081639)
-function MP.UTILS.serialize_table(val, name, skipnewlines, depth)
+function PVP.UTILS.serialize_table(val, name, skipnewlines, depth)
 	skipnewlines = skipnewlines or false
 	depth = depth or 0
 
@@ -15,7 +15,7 @@ function MP.UTILS.serialize_table(val, name, skipnewlines, depth)
 
 		for k, v in pairs(val) do
 			tmp = tmp
-				.. MP.UTILS.serialize_table(v, k, skipnewlines, depth + 1)
+				.. PVP.UTILS.serialize_table(v, k, skipnewlines, depth + 1)
 				.. ","
 				.. (not skipnewlines and "\n" or "")
 		end
@@ -34,7 +34,7 @@ function MP.UTILS.serialize_table(val, name, skipnewlines, depth)
 	return tmp
 end
 
-function MP.UTILS.reverse_key_value_pairs(tbl, stringify_keys)
+function PVP.UTILS.reverse_key_value_pairs(tbl, stringify_keys)
 	local reversed_tbl = {}
 	for k, v in pairs(tbl) do
 		if stringify_keys then v = tostring(v) end
@@ -45,4 +45,4 @@ end
 
 -- Defers to the API's implementation (BalatroMultiplayerAPI/lib/util.lua) rather than
 -- shipping our own copy. MPAPI is a hard dependency and is loaded before this file.
-MP.UTILS.shallow_copy = MPAPI.shallow_copy
+PVP.UTILS.shallow_copy = MPAPI.shallow_copy

@@ -138,7 +138,7 @@ if Handy then
 			function Handy.UI.get_options_button(...)
 				if type(Handy.is_in_multiplayer) ~= "function" or Handy.is_in_multiplayer() then
 					return UIBox_button({
-						label = { "Handy [MP Patched]" },
+						label = { "Handy [PVP Patched]" },
 						button = "handy_open_options",
 						minw = 5,
 						colour = G.C.CHIPS,

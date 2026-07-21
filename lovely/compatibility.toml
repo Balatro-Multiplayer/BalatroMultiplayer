@@ -24,7 +24,7 @@ pattern = '''if G.GAME.USING_CODE then
 			end'''
 position = 'before'
 payload = '''
-if MP.LOBBY.code then
+if PVP.LOBBY.code then
     return
 end
 '''

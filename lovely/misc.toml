@@ -59,7 +59,7 @@ target = "card.lua"
 pattern = 'for i = self.ability.extra.min, self.ability.extra.max do'
 position = "before"
 payload = '''
-local mp_collection = self.area.config.type == "title" and MP.LOBBY.code
+local mp_collection = self.area.config.type == "title" and PVP.LOBBY.code
 '''
 match_indent = true
 
@@ -89,7 +89,7 @@ match_indent = true
 target = "back.lua"
 pattern = '''local card = create_card('Tarot', G.consumeables, nil, nil, nil, nil, v, 'deck')'''
 position = "at"
-payload = '''local card = create_card(MP.legacy_smallworld() and 'Tarot' or G.P_CENTERS[v].set, G.consumeables, nil, nil, nil, nil, v, 'deck')'''
+payload = '''local card = create_card(PVP.legacy_smallworld() and 'Tarot' or G.P_CENTERS[v].set, G.consumeables, nil, nil, nil, nil, v, 'deck')'''
 match_indent = true
 
 # i was the one who pred this line, i guess it became a problem
@@ -104,28 +104,9 @@ payload = '''
 '''
 match_indent = true
 
-# Pool exclusion hook for RNG-safe removal:
-# pop the just-added entry, but only decrement _pool_size when it was a real key
-# banned keys hit the 'UNAVAILABLE' branch and need their slot preserved so the pseudorandom pool
-# queue stays aligned across clients and versions
-# unfortunate timing but lua doesn't have continue, so this is an uninvasive patch
-[[patches]]
-[patches.pattern]
-target = "functions/common_events.lua"
-pattern = '''
-	_pool[#_pool + 1] = 'UNAVAILABLE'
-end
-'''
-position = "after"
-payload = '''
-if MP.should_exclude_from_pool(v) then
-	table.remove(_pool) -- remove whatever was just done
-	if add and not G.GAME.banned_keys[v.key] then
-		_pool_size = _pool_size - 1
-	end
-end
-'''
-match_indent = true
+# Pool exclusion hook (RNG-safe removal from get_current_pool) moved to
+# BalatroMultiplayerAPI/lovely/pool_gating.toml -- MPAPI.should_exclude_from_pool
+# applies generically to any MPAPI-consumer mod's content, not just PvP's.
 
 # STEAMODDED BUG - hackfix for deck flashing in incorrect position for one frame when switching (caused due to set_sprites drawing jank)
 [[patches]]
@@ -174,7 +155,7 @@ target = "functions/misc_functions.lua"
 pattern = '''collectgarbage("collect")'''
 position = 'before'
 payload = '''
-MP._DEBUG_PANIC_COLLECTS = (MP._DEBUG_PANIC_COLLECTS or 0) + 1
+PVP._DEBUG_PANIC_COLLECTS = (PVP._DEBUG_PANIC_COLLECTS or 0) + 1
 '''
 match_indent = true
 times = 1

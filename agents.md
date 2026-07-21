@@ -14,14 +14,14 @@
 
 `Multiplayer.json` — SMODS mod manifest (id: `Multiplayer`, prefix: `mp`). Loads `core.lua` as main file.
 
-`core.lua` initializes the global `MP` table (= `SMODS.current_mod`) and loads everything via `MP.load_mp_file` / `MP.load_mp_dir` (wraps `SMODS.load_file`). Load order: `lib/` → `overrides/` → `compatibility/` → `networking/` → `gamemodes/` → `layers/` → `rulesets/` → `ui/` → `objects/`.
+`core.lua` initializes the global `PVP` table (= `SMODS.current_mod`) and loads everything via `PVP.load_mp_file` / `PVP.load_mp_dir` (wraps `SMODS.load_file`). Load order: `lib/` → `overrides/` → `compatibility/` → `networking/` → `gamemodes/` → `layers/` → `rulesets/` → `ui/` → `objects/`.
 
 ## Key Globals
 
-- `MP` — Mod root. Contains `LOBBY`, `GAME`, `UI`, `ACTIONS`, `UTILS`, `INSANE_INT`, `EXPERIMENTAL`, `SANDBOX`, etc.
-- `MP.LOBBY` — Lobby state (code, config, host/guest, deck selection, ruleset, gamemode).
-- `MP.GAME` — In-game state (lives, enemy state, timer, scores, stats).
-- `MP.ACTIONS` — Network action handlers (send/receive).
+- `PVP` — Mod root. Contains `LOBBY`, `GAME`, `UI`, `ACTIONS`, `UTILS`, `INSANE_INT`, `EXPERIMENTAL`, `SANDBOX`, etc.
+- `PVP.LOBBY` — Lobby state (code, config, host/guest, deck selection, ruleset, gamemode).
+- `PVP.GAME` — In-game state (lives, enemy state, timer, scores, stats).
+- `PVP.ACTIONS` — Network action handlers (send/receive).
 - `Client.send({action = "...", ...})` — Send message to server.
 - `G` — Balatro's global game state (vanilla).
 
@@ -30,14 +30,14 @@
 Three layers of hooks, from deepest to highest-level:
 
 1. **Lovely patches** (`lovely/*.toml`): Pattern-match vanilla source strings and inject code at/before/after match points. Used for deep hooks into game state (round eval, dollar calculation, blind selection, shop flow, card initialization for sticker support).
-2. **Lua overrides** (`overrides/`): Store function reference (`local fn_ref = SomeFunc`), redefine, call original inside. Used for wrapping vanilla/global functions with MP-specific behavior. Hooks: `ease_dollars`, `Card:sell_card`, `G.FUNCS.reroll_shop`, `G.FUNCS.buy_from_shop`, `G.FUNCS.use_card`, `G.FUNCS.evaluate_round`.
+2. **Lua overrides** (`overrides/`): Store function reference (`local fn_ref = SomeFunc`), redefine, call original inside. Used for wrapping vanilla/global functions with PVP-specific behavior. Hooks: `ease_dollars`, `Card:sell_card`, `G.FUNCS.reroll_shop`, `G.FUNCS.buy_from_shop`, `G.FUNCS.use_card`, `G.FUNCS.evaluate_round`.
 3. **SMODS APIs**: `SMODS.calculate_context` for joker/card evaluation hooks. `SMODS.GameObject:extend` for custom object types (Gamemode, Ruleset).
 
 ## Networking
 
 TCP socket via `love.socket` running on a separate LÖVE thread (`love.thread.newThread`). Communication via `love.thread.getChannel` — two channels: `uiToNetwork` (client→server) and `networkToUi` (server→client). JSON-encoded messages. Server at configurable URL (default: `balatro.virtualized.dev:8788`).
 
-`Client.send()` pushes JSON to the outbound channel. `MP.ACTIONS.*` functions in `networking/action_handlers.lua` handle inbound server messages.
+`Client.send()` pushes JSON to the outbound channel. `PVP.ACTIONS.*` functions in `networking/action_handlers.lua` handle inbound server messages.
 
 ## Gameplay Loop
 
@@ -82,7 +82,7 @@ The **only networked gameplay data** is the opponent's score during PvP blinds. 
 
 ## Gamemodes
 
-`MP.Gamemode` (`gamemodes/_gamemodes.lua`) extends `SMODS.GameObject`, stored in `MP.Gamemodes[]` and `G.P_CENTER_POOLS.Gamemode`. Each gamemode defines `get_blinds_by_ante(ante)` → `(small, big, boss)` override keys (or `nil` for vanilla), its own ban lists, and a `create_info_menu()` for UI.
+`PVP.Gamemode` (`gamemodes/_gamemodes.lua`) extends `SMODS.GameObject`, stored in `PVP.Gamemodes[]` and `G.P_CENTER_POOLS.Gamemode`. Each gamemode defines `get_blinds_by_ante(ante)` → `(small, big, boss)` override keys (or `nil` for vanilla), its own ban lists, and a `create_info_menu()` for UI.
 
 ### Attrition
 The standard head-to-head mode. Normal blinds until `pvp_start_round`, then boss blind becomes `bl_mp_nemesis` (the PvP blind). Bans SP-specific jokers, ante-manipulation vouchers, the boss tag, and SP boss blinds.
@@ -91,31 +91,31 @@ The standard head-to-head mode. Normal blinds until `pvp_start_round`, then boss
 Intensive PvP variant. Normal blinds until `showdown_starting_antes`, then *all three* blind slots become `bl_mp_nemesis`. Same bans as Attrition.
 
 ### Survival
-Solo endurance — 1 life, no PvP blinds at all (all vanilla). Bans MP jokers and consumables. Forces `starting_lives = 1` and `disable_live_and_timer_hud = true`.
+Solo endurance — 1 life, no PvP blinds at all (all vanilla). Bans PVP jokers and consumables. Forces `starting_lives = 1` and `disable_live_and_timer_hud = true`.
 
 ## Rulesets & Layers
 
 ### Overview
 
-`MP.Ruleset` (`rulesets/_rulesets.lua`) extends `SMODS.GameObject`, stored in `MP.Rulesets[]`. Rulesets are now composed from **layers** — reusable bundles of ban lists, rework lists, scalars, and runtime hooks. A ruleset definition is typically 3–5 lines pointing at its layers plus any ruleset-specific overrides.
+`PVP.Ruleset` (`rulesets/_rulesets.lua`) extends `SMODS.GameObject`, stored in `PVP.Rulesets[]`. Rulesets are now composed from **layers** — reusable bundles of ban lists, rework lists, scalars, and runtime hooks. A ruleset definition is typically 3–5 lines pointing at its layers plus any ruleset-specific overrides.
 
 ### Layers
 
-`MP.Layer(name, definition)` (`layers/_layers.lua`) registers a named bundle in `MP.Layers`. Definitions live in `layers/*.lua`.
+`PVP.Layer(name, definition)` (`layers/_layers.lua`) registers a named bundle in `PVP.Layers`. Definitions live in `layers/*.lua`.
 
 **Base layers** (composed into rulesets via `layers = { ... }`):
 
 | Layer | Purpose |
 |---|---|
-| `standard` | MP jokers enabled, standard balance bans + reworks |
+| `standard` | PVP jokers enabled, standard balance bans + reworks |
 | `experimental` | Standard-shaped rebalance playtest layer with additional reworks |
 | `sandbox` | Parallel joker pool, idol selection, extra credit gating, vanilla-counterpart bans |
 | `smallworld` | Random ban cull, showman override, tag/voucher/joker replacement logic |
 | `speedlatro_timer` | Per-round countdown timer replacing the normal PvP timer |
 | `ranked` | Version-gated, lobby locked |
-| `classic` | Pre-MP-joker-era card pool |
+| `classic` | Pre-PVP-joker-era card pool |
 
-**Modifier layers** (picked at runtime via `MP.MODIFIERS`, not baked into rulesets — see "Active context" below):
+**Modifier layers** (picked at runtime via `PVP.MODIFIERS`, not baked into rulesets — see "Active context" below):
 
 | Layer | Purpose |
 |---|---|
@@ -124,7 +124,7 @@ Solo endurance — 1 life, no PvP blinds at all (all vanilla). Bans MP jokers an
 
 ### Merge semantics
 
-`MP.resolve_layers(init)` runs **before** SMODS construction (because SMODS validates `required_params` in `__call`, not `inject()`). Left-to-right:
+`PVP.resolve_layers(init)` runs **before** SMODS construction (because SMODS validates `required_params` in `__call`, not `inject()`). Left-to-right:
 - **Array fields** (`banned_*`, `reworked_*`): concatenated (union of all layers + ruleset additions)
 - **Scalar fields**: last layer wins; ruleset-level always overrides
 - Missing `banned_*`/`reworked_*` arrays default to `{}`
@@ -133,21 +133,21 @@ Solo endurance — 1 life, no PvP blinds at all (all vanilla). Bans MP jokers an
 
 The runtime view of "what's active right now" is bigger than a single ruleset — modifier layers compose on top. Two abstractions:
 
-**`MP.current_ruleset()`** — a metatable proxy that resolves any field as (ruleset + active modifiers). Arrays union; scalars last-wins; modifiers beat the ruleset's own scalars. This is the canonical read site for ban lists, timer scalars, preview flags, etc. — `ApplyBans`, `LoadReworks`, lobby code all go through it. Safe with no active ruleset (arrays read as `{}`, scalars as `nil`).
+**`PVP.current_ruleset()`** — a metatable proxy that resolves any field as (ruleset + active modifiers). Arrays union; scalars last-wins; modifiers beat the ruleset's own scalars. This is the canonical read site for ban lists, timer scalars, preview flags, etc. — `ApplyBans`, `LoadReworks`, lobby code all go through it. Safe with no active ruleset (arrays read as `{}`, scalars as `nil`).
 
-**`MP.active_layer_chain(target?)`** — single source of truth for the deduped, ordered list of active layer names: ruleset's `_layer_order` → ruleset's self-name → modifiers. Powers `is_layer_active`, `RunLayerHooks`, and `LoadReworks` resolution. Dedup matters because not every hook is idempotent (smallworld's 75% cull would re-cull survivors if the ruleset's self-name re-fired the layer hook).
+**`PVP.active_layer_chain(target?)`** — single source of truth for the deduped, ordered list of active layer names: ruleset's `_layer_order` → ruleset's self-name → modifiers. Powers `is_layer_active`, `RunLayerHooks`, and `LoadReworks` resolution. Dedup matters because not every hook is idempotent (smallworld's 75% cull would re-cull survivors if the ruleset's self-name re-fired the layer hook).
 
-**`MP.MODIFIERS`** — runtime-only ordered list of modifier-layer names. Picked from the Modifiers overlay in lobby (host) or in practice mode (player). Reset to `{}` on lobby leave / practice exit. Helpers: `MP.has_modifier`, `MP.add_modifier`, `MP.remove_modifier`, `MP.modifiers_serialize`, `MP.modifiers_parse`. Modifiers are *not* materialized onto the ruleset — they're queried at read time via `current_ruleset()`.
+**`PVP.MODIFIERS`** — runtime-only ordered list of modifier-layer names. Picked from the Modifiers overlay in lobby (host) or in practice mode (player). Reset to `{}` on lobby leave / practice exit. Helpers: `PVP.has_modifier`, `PVP.add_modifier`, `PVP.remove_modifier`, `PVP.modifiers_serialize`, `PVP.modifiers_parse`. Modifiers are *not* materialized onto the ruleset — they're queried at read time via `current_ruleset()`.
 
-### Runtime query: `MP.is_layer_active(name)`
+### Runtime query: `PVP.is_layer_active(name)`
 
-Returns true if `name` appears in `MP.active_layer_chain()` — i.e. the active ruleset composes that layer, the ruleset's own short name matches, or it's an active modifier. Use this to gate runtime behavior. Replaces the old `is_standard_ruleset()` and most `is_ruleset_active()` usage.
+Returns true if `name` appears in `PVP.active_layer_chain()` — i.e. the active ruleset composes that layer, the ruleset's own short name matches, or it's an active modifier. Use this to gate runtime behavior. Replaces the old `is_standard_ruleset()` and most `is_ruleset_active()` usage.
 
 ### How to write / modify a ruleset
 
 **Minimal (layer-only):**
 ```lua
-MP.Ruleset({
+PVP.Ruleset({
     key = "blitz",
     layers = { "standard" },
 }):inject()
@@ -155,12 +155,12 @@ MP.Ruleset({
 
 **With overrides:**
 ```lua
-MP.Ruleset({
+PVP.Ruleset({
     key = "traditional",
     layers = { "standard" },
     banned_jokers = { "j_mp_speedrun", "j_mp_conjoined_joker" },  -- merged into standard's bans
     force_lobby_options = function(self)
-        MP.LOBBY.config.timer = false
+        PVP.LOBBY.config.timer = false
         return false  -- false = soft defaults, host can override
     end,
 }):inject()
@@ -168,7 +168,7 @@ MP.Ruleset({
 
 **Layerless (standalone):**
 ```lua
-MP.Ruleset({
+PVP.Ruleset({
     key = "vanilla",
     multiplayer_content = false,
     banned_jokers = {}, banned_consumables = {}, banned_vouchers = {},
@@ -184,12 +184,12 @@ MP.Ruleset({
 
 ### The Ban System
 
-`MP.ApplyBans()` merges bans from three sources into `G.GAME.banned_keys` at game start:
-1. **Ruleset** — read via `MP.current_ruleset()`, which folds in active modifier layers
+`PVP.ApplyBans()` merges bans from three sources into `G.GAME.banned_keys` at game start:
+1. **Ruleset** — read via `PVP.current_ruleset()`, which folds in active modifier layers
 2. **Gamemode** — `gamemode["banned_" .. category]`
-3. **Deck** — `MP.DECK["BANNED_" .. category]` (deck-specific compat bans)
+3. **Deck** — `PVP.DECK["BANNED_" .. category]` (deck-specific compat bans)
 
-Then `MP.RunLayerHooks("on_apply_bans")` fires each layer's hook in `active_layer_chain` order. Used by sandbox (idol selection, extra credit gating) and smallworld (75% random cull).
+Then `PVP.RunLayerHooks("on_apply_bans")` fires each layer's hook in `active_layer_chain` order. Used by sandbox (idol selection, extra credit gating) and smallworld (75% random cull).
 
 `banned_silent` adds hidden bans not shown in UI (used to hide vanilla counterparts of reworked cards).
 
@@ -208,27 +208,27 @@ Steps:
 2. Add the vanilla key to the layer's `banned_silent` (hides it from pool)
 3. Add your new key to the layer's `reworked_jokers` — this both shows it in the info panel **and** auto-attaches an `mp_include` that returns true iff any owning layer is active
 
-Auto-gating is driven by reverse indices `MP._JOKER_LAYERS` / `MP._CONSUMABLE_LAYERS` built in `MP.Layer()`. `SMODS.Joker:register` and `SMODS.Consumable:register` are grafted to consult them and stitch a default `mp_include` onto cards whose key is in the index — but only when the card doesn't already define one. Override `mp_include` only for bespoke logic (e.g. sandbox `joker_mappings`, top-level MP jokers gated on `multiplayer_content`, error/magnet special-cases).
+Auto-gating is driven by reverse indices `PVP._JOKER_LAYERS` / `PVP._CONSUMABLE_LAYERS` built in `PVP.Layer()`. `SMODS.Joker:register` and `SMODS.Consumable:register` are grafted to consult them and stitch a default `mp_include` onto cards whose key is in the index — but only when the card doesn't already define one. Override `mp_include` only for bespoke logic (e.g. sandbox `joker_mappings`, top-level PVP jokers gated on `multiplayer_content`, error/magnet special-cases).
 
 #### Path B: `ReworkCenter` (property patching)
 
 Overrides config, loc text, and/or logic on an existing center without creating a new key. Cleaner API, less boilerplate — good for enhancements, consumables, tags, stakes, blinds, and poker hands.
 
 ```lua
-MP.ReworkCenter("m_glass", {
+PVP.ReworkCenter("m_glass", {
     layers = "standard",           -- string or array of strings
     config = { Xmult = 1.5, extra = 4 },
 })
 ```
 
-Registration stores properties as `mp_<layer>_<prop>` on the center. `MP.LoadReworks(ruleset)` resolves in `MP.active_layer_chain(ruleset)` order: vanilla → composed layers → ruleset self-name → modifiers. Later entries override earlier ones.
+Registration stores properties as `mp_<layer>_<prop>` on the center. `PVP.LoadReworks(ruleset)` resolves in `PVP.active_layer_chain(ruleset)` order: vanilla → composed layers → ruleset self-name → modifiers. Later entries override earlier ones.
 
 **Why not for jokers:** `ReworkCenter` mutates `G.P_CENTERS[key]` properties. Balatro's shop pool generation reads center config during pseudorandom selection. If you change a joker's rarity or config after pool generation has already used the original values, the two clients can diverge. Enhancements/consumables/tags don't go through the same shop queue machinery, so they're safe.
 
 ### Wiring: when the layer entry is enough vs. when you need more
 
 - **Path A jokers / consumables / tags** (`reworked_jokers`, `reworked_consumables`, `reworked_tags`): the layer entry *does* drive runtime gating — auto-mp_include kicks in. You still write the `SMODS.Joker`/`SMODS.Consumable`/`SMODS.Tag` definition and the `banned_silent` entry for the vanilla version (if reskinning one), but no manual `mp_include` or `in_pool` is needed for layer-only gates. `tag_mp_*` is default-deny: a tag must be listed in some layer's `reworked_tags` (or define its own `mp_include`) to appear anywhere.
-- **Path B centers** (`reworked_enhancements`, `reworked_vouchers`, `reworked_blinds`): the layer entry is **display metadata only**. Runtime patching needs a separate `MP.ReworkCenter(key, { layers = "..." })` call. Auto-gating doesn't apply because Path B doesn't go through `register`.
+- **Path B centers** (`reworked_enhancements`, `reworked_vouchers`, `reworked_blinds`): the layer entry is **display metadata only**. Runtime patching needs a separate `PVP.ReworkCenter(key, { layers = "..." })` call. Auto-gating doesn't apply because Path B doesn't go through `register`.
 
 ### Ruleset Details
 
@@ -242,23 +242,23 @@ Registration stores properties as `mp_<layer>_<prop>` on the center. `MP.LoadRew
 | **Chaos** | standard, sandbox, smallworld, speedlatro_timer | — | no | Everything composed together |
 | **Sandbox** | sandbox | — | no (soft defaults) | Parallel joker pool, idol selection; seeds preview/order/lives, host can override |
 | **Experimental** | experimental, ranked, pressure_timer | Attrition | yes | Rebalance playtest — ranked-shaped + pressure-timer modifier |
-| **Legacy Ranked** | classic, ranked | Attrition | yes | Pre-MP-joker card pool, version-gated |
-| **Vanilla** | *(none)* | — | no | No bans, no reworks, no MP jokers |
+| **Legacy Ranked** | classic, ranked | Attrition | yes | Pre-PVP-joker card pool, version-gated |
+| **Vanilla** | *(none)* | — | no | No bans, no reworks, no PVP jokers |
 | **Badlatro** | *(none)* | — | no | Heavy joker bans |
 | **MajorLeague** | *(none)* | Attrition | yes | Longer timer with forgiveness |
 | **MinorLeague** | *(none)* | Attrition | yes | Even longer timer with forgiveness |
 
 ### `forced_gamemode` Mechanism
 
-When a ruleset has `forced_gamemode`, the "Next" button in ruleset selection becomes "Create Lobby" and directly sets `MP.LOBBY.config.gamemode`, skipping the gamemode selection screen. Rulesets without it show the gamemode picker.
+When a ruleset has `forced_gamemode`, the "Next" button in ruleset selection becomes "Create Lobby" and directly sets `PVP.LOBBY.config.gamemode`, skipping the gamemode selection screen. Rulesets without it show the gamemode picker.
 
 ### `force_lobby_options` and `forced_config`
 
-`G.FUNCS.start_lobby` calls `ruleset.force_lobby_options()`. Returning `true` = fully locked (host can't change settings). Returning `false` = soft defaults applied, host can still override. Result is stored in `MP.LOBBY.config.forced_config`. `multiplayer_content` is also set here to gate the `j_mp_*` pool.
+`G.FUNCS.start_lobby` calls `ruleset.force_lobby_options()`. Returning `true` = fully locked (host can't change settings). Returning `false` = soft defaults applied, host can still override. Result is stored in `PVP.LOBBY.config.forced_config`. `multiplayer_content` is also set here to gate the `j_mp_*` pool.
 
 ### Sandbox Layer (Detail)
 
-The most complex layer. `MP.SANDBOX` (defined in `layers/sandbox.lua`) manages a parallel joker pool:
+The most complex layer. `PVP.SANDBOX` (defined in `layers/sandbox.lua`) manages a parallel joker pool:
 - `joker_mappings` links sandbox joker keys (`j_mp_*_sandbox`) to vanilla counterparts (or `nil` for originals). Tracks active/out-of-rotation status.
 - `get_vanilla_bans()` silently bans vanilla versions of active sandbox jokers.
 - `is_joker_allowed(key)` gates card pools — checks `is_layer_active("sandbox")` internally.
@@ -270,15 +270,15 @@ The most complex layer. `MP.SANDBOX` (defined in `layers/sandbox.lua`) manages a
 1. Register optional art via `SMODS.Atlas`, then call `SMODS.Joker` with metadata (rarity, cost, compat flags) plus `config.extra` to seed per-card state.
 2. `loc_txt` holds name/description templates; `loc_vars` returns dynamic numbers and color tags injected into that text.
 3. Runtime behavior via `calculate(context)` — inspects context table (`context.joker_main`, `context.individual`, `context.end_of_round`, etc.) and returns chip/mult/xmult values or UI messages. Other hooks: `add_to_deck`, `remove_from_deck`, `mp_include` (pool gating).
-4. Pool gating layers: layer-membership cards get `mp_include` auto-attached at register time (see "Wiring" above). Top-level MP jokers (not tied to a single layer) still hand-roll `mp_include` to check `MP.LOBBY.code` + `MP.LOBBY.multiplayer_jokers`. Sandbox variants gate via `MP.SANDBOX.is_joker_allowed`.
+4. Pool gating layers: layer-membership cards get `mp_include` auto-attached at register time (see "Wiring" above). Top-level PVP jokers (not tied to a single layer) still hand-roll `mp_include` to check `PVP.LOBBY.code` + `PVP.LOBBY.multiplayer_jokers`. Sandbox variants gate via `PVP.SANDBOX.is_joker_allowed`.
 5. Balanced sticker: Lovely patches auto-apply sticker to any card flagged as reworked for the active ruleset (or with `mp_sticker_balanced` in config) during `Card` initialization.
 6. Sandbox rotation: `joker_mappings` links sandbox keys to vanilla ancestors, controls active status, silently bans vanilla when sandbox is live.
 
 ## Compatibility
 
-`core.lua` hard-bans incompatible mods via `MP.BANNED_MODS` and exposes integrations (e.g., Preview) through `MP.INTEGRATIONS` for opt-in/out without hard dependencies.
+`core.lua` hard-bans incompatible mods via `PVP.BANNED_MODS` and exposes integrations (e.g., Preview) through `PVP.INTEGRATIONS` for opt-in/out without hard dependencies.
 
-The `compatibility/` tree contains targeted shims for popular mods (Pokermon, StrangePencil, TooManyJokers, AntePreview, etc.). Each shim can push additional bans through `MP.DECK.ban_*` helpers or inject UI/logic so shared content cooperates.
+The `compatibility/` tree contains targeted shims for popular mods (Pokermon, StrangePencil, TooManyJokers, AntePreview, etc.). Each shim can push additional bans through `PVP.DECK.ban_*` helpers or inject UI/logic so shared content cooperates.
 
 ## Config
 

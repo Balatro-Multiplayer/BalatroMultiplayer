@@ -1,13 +1,13 @@
-function MP.UI.update_blind_HUD(blind, reset, silent)
-    if MP.is_mp_or_ghost() then
+function PVP.UI.update_blind_HUD(blind, reset, silent)
+    if PVP.is_mp_or_ghost() then
         -- Prepare blind name
         local blind_name_string
-        if MP.GHOST.is_active() then
-            blind_name_string = MP.GHOST.get_blind_name_ui()
+        if PVP.GHOST.is_active() then
+            blind_name_string = PVP.GHOST.get_blind_name_ui()
         else
             blind_name_string = {
                 {
-                    ref_table = MP.LOBBY.is_host and MP.LOBBY.guest or MP.LOBBY.host,
+                    ref_table = PVP.LOBBY.is_host and PVP.LOBBY.guest or PVP.LOBBY.host,
                     ref_value = "username",
                 },
             }
@@ -16,7 +16,7 @@ function MP.UI.update_blind_HUD(blind, reset, silent)
         local name_element = G.HUD_blind:get_UIE_by_ID("HUD_blind_name")
         name_element.config.object.config.string =  {
             {
-                ref_table = MP.LOBBY.is_host and MP.LOBBY.guest or MP.LOBBY.host,
+                ref_table = PVP.LOBBY.is_host and PVP.LOBBY.guest or PVP.LOBBY.host,
                 ref_value = "username",
             },
         }
@@ -31,7 +31,7 @@ function MP.UI.update_blind_HUD(blind, reset, silent)
         name_element.config.object:update_text(true)
         name_element.states.visible = false
         -- Setup enemy score text
-        G.HUD_blind:get_UIE_by_ID("HUD_blind_count").config.ref_table = MP.GAME.enemy
+        G.HUD_blind:get_UIE_by_ID("HUD_blind_count").config.ref_table = PVP.GAME.enemy
         G.HUD_blind:get_UIE_by_ID("HUD_blind_count").config.ref_value = "score_text"
         G.HUD_blind:get_UIE_by_ID("HUD_blind_count").config.func = "multiplayer_blind_chip_UI_scale"
         -- Setup labels
@@ -43,7 +43,7 @@ function MP.UI.update_blind_HUD(blind, reset, silent)
         -- Setup enemy hands
         G.HUD_blind:get_UIE_by_ID("dollars_to_be_earned").parent.parent.states.visible = false
         G.HUD_blind:get_UIE_by_ID("dollars_to_be_earned").config.object.config.string =
-            { { ref_table = MP.GAME.enemy, ref_value = "hands_text" } }
+            { { ref_table = PVP.GAME.enemy, ref_value = "hands_text" } }
         G.HUD_blind:get_UIE_by_ID("dollars_to_be_earned").config.object:update_text()
 
         G.HUD_blind.alignment.offset.y = 0
@@ -57,7 +57,7 @@ function MP.UI.update_blind_HUD(blind, reset, silent)
                 if self.config.blind.key == "bl_mp_nemesis" then
                     -- Setup blind atlas and pos
                     self.children.animatedSprite.atlas = G.ANIMATION_ATLAS["mp_player_blind_col"]
-                    local nemesis_blind_col = MP.UTILS.get_nemesis_key()
+                    local nemesis_blind_col = PVP.UTILS.get_nemesis_key()
                     self.children.animatedSprite:set_sprite_pos(G.P_BLINDS[nemesis_blind_col].pos)
                 end
 
@@ -80,8 +80,8 @@ function MP.UI.update_blind_HUD(blind, reset, silent)
     end
 end
 
-function MP.UI.reset_blind_HUD()
-	if MP.is_mp_or_ghost() then
+function PVP.UI.reset_blind_HUD()
+	if PVP.is_mp_or_ghost() then
         local name_element = G.HUD_blind:get_UIE_by_ID("HUD_blind_name")
 		name_element.config.object.config.string =
 			{ { ref_table = G.GAME.blind, ref_value = "loc_name" } }
@@ -113,7 +113,7 @@ end
 local get_blind_main_colourref = get_blind_main_colour
 function get_blind_main_colour(type) -- handles ui colour stuff
 	local nemesis = G.GAME.round_resets.blind_choices[type] == "bl_mp_nemesis" or type == "bl_mp_nemesis"
-	if nemesis then type = MP.UTILS.get_nemesis_key() end
+	if nemesis then type = PVP.UTILS.get_nemesis_key() end
 	return get_blind_main_colourref(type)
 end
 
@@ -121,7 +121,7 @@ local blind_change_colourref = Blind.change_colour
 function Blind:change_colour(blind_col) -- ensures that small/big blinds have proper colouration
 	local small = false
 	if self.config.blind.key == "bl_mp_nemesis" then
-		local blind_key = MP.UTILS.get_nemesis_key()
+		local blind_key = PVP.UTILS.get_nemesis_key()
 		if blind_key == "bl_small" or blind_key == "bl_big" then small = true end
 	end
 	local boss = self.boss
@@ -136,7 +136,7 @@ function Blind:set_blind(blind, reset, silent) -- hacking in proper spirals, far
 	if (blind and blind.key == "bl_mp_nemesis") or (self and self.name and self.name == "bl_mp_nemesis") then -- this shouldn't break and this fix shouldn't work
 		local boss = false
 		local showdown = false
-		local blind_key = MP.UTILS.get_nemesis_key()
+		local blind_key = PVP.UTILS.get_nemesis_key()
 		if G.P_BLINDS[blind_key].boss then
 			boss = true
 			if G.P_BLINDS[blind_key].boss.showdown then
@@ -154,7 +154,7 @@ function ease_background_colour_blind(state, blind_override) -- handles backgrou
 	)
 	local blindname = (blindname == "" and "Small Blind" or blindname)
 	if blindname == "bl_mp_nemesis" then
-		blind_override = MP.UTILS.get_nemesis_key()
+		blind_override = PVP.UTILS.get_nemesis_key()
 		for k, v in pairs(G.P_BLINDS) do
 			if blind_override == k then blind_override = v.name end
 		end
@@ -165,10 +165,10 @@ end
 local add_round_eval_rowref = add_round_eval_row
 function add_round_eval_row(config) -- if i could post a skull emoji i would, wtf is this (cashout screen)
 	if config.name == "blind1" and G.GAME.blind.config.blind.key == "bl_mp_nemesis" then
-		G.GAME.blind.chip_text = MP.INSANE_INT.to_string(MP.GAME.enemy.score)
+		G.GAME.blind.chip_text = PVP.INSANE_INT.to_string(PVP.GAME.enemy.score)
 
 		G.P_BLINDS["bl_mp_nemesis"].atlas = "mp_player_blind_col"
-		G.GAME.blind.pos = G.P_BLINDS[MP.UTILS.get_nemesis_key()].pos -- this one is getting reset so no need to bother
+		G.GAME.blind.pos = G.P_BLINDS[PVP.UTILS.get_nemesis_key()].pos -- this one is getting reset so no need to bother
 		add_round_eval_rowref(config)
 		G.E_MANAGER:add_event(Event({
 			trigger = "before",
@@ -186,28 +186,38 @@ end
 local blind_defeat_ref = Blind.defeat
 function Blind:defeat(silent)
 	blind_defeat_ref(self, silent)
-	if MP.is_mp_or_ghost() and MP.UI.reset_blind_HUD then MP.UI.reset_blind_HUD() end
+	if PVP.is_mp_or_ghost() and PVP.UI.reset_blind_HUD then PVP.UI.reset_blind_HUD() end
 end
 
 local blind_disable_ref = Blind.disable
 function Blind:disable()
-	if MP.is_pvp_boss() and not (G.GAME.blind and G.GAME.blind.name == "Verdant Leaf") then -- hackfix to make verdant work properly
+	if PVP.is_pvp_boss() and not (G.GAME.blind and G.GAME.blind.name == "Verdant Leaf") then -- hackfix to make verdant work properly
 		return
 	end
 	blind_disable_ref(self)
 end
 
 G.FUNCS.multiplayer_blind_chip_UI_scale = function(e)
+	-- No real opponent in practice -- always mask both, never reveal (there is
+	-- nothing to reveal). Checked first since practice is never a real PvP boss in
+	-- the sense the checks below assume (hide_score_until_played/info_received are
+	-- both meaningless without a live opponent).
+	if PVP.is_practice_mode() then
+		PVP.GAME.enemy.hands_text = "???"
+		PVP.GAME.enemy.score_text = "???"
+		return
+	end
+
 	-- Mask the opponent's hands as "?" until the first enemyInfo arrives this
 	-- blind (same gating as the hidden score), otherwise mirror the real count.
 	if
-		MP.LOBBY.config.hide_score_until_played
-		and MP.is_pvp_boss()
-		and not MP.GAME.enemy.info_received
+		PVP.LOBBY.config.hide_score_until_played
+		and PVP.is_pvp_boss()
+		and not PVP.GAME.enemy.info_received
 	then
-		MP.GAME.enemy.hands_text = "?"
+		PVP.GAME.enemy.hands_text = "?"
 	else
-		MP.GAME.enemy.hands_text = tostring(MP.GAME.enemy.hands)
+		PVP.GAME.enemy.hands_text = tostring(PVP.GAME.enemy.hands)
 	end
 
 	-- Hide the opponent's score until we have played a hand this PvP blind, so
@@ -216,25 +226,25 @@ G.FUNCS.multiplayer_blind_chip_UI_scale = function(e)
 	-- Gated by the hide_score_until_played lobby option (on by default only on
 	-- standard-layer rulesets; host-toggleable in non-forcing lobbies).
 	if
-		MP.LOBBY.config.hide_score_until_played
-		and MP.is_pvp_boss()
+		PVP.LOBBY.config.hide_score_until_played
+		and PVP.is_pvp_boss()
 		and G.GAME.current_round
 		and G.GAME.current_round.hands_played == 0
 	then
-		MP.GAME.enemy.score_text = "???"
+		PVP.GAME.enemy.score_text = "???"
 		return
 	end
-	local new_score_text = MP.INSANE_INT.to_string(MP.GAME.enemy.score)
-	if G.GAME.blind and MP.GAME.enemy.score and MP.GAME.enemy.score_text ~= new_score_text then
-		if not MP.INSANE_INT.greater_than(MP.GAME.enemy.score, MP.INSANE_INT.create(0, G.E_SWITCH_POINT, 0)) then
-			e.config.scale = scale_number(MP.GAME.enemy.score.coeffiocient, 0.7, 100000)
+	local new_score_text = PVP.INSANE_INT.to_string(PVP.GAME.enemy.score)
+	if G.GAME.blind and PVP.GAME.enemy.score and PVP.GAME.enemy.score_text ~= new_score_text then
+		if not PVP.INSANE_INT.greater_than(PVP.GAME.enemy.score, PVP.INSANE_INT.create(0, G.E_SWITCH_POINT, 0)) then
+			e.config.scale = scale_number(PVP.GAME.enemy.score.coeffiocient, 0.7, 100000)
 		end
-		MP.GAME.enemy.score_text = new_score_text
+		PVP.GAME.enemy.score_text = new_score_text
 	end
 end
 
-function MP.UI.juice_up_pvp_hud()
-	if MP.is_pvp_boss() then
+function PVP.UI.juice_up_pvp_hud()
+	if PVP.is_pvp_boss() then
 		G.HUD_blind:get_UIE_by_ID("HUD_blind_count"):juice_up()
 		G.HUD_blind:get_UIE_by_ID("dollars_to_be_earned"):juice_up()
 	end

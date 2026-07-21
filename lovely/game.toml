@@ -8,8 +8,8 @@ priority = 2147483600
 target = "game.lua"
 pattern = '''function Game:update_round_eval\(dt\)(?<pre>[\s\S]+?)if not G.STATE_COMPLETE then'''
 position = 'at'
-payload = '''function Game:update_round_eval(dt)$pre if not G.STATE_COMPLETE and not MP.GAME.prevent_eval then
-        MP.GAME.prevent_eval = true'''
+payload = '''function Game:update_round_eval(dt)$pre if not G.STATE_COMPLETE and not PVP.GAME.prevent_eval then
+        PVP.GAME.prevent_eval = true'''
 times = 1
 
 [[patches]]
@@ -19,15 +19,15 @@ pattern = '''dollars = dollars + G.GAME.interest_amount*math.min(math.floor(G.GA
     end'''
 position = 'after'
 payload = '''
-  if not MP.GAME.comeback_bonus_given then
-		MP.GAME.comeback_bonus_given = true
+  if not PVP.GAME.comeback_bonus_given then
+		PVP.GAME.comeback_bonus_given = true
 		local comeback_bonus
 
-		if MP.LOBBY.config.ruleset == "ruleset_mp_sandbox" then
+		if PVP.LOBBY.config.ruleset == "ruleset_mp_sandbox" then
 		    comeback_bonus = 3 * (G.GAME.round_resets.ante - 1)
 		else
-			if MP.is_major_league_ruleset() then 
-				comeback_bonus = 4 * MP.GAME.comeback_bonus
+			if PVP.is_major_league_ruleset() then 
+				comeback_bonus = 4 * PVP.GAME.comeback_bonus
 			else
 				if G.GAME.stake >= 6 then
 					comeback_bonus = 2
@@ -55,10 +55,10 @@ pattern = '''elseif config.name == 'hands' then'''
 position = 'before'
 payload = '''elseif config.name == "comeback" then
   local bonus
-  if MP.LOBBY.config.ruleset == "ruleset_mp_sandbox" then
+  if PVP.LOBBY.config.ruleset == "ruleset_mp_sandbox" then
 	bonus = G.GAME.round_resets.ante - 1
   else
-	bonus = MP.GAME.comeback_bonus
+	bonus = PVP.GAME.comeback_bonus
   end
   table.insert(left_text, {
     n = G.UIT.T,
@@ -71,7 +71,7 @@ payload = '''elseif config.name == "comeback" then
     },
   })
 
-  local comeback_money_key = MP.LOBBY.config.ruleset == "ruleset_mp_sandbox" and "k_comeback_money_sandbox" or "k_total_lives_lost"
+  local comeback_money_key = PVP.LOBBY.config.ruleset == "ruleset_mp_sandbox" and "k_comeback_money_sandbox" or "k_total_lives_lost"
   table.insert(left_text, {
     n = G.UIT.O,
     config = {
@@ -95,7 +95,7 @@ times = 1
 target = "functions/state_events.lua"
 pattern = '''if G.GAME.current_round.hands_left > 0 and not G.GAME.modifiers.no_extra_hand_money then'''
 position = 'at'
-payload = '''if G.GAME.current_round.hands_left > 0 and (not G.GAME.modifiers.no_extra_hand_money) and (not MP.is_pvp_boss()) then'''
+payload = '''if G.GAME.current_round.hands_left > 0 and (not G.GAME.modifiers.no_extra_hand_money) and (not PVP.is_pvp_boss()) then'''
 match_indent = true
 times = 1
 
@@ -104,8 +104,8 @@ times = 1
 target = "functions/common_events.lua"
 pattern = '''G.GAME.current_round.hands_left = G.GAME.current_round.hands_left + mod'''
 position = 'after'
-payload = '''if MP.LOBBY.code and MP.is_pvp_boss() and mod > 0 then
-		MP.ACTIONS.play_hand(G.GAME.chips, G.GAME.current_round.hands_left)
+payload = '''if PVP.LOBBY.code and PVP.is_pvp_boss() and mod > 0 then
+		PVP.ACTIONS.play_hand(G.GAME.chips, G.GAME.current_round.hands_left)
 	end'''
 match_indent = true
 times = 1
@@ -115,8 +115,8 @@ times = 1
 target = "functions/button_callbacks.lua"
 pattern = '''G.FUNCS.toggle_shop = function(e)'''
 position = 'after'
-payload = '''if MP.LOBBY.code then
-  MP.broadcast_spent_last_shop(to_big(MP.GAME.spent_total) - to_big(MP.GAME.spent_before_shop))
+payload = '''if PVP.LOBBY.code then
+  PVP.broadcast_spent_last_shop(to_big(PVP.GAME.spent_total) - to_big(PVP.GAME.spent_before_shop))
 end'''
 match_indent = true
 times = 1
@@ -126,8 +126,8 @@ times = 1
 target = "functions/common_events.lua"
 pattern = '''G.GAME.dollars = G.GAME.dollars + mod'''
 position = 'after'
-payload = '''if MP.LOBBY.code and to_big(mod) < to_big(0) then
-  MP.GAME.spent_total = to_big(MP.GAME.spent_total) + (to_big(mod) * to_big(-1))
+payload = '''if PVP.LOBBY.code and to_big(mod) < to_big(0) then
+  PVP.GAME.spent_total = to_big(PVP.GAME.spent_total) + (to_big(mod) * to_big(-1))
 end'''
 match_indent = true
 times = 1
@@ -138,7 +138,7 @@ target = 'functions/state_events.lua'
 pattern = '''if G.GAME.chips - G.GAME.blind.chips >= 0 then
 add_round_eval_row({dollars = G.GAME.blind.dollars, name='blind1', pitch = pitch})'''
 position = 'at'
-payload = '''if G.GAME.chips - G.GAME.blind.chips >= 0 or MP.is_pvp_boss() then
+payload = '''if G.GAME.chips - G.GAME.blind.chips >= 0 or PVP.is_pvp_boss() then
 add_round_eval_row({dollars = G.GAME.blind.dollars, name='blind1', pitch = pitch})'''
 match_indent = true
 times = 1
@@ -164,7 +164,7 @@ target = '''=[SMODS _ "src/game_object.lua"]'''
 pattern = '''for k, v in pairs(G.P_CENTER_POOLS["Enhanced"]) do'''
 position = "at"
 payload = '''
-for i, v in ipairs(MP.UTILS.get_spectral_enhancement_pool()) do
+for i, v in ipairs(PVP.UTILS.get_spectral_enhancement_pool()) do
 '''
 match_indent = true
 times = 3

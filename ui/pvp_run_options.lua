@@ -6,18 +6,18 @@
 G.FUNCS.mp_pvp_seed_change = function()
 	G.FUNCS.exit_overlay_menu()
 	-- A unanimous vote restarts the match on a fresh seed (see pvp_seed_vote action).
-	MP.cast_seed_vote()
+	PVP.cast_seed_vote()
 end
 
 G.FUNCS.mp_pvp_forfeit = function()
 	G.FUNCS.exit_overlay_menu()
-	MP.pvp_forfeit()
+	PVP.pvp_forfeit()
 end
 
 -- Seed change is only offered for the first few minutes of a run.
-MP.SEED_CHANGE_WINDOW = 300
+PVP.SEED_CHANGE_WINDOW = 300
 
-MP.create_run_options = function()
+PVP.create_run_options = function()
 	-- Each button is its own row inside one column so they stack vertically.
 	local rows = {}
 	local function add_row(node)
@@ -33,8 +33,8 @@ MP.create_run_options = function()
 	local meta = lobby and lobby:get_metadata()
 	local gm = meta and meta.queue_mode and MPAPI.GameModes[meta.queue_mode]
 	if not gm or gm.seed_change_allowed ~= false then
-		local within_window = MP._run_started_at ~= nil
-			and (love.timer.getTime() - MP._run_started_at) < MP.SEED_CHANGE_WINDOW
+		local within_window = PVP._run_started_at ~= nil
+			and (love.timer.getTime() - PVP._run_started_at) < PVP.SEED_CHANGE_WINDOW
 		add_row(MPAPI.disableable_button({
 			button = "mp_pvp_seed_change",
 			label = { "Seed Change" },

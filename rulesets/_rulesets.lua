@@ -14,44 +14,44 @@
 -- "spdrn_order", and don't want one), so PvP computes the "ruleset_" segment
 -- itself and tells SMODS not to touch the key further.
 --
--- MP.Rulesets stays as a direct alias: read elsewhere (lib/ghost_replay.lua,
+-- PVP.Rulesets stays as a direct alias: read elsewhere (lib/ghost_replay.lua,
 -- networking/action_handlers.lua) expecting a key -> ruleset lookup table, which
 -- MPAPI.Rulesets now IS.
-MP.Rulesets = MPAPI.Rulesets
+PVP.Rulesets = MPAPI.Rulesets
 
-function MP.Ruleset(init)
+function PVP.Ruleset(init)
 	init.key = "ruleset_mp_" .. init.key
 	init.prefix_config = init.prefix_config or { key = false }
 	return MPAPI.Ruleset(init)
 end
 
-function MP.is_ruleset_active(ruleset_name)
+function PVP.is_ruleset_active(ruleset_name)
 	local key = "ruleset_mp_" .. ruleset_name
-	if MP.LOBBY.code then
-		return MP.LOBBY.config.ruleset == key
-	elseif MP.is_practice_mode() then
-		return MP.SP.ruleset == key
+	if PVP.LOBBY.code then
+		return PVP.LOBBY.config.ruleset == key
+	elseif PVP.is_practice_mode() then
+		return PVP.SP.ruleset == key
 	end
 	return false
 end
 
 -- "Active" meaning both a live lobby and the configuration-in-progress phase.
-function MP.get_active_ruleset()
-	if MP.LOBBY.config.ruleset then
-		return MP.LOBBY.config.ruleset
-	elseif MP.is_practice_mode() then
-		return MP.SP.ruleset
+function PVP.get_active_ruleset()
+	if PVP.LOBBY.config.ruleset then
+		return PVP.LOBBY.config.ruleset
+	elseif PVP.is_practice_mode() then
+		return PVP.SP.ruleset
 	end
 	return nil
 end
 
-function MP.get_active_gamemode()
-	if MP.LOBBY.code then
-		return MP.LOBBY.config.gamemode
-	elseif MP.is_practice_mode() then
+function PVP.get_active_gamemode()
+	if PVP.LOBBY.code then
+		return PVP.LOBBY.config.gamemode
+	elseif PVP.is_practice_mode() then
 		-- Ghost replay stores the gamemode directly
-		if MP.GHOST.is_active() and MP.GHOST.gamemode then return MP.GHOST.gamemode end
-		return MP.current_ruleset().forced_gamemode
+		if PVP.GHOST.is_active() and PVP.GHOST.gamemode then return PVP.GHOST.gamemode end
+		return PVP.current_ruleset().forced_gamemode
 	end
 	return nil
 end
@@ -66,13 +66,13 @@ end
 
 local _resolver = setmetatable({}, {
 	__index = function(_, field)
-		return MPAPI.resolve_ruleset_field(MP.get_active_ruleset(), field)
+		return MPAPI.resolve_ruleset_field(PVP.get_active_ruleset(), field)
 	end,
 })
 
 -- The answer to "what's in the active ruleset?".
 -- Safe with no active ruleset: arrays read as {}, the rest as nil.
-function MP.current_ruleset()
+function PVP.current_ruleset()
 	return _resolver
 end
 
@@ -86,11 +86,11 @@ end
 -- identical: MPAPI adds the ruleset's own KEY as its self-entry, which for
 -- MPAPI/Speed content is fine (their ruleset keys are already fully-qualified,
 -- doubling as their own layer name when one exists). PvP's ruleset keys carry
--- the extra "ruleset_mp_" prefix (see MP.Ruleset above) while a same-named
+-- the extra "ruleset_mp_" prefix (see PVP.Ruleset above) while a same-named
 -- layer, when one exists, is registered under the unprefixed SHORT name --
 -- so PvP must add target_short here, not the prefixed key MPAPI would add.
-function MP.active_layer_chain(target_short)
-	local active_key = MP.get_active_ruleset()
+function PVP.active_layer_chain(target_short)
+	local active_key = PVP.get_active_ruleset()
 	local active_short = active_key and active_key:gsub("^ruleset_mp_", "") or nil
 	target_short = target_short or active_short
 
@@ -121,6 +121,6 @@ end
 
 -- Delegate straight to MPAPI: both take (key, opts) / (ruleset_key, key) and
 -- MPAPI.LoadReworks resolves via MPAPI.active_layer_chain, which agrees with the
--- resolution above since MP.Ruleset/MP.Layer register into MPAPI's own tables.
-MP.ReworkCenter = MPAPI.ReworkCenter
-MP.LoadReworks = MPAPI.LoadReworks
+-- resolution above since PVP.Ruleset/PVP.Layer register into MPAPI's own tables.
+PVP.ReworkCenter = MPAPI.ReworkCenter
+PVP.LoadReworks = MPAPI.LoadReworks

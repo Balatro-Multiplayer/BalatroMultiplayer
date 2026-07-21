@@ -1,5 +1,5 @@
-MP.MOD_HASH = "0000"
-MP.MOD_STRING = ""
+PVP.MOD_HASH = "0000"
+PVP.MOD_STRING = ""
 
 function hash(str)
 	local str_to_hash = str or "0000"
@@ -16,25 +16,25 @@ local function get_mod_data()
 	for key, mod in pairs(SMODS.Mods) do
 		if not mod.disabled and key ~= "Balatro" then table.insert(mod_table, key .. "-" .. (mod.version or "UNK")) end
 	end
-	for key, mod in pairs(MP.INTEGRATIONS) do
+	for key, mod in pairs(PVP.INTEGRATIONS) do
 		if mod then table.insert(mod_table, key .. "-MultiplayerIntegration") end
 	end
 	return mod_table
 end
 
-function MP:generate_hash()
+function PVP:generate_hash()
 	local mod_data = get_mod_data()
 	table.sort(mod_data)
-	table.insert(mod_data, 1, "serversideConnectionID=" .. tostring(MP.UTILS.server_connection_ID()))
-	table.insert(mod_data, 1, "encryptID=" .. tostring(MP.UTILS.encrypt_ID()))
-	MP.config.unlocked = MP.UTILS.unlock_check()
-	table.insert(mod_data, 1, "unlocked=" .. tostring(MP.config.unlocked))
-	table.insert(mod_data, 1, "preview=" .. tostring(MP.config.integrations.Preview))
+	table.insert(mod_data, 1, "serversideConnectionID=" .. tostring(PVP.UTILS.server_connection_ID()))
+	table.insert(mod_data, 1, "encryptID=" .. tostring(PVP.UTILS.encrypt_ID()))
+	PVP.config.unlocked = PVP.UTILS.unlock_check()
+	table.insert(mod_data, 1, "unlocked=" .. tostring(PVP.config.unlocked))
+	table.insert(mod_data, 1, "preview=" .. tostring(PVP.config.integrations.Preview))
 	local mod_string = table.concat(mod_data, ";")
-	MP.MOD_STRING = mod_string
-	MP.MOD_HASH = hash(mod_string) or "0000"
-    if MP.ACTIONS.set_username then
-        MP.ACTIONS.set_username(MP.LOBBY.username)
+	PVP.MOD_STRING = mod_string
+	PVP.MOD_HASH = hash(mod_string) or "0000"
+    if PVP.ACTIONS.set_username then
+        PVP.ACTIONS.set_username(PVP.LOBBY.username)
     end
 end
 
@@ -46,12 +46,12 @@ function Game:update(dt)
 	game_update_ref(self, dt)
 
 	if not hash_generated and SMODS.booted then
-		MP:generate_hash()
+		PVP:generate_hash()
 		hash_generated = true
 	end
 end
 
-function MP.UTILS.unlock_check()
+function PVP.UTILS.unlock_check()
 	local notFullyUnlocked = false
 
 	for k, v in pairs(G.P_CENTER_POOLS.Joker) do
@@ -64,13 +64,13 @@ function MP.UTILS.unlock_check()
 	return not notFullyUnlocked
 end
 
-function MP.UTILS.encrypt_ID()
+function PVP.UTILS.encrypt_ID()
 	local encryptID = 1
 	for key, center in pairs(G.P_CENTERS or {}) do
 		if type(key) == "string" and key:match("^j_") then
 			if center.cost and type(center.cost) == "number" then encryptID = encryptID + center.cost end
 			if center.config and type(center.config) == "table" then
-				encryptID = encryptID + MP.UTILS.sum_numbers_in_table(center.config)
+				encryptID = encryptID + PVP.UTILS.sum_numbers_in_table(center.config)
 			end
 		elseif type(key) == "string" and key:match("^[cvp]_") then
 			if center.cost and type(center.cost) == "number" then
@@ -107,7 +107,7 @@ end
 --       Mods = table           -- Parsed mod list (see parse_modlist for structure)
 --     }
 --   mod_string (string): Semicolon-delimited string of mod entries only (for backward compatibility)
-function MP.UTILS.parse_Hash(hash)
+function PVP.UTILS.parse_Hash(hash)
 	local parts = {}
 	for part in string.gmatch(hash, "([^;]+)") do
 		table.insert(parts, part)
@@ -132,7 +132,7 @@ function MP.UTILS.parse_Hash(hash)
 		end
 	end
 
-	config.Mods = MP.UTILS.parse_modlist(mod_data)
+	config.Mods = PVP.UTILS.parse_modlist(mod_data)
 	-- this is for backwards compatibility
 	-- We don't need to return mod_string anymore; can use config.Mods as a cleaner interface for the host/guest's mods
 	-- and hash this in what we send to the server instead
@@ -156,7 +156,7 @@ end
 --     ModName2 = "2.1.0",
 --     ModName3 = nil
 --   }
-function MP.UTILS.parse_modlist(mod_entries)
+function PVP.UTILS.parse_modlist(mod_entries)
 	if not mod_entries then return {} end
 
 	local mods = {}
@@ -178,7 +178,7 @@ function MP.UTILS.parse_modlist(mod_entries)
 	return mods
 end
 
-function MP.UTILS.resolve_mod_name_and_version(mod_name, mod_version)
+function PVP.UTILS.resolve_mod_name_and_version(mod_name, mod_version)
     local fullname = mod_name .. "-" .. (mod_version or "")
     local new_mod_name, new_mod_version = fullname:match("^(.*)%-([^~]+~.*)$")
     mod_name = new_mod_name or mod_name
@@ -187,25 +187,25 @@ function MP.UTILS.resolve_mod_name_and_version(mod_name, mod_version)
 end
 
 -- "0.4.0~pre1-DEV" -> "0.4.0". nil if no leading numeric version.
-function MP.UTILS.version_prefix(version)
+function PVP.UTILS.version_prefix(version)
 	if type(version) ~= "string" then return nil end
 	return version:match("^(%d+%.%d+%.%d+)") or version:match("^(%d+%.%d+)")
 end
 
 -- Reads from hash_str, not the parsed Mods table: parse_modlist splits on the last dash
 -- and would mangle versions that contain dashes (e.g. the -DEV suffix).
-function MP.UTILS.player_mod_version(player, mod_name)
+function PVP.UTILS.player_mod_version(player, mod_name)
 	if not player or not player.hash_str then return nil end
 	return (";" .. player.hash_str):match(";" .. mod_name .. "%-([^;]+)")
 end
 
-function MP.UTILS.mp_version_mismatch()
-	local other = MP.LOBBY.is_host and MP.LOBBY.guest or MP.LOBBY.host
-	local their_version = other and MP.UTILS.player_mod_version(other, "Multiplayer")
+function PVP.UTILS.mp_version_mismatch()
+	local other = PVP.LOBBY.is_host and PVP.LOBBY.guest or PVP.LOBBY.host
+	local their_version = other and PVP.UTILS.player_mod_version(other, "Multiplayer")
 	if not their_version then return false end
-	local our_version = MP.version
-	local our_prefix = MP.UTILS.version_prefix(our_version)
-	local their_prefix = MP.UTILS.version_prefix(their_version)
+	local our_version = PVP.version
+	local our_prefix = PVP.UTILS.version_prefix(our_version)
+	local their_prefix = PVP.UTILS.version_prefix(their_version)
 	if our_prefix and their_prefix and our_prefix ~= their_prefix then
 		return true, our_version, their_version
 	end
@@ -220,19 +220,19 @@ local VERSION_CHECKS = {
 }
 
 -- Returns { mod, our, their } for each checked mod whose version differs from the opponent's.
-function MP.UTILS.version_mismatches()
-	local other = MP.LOBBY.is_host and MP.LOBBY.guest or MP.LOBBY.host
+function PVP.UTILS.version_mismatches()
+	local other = PVP.LOBBY.is_host and PVP.LOBBY.guest or PVP.LOBBY.host
 	if not other then return {} end
 
 	local results = {}
 	for _, check in ipairs(VERSION_CHECKS) do
-		local their_version = MP.UTILS.player_mod_version(other, check.name)
+		local their_version = PVP.UTILS.player_mod_version(other, check.name)
 		local our_version = SMODS.Mods[check.name] and SMODS.Mods[check.name].version
 		if their_version and our_version then
 			local mismatch
 			if check.prefix then
-				local op = MP.UTILS.version_prefix(our_version)
-				local tp = MP.UTILS.version_prefix(their_version)
+				local op = PVP.UTILS.version_prefix(our_version)
+				local tp = PVP.UTILS.version_prefix(their_version)
 				mismatch = op and tp and op ~= tp
 			else
 				mismatch = our_version ~= their_version
@@ -245,12 +245,12 @@ function MP.UTILS.version_mismatches()
 	return results
 end
 
-function MP.UTILS.get_banned_mods(mods)
+function PVP.UTILS.get_banned_mods(mods)
 	local banned_mods = {}
 	if not mods then return banned_mods end
 
 	for mod_name, mod_version in pairs(mods) do
-		local ban_info = MP.BANNED_MODS[mod_name]
+		local ban_info = PVP.BANNED_MODS[mod_name]
 		local is_banned = false
 
 		if ban_info then
@@ -277,13 +277,13 @@ function MP.UTILS.get_banned_mods(mods)
 	return banned_mods
 end
 
-function MP.UTILS.sum_numbers_in_table(t)
+function PVP.UTILS.sum_numbers_in_table(t)
 	local sum = 0
 	for k, v in pairs(t) do
 		if type(v) == "number" then
 			sum = sum + v
 		elseif type(v) == "table" then
-			sum = sum + MP.UTILS.sum_numbers_in_table(v)
+			sum = sum + PVP.UTILS.sum_numbers_in_table(v)
 		end
 		-- ignore other types
 	end

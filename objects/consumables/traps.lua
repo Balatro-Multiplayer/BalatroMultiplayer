@@ -1,15 +1,15 @@
 -- Trap: a consumable type that reacts to something your Nemesis does. A Trap can only be
 -- drafted from a Trap booster pack (objects/boosters/traps.lua); drafting one plants it,
 -- face-down, in the drafter's Nemesis's own consumables instead of the drafter's (see
--- lib/trap_utils.lua's MP.TRAP.plant/disguise). When the Nemesis's own action satisfies the
+-- lib/trap_utils.lua's PVP.TRAP.plant/disguise). When the Nemesis's own action satisfies the
 -- trap's trigger, it reveals itself on their screen and its effect benefits the ORIGINAL
 -- drafter -- who also gets a "use" animation on their own screen. See lib/trap_utils.lua for
 -- the shared plant/disguise/reveal/notify_owner framework every card below reuses, and the
 -- layer that gates when these can spawn at all in layers/traps.lua.
 SMODS.ConsumableType({
 	key = "Trap",
-	primary_colour = MP.COLOURS.BLACK,
-	secondary_colour = MP.COLOURS.DARK_PINK,
+	primary_colour = PVP.COLOURS.BLACK,
+	secondary_colour = PVP.COLOURS.DARK_PINK,
 	loc_txt = {
 		["en-us"] = {
 			name = "Trap",
@@ -41,19 +41,19 @@ local TRAPS = {
 		atlas = "t_glyph_of_warding.png",
 		calculate = function(self, card, context)
 			if context.using_consumeable and context.consumeable.config.center.set == "Spectral" then
-				MP.TRAP.reveal_and_consume(card)
-				return MP.TRAP.notify_owner(card, {})
+				PVP.TRAP.reveal_and_consume(card)
+				return PVP.TRAP.notify_owner(card, {})
 			end
 		end,
 		receive = function(self, context)
-			if context.data.owner ~= MP.TRAP.self_id() then
+			if context.data.owner ~= PVP.TRAP.self_id() then
 				return
 			end
 			local pack_card = SMODS.add_card({ key = "p_spectral_jumbo_1", area = G.consumeables, skip_materialize = true })
 			if pack_card and pack_card.open then
 				pack_card:open()
 			end
-			MP.UI.show_trap_fired_animation("Glyph of Warding")
+			PVP.UI.show_trap_fired_animation("Glyph of Warding")
 		end,
 	},
 	-- Symbol: when the holder plays a flush, convert all scored cards to random suits.
@@ -62,19 +62,19 @@ local TRAPS = {
 		atlas = "t_symbol.png",
 		calculate = function(self, card, context)
 			if context.before and context.poker_hands and next(context.poker_hands["Flush"]) then
-				MP.TRAP.reveal_and_consume(card)
+				PVP.TRAP.reveal_and_consume(card)
 				for _, scored in ipairs(context.scoring_hand or {}) do
 					local suit = pseudorandom_element({ "Spades", "Hearts", "Clubs", "Diamonds" }, pseudoseed("mp_trap_symbol"))
 					scored:change_suit(suit)
 				end
-				return MP.TRAP.notify_owner(card, {})
+				return PVP.TRAP.notify_owner(card, {})
 			end
 		end,
 		receive = function(self, context)
-			if context.data.owner ~= MP.TRAP.self_id() then
+			if context.data.owner ~= PVP.TRAP.self_id() then
 				return
 			end
-			MP.UI.show_trap_fired_animation("Symbol")
+			PVP.UI.show_trap_fired_animation("Symbol")
 		end,
 	},
 	-- Alarm: when the holder rerolls their shop, the drafter gains 2 free rerolls.
@@ -83,16 +83,16 @@ local TRAPS = {
 		atlas = "t_alarm.png",
 		calculate = function(self, card, context)
 			if context.reroll_shop then
-				MP.TRAP.reveal_and_consume(card)
-				return MP.TRAP.notify_owner(card, { rerolls = 2 })
+				PVP.TRAP.reveal_and_consume(card)
+				return PVP.TRAP.notify_owner(card, { rerolls = 2 })
 			end
 		end,
 		receive = function(self, context)
-			if context.data.owner ~= MP.TRAP.self_id() then
+			if context.data.owner ~= PVP.TRAP.self_id() then
 				return
 			end
 			G.GAME.current_round.free_rerolls = (G.GAME.current_round.free_rerolls or 0) + context.data.rerolls
-			MP.UI.show_trap_fired_animation("Alarm")
+			PVP.UI.show_trap_fired_animation("Alarm")
 		end,
 	},
 	-- Explosive Runes: when the holder plays a hand with a glass card, all glass cards in
@@ -110,18 +110,18 @@ local TRAPS = {
 				and context.card.ability.set == "Joker"
 				and (context.card.config.center.rarity == 3 or context.card.config.center.rarity == "Rare")
 			then
-				MP.TRAP.reveal_and_consume(card)
-				return MP.TRAP.notify_owner(card, { key = context.card.config.center.key })
+				PVP.TRAP.reveal_and_consume(card)
+				return PVP.TRAP.notify_owner(card, { key = context.card.config.center.key })
 			end
 		end,
 		receive = function(self, context)
-			if context.data.owner ~= MP.TRAP.self_id() then
+			if context.data.owner ~= PVP.TRAP.self_id() then
 				return
 			end
 			if context.data.key then
 				SMODS.add_card({ key = context.data.key, area = G.jokers })
 			end
-			MP.UI.show_trap_fired_animation("Sepia Snake Sigil")
+			PVP.UI.show_trap_fired_animation("Sepia Snake Sigil")
 		end,
 	},
 	-- Fire Trap: when the holder plays a hand with a pair, decrease the rank of all scored
@@ -131,18 +131,18 @@ local TRAPS = {
 		atlas = "t_fire_trap.png",
 		calculate = function(self, card, context)
 			if context.before and context.poker_hands and next(context.poker_hands["Pair"]) then
-				MP.TRAP.reveal_and_consume(card)
+				PVP.TRAP.reveal_and_consume(card)
 				for _, scored in ipairs(context.scoring_hand or {}) do
-					MP.TRAP.decrease_rank(scored)
+					PVP.TRAP.decrease_rank(scored)
 				end
-				return MP.TRAP.notify_owner(card, {})
+				return PVP.TRAP.notify_owner(card, {})
 			end
 		end,
 		receive = function(self, context)
-			if context.data.owner ~= MP.TRAP.self_id() then
+			if context.data.owner ~= PVP.TRAP.self_id() then
 				return
 			end
-			MP.UI.show_trap_fired_animation("Fire Trap")
+			PVP.UI.show_trap_fired_animation("Fire Trap")
 		end,
 	},
 	-- Guards and Wards: when the holder adds a playing card to their deck, add 2 Stone cards
@@ -152,12 +152,12 @@ local TRAPS = {
 		atlas = "t_guards_and_wards.png",
 		calculate = function(self, card, context)
 			if context.playing_card_added then
-				MP.TRAP.reveal_and_consume(card)
-				return MP.TRAP.notify_owner(card, {})
+				PVP.TRAP.reveal_and_consume(card)
+				return PVP.TRAP.notify_owner(card, {})
 			end
 		end,
 		receive = function(self, context)
-			if context.data.owner ~= MP.TRAP.self_id() then
+			if context.data.owner ~= PVP.TRAP.self_id() then
 				return
 			end
 			for _ = 1, 2 do
@@ -166,7 +166,7 @@ local TRAPS = {
 					center = G.P_CENTERS.m_stone,
 				}, G.deck)
 			end
-			MP.UI.show_trap_fired_animation("Guards and Wards")
+			PVP.UI.show_trap_fired_animation("Guards and Wards")
 		end,
 	},
 	-- Magic Mouth: when the holder triggers a blue or purple seal, steal the consumable.
@@ -180,23 +180,23 @@ local TRAPS = {
 		calculate = function(self, card, context)
 			if context.skip_blind then
 				local skipped_tag = G.GAME.tags[#G.GAME.tags]
-				MP.TRAP.reveal_and_consume(card)
-				return MP.TRAP.notify_owner(card, { tag_key = skipped_tag and skipped_tag.key })
+				PVP.TRAP.reveal_and_consume(card)
+				return PVP.TRAP.notify_owner(card, { tag_key = skipped_tag and skipped_tag.key })
 			end
 		end,
 		receive = function(self, context)
-			if context.data.owner ~= MP.TRAP.self_id() then
+			if context.data.owner ~= PVP.TRAP.self_id() then
 				return
 			end
 			if context.data.tag_key then
 				add_tag(Tag(context.data.tag_key))
 			end
-			MP.UI.show_trap_fired_animation("Snare")
+			PVP.UI.show_trap_fired_animation("Snare")
 		end,
 	},
 	-- Arcane Lock: when the holder uses (i.e. a different planted trap fires on) a Trap card,
 	-- they get trapped instead. Deferred: needs a "another trap just fired" signal, which isn't
-	-- a natural calculate-context flag -- would need MP.TRAP.reveal_and_consume itself to fire a
+	-- a natural calculate-context flag -- would need PVP.TRAP.reveal_and_consume itself to fire a
 	-- custom local context so a co-resident Arcane Lock can intercept. Not yet implemented.
 	{ key = "trap_arcane_lock", atlas = "t_arcane_lock.png" },
 	-- Programmed Illusion: when the holder opens a booster pack, add a fake card to it.
@@ -210,18 +210,18 @@ local TRAPS = {
 		atlas = "t_web.png",
 		calculate = function(self, card, context)
 			if context.using_consumeable then
-				MP.TRAP.reveal_and_consume(card)
-				return MP.TRAP.notify_owner(card, { key = context.consumeable.config.center.key })
+				PVP.TRAP.reveal_and_consume(card)
+				return PVP.TRAP.notify_owner(card, { key = context.consumeable.config.center.key })
 			end
 		end,
 		receive = function(self, context)
-			if context.data.owner ~= MP.TRAP.self_id() then
+			if context.data.owner ~= PVP.TRAP.self_id() then
 				return
 			end
 			if context.data.key then
 				SMODS.add_card({ key = context.data.key, area = G.consumeables, edition = "e_negative" })
 			end
-			MP.UI.show_trap_fired_animation("Web")
+			PVP.UI.show_trap_fired_animation("Web")
 		end,
 	},
 	-- Forbiddance: when the holder discards, the cards drawn from their deck are flipped.
@@ -238,19 +238,19 @@ local TRAPS = {
 			if context.using_consumeable and context.consumeable.config.center.set == "Planet" then
 				local hand_type = context.consumeable.ability.consumeable and context.consumeable.ability.consumeable.hand_type
 				if hand_type then
-					MP.TRAP.reveal_and_consume(card)
-					return MP.TRAP.notify_owner(card, { hand_type = hand_type })
+					PVP.TRAP.reveal_and_consume(card)
+					return PVP.TRAP.notify_owner(card, { hand_type = hand_type })
 				end
 			end
 		end,
 		receive = function(self, context)
-			if context.data.owner ~= MP.TRAP.self_id() then
+			if context.data.owner ~= PVP.TRAP.self_id() then
 				return
 			end
 			if context.data.hand_type then
 				level_up_hand(nil, context.data.hand_type, true, 3)
 			end
-			MP.UI.show_trap_fired_animation("Faithful Hound")
+			PVP.UI.show_trap_fired_animation("Faithful Hound")
 		end,
 	},
 	-- Phase Door: when the holder scores a gold card, the drafter gains $4 per gold card in
@@ -267,17 +267,17 @@ local TRAPS = {
 					end
 				end
 				if gold_count > 0 then
-					MP.TRAP.reveal_and_consume(card)
-					return MP.TRAP.notify_owner(card, { dollars = gold_count * 4 })
+					PVP.TRAP.reveal_and_consume(card)
+					return PVP.TRAP.notify_owner(card, { dollars = gold_count * 4 })
 				end
 			end
 		end,
 		receive = function(self, context)
-			if context.data.owner ~= MP.TRAP.self_id() then
+			if context.data.owner ~= PVP.TRAP.self_id() then
 				return
 			end
 			ease_dollars(context.data.dollars, true)
-			MP.UI.show_trap_fired_animation("Phase Door")
+			PVP.UI.show_trap_fired_animation("Phase Door")
 		end,
 	},
 	-- Mental Prison: when the holder fails to use a Wheel of Fortune they saw in a shop, create
@@ -307,9 +307,9 @@ for _, def in ipairs(TRAPS) do
 			return false
 		end,
 		-- Fires exactly once: the moment this card is drafted from a Trap pack (see
-		-- lib/trap_utils.lua's MP.TRAP.plant for why this is the sole, exact interception point).
+		-- lib/trap_utils.lua's PVP.TRAP.plant for why this is the sole, exact interception point).
 		use = function(self, card, area, copier)
-			MP.TRAP.plant(card)
+			PVP.TRAP.plant(card)
 		end,
 		calculate = def.calculate,
 		receive = def.receive,

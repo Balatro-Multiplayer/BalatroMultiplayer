@@ -16,8 +16,8 @@ SMODS.Booster({
 	weight = 0,
 	unskippable = true,
 	create_card = function(self, card, i)
-		local s_append = "" -- MP.get_booster_append(card)
-		local b_append = MP.ante_based() .. s_append
+		local s_append = "" -- PVP.get_booster_append(card)
+		local b_append = PVP.ante_based() .. s_append
 
 		local _edition = poll_edition("standard_edition" .. b_append, 2, true)
 		local _seal = SMODS.poll_seal({ mod = 10, key = "stdseal" .. b_append })

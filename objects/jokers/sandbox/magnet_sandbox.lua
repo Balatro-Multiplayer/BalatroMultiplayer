@@ -12,13 +12,13 @@ MPAPI.Joker({
 	cost = 7,
 	unlocked = true,
 	discovered = true,
-	no_collection = MP.sandbox_no_collection,
+	no_collection = PVP.sandbox_no_collection,
 	blueprint_compat = false,
 	eternal_compat = false,
 	perishable_compat = true,
 	config = { extra = { rounds = 2, current_rounds = 0, max_rounds = 5 } },
 	loc_vars = function(self, info_queue, card)
-		MP.UTILS.add_nemesis_info(info_queue)
+		PVP.UTILS.add_nemesis_info(info_queue)
 		return {
 			vars = {
 				card.ability.extra.rounds,
@@ -35,7 +35,7 @@ MPAPI.Joker({
 	receive = function(self, context)
 		local d = context.data
 		if d.type == "request" then
-			MP.RLOG.record("net_magnet", nil, "action:netMagnet")
+			PVP.RLOG.record("net_magnet", nil, "action:netMagnet")
 			local best = nil
 			for _, v in pairs(G.jokers.cards) do
 				if not best or v.sell_cost > best.sell_cost then best = v end
@@ -117,6 +117,6 @@ MPAPI.Joker({
 		code = { "Virtualized" },
 	},
 	mp_include = function(self)
-		return MP.SANDBOX.is_joker_allowed(self.key) and MP.LOBBY.config.multiplayer_jokers
+		return PVP.SANDBOX.is_joker_allowed(self.key) and MPAPI.mod_isolation_active(PVP.id)
 	end,
 })

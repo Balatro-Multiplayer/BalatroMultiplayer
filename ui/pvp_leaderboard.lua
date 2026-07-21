@@ -2,7 +2,7 @@
 -- four server/web PvP gamemode keys; the metric is season-best single-blind score
 -- (kind='score', higher is better). Pagination / own-rank footer / tabs live in MPAPI.
 
-local DEFAULT_TAB = "pvp_standard"
+local DEFAULT_TAB = "pvp_chocolate"
 
 -- Built lazily on first open (G.C colours + localization must be ready; this file
 -- loads during the mod's main_file pass, before the game is fully up).
@@ -13,8 +13,8 @@ local function get_leaderboard()
 	end
 	_leaderboard = MPAPI.ui_leaderboard({
 		tabs = {
-			{ key = "pvp_standard", label = "Standard", colour = G.C.RED },
-			{ key = "pvp_expanded", label = "Expanded", colour = G.C.ORANGE },
+			{ key = "pvp_chocolate", label = "Chocolate", colour = G.C.RED },
+			{ key = "pvp_strawberry", label = "Strawberry", colour = G.C.ORANGE },
 			{ key = "pvp_vanilla", label = "Vanilla", colour = G.C.BLUE },
 			{ key = "pvp_smallworld", label = "Small World", colour = G.C.GREEN },
 		},
@@ -28,13 +28,13 @@ local function get_leaderboard()
 		web_url = "https://new.balatromp.com/leaderboards",
 		-- Leaderboards are the rated queue, so they carry the server's ranked prefix.
 		fetch = function(tab_key, cb)
-			MPAPI.matchmaking.get_leaderboard(MP.id, MP.LobbyKind.RANKED_PREFIX .. tab_key, nil, {}, cb)
+			MPAPI.matchmaking.get_leaderboard(PVP.id, PVP.LobbyAccess.RANKED_PREFIX .. tab_key, nil, {}, cb)
 		end,
 	})
 	return _leaderboard
 end
 
-MP.open_leaderboard = function(gamemode_key, page)
+PVP.open_leaderboard = function(gamemode_key, page)
 	get_leaderboard():open(gamemode_key or DEFAULT_TAB, page)
 end
 

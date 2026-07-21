@@ -7,7 +7,7 @@ SMODS.Back({
 	pos = { x = 2, y = 1 },
 	mp_credits = { art = { "aura!" }, code = { "Toneblock" } },
 	apply = function(self)
-		if MP.LOBBY.code then
+		if PVP.LOBBY.code then
 			G.GAME.modifiers.view_nemesis_deck = true
 		end
 	end,
@@ -15,7 +15,7 @@ SMODS.Back({
 
 -- new global table for white deck stuff because there's a lot of things and i want it to be as clean as possible
 -- some may argue it's worse. perhaps it is
-MP.WHITE = {
+PVP.WHITE = {
 	state = {
 		client = {},
 		nemesis = {},
@@ -23,8 +23,8 @@ MP.WHITE = {
 
 }
 
-function MP.WHITE.save_state()
-	local save = MP.WHITE.state.client
+function PVP.WHITE.save_state()
+	local save = PVP.WHITE.state.client
 	
 	save.ante = G.GAME.round_resets.ante
 	
@@ -35,9 +35,9 @@ function MP.WHITE.save_state()
 	save.deck = MPAPI.encode(deck_save)
 end
 
-function MP.WHITE.send_state()
+function PVP.WHITE.send_state()
 end
 
-function MP.WHITE.request_state() -- need another function for "request until received"
+function PVP.WHITE.request_state() -- need another function for "request until received"
 end
 ]]

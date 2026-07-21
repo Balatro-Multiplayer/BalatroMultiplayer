@@ -1,4 +1,4 @@
-MP.Ruleset({
-	key = "blitz",
+PVP.Ruleset({
+	key = "strawberry",
 	layers = { "standard" },
 }):inject()

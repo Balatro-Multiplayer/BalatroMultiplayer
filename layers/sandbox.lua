@@ -1,12 +1,12 @@
-MP.SANDBOX = {}
+PVP.SANDBOX = {}
 
 -- The sandbox layer's key, referenced as a raw string across several consumer
 -- files (jokers, rulesets, enhancements) -- kept as one named constant here, next
 -- to this layer's own registration below, so those call sites can't drift from it.
-MP.LayerKey = { SANDBOX = "sandbox" }
+PVP.LayerKey = { SANDBOX = "sandbox" }
 
 -- Centralized joker mappings: defines sandbox variants, their vanilla counterparts, and rotation status
-MP.SANDBOX.joker_mappings = {
+PVP.SANDBOX.joker_mappings = {
 	-- Active jokers in rotation
 	{ sandbox = "j_mp_misprint_sandbox", vanilla = "j_misprint", active = true },
 	{ sandbox = "j_mp_castle_sandbox", vanilla = "j_castle", active = true },
@@ -68,9 +68,9 @@ MP.SANDBOX.joker_mappings = {
 
 --- Returns list of active sandbox joker keys
 --- @return table List of sandbox joker keys that are active
-function MP.SANDBOX.get_active_sandbox_jokers()
+function PVP.SANDBOX.get_active_sandbox_jokers()
 	local active = {}
-	for _, mapping in ipairs(MP.SANDBOX.joker_mappings) do
+	for _, mapping in ipairs(PVP.SANDBOX.joker_mappings) do
 		if mapping.active then table.insert(active, mapping.sandbox) end
 	end
 	return active
@@ -78,10 +78,10 @@ end
 
 --- Returns list of unique vanilla joker keys to ban
 --- @return table List of vanilla joker keys to silently ban
-function MP.SANDBOX.get_vanilla_bans()
+function PVP.SANDBOX.get_vanilla_bans()
 	local bans = {}
 	local seen = {}
-	for _, mapping in ipairs(MP.SANDBOX.joker_mappings) do
+	for _, mapping in ipairs(PVP.SANDBOX.joker_mappings) do
 		if mapping.active and mapping.vanilla and not seen[mapping.vanilla] then
 			table.insert(bans, mapping.vanilla)
 			seen[mapping.vanilla] = true
@@ -93,10 +93,10 @@ end
 --- Centralized allowlist check for sandbox jokers
 --- @param joker_key string The key of the joker to check (e.g., "j_mp_mail_sandbox")
 --- @return boolean true if the joker is allowed in the sandbox ruleset and in a multiplayer lobby
-function MP.SANDBOX.is_joker_allowed(joker_key)
-	if not MP.is_layer_active(MP.LayerKey.SANDBOX) then return false end
+function PVP.SANDBOX.is_joker_allowed(joker_key)
+	if not PVP.is_layer_active(PVP.LayerKey.SANDBOX) then return false end
 
-	for _, mapping in ipairs(MP.SANDBOX.joker_mappings) do
+	for _, mapping in ipairs(PVP.SANDBOX.joker_mappings) do
 		if mapping.active and mapping.sandbox == joker_key then return true end
 	end
 
@@ -129,7 +129,7 @@ local sandbox_reworked_jokers = (function()
 	local idol_jokers = {}
 
 	-- Collect extra_credit and idol jokers separately
-	for _, mapping in ipairs(MP.SANDBOX.joker_mappings) do
+	for _, mapping in ipairs(PVP.SANDBOX.joker_mappings) do
 		if mapping.active then
 			if mapping.group == "extra_credit" then
 				table.insert(jokers, mapping.sandbox)
@@ -162,10 +162,10 @@ local sandbox_reworked_jokers = (function()
 	return jokers
 end)()
 
-MPAPI.Layer(MP.LayerKey.SANDBOX, {
+MPAPI.Layer(PVP.LayerKey.SANDBOX, {
 	multiplayer_content = true,
 	banned_jokers = { "j_hanging_chad" },
-	banned_silent = MP.SANDBOX.get_vanilla_bans(),
+	banned_silent = PVP.SANDBOX.get_vanilla_bans(),
 	banned_consumables = { "c_ouija", "c_ectoplasm" },
 	banned_tags = { "tag_rare", "tag_juggle", "tag_investment" },
 	reworked_jokers = sandbox_reworked_jokers,
@@ -180,7 +180,7 @@ MPAPI.Layer(MP.LayerKey.SANDBOX, {
 
 		if SMODS.Mods["extracredit"] and SMODS.Mods["extracredit"].can_load then
 			print("Banning sandbox jokers")
-			for _, mapping in ipairs(MP.SANDBOX.joker_mappings) do
+			for _, mapping in ipairs(PVP.SANDBOX.joker_mappings) do
 				if mapping.group == "extra_credit" then G.GAME.banned_keys[mapping.sandbox] = true end
 			end
 		end
@@ -188,4 +188,4 @@ MPAPI.Layer(MP.LayerKey.SANDBOX, {
 })
 
 -- debugging hotswitch
-MP.sandbox_no_collection = not MP.EXPERIMENTAL.show_sandbox_collection
+PVP.sandbox_no_collection = not PVP.EXPERIMENTAL.show_sandbox_collection

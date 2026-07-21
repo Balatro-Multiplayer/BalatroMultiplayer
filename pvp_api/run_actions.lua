@@ -4,7 +4,7 @@
 -- prefix_config.key = false keeps the literal pvp_* keys (see actions.lua for why).
 
 -- Random 8-char run seed (uppercase alphanumeric), matching the game's seed alphabet.
-function MP.generate_seed()
+function PVP.generate_seed()
 	local chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890"
 	local s = ""
 	for _ = 1, 8 do
@@ -37,7 +37,7 @@ MPAPI.ActionType({
 	end,
 })
 
-function MP.pvp_forfeit()
+function PVP.pvp_forfeit()
 	local lobby = MPAPI.get_current_lobby()
 	if not lobby or not MPAPI.ActionTypes["pvp_forfeit"] then
 		return
@@ -52,7 +52,7 @@ MPAPI.ActionType({
 	key = "pvp_seed_vote",
 	prefix_config = { key = false },
 	on_receive = function(_at, from_player_id, _params)
-		MP.register_seed_vote(from_player_id)
+		PVP.register_seed_vote(from_player_id)
 	end,
 })
 
@@ -65,13 +65,13 @@ MPAPI.ActionType({
 	on_receive = function(_at, _from, params)
 		local lobby = MPAPI.get_current_lobby()
 		if lobby and lobby.is_host then
-			MP.referee_reset(MP.LOBBY.config.starting_lives)
+			PVP.referee_reset(PVP.LOBBY.config.starting_lives)
 		end
-		MP.dispatch_action("startGame", { seed = params.seed, stake = MP.LOBBY.deck.stake })
+		PVP.dispatch_action("startGame", { seed = params.seed, stake = PVP.LOBBY.deck.stake })
 	end,
 })
 
-function MP.cast_seed_vote()
+function PVP.cast_seed_vote()
 	local lobby = MPAPI.get_current_lobby()
 	if not lobby or not MPAPI.ActionTypes["pvp_seed_vote"] then
 		return
@@ -81,12 +81,12 @@ end
 
 -- Runs on every client when any vote arrives. Tallies via the lobby VoteTracker, shows
 -- progress in chat, and (host only) restarts on a fresh seed once the vote is unanimous.
-function MP.register_seed_vote(voter_id)
+function PVP.register_seed_vote(voter_id)
 	local lobby = MPAPI.get_current_lobby()
-	if not lobby or not MP.lobby or not MP.lobby.seed_votes then
+	if not lobby or not PVP.lobby or not PVP.lobby.seed_votes then
 		return
 	end
-	local count, total, unanimous = MP.lobby.seed_votes:record(voter_id)
+	local count, total, unanimous = PVP.lobby.seed_votes:record(voter_id)
 
 	if MPAPI.chat and MPAPI.chat.addMessage then
 		MPAPI.chat.addMessage(
@@ -96,7 +96,7 @@ function MP.register_seed_vote(voter_id)
 	end
 
 	if lobby.is_host and unanimous and MPAPI.ActionTypes["pvp_reseed"] then
-		MP.lobby.seed_votes:reset()
-		lobby:action(MPAPI.ActionTypes["pvp_reseed"]):broadcast({ seed = MP.generate_seed() })
+		PVP.lobby.seed_votes:reset()
+		lobby:action(MPAPI.ActionTypes["pvp_reseed"]):broadcast({ seed = PVP.generate_seed() })
 	end
 end

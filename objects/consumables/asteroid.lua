@@ -10,7 +10,7 @@ SMODS.Atlas({
 
 -- Broadcasts the "an asteroid was used" event to the opponent; the receiver's
 -- receive downgrades their own best-leveled visible hand by 1 (was action_asteroid).
-function MP.broadcast_asteroid()
+function PVP.broadcast_asteroid()
 	local center = G.P_CENTERS["c_mp_asteroid"]
 	if center then center:sync({}) end
 end
@@ -23,40 +23,37 @@ MPAPI.Consumable({
 	unlocked = true,
 	discovered = true,
 	loc_vars = function(self, info_queue, card)
-		MP.UTILS.add_nemesis_info(info_queue)
+		PVP.UTILS.add_nemesis_info(info_queue)
 		return { vars = { 1 } }
-	end,
-	mp_include = function(self)
-		return MP.LOBBY.code and MP.LOBBY.config.multiplayer_jokers
 	end,
 	can_use = function(self, card)
 		return true
 	end,
 	receive = function(self, context)
-		MP.note_target_candidate(context.from)
-		if MP.current_target_id() and context.from ~= MP.current_target_id() then
+		PVP.note_target_candidate(context.from)
+		if PVP.current_target_id() and context.from ~= PVP.current_target_id() then
 			return
 		end
-		MP.UI.show_asteroid_hand_level_up()
+		PVP.UI.show_asteroid_hand_level_up()
 	end,
 	use = function(self, card, area, copier)
-		local asteroids = MP.GAME.asteroids
+		local asteroids = PVP.GAME.asteroids
 		update_hand_text(
 			{ sound = "button", volume = 0.7, pitch = 0.8, delay = 0.3 },
-			{ handname = localize("k_asteroids"), chips = localize("k_amount_short"), mult = MP.GAME.asteroids }
+			{ handname = localize("k_asteroids"), chips = localize("k_amount_short"), mult = PVP.GAME.asteroids }
 		)
 		G.E_MANAGER:add_event(Event({
 			trigger = "after",
 			delay = 0.2,
 			func = function()
-				play_sound("tarot1", 0.9 + (MP.GAME.asteroids / 10), 1)
+				play_sound("tarot1", 0.9 + (PVP.GAME.asteroids / 10), 1)
 				card:juice_up(0.8, 0.5)
 				return true
 			end,
 		}))
 		update_hand_text({ delay = 0 }, { mult = "+1", StatusText = true })
-		MP.GAME.asteroids = MP.GAME.asteroids + 1
-		update_hand_text({ delay = 0 }, { mult = MP.GAME.asteroids })
+		PVP.GAME.asteroids = PVP.GAME.asteroids + 1
+		update_hand_text({ delay = 0 }, { mult = PVP.GAME.asteroids })
 		delay(2.5)
 		update_hand_text(
 			{ sound = "button", volume = 0.7, pitch = 1.1, delay = 0 },

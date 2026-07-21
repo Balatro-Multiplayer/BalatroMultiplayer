@@ -1,10 +1,10 @@
 local function next_taxes_total_mult_gain(card)
-	local sells = MP.GAME.enemy.sells_per_ante[G.GAME.round_resets.ante] or 0
+	local sells = PVP.GAME.enemy.sells_per_ante[G.GAME.round_resets.ante] or 0
 
 	-- If PvP hasn't been reached for the first time, accumulate sells from previous Antes
-	if G.GAME.round_resets.ante <= MP.LOBBY.config.pvp_start_round then
+	if G.GAME.round_resets.ante <= PVP.LOBBY.config.pvp_start_round then
 		for i = 1, G.GAME.round_resets.ante - 1 do
-			sells = sells + (MP.GAME.enemy.sells_per_ante[i] or 0)
+			sells = sells + (PVP.GAME.enemy.sells_per_ante[i] or 0)
 		end
 	end
 
@@ -20,7 +20,7 @@ SMODS.Atlas({
 
 -- Any card sale (own joker/consumable, any joker) tells the opponent's Taxes joker to
 -- count it -- the trigger is generic (overrides/game.lua's Card:sell_card), owned here.
-function MP.broadcast_sold_joker()
+function PVP.broadcast_sold_joker()
 	local center = G.P_CENTERS["j_mp_taxes"]
 	if center then center:sync({}) end
 end
@@ -37,20 +37,17 @@ MPAPI.Joker({
 	perishable_compat = false,
 	config = { extra = { mult_gain = 4, mult = 0 } },
 	loc_vars = function(self, info_queue, card)
-		MP.UTILS.add_nemesis_info(info_queue)
+		PVP.UTILS.add_nemesis_info(info_queue)
 		return { vars = { card.ability.extra.mult_gain, card.ability.extra.mult } }
-	end,
-	mp_include = function(self)
-		return MP.LOBBY.code and MP.LOBBY.config.multiplayer_jokers
 	end,
 	-- Was action_sold_joker.
 	receive = function(self, context)
-		MP.note_target_candidate(context.from)
-		if MP.current_target_id() and context.from ~= MP.current_target_id() then
+		PVP.note_target_candidate(context.from)
+		if PVP.current_target_id() and context.from ~= PVP.current_target_id() then
 			return
 		end
-		MP.GAME.enemy.sells = MP.GAME.enemy.sells + 1
-		MP.GAME.enemy.sells_per_ante[G.GAME.round_resets.ante] = (MP.GAME.enemy.sells_per_ante[G.GAME.round_resets.ante] or 0)
+		PVP.GAME.enemy.sells = PVP.GAME.enemy.sells + 1
+		PVP.GAME.enemy.sells_per_ante[G.GAME.round_resets.ante] = (PVP.GAME.enemy.sells_per_ante[G.GAME.round_resets.ante] or 0)
 			+ 1
 	end,
 	calculate = function(self, card, context)

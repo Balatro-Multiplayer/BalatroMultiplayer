@@ -826,8 +826,8 @@ return {
 			k_vanilla = "바닐라",
 			k_vanilla_description = "Balatro의 오리지널 경험.\n멀티플레이어 전용 조커와밸런스 변경 없이\n기본 게임 그대로 플레이합니다.\n(멀티플레이어 기능은 옵션에서 비활성화 가능)",
 
-			k_blitz = "스탠다드",
-			k_blitz_description = "균형 잡힌 멀티플레이어 룰셋.\n멀티플레이어 조커와밸런스 변경을 포함하며\n로비 설정을 자유롭게 조절할 수 있습니다.\n(자세한 내용은 금지/리워크 탭 참고)",
+			k_strawberry = "스탠다드",
+			k_strawberry_description = "균형 잡힌 멀티플레이어 룰셋.\n멀티플레이어 조커와밸런스 변경을 포함하며\n로비 설정을 자유롭게 조절할 수 있습니다.\n(자세한 내용은 금지/리워크 탭 참고)",
 
 			k_traditional = "트래디셔널",
 			k_traditional_description = "시간 압박 없는 멀티플레이어 룰셋.\n멀티플레이어 조커와밸런스 변경을 포함하지만\n시간 기반 요소는 제거됩니다.\n(자세한 내용은 금지/리워크 탭 참고)",
@@ -891,7 +891,7 @@ return {
 				"상대",
 				"위치",
 			},
-			k_hide_mp_content = "멀티플레이어 콘텐츠 숨기기*",
+			k_show_mp_content_anyway = "멀티플레이어 콘텐츠 숨기기*",
 			k_applies_singleplayer_vanilla_rulesets = "*싱글플레이 및 바닐라 룰셋에도 적용",
 			k_timer_sfx = "타이머 효과음",
 			ml_mp_kofi_message = {

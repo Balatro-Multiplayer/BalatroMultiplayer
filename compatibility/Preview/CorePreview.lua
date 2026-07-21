@@ -65,7 +65,7 @@ function CardArea:update(dt)
 end
 
 function FN.PRE.update_on_card_order_change(cardarea)
-    if not MP.INTEGRATIONS.Preview then return end
+    if not PVP.INTEGRATIONS.Preview then return end
     if not (cardarea == G.joker or cardarea == G.hand) then return end
 	if
         not cardarea.cards
@@ -132,12 +132,12 @@ local orig_discard = G.FUNCS.discard_cards_from_highlighted
 function G.FUNCS.discard_cards_from_highlighted(e, is_hook_blind)
 	-- Carbon: capture which hand slots are discarded BEFORE orig_discard consumes
 	-- them. is_hook_blind means a programmatic discard (blind effect), not a click.
-	local discarded = (not is_hook_blind) and MP.UTILS.highlighted_hand_indices() or nil
+	local discarded = (not is_hook_blind) and PVP.UTILS.highlighted_hand_indices() or nil
 	orig_discard(e, is_hook_blind)
 
 	if not is_hook_blind then
 		if discarded and #discarded > 0 then
-			MP.RLOG.record("discard", { discarded }, "action:discard,cards:" .. table.concat(discarded, "."))
+			PVP.RLOG.record("discard", { discarded }, "action:discard,cards:" .. table.concat(discarded, "."))
 		end
 		FN.PRE.stop_current_coroutine()
 	end
@@ -151,7 +151,7 @@ function G.FUNCS.fn_pre_score_UI_set(e)
 	local should_juice = false
 	if FN.PRE.lock_updates then
 		if e.config.id == "fn_pre_m" then
-			new_preview_text = " " .. MP.UTILS.get_preview_cfg("text") .. " "
+			new_preview_text = " " .. PVP.UTILS.get_preview_cfg("text") .. " "
 			should_juice = true
 		end
 	else

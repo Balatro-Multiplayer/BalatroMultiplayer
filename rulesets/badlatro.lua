@@ -1,4 +1,4 @@
-MP.Ruleset({
+PVP.Ruleset({
 	key = "badlatro",
 	multiplayer_content = true,
 	banned_jokers = {

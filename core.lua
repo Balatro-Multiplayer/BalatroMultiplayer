@@ -1,6 +1,6 @@
-MP = SMODS.current_mod
+PVP = SMODS.current_mod
 
-MP.BANNED_MODS = {
+PVP.BANNED_MODS = {
 	["Incantation"] = true,
 	["Brainstorm"] = true,
 	["DVPreview"] = true,
@@ -11,13 +11,13 @@ MP.BANNED_MODS = {
 	["FantomsPreview"] = true,
 }
 
-MP.LOBBY = {
+PVP.LOBBY = {
 	connected = false,
 	temp_code = "",
 	temp_seed = "",
 	code = nil,
 	type = "",
-	config = {}, -- Now set in MP.reset_lobby_config
+	config = {}, -- Now set in PVP.reset_lobby_config
 	deck = {
 		back = "Red Deck",
 		sleeve = "sleeve_casl_none",
@@ -31,37 +31,37 @@ MP.LOBBY = {
 	is_host = false,
 	ready_to_start = false,
 }
-MP.GAME = {}
-MP.UI = {}
-MP.ACTIONS = {}
-MP.MOD_ACTIONS = {}
+PVP.GAME = {}
+PVP.UI = {}
+PVP.ACTIONS = {}
+PVP.MOD_ACTIONS = {}
 
 -- SMODS flag: lets cards count as multiple enhancements at once (required by Alloy)
-MP.optional_features = { quantum_enhancements = false }
+PVP.optional_features = { quantum_enhancements = false }
 
-function MP.register_mod_action(modAction, callback, modId)
+function PVP.register_mod_action(modAction, callback, modId)
 	if not modId then
 		local mod = SMODS.current_mod
 		if not mod then
-			sendWarnMessage("MP.register_mod_action called outside of mod init without a modId", "MULTIPLAYER")
+			sendWarnMessage("PVP.register_mod_action called outside of mod init without a modId", "MULTIPLAYER")
 			return
 		end
 		modId = mod.id
 	end
-	MP.MOD_ACTIONS[modId] = MP.MOD_ACTIONS[modId] or {}
-	MP.MOD_ACTIONS[modId][modAction] = callback
+	PVP.MOD_ACTIONS[modId] = PVP.MOD_ACTIONS[modId] or {}
+	PVP.MOD_ACTIONS[modId][modAction] = callback
 end
 
-MP.INTEGRATIONS = {
-	Preview = MP.config.integrations.Preview,
+PVP.INTEGRATIONS = {
+	Preview = PVP.config.integrations.Preview,
 }
 
-MP.PREVIEW = {
-	text = MP.config.preview.text,
-	button = MP.config.preview.button,
+PVP.PREVIEW = {
+	text = PVP.config.preview.text,
+	button = PVP.config.preview.button,
 }
 
-MP.EXPERIMENTAL = {
+PVP.EXPERIMENTAL = {
 	show_sandbox_collection = false,
 	alt_stakes = false,
 	suppress_dev_warning = false,
@@ -69,8 +69,8 @@ MP.EXPERIMENTAL = {
 }
 
 -- Override experimental flags and server config from .env file if present
-MP.ENV = {}
-local env_path = MP.path .. "/.env"
+PVP.ENV = {}
+local env_path = PVP.path .. "/.env"
 local env_info = NFS.getInfo(env_path)
 if env_info then
 	local content = NFS.read(env_path)
@@ -85,9 +85,9 @@ if env_info then
 					elseif val == "false" then
 						val = false
 					end
-					MP.ENV[key] = val
-					if MP.EXPERIMENTAL[key] ~= nil then
-						MP.EXPERIMENTAL[key] = val
+					PVP.ENV[key] = val
+					if PVP.EXPERIMENTAL[key] ~= nil then
+						PVP.EXPERIMENTAL[key] = val
 					end
 				end
 			end
@@ -98,41 +98,41 @@ end
 
 G.C.MULTIPLAYER = HEX("AC3232")
 
-MP.SMODS_VERSION = "1.0.0~BETA-1620a"
-MP.REQUIRED_LOVELY_VERSION = "0.9"
+PVP.SMODS_VERSION = "1.0.0~BETA-1620a"
+PVP.REQUIRED_LOVELY_VERSION = "0.9"
 
 -- The Order (deterministic/anti-desync RNG) engine now lives entirely in the API
 -- (BalatroMultiplayerAPI/api/the_order.lua). We delegate the gate + helpers to the
 -- API's single implementation instead of shipping our own copy (was compatibility/TheOrder.lua).
--- The API's MPAPI.should_use_the_order carries the MP-compat branch (reads
--- MP.LOBBY.config.the_order + is_practice_mode), so this stays behaviour-preserving.
-function MP.should_use_the_order()
+-- The API's MPAPI.should_use_the_order carries the PVP-compat branch (reads
+-- PVP.LOBBY.config.the_order + is_practice_mode), so this stays behaviour-preserving.
+function PVP.should_use_the_order()
 	return MPAPI.should_use_the_order()
 end
 
--- Legacy MP.* aliases for The Order queue helpers, kept because live content still calls
+-- Legacy PVP.* aliases for The Order queue helpers, kept because live content still calls
 -- them (objects/jokers/standard/bloodstone, objects/boosters/standard_giga, ui/game/blind_choice,
 -- layers/smallworld). They forward to the API's implementations.
-MP.ante_based = MPAPI.ante_based
-MP.order_round_based = MPAPI.order_round_based
-MP.sorted_hand_list = MPAPI.sorted_hand_list
+PVP.ante_based = MPAPI.ante_based
+PVP.order_round_based = MPAPI.order_round_based
+PVP.sorted_hand_list = MPAPI.sorted_hand_list
 
-function MP.is_major_league_ruleset()
-	return MP.LOBBY and MP.LOBBY.config and MP.LOBBY.config.ruleset == "ruleset_mp_majorleague" and MP.LOBBY.code
+function PVP.is_major_league_ruleset()
+	return PVP.LOBBY and PVP.LOBBY.config and PVP.LOBBY.config.ruleset == "ruleset_mp_majorleague" and PVP.LOBBY.code
 end
 
--- Forward-declaration stub: MP.reset_game_states() below calls MP.UTILS.timer_base(),
--- which reads MP.current_ruleset() -- but that call happens synchronously at this
+-- Forward-declaration stub: PVP.reset_game_states() below calls PVP.UTILS.timer_base(),
+-- which reads PVP.current_ruleset() -- but that call happens synchronously at this
 -- file's own load time, before rulesets/_rulesets.lua (loaded later via
--- MP.load_mp_dir("rulesets", true)) defines the real MP.current_ruleset(). Without
+-- PVP.load_mp_dir("rulesets", true)) defines the real PVP.current_ruleset(). Without
 -- this stub the early call crashes on a nil field. The real definition overwrites
 -- this one once rulesets load; this one is never reached again after that.
-function MP.current_ruleset()
+function PVP.current_ruleset()
 	return {}
 end
 
-function MP.load_mp_file(file)
-	local chunk, err = SMODS.load_file(file, MP.id)
+function PVP.load_mp_file(file)
+	local chunk, err = SMODS.load_file(file, PVP.id)
 	if chunk then
 		local ok, func = pcall(chunk)
 		if ok then
@@ -146,13 +146,13 @@ function MP.load_mp_file(file)
 	return nil
 end
 
-function MP.load_mp_dir(directory, recursive)
+function PVP.load_mp_dir(directory, recursive)
 	recursive = recursive or false
 	local function has_prefix(name)
 		return name:match("^_") ~= nil
 	end
 
-	local dir_path = MP.path .. "/" .. directory
+	local dir_path = PVP.path .. "/" .. directory
 	local items = NFS.getDirectoryItemsInfo(dir_path)
 	-- sort by prefix like { _file, _dir, file, dir }
 	table.sort(items, function(a, b)
@@ -169,19 +169,19 @@ function MP.load_mp_dir(directory, recursive)
 	for _, item in ipairs(items) do
 		local path = directory .. "/" .. item.name
 		if item.type ~= "directory" then
-			MP.load_mp_file(path)
+			PVP.load_mp_file(path)
 		elseif recursive then
-			MP.load_mp_dir(path, recursive)
+			PVP.load_mp_dir(path, recursive)
 		end
 	end
 end
 
-MP.load_mp_dir("lib")
-MP.load_mp_dir("overrides")
+PVP.load_mp_dir("lib")
+PVP.load_mp_dir("overrides")
 
-function MP.reset_lobby_config(persist_ruleset_and_gamemode)
+function PVP.reset_lobby_config(persist_ruleset_and_gamemode)
 	sendDebugMessage("Resetting lobby options", "MULTIPLAYER")
-	MP.LOBBY.config = {
+	PVP.LOBBY.config = {
 		gold_on_life_loss = true,
 		no_gold_on_round_loss = false,
 		death_on_round_loss = true,
@@ -192,8 +192,8 @@ function MP.reset_lobby_config(persist_ruleset_and_gamemode)
 		timer_base_seconds = 150,
 		timer_increment_seconds = 60,
 		pvp_countdown_seconds = 3,
-		ruleset = persist_ruleset_and_gamemode and MP.LOBBY.config.ruleset or "ruleset_mp_blitz",
-		gamemode = persist_ruleset_and_gamemode and MP.LOBBY.config.gamemode or "gamemode_mp_attrition",
+		ruleset = persist_ruleset_and_gamemode and PVP.LOBBY.config.ruleset or "ruleset_mp_strawberry",
+		gamemode = persist_ruleset_and_gamemode and PVP.LOBBY.config.gamemode or "gamemode_mp_attrition",
 		weekly = nil,
 		custom_seed = "random",
 		different_decks = false,
@@ -213,11 +213,11 @@ function MP.reset_lobby_config(persist_ruleset_and_gamemode)
 		hide_score_until_played = false,
 	}
 end
-MP.reset_lobby_config()
+PVP.reset_lobby_config()
 
-function MP.reset_game_states()
+function PVP.reset_game_states()
 	sendDebugMessage("Resetting game states", "MULTIPLAYER")
-	MP.GAME = {
+	PVP.GAME = {
 		ready_blind = false,
 		ready_blind_text = localize("b_ready"),
 		processed_round_done = false,
@@ -228,8 +228,8 @@ function MP.reset_game_states()
 		comeback_bonus = 0,
 		end_pvp = false,
 		enemy = {
-			score = MP.INSANE_INT.empty(),
-			real_score = MP.INSANE_INT.empty(),
+			score = PVP.INSANE_INT.empty(),
+			real_score = PVP.INSANE_INT.empty(),
 			score_text = "0",
 			hands = 4,
 			hands_text = "4",
@@ -238,11 +238,11 @@ function MP.reset_game_states()
 			info_received = false,
 			location = localize("loc_selecting"),
 			skips = 0,
-			lives = MP.LOBBY.config.starting_lives,
+			lives = PVP.LOBBY.config.starting_lives,
 			sells = 0,
 			sells_per_ante = {},
 			spent_in_shop = {},
-			highest_score = MP.INSANE_INT.empty(),
+			highest_score = PVP.INSANE_INT.empty(),
 		},
 		location = "loc_selecting",
 		next_blind_context = nil,
@@ -254,8 +254,8 @@ function MP.reset_game_states()
 		misprint_display = "",
 		spent_total = 0,
 		spent_before_shop = 0,
-		highest_score = MP.INSANE_INT.empty(),
-		timer = MP.UTILS.timer_base(),
+		highest_score = PVP.INSANE_INT.empty(),
+		timer = PVP.UTILS.timer_base(),
 		timer_started = false,
 		timer_consumed = false,
 		pvp_reached = false,
@@ -276,12 +276,12 @@ function MP.reset_game_states()
 		},
 	}
 end
-MP.reset_game_states()
+PVP.reset_game_states()
 
-MP.LOBBY.username = MP.UTILS.get_username()
-MP.LOBBY.blind_col = MP.UTILS.get_blind_col()
+PVP.LOBBY.username = PVP.UTILS.get_username()
+PVP.LOBBY.blind_col = PVP.UTILS.get_blind_col()
 
-MP.LOBBY.config.weekly = MP.UTILS.get_weekly()
+PVP.LOBBY.config.weekly = PVP.UTILS.get_weekly()
 
 if not SMODS.current_mod.lovely then
 	G.E_MANAGER:add_event(Event({
@@ -291,8 +291,8 @@ if not SMODS.current_mod.lovely then
 		blocking = false,
 		func = function()
 			if G.MAIN_MENU_UI then
-				MP.UI.UTILS.overlay_message(
-					MP.UTILS.wrapText(
+				PVP.UI.UTILS.overlay_message(
+					PVP.UTILS.wrapText(
 						"Your Multiplayer Mod is not loaded correctly, make sure the Multiplayer folder does not have an extra Multiplayer folder around it.",
 						50
 					)
@@ -311,37 +311,37 @@ SMODS.Atlas({
 	py = 34,
 })
 
-MP.load_mp_dir("compatibility")
+PVP.load_mp_dir("compatibility")
 
-MP.load_mp_file("networking/action_handlers.lua")
+PVP.load_mp_file("networking/action_handlers.lua")
 
-MP.load_mp_dir("gamemodes")
-MP.load_mp_dir("layers")
-MP.load_mp_dir("rulesets", true)
-MP.load_mp_dir("ui", true)
-MP.load_mp_dir("objects/editions")
-MP.load_mp_dir("objects/enhancements")
-MP.load_mp_dir("objects/seals")
-MP.load_mp_dir("objects/stickers")
-MP.load_mp_dir("objects/blinds")
-MP.load_mp_dir("objects/decks")
-MP.load_mp_dir("objects/jokers")
-MP.load_mp_dir("objects/jokers/sandbox")
-MP.load_mp_dir("objects/jokers/sandbox/extra-credit")
-MP.load_mp_dir("objects/jokers/standard")
-MP.load_mp_dir("objects/jokers/experimental")
-MP.load_mp_dir("objects/stakes")
-MP.load_mp_dir("objects/tags")
-MP.load_mp_dir("objects/consumables")
-MP.load_mp_dir("objects/consumables/sandbox")
-MP.load_mp_dir("objects/boosters")
-MP.load_mp_dir("objects/challenges")
+PVP.load_mp_dir("gamemodes")
+PVP.load_mp_dir("layers")
+PVP.load_mp_dir("rulesets", true)
+PVP.load_mp_dir("ui", true)
+PVP.load_mp_dir("objects/editions")
+PVP.load_mp_dir("objects/enhancements")
+PVP.load_mp_dir("objects/seals")
+PVP.load_mp_dir("objects/stickers")
+PVP.load_mp_dir("objects/blinds")
+PVP.load_mp_dir("objects/decks")
+PVP.load_mp_dir("objects/jokers")
+PVP.load_mp_dir("objects/jokers/sandbox")
+PVP.load_mp_dir("objects/jokers/sandbox/extra-credit")
+PVP.load_mp_dir("objects/jokers/standard")
+PVP.load_mp_dir("objects/jokers/experimental")
+PVP.load_mp_dir("objects/stakes")
+PVP.load_mp_dir("objects/tags")
+PVP.load_mp_dir("objects/consumables")
+PVP.load_mp_dir("objects/consumables/sandbox")
+PVP.load_mp_dir("objects/boosters")
+PVP.load_mp_dir("objects/challenges")
 
 -- MultiplayerPvP runs on BalatroMultiplayerAPI. The API owns the connection,
 -- lobbies, matchmaking, leaderboards, and the main-menu host, so we no longer start
--- our own TCP socket thread or call MP.ACTIONS.connect(). Instead we register with
+-- our own TCP socket thread or call PVP.ACTIONS.connect(). Instead we register with
 -- the API once it signals ready; it then lists "PvP" in its account panel and swaps
--- in our menu (MP.build_pre_lobby_ui) when the player selects it.
+-- in our menu (PVP.build_pre_lobby_ui) when the player selects it.
 --
 -- NOTE (skeleton milestone): the in-game PvP protocol in networking/action_handlers.lua
 -- is still loaded but inert (no socket thread) — Phase 4 converts each action to an
@@ -349,15 +349,15 @@ MP.load_mp_dir("objects/challenges")
 -- Find Game / Leaderboard / Practice / Join / Create layout.
 MPAPI.on_loaded(function()
 	MPAPI.register_mod({
-		id = MP.id,
+		id = PVP.id,
 		name = "PvP",
 		colour = G.C.RED,
-		main_menu_ui = MP.build_pre_lobby_ui,
-		lobby_ui = MP.build_in_lobby_ui,
+		main_menu_ui = PVP.build_pre_lobby_ui,
+		lobby_ui = PVP.build_in_lobby_ui,
 		-- Custom in-run pause menu (Settings + Seed Change + Forfeit), built by the API's
 		-- options_builder hook instead of the vanilla options box (see ui/pvp_run_options.lua).
 		prevent_pause = true,
-		options_builder = MP.create_run_options,
+		options_builder = PVP.create_run_options,
 		-- Custom title logo shown while PvP's menu is focused (atlases in ui/pvp_title.lua).
 		-- Prefixed with the mod prefix "mp" like every SMODS key.
 		title = { base = "mp_pvp_title_base", extra = "mp_pvp_title_extra" },
@@ -365,7 +365,7 @@ MPAPI.on_loaded(function()
 
 	-- Load API-side content (bridge GameModes now; ActionTypes in Phase 4) here so
 	-- their SMODS GameObjects are tagged to this mod — per-lobby routing requires it.
-	MP.load_mp_dir("pvp_api", true)
+	PVP.load_mp_dir("pvp_api", true)
 
 	-- Boot diagnostic: confirm the pvp_* ActionTypes actually registered.
 	local n = 0
@@ -381,12 +381,12 @@ MPAPI.on_loaded(function()
 	)
 
 	MPAPI.on_connection_state_change(function()
-		if MP.UI and MP.UI.update_connection_status then
-			pcall(MP.UI.update_connection_status)
+		if PVP.UI and PVP.UI.update_connection_status then
+			pcall(PVP.UI.update_connection_status)
 		end
 		-- Refresh the reactive main-menu buttons so they enable once connected.
-		if MP.update_main_menu_buttons then
-			pcall(MP.update_main_menu_buttons)
+		if PVP.update_main_menu_buttons then
+			pcall(PVP.update_main_menu_buttons)
 		end
 	end)
 end)

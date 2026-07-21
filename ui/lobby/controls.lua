@@ -1,5 +1,5 @@
 local function code_panel()
-	local b = MP.lobby.buttons
+	local b = PVP.lobby.buttons
 	return {
 		n = G.UIT.C,
 		config = { align = "cm", padding = 0.1, r = 0.2, colour = G.C.BLACK },
@@ -17,7 +17,7 @@ end
 
 -- Read-only deck label (host deck picker is a later addition).
 local function deck_panel()
-	local lobby = MP.lobby.ref
+	local lobby = PVP.lobby.ref
 	local meta = (lobby and lobby:get_metadata()) or {}
 	local deck_name = meta.deck or "Red Deck"
 	return { n = G.UIT.C, config = { align = "cm", padding = 0.05, r = 0.1, colour = G.C.L_BLACK, minw = 2.65, minh = 1.35, emboss = 0.05 }, nodes = {
@@ -27,8 +27,8 @@ local function deck_panel()
 end
 
 local function build_private_controls()
-	local b = MP.lobby.buttons
-	local lobby = MP.lobby.ref
+	local b = PVP.lobby.buttons
+	local lobby = PVP.lobby.ref
 	local row_nodes = {}
 	if lobby and lobby.is_host then
 		row_nodes[#row_nodes + 1] = b.start_game.node
@@ -70,14 +70,14 @@ local function build_matchmaking_controls()
 	}
 end
 
-function MP.lobby.refresh_mm_status()
+function PVP.lobby.refresh_mm_status()
 	if _mm_status_el then
 		_mm_status_el:update()
 	end
 end
 
-function MP.lobby.build_controls()
-	if MP.is_matchmaking() then
+function PVP.lobby.build_controls()
+	if PVP.is_matchmaking() then
 		return build_matchmaking_controls()
 	end
 	return build_private_controls()

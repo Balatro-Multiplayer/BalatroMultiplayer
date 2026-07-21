@@ -9,7 +9,7 @@ if SMODS.Mods["Distro"] and SMODS.Mods["Distro"].can_load then
 			if DiscordIPC and DiscordIPC.send_activity then
 				local send_activity_ref = DiscordIPC.send_activity
 				DiscordIPC.send_activity = function(bypass_block)
-					if MP.LOBBY.code and not bypass_block then return end
+					if PVP.LOBBY.code and not bypass_block then return end
 					send_activity_ref()
 				end
 				return true
@@ -18,16 +18,16 @@ if SMODS.Mods["Distro"] and SMODS.Mods["Distro"].can_load then
 	}))
 
 	function get_multiplayer_details()
-		local enemy_username = MP.LOBBY.is_host and MP.LOBBY.guest.username or MP.LOBBY.host.username
+		local enemy_username = PVP.LOBBY.is_host and PVP.LOBBY.guest.username or PVP.LOBBY.host.username
 
-		return "Multiplayer Versus " .. enemy_username .. " | " .. tostring(MP.GAME.lives) .. " Lives Left"
+		return "Multiplayer Versus " .. enemy_username .. " | " .. tostring(PVP.GAME.lives) .. " Lives Left"
 	end
 
 	local start_run_ref = Game.start_run
 	function Game:start_run(args)
 		start_run_ref(self, args)
 
-		if MP.LOBBY.code then
+		if PVP.LOBBY.code then
 			local back_key, back_name = Distro.get_back_name()
 			local stake_key, stake_name = Distro.get_stake_name()
 
@@ -52,7 +52,7 @@ if SMODS.Mods["Distro"] and SMODS.Mods["Distro"].can_load then
 	local update_selecting_hand_ref = Game.update_selecting_hand
 	function Game:update_selecting_hand(dt)
 		if not G.STATE_COMPLETE then
-			if MP.LOBBY.code then
+			if PVP.LOBBY.code then
 				DiscordIPC.activity.details = get_multiplayer_details()
 				DiscordIPC.activity.state = G.GAME.current_round.hands_left
 					.. " Hands, "
@@ -68,7 +68,7 @@ if SMODS.Mods["Distro"] and SMODS.Mods["Distro"].can_load then
 	local update_shop_ref = Game.update_shop
 	function Game:update_shop(dt)
 		if not G.STATE_COMPLETE then
-			if MP.LOBBY.code then
+			if PVP.LOBBY.code then
 				DiscordIPC.activity.details = get_multiplayer_details()
 				DiscordIPC.activity.state = "Shopping"
 				DiscordIPC.send_activity(true)
@@ -82,12 +82,12 @@ if SMODS.Mods["Distro"] and SMODS.Mods["Distro"].can_load then
 	function Game:main_menu(change_context)
 		main_menu_ref(self, change_context)
 
-		if MP.LOBBY.code then
+		if PVP.LOBBY.code then
 			local enemy_username = nil
-			if MP.LOBBY.is_host then
-				if MP.LOBBY.guest then enemy_username = MP.LOBBY.guest.username end
+			if PVP.LOBBY.is_host then
+				if PVP.LOBBY.guest then enemy_username = PVP.LOBBY.guest.username end
 			else
-				enemy_username = MP.LOBBY.host.username
+				enemy_username = PVP.LOBBY.host.username
 			end
 
 			DiscordIPC.activity = {

@@ -19,7 +19,7 @@ SMODS.Booster({
 	config = { extra = 3, choose = 1 },
 	cost = 4,
 	mp_include = function(self)
-		return MP.is_layer_active("traps")
+		return PVP.is_layer_active("traps")
 	end,
 	create_card = function(self, card, i)
 		return {
@@ -42,7 +42,7 @@ SMODS.Booster({
 	config = { extra = 5, choose = 1 },
 	cost = 6,
 	mp_include = function(self)
-		return MP.is_layer_active("traps")
+		return PVP.is_layer_active("traps")
 	end,
 	create_card = function(self, card, i)
 		return {

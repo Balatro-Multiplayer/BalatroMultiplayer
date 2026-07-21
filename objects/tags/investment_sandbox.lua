@@ -29,5 +29,5 @@ SMODS.Tag({
 	end,
 	unlocked = true,
 	discovered = true,
-	no_collection = MP.sandbox_no_collection,
+	no_collection = PVP.sandbox_no_collection,
 })
