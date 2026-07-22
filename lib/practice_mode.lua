@@ -34,6 +34,9 @@ function PVP._start_practice(gamemode_key)
 	-- Clean slate: don't inherit deck/stake/ruleset leftovers from whatever the player
 	-- was doing before entering practice (e.g. a private lobby with different_decks set).
 	PVP.reset_lobby_config()
+	-- reset_lobby_config() above stamps its own hardcoded default (strawberry), not
+	-- this practice gamemode's -- reset again to the actual requested ruleset.
+	PVP.reset_ruleset_to_gamemode_default(gamemode_key)
 
 	PVP.SP.practice = true
 	PVP.SP.ruleset = def.ruleset
