@@ -51,8 +51,12 @@ function PVP.lobby.create_buttons()
 		label = localize("b_lobby_options_cap"),
 		scale = 0.6,
 		col = true,
+		-- Ruleset picking is private-lobby-only (ranked/casual already committed to
+		-- a ruleset by which queue option was picked); Manhunt/Teams role pickers
+		-- apply to any lobby kind, since a casual-formed match still needs roles
+		-- picked before it can start.
 		enabled = function()
-			return PVP.LOBBY.config.manhunt or PVP.LOBBY.config.team_based
+			return PVP.LOBBY.config.manhunt or PVP.LOBBY.config.team_based or PVP._pvp_kind == PVP.LobbyAccess.PRIVATE
 		end,
 	})
 	b.view_code = MPAPI.disableable_button({

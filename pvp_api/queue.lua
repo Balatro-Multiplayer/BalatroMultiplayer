@@ -20,9 +20,11 @@ end
 function PVP._join_queue(kind, gamemode_key)
 	gamemode_key = gamemode_key or PVP.GamemodeKey.PVP_CHOCOLATE
 	PVP._pvp_kind = kind
+	PVP.reset_ruleset_to_gamemode_default(gamemode_key)
 
 	local gm = MPAPI.GameModes[gamemode_key]
-	local mm_max = (gm and gm.max_players and gm.max_players.ranked) or 2
+	local mm_max_key = (kind == PVP.LobbyAccess.RANKED) and "ranked" or "public"
+	local mm_max = (gm and gm.max_players and gm.max_players[mm_max_key]) or 2
 	local game_mode = (kind == PVP.LobbyAccess.RANKED) and (PVP.LobbyAccess.RANKED_PREFIX .. gamemode_key) or gamemode_key
 
 	local handle = MPAPI.matchmaking.queue({
@@ -118,11 +120,13 @@ function PVP._cancel_queue()
 	PVP._show_searching(false)
 end
 
--- ── Find Game overlay + click handlers ───────────────────────────────────────
-local function queue_button(label, fn_name, colour)
-	return UIBox_button({ button = fn_name, label = label, colour = colour, minw = 3, minh = 0.9, scale = 0.42, col = true })
-end
-
+-- ── Find Game overlays + click handlers ──────────────────────────────────────
+-- Ranked/Casual (top level), then a per-kind picker (grid-of-buttons style
+-- matching the Practice/Create Lobby overlays). Ranked is always exactly 2
+-- players -- matchmaking.service.ts's forfeit/ELO resolution is hardcoded for a
+-- 2-player result -- so ranked only offers the four ruleset-only (Nemesis-shaped)
+-- entries; casual additionally offers Royale/Manhunt/Teams (all on Chocolate,
+-- the shared default ruleset) at up to 8 players.
 G.FUNCS.mp_pvp_find_game = function()
 	G.FUNCS.overlay_menu({
 		definition = create_UIBox_generic_options({
@@ -132,19 +136,13 @@ G.FUNCS.mp_pvp_find_game = function()
 				} },
 				{
 					n = G.UIT.R,
-					config = { align = "cm", padding = 0.15 },
+					config = { align = "cm", padding = 0.1 },
 					nodes = {
-						{ n = G.UIT.C, config = { align = "cm", padding = 0.1, r = 0.2, colour = G.C.BLACK }, nodes = {
-							{ n = G.UIT.R, config = { align = "cm", padding = 0.05 }, nodes = { queue_button({ "Chocolate" }, "mp_pvp_queue_ranked", G.C.RED) } },
-							{ n = G.UIT.R, config = { align = "cm", padding = 0.05 }, nodes = {
-								{ n = G.UIT.T, config = { text = localize("k_ranked_cap"), scale = 0.5, colour = G.C.UI.TEXT_LIGHT, shadow = true } },
-							} },
+						{ n = G.UIT.C, config = { align = "cm", padding = 0.08 }, nodes = {
+							UIBox_button({ button = "mp_pvp_find_game_ranked", label = { "Ranked" }, colour = G.C.RED, minw = 2.5, minh = 2.0, scale = 0.5, col = true }),
 						} },
-						{ n = G.UIT.C, config = { align = "cm", padding = 0.1, r = 0.2, colour = G.C.BLACK }, nodes = {
-							{ n = G.UIT.R, config = { align = "cm", padding = 0.05 }, nodes = { queue_button({ "Chocolate" }, "mp_pvp_queue_casual", G.C.BLUE) } },
-							{ n = G.UIT.R, config = { align = "cm", padding = 0.05 }, nodes = {
-								{ n = G.UIT.T, config = { text = localize("k_casual_cap"), scale = 0.5, colour = G.C.UI.TEXT_LIGHT, shadow = true } },
-							} },
+						{ n = G.UIT.C, config = { align = "cm", padding = 0.08 }, nodes = {
+							UIBox_button({ button = "mp_pvp_find_game_casual", label = { "Casual" }, colour = G.C.BLUE, minw = 2.5, minh = 2.0, scale = 0.5, col = true }),
 						} },
 					},
 				},
@@ -153,14 +151,123 @@ G.FUNCS.mp_pvp_find_game = function()
 	})
 end
 
-G.FUNCS.mp_pvp_queue_ranked = function()
-	G.FUNCS.exit_overlay_menu()
-	PVP._join_queue(PVP.LobbyAccess.RANKED, PVP.GamemodeKey.PVP_CHOCOLATE)
+G.FUNCS.mp_pvp_find_game_ranked = function()
+	G.FUNCS.overlay_menu({
+		definition = create_UIBox_generic_options({
+			contents = {
+				{ n = G.UIT.R, config = { align = "cm", padding = 0.1 }, nodes = {
+					{ n = G.UIT.T, config = { text = "Ranked", scale = 0.6, colour = G.C.UI.TEXT_LIGHT, shadow = true } },
+				} },
+				{
+					n = G.UIT.R,
+					config = { align = "cm", padding = 0.1 },
+					nodes = {
+						{ n = G.UIT.C, config = { align = "cm", padding = 0.08 }, nodes = {
+							UIBox_button({ button = "mp_pvp_queue_ranked_chocolate", label = { "Chocolate" }, colour = G.C.BLUE, minw = 2.5, minh = 2.0, scale = 0.5, col = true }),
+						} },
+						{ n = G.UIT.C, config = { align = "cm", padding = 0.08 }, nodes = {
+							UIBox_button({ button = "mp_pvp_queue_ranked_strawberry", label = { "Strawberry" }, colour = G.C.PURPLE, minw = 2.5, minh = 2.0, scale = 0.5, col = true }),
+						} },
+					},
+				},
+				{
+					n = G.UIT.R,
+					config = { align = "cm", padding = 0.1 },
+					nodes = {
+						{ n = G.UIT.C, config = { align = "cm", padding = 0.08 }, nodes = {
+							UIBox_button({ button = "mp_pvp_queue_ranked_vanilla", label = { "Vanilla" }, colour = G.C.GREEN, minw = 2.5, minh = 2.0, scale = 0.5, col = true }),
+						} },
+						{ n = G.UIT.C, config = { align = "cm", padding = 0.08 }, nodes = {
+							UIBox_button({ button = "mp_pvp_queue_ranked_smallworld", label = { "Small", "World" }, colour = G.C.RED, minw = 2.5, minh = 2.0, scale = 0.5, col = true }),
+						} },
+					},
+				},
+			},
+		}),
+	})
 end
 
-G.FUNCS.mp_pvp_queue_casual = function()
+G.FUNCS.mp_pvp_find_game_casual = function()
+	G.FUNCS.overlay_menu({
+		definition = create_UIBox_generic_options({
+			contents = {
+				{ n = G.UIT.R, config = { align = "cm", padding = 0.1 }, nodes = {
+					{ n = G.UIT.T, config = { text = "Casual", scale = 0.6, colour = G.C.UI.TEXT_LIGHT, shadow = true } },
+				} },
+				{
+					n = G.UIT.R,
+					config = { align = "cm", padding = 0.1 },
+					nodes = {
+						{ n = G.UIT.C, config = { align = "cm", padding = 0.08 }, nodes = {
+							UIBox_button({ button = "mp_pvp_queue_casual_nemesis", label = { "Nemesis" }, colour = G.C.BLUE, minw = 2.5, minh = 2.0, scale = 0.5, col = true }),
+						} },
+						{ n = G.UIT.C, config = { align = "cm", padding = 0.08 }, nodes = {
+							UIBox_button({ button = "mp_pvp_queue_casual_royale", label = { "Royale" }, colour = G.C.PURPLE, minw = 2.5, minh = 2.0, scale = 0.5, col = true }),
+						} },
+					},
+				},
+				{
+					n = G.UIT.R,
+					config = { align = "cm", padding = 0.1 },
+					nodes = {
+						{ n = G.UIT.C, config = { align = "cm", padding = 0.08 }, nodes = {
+							UIBox_button({ button = "mp_pvp_queue_casual_manhunt", label = { "Manhunt" }, colour = G.C.RED, minw = 2.5, minh = 2.0, scale = 0.5, col = true }),
+						} },
+						{ n = G.UIT.C, config = { align = "cm", padding = 0.08 }, nodes = {
+							UIBox_button({ button = "mp_pvp_queue_casual_teams", label = { "Teams" }, colour = G.C.GREEN, minw = 2.5, minh = 2.0, scale = 0.5, col = true }),
+						} },
+					},
+				},
+				{
+					n = G.UIT.R,
+					config = { align = "cm", padding = 0.1 },
+					nodes = {
+						{ n = G.UIT.C, config = { align = "cm", padding = 0.08 }, nodes = {
+							UIBox_button({ button = "mp_pvp_queue_casual_smallworld", label = { "Small", "World" }, colour = G.C.ORANGE, minw = 2.5, minh = 2.0, scale = 0.5, col = true }),
+						} },
+					},
+				},
+			},
+		}),
+	})
+end
+
+G.FUNCS.mp_pvp_queue_ranked_chocolate = function()
 	G.FUNCS.exit_overlay_menu()
-	PVP._join_queue(PVP.LobbyAccess.CASUAL, PVP.GamemodeKey.PVP_CHOCOLATE)
+	PVP._join_queue(PVP.LobbyAccess.RANKED, "pvp_chocolate")
+end
+G.FUNCS.mp_pvp_queue_ranked_strawberry = function()
+	G.FUNCS.exit_overlay_menu()
+	PVP._join_queue(PVP.LobbyAccess.RANKED, "pvp_strawberry")
+end
+G.FUNCS.mp_pvp_queue_ranked_vanilla = function()
+	G.FUNCS.exit_overlay_menu()
+	PVP._join_queue(PVP.LobbyAccess.RANKED, "pvp_vanilla")
+end
+G.FUNCS.mp_pvp_queue_ranked_smallworld = function()
+	G.FUNCS.exit_overlay_menu()
+	PVP._join_queue(PVP.LobbyAccess.RANKED, "pvp_smallworld")
+end
+
+G.FUNCS.mp_pvp_queue_casual_nemesis = function()
+	G.FUNCS.exit_overlay_menu()
+	PVP._join_queue(PVP.LobbyAccess.CASUAL, "pvp_chocolate")
+end
+G.FUNCS.mp_pvp_queue_casual_royale = function()
+	G.FUNCS.exit_overlay_menu()
+	PVP._join_queue(PVP.LobbyAccess.CASUAL, "pvp_royale")
+end
+G.FUNCS.mp_pvp_queue_casual_manhunt = function()
+	G.FUNCS.exit_overlay_menu()
+	PVP._join_queue(PVP.LobbyAccess.CASUAL, "pvp_manhunt")
+end
+G.FUNCS.mp_pvp_queue_casual_teams = function()
+	G.FUNCS.exit_overlay_menu()
+	PVP._join_queue(PVP.LobbyAccess.CASUAL, "pvp_teams")
+end
+G.FUNCS.mp_pvp_queue_casual_smallworld = function()
+	G.FUNCS.exit_overlay_menu()
+	PVP._join_queue(PVP.LobbyAccess.CASUAL, "pvp_smallworld")
 end
 
 G.FUNCS.mp_pvp_cancel_queue = function()

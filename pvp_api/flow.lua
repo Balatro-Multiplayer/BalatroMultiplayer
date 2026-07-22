@@ -9,17 +9,35 @@ PVP.LobbyAccess = {
 	RANKED_PREFIX = "ranked:",
 }
 
+-- Stamps PVP.LOBBY.config.ruleset/gamemode to this gamemode key's defaults.
+-- Every entry point that adopts a NEW gamemode key (a fresh private lobby, a
+-- fresh matchmaking queue join, a fresh practice run) must call this before its
+-- first pvp_lobby_metadata() -- that function prefers whatever's ALREADY in
+-- PVP.LOBBY.config (so a private lobby's later Lobby Options ruleset override
+-- survives re-broadcasts instead of reverting to this gamemode's default every
+-- time), so the slate has to be genuinely reset here first, not left holding
+-- module-load's own hardcoded default or a leftover from an unrelated lobby
+-- browsed earlier this session.
+function PVP.reset_ruleset_to_gamemode_default(gamemode_key)
+	local def = PVP.PVP_GAMEMODES[gamemode_key] or PVP.PVP_GAMEMODES.pvp_chocolate
+	PVP.LOBBY.config.ruleset = def.ruleset
+	PVP.LOBBY.config.gamemode = def.gamemode
+end
+
 -- Host-authored shared lobby metadata. `gamemode`/`ruleset` are MPAPI's own content
 -- keys (e.g. "gamemode_mp_attrition" / "ruleset_mp_chocolate_ranked") so MPAPI.ApplyBans/
 -- MPAPI.get_active_gamemode() resolve directly to the banned_*-bearing object, no
 -- translation needed. `queue_mode` carries the separate API/queue/bridge key (e.g.
 -- "pvp_chocolate") that the matchmaking taxonomy, ban_pick draft, and per-lobby
 -- MPAPI.GameModes[...] instance (forfeit handling) still need.
+--
+-- ruleset/gamemode prefer the ALREADY-current PVP.LOBBY.config value over the
+-- gamemode key's own default -- see PVP.reset_ruleset_to_gamemode_default above.
 function PVP.pvp_lobby_metadata(gamemode_key, kind)
 	local def = PVP.PVP_GAMEMODES[gamemode_key] or PVP.PVP_GAMEMODES.pvp_chocolate
 	return {
-		gamemode = def.gamemode,
-		ruleset = def.ruleset,
+		gamemode = PVP.LOBBY.config.gamemode or def.gamemode,
+		ruleset = PVP.LOBBY.config.ruleset or def.ruleset,
 		queue_mode = gamemode_key,
 		kind = kind or PVP.LobbyAccess.PRIVATE,
 		deck = PVP.LOBBY.config.back or "Red Deck",
@@ -49,6 +67,7 @@ function PVP.pvp_create_private_lobby(gamemode_key)
 	end
 	PVP._pvp_kind = PVP.LobbyAccess.PRIVATE
 	PVP._pvp_gamemode = gamemode_key
+	PVP.reset_ruleset_to_gamemode_default(gamemode_key)
 	PVP.setup_lobby_mirror(lobby)
 	lobby:on(MPAPI.LobbyEvent.CONNECTED, function()
 		if lobby.is_host then
@@ -127,8 +146,7 @@ function PVP.pvp_leave_lobby()
 	end
 end
 
--- Create-lobby click (main menu). Join / ready / start / leave handlers live in the
--- menu + lobby UI files (ui/pvp_main_menu.lua, ui/pvp_lobby.lua).
-G.FUNCS.mp_pvp_create_lobby = function(e)
-	PVP.pvp_create_private_lobby(PVP.GamemodeKey.PVP_CHOCOLATE)
-end
+-- Create-lobby click (main menu) opens the gamemode picker; its buttons call
+-- PVP.pvp_create_private_lobby(...) directly. Handler defined in
+-- ui/pvp_main_menu.lua, colocated with its overlay (join/ready/start/leave
+-- handlers live in the menu + lobby UI files the same way).

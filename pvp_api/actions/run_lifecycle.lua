@@ -47,7 +47,12 @@ A("pvp_start_game", function(_at, from, params)
 
 	-- Matchmaking (2 players) with a ban_pick config: run the deck+stake draft first, in
 	-- lockstep off this same broadcast; the picked deck+stake then starts the run.
-	if gm_def and gm_def.ban_pick and PVP.is_matchmaking and PVP.is_matchmaking() then
+	-- The 2-actor schedule (ban_pick.schedule) hardcodes exactly two alternating
+	-- actors, so it only applies at exactly 2 players -- a GameMode with ban_pick
+	-- set (the four ruleset-only entries, gamemodes.lua) is also casual-queueable
+	-- at up to 8 players, which must skip straight to proceed() the same way
+	-- Royale/Manhunt/Teams (no ban_pick at all) already do.
+	if gm_def and gm_def.ban_pick and PVP.is_matchmaking and PVP.is_matchmaking() and lobby and #lobby:get_players() == 2 then
 		local bp = gm_def.ban_pick
 		MPAPI.BanPick.start(lobby, {
 			pool_size = bp.pool_size,
