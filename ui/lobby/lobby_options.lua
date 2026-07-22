@@ -1,13 +1,50 @@
--- Manhunt (Hunter/Runner) and Teams (A/B) lobby options -- the lobby's first real
--- options screen (previously a no-op placeholder, see ui/lobby/code.lua). Only
--- ever shows one of the two picker rows: PVP.LOBBY.config.manhunt/team_based are
--- mutually exclusive, set once from the chosen gamemode at lobby creation.
+-- The lobby's options screen (previously a no-op placeholder, see ui/lobby/code.lua):
+-- a host-only ruleset picker (private lobbies only -- ranked/casual matchmaking
+-- already commits to a specific ruleset by which queue option was picked, see
+-- pvp_api/queue.lua), plus Manhunt's Hunter/Runner or Teams' A/B role picker when
+-- applicable (any lobby kind -- a casual matchmaking-formed Manhunt/Teams match
+-- still needs its players to pick a role before the match can start).
 --
 -- Literal English strings (not localize() keys) match the existing "Practice"
 -- ruleset-picker overlay's own style (ui/pvp_main_menu.lua) rather than inventing
--- localization keys ahead of the Phase G polish pass.
-function PVP.build_manhunt_teams_options()
+-- localization keys ahead of a later polish pass.
+
+local RULESET_LABELS = { "Vanilla", "Chocolate", "Strawberry", "Small World" }
+local RULESET_KEYS = { "ruleset_mp_vanilla", "ruleset_mp_chocolate_ranked", "ruleset_mp_strawberry", "ruleset_mp_smallworld" }
+
+local function current_ruleset_option()
+	for i, key in ipairs(RULESET_KEYS) do
+		if PVP.LOBBY.config.ruleset == key then
+			return i
+		end
+	end
+	return 2 -- Chocolate, the default every gamemode key creates a lobby on.
+end
+
+function PVP.build_lobby_options()
 	local rows = {}
+	local lobby = MPAPI.get_current_lobby()
+
+	if PVP._pvp_kind == PVP.LobbyAccess.PRIVATE then
+		rows[#rows + 1] = {
+			n = G.UIT.R,
+			config = { align = "cm", padding = 0.1 },
+			nodes = {
+				MPAPI.disableable_option_cycle({
+					id = "mp_pvp_ruleset_pick",
+					label = "Ruleset",
+					options = RULESET_LABELS,
+					current_option = current_ruleset_option(),
+					opt_callback = "mp_pvp_change_ruleset",
+					w = 4,
+					scale = 0.6,
+					enabled = function()
+						return lobby and lobby.is_host
+					end,
+				}).node,
+			},
+		}
+	end
 
 	if PVP.LOBBY.config.manhunt then
 		rows[#rows + 1] = {
@@ -29,7 +66,6 @@ function PVP.build_manhunt_teams_options()
 			},
 		}
 
-		local lobby = MPAPI.get_current_lobby()
 		if lobby and lobby.is_host then
 			rows[#rows + 1] = {
 				n = G.UIT.R,
@@ -66,6 +102,14 @@ function PVP.build_manhunt_teams_options()
 	end
 
 	return create_UIBox_generic_options({ contents = rows })
+end
+
+G.FUNCS.mp_pvp_change_ruleset = function(e)
+	PVP.LOBBY.config.ruleset = RULESET_KEYS[e.to_key]
+	local lobby = MPAPI.get_current_lobby()
+	if lobby and lobby.is_host then
+		lobby:set_metadata(PVP.pvp_lobby_metadata(PVP._pvp_gamemode, PVP._pvp_kind))
+	end
 end
 
 G.FUNCS.mp_pvp_change_manhunt_role = function(e)

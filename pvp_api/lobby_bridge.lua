@@ -115,7 +115,7 @@ local function mirror_metadata(lobby)
 	end
 	-- nemesis_pairing isn't part of the shared metadata schema, so it can't ride the
 	-- generic loop above -- but every client (not just the host, who's the only one
-	-- that runs pvp_nemesis's start_run) needs it set correctly, since
+	-- that runs the active gamemode's start_run) needs it set correctly, since
 	-- PVP.current_target_id/attrition.lua's bye check/the joker-targeting guards all
 	-- run client-side. Derive it the same way gamemode/ruleset are derived here.
 	PVP.LOBBY.config.nemesis_pairing = (def and def.nemesis_pairing) or nil
