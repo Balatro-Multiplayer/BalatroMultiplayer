@@ -43,6 +43,21 @@ local function gen_seed()
 	return MP.generate_seed()
 end
 
+-- Dispatch the hand_played/discarded display-sync context straight to the nemesis blind
+-- by its stable registered key, instead of MPAPI.calculate_blind's "whatever blind is
+-- currently active" resolution (G.GAME.blind.config.blind in the framework's
+-- api/gamemode/hooks.lua). A skip fires while the ACTIVE blind is still the vanilla
+-- small/big blind being skipped -- bl_mp_nemesis only becomes active once the boss
+-- blind starts -- so gating this on the active blind silently drops the skip's display
+-- sync (and its SFX) until the opponent's first hand of the boss blind, whose payload
+-- still carries the cumulative skip count and fires the SFX there instead, one hand
+-- late (see tests/test_skip_sync.lua). The nemesis blind is registered once at load and
+-- is the only consumer of this context shape, so resolving it directly here is safe.
+local function sync_pvp_blind(context)
+	local nemesis = G.P_BLINDS and G.P_BLINDS["bl_mp_nemesis"]
+	if nemesis and nemesis.calculate then nemesis:calculate(context) end
+end
+
 -- Map each legacy action to its peer broadcast. Anything not listed (lobby/auth/
 -- version/replay-stream actions the API now owns) is silently dropped.
 local ROUTES = {
@@ -75,8 +90,8 @@ local ROUTES = {
 	end,
 	playHand = function(msg)
 		broadcast("pvp_play_hand", { score = msg.score, handsLeft = msg.handsLeft, skips = my_skips(), lives = my_lives() }) -- referee (host-authoritative)
-		-- Display sync is the active blind's own decision now (see objects/blinds/nemesis.lua).
-		MPAPI.calculate_blind({ hand_played = true, score = msg.score, hands_left = msg.handsLeft, skips = my_skips(), lives = my_lives() })
+		-- Display sync via the nemesis blind's own calculate/send (see sync_pvp_blind above).
+		sync_pvp_blind({ hand_played = true, score = msg.score, hands_left = msg.handsLeft, skips = my_skips(), lives = my_lives() })
 		-- Score-bearing RLOG event (Phase 6): this is the only point in the
 		-- codebase where "my own score after playing" is already computed for
 		-- the legacy broadcast, so it doubles as the source for a server-side
@@ -95,8 +110,8 @@ local ROUTES = {
 	end,
 	skip = function(msg)
 		broadcast("pvp_skip", { skips = msg.skips, score = my_score_str(), handsLeft = my_hands(), lives = my_lives() }) -- referee (host-authoritative)
-		-- Display sync is the active blind's own decision now (see objects/blinds/nemesis.lua).
-		MPAPI.calculate_blind({ discarded = true, skips = msg.skips, score = my_score_str(), hands_left = my_hands(), lives = my_lives() })
+		-- Display sync via the nemesis blind's own calculate/send (see sync_pvp_blind above).
+		sync_pvp_blind({ discarded = true, skips = msg.skips, score = my_score_str(), hands_left = my_hands(), lives = my_lives() })
 		-- See playHand's hand_result comment above -- same rationale, for discards.
 		if MP.RLOG then MP.RLOG.record("hand_result", { my_score_str(), my_hands() }) end
 	end,

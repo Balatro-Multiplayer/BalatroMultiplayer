@@ -28,9 +28,11 @@ MPAPI.Blind({
 		return false
 	end,
 
-	-- Decides whether/what to tell the opponent on a hand played or discard, dispatched via
-	-- MPAPI.calculate_blind from pvp_api/net.lua's playHand/skip routes -- the blind's own
-	-- decision now, not an external hardcoded sync call.
+	-- Decides whether/what to tell the opponent on a hand played or discard, dispatched by
+	-- key from pvp_api/net.lua's playHand/skip routes (sync_pvp_blind) rather than through
+	-- MPAPI.calculate_blind's "currently active blind" lookup -- a skip fires while the
+	-- vanilla small/big blind is still active, so that lookup would miss this blind's
+	-- calculate entirely at the moment a skip happens. The blind's own decision, either way.
 	calculate = function(self, context)
 		if context.hand_played or context.discarded then
 			return {
