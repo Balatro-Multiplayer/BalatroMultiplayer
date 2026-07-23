@@ -1,9 +1,9 @@
 -- Credit to @MathIsFun_ and the Balatro Multiplayer project for the ruleset system this is based on.
 -- Thin delegating wrapper around MPAPI.Ruleset: registers PvP rulesets into the
 -- shared MPAPI.Rulesets registry (dupe-key checking, required_params validation,
--- reworked_* reverse-indexing, `inject`'s G.P_CENTER_POOLS.Ruleset registration, and
--- the default no-op is_disabled/force_lobby_options methods all come from MPAPI's
--- own RulesetBase for free) while keeping PvP's own active-ruleset/gamemode
+-- `inject`'s G.P_CENTER_POOLS.Ruleset registration, and the default no-op
+-- is_disabled/force_lobby_options methods all come from MPAPI's own RulesetBase
+-- for free) while keeping PvP's own active-ruleset/gamemode
 -- resolution (lobby / practice-mode / ghost-replay -- MPAPI only knows about the
 -- lobby case, so this stays PvP-owned).
 --
