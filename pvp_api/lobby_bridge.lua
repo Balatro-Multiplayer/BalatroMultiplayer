@@ -25,14 +25,25 @@ end
 
 -- The gamemode-defined "current target": whichever player's enemy-facing state
 -- (score/hands/lives sync, HUD, joker targeting like Asteroid/Penny Pincher/the
--- Nemesis boss blind) should be treated as "the enemy" right now.
+-- Nemesis boss blind) should be treated as "the enemy" right now. Host-computed
+-- and broadcast in every N>2 case -- never a client-side race.
 --  - Nemesis-pairing (rotating no-repeat duels, N>2): this ante's assigned partner,
 --    broadcast by the host each ante; nil if byed or not yet received.
 --  - Plain 1v1: the sole other lobby player, unchanged from before this existed.
---  - Royale (N>2, no pairing): whichever sender's sync arrived first since this
---    blind started (see PVP.note_target_candidate) -- a stable per-blind choice,
---    not a literal reroll on every hit, since a true per-hit reroll would need a
---    client-visible alive-roster broadcast that doesn't exist today.
+--  - Manhunt (N>2): a Hunter's target is always the sole Runner, resolved locally
+--    from the roster (static for the whole match, no broadcast needed). The
+--    Runner's target is whichever Hunter currently has the highest score --
+--    PVP.GAME.manhunt_target_id, broadcast live by the host (pvp_api/referee.lua).
+--  - Teams (N>2): PVP.GAME.team_card_target_id, one random opposing-team member
+--    per player, re-picked once per ante by the host (same cadence as Nemesis
+--    pairing) -- used for joker/consumable triggering. The Teams score DISPLAY is
+--    a separate aggregate broadcast (pvp_team_score_board) read directly by the
+--    HUD, not routed through current_target_id().
+--  - Royale (N>2, no pairing): PVP.GAME.royale_target_id, broadcast live by the
+--    host and personalized per player -- a safe player's target is the adjacent
+--    player with the next-lower score (their safety margin), an unsafe player's
+--    target is the adjacent player with the next-higher score (what they need to
+--    beat). See PVP.referee_rank_royale/broadcast_royale_targets.
 function PVP.current_target_id()
 	if PVP.LOBBY.config.nemesis_pairing then
 		return PVP.GAME.nemesis_partner_id
@@ -44,47 +55,31 @@ function PVP.current_target_id()
 	if #lobby:get_players() == 2 then
 		return PVP.get_opponent_id()
 	end
-	-- Manhunt/Teams (N>2): same "first sync wins" per-blind latch Royale uses
-	-- below, but restricted to an opposing-team sender (see note_target_candidate)
-	-- so a Hunter's HUD/joker-targeting never latches onto a fellow Hunter, and a
-	-- Teams player's never latches onto a teammate.
-	if PVP.LOBBY.config.manhunt or PVP.LOBBY.config.team_based then
-		return PVP.GAME.team_target_id
+	if PVP.LOBBY.config.manhunt then
+		if PVP.LOBBY.team_id == "HUNTER" then
+			for id, role in pairs(PVP.LOBBY.roster or {}) do
+				if role == "RUNNER" then
+					return id
+				end
+			end
+			return nil
+		end
+		return PVP.GAME.manhunt_target_id
+	end
+	if PVP.LOBBY.config.team_based then
+		return PVP.GAME.team_card_target_id
 	end
 	return PVP.GAME.royale_target_id
 end
 
--- Lets Royale's "first sync wins" strategy latch onto a target: called by the
--- enemy-targeting receive() guard on every incoming sync, before filtering. A
--- no-op for 1v1 (target is resolved from roster state, not a latch) and for
--- Nemesis-pairing (target is host-assigned, not sender-latched).
-function PVP.note_target_candidate(sender_id)
-	if PVP.LOBBY.config.nemesis_pairing then
-		return
-	end
-	local lobby = MPAPI.get_current_lobby()
-	if not lobby or #lobby:get_players() == 2 then
-		return
-	end
-	if PVP.LOBBY.config.manhunt or PVP.LOBBY.config.team_based then
-		if PVP.GAME.team_target_id then
-			return
-		end
-		local my_team = PVP.LOBBY.roster and PVP.LOBBY.roster[lobby.player_id]
-		local their_team = PVP.LOBBY.roster and PVP.LOBBY.roster[sender_id]
-		if my_team and their_team and my_team ~= their_team then
-			PVP.GAME.team_target_id = sender_id
-			if PVP.CURRENT_LOBBY then PVP.mirror_players(PVP.CURRENT_LOBBY) end
-		end
-		return
-	end
-	if not PVP.GAME.royale_target_id then
-		PVP.GAME.royale_target_id = sender_id
-		-- PVP.mirror_players (not the bare local) since this runs before mirror_players
-		-- is declared further down this same file -- the global table indirection
-		-- is what makes the call order-independent.
-		if PVP.CURRENT_LOBBY then PVP.mirror_players(PVP.CURRENT_LOBBY) end
-	end
+-- True only while byed in Nemesis-pairing mode (an odd-numbered alive roster
+-- leaves one player without a partner this ante) -- distinct from "target not
+-- yet received", which current_target_id() also represents as nil. Guards that
+-- need to reject stray senders while genuinely byed must check this explicitly
+-- rather than relying on current_target_id() == nil, which is ambiguous between
+-- the two cases.
+function PVP.is_byed()
+	return PVP.LOBBY.config.nemesis_pairing and PVP.GAME.nemesis_partner_id == nil
 end
 
 local function player_name(lobby, player_id)
