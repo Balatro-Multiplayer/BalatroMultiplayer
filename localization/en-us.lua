@@ -1197,7 +1197,7 @@ return {
 			},
 			b_wait_for_guest_ready = {
 				"WAITING FOR",
-				"GUEST TO READY UP",
+				"#1# TO READY UP",
 			},
 			b_lobby_options = "LOBBY OPTIONS",
 			b_copy_clipboard = "Copy to clipboard",

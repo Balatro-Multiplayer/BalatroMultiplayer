@@ -137,7 +137,8 @@ function MP.UI.create_lobby_main_button(text_scale)
 			minw = 3.65,
 			minh = 1.55,
 			label = { localize("b_start") },
-			disabled_text = MP.LOBBY.guest.username and localize("b_wait_for_guest_ready")
+			disabled_text = MP.LOBBY.guest.username
+				and localize({ type = "variable", key = "b_wait_for_guest_ready", vars = { MP.LOBBY.guest.username } })
 				or localize("b_wait_for_players"),
 			scale = text_scale * 2,
 			col = true,
