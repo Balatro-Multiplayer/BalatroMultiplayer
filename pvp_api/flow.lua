@@ -26,6 +26,13 @@ function MP.pvp_lobby_metadata(gamemode_key, kind)
 		stake = tostring(MP.LOBBY.config.stake or 1),
 		starting_lives = MP.LOBBY.config.starting_lives or 4,
 		pvp_start_round = MP.LOBBY.config.pvp_start_round or 2,
+		-- reset_lobby_config defaults cocktail to "" (never synced); a lobby created
+		-- without ever opening the cocktail edit overlay would otherwise ship an empty
+		-- pool to the guest (and to the host's own copy_host_deck at run start) -- fall
+		-- back to the host's own saved preference so it always carries a real value.
+		cocktail = MP.CocktailConfig.resolve(MP.LOBBY.config.cocktail, MP.config.cocktail),
+		sleeve = MP.LOBBY.config.sleeve or "sleeve_casl_none",
+		challenge = MP.LOBBY.config.challenge or "",
 	}
 end
 
@@ -117,6 +124,8 @@ function MP.pvp_leave_lobby()
 	MP.LOBBY.code = nil
 	MP.CURRENT_LOBBY = nil
 	MPAPI.MODIFIERS = {}
+	-- Match-scoped cocktail composition must not leak into the next lobby/match.
+	MP._match_cocktail = nil
 	MP._version_mismatch_shown = false
 	if G.STATE ~= G.STATES.MENU then
 		G.STATE = G.STATES.MENU
