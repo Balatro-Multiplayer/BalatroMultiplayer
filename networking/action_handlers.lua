@@ -404,6 +404,12 @@ local function action_start_blind(p)
 	MP.GAME.enemy.score_text = "0"
 	-- Re-mask the opponent's hands until the first enemyInfo of the new blind.
 	MP.GAME.enemy.info_received = false
+	-- Reset the stored hands count too -- otherwise it carries over the
+	-- previous blind's leftover value (or the hardcoded initial default) and
+	-- the HUD briefly shows that wrong number before the first sync.
+	local hands_reset = MP.UTILS.enemy_hands_reset()
+	MP.GAME.enemy.hands = hands_reset.hands
+	MP.GAME.enemy.hands_text = hands_reset.hands_text
 	-- Royale's "first sync wins" MP.current_target_id() strategy re-latches fresh
 	-- each blind (a no-op for 1v1/Nemesis, which don't use this field).
 	MP.GAME.royale_target_id = nil
