@@ -467,6 +467,12 @@ local function action_player_info(p)
 end
 
 local function action_win_game()
+	-- Guard against re-entry: a stray duplicate winGame dispatch (network
+	-- retry, referee re-broadcast, etc.) must not replay the win jingle/screen
+	-- or double-record match stats.
+	if MP.GAME.won then
+		return
+	end
 	MP.end_game_jokers_payload = ""
 	MP.nemesis_deck_string = ""
 	MP.end_game_jokers_received = false
@@ -480,10 +486,15 @@ local function action_win_game()
 end
 
 local function action_lose_game()
+	-- Symmetric re-entry guard, see action_win_game.
+	if MP.GAME.lost then
+		return
+	end
 	MP.end_game_jokers_payload = ""
 	MP.nemesis_deck_string = ""
 	MP.end_game_jokers_received = false
 	MP.nemesis_deck_received = false
+	MP.GAME.lost = true
 	MP.STATS.record_match(false)
 	G.STATE_COMPLETE = false
 	G.STATE = G.STATES.GAME_OVER
