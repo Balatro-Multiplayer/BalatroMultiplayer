@@ -73,6 +73,63 @@ MPAPI.ActionType({
 	end,
 })
 
+-- Teams' score-DISPLAY board (host -> all): the true summed opposing-team score,
+-- recomputed on every score update (see referee.lua's sum_team_scores/
+-- broadcast_live_targets). Separate from pvp_team_card_target below, which is
+-- joker/consumable TRIGGERING, not display -- a team's combined score isn't any
+-- single member's raw broadcast, so this can't reuse the nemesis blind's
+-- per-sender relay the way Royale/Manhunt's id-only broadcasts do.
+MPAPI.ActionType({
+	key = "pvp_team_score_board",
+	prefix_config = { key = false },
+	parameters = { { key = "team_scores", type = "table", required = true } },
+	on_receive = function(_at, _from, params)
+		if not PVP.LOBBY.config.team_based or not PVP.LOBBY.team_id then
+			return
+		end
+		local enemy_team = (PVP.LOBBY.team_id == "A") and "B" or "A"
+		local raw = params.team_scores and params.team_scores[enemy_team]
+		if not raw then
+			return
+		end
+		local score = PVP.INSANE_INT.from_string(raw)
+		PVP.UI.ease_enemy_score(score)
+		PVP.GAME.enemy.real_score = score
+		PVP.GAME.enemy.info_received = true
+	end,
+})
+
+-- Teams' card-targeting rotation (host -> all, re-picked once per ante): a flat
+-- id -> target-id-or-"" map, same shape/handling as pvp_nemesis_pairing. Used for
+-- joker/consumable triggering (Asteroid/Taxes/Penny Pincher), NOT the score
+-- display above.
+MPAPI.ActionType({
+	key = "pvp_team_card_target",
+	prefix_config = { key = false },
+	parameters = { { key = "pairing", type = "table", required = true } },
+	on_receive = function(_at, _from, params)
+		local sid = self_id()
+		local target = params.pairing and params.pairing[sid]
+		PVP.GAME.team_card_target_id = (target and target ~= "") and target or nil
+	end,
+})
+
+-- Manhunt Runner's live target (host -> all): whichever Hunter currently holds
+-- the highest score, recomputed on every score update (referee.lua's
+-- broadcast_live_targets). Hunters ignore this -- their target (the Runner) is
+-- resolved locally from the static roster instead (PVP.current_target_id()).
+MPAPI.ActionType({
+	key = "pvp_manhunt_target",
+	prefix_config = { key = false },
+	parameters = { { key = "target_id", type = "string", required = false } },
+	on_receive = function(_at, _from, params)
+		if PVP.LOBBY.team_id ~= "RUNNER" then
+			return
+		end
+		PVP.GAME.manhunt_target_id = (params.target_id and params.target_id ~= "") and params.target_id or nil
+	end,
+})
+
 -- Manhunt's Hieroglyph/Petroglyph replacements (objects/vouchers/manhunt_vouchers.lua)
 -- call this when the RUNNER redeems one: every Hunter gains +1 life as
 -- compensation for the Runner buying themselves more time to evade.

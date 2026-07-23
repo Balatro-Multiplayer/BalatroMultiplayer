@@ -32,8 +32,11 @@ MPAPI.Joker({
 	end,
 	-- Was action_spent_last_shop.
 	receive = function(self, context)
-		PVP.note_target_candidate(context.from)
-		if PVP.current_target_id() and context.from ~= PVP.current_target_id() then
+		if PVP.is_byed() then
+			return
+		end
+		local target = PVP.current_target_id()
+		if target and context.from ~= target then
 			return
 		end
 		PVP.GAME.enemy.spent_in_shop[#PVP.GAME.enemy.spent_in_shop + 1] = tonumber(context.data)

@@ -34,6 +34,24 @@ MPAPI.ActionType({
 	end,
 })
 
+-- Royale live targeting: host -> all, a flat id -> target-id-or-"" map,
+-- recomputed on every score update (see PVP.referee_rank_royale/
+-- broadcast_royale_targets, pvp_api/referee.lua). Each client picks out its own
+-- entry; PVP.current_target_id() reads it. Ids only -- the actual score/hands/
+-- lives display comes from the existing raw per-sender relay above, filtered by
+-- current_target_id().
+MPAPI.ActionType({
+	key = "pvp_royale_target",
+	prefix_config = { key = false },
+	parameters = { { key = "targets", type = "table", required = true } },
+	on_receive = function(_at, _from, params)
+		local sid = self_id()
+		local target = params.targets and params.targets[sid]
+		PVP.GAME.royale_target_id = (target and target ~= "") and target or nil
+		if PVP.CURRENT_LOBBY then PVP.mirror_players(PVP.CURRENT_LOBBY) end
+	end,
+})
+
 A("pvp_set_furthest_blind", function(_at, from, params)
 	PVP.referee_on_set_furthest_blind(from, params or {})
 end)

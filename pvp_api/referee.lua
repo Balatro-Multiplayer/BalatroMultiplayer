@@ -27,12 +27,25 @@ PVP.REF = PVP.REF
 		-- keeps asymmetric per-player lives (Runner=1, Hunter=manhunt_hunter_lives)
 		-- on the existing pl.lives field -- no pool needed there.
 		team_lives = {},
+		-- Teams: team_card_target[id] = one random opposing-team member id, re-picked
+		-- once per ante (same cadence as nemesis_of), used for joker/consumable
+		-- triggering (Asteroid/Taxes/Penny Pincher) -- separate from the team score
+		-- SUM shown on the HUD (pvp_team_score_board), which isn't routed through a
+		-- single target id at all.
+		team_card_target = {},
+		team_card_ante_computed_for = 0,
 	}
 
 local function is_host()
 	local lobby = MPAPI.get_current_lobby()
 	return lobby and lobby.is_host
 end
+
+-- Forward-declared: PVP.referee_on_ready_blind (below) needs to call
+-- broadcast_live_targets before its definition further down this file, since a
+-- fresh round's board should show reset (0) values immediately rather than
+-- stale ones from the round that just ended.
+local broadcast_royale_targets, broadcast_live_targets
 
 local function broadcast(key, params)
 	local lobby = MPAPI.get_current_lobby()
@@ -253,6 +266,40 @@ local function broadcast_nemesis_pairing()
 	broadcast("pvp_nemesis_pairing", { pairing = payload })
 end
 
+-- Recomputes PVP.REF.team_card_target for the current ante: each alive player is
+-- assigned one random currently-alive OPPOSING-team member, for joker/consumable
+-- triggering (Asteroid/Taxes/Penny Pincher). Re-picked once per ante, same cadence
+-- as compute_nemesis_pairing -- kept separate from the team score SUM shown on the
+-- HUD (pvp_team_score_board), which isn't routed through a target id at all.
+local function compute_team_card_targets(alive)
+	PVP.REF.team_card_target = {}
+	local by_team = { A = {}, B = {} }
+	for _, id in ipairs(alive) do
+		local team_id = ref_player(id).team_id
+		if by_team[team_id] then
+			table.insert(by_team[team_id], id)
+		end
+	end
+	for _, id in ipairs(alive) do
+		local my_team = ref_player(id).team_id
+		local enemy_team = (my_team == "A") and "B" or "A"
+		local candidates = by_team[enemy_team]
+		if candidates and #candidates > 0 then
+			PVP.REF.team_card_target[id] = candidates[math.random(#candidates)]
+		end
+	end
+end
+
+-- Broadcasts the current ante's team card-targeting assignments to everyone (flat
+-- id -> target-id-or-"" map) so each client can resolve PVP.current_target_id().
+local function broadcast_team_card_target()
+	local payload = {}
+	for _, id in ipairs(alive_ids()) do
+		payload[id] = PVP.REF.team_card_target[id] or ""
+	end
+	broadcast("pvp_team_card_target", { pairing = payload })
+end
+
 -- Best PvP score for a player (host referee state), as a plausibility-bounded number
 -- for the matchmaking `metric` (season-best score column). Host-only.
 function PVP.pvp_score_metric(player_id)
@@ -279,6 +326,8 @@ function PVP.referee_reset(starting_lives)
 	PVP.REF.nemesis_ante_computed_for = 0
 	PVP.REF.last_bye_id = nil
 	PVP.REF.team_lives = {}
+	PVP.REF.team_card_target = {}
+	PVP.REF.team_card_ante_computed_for = 0
 	PVP._result_reported = false
 	local lives = starting_lives or PVP.LOBBY.config.starting_lives or 4
 	local total = both_players()
@@ -347,6 +396,10 @@ function PVP.referee_reset(starting_lives)
 		compute_nemesis_pairing(alive_ids())
 		PVP.REF.nemesis_ante_computed_for = 1
 		broadcast_nemesis_pairing()
+	elseif PVP.LOBBY.config.team_based then
+		compute_team_card_targets(alive_ids())
+		PVP.REF.team_card_ante_computed_for = 1
+		broadcast_team_card_target()
 	end
 end
 
@@ -419,6 +472,9 @@ function PVP.referee_on_ready_blind(from)
 				pl.played_this_blind = false
 			end
 			broadcast("pvp_start_blind", { first_player = "" })
+			-- Show fresh (0) values on the live target board immediately, not stale
+			-- ones from the round that just ended.
+			broadcast_live_targets()
 		end
 		return
 	end
@@ -493,9 +549,13 @@ end
 -- not penalized.
 function PVP.referee_resolve_manhunt_round(runner, hunters)
 	local highest_hunter_score = PVP.INSANE_INT.empty()
+	-- Defaults to the first hunter (not nil) so an all-0-0 tie still shows someone
+	-- on the Runner's live target board rather than "no target yet".
+	local highest_hunter_id = hunters[1] and hunters[1].id or nil
 	for _, h in ipairs(hunters) do
 		if PVP.INSANE_INT.greater_than(h.score, highest_hunter_score) then
 			highest_hunter_score = h.score
+			highest_hunter_id = h.id
 		end
 	end
 
@@ -512,23 +572,62 @@ function PVP.referee_resolve_manhunt_round(runner, hunters)
 	return {
 		hunter_losers = hunter_losers,
 		runner_caught = PVP.INSANE_INT.greater_than(highest_hunter_score, runner.score),
+		-- The Runner's live HUD target -- whichever Hunter currently holds the
+		-- highest score (first-in-iteration-order tiebreak on exact ties). nil only
+		-- if `hunters` is empty (shouldn't happen with a live match, but a fabricated
+		-- test roster could hit it).
+		highest_hunter_id = highest_hunter_id,
 	}
+end
+
+-- Pure: sums a team's scores this round. Shared by the win/loss decision
+-- (PVP.referee_resolve_teams_round below) and the live pvp_team_score_board
+-- broadcast (broadcast_live_targets), so the summing rule can't drift between them.
+local function sum_team_scores(team_players)
+	local sum = PVP.INSANE_INT.empty()
+	for _, pl in ipairs(team_players) do
+		sum = PVP.INSANE_INT.add(sum, pl.score)
+	end
+	return sum
 end
 
 -- Pure: sums each team's scores this round and returns the losing team ("A"/"B"),
 -- or equal=true on an exact tie (mirrors the 1v1/Royale "nobody loses on a tie" rule).
 function PVP.referee_resolve_teams_round(team_a, team_b)
-	local sum_a, sum_b = PVP.INSANE_INT.empty(), PVP.INSANE_INT.empty()
-	for _, pl in ipairs(team_a) do
-		sum_a = PVP.INSANE_INT.add(sum_a, pl.score)
-	end
-	for _, pl in ipairs(team_b) do
-		sum_b = PVP.INSANE_INT.add(sum_b, pl.score)
-	end
+	local sum_a, sum_b = sum_team_scores(team_a), sum_team_scores(team_b)
 	if PVP.INSANE_INT.equal(sum_a, sum_b) then
 		return { equal = true }
 	end
 	return { equal = false, loser_team = PVP.INSANE_INT.greater_than(sum_b, sum_a) and "A" or "B" }
+end
+
+-- Pure: ranks alive players by score ascending and returns the same "bottom
+-- floor(N/2) (min 1), ties folded down into the loser set" split
+-- try_resolve_round's Royale branch has always used -- plus an is_loser lookup so
+-- callers (round resolution AND the live pvp_royale_target broadcast) can
+-- classify any alive id as currently safe/unsafe without duplicating the
+-- cutoff/tie logic. Ties folding an EXTRA player past cutoff_idx into losers is
+-- why callers must use is_loser, not just index vs. cutoff_idx, to know who's safe.
+function PVP.referee_rank_royale(players)
+	local ranked = {}
+	for _, pl in ipairs(players) do
+		ranked[#ranked + 1] = pl
+	end
+	table.sort(ranked, function(x, y)
+		return PVP.INSANE_INT.greater_than(y.score, x.score)
+	end)
+
+	local cutoff_idx = math.max(1, math.floor(#ranked / 2))
+	local cutoff_score = ranked[cutoff_idx].score
+	local losers, is_loser = {}, {}
+	for _, pl in ipairs(ranked) do
+		if not PVP.INSANE_INT.greater_than(pl.score, cutoff_score) then
+			losers[#losers + 1] = pl
+			is_loser[pl.id] = true
+		end
+	end
+
+	return { ranked = ranked, cutoff_idx = cutoff_idx, losers = losers, is_loser = is_loser }
 end
 
 -- Effects wrapper for the Manhunt branch of try_resolve_round: splits the alive
@@ -592,6 +691,78 @@ local function resolve_teams_round(alive)
 	end
 	if not check_team_win() then
 		broadcast("pvp_end_pvp", { loser_id = "", pvp_timer_lost = false })
+	end
+end
+
+-- Broadcasts each alive Royale player's personalized live target: a SAFE player
+-- (not currently losing a life) is shown the adjacent ranked player with the
+-- next-LOWER score (their safety margin); an UNSAFE player is shown the adjacent
+-- ranked player with the next-HIGHER score (what they need to beat). Carries ids
+-- only -- once a client's PVP.current_target_id() resolves to the right id, the
+-- existing raw per-sender score/hands/lives relay (objects/blinds/nemesis.lua)
+-- displays the value, no separate score payload needed here.
+function broadcast_royale_targets(rank)
+	local payload = {}
+	for i, pl in ipairs(rank.ranked) do
+		local neighbor
+		if rank.is_loser[pl.id] then
+			neighbor = rank.ranked[i + 1] -- may be nil: the whole alive set tied (nobody loses)
+		else
+			neighbor = rank.ranked[i - 1] -- may be nil: i == 1, the lowest-ranked "safe" player (full-tie edge case)
+		end
+		payload[pl.id] = neighbor and neighbor.id or ""
+	end
+	broadcast("pvp_royale_target", { targets = payload })
+end
+
+-- Live (mid-round, not just round-end) target broadcast for N>2 modes, called on
+-- every score update so the HUD tracks continuously. A no-op for 2-player lobbies
+-- (mirrors try_resolve_round's own size-based branch), Nemesis-pairing (target is
+-- the per-ante partner, unrelated to live score), and Manhunt Hunters (their
+-- target -- the Runner -- never changes mid-match, resolved locally instead).
+function broadcast_live_targets()
+	if #both_players() <= 2 or PVP.LOBBY.config.nemesis_pairing then
+		return
+	end
+	local alive = alive_ids()
+	if #alive < 2 then
+		return
+	end
+
+	if PVP.LOBBY.config.manhunt then
+		local runner, hunters = nil, {}
+		for _, id in ipairs(alive) do
+			local pl = ref_player(id)
+			if pl.team_id == "RUNNER" then
+				runner = pl
+			else
+				hunters[#hunters + 1] = pl
+			end
+		end
+		if runner and #hunters > 0 then
+			local outcome = PVP.referee_resolve_manhunt_round(runner, hunters)
+			broadcast("pvp_manhunt_target", { target_id = outcome.highest_hunter_id })
+		end
+	elseif PVP.LOBBY.config.team_based then
+		local by_team = { A = {}, B = {} }
+		for _, id in ipairs(alive) do
+			local pl = ref_player(id)
+			if by_team[pl.team_id] then
+				table.insert(by_team[pl.team_id], pl)
+			end
+		end
+		broadcast("pvp_team_score_board", {
+			team_scores = {
+				A = PVP.INSANE_INT.to_string(sum_team_scores(by_team.A)),
+				B = PVP.INSANE_INT.to_string(sum_team_scores(by_team.B)),
+			},
+		})
+	else
+		local alive_players = {}
+		for _, id in ipairs(alive) do
+			alive_players[#alive_players + 1] = ref_player(id)
+		end
+		broadcast_royale_targets(PVP.referee_rank_royale(alive_players))
 	end
 end
 
@@ -696,27 +867,19 @@ local function try_resolve_round()
 		-- the cutoff are folded into the loser set (not a strict headcount) so a tied
 		-- cluster isn't split arbitrarily -- unless the tie reaches every alive player,
 		-- in which case (mirroring the 1v1 exact-tie "nobody loses" rule) nobody loses
-		-- this round.
-		local ranked = {}
+		-- this round. See PVP.referee_rank_royale for the extracted, independently
+		-- testable ranking/cutoff logic (also reused by the live target broadcast).
+		local alive_players = {}
 		for _, id in ipairs(alive) do
-			ranked[#ranked + 1] = ref_player(id)
+			alive_players[#alive_players + 1] = ref_player(id)
 		end
-		table.sort(ranked, function(x, y)
-			return PVP.INSANE_INT.greater_than(y.score, x.score)
-		end)
-
-		local cutoff_idx = math.max(1, math.floor(#ranked / 2))
-		local cutoff_score = ranked[cutoff_idx].score
-		local losers = {}
-		for _, pl in ipairs(ranked) do
+		local rank = PVP.referee_rank_royale(alive_players)
+		for _, pl in ipairs(rank.ranked) do
 			pl.first_ready = false
-			if not PVP.INSANE_INT.greater_than(pl.score, cutoff_score) then
-				losers[#losers + 1] = pl
-			end
 		end
 
-		if #losers < #ranked then
-			for _, pl in ipairs(losers) do
+		if #rank.losers < #rank.ranked then
+			for _, pl in ipairs(rank.losers) do
 				lose_life(pl)
 			end
 		end
@@ -747,6 +910,7 @@ function PVP.referee_on_play_hand(from, params)
 	if PVP.INSANE_INT.greater_than(pl.score, pl.highest_score) then
 		pl.highest_score = pl.score
 	end
+	broadcast_live_targets()
 	try_resolve_round()
 end
 
@@ -787,6 +951,15 @@ function PVP.referee_on_set_ante(from, params)
 			PVP.REF.nemesis_ante_computed_for = ante
 			compute_nemesis_pairing(alive_ids())
 			broadcast_nemesis_pairing()
+		end
+	elseif PVP.LOBBY.config.team_based then
+		-- Teams' card-targeting rotation: same once-per-ante cadence as Nemesis
+		-- pairing above (see that branch's comment for why this is race-safe).
+		local ante = tonumber(params.ante)
+		if ante and ante > PVP.REF.team_card_ante_computed_for then
+			PVP.REF.team_card_ante_computed_for = ante
+			compute_team_card_targets(alive_ids())
+			broadcast_team_card_target()
 		end
 	end
 end
@@ -853,6 +1026,7 @@ function PVP.referee_on_fail_round(from)
 	end
 	if PVP.LOBBY.config.manhunt or PVP.LOBBY.config.team_based or #both_players() > 2 then
 		pl.hands_left = 0
+		broadcast_live_targets()
 		try_resolve_round()
 	end
 end
@@ -870,6 +1044,7 @@ function PVP.referee_on_fail_timer(from)
 	end
 	if PVP.LOBBY.config.manhunt or PVP.LOBBY.config.team_based or #both_players() > 2 then
 		pl.hands_left = 0
+		broadcast_live_targets()
 		try_resolve_round()
 	end
 end
@@ -900,6 +1075,7 @@ function PVP.referee_on_fail_pvp_timer(from)
 		return
 	end
 	pl.hands_left = 0
+	broadcast_live_targets()
 	try_resolve_round()
 end
 

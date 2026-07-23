@@ -44,8 +44,19 @@ MPAPI.Blind({
 	-- PVP.GAME.enemy.* store the HUD already reads. The referee (win/lose/lives) is separate,
 	-- still driven by pvp_play_hand/pvp_skip.
 	receive = function(self, context)
-		PVP.note_target_candidate(context.from)
-		if PVP.current_target_id() and context.from ~= PVP.current_target_id() then
+		if PVP.is_byed() then
+			return
+		end
+		if PVP.LOBBY.config.team_based then
+			-- Teams' score DISPLAY comes from the host-aggregated
+			-- pvp_team_score_board broadcast, not this raw per-sender relay
+			-- (current_target_id() resolves to the card-targeting id here, not a
+			-- display id) -- accepting this would overwrite the true team sum with
+			-- a single raw sender's own score.
+			return
+		end
+		local target = PVP.current_target_id()
+		if target and context.from ~= target then
 			return
 		end
 		local d = context.data
@@ -90,44 +101,7 @@ MPAPI.Blind({
 			end
 		end
 
-		G.E_MANAGER:add_event(Event({
-			blockable = false,
-			blocking = false,
-			trigger = "ease",
-			delay = 3,
-			ref_table = PVP.GAME.enemy.score,
-			ref_value = "e_count",
-			ease_to = score.e_count,
-			func = function(t)
-				return math.floor(t)
-			end,
-		}))
-		G.E_MANAGER:add_event(Event({
-			blockable = false,
-			blocking = false,
-			trigger = "ease",
-			delay = 3,
-			ref_table = PVP.GAME.enemy.score,
-			ref_value = "coeffiocient", -- misspelled in InsaneInt
-			ease_to = score.coeffiocient,
-			func = function(t)
-				local mult = 1
-				if score.exponent > 0 then mult = 100 end
-				return math.floor(t * mult) / mult
-			end,
-		}))
-		G.E_MANAGER:add_event(Event({
-			blockable = false,
-			blocking = false,
-			trigger = "ease",
-			delay = 3,
-			ref_table = PVP.GAME.enemy.score,
-			ref_value = "exponent",
-			ease_to = score.exponent,
-			func = function(t)
-				return math.floor(t)
-			end,
-		}))
+		PVP.UI.ease_enemy_score(score)
 
 		if PVP.GAME.enemy.lives > lives then
 			play_sound("holo1", 0.865, 0.9)
