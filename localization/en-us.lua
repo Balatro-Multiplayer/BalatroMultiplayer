@@ -1317,6 +1317,11 @@ return {
 			mp_sticker_draining = "Draining",
 		},
 		dictionary = {
+			-- Composite-deck (cocktail) + draft display wording. PvP owns these --
+			-- the generic ban-pick engine renders item.name/subtitle verbatim.
+			k_cocktail_suffix = "Cocktail",
+			k_banpick_weekly_mix = "A rotating 3-deck mix",
+			k_draft_failed = "Draft failed",
 			k_trap_pack = "Trap Pack",
 			b_singleplayer = "Singleplayer",
 			b_sp_with_ruleset = "Practice Mode",
@@ -1541,6 +1546,7 @@ return {
 			k_cocktail_select = "Select deck cards to include them",
 			k_cocktail_shiftclick = "Shift-click to foil, foiled decks will always be selected",
 			k_cocktail_rightclick = "Right-click to select all",
+			k_cocktail_show_decks = "Show active decks during run",
 			k_bans = "Bans",
 			k_reworks = "Reworks",
 			k_edit = "Edit",

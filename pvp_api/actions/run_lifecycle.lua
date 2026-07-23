@@ -49,45 +49,91 @@ A("pvp_start_game", function(_at, from, params)
 	-- lockstep off this same broadcast; the picked deck+stake then starts the run.
 	if gm_def and gm_def.ban_pick and MP.is_matchmaking and MP.is_matchmaking() then
 		local bp = gm_def.ban_pick
-		MPAPI.BanPick.start(lobby, {
-			pool_size = bp.pool_size,
-			keep = bp.keep,
-			schedule = bp.schedule,
-			-- 9 distinct random deck backs, each paired with a random stake. The stake
-			-- cap mirrors MP's own (ui/lobby/lobby.lua:346): MP.DECK.MAX_STAKE when a
-			-- compatibility mod restricts it, else all 8.
-			build_pool = function()
-				local cap = (MP.DECK and MP.DECK.MAX_STAKE and MP.DECK.MAX_STAKE > 0) and MP.DECK.MAX_STAKE or 8
-				local keys = {}
-				for _, center in ipairs(G.P_CENTER_POOLS.Back or {}) do
-					keys[#keys + 1] = center.key
+		-- Start the draft with the server-issued pool. The draft only ever runs
+		-- inside matchmaking, and every matchmaking queue has a server draft
+		-- policy, so only the host (below) ever calls this with a real pool --
+		-- guard against nil anyway so a stray call can't crash.
+		local function start_draft(server_pool)
+			MPAPI.BanPick.start(lobby, {
+				pool_size = bp.pool_size,
+				keep = bp.keep,
+				schedule = bp.schedule,
+				build_pool = function()
+					if not server_pool then
+						return {}
+					end
+					-- Server-provided cocktail items already carry their composition
+					-- (item.decks); add PvP's display wording (rides the broadcast).
+					return MP.decorate_cocktail_items(server_pool)
+				end,
+				-- Stamp the stake sticker onto each deck back (see the game's back_sticker DrawStep).
+				decorate_tile = function(card, item)
+					if type(item) == "table" and item.stake then
+						card.sticker = G.sticker_map[SMODS.stake_from_index(item.stake)]
+					end
+				end,
+				state_action = "pvp_ban_pick_state",
+				ban_action = "pvp_ban_pick_ban",
+				on_refresh = function()
+					if MP.lobby and MP.lobby.refresh_mm_status then
+						MP.lobby.refresh_mm_status()
+					end
+				end,
+			}, function(survivors)
+				local picked = survivors and survivors[1]
+				-- The cocktail composition both clients run comes from the PICKED
+				-- item (broadcast state) -- one source of truth, never the private
+				-- weekly stash.
+				if MP.set_match_cocktail then
+					MP.set_match_cocktail(picked)
 				end
-				for i = #keys, 2, -1 do
-					local j = math.random(i)
-					keys[i], keys[j] = keys[j], keys[i]
+				proceed(picked)
+			end)
+		end
+		-- Only the host builds a pool, so only the host fetches; guests start
+		-- straight into the "Selecting decks..." waiting state and render off the
+		-- host's first broadcast. A fetch failure or an unusable pool (wrong size,
+		-- unknown deck keys, out-of-cap stakes) aborts the draft -- there is no
+		-- local-generation fallback to degrade into.
+		if lobby and lobby.is_host then
+			MP.fetch_draft_pool(function(server_pool)
+				-- Staleness guard: the fetch resolves through the FIFO; if the match
+				-- was cancelled (or this lobby died) meanwhile, don't start a draft
+				-- into a dead lobby.
+				if lobby ~= MPAPI.get_current_lobby() then
+					return
 				end
-				local pool = {}
-				for i = 1, math.min(bp.pool_size, #keys) do
-					pool[i] = { key = keys[i], stake = math.random(cap) }
+				local failure_detail
+				if not server_pool then
+					failure_detail = "no pool returned"
+				elseif not MP.validate_server_pool(server_pool, bp.pool_size) then
+					failure_detail = "pool failed validation"
 				end
-				return pool
-			end,
-			-- Stamp the stake sticker onto each deck back (see the game's back_sticker DrawStep).
-			decorate_tile = function(card, item)
-				if type(item) == "table" and item.stake then
-					card.sticker = G.sticker_map[SMODS.stake_from_index(item.stake)]
+				if failure_detail then
+					sendWarnMessage("[draft] aborting draft -- " .. failure_detail, "MULTIPLAYER")
+					-- No local-generation fallback exists: show the user only a
+					-- generic error and tear the match down via the standard
+					-- leave-lobby path -- one abort path, never invent a second.
+					pcall(function()
+						attention_text({
+							text = localize("k_draft_failed"),
+							scale = 0.9,
+							hold = 4,
+							backdrop_colour = G.C.RED,
+							align = "cm",
+							offset = { x = 0, y = -3.5 },
+							major = G.ROOM_ATTACH,
+						})
+					end)
+					MP.pvp_leave_lobby()
+					pcall(MPAPI.refresh_current_view)
+					return
 				end
-			end,
-			state_action = "pvp_ban_pick_state",
-			ban_action = "pvp_ban_pick_ban",
-			on_refresh = function()
-				if MP.lobby and MP.lobby.refresh_mm_status then
-					MP.lobby.refresh_mm_status()
-				end
-			end,
-		}, function(survivors)
-			proceed(survivors and survivors[1])
-		end)
+				start_draft(server_pool)
+			end)
+		else
+			start_draft(nil)
+		end
 	else
 		proceed(meta.deck)
 	end
