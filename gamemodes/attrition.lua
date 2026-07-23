@@ -12,7 +12,7 @@ PVP.Gamemode({
 			-- runs. Treating an unresolved Royale target as a bye would mean a match with
 			-- no multiplayer jokers owned/used never reaches a PvP blind at all, so only
 			-- Nemesis-pairing's real bye gates on it.
-			local byed = PVP.LOBBY.config.nemesis_pairing and PVP.current_target_id() == nil
+			local byed = PVP.is_byed()
 			if not PVP.LOBBY.config.normal_bosses and not byed then
 				return nil, nil, "bl_mp_nemesis"
 			else

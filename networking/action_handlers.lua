@@ -404,11 +404,13 @@ local function action_start_blind(p)
 	PVP.GAME.enemy.score_text = "0"
 	-- Re-mask the opponent's hands until the first enemyInfo of the new blind.
 	PVP.GAME.enemy.info_received = false
-	-- Royale's "first sync wins" PVP.current_target_id() strategy re-latches fresh
-	-- each blind (a no-op for 1v1/Nemesis, which don't use this field). Manhunt/
-	-- Teams' analogous latch (team_target_id) resets the same way.
+	-- Royale's live target and the Manhunt Runner's live target are re-broadcast
+	-- fresh each blind by the host (pvp_api/referee.lua), so clear the stale value
+	-- here too (a no-op for 1v1/Nemesis, which don't use these fields). Teams'
+	-- team_card_target_id is NOT reset here -- it re-picks once per ante, the same
+	-- cadence as Nemesis pairing, not once per blind.
 	PVP.GAME.royale_target_id = nil
-	PVP.GAME.team_target_id = nil
+	PVP.GAME.manhunt_target_id = nil
 	if PVP.CURRENT_LOBBY then PVP.mirror_players(PVP.CURRENT_LOBBY) end
 	PVP.GAME.ready_blind = false
 	PVP.GAME.pvp_reached = false

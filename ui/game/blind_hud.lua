@@ -243,6 +243,52 @@ G.FUNCS.multiplayer_blind_chip_UI_scale = function(e)
 	end
 end
 
+-- Eases PVP.GAME.enemy.score's InsaneInt components toward `new_score` over 3s.
+-- Shared by objects/blinds/nemesis.lua's raw per-sender relay and
+-- pvp_api/actions/team_manhunt.lua's pvp_team_score_board handler (Teams' HUD
+-- shows a host-computed team SUM, not a single sender's raw score, so it can't
+-- reuse the relay itself -- just this animation).
+function PVP.UI.ease_enemy_score(new_score)
+	G.E_MANAGER:add_event(Event({
+		blockable = false,
+		blocking = false,
+		trigger = "ease",
+		delay = 3,
+		ref_table = PVP.GAME.enemy.score,
+		ref_value = "e_count",
+		ease_to = new_score.e_count,
+		func = function(t)
+			return math.floor(t)
+		end,
+	}))
+	G.E_MANAGER:add_event(Event({
+		blockable = false,
+		blocking = false,
+		trigger = "ease",
+		delay = 3,
+		ref_table = PVP.GAME.enemy.score,
+		ref_value = "coeffiocient", -- misspelled in InsaneInt
+		ease_to = new_score.coeffiocient,
+		func = function(t)
+			local mult = 1
+			if new_score.exponent > 0 then mult = 100 end
+			return math.floor(t * mult) / mult
+		end,
+	}))
+	G.E_MANAGER:add_event(Event({
+		blockable = false,
+		blocking = false,
+		trigger = "ease",
+		delay = 3,
+		ref_table = PVP.GAME.enemy.score,
+		ref_value = "exponent",
+		ease_to = new_score.exponent,
+		func = function(t)
+			return math.floor(t)
+		end,
+	}))
+end
+
 function PVP.UI.juice_up_pvp_hud()
 	if PVP.is_pvp_boss() then
 		G.HUD_blind:get_UIE_by_ID("HUD_blind_count"):juice_up()
