@@ -482,7 +482,7 @@ return {
 			},
 			b_wait_for_guest_ready = {
 				"IN ATTESA",
-				"DEGLI OSPITI",
+				"DI #1#",
 			},
 			b_lobby_options = "OPZIONI LOBBY",
 			b_copy_clipboard = "Copia negli Appunti",
