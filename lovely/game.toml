@@ -143,19 +143,6 @@ add_round_eval_row({dollars = G.GAME.blind.dollars, name='blind1', pitch = pitch
 match_indent = true
 times = 1
 
-[[patches]]
-[patches.pattern]
-target = "game.lua"
-pattern = '''G:save_settings()'''
-position = "before"
-payload = '''
-if not saveTable then -- i am 99% sure this is unnecessary but i'm checking it anyway
-	MPAPI.ApplyBans()
-end
-'''
-match_indent = true
-times = 1
-
 # Filter grim/familiar/incantation's enhancement roll by spectral_banned_enhancements
 # (independent of banned_enhancements / G.GAME.banned_keys).
 [[patches]]
