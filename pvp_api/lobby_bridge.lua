@@ -137,10 +137,23 @@ end
 -- delegates to PVP.get_opponent_id() there); in Royale/Nemesis (N>2) it's nil
 -- until a target latches, same "not yet known" semantics as the masked
 -- score/hands fields elsewhere -- not a wrong name.
+--
+-- §17.2: Teams is the one exception -- its blind shows the whole opposing
+-- TEAM's combined score (pvp_team_score_board), not any single member's, so
+-- naming it after current_target_id()'s pick (one random opposing-team member,
+-- chosen for joker-targeting purposes only -- see that function's own header
+-- comment) would show a name that doesn't match what the score represents.
+-- "Team A"/"Team B" mirrors the exact enemy_team derivation team_manhunt.lua's
+-- own pvp_team_score_board receive handler already uses for the same purpose.
 local function mirror_players(lobby)
 	local self_name = player_name(lobby, lobby.player_id) or PVP.LOBBY.username or "Guest"
 	local opp_id = PVP.current_target_id()
-	local opp_name = opp_id and player_name(lobby, opp_id) or nil
+	local opp_name
+	if PVP.LOBBY.config.team_based and PVP.LOBBY.team_id then
+		opp_name = "Team " .. ((PVP.LOBBY.team_id == "A") and "B" or "A")
+	else
+		opp_name = opp_id and player_name(lobby, opp_id) or nil
+	end
 	PVP.LOBBY.is_host = lobby.is_host and true or false
 	if lobby.is_host then
 		PVP.LOBBY.host = { username = self_name, id = lobby.player_id }
