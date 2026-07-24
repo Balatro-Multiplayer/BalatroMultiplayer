@@ -480,7 +480,7 @@ local function action_win_game()
 	PVP.RLOG.end_run({ result = "win" })
 	PVP.UTILS.log_mem_debug_messages()
 	PVP.UTILS.emit_log_checksum()
-	PVP.report_match_result()
+	PVP.report_roster_result()
 	win_game()
 end
 
@@ -495,7 +495,7 @@ local function action_lose_game()
 	PVP.RLOG.end_run({ result = "loss" })
 	PVP.UTILS.log_mem_debug_messages()
 	PVP.UTILS.emit_log_checksum()
-	PVP.report_match_result()
+	PVP.report_roster_result()
 end
 
 local function action_lobby_options(options)
