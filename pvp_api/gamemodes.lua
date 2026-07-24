@@ -38,7 +38,7 @@ PVP.GamemodeKey = { PVP_CHOCOLATE = "pvp_chocolate" }
 -- one shape covers both. Ranked play is always exactly 2 players (matchmaking's
 -- ELO/forfeit resolution -- BalatroMultiplayerServer's autoForfeitMatch -- is
 -- hardcoded for a 2-player result and would tie multiple players for 1st with
--- more); casual/private go up to 8/16.
+-- more); casual/private both go up to 16 (§17.4).
 PVP.PVP_GAMEMODES = {
 	pvp_chocolate = { ruleset = "ruleset_mp_chocolate_ranked", gamemode = "gamemode_mp_attrition", display = "Chocolate", has_ranked = true, custom_bridge = true, nemesis_pairing = true },
 	pvp_strawberry = { ruleset = "ruleset_mp_strawberry", gamemode = "gamemode_mp_attrition", display = "Strawberry", has_ranked = true, custom_bridge = true, nemesis_pairing = true },
@@ -46,7 +46,7 @@ PVP.PVP_GAMEMODES = {
 	pvp_smallworld = { ruleset = "ruleset_mp_smallworld", gamemode = "gamemode_mp_attrition", display = "Small World", has_ranked = true, custom_bridge = true, nemesis_pairing = true },
 	-- Royale/Manhunt/Teams (2-16 players): never ranked (no per-ruleset ELO ladder
 	-- for these), default to the Chocolate ruleset like everything else (swappable
-	-- in Lobby Options for private lobbies), casual-queueable at up to 8 players.
+	-- in Lobby Options for private lobbies), casual-queueable at up to 16 players.
 	pvp_royale = { ruleset = "ruleset_mp_chocolate_ranked", gamemode = "gamemode_mp_attrition", display = "Royale", has_ranked = false, custom_bridge = true },
 	pvp_manhunt = { ruleset = "ruleset_mp_chocolate_ranked", gamemode = "gamemode_mp_attrition", display = "Manhunt", has_ranked = false, custom_bridge = true, manhunt = true },
 	pvp_teams = { ruleset = "ruleset_mp_chocolate_ranked", gamemode = "gamemode_mp_attrition", display = "Teams", has_ranked = false, custom_bridge = true, team_based = true },
@@ -81,7 +81,7 @@ for _, key in ipairs({ "pvp_chocolate", "pvp_strawberry", "pvp_vanilla", "pvp_sm
 		has_ranked_mode = def.has_ranked,
 		ban_pick = BAN_PICK,
 		min_players = 2,
-		max_players = { public = 8, private = 16, ranked = 2 },
+		max_players = { public = 16, private = 16, ranked = 2 },
 		-- PVP.LOBBY.config.ruleset/gamemode are already correctly populated by the
 		-- metadata mirror (lobby_bridge.lua's mirror_metadata) by the time start_run
 		-- runs -- setting them here from `def` would stomp a ruleset the host chose
@@ -121,7 +121,7 @@ do
 		display_name = def.display,
 		has_ranked_mode = def.has_ranked,
 		min_players = 2,
-		max_players = { public = 8, private = 16 },
+		max_players = { public = 16, private = 16 },
 		start_run = function(self, deck_name, seed)
 			if deck_name then
 				PVP.LOBBY.deck.back = deck_name
@@ -154,7 +154,7 @@ do
 		display_name = def.display,
 		has_ranked_mode = def.has_ranked,
 		min_players = 2,
-		max_players = { public = 8, private = 16 },
+		max_players = { public = 16, private = 16 },
 		start_run = function(self, deck_name, seed)
 			if deck_name then
 				PVP.LOBBY.deck.back = deck_name
@@ -187,7 +187,7 @@ do
 		display_name = def.display,
 		has_ranked_mode = def.has_ranked,
 		min_players = 2,
-		max_players = { public = 8, private = 16 },
+		max_players = { public = 16, private = 16 },
 		start_run = function(self, deck_name, seed)
 			if deck_name then
 				PVP.LOBBY.deck.back = deck_name
