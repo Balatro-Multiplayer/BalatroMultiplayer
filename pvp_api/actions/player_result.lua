@@ -36,7 +36,16 @@ end
 
 -- Called once, when this client's own match involvement ends (win or loss --
 -- see action_win_game/action_lose_game in networking/action_handlers.lua).
-function PVP.report_match_result()
+--
+-- Named report_ROSTER_result, not report_match_result -- pvp_api/queue.lua
+-- ALREADY defines PVP.report_match_result(winner_id) (matchmaking placement/
+-- ELO reporting, called from pvp_api/actions/outcomes.lua). A same-name
+-- function here would silently clobber whichever one loads second, and
+-- calling that OTHER function with no winner_id from here would also corrupt
+-- every real matchmaking result -- confirmed live: this collision existed for
+-- one commit before being caught by this session's own end-of-batch
+-- verification pass and fixed immediately.
+function PVP.report_roster_result()
 	local lobby = MPAPI.get_current_lobby()
 	if not lobby then
 		return
