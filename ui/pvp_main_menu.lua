@@ -324,6 +324,17 @@ G.FUNCS.mp_pvp_practice = function()
 						} },
 					},
 				},
+				-- §17.6/§17.3: the 5th real ruleset -- was never wired into any
+				-- player-facing picker at all (not practice-specific, project-wide).
+				{
+					n = G.UIT.R,
+					config = { align = "cm", padding = 0.1 },
+					nodes = {
+						{ n = G.UIT.C, config = { align = "cm", padding = 0.08 }, nodes = {
+							UIBox_button({ button = "mp_pvp_practice_experimental", label = { "Experimental" }, colour = G.C.ORANGE, minw = 2.5, minh = 2.0, scale = 0.5, col = true }),
+						} },
+					},
+				},
 			},
 		}),
 	})
@@ -347,4 +358,9 @@ end
 G.FUNCS.mp_pvp_practice_smallworld = function()
 	G.FUNCS.exit_overlay_menu()
 	PVP._start_practice("pvp_smallworld")
+end
+
+G.FUNCS.mp_pvp_practice_experimental = function()
+	G.FUNCS.exit_overlay_menu()
+	PVP._start_practice("pvp_experimental")
 end
