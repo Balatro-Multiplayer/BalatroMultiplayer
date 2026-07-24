@@ -177,7 +177,7 @@ SMODS.Joker({
 	rarity = 2,
 	cost = 6,
 	atlas = "idol_sandbox_collector",
-	config = { extra = { xmult = 1.0, xmult_per_card = 0.05 }, mp_sticker_balanced = true },
+	config = { extra = { xmult = 1.0, xmult_per_card = 0.05 }, mp_balanced = true },
 	add_to_deck = function(self, card, from_debuff)
 		G.GAME.banned_keys["j_mp_idol_sandbox_zealot"] = true
 		if G.shop_jokers and G.shop_jokers.cards then
