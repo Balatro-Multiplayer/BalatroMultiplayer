@@ -1,15 +1,15 @@
--- Phase 9: reconnect tail-replay.
+-- §22.5: reconnect tail-replay.
 --
 -- Display-only catch-up for the OPPONENT's HUD state after this client's own
 -- network reconnect -- NOT a rebuild of this client's own game state, which
 -- is assumed to have stayed intact throughout (a mere MQTT/network drop, not
 -- a crash; MPAPI/MQTT-level reconnect already handles that case today). What
 -- this covers: while disconnected, this client missed any pvp_log_event
--- broadcasts the opponent sent -- MQTT doesn't backlog non-retained topic
--- messages -- so its view of the opponent's score/hands is stale until the
--- opponent's next live sync. This fetches and applies the missed events once
--- it's safe to do so, via MPAPI.replay.get_tail (Phase 9.1) reading the
--- server's live buffer.
+-- broadcasts the opponent sent, so its view of the opponent's score/hands is
+-- stale until the opponent's next live sync. The server pushes the missed
+-- events over MQTT (player/{id}/replay-tail, see connection.lua's
+-- _handle_player_notification) the instant it detects this client is back --
+-- no REST pull needed -- and this applies them once it's safe to do so.
 --
 -- Deliberately NOT routed through the referee/nemesis-blind live-sync
 -- pipeline (objects/blinds/nemesis.lua's `receive`) -- that path expects a
@@ -21,9 +21,13 @@
 -- self-correcting via the opponent's next live sync (see the design plan).
 PVP.RECONNECT_TAIL = PVP.RECONNECT_TAIL or {}
 
+-- Pushed tails received so far, keyed by the opponent player id they belong
+-- to -- may arrive before or after the lobby's own player_reconnected event,
+-- so this just accumulates until on_checkpoint drains whatever's pending.
+PVP.RECONNECT_TAIL._received_tails = PVP.RECONNECT_TAIL._received_tails or {}
+
 -- At most one pending catch-up -- a second reconnect before the first drains
--- just replaces it; fetch_and_apply always asks since the last APPLIED `t`
--- (PVP.RLOG._last_seen_t), so nothing is lost by collapsing to one.
+-- just replaces it.
 local pending_opponent_id = nil
 
 local function apply_hand_result(ev)
@@ -69,15 +73,14 @@ local function apply_tail(opponent_id, events)
 	end
 end
 
-local function fetch_and_apply(opponent_id)
-	local since_t = PVP.RLOG._last_seen_t[opponent_id] or 0
-	MPAPI.replay.get_tail(PVP.LOBBY.code, opponent_id, since_t, function(err, data)
-		if err or not data or not data.events then
-			sendWarnMessage("RECONNECT_TAIL: get_tail failed: " .. tostring(err), "MULTIPLAYER")
-			return
-		end
-		apply_tail(opponent_id, data.events)
-	end)
+-- Called via MPAPI.on_connection_state_change (registered below) the moment
+-- the server pushes a §22.5 catch-up over MQTT -- may arrive before or after
+-- PLAYER_RECONNECTED, so this only stores; on_checkpoint decides when it's
+-- safe to actually apply.
+function PVP.RECONNECT_TAIL.receive_pushed_tails(tails)
+	for _, tail in ipairs(tails or {}) do
+		PVP.RECONNECT_TAIL._received_tails[tail.playerId] = tail.events
+	end
 end
 
 -- Called from PLAYER_RECONNECTED when THIS client is the one that just
@@ -94,10 +97,24 @@ end
 -- cash_out -- see ui/game/functions.lua / overrides/game.lua). A third
 -- checkpoint ("pack resolved") has no confirmed discrete hook in this repo
 -- (base-game Lua, not visible here) -- not added; a mid-pack reconnect simply
--- waits for the next select_blind/cash_out, never applies mid-pack.
+-- waits for the next select_blind/cash_out, never applies mid-pack. If the
+-- server's push hasn't arrived yet by the time this fires, there's simply
+-- nothing to apply this checkpoint -- it's harmless: whatever's missed stays
+-- pending in _received_tails until it does arrive (or the next reconnect
+-- replaces pending_opponent_id entirely).
 function PVP.RECONNECT_TAIL.on_checkpoint()
 	if not pending_opponent_id then return end
 	local opponent_id = pending_opponent_id
 	pending_opponent_id = nil
-	fetch_and_apply(opponent_id)
+	local events = PVP.RECONNECT_TAIL._received_tails[opponent_id]
+	PVP.RECONNECT_TAIL._received_tails[opponent_id] = nil
+	if events then
+		apply_tail(opponent_id, events)
+	end
 end
+
+MPAPI.on_connection_state_change(function(new_state, context)
+	if context and context.replay_tail then
+		PVP.RECONNECT_TAIL.receive_pushed_tails(context.replay_tail.tails)
+	end
+end)
