@@ -23,9 +23,9 @@ function Card:sell_card()
 		local idx = PVP.UTILS.index_in_area(self)
 		if area and idx then PVP.RLOG.record("sell", { area, idx }, human) end
 	end
-	-- Tell the opponent we sold a card so their Taxes joker counts it (see
-	-- objects/jokers/taxes.lua's receive).
-	if PVP.LOBBY.code then PVP.broadcast_sold_joker() end
+	-- §18.2: tell the opponent a card was sold -- any of their cards watching
+	-- for opponent_selling_card (e.g. Taxes) reacts via their own calculate.
+	if PVP.LOBBY.code then MPAPI.broadcast_opponent_context({ opponent_selling_card = true }) end
 	return sell_card_ref(self)
 end
 

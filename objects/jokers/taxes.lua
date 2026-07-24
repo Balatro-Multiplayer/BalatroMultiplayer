@@ -18,13 +18,6 @@ SMODS.Atlas({
 	py = 95,
 })
 
--- Any card sale (own joker/consumable, any joker) tells the opponent's Taxes joker to
--- count it -- the trigger is generic (overrides/game.lua's Card:sell_card), owned here.
-function PVP.broadcast_sold_joker()
-	local center = G.P_CENTERS["j_mp_taxes"]
-	if center then center:sync({}) end
-end
-
 MPAPI.Joker({
 	key = "taxes",
 	atlas = "taxes",
@@ -40,20 +33,23 @@ MPAPI.Joker({
 		PVP.UTILS.add_nemesis_info(info_queue)
 		return { vars = { card.ability.extra.mult_gain, card.ability.extra.mult } }
 	end,
-	-- Was action_sold_joker.
-	receive = function(self, context)
-		if PVP.is_byed() then
-			return
-		end
-		local target = PVP.current_target_id()
-		if target and context.from ~= target then
-			return
-		end
-		PVP.GAME.enemy.sells = PVP.GAME.enemy.sells + 1
-		PVP.GAME.enemy.sells_per_ante[G.GAME.round_resets.ante] = (PVP.GAME.enemy.sells_per_ante[G.GAME.round_resets.ante] or 0)
-			+ 1
-	end,
 	calculate = function(self, card, context)
+		-- §18.2: opponent sold a card, told to us via MPAPI.broadcast_opponent_context
+		-- (overrides/game.lua's Card:sell_card) -- was previously its own bespoke
+		-- receive handler (action_sold_joker).
+		if context.opponent_selling_card then
+			if PVP.is_byed() then
+				return
+			end
+			local target = PVP.current_target_id()
+			if target and context.from ~= target then
+				return
+			end
+			PVP.GAME.enemy.sells = PVP.GAME.enemy.sells + 1
+			PVP.GAME.enemy.sells_per_ante[G.GAME.round_resets.ante] = (PVP.GAME.enemy.sells_per_ante[G.GAME.round_resets.ante] or 0)
+				+ 1
+			return
+		end
 		if context.cardarea == G.jokers and context.joker_main then
 			return {
 				mult = card.ability.extra.mult,
