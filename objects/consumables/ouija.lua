@@ -13,7 +13,7 @@ SMODS.Consumable({
 	pos = { x = 0, y = 0 },
 	unlocked = true,
 	discovered = true,
-	config = { extra = { destroy = 3 }, mp_sticker_balanced = true },
+	config = { extra = { destroy = 3 }, mp_balanced = true },
 	loc_vars = function(self, info_queue, card)
 		return { vars = { card.ability.extra.destroy } }
 	end,
