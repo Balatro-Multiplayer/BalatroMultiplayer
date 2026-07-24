@@ -18,6 +18,16 @@ end
 PVP.SEED_CHANGE_WINDOW = 300
 
 PVP.create_run_options = function()
+	-- §17.9: unlike Speedrunning's version of this same overlay (a timed race, where
+	-- pausing must never stop the clock), PvP's pause menu is meant to actually pause --
+	-- prevent_pause (core.lua) only means "render our own options box instead of
+	-- vanilla's," not "never pause." view.lua's G.FUNCS.options wrapper calls this
+	-- builder directly instead of vanilla's own G.FUNCS.options (which sets this same
+	-- flag before building create_UIBox_options()), so nothing else sets it for us.
+	-- G.FUNCS.exit_overlay_menu already unconditionally resets this to false on any
+	-- close path (ESC or an explicit button here), so no unpause wiring is needed.
+	G.SETTINGS.paused = true
+
 	-- Each button is its own row inside one column so they stack vertically.
 	local rows = {}
 	local function add_row(node)
