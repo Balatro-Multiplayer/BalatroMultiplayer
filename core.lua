@@ -104,11 +104,27 @@ PVP.REQUIRED_LOVELY_VERSION = "0.9"
 -- The Order (deterministic/anti-desync RNG) engine now lives entirely in the API
 -- (BalatroMultiplayerAPI/api/the_order.lua). We delegate the gate + helpers to the
 -- API's single implementation instead of shipping our own copy (was compatibility/TheOrder.lua).
--- The API's MPAPI.should_use_the_order carries the PVP-compat branch (reads
--- PVP.LOBBY.config.the_order + is_practice_mode), so this stays behaviour-preserving.
 function PVP.should_use_the_order()
 	return MPAPI.should_use_the_order()
 end
+
+function PVP.is_major_league_ruleset()
+	return PVP.LOBBY and PVP.LOBBY.config and PVP.LOBBY.config.ruleset == "ruleset_mp_majorleague" and PVP.LOBBY.code
+end
+
+-- §20: register our own predicates through the API's generic extension points
+-- (MPAPI.register_order_gate/register_voucher_queue_gate) rather than the_order.lua
+-- reading PVP.* globals directly. Practice mode always uses the order; otherwise a
+-- lobby with the_order enabled does -- exactly the previous PVP-compat branch's logic.
+MPAPI.register_order_gate(function()
+	return (PVP.is_practice_mode and PVP.is_practice_mode())
+		or (PVP.LOBBY and PVP.LOBBY.config and PVP.LOBBY.config.the_order and PVP.LOBBY.code ~= nil)
+		or false
+end)
+
+MPAPI.register_voucher_queue_gate(function()
+	return PVP.is_major_league_ruleset() and true or false
+end)
 
 -- Legacy PVP.* aliases for The Order queue helpers, kept because live content still calls
 -- them (objects/jokers/standard/bloodstone, objects/boosters/standard_giga, ui/game/blind_choice,
@@ -116,10 +132,6 @@ end
 PVP.ante_based = MPAPI.ante_based
 PVP.order_round_based = MPAPI.order_round_based
 PVP.sorted_hand_list = MPAPI.sorted_hand_list
-
-function PVP.is_major_league_ruleset()
-	return PVP.LOBBY and PVP.LOBBY.config and PVP.LOBBY.config.ruleset == "ruleset_mp_majorleague" and PVP.LOBBY.code
-end
 
 -- Forward-declaration stub: PVP.reset_game_states() below calls PVP.UTILS.timer_base(),
 -- which reads PVP.current_ruleset() -- but that call happens synchronously at this

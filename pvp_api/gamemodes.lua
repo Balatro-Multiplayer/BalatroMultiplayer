@@ -50,6 +50,13 @@ PVP.PVP_GAMEMODES = {
 	pvp_royale = { ruleset = "ruleset_mp_chocolate_ranked", gamemode = "gamemode_mp_attrition", display = "Royale", has_ranked = false, custom_bridge = true },
 	pvp_manhunt = { ruleset = "ruleset_mp_chocolate_ranked", gamemode = "gamemode_mp_attrition", display = "Manhunt", has_ranked = false, custom_bridge = true, manhunt = true },
 	pvp_teams = { ruleset = "ruleset_mp_chocolate_ranked", gamemode = "gamemode_mp_attrition", display = "Teams", has_ranked = false, custom_bridge = true, team_based = true },
+	-- §17.6/§17.3: Experimental is a real, working ruleset (rulesets/experimental/
+	-- experimental.lua) that was never wired into any player-facing picker at all --
+	-- not a matchmaking gap, an everywhere gap. Deliberately NOT added to the
+	-- ipairs registration loop below (no GameMode/matchmaking entry, no ranked
+	-- ladder): it stays practice/private-lobby-local, the same scope the doc's
+	-- §17.6 item asks for.
+	pvp_experimental = { ruleset = "ruleset_mp_experimental", gamemode = "gamemode_mp_attrition", display = "Experimental", has_ranked = false, custom_bridge = true, nemesis_pairing = true },
 }
 
 -- Pre-run deck+stake draft (matchmaking only, exactly 2 players -- see
