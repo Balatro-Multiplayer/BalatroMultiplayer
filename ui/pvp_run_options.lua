@@ -56,6 +56,13 @@ PVP.create_run_options = function()
 
 	add_row(UIBox_button({ button = "mp_pvp_forfeit", label = { "Forfeit" }, minw = 5, colour = G.C.RED }))
 
+	-- §17.9: Collection/Mods, shared with SPDRN's identical overlay (both mods
+	-- previously stopped at 3 buttons; the doc's claimed 5-button set needs
+	-- these two on top of the mode-specific ones above).
+	for _, row in ipairs(MPAPI.pause_menu_extra_rows()) do
+		rows[#rows + 1] = row
+	end
+
 	return create_UIBox_generic_options({
 		contents = {
 			{ n = G.UIT.C, config = { align = "cm" }, nodes = rows },
