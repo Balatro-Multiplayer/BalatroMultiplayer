@@ -45,15 +45,19 @@ A("pvp_start_game", function(_at, from, params)
 		PVP.dispatch_action("startGame", { seed = params.seed, stake = stake or params.stake })
 	end
 
-	-- Matchmaking (2 players) with a ban_pick config: run the deck+stake draft first, in
+	-- Matchmaking with a ban_pick config: run the deck+stake draft first, in
 	-- lockstep off this same broadcast; the picked deck+stake then starts the run.
-	-- The 2-actor schedule (ban_pick.schedule) hardcodes exactly two alternating
-	-- actors, so it only applies at exactly 2 players -- a GameMode with ban_pick
-	-- set (the four ruleset-only entries, gamemodes.lua) is also casual-queueable
-	-- at up to 8 players, which must skip straight to proceed() the same way
-	-- Royale/Manhunt/Teams (no ban_pick at all) already do.
-	if gm_def and gm_def.ban_pick and PVP.is_matchmaking and PVP.is_matchmaking() and lobby and #lobby:get_players() == 2 then
-		local bp = gm_def.ban_pick
+	-- Two shapes exist (gamemodes.lua): BAN_PICK's explicit schedule hardcodes
+	-- exactly two alternating actor slots (the four ruleset-only entries, also
+	-- casual-queueable up to 16 -- §17.4), so those only draft at exactly 2
+	-- players and skip straight to proceed() otherwise, same as before this
+	-- change. ROTATING_BAN_PICK (§17.7, Royale/Manhunt/Teams) has no schedule --
+	-- its derived schedule (derive_schedule/resolve_actor) rotates through
+	-- however many players are actually in the draft, so it runs at any N >= 2.
+	local n = lobby and #lobby:get_players() or 0
+	local bp = gm_def and gm_def.ban_pick
+	local n_ok = bp and (bp.schedule and n == 2 or (not bp.schedule and n >= 2))
+	if bp and PVP.is_matchmaking and PVP.is_matchmaking() and lobby and n_ok then
 		MPAPI.BanPick.start(lobby, {
 			pool_size = bp.pool_size,
 			keep = bp.keep,

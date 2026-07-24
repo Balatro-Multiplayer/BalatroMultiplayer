@@ -74,6 +74,22 @@ local BAN_PICK = {
 	},
 }
 
+-- §17.7: Royale/Manhunt/Teams's own draft. The legacy {pool_size,keep} shape
+-- (no explicit schedule) instead of BAN_PICK above -- BAN_PICK's hand-authored
+-- schedule only ever addresses actor slots 1/2, so it silently degenerates to
+-- a 2-player draft regardless of lobby size. The legacy shape's derived
+-- schedule (derive_schedule/resolve_actor, generalized to N actors this
+-- session) genuinely rotates through however many players are actually in
+-- the draft, matching the same shape SPDRN's own N-player drafts (All Deck,
+-- Challenge, Seed Scout) already ship live with. keep=1: ban every deck+stake
+-- pairing down to the one survivor, same "one deck decided by everyone" result
+-- BAN_PICK's own pick-step produces, without needing a schedule's explicit
+-- final pick action.
+local ROTATING_BAN_PICK = {
+	pool_size = 9,
+	keep = 1,
+}
+
 -- The four ruleset-only (Nemesis-shaped) entries: identical registration shape,
 -- parameterized per ruleset. Round-robin pairing degenerates to plain pairwise at
 -- 2 players (ranked) and behaves as real rotating Nemesis at N>2 (casual/private).
@@ -116,9 +132,8 @@ for _, key in ipairs({ "pvp_chocolate", "pvp_strawberry", "pvp_vanilla", "pvp_sm
 	})
 end
 
--- Royale: no ban/pick draft (the 2-actor ban_pick schedule above doesn't
--- generalize to N players). Elimination math (rank-and-cut bottom half) lives in
--- pvp_api/referee.lua.
+-- Royale: rotating N-player draft via ROTATING_BAN_PICK (§17.7). Elimination
+-- math (rank-and-cut bottom half) lives in pvp_api/referee.lua.
 do
 	local def = PVP.PVP_GAMEMODES.pvp_royale
 	MPAPI.GameMode({
@@ -126,6 +141,7 @@ do
 		prefix_config = { key = false },
 		display_name = def.display,
 		has_ranked_mode = def.has_ranked,
+		ban_pick = ROTATING_BAN_PICK,
 		min_players = 2,
 		max_players = { public = 16, private = 16 },
 		start_run = function(self, deck_name, seed)
@@ -147,8 +163,8 @@ do
 	})
 end
 
--- Manhunt: same bridge shape as Royale (no ban/pick draft). Win/loss is
--- asymmetric (Runner vs best-Hunter, not "last one standing"), so forfeit
+-- Manhunt: same bridge shape as Royale, including the rotating draft. Win/loss
+-- is asymmetric (Runner vs best-Hunter, not "last one standing"), so forfeit
 -- handling calls the dedicated referee helper instead of the generic
 -- check_single_survivor -- a Hunter leaving doesn't end the match by itself.
 do
@@ -158,6 +174,7 @@ do
 		prefix_config = { key = false },
 		display_name = def.display,
 		has_ranked_mode = def.has_ranked,
+		ban_pick = ROTATING_BAN_PICK,
 		min_players = 2,
 		max_players = { public = 16, private = 16 },
 		start_run = function(self, deck_name, seed)
@@ -181,8 +198,9 @@ do
 	})
 end
 
--- Teams: same bridge shape. A whole team's roster leaving ends the match for the
--- other team; a single member leaving does not (see PVP.referee_teams_on_forfeit).
+-- Teams: same bridge shape, including the rotating draft. A whole team's
+-- roster leaving ends the match for the other team; a single member leaving
+-- does not (see PVP.referee_teams_on_forfeit).
 do
 	local def = PVP.PVP_GAMEMODES.pvp_teams
 	MPAPI.GameMode({
@@ -190,6 +208,7 @@ do
 		prefix_config = { key = false },
 		display_name = def.display,
 		has_ranked_mode = def.has_ranked,
+		ban_pick = ROTATING_BAN_PICK,
 		min_players = 2,
 		max_players = { public = 16, private = 16 },
 		start_run = function(self, deck_name, seed)
