@@ -181,6 +181,9 @@ function PVP.UI.end_game_body(has_won)
 									create_UIBox_round_scores_row("seed", G.C.WHITE),
 									UIBox_button({ id = "copy_seed_button", button = "copy_seed", label = { localize("b_copy") }, colour = G.C.BLUE, scale = 0.3, minw = 2.5, maxw = 2.5, minh = 0.4 }),
 									{ n = G.UIT.R, config = { align = "cm", minh = 0.45, minw = 0.1 }, nodes = {} },
+									-- §17.10: every player's deck/jokers/highest PvP score, not just
+									-- the single toggleable nemesis above.
+									UIBox_button({ button = "mp_pvp_open_roster", label = { "Roster" }, colour = G.C.PURPLE, minw = 4, maxw = 4, minh = 0.8, focus_args = { nav = "wide" } }),
 									UIBox_button({ id = "from_game_won", button = "continue_in_singleplayer", label = { localize("b_continue_singleplayer") }, minw = 4, maxw = 4, minh = 0.8, focus_args = { nav = "wide", snap_to = true } }),
 									UIBox_button({ button = "mp_pvp_leave_from_game", label = { localize("b_leave_lobby") }, minw = 4, maxw = 4, minh = 0.8, focus_args = { nav = "wide" } }),
 								},

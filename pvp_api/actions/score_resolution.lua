@@ -76,3 +76,31 @@ end)
 A("pvp_new_round", function(_at, from, _params)
 	PVP.referee_on_new_round(from)
 end)
+
+-- §17.12: the LOCAL consequence of a PvP-timer timeout for the specific
+-- player it happened to -- consume one hand (matching the host's own
+-- authoritative decrement, PVP.referee_on_fail_pvp_timer, so this player's
+-- own NEXT normal hand-play reports the already-correct count back rather
+-- than clobbering the host's decrement with a stale higher one), credit the
+-- same time bonus a normal hand-play would have earned, and clear the "am I
+-- currently being timered" flags so the timer can legitimately restart
+-- rather than immediately re-firing. Deliberately does NOT touch
+-- PVP.GAME.score/call PVP.ACTIONS.play_hand -- score is untouched by a
+-- timeout, and re-reporting it here would risk a lossy round-trip through
+-- play_hand's own to_big() conversion (PVP.GAME.score is an INSANE_INT, a
+-- different big-number representation).
+A("pvp_timer_hand_lost", function(_at, _from, params)
+	if not params or params.player_id ~= self_id() then
+		return
+	end
+	if G.GAME and G.GAME.current_round then
+		G.GAME.current_round.hands_left = math.max(0, (G.GAME.current_round.hands_left or 0) - 1)
+	end
+	PVP.GAME.timer_consumed = false
+	PVP.GAME.timer_started = false
+	PVP.GAME.nemesis_timer_started = false
+	local increment = PVP.LOBBY.config.pvp_timer_hand_played_increment_seconds
+		or PVP.current_ruleset().pvp_timer_hand_played_increment_seconds
+		or 0
+	PVP.UI.restore_timer(increment)
+end)

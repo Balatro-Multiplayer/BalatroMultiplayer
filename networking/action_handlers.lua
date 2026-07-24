@@ -480,6 +480,7 @@ local function action_win_game()
 	PVP.RLOG.end_run({ result = "win" })
 	PVP.UTILS.log_mem_debug_messages()
 	PVP.UTILS.emit_log_checksum()
+	PVP.report_match_result()
 	win_game()
 end
 
@@ -494,6 +495,7 @@ local function action_lose_game()
 	PVP.RLOG.end_run({ result = "loss" })
 	PVP.UTILS.log_mem_debug_messages()
 	PVP.UTILS.emit_log_checksum()
+	PVP.report_match_result()
 end
 
 local function action_lobby_options(options)
@@ -965,6 +967,11 @@ function PVP.ACTIONS.play_hand(score, hands_left)
 	PVP.GAME.score = insane_int_score
 	if PVP.INSANE_INT.greater_than(insane_int_score, PVP.GAME.highest_score) then
 		PVP.GAME.highest_score = insane_int_score
+	end
+	-- §17.10: the end-of-run roster's "highest PvP-blind score" needs the
+	-- PvP-blind-only figure, not the any-blind one tracked just above.
+	if PVP.is_pvp_boss() and PVP.INSANE_INT.greater_than(insane_int_score, PVP.GAME.highest_pvp_score) then
+		PVP.GAME.highest_pvp_score = insane_int_score
 	end
 
 	-- Stop PvP timers according to score
