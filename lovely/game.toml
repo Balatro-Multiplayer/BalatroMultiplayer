@@ -115,8 +115,11 @@ times = 1
 target = "functions/button_callbacks.lua"
 pattern = '''G.FUNCS.toggle_shop = function(e)'''
 position = 'after'
+# §18.2: tell the opponent how much we spent this shop visit -- any of their
+# cards watching for opponent_spent_in_shop (e.g. Penny Pincher) reacts via
+# their own calculate.
 payload = '''if PVP.LOBBY.code then
-  PVP.broadcast_spent_last_shop(to_big(PVP.GAME.spent_total) - to_big(PVP.GAME.spent_before_shop))
+  MPAPI.broadcast_opponent_context({ opponent_spent_in_shop = to_number(to_big(PVP.GAME.spent_total) - to_big(PVP.GAME.spent_before_shop)) })
 end'''
 match_indent = true
 times = 1

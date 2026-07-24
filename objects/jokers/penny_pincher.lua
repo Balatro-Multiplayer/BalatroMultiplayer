@@ -5,13 +5,6 @@ SMODS.Atlas({
 	py = 95,
 })
 
--- Leaving the shop tells the opponent's Penny Pincher how much we spent -- the trigger
--- is a generic lovely patch on G.FUNCS.toggle_shop (lovely/game.toml), owned here.
-function PVP.broadcast_spent_last_shop(amount)
-	local center = G.P_CENTERS["j_mp_penny_pincher"]
-	if center then center:sync(amount) end
-end
-
 MPAPI.Joker({
 	key = "penny_pincher",
 	atlas = "penny_pincher",
@@ -30,16 +23,21 @@ MPAPI.Joker({
 	in_pool = function(self)
 		return PVP.GAME.pincher_unlock -- do NOT replace this with G.GAME.round_resets.ante >= 3, order sets ante to 0
 	end,
-	-- Was action_spent_last_shop.
-	receive = function(self, context)
-		if PVP.is_byed() then
-			return
+	calculate = function(self, card, context)
+		-- §18.2: opponent left their shop, told to us via
+		-- MPAPI.broadcast_opponent_context (lovely/game.toml's toggle_shop
+		-- patch) -- was previously its own bespoke receive handler
+		-- (action_spent_last_shop).
+		if context.opponent_spent_in_shop then
+			if PVP.is_byed() then
+				return
+			end
+			local target = PVP.current_target_id()
+			if target and context.from ~= target then
+				return
+			end
+			PVP.GAME.enemy.spent_in_shop[#PVP.GAME.enemy.spent_in_shop + 1] = tonumber(context.opponent_spent_in_shop)
 		end
-		local target = PVP.current_target_id()
-		if target and context.from ~= target then
-			return
-		end
-		PVP.GAME.enemy.spent_in_shop[#PVP.GAME.enemy.spent_in_shop + 1] = tonumber(context.data)
 	end,
 	calc_dollar_bonus = function(self, card)
 		local spent = PVP.GAME.enemy.spent_in_shop[PVP.GAME.pincher_index]
