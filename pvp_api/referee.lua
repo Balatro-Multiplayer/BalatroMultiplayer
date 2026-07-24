@@ -1056,25 +1056,25 @@ end
 -- other pair/comparison still in progress -- so it defers to the same batch-wait
 -- gate as everything else via try_resolve_round(). This also fixes a pre-existing
 -- bug: this function used to broadcast pvp_end_pvp unconditionally even at N>2.
+-- §17.12: previously this ended the whole PvP round outright (life loss +
+-- broadcast pvp_end_pvp / force hands_left=0) the instant the PvP timer
+-- expired. Per the design doc, running out of time on a single hand should
+-- cost exactly that -- one hand, credited with the same time bonus a normal
+-- hand-play would have earned -- not the life and the round. hands_left is
+-- decremented here directly (the host's own authoritative mirror, kept in
+-- sync from the client's own pvp_play_hand reports the same way
+-- referee_on_play_hand already updates it) rather than round-tripping
+-- through a client acknowledgment; the targeted pvp_timer_hand_lost
+-- broadcast below only carries the LOCAL consequence (crediting the timer
+-- bonus) back to the specific player who timed out, since score itself is
+-- untouched by a timeout and doesn't need re-reporting.
 function PVP.referee_on_fail_pvp_timer(from)
 	if not is_host() then
 		return
 	end
 	local pl = ref_player(from)
-	team_lose_life(pl)
-	if pl.lives == 0 and check_any_win() then
-		return
-	end
-	if #both_players() == 2 then
-		pl.first_ready = false
-		local opp = opponent_of(from)
-		if opp then
-			ref_player(opp).first_ready = false
-		end
-		broadcast("pvp_end_pvp", { loser_id = from, pvp_timer_lost = true })
-		return
-	end
-	pl.hands_left = 0
+	pl.hands_left = math.max(0, (pl.hands_left or 0) - 1)
+	broadcast("pvp_timer_hand_lost", { player_id = from })
 	broadcast_live_targets()
 	try_resolve_round()
 end
