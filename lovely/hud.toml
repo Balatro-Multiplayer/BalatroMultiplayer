@@ -62,7 +62,7 @@ target = "blind.lua"
 pattern = '''G.HUD_blind:get_UIE_by_ID("HUD_blind_name").states.visible = false'''
 position = 'before'
 payload = '''
-if PVP.is_mp_or_ghost() and PVP.is_pvp_boss() then
+if PVP.is_mp_or_practice() and PVP.is_pvp_boss() then
     PVP.UI.update_blind_HUD(blind, reset, silent)
     return true
 end

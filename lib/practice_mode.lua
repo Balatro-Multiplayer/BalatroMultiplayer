@@ -7,6 +7,14 @@ function PVP.is_practice_mode()
 	return PVP.SP.practice == true
 end
 
+-- True for any active PvP session -- a real networked match or practice --
+-- as opposed to being at the main menu with no run underway. Formerly also
+-- included a ghost-replay branch (PVP.GHOST.is_active()); the ghost system
+-- was removed, not replaced, so this is just the remaining two cases.
+function PVP.is_mp_or_practice()
+	return PVP.LOBBY.code or PVP.is_practice_mode()
+end
+
 -- Client-only practice lobby: no server lobby is ever allocated (MPAPI.create_local_lobby),
 -- so there's nothing to be orphaned if the run is abandoned. `gamemode_key` is one of
 -- PVP.PVP_GAMEMODES's 1v1 keys (pvp_chocolate/pvp_strawberry/pvp_vanilla/pvp_smallworld) -- Royale

@@ -3,7 +3,7 @@
 
 local update_draw_to_hand_ref = Game.update_draw_to_hand
 function Game:update_draw_to_hand(dt)
-	if PVP.is_mp_or_ghost() then
+	if PVP.is_mp_or_practice() then
 		if
 			not G.STATE_COMPLETE
 			and G.GAME.current_round.hands_played == 0
@@ -37,10 +37,8 @@ function Game:update_draw_to_hand(dt)
 					end
 					G.E_MANAGER:add_event(Event({
 						func = function()
-							if not PVP.GHOST.is_active() then
-								for i = 1, PVP.GAME.asteroids do
-									PVP.broadcast_asteroid()
-								end
+							for i = 1, PVP.GAME.asteroids do
+								PVP.broadcast_asteroid()
 							end
 							PVP.GAME.asteroids = 0
 							return true
@@ -161,9 +159,8 @@ local update_hand_played_ref = Game.update_hand_played
 ---@diagnostic disable-next-line: duplicate-set-field
 function Game:update_hand_played(dt)
 	-- Ignore for singleplayer or regular blinds
-	local ghost = PVP.GHOST.is_active()
 	local practice = PVP.is_practice_mode()
-	if (not ghost and not practice and (not PVP.LOBBY.connected or not PVP.LOBBY.code)) or not PVP.is_pvp_boss() then
+	if (not practice and (not PVP.LOBBY.connected or not PVP.LOBBY.code)) or not PVP.is_pvp_boss() then
 		update_hand_played_ref(self, dt)
 		return
 	end
@@ -182,22 +179,12 @@ function Game:update_hand_played(dt)
 		G.E_MANAGER:add_event(Event({
 			trigger = "immediate",
 			func = function()
-				if not ghost and not practice then
+				if not practice then
 					PVP.ACTIONS.play_hand(G.GAME.chips, G.GAME.current_round.hands_left)
 				end
 
 				if G.GAME.current_round.hands_left < 1 then
-					if ghost then
-						local result = PVP.GHOST.resolve_pvp_hands_exhausted(G.GAME.chips)
-						if result == "won" then
-							win_game()
-							return true
-						elseif result == "game_over" then
-							G.STATE = G.STATES.GAME_OVER
-							G.STATE_COMPLETE = false
-							return true
-						end
-					elseif practice then
+					if practice then
 						-- No referee to wait on -- always continue to the next blind,
 						-- regardless of score (see update_new_round's practice branch).
 						PVP.GAME.end_pvp = true
@@ -214,13 +201,6 @@ function Game:update_hand_played(dt)
 					if G.hand.cards[1] and G.STATE == G.STATES.HAND_PLAYED then
 						eval_hand_and_jokers()
 						G.FUNCS.draw_from_hand_to_discard()
-					end
-				elseif ghost and PVP.GHOST.has_hand_data() then
-					PVP.GHOST.resolve_pvp_mid_hand(G.GAME.chips)
-
-					if not PVP.GAME.end_pvp and G.STATE == G.STATES.HAND_PLAYED then
-						G.STATE_COMPLETE = false
-						G.STATE = G.STATES.DRAW_TO_HAND
 					end
 				elseif not PVP.GAME.end_pvp and G.STATE == G.STATES.HAND_PLAYED then
 					G.STATE_COMPLETE = false
@@ -248,19 +228,12 @@ function Game:update_new_round(dt)
 		G.STATE = G.STATES.NEW_ROUND
 		PVP.GAME.end_pvp = false
 	end
-	if PVP.is_mp_or_ghost() and not G.STATE_COMPLETE then
-		local ghost = PVP.GHOST.is_active()
+	if PVP.is_mp_or_practice() and not G.STATE_COMPLETE then
 		local practice = PVP.is_practice_mode()
 		-- Prevent player from losing
 		if to_big(G.GAME.chips) < to_big(G.GAME.blind.chips) and not PVP.is_pvp_boss() then
 			G.GAME.blind.chips = -1
-			if ghost then
-				if PVP.GHOST.resolve_round_fail() == "game_over" then
-					G.STATE = G.STATES.GAME_OVER
-					G.STATE_COMPLETE = false
-					return
-				end
-			elseif practice then
+			if practice then
 				-- Just score as much as you can -- no life, no fail, ever.
 			else
 				PVP.ACTIONS.fail_round(G.GAME.current_round.hands_played)
@@ -294,14 +267,14 @@ function Game:update_selecting_hand(dt)
 		and #G.hand.cards < 1
 		and #G.deck.cards < 1
 		and #G.play.cards < 1
-		and PVP.is_mp_or_ghost()
+		and PVP.is_mp_or_practice()
 	then
 		G.GAME.current_round.hands_left = 0
 		if not PVP.is_pvp_boss() then
 			G.STATE_COMPLETE = false
 			G.STATE = G.STATES.NEW_ROUND
 		else
-			if not PVP.GHOST.is_active() and not PVP.is_practice_mode() then
+			if not PVP.is_practice_mode() then
 				PVP.ACTIONS.play_hand(G.GAME.chips, 0)
 			end
 			G.STATE_COMPLETE = false
@@ -311,7 +284,7 @@ function Game:update_selecting_hand(dt)
 	end
 	update_selecting_hand_ref(self, dt)
 
-	if PVP.GAME.end_pvp and PVP.is_pvp_boss() and PVP.is_mp_or_ghost() then
+	if PVP.GAME.end_pvp and PVP.is_pvp_boss() and PVP.is_mp_or_practice() then
 		G.hand:unhighlight_all()
 		G.STATE_COMPLETE = false
 		G.STATE = G.STATES.NEW_ROUND
@@ -363,7 +336,7 @@ function Game:start_run(args)
 	-- lives (practice has no life system, see update_new_round's practice branch) and
 	-- doing it synchronously at run start raced with other HUD setup in local-lobby
 	-- testing (no risk in a real lobby, which has natural network pacing beforehand).
-	local show_lives_hud = (PVP.LOBBY.connected and PVP.LOBBY.code) or PVP.GHOST.is_active()
+	local show_lives_hud = PVP.LOBBY.connected and PVP.LOBBY.code
 	if not show_lives_hud or PVP.LOBBY.config.disable_live_and_timer_hud then return end
 
 	local scale = 0.4
@@ -434,7 +407,7 @@ end
 
 -- This prevents duplicate execution during certain cases. e.g. Full deck discard before playing any hands.
 function PVP.handle_duplicate_end()
-	if PVP.is_mp_or_ghost() then
+	if PVP.is_mp_or_practice() then
 		if PVP.GAME.round_ended then
 			if not PVP.GAME.duplicate_end then
 				PVP.GAME.duplicate_end = true
@@ -449,15 +422,13 @@ end
 -- This handles an edge case where a player plays no hands, and discards the only cards in their deck.
 -- Allows opponent to advance after playing anything, and eases a life from the person who discarded their deck.
 function PVP.handle_deck_out()
-	if PVP.is_mp_or_ghost() then
+	if PVP.is_mp_or_practice() then
 		if
 			G.GAME.current_round.hands_played == 0
 			and G.GAME.current_round.discards_used > 0
 		then
-			if not PVP.GHOST.is_active() then
-				if PVP.is_pvp_boss() then PVP.ACTIONS.play_hand(0, 0) end
-				PVP.ACTIONS.fail_round(1)
-			end
+			if PVP.is_pvp_boss() then PVP.ACTIONS.play_hand(0, 0) end
+			PVP.ACTIONS.fail_round(1)
 		end
 	end
 end

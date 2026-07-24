@@ -1,17 +1,5 @@
 function PVP.UI.update_blind_HUD(blind, reset, silent)
-    if PVP.is_mp_or_ghost() then
-        -- Prepare blind name
-        local blind_name_string
-        if PVP.GHOST.is_active() then
-            blind_name_string = PVP.GHOST.get_blind_name_ui()
-        else
-            blind_name_string = {
-                {
-                    ref_table = PVP.LOBBY.is_host and PVP.LOBBY.guest or PVP.LOBBY.host,
-                    ref_value = "username",
-                },
-            }
-        end
+    if PVP.is_mp_or_practice() then
         -- Setup blind name display
         local name_element = G.HUD_blind:get_UIE_by_ID("HUD_blind_name")
         name_element.config.object.config.string =  {
@@ -81,7 +69,7 @@ function PVP.UI.update_blind_HUD(blind, reset, silent)
 end
 
 function PVP.UI.reset_blind_HUD()
-	if PVP.is_mp_or_ghost() then
+	if PVP.is_mp_or_practice() then
         local name_element = G.HUD_blind:get_UIE_by_ID("HUD_blind_name")
 		name_element.config.object.config.string =
 			{ { ref_table = G.GAME.blind, ref_value = "loc_name" } }
@@ -186,7 +174,7 @@ end
 local blind_defeat_ref = Blind.defeat
 function Blind:defeat(silent)
 	blind_defeat_ref(self, silent)
-	if PVP.is_mp_or_ghost() and PVP.UI.reset_blind_HUD then PVP.UI.reset_blind_HUD() end
+	if PVP.is_mp_or_practice() and PVP.UI.reset_blind_HUD then PVP.UI.reset_blind_HUD() end
 end
 
 local blind_disable_ref = Blind.disable
