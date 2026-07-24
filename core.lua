@@ -220,6 +220,9 @@ PVP.reset_lobby_config()
 
 function PVP.reset_game_states()
 	sendDebugMessage("Resetting game states", "MULTIPLAYER")
+	-- §17.10: fresh per-match roster collection -- must not carry over from
+	-- whatever match (if any) this player was previously in.
+	PVP._collected_results = {}
 	PVP.GAME = {
 		ready_blind = false,
 		ready_blind_text = localize("b_ready"),
@@ -258,6 +261,12 @@ function PVP.reset_game_states()
 		spent_total = 0,
 		spent_before_shop = 0,
 		highest_score = PVP.INSANE_INT.empty(),
+		-- §17.10: PVP.GAME.highest_score above tracks the best SINGLE-BLIND
+		-- score of any kind (updated unconditionally in every play_hand,
+		-- including plain Small/Big/Boss blinds) -- not what the end-of-run
+		-- roster needs ("highest PvP-blind score"). Tracked separately here,
+		-- only updated while PVP.is_pvp_boss() is true.
+		highest_pvp_score = PVP.INSANE_INT.empty(),
 		timer = PVP.UTILS.timer_base(),
 		timer_started = false,
 		timer_consumed = false,
