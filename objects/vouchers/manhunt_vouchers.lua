@@ -10,7 +10,7 @@ SMODS.Voucher({
 	cost = 10,
 	unlocked = true,
 	discovered = true,
-	config = { extra = 1, mp_sticker_balanced = true },
+	config = { extra = 1, mp_balanced = true },
 	loc_vars = function(self, info_queue, card)
 		return { vars = { card.ability.extra } }
 	end,
@@ -36,7 +36,7 @@ SMODS.Voucher({
 	cost = 10,
 	unlocked = true,
 	discovered = true,
-	config = { extra = 1, mp_sticker_balanced = true },
+	config = { extra = 1, mp_balanced = true },
 	requires = { "v_mp_hieroglyph_manhunt" },
 	loc_vars = function(self, info_queue, card)
 		return { vars = { card.ability.extra } }

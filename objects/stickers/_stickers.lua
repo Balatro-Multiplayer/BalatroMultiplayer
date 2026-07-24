@@ -13,6 +13,15 @@ function Card:set_ability(center, initial, delay_sprites)
 			SMODS.Stickers["mp_sticker_" .. v]:apply(self, center["mp_forced_" .. v])
 		end
 	end
+	-- §18.6: mp_balanced marks a card as rebalanced from vanilla (set directly on
+	-- ~30 reworked centers' config, or auto-injected by ReworkCenter for any center
+	-- with an existing config -- see api/ruleset/reworks.lua). Unlike persistent/
+	-- unreliable/draining above, this isn't an optional per-match toggle: it's
+	-- always-on transparency, so it's applied unconditionally rather than gated
+	-- on a G.GAME.modifiers flag.
+	if self.ability and self.ability.mp_balanced then
+		SMODS.Stickers["mp_sticker_balanced"]:apply(self, true)
+	end
 end
 
 local PERSISTENT = {

@@ -3,7 +3,7 @@ SMODS.Consumable({
 	set = "Spectral",
 	cost = 4,
 	pos = { x = 8, y = 4 },
-	config = { mp_sticker_balanced = true },
+	config = { mp_balanced = true },
 	loc_vars = function(self, info_queue, card)
 		info_queue[#info_queue + 1] = G.P_CENTERS.e_negative
 		return { vars = { G.GAME.ecto_minus or 1 } }

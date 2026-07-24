@@ -97,7 +97,6 @@ for _, key in ipairs({ "pvp_chocolate", "pvp_strawberry", "pvp_vanilla", "pvp_sm
 		get_blinds_by_ante = function(self, ante)
 			return nil, nil, nil
 		end,
-		on_ante_change = function(self, ante) end,
 		-- Host-authoritative: when the opponent forfeits/leaves, the last player
 		-- standing wins. The registered winner handler above performs the broadcast.
 		on_player_forfeit = function(self, player_id)
@@ -131,7 +130,6 @@ do
 		get_blinds_by_ante = function(self, ante)
 			return nil, nil, nil
 		end,
-		on_ante_change = function(self, ante) end,
 		on_player_forfeit = function(self, player_id)
 			local winner_id = self:check_single_survivor(player_id)
 			if not winner_id then
@@ -164,7 +162,6 @@ do
 		get_blinds_by_ante = function(self, ante)
 			return nil, nil, nil
 		end,
-		on_ante_change = function(self, ante) end,
 		-- Broadcasts pvp_win (winner_team_id) itself -- unlike check_single_survivor's
 		-- callers above, NOT returned as { winner = ... }: MPAPI._handle_gamemode_result
 		-- would hand a team_id string ("HUNTER") to the generic on_winner_declared
@@ -197,7 +194,6 @@ do
 		get_blinds_by_ante = function(self, ante)
 			return nil, nil, nil
 		end,
-		on_ante_change = function(self, ante) end,
 		-- Same reason as Manhunt's forfeit hook above: broadcasts pvp_win itself,
 		-- not returned as { winner = ... }.
 		on_player_forfeit = function(self, player_id)
