@@ -16,12 +16,7 @@ function PVP.UI.create_UIBox_round_scores_row_nemesis()
     local score_tab = {}
     local label_w, score_w, h = 2.9, 1, 0.5
 
-    local blind_name_string
-    if PVP.GHOST.is_active() then
-        blind_name_string = PVP.GHOST.get_blind_name_ui() or "ERROR"
-    else
-        blind_name_string = (PVP.LOBBY.is_host and PVP.LOBBY.guest or PVP.LOBBY.host or {})["username"] or "ERROR"
-    end
+    local blind_name_string = (PVP.LOBBY.is_host and PVP.LOBBY.guest or PVP.LOBBY.host or {})["username"] or "ERROR"
 
     local nemesis_blind_col = PVP.UTILS.get_nemesis_key()
     local blind_choice = {}

@@ -63,22 +63,20 @@ function G.FUNCS.select_blind(e)
 	-- Confirmed-safe checkpoint for Phase 9's reconnect tail-replay -- drains
 	-- any pending opponent catch-up queued since the last checkpoint.
 	if PVP.RECONNECT_TAIL then PVP.RECONNECT_TAIL.on_checkpoint() end
-	if PVP.is_mp_or_ghost() then
+	if PVP.is_mp_or_practice() then
 		PVP.GAME.ante_key = tostring(math.random())
-		if not PVP.GHOST.is_active() then
-			-- Carbon: log the freshly-rolled (non-deterministic) ante_key first so
-			-- a replay can restore it, then the blind selection itself.
-			PVP.RLOG.record("set_ante_key", PVP.GAME.ante_key)
-			PVP.RLOG.record(
-				"select_blind",
-				0,
-				string.format("action:selectBlind,blind:%s", tostring(e.config.ref_table.key or e.config.ref_table.name))
-			)
-			PVP.ACTIONS.play_hand(0, G.GAME.round_resets.hands)
-			PVP.ACTIONS.new_round()
-			PVP.ACTIONS.set_location("loc_playing", (e.config.ref_table.key or e.config.ref_table.name))
-			if PVP.UI.hide_enemy_location then PVP.UI.hide_enemy_location() end
-		end
+		-- Carbon: log the freshly-rolled (non-deterministic) ante_key first so
+		-- a replay can restore it, then the blind selection itself.
+		PVP.RLOG.record("set_ante_key", PVP.GAME.ante_key)
+		PVP.RLOG.record(
+			"select_blind",
+			0,
+			string.format("action:selectBlind,blind:%s", tostring(e.config.ref_table.key or e.config.ref_table.name))
+		)
+		PVP.ACTIONS.play_hand(0, G.GAME.round_resets.hands)
+		PVP.ACTIONS.new_round()
+		PVP.ACTIONS.set_location("loc_playing", (e.config.ref_table.key or e.config.ref_table.name))
+		if PVP.UI.hide_enemy_location then PVP.UI.hide_enemy_location() end
 	end
 end
 

@@ -340,9 +340,8 @@ end
 local function action_start_game(p)
 	local seed = p.seed
 	sendDebugMessage(string.format("Game starting — %s", os.date("%Y-%m-%dT%H:%M:%S%z")), "MULTIPLAYER")
-	-- Clear any stale practice/ghost state so it can't leak into real PVP
+	-- Clear any stale practice state so it can't leak into real PVP
 	PVP.SP.practice = false
-	PVP.GHOST.clear()
 
 	PVP.reset_game_states()
 	-- Stamp the run start (drives the pause menu's seed-change window) and clear any

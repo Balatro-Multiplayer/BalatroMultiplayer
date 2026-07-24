@@ -28,8 +28,8 @@ PVP.modifiers_parse = MPAPI.modifiers_parse
 
 -- PVP.active_layer_chain()/get_active_ruleset() (rulesets/_rulesets.lua) resolve the
 -- same lobby metadata MPAPI's own equivalents do, but additionally know about PvP's
--- practice-mode/ghost-replay cases that MPAPI doesn't -- kept as the PvP-owned
--- resolution layer for that reason, even though the two agree for any live lobby.
+-- practice-mode case that MPAPI doesn't -- kept as the PvP-owned resolution layer
+-- for that reason, even though the two agree for any live lobby.
 function PVP.is_layer_active(layer_name)
 	if not layer_name then return false end
 	for _, name in ipairs(PVP.active_layer_chain()) do
