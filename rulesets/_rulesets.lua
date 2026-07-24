@@ -4,8 +4,8 @@
 -- `inject`'s G.P_CENTER_POOLS.Ruleset registration, and the default no-op
 -- is_disabled/force_lobby_options methods all come from MPAPI's own RulesetBase
 -- for free) while keeping PvP's own active-ruleset/gamemode
--- resolution (lobby / practice-mode / ghost-replay -- MPAPI only knows about the
--- lobby case, so this stays PvP-owned).
+-- resolution (lobby / practice-mode -- MPAPI only knows about the lobby case,
+-- so this stays PvP-owned).
 --
 -- Key prefixing: PvP ruleset files pass short keys (key = "vanilla") and have
 -- always relied on a "ruleset_mp_" prefix (class "ruleset" + this mod's "mp") to
@@ -14,9 +14,8 @@
 -- "spdrn_order", and don't want one), so PvP computes the "ruleset_" segment
 -- itself and tells SMODS not to touch the key further.
 --
--- PVP.Rulesets stays as a direct alias: read elsewhere (lib/ghost_replay.lua,
--- networking/action_handlers.lua) expecting a key -> ruleset lookup table, which
--- MPAPI.Rulesets now IS.
+-- PVP.Rulesets stays as a direct alias: read elsewhere (networking/action_handlers.lua)
+-- expecting a key -> ruleset lookup table, which MPAPI.Rulesets now IS.
 PVP.Rulesets = MPAPI.Rulesets
 
 function PVP.Ruleset(init)
@@ -49,8 +48,6 @@ function PVP.get_active_gamemode()
 	if PVP.LOBBY.code then
 		return PVP.LOBBY.config.gamemode
 	elseif PVP.is_practice_mode() then
-		-- Ghost replay stores the gamemode directly
-		if PVP.GHOST.is_active() and PVP.GHOST.gamemode then return PVP.GHOST.gamemode end
 		return PVP.current_ruleset().forced_gamemode
 	end
 	return nil
@@ -61,7 +58,7 @@ end
 -- ----------------------------------------------------------------------------
 -- Field-kind merging delegates to MPAPI.resolve_ruleset_field (the single shared
 -- implementation, also used by Speed) -- only the active-KEY resolution above
--- stays PvP-owned (lobby/practice/ghost), threaded through as an explicit
+-- stays PvP-owned (lobby/practice), threaded through as an explicit
 -- argument since MPAPI's own equivalent only knows about the lobby case.
 
 local _resolver = setmetatable({}, {

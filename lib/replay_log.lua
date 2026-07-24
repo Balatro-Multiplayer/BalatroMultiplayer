@@ -90,12 +90,11 @@ RLOG._game_id = nil -- generated in begin_run
 -- Gate
 -------------------------------------------------------------------------------
 
--- Only real multiplayer games log. Ghost playback, practice, and the preview
--- simulation have no lobby code, so they never emit.
+-- Only real multiplayer games log. Practice and the preview simulation have
+-- no lobby code, so they never emit.
 function RLOG.is_active()
 	if RLOG._force_active then return true end
 	if not (PVP.LOBBY and PVP.LOBBY.code) then return false end
-	if PVP.GHOST and PVP.GHOST.is_active and PVP.GHOST.is_active() then return false end
 	return true
 end
 
