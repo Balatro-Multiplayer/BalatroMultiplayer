@@ -4,6 +4,28 @@
 return {
 	descriptions = {
 		Tag = {
+			tag_mp_investment_blind_raiser = {
+				name = "Nhãn Đầu Tư",
+				text = {
+					"Nhận {C:money}$#1#{} cho mỗi",
+					"{C:attention}Blind{} đã nâng cấp trong lượt chơi",
+					"{C:inactive}(Sẽ nhận {C:money}$#2#{C:inactive})",
+				},
+			},
+			tag_mp_negative_blind_raiser = {
+				name = "Nhãn Âm Bản",
+				text = {
+					"Joker Phổ Biến bản chuẩn tiếp theo trong shop",
+					"trở thành {C:dark_edition}Âm Bản",
+				},
+			},
+			tag_mp_rare_blind_raiser = {
+				name = "Nhãn Hiếm",
+				text = {
+					"Shop có một {C:red}Joker Hiếm{} miễn phí",
+					"đặt tiền về {C:money}$0{} khi mua",
+				},
+			},
 			tag_mp_sandbox_rare = {
 				name = "Nhãn Con Bạc",
 				text = {
@@ -962,6 +984,7 @@ return {
             },
 			k_bl_life = "Sống",
 			k_bl_or = "hoặc",
+			mp_upgrade_blind = "Nâng Cấp Blind",
 			k_bl_death = "Chết",
 			k_bl_mostchips = "Nhiều điểm hơn sẽ chiến thắng",
 			k_current_seed = "Giống hiện tại: ",
@@ -988,6 +1011,8 @@ return {
 			k_experimental_description = "Đây là điều lệ thử nghiệm Tiêu Chuẩn.\n\nCác bản cân bằng sẽ liên tục được thử nghiệm tại đây\ntrước khi đưa vào điều lệ Tiêu Chuẩn.\n\n(xem mục bị cấm và làm lại để biết thêm thông tin)",
 			k_experimental_legacy = "Thử Nghiệm (Cổ Điển)",
 			k_experimental_legacy_description = "Đây là điều lệ mang ý kiến cá nhân với Xếp Hạng Truyền Thống.\n\nGiảm sức mạnh Lá Kính, làm lại Phiếu Đục Lỗ, cấm Công Lý,\nCờ bạc là bác thằng đần.",
+			k_experimental_blind_raiser = "Thử Nghiệm (Blind Raiser)",
+			k_experimental_blind_raiser_description = "Xếp Hạng Tiêu Chuẩn với Blind Raiser.\n\nNâng cấp Blind Nhỏ hoặc Blind Lớn hiện tại thành một Boss Blind\nkhông phải Hạ Màn ngẫu nhiên và nhận phần thưởng Nhãn Bỏ Qua.\nLần nâng cấp thứ N dùng điểm Blind thường x 2^N.\nTính năng có ở mọi Mức Cược.",
             k_badlatro = "Badlatro",
 			k_badlatro_description = "Một thể thức tuần được thiết kế bởi @dr_monty_the_snek trong máy chủ đã được thêm vĩnh viễn vào mod.\n\nThể thức này cấm 48 joker, lá tiêu thụ, nhãn bỏ qua, v.v...",
 			k_attrition = "Hao Mòn",

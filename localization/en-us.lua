@@ -1,6 +1,30 @@
 return {
 	descriptions = {
 		Tag = {
+			tag_mp_investment_blind_raiser = {
+				name = "Investment Tag",
+				text = {
+					"Gives {C:money}$#1#{} per upgraded",
+					"{C:attention}Blind{} this run",
+					"{C:inactive}(Will give {C:money}$#2#{C:inactive})"
+				},
+			},
+			tag_mp_negative_blind_raiser = {
+				name = "Negative Tag",
+				text = {
+					"Next base edition",
+					"shop {C:blue}Common Joker{}",
+					"becomes {C:dark_edition}Negative"
+				},
+			},
+			tag_mp_rare_blind_raiser = {
+				name = "Rare Tag",
+				text = {
+					"Shop has a free {C:red}Rare",
+					"{C:red}Joker{} that sets money",
+					"to {C:money}$0{} when bought"
+				},
+			},
 			tag_mp_gambling_sandbox = {
 				name = "Gambling Tag",
 				text = {
@@ -1329,6 +1353,7 @@ return {
             },
 			k_bl_life = "Life",
 			k_bl_or = "or",
+			mp_upgrade_blind = "Upgrade Blind",
 			k_bl_death = "Death",
 			k_bl_mostchips = "Most chips wins",
 			k_current_seed = "Current seed: ",
@@ -1357,6 +1382,8 @@ return {
 			k_experimental_description = "Standard's bleeding edge.\n\nHeavier balance changes being trialed\nfor a future Standard ruleset.\n\n(See bans and reworks tabs for details)",
 			k_experimental_legacy = "Experimental (Classic)",
 			k_experimental_legacy_description = "An opinionated take on Legacy Ranked.\n\nGlass nerfed, Hanging Chad reworked, Justice banned,\nLet's Go Gambling.",
+			k_experimental_blind_raiser = "Experimental (Blind Raiser)",
+			k_experimental_blind_raiser_description = "Standard Ranked with Blind Raiser.\n\nUpgrade the current Small or Big Blind into a random\nnon-Showdown Boss Blind and receive its Skip Tag reward.\nThe Nth upgrade uses the regular Blind score x 2^N.\nThe feature is available on every Stake.",
 			k_badlatro = "Badlatro",
 			k_badlatro_description = "A weekly ruleset designed by @dr_monty_the_snek on the discord server\nthat has been added to the mod permanently.\n\nThis ruleset bans 48 jokers, consumables, tags, etc.",
 			k_attrition = "Attrition",
