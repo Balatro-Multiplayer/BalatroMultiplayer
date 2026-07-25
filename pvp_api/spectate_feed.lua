@@ -20,10 +20,20 @@
 -- actually needs: pvp_log_event (lib/replay_log.lua/pvp_api/replay_log_actions.lua),
 -- ignoring every other action on the same topic entirely.
 --
--- Assumes the caller (a Phase 5 UI screen) has already put the client into
--- whatever local run/HUD context replay/spectate renders into -- same as
--- practice mode's own MPAPI.create_local_lobby -- before calling S.start;
--- this file owns the feed only, not standing up a place to render it.
+-- §22.3 full-fidelity update: S.start now bootstraps its own seeded local
+-- run via PVP._start_playback (lib/playback_launch.lua), using the manifest
+-- fields the server's getSpectatorSnapshot extracts from the match's own
+-- buffered manifest event (BalatroMultiplayerServer's replay-log.service.ts)
+-- -- the same seed/deck/stake/ruleset a post-hoc replay uses, so a spectator
+-- sees the real, deterministic cards too, not just score/ante text. Known
+-- gap, not solved here: this only gives full fidelity for a spectator who
+-- joins from the very start of a match -- one joining mid-match has no way
+-- to replay the ALREADY-MISSED actions (only the aggregated latest ante/
+-- score the snapshot carries), so their local run starts at ante 1/blind-
+-- select while the live feed's next real event may be from a much later
+-- point -- the display baseline (_apply_snapshot) still shows the right
+-- ballpark score/ante, but the actual cards on screen won't reflect a mid-
+-- match join. Same class of gap as the already-flagged missing `lives` field.
 PVP.SPECTATE = PVP.SPECTATE or {}
 local S = PVP.SPECTATE
 S._mqtt = nil
@@ -93,7 +103,9 @@ end
 -- Starts spectating `code`. on_ready(err) reports whether the feed connected
 -- (nil err = success); once it does, the driver is playing and PVP.GAME/
 -- enemy already reflect the join-time snapshot, updating live as further
--- pvp_log_event broadcasts arrive.
+-- pvp_log_event broadcasts arrive. Bootstraps its own seeded local run first
+-- (see file header) -- this can take a moment (a real run start), unlike
+-- Phase 4's original version which assumed a run already existed.
 function S.start(code, on_ready)
 	MPAPI.replay.spectate_lobby(code, function(err, data)
 		if err or not data or not data.token then
@@ -103,33 +115,44 @@ function S.start(code, on_ready)
 			return
 		end
 
-		local pov_player_id = S._apply_snapshot(data.snapshot or {})
-		S._driver = MPAPI.playback.new_driver({}, { mod_id = 'pvp', pov_player_id = pov_player_id })
-		S._driver:play()
-
-		local conn = MPAPI.get_connection()
-		local mqtt = MPAPI.networking.mqtt_client.new({
-			broker = conn.config.mqtt_broker,
-			port = conn.config.mqtt_port,
-			secure = conn.config.mqtt_secure,
-			username = self_player_id(),
-			password = data.token,
-		})
-		S._mqtt = mqtt
-
-		mqtt.on_connect = function()
-			mqtt:subscribe(mqtt:lobby_topic(code, 'players/+/actions'), 1, on_actions_message)
+		local snapshot = data.snapshot or {}
+		local manifest = snapshot[1] and snapshot[1].manifest
+		if not manifest then
 			if on_ready then
-				on_ready(nil)
+				on_ready('spectate: no manifest available yet for this lobby (no buffered run)')
 			end
-		end
-		mqtt.on_error = function(msg)
-			if on_ready then
-				on_ready(tostring(msg))
-			end
+			return
 		end
 
-		mqtt:connect()
+		PVP._start_playback(manifest, function()
+			local pov_player_id = S._apply_snapshot(snapshot)
+			S._driver = MPAPI.playback.new_driver({}, { mod_id = 'pvp', pov_player_id = pov_player_id })
+			S._driver:play()
+
+			local conn = MPAPI.get_connection()
+			local mqtt = MPAPI.networking.mqtt_client.new({
+				broker = conn.config.mqtt_broker,
+				port = conn.config.mqtt_port,
+				secure = conn.config.mqtt_secure,
+				username = self_player_id(),
+				password = data.token,
+			})
+			S._mqtt = mqtt
+
+			mqtt.on_connect = function()
+				mqtt:subscribe(mqtt:lobby_topic(code, 'players/+/actions'), 1, on_actions_message)
+				if on_ready then
+					on_ready(nil)
+				end
+			end
+			mqtt.on_error = function(msg)
+				if on_ready then
+					on_ready(tostring(msg))
+				end
+			end
+
+			mqtt:connect()
+		end)
 	end)
 end
 
