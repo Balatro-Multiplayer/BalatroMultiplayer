@@ -90,6 +90,22 @@ function PVP.main_menu.create_buttons()
 			return MPAPI.is_connected()
 		end,
 	})
+	-- §22.2/§22.3: replay is fully local playback once the run/lobby list is
+	-- fetched, but the list fetch itself needs a real connection, same as
+	-- Leaderboard.
+	b.replay = MPAPI.disableable_button({
+		id = "mp_pvp_replay",
+		button = "mp_pvp_open_replay_menu",
+		colour = { 0.55, 0.35, 0.75, 1 },
+		minw = 2.65,
+		minh = 1.35,
+		label = { "Replay" },
+		scale = 0.54,
+		col = true,
+		enabled = function()
+			return MPAPI.is_connected()
+		end,
+	})
 	M.initialized = true
 end
 
@@ -103,6 +119,7 @@ PVP.update_main_menu_buttons = function()
 	M.buttons.join_by_code:update()
 	M.buttons.join_from_clipboard:update()
 	M.buttons.leaderboard:update()
+	M.buttons.replay:update()
 end
 
 -- Swap the Find Game button between search / cancel (called by queue.lua).
@@ -147,6 +164,7 @@ PVP.build_pre_lobby_ui = function()
 									{ n = G.UIT.R, config = { align = "cm" }, nodes = {
 										{ n = G.UIT.C, config = { align = "cm", padding = 0.05 }, nodes = { b.leaderboard.node } },
 										{ n = G.UIT.C, config = { align = "cm", padding = 0.05 }, nodes = { b.practice.node } },
+										{ n = G.UIT.C, config = { align = "cm", padding = 0.05 }, nodes = { b.replay.node } },
 									} },
 								},
 							},
@@ -363,4 +381,42 @@ end
 G.FUNCS.mp_pvp_practice_experimental = function()
 	G.FUNCS.exit_overlay_menu()
 	PVP._start_practice("pvp_experimental")
+end
+
+-- ── Replay/Spectate overlay ───────────────────────────────────────────────
+-- §22.2/§22.3: a small picker routing to the two list screens
+-- (ui/replay/replay_browser.lua, ui/replay/spectate_browser.lua), same
+-- overlay style as the Practice/Create Lobby pickers above.
+G.FUNCS.mp_pvp_open_replay_menu = function()
+	G.FUNCS.overlay_menu({
+		definition = create_UIBox_generic_options({
+			contents = {
+				{ n = G.UIT.R, config = { align = "cm", padding = 0.1 }, nodes = {
+					{ n = G.UIT.T, config = { text = "Replay / Spectate", scale = 0.6, colour = G.C.UI.TEXT_LIGHT, shadow = true } },
+				} },
+				{
+					n = G.UIT.R,
+					config = { align = "cm", padding = 0.1 },
+					nodes = {
+						{ n = G.UIT.C, config = { align = "cm", padding = 0.08 }, nodes = {
+							UIBox_button({ button = "mp_pvp_open_replay_browser_from_menu", label = { "My", "Replays" }, colour = G.C.BLUE, minw = 2.5, minh = 2.0, scale = 0.5, col = true }),
+						} },
+						{ n = G.UIT.C, config = { align = "cm", padding = 0.08 }, nodes = {
+							UIBox_button({ button = "mp_pvp_open_spectate_browser_from_menu", label = { "Spectate" }, colour = G.C.PURPLE, minw = 2.5, minh = 2.0, scale = 0.5, col = true }),
+						} },
+					},
+				},
+			},
+		}),
+	})
+end
+
+G.FUNCS.mp_pvp_open_replay_browser_from_menu = function()
+	G.FUNCS.exit_overlay_menu()
+	G.FUNCS.mp_pvp_open_replay_browser()
+end
+
+G.FUNCS.mp_pvp_open_spectate_browser_from_menu = function()
+	G.FUNCS.exit_overlay_menu()
+	G.FUNCS.mp_pvp_open_spectate_browser()
 end
