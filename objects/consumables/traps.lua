@@ -49,7 +49,14 @@ local TRAPS = {
 			if context.data.owner ~= PVP.TRAP.self_id() then
 				return
 			end
-			local pack_card = SMODS.add_card({ key = "p_spectral_jumbo_1", area = G.consumeables, skip_materialize = true })
+			-- SMODS.add_card needs `set` explicitly -- it's passed straight through
+			-- to vanilla create_card's positional _type arg, never inferred from
+			-- the target center's own .set (confirmed by reading SMODS.create_card:
+			-- only `area` gets auto-derived from G.P_CENTERS[key], not `set`).
+			-- Omitting it crashes deep in create_card's rarity-pool code with
+			-- "attempt to concatenate local '_type' (a nil value)" -- found live via
+			-- cctl, not from reading this file in isolation.
+			local pack_card = SMODS.add_card({ key = "p_spectral_jumbo_1", set = "Booster", area = G.consumeables, skip_materialize = true })
 			if pack_card and pack_card.open then
 				pack_card:open()
 			end
@@ -119,7 +126,9 @@ local TRAPS = {
 				return
 			end
 			if context.data.key then
-				SMODS.add_card({ key = context.data.key, area = G.jokers })
+				-- set required -- see glyph_of_warding's comment above (SMODS.add_card
+				-- never infers it from the target center).
+				SMODS.add_card({ key = context.data.key, set = "Joker", area = G.jokers })
 			end
 			PVP.UI.show_trap_fired_animation("Sepia Snake Sigil")
 		end,
@@ -211,7 +220,10 @@ local TRAPS = {
 		calculate = function(self, card, context)
 			if context.using_consumeable then
 				PVP.TRAP.reveal_and_consume(card)
-				return PVP.TRAP.notify_owner(card, { key = context.consumeable.config.center.key })
+				-- `set` must travel with the key: unlike sepia_snake_sigil/glyph_of_warding
+				-- (always one fixed type), Web can copy ANY consumable set (Tarot/Planet/
+				-- Spectral), and SMODS.add_card never infers `set` from the target center.
+				return PVP.TRAP.notify_owner(card, { key = context.consumeable.config.center.key, set = context.consumeable.config.center.set })
 			end
 		end,
 		receive = function(self, context)
@@ -219,7 +231,7 @@ local TRAPS = {
 				return
 			end
 			if context.data.key then
-				SMODS.add_card({ key = context.data.key, area = G.consumeables, edition = "e_negative" })
+				SMODS.add_card({ key = context.data.key, set = context.data.set, area = G.consumeables, edition = "e_negative" })
 			end
 			PVP.UI.show_trap_fired_animation("Web")
 		end,
