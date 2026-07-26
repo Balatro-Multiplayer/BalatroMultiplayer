@@ -363,9 +363,26 @@ function PVP.referee_reset(starting_lives)
 			broadcast("pvp_player_lives", { player_id = id, lives = pl.lives })
 		end
 	elseif PVP.LOBBY.config.team_based then
+		-- Anyone who never opened the picker (pl.team_id nil) needs a default --
+		-- unlike Manhunt's single-Runner fallback, "or 'A'" here left EVERY unpicked
+		-- player on the same team (confirmed live: a 4-player lobby with nobody
+		-- picking ended up A=4/B=0, a non-functional match). Balance unassigned
+		-- players onto whichever team currently has fewer members instead, so a
+		-- lobby where nobody picks still comes out an even split.
+		local counts = { A = 0, B = 0 }
+		for _, id in ipairs(total) do
+			local team = ref_player(id).team_id
+			if team then
+				counts[team] = (counts[team] or 0) + 1
+			end
+		end
 		for _, id in ipairs(total) do
 			local pl = ref_player(id)
-			pl.team_id = pl.team_id or "A"
+			if not pl.team_id then
+				local team = (counts.B < counts.A) and "B" or "A"
+				pl.team_id = team
+				counts[team] = counts[team] + 1
+			end
 		end
 		PVP.REF.team_lives = { A = lives, B = lives }
 		broadcast("pvp_player_lives", { player_id = "*all*", lives = lives })
