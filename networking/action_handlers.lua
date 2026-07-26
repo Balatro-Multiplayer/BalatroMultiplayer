@@ -480,6 +480,13 @@ local function action_win_game()
 	PVP.UTILS.log_mem_debug_messages()
 	PVP.UTILS.emit_log_checksum()
 	PVP.report_roster_result()
+	-- pvp_win can fire while the winner is still mid-HAND_PLAYED (last hand
+	-- exhausted hands_left before the opponent's result arrived). Unlike
+	-- action_lose_game (which force-sets G.STATE directly), win_game() alone
+	-- doesn't know about end_pvp, the flag update_hand_played's override
+	-- requires to ever release HAND_PLAYED -- without it the client hangs
+	-- forever. Mirrors action_end_pvp's established handoff for this same gate.
+	PVP.GAME.end_pvp = true
 	win_game()
 end
 
