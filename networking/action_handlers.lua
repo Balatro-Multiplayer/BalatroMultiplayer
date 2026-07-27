@@ -319,6 +319,9 @@ end
 local function begin_pvp_blind()
 	if MP.GAME.next_blind_context then
 		G.FUNCS.select_blind(MP.GAME.next_blind_context)
+        MP.GAME.enemy.skips_before_pvp = 0
+        MP.GAME.skips_before_pvp = 0
+        MP.GAME.skips_difference = 0
         MP.GAME.timer_started = false
         MP.GAME.nemesis_timer_started = false
         MP.GAME.nemesis_timer_was_started = false
@@ -338,6 +341,9 @@ local function action_start_blind(p)
 	MP.GAME.enemy.score_text = "0"
 	-- Re-mask the opponent's hands until the first enemyInfo of the new blind.
 	MP.GAME.enemy.info_received = false
+    MP.GAME.enemy.skips_before_pvp = 0
+    MP.GAME.skips_before_pvp = 0
+    MP.GAME.skips_difference = 0
 	MP.GAME.ready_blind = false
 	MP.GAME.pvp_reached = false
     MP.GAME.pvp_timer_order = nil
@@ -356,6 +362,9 @@ local function action_enemy_info(p)
 	if skips and MP.GAME.enemy.skips ~= skips then
 		for i = 1, skips - MP.GAME.enemy.skips do
 			MP.GAME.enemy.spent_in_shop[#MP.GAME.enemy.spent_in_shop + 1] = 0
+            MP.GAME.enemy.skips_before_pvp = (MP.GAME.enemy.skips_before_pvp or 0) + 1
+            MP.UI.update_matching_skip_timer(true)
+
 			if
 				MP.GAME.enemy.skips < skips
 				and MP.LOBBY.config.timer
@@ -377,49 +386,51 @@ local function action_enemy_info(p)
     if score then
         if MP.INSANE_INT.greater_than(score, MP.GAME.enemy.highest_score) then MP.GAME.enemy.highest_score = score end
 
-        G.E_MANAGER:add_event(Event({
-            blockable = false,
-            blocking = false,
-            trigger = "ease",
-            delay = 0.75,
-            timer = "REAL",
-            ref_table = MP.GAME.enemy.score,
-            ref_value = "e_count",
-            ease_to = score.e_count,
-            func = function(t)
-                return math.floor(t)
-            end,
-        }))
-
-        G.E_MANAGER:add_event(Event({
-            blockable = false,
-            blocking = false,
-            trigger = "ease",
-            delay = 0.75,
-            timer = "REAL",
-            ref_table = MP.GAME.enemy.score,
-            ref_value = "coeffiocient", -- why is this misspelled
-            ease_to = score.coeffiocient,
-            func = function(t)
-                local mult = 1
-                if score.exponent > 0 then mult = 100 end
-                return math.floor(t * mult) / mult
-            end,
-        }))
-
-        G.E_MANAGER:add_event(Event({
-            blockable = false,
-            blocking = false,
-            trigger = "ease",
-            delay = 0.75,
-            timer = "REAL",
-            ref_table = MP.GAME.enemy.score,
-            ref_value = "exponent",
-            ease_to = score.exponent,
-            func = function(t)
-                return math.floor(t)
-            end,
-        }))
+        if not MP.INSANE_INT.equal(MP.GAME.enemy.score, score) then
+            G.E_MANAGER:add_event(Event({
+                blockable = false,
+                blocking = false,
+                trigger = "ease",
+                delay = 0.75,
+                timer = "REAL",
+                ref_table = MP.GAME.enemy.score,
+                ref_value = "e_count",
+                ease_to = score.e_count,
+                func = function(t)
+                    return math.floor(t)
+                end,
+            }))
+    
+            G.E_MANAGER:add_event(Event({
+                blockable = false,
+                blocking = false,
+                trigger = "ease",
+                delay = 0.75,
+                timer = "REAL",
+                ref_table = MP.GAME.enemy.score,
+                ref_value = "coeffiocient", -- why is this misspelled
+                ease_to = score.coeffiocient,
+                func = function(t)
+                    local mult = 1
+                    if score.exponent > 0 then mult = 100 end
+                    return math.floor(t * mult) / mult
+                end,
+            }))
+    
+            G.E_MANAGER:add_event(Event({
+                blockable = false,
+                blocking = false,
+                trigger = "ease",
+                delay = 0.75,
+                timer = "REAL",
+                ref_table = MP.GAME.enemy.score,
+                ref_value = "exponent",
+                ease_to = score.exponent,
+                func = function(t)
+                    return math.floor(t)
+                end,
+            }))
+        end
 
         MP.GAME.enemy.real_score = score
         MP.GAME.enemy.info_received = true

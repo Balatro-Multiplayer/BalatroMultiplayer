@@ -226,6 +226,7 @@ function MP.reset_game_states()
 			info_received = false,
 			location = localize("loc_selecting"),
 			skips = 0,
+            skips_before_pvp = 0,
 			lives = MP.LOBBY.config.starting_lives,
 			sells = 0,
 			sells_per_ante = {},
@@ -268,6 +269,8 @@ function MP.reset_game_states()
 		},
         pvp_timer_order = nil,
         pvp_timer_activated = false,
+        skips_before_pvp = 0,
+        skips_difference = 0,
 	}
 end
 MP.reset_game_states()

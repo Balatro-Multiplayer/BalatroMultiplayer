@@ -523,6 +523,41 @@ function MP.UI.restore_timer(amount, silent, max_timer)
 	end
 end
 
+-- Update skips difference between 2 players.
+-- If value increased - one player skipped even further, add time.
+-- If value decreased - another player catches up, deduct time.
+function MP.UI.update_matching_skip_timer(from_nemesis)
+    local new_diff = math.abs((MP.GAME.skips_before_pvp or 0) - (MP.GAME.enemy.skips_before_pvp or 0))
+    local skips_dx = new_diff - (MP.GAME.skips_difference or 0)
+    MP.GAME.skips_difference = new_diff
+
+    if skips_dx > 0 then
+        if
+            MP.LOBBY.config.timer
+			and not MP.GAME.timer_started
+			and not MP.GAME.nemesis_timer_started
+            and not MP.GAME.timer_consumed
+            and not MP.GAME.nemesis_timer_was_started
+            and not MP.is_any_layer_active({ "no_animation_timer", "pressure_timer" })
+			and (MP.LOBBY.config.timer_increment_seconds or 0) > 0
+        then
+            MP.UI.restore_timer(MP.LOBBY.config.timer_increment_seconds)
+		end
+    elseif skips_dx < 0 then
+        if
+            MP.LOBBY.config.timer
+			and not MP.GAME.timer_started
+			and not MP.GAME.nemesis_timer_started
+            and not MP.GAME.timer_consumed
+            and not MP.GAME.nemesis_timer_was_started
+            and not MP.is_any_layer_active({ "no_animation_timer", "pressure_timer" })
+			and (MP.LOBBY.config.timer_increment_seconds or 0) > 0
+        then
+            MP.UI.consume_timer(MP.LOBBY.config.timer_increment_seconds, false, 10)
+		end
+    end
+end
+
 local old_play = G.FUNCS.play_cards_from_highlighted
 function G.FUNCS.play_cards_from_highlighted(...)
 	-- Carbon: capture which hand slots are played BEFORE old_play consumes them.
