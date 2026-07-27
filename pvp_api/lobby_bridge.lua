@@ -9,6 +9,18 @@
 -- Call PVP.setup_lobby_mirror(lobby) right after MPAPI.create_lobby / join_lobby /
 -- a matchmaking lobby_ready, before signalling ready.
 
+-- Fixed opponent-side labels for gamemodes where the PvP boss blind doesn't
+-- face a single named player (Royale/Manhunt/Teams) -- centralized here so
+-- they're a one-line change to reskin later, instead of literals scattered
+-- across every call site. Team.A/Team.B are placeholders until real
+-- user-chosen team names exist.
+PVP.DISPLAY_NAMES = {
+	royale = "The Royale",
+	manhunt_hunters = "The Hunters", -- shown to the Runner
+	manhunt_runner = "The Runner", -- shown to a Hunter
+	team = { A = "Team A", B = "Team B" }, -- shown to the opposing team
+}
+
 -- The single opponent in a 1v1 PvP lobby (nil until a second player is present).
 function PVP.get_opponent_id()
 	local lobby = MPAPI.get_current_lobby()
@@ -70,6 +82,35 @@ function PVP.current_target_id()
 		return PVP.GAME.team_card_target_id
 	end
 	return PVP.GAME.royale_target_id
+end
+
+-- The name shown on the PvP boss blind (key "bl_mp_nemesis", the shared marker
+-- for every gamemode's PvP boss -- see gamemodes/attrition.lua) for the CURRENT
+-- gamemode. Mirrors current_target_id()'s own branch order/reasoning above:
+--  - Nemesis-pairing or a plain 2-player lobby: a single real opponent, so show
+--    their actual username, same as everywhere else PVP.LOBBY.host/.guest is
+--    read. That mirror is nil ("not yet known") until PVP.current_target_id()
+--    latches, so mask to "????" rather than feed a nil string to DynaText.
+--  - Manhunt (N>2): there's no single named opponent from either role's POV --
+--    show the fixed "The Hunters"/"The Runner" label instead.
+--  - Teams (N>2): the blind shows the whole opposing team's aggregate score,
+--    not any one member -- show that team's fixed label.
+--  - Royale (N>2, no pairing): show the fixed "The Royale" label.
+function PVP.pvp_blind_opponent_name()
+	local lobby = MPAPI.get_current_lobby()
+	if PVP.LOBBY.config.nemesis_pairing or not lobby or #lobby:get_players() == 2 then
+		local opponent = PVP.LOBBY.is_host and PVP.LOBBY.guest or PVP.LOBBY.host
+		return opponent.username or "????"
+	end
+	if PVP.LOBBY.config.manhunt then
+		return PVP.LOBBY.team_id == "RUNNER" and PVP.DISPLAY_NAMES.manhunt_hunters
+			or PVP.DISPLAY_NAMES.manhunt_runner
+	end
+	if PVP.LOBBY.config.team_based then
+		local opposing = (PVP.LOBBY.team_id == "A") and "B" or "A"
+		return PVP.DISPLAY_NAMES.team[opposing] or PVP.DISPLAY_NAMES.team.A
+	end
+	return PVP.DISPLAY_NAMES.royale
 end
 
 -- True only while byed in Nemesis-pairing mode (an odd-numbered alive roster
@@ -150,7 +191,8 @@ local function mirror_players(lobby)
 	local opp_id = PVP.current_target_id()
 	local opp_name
 	if PVP.LOBBY.config.team_based and PVP.LOBBY.team_id then
-		opp_name = "Team " .. ((PVP.LOBBY.team_id == "A") and "B" or "A")
+		local opposing = (PVP.LOBBY.team_id == "A") and "B" or "A"
+		opp_name = PVP.DISPLAY_NAMES.team[opposing]
 	else
 		opp_name = opp_id and player_name(lobby, opp_id) or nil
 	end
