@@ -136,7 +136,12 @@ function create_UIBox_blind_choice(type, run_info)
 		})
 		local loc_name
 		if G.GAME.round_resets.blind_choices[type] == "bl_mp_nemesis" then
-			loc_name = PVP.LOBBY.is_host and PVP.LOBBY.guest.username or PVP.LOBBY.host.username
+			-- Royale/Manhunt/Teams don't have a single named opponent (and
+			-- host/guest's mirrored PVP.current_target_id() can be nil / "not yet
+			-- latched" at blind-select time for them) -- PVP.pvp_blind_opponent_name
+			-- picks the right label per gamemode instead of feeding a nil string to
+			-- DynaText. See pvp_api/lobby_bridge.lua.
+			loc_name = PVP.pvp_blind_opponent_name()
 		else
 			loc_name = localize({ type = "name_text", key = blind_choice.config.key, set = "Blind" })
 		end
