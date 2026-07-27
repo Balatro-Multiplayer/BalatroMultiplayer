@@ -487,9 +487,17 @@ function Game:update(dt)
 	end
 end
 
+-- Decrease timer up to specified minimum & juice up timer UI
 function MP.UI.consume_timer(amount, silent, min_timer)
-	if amount > 0 and MP.LOBBY.config.timer and MP.GAME.timer and MP.GAME.timer > (min_timer or 0) then
-		MP.GAME.timer = math.max(0, MP.GAME.timer - amount)
+    if not MP.GAME.timer or not MP.LOBBY.config.timer then return end
+    amount = math.max(0, amount)
+    min_timer = min_timer or 0
+
+    local new_timer = math.max(0, min_timer, MP.GAME.timer - amount)
+    amount = MP.GAME.timer - new_timer
+
+	if amount > 0 then
+		MP.GAME.timer = new_timer
 		if not silent then
 			local timer_ui = G.HUD:get_UIE_by_ID("timer_UI_count")
 			if timer_ui then timer_ui.config.object:juice_up() end
@@ -497,9 +505,17 @@ function MP.UI.consume_timer(amount, silent, min_timer)
 	end
 end
 
+-- Increase timer up to specified maximum & juice up timer UI
 function MP.UI.restore_timer(amount, silent, max_timer)
-	if amount > 0 and MP.LOBBY.config.timer and MP.GAME.timer and (not max_timer or MP.GAME.timer < max_timer) then
-		MP.GAME.timer = math.max(0, MP.GAME.timer + amount)
+    if not MP.GAME.timer or not MP.LOBBY.config.timer then return end
+    amount = math.max(0, amount)
+    max_timer = max_timer or (MP.GAME.timer + amount)
+
+    local new_timer = math.max(0, math.min(MP.GAME.timer + amount, max_timer))
+    amount = new_timer - MP.GAME.timer
+
+	if amount > 0 then
+		MP.GAME.timer = new_timer
 		if not silent then
 			local timer_ui = G.HUD:get_UIE_by_ID("timer_UI_count")
 			if timer_ui then timer_ui.config.object:juice_up() end
