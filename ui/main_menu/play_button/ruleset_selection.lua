@@ -341,7 +341,21 @@ local function create_bans_and_reworks_tabs(ruleset_or_gamemode, is_banned_tab, 
 				if layer then lists[#lists + 1] = layer["reworked_" .. key] end
 			end
 		end
-		return merge_lists(lists)
+		local merged = merge_lists(lists)
+		if is_banned_tab then
+			local unbanned = {}
+			for _, id in ipairs(ruleset_or_gamemode["unbanned_" .. key] or {}) do
+				unbanned[id] = true
+			end
+			if next(unbanned) then
+				local filtered = {}
+				for _, id in ipairs(merged) do
+					if not unbanned[id] then filtered[#filtered + 1] = id end
+				end
+				return filtered
+			end
+		end
+		return merged
 	end
 	for _, v in ipairs({ "jokers", "consumables", "vouchers", "enhancements", "other" }) do
 		local entry = { type = localize(loc_keys[v]) }
