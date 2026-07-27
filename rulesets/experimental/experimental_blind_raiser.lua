@@ -107,6 +107,11 @@ MP.Ruleset({
 	key = BLIND_RAISER_LAYER,
 	layers = { "standard", "ranked", "pvp_timer" },
 	forced_gamemode = "gamemode_mp_attrition",
+	unbanned_jokers = {
+		"j_luchador",
+		"j_matador",
+		"j_chicot",
+	},
 	reworked_tags = {
 		"tag_investment",
 		"tag_negative",
