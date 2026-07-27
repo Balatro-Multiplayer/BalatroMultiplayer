@@ -170,6 +170,54 @@ function BR.regular_score_for_slot(blind_choice, ante)
 	return get_blind_amount(score_ante) * base_blind.mult * ante_scaling
 end
 
+function BR.upgrade_count()
+	return G and G.GAME
+		and math.max(0, tonumber(G.GAME.mp_blind_raiser_upgrade_count) or 0)
+		or 0
+end
+
+function BR.next_upgrade_score_for_slot(blind_choice, ante)
+	if not blind_raiser_active() then return nil end
+	blind_choice = normalize_blind_choice(blind_choice)
+	if blind_choice ~= "Small" and blind_choice ~= "Big" then return nil end
+
+	local base_score = BR.regular_score_for_slot(blind_choice, ante or current_slot_ante())
+	if not base_score then return nil end
+	return base_score * (2 ^ (BR.upgrade_count() + 1))
+end
+
+local function dictionary_text(key, vars, fallback)
+	local text = localize(key)
+	if type(text) == "table" then text = text[1] end
+	if type(text) ~= "string" or text == "" or text == key then text = fallback end
+	for i, value in ipairs(vars or {}) do
+		text = text:gsub("#" .. tostring(i) .. "#", tostring(value))
+	end
+	return text
+end
+
+function BR.upgrade_button_tooltip(blind_choice)
+	local upgrade_count = BR.upgrade_count()
+	local next_score = BR.next_upgrade_score_for_slot(blind_choice, current_slot_ante())
+	local formatted_score = next_score and number_format(next_score) or "?"
+
+	return {
+		title = dictionary_text("mp_blind_raiser_tooltip_title", nil, "Blind Raiser"),
+		text = {
+			dictionary_text(
+				"mp_blind_raiser_tooltip_upgrades",
+				{ upgrade_count },
+				"Blind upgrades this game: " .. tostring(upgrade_count)
+			),
+			dictionary_text(
+				"mp_blind_raiser_tooltip_score",
+				{ formatted_score },
+				"Score if upgraded: " .. tostring(formatted_score)
+			),
+		},
+	}
+end
+
 local function upgrade_index_for(blind_choice, ante, expected_boss)
 	local record = replacement_record(blind_choice, ante, expected_boss)
 	if type(record) ~= "table" then return nil, nil end
@@ -597,7 +645,9 @@ G.FUNCS.mp_blind_raiser_update_upgrade_button = function(e)
 
 	local blind_choice = e.config.mp_blind_raiser_choice
 	set_runtime_button(e, blind_choice and can_upgrade(blind_choice), "mp_blind_raiser_upgrade")
-	if G.FUNCS.hover_tag_proxy then G.FUNCS.hover_tag_proxy(e) end
+	-- Keep the tooltip live so an untouched Big Blind button immediately reflects
+	-- an upgrade made to the Small Blind without rebuilding the whole screen.
+	e.config.tooltip = BR.upgrade_button_tooltip(blind_choice)
 end
 
 local create_UIBox_blind_tag_ref = create_UIBox_blind_tag
@@ -710,13 +760,14 @@ function create_UIBox_blind_tag(blind_choice, run_info)
 							padding = 0.07,
 							r = 0.1,
 							shadow = true,
-							hover = upgrade_active,
+							hover = true,
 							one_press = true,
 							button = upgrade_active and "mp_blind_raiser_upgrade" or nil,
 							func = "mp_blind_raiser_update_upgrade_button",
 							insta_func = true,
 							ref_table = reward_tag,
 							mp_blind_raiser_choice = blind_choice,
+							tooltip = BR.upgrade_button_tooltip(blind_choice),
 						},
 						nodes = {
 							{
