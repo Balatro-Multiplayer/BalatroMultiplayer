@@ -211,20 +211,16 @@ function MP.ApplyBans()
 			"blinds",
 		}
 		for _, table in ipairs(banned_tables) do
-			local unbanned = {}
-			for _, v in ipairs(ruleset["unbanned_" .. table] or {}) do
-				unbanned[v] = true
-			end
 			for _, v in ipairs(ruleset["banned_" .. table]) do
-				if not unbanned[v] then G.GAME.banned_keys[v] = true end
+				G.GAME.banned_keys[v] = true
 			end
 			if gamemode then
 				for _, v in ipairs(gamemode["banned_" .. table]) do
-					if not unbanned[v] then G.GAME.banned_keys[v] = true end
+					G.GAME.banned_keys[v] = true
 				end
 			end
 			for _, v in pairs(MP.DECK["BANNED_" .. string.upper(table)]) do
-				if not unbanned[v] then G.GAME.banned_keys[v] = true end
+				G.GAME.banned_keys[v] = true
 			end
 		end
 		for _, v in ipairs(ruleset.banned_silent) do
