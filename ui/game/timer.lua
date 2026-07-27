@@ -531,24 +531,21 @@ function MP.UI.update_matching_skip_timer(from_nemesis)
     local skips_dx = new_diff - (MP.GAME.skips_difference or 0)
     MP.GAME.skips_difference = new_diff
 
+    -- Same implementation twice is in case of future changes how this should work.
     if skips_dx > 0 then
         if
             MP.LOBBY.config.timer
-			and not MP.GAME.timer_started
-			and not MP.GAME.nemesis_timer_started
-            and not MP.GAME.timer_consumed
+            and not MP.GAME.timer_was_started
             and not MP.GAME.nemesis_timer_was_started
             and not MP.is_any_layer_active({ "no_animation_timer", "pressure_timer" })
 			and (MP.LOBBY.config.timer_increment_seconds or 0) > 0
         then
-            MP.UI.restore_timer(MP.LOBBY.config.timer_increment_seconds)
+            MP.UI.restore_timer(MP.LOBBY.config.timer_increment_seconds, false)
 		end
     elseif skips_dx < 0 then
         if
             MP.LOBBY.config.timer
-			and not MP.GAME.timer_started
-			and not MP.GAME.nemesis_timer_started
-            and not MP.GAME.timer_consumed
+            and not MP.GAME.timer_was_started
             and not MP.GAME.nemesis_timer_was_started
             and not MP.is_any_layer_active({ "no_animation_timer", "pressure_timer" })
 			and (MP.LOBBY.config.timer_increment_seconds or 0) > 0

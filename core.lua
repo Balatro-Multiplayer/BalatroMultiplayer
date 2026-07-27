@@ -246,6 +246,7 @@ function MP.reset_game_states()
 		highest_score = MP.INSANE_INT.empty(),
 		timer = MP.UTILS.timer_base(),
 		timer_started = false,
+        timer_was_started = false,
         nemesis_timer_started = false,
         nemesis_timer_was_started = false,
 		timer_consumed = false,

@@ -323,6 +323,7 @@ local function begin_pvp_blind()
         MP.GAME.skips_before_pvp = 0
         MP.GAME.skips_difference = 0
         MP.GAME.timer_started = false
+        MP.GAME.timer_was_started = false
         MP.GAME.nemesis_timer_started = false
         MP.GAME.nemesis_timer_was_started = false
         MP.GAME.timer_consumed = false
@@ -492,6 +493,7 @@ local function action_end_pvp(p)
 	MP.GAME.timer = MP.UTILS.timer_base()
 	MP.GAME.timer_consumed = false
 	MP.GAME.timer_started = false
+    MP.GAME.timer_was_started = false
 	MP.GAME.nemesis_timer_started = false
     MP.GAME.nemesis_timer_was_started = false
 	MP.GAME.ready_blind = false
@@ -507,6 +509,7 @@ local function action_end_pvp(p)
                 func = function()
                     MP.GAME.timer = MP.UTILS.timer_base()
                     MP.GAME.timer_started = false
+                    MP.GAME.timer_was_started = false
                     MP.GAME.nemesis_timer_started = false
                     MP.GAME.nemesis_timer_was_started = false
                     MP.GAME.pvp_timer_activated = false
@@ -1058,6 +1061,7 @@ local function action_start_ante_timer(p)
         MP.GAME.nemesis_timer_was_started = true
 	else
 		MP.GAME.timer_started = true
+        MP.GAME.timer_was_started = true
 	end
 end
 
