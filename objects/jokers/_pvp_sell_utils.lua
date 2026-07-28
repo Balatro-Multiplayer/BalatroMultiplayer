@@ -8,6 +8,30 @@ function MP.PVP_SELL.register(center_key, handler)
 	MP.PVP_SELL.handlers[center_key] = handler
 end
 
+local function sold_phantom_queue()
+	MP.GAME = MP.GAME or {}
+	MP.GAME.pvp_sold_phantom_keys = MP.GAME.pvp_sold_phantom_keys or {}
+	return MP.GAME.pvp_sold_phantom_keys
+end
+
+function MP.PVP_SELL.show_sold_phantom(center_key)
+	if not center_key or not (MP.LOBBY and MP.LOBBY.code) then return end
+	if not (MP.ACTIONS and MP.ACTIONS.send_phantom) then return end
+	table.insert(sold_phantom_queue(), center_key)
+	MP.ACTIONS.send_phantom(center_key)
+end
+
+function MP.PVP_SELL.clear_sold_phantoms()
+	local queue = sold_phantom_queue()
+	if #queue < 1 then return end
+	if MP.LOBBY and MP.LOBBY.code and MP.ACTIONS and MP.ACTIONS.remove_phantom then
+		for _, center_key in ipairs(queue) do
+			MP.ACTIONS.remove_phantom(center_key)
+		end
+	end
+	MP.GAME.pvp_sold_phantom_keys = {}
+end
+
 function MP.PVP_SELL.empty_joker_slots_after_sale(card)
 	if not (G and G.jokers and G.jokers.config and G.jokers.cards) then return 0 end
 	local joker_count = #G.jokers.cards
@@ -161,11 +185,21 @@ function Card:sell_card(...)
 	local handler = center_key and MP.PVP_SELL.handlers[center_key]
 	if handler and not self.mp_pvp_sell_triggered and MP.PVP_SELL.is_active() then
 		self.mp_pvp_sell_triggered = true
+		-- These six Jokers remain visible to the opponent as Phantom copies for
+		-- the rest of this PvP Blind, even though the original card was sold.
+		MP.PVP_SELL.show_sold_phantom(center_key)
 		local ok, err = pcall(handler, self)
 		if not ok then
-			self.mp_pvp_sell_triggered = nil
 			sendErrorMessage("PvP sell Joker failed (" .. tostring(center_key) .. "): " .. tostring(err), "MULTIPLAYER")
 		end
 	end
 	return sell_card_ref(self, ...)
+end
+
+-- Cash Out is the lifetime boundary for sold PvP Joker Phantoms. Sending one
+-- removal per queued sale also handles multiple copies of the same Joker.
+local cash_out_ref = G.FUNCS.cash_out
+function G.FUNCS.cash_out(...)
+	MP.PVP_SELL.clear_sold_phantoms()
+	return cash_out_ref(...)
 end
