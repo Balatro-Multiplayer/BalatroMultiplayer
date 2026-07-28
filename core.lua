@@ -199,6 +199,8 @@ function MP.reset_lobby_config(persist_ruleset_and_gamemode)
 		legacy_smallworld = false,
 		-- Baseline off; start_lobby sets it on for standard-layer rulesets.
 		hide_score_until_played = false,
+		enemy_location_disabled = false,
+		timer_display_threshold = 0,
 	}
 end
 MP.reset_lobby_config()
@@ -247,6 +249,7 @@ function MP.reset_game_states()
 		timer_started = false,
         nemesis_timer_started = false,
         nemesis_timer_was_started = false,
+		timer_threshold_pending = false,
 		timer_consumed = false,
 		pvp_reached = false,
         pvp_reached_first = false,
