@@ -29,7 +29,7 @@ end
 -- Patches idol RNG when using the order to sort deck based on count of identical cards instead of default deck order
 local original_reset_idol_card = reset_idol_card
 function reset_idol_card()
-	if MP.should_use_the_order() then
+	if MP.should_use_the_order() or MP.is_major_league_ruleset() then
 
 		G.GAME.current_round.idol_card.rank = "Ace"
 		G.GAME.current_round.idol_card.suit = "Spades"
