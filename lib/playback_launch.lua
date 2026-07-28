@@ -19,6 +19,20 @@
 -- MPAPI.playback.build_timeline's first event already carries for whichever
 -- player is chosen as POV.
 function PVP._start_playback(manifest, on_ready)
+	-- Guard against being invoked while still connected to a real lobby --
+	-- confirmed live to hang the whole instance: creating a local lobby
+	-- (below) while the real lobby's own leave/teardown is still an
+	-- in-flight async API call (see PVP.pvp_leave_lobby -> lobby:leave(),
+	-- api/lobby/state.lua) leaves two lobby objects/MQTT subscriptions
+	-- fighting over MPAPI's current-lobby state at once. The real UI entry
+	-- points (replay/spectate browsers) are only menu-reachable, never
+	-- mid-match, so refusing here is a pure safety net, not a real-world
+	-- workflow this blocks.
+	if PVP.LOBBY and PVP.LOBBY.code then
+		sendWarnMessage("PVP._start_playback: refusing to start while connected to a real lobby (" .. tostring(PVP.LOBBY.code) .. ")", "MULTIPLAYER")
+		return
+	end
+
 	PVP.reset_lobby_config()
 	PVP.SP.practice = true
 	PVP.SP.ruleset = manifest.ruleset
