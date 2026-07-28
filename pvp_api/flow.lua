@@ -50,6 +50,22 @@ end
 
 function PVP.pvp_create_private_lobby(gamemode_key)
 	gamemode_key = gamemode_key or PVP.GamemodeKey.PVP_CHOCOLATE
+	-- Reject an unregistered gamemode key up front instead of silently
+	-- degrading: PVP.reset_ruleset_to_gamemode_default/pvp_lobby_metadata
+	-- both quietly fall back to the chocolate ruleset's config for an
+	-- unknown key, but PVP._pvp_gamemode itself keeps the bogus literal
+	-- string -- so round.lua's reset_blinds (PVP.Gamemodes[gamemode_key])
+	-- never finds a match and the nemesis/PvP boss blind mechanism never
+	-- engages for the whole match, with no error shown to either player.
+	-- Confirmed live with "pvp_standard" (not a real key -- valid ones are
+	-- pvp_chocolate/strawberry/vanilla/smallworld/royale/manhunt/teams/
+	-- experimental): the match proceeded normally through a full ante with
+	-- zero PvP scoring/lives, indistinguishable from a working match until
+	-- someone noticed nothing PvP-shaped ever happened.
+	if not PVP.PVP_GAMEMODES[gamemode_key] then
+		sendWarnMessage("pvp_create_private_lobby: unknown gamemode key '" .. tostring(gamemode_key) .. "'", "MULTIPLAYER")
+		return
+	end
 	-- Block creating a lobby while in matchmaking. The replay re-enters THIS
 	-- function (not MPAPI.create_lobby) so "Leave Queue & Continue" runs the full
 	-- setup -- setup_lobby_mirror + the CONNECTED UI transition below. Replaying
