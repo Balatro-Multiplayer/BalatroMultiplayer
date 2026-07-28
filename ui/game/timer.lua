@@ -86,12 +86,14 @@ function MP.UI.timer_hud()
 											ref_table = setmetatable({}, {
 												__index = function()
 													if not MP.GAME.timer then return 0 end
-													-- All numbers bigger then 10 - display as integer
-													-- Also accounting for rounding to prevent 10.0 to be displayed
+													local threshold = MP.LOBBY.config.timer_display_threshold or 0
+													if threshold > 0 and MP.GAME.timer > threshold
+														and not MP.GAME.timer_started and not MP.GAME.nemesis_timer_started then
+														return string.format("%d", threshold)
+													end
 													if MP.GAME.timer > 9.95 then
 														return string.format("%d", MP.GAME.timer)
 													end
-													-- Less than 10 - display decimal part
 													return string.format("%.1f", MP.GAME.timer)
 												end,
 											}),
@@ -469,6 +471,18 @@ function Game:update(dt)
 	local speedup = is_pvp_timer and 1 or MP.current_ruleset().timer_speedup_multiplier or 1
 	local tick_mult = MP.GAME.nemesis_timer_started and speedup or 1
 	MP.GAME.timer = math.max(0, MP.GAME.timer - timer_dt * tick_mult)
+
+	if MP.GAME.timer_threshold_pending then
+		local threshold = MP.LOBBY.config.timer_display_threshold or 0
+		if MP.GAME.timer <= threshold then
+			MP.GAME.timer_threshold_pending = false
+			Client.send({
+				action = "startAnteTimer",
+				time = threshold,
+				isPvP = (MP.is_pvp_boss() and MP.is_layer_active("pvp_timer")) or nil,
+			})
+		end
+	end
 
 	if MP.GAME.timer == 0 then
 		MP.GAME.timer_consumed = true
