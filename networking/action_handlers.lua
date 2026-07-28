@@ -1359,10 +1359,14 @@ function MP.ACTIONS.start_ante_timer()
 end
 
 function MP.ACTIONS.pause_ante_timer()
-	Client.send({
-		action = "pauseAnteTimer",
-		time = MP.GAME.timer,
-	})
+	if MP.GAME.timer_threshold_pending then
+		MP.GAME.timer_threshold_pending = false
+	else
+		Client.send({
+			action = "pauseAnteTimer",
+			time = MP.GAME.timer,
+		})
+	end
 	action_pause_ante_timer({ time = MP.GAME.timer, fromNemesis = false })
 end
 
