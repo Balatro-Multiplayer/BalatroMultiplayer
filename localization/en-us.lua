@@ -234,6 +234,70 @@ return {
 					"not in a {C:attention}PvP Blind{}",
 				},
 			},
+			j_mp_last_laugh = {
+				name = "Last Laugh",
+				text = {
+					"Sell this card during",
+					"{C:attention}PvP Blind{} to destroy {C:attention}#1#{}",
+					"random cards in hand",
+				},
+			},
+			j_mp_line_cutter = {
+				name = "Line Cutter",
+				text = {
+					"Sell this card during",
+					"{C:attention}PvP Blind{} to create",
+					"a {C:attention}Voucher Tag{}",
+				},
+			},
+			j_mp_balloons = {
+				name = "Balloons",
+				text = {
+					"Sell this card during",
+					"{C:attention}PvP Blind{} to create a",
+					"random {C:attention}Tag{} for each",
+					"empty Joker slot",
+					"{C:inactive}(Max of {C:attention}#1#{} {C:inactive}Tags)",
+				},
+			},
+			j_mp_occultist = {
+				name = "Occultist",
+				text = {
+					"Sell this card during",
+					"{C:attention}PvP Blind{} to create a",
+					"{C:attention}Charm Tag{} for each",
+					"empty Joker slot",
+					"{C:inactive}(Max of {C:attention}#1#{} {C:inactive}Tags)",
+				},
+			},
+			j_mp_jester_in_yellow = {
+				name = "Jester in Yellow",
+				text = {
+					"Sell this card during",
+					"{C:attention}PvP Blind{} to add",
+					"{C:money}Rental{} to a random",
+					"{X:purple,C:white}Nemesis{} Joker",
+				},
+			},
+			j_mp_dynamic_duo = {
+				name = "Dynamic Duo",
+				text = {
+					"Sell this card during",
+					"{C:attention}PvP Blind{} to remove",
+					"{C:dark_edition}Editions{} and {C:attention}Stickers{}",
+					"from players' Jokers",
+				},
+			},
+			j_mp_dynamic_duo_overflow = {
+				name = "Dynamic Duo",
+				text = {
+					"Sell this card during",
+					"{C:attention}PvP Blind{} to remove",
+					"{C:dark_edition}Editions{} and {C:attention}Stickers{}",
+					"from players' Jokers",
+					"{C:inactive}(Cards can overflow)",
+				},
+			},
 			j_mp_hanging_chad = {
 				name = "Hanging Chad",
 				text = {
