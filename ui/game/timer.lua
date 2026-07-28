@@ -86,11 +86,6 @@ function MP.UI.timer_hud()
 											ref_table = setmetatable({}, {
 												__index = function()
 													if not MP.GAME.timer then return 0 end
-													local threshold = MP.LOBBY.config.timer_display_threshold or 0
-													if threshold > 0 and MP.GAME.timer > threshold
-														and not MP.GAME.timer_started and not MP.GAME.nemesis_timer_started then
-														return string.format("%d", threshold)
-													end
 													if MP.GAME.timer > 9.95 then
 														return string.format("%d", MP.GAME.timer)
 													end
