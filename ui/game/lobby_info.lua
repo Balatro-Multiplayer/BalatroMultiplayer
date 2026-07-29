@@ -230,7 +230,7 @@ function MP.UI.create_UIBox_player_row(type)
 					},
 				},
 			},
-			{
+			(MP.LOBBY.config.timer_display_threshold or 0) <= 0 and {
 				n = G.UIT.C,
 				config = { align = "cm" },
 				nodes = {
@@ -291,7 +291,7 @@ function MP.UI.create_UIBox_player_row(type)
 					-- 	},
 					-- },
 				},
-			},
+			} or nil,
 			{
 				n = G.UIT.C,
 				config = { align = "cm", padding = 0.05, colour = G.C.L_BLACK, r = 0.1, minw = 3, maxw = 3 },

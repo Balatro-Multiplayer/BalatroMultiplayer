@@ -21,7 +21,7 @@ MP.Ruleset({
 	end,
 	force_lobby_options = function(self)
 		MP.LOBBY.config.timer_base_seconds = 180
-		MP.LOBBY.config.timer_forgiveness = 1
+		MP.LOBBY.config.timer_forgiveness = 0
 		MP.LOBBY.config.the_order = false
 		MP.LOBBY.config.preview_disabled = true
 		MP.LOBBY.config.enemy_location_disabled = true
