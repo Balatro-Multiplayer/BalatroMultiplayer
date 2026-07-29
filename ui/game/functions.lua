@@ -83,18 +83,8 @@ local skip_blind_ref = G.FUNCS.skip_blind
 G.FUNCS.skip_blind = function(e)
 	skip_blind_ref(e)
 	if MP.LOBBY.code then
-		-- Old timer: add time from skipping to own timer when not timered and not timering
-		if
-            MP.LOBBY.config.timer
-			and not MP.GAME.timer_started
-			and not MP.GAME.nemesis_timer_started
-            and not MP.GAME.timer_consumed
-            and not MP.GAME.nemesis_timer_was_started
-            and not MP.is_any_layer_active({ "no_animation_timer", "pressure_timer" })
-			and (MP.LOBBY.config.timer_increment_seconds or 0) > 0
-        then
-            MP.UI.restore_timer(MP.LOBBY.config.timer_increment_seconds)
-		end
+        MP.GAME.skips_before_pvp = (MP.GAME.skips_before_pvp or 0) + 1
+        MP.UI.update_matching_skip_timer(false)
 
 		MP.ACTIONS.skip(G.GAME.skips)
 		MP.RLOG.record("skip_blind", 0, "action:skipBlind")
