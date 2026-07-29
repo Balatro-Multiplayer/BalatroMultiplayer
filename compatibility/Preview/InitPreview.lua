@@ -55,7 +55,7 @@ function FN.PRE.start_new_coroutine()
                 and not MP.GAME.nemesis_timer_started
                 and not MP.GAME.timer_consumed
             then
-                MP.UI.consume_timer(timer_cost, nil, math.max(10, timer_cost))
+                MP.UI.consume_timer(timer_cost, nil, 10)
             end
             return true
         end
