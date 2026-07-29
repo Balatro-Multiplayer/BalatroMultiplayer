@@ -333,6 +333,28 @@ function reset_idol_card()
 				G.GAME.current_round.idol_card.rank = idol_card.base.value
 				G.GAME.current_round.idol_card.suit = idol_card.base.suit
 				G.GAME.current_round.idol_card.id   = idol_card.base.id
+
+				-- Log the hit so the website log parser can show which card won and
+				-- how likely it was. Cards are compact "<rank><suit><count>" tokens
+				-- in selection order (T = 10), base64'd so the line stays one token:
+				--   IDOL_ROLL::<base64 of
+				--     {"roll":0.62,"winner":"QH","cards":["KS4","QH3","AS1"]}>
+				local rank_codes = { Ace = "A", King = "K", Queen = "Q", Jack = "J", ["10"] = "T" }
+				local function card_token(value, suit)
+					return (rank_codes[value] or tostring(value)) .. tostring(suit):sub(1, 1)
+				end
+				local tokens = {}
+				for _, reel_entry in ipairs(valid_idol_cards) do
+					tokens[#tokens + 1] = string.format('"%s%s"', card_token(reel_entry.value, reel_entry.suit), tostring(reel_entry.count))
+				end
+				local idol_payload = string.format(
+					'{"roll":%s,"winner":"%s","cards":[%s]}',
+					tostring(raw_random),
+					card_token(idol_card.base.value, idol_card.base.suit),
+					table.concat(tokens, ",")
+				)
+				sendDebugMessage("IDOL_ROLL::" .. love.data.encode("string", "base64", idol_payload), "IdolAlgo")
+
 				break
 			end
 		end
