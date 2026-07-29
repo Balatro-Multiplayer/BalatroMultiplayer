@@ -536,7 +536,18 @@ end
 -- If value increased - one player skipped even further, add time.
 -- If value decreased - another player catches up, deduct time.
 function MP.UI.update_matching_skip_timer(from_nemesis)
-    if (MP.LOBBY.config.timer_display_threshold or 0) > 0 then return end
+    if (MP.LOBBY.config.timer_display_threshold or 0) > 0 then
+        if not from_nemesis
+            and MP.LOBBY.config.timer
+            and not MP.GAME.timer_was_started
+            and not MP.GAME.nemesis_timer_was_started
+            and not MP.is_any_layer_active({ "no_animation_timer", "pressure_timer" })
+            and (MP.LOBBY.config.timer_increment_seconds or 0) > 0
+        then
+            MP.UI.restore_timer(MP.LOBBY.config.timer_increment_seconds, false)
+        end
+        return
+    end
 
     local new_diff = math.abs((MP.GAME.skips_before_pvp or 0) - (MP.GAME.enemy.skips_before_pvp or 0))
     local skips_dx = new_diff - (MP.GAME.skips_difference or 0)
