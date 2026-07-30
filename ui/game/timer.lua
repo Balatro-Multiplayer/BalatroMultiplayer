@@ -162,13 +162,15 @@ function MP.UI.nemesis_timer_hud()
 														if not MP.GAME.enemy or not MP.GAME.enemy.last_timer then
 															return "0.0"
 														end
-														-- All numbers bigger then 10 - display as integer
-														-- Also accounting for rounding to prevent 10.0 to be displayed
-														if MP.GAME.enemy.last_timer > 9.95 then
-															return string.format("%d", MP.GAME.enemy.last_timer)
+														local val = MP.GAME.enemy.last_timer
+														local threshold = MP.LOBBY.config.timer_display_threshold or 0
+														if threshold > 0 and val > threshold then
+															val = threshold
 														end
-														-- Less than 10 - display decimal part
-														return string.format("%.1f", MP.GAME.enemy.last_timer)
+														if val > 9.95 then
+															return string.format("%d", val)
+														end
+														return string.format("%.1f", val)
 													end,
 												}),
 												ref_value = "timer",
