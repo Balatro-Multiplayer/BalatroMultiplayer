@@ -49,153 +49,44 @@ function PVP.UI.create_UIBox_round_scores_row_nemesis()
     }}
 end
 
--- The mod-specific body of the PvP end screen, rendered inside the shared
--- MPAPI.end_screen shell: opponent jokers + toggle/view-deck buttons, the stat block +
--- Ko-fi, and the nemesis row + seed + lobby buttons.
-function PVP.UI.end_game_body(has_won)
-	return {
-		n = G.UIT.R,
-		config = { align = "cm", padding = 0.15 },
-		nodes = {
-			{
-				n = G.UIT.C,
-				config = { align = "cm" },
-				nodes = {
-					{
-						n = G.UIT.R,
-						config = { align = "cm", padding = 0.08 },
-						nodes = {
-							{ n = G.UIT.T, config = { ref_table = PVP, ref_value = "end_game_jokers_text", scale = 0.8, maxw = 5, shadow = true } },
-						},
-					},
-					{
-						n = G.UIT.R,
-						config = { align = "cm", padding = 0.08 },
-						nodes = {
-							{ n = G.UIT.O, config = { object = PVP.end_game_jokers } },
-						},
-					},
-					{
-						n = G.UIT.R,
-						config = { align = "cm", padding = 0.08 },
-						nodes = {
-							{ n = G.UIT.C, config = { maxw = has_won and 0.8 or 1, minw = has_won and 0.8 or 1, minh = 0.7, colour = G.C.CLEAR, no_fill = false } },
-							{
-								n = G.UIT.C,
-								config = { button = "toggle_players_jokers", align = "cm", padding = 0.12, colour = G.C.BLUE, emboss = 0.05, minh = 0.7, minw = 2, maxw = 2, r = 0.1, shadow = true, hover = true },
-								nodes = {
-									{ n = G.UIT.T, config = { text = localize("b_toggle_jokers"), colour = G.C.UI.TEXT_LIGHT, scale = 0.65, col = true } },
-								},
-							},
-							{
-								n = G.UIT.C,
-								config = { id = "view_nemesis_deck_button", button = "view_nemesis_deck", align = "cm", padding = 0.12, colour = G.C.BLUE, emboss = 0.05, minh = 0.7, minw = 2, maxw = 2, r = 0.1, shadow = true, hover = true, focus_args = has_won and { nav = "wide" } or nil },
-								nodes = {
-									{ n = G.UIT.T, config = { text = localize("b_view_nemesis_deck"), colour = G.C.UI.TEXT_LIGHT, scale = 0.65, col = true } },
-								},
-							},
-							{ n = G.UIT.C, config = { maxw = has_won and 0.8 or 1, minw = has_won and 0.8 or 1, minh = 0.7, colour = G.C.CLEAR, no_fill = false } },
-						},
-					},
-					{
-						n = G.UIT.R,
-						config = { align = "cm" },
-						nodes = {
-							{
-								n = G.UIT.C,
-								config = { padding = 0.08 },
-								nodes = {
-									create_UIBox_round_scores_row("hand"),
-									create_UIBox_round_scores_row("poker_hand"),
-									{
-										n = G.UIT.R,
-										config = {},
-										nodes = {
-											{
-												n = G.UIT.C,
-												nodes = {
-													create_UIBox_round_scores_row('cards_purchased', G.C.MONEY),
-													{ n = G.UIT.R, config = { minh = 0.08 } },
-													create_UIBox_round_scores_row('times_rerolled', G.C.GREEN),
-												},
-											},
-											{ n = G.UIT.C, config = { minw = 0.08 } },
-											{
-												n = G.UIT.C,
-												nodes = {
-													create_UIBox_round_scores_row('furthest_ante', G.C.FILTER),
-													{ n = G.UIT.R, config = { minh = 0.08 } },
-													create_UIBox_round_scores_row('furthest_round', G.C.FILTER),
-												},
-											},
-										},
-									},
-									{ n = G.UIT.R, config = { minh = 0.01 } },
-									{
-										n = G.UIT.R,
-										config = { align = "cm", minw = 2 },
-										nodes = {
-											{ n = G.UIT.T, config = { text = localize("ml_mp_kofi_message")[1], scale = 0.35, colour = G.C.UI.TEXT_LIGHT, col = true } },
-										},
-									},
-									{
-										n = G.UIT.R,
-										config = { align = "cm", minw = 2 },
-										nodes = {
-											{ n = G.UIT.T, config = { text = localize("ml_mp_kofi_message")[2], scale = 0.35, colour = G.C.UI.TEXT_LIGHT, col = true } },
-										},
-									},
-									{
-										n = G.UIT.R,
-										config = { align = "cm", minw = 2 },
-										nodes = {
-											{ n = G.UIT.T, config = { text = localize("ml_mp_kofi_message")[3] .. (localize("ml_mp_kofi_message")[4] and (" " .. localize("ml_mp_kofi_message")[4]) or ""), scale = 0.35, colour = G.C.UI.TEXT_LIGHT, col = true } },
-										},
-									},
-									{ n = G.UIT.R, config = { minh = 0.08 } },
-									{
-										n = G.UIT.R,
-										config = { id = "ko-fi_button", align = "cm", padding = 0.1, r = 0.1, hover = true, colour = HEX("72A5F2"), button = "open_kofi", shadow = true },
-										nodes = {
-											{
-												n = G.UIT.R,
-												config = { align = "cm", padding = 0, no_fill = true, maxw = 3 },
-												nodes = {
-													{ n = G.UIT.T, config = { text = localize("b_mp_kofi_button"), scale = 0.35, colour = G.C.UI.TEXT_LIGHT } },
-												},
-											},
-										},
-									},
-								},
-							},
-							{
-								n = G.UIT.C,
-								config = { align = "tr", padding = 0.08 },
-								nodes = {
-									PVP.UI.create_UIBox_round_scores_row_nemesis(),
-									create_UIBox_round_scores_row("seed", G.C.WHITE),
-									UIBox_button({ id = "copy_seed_button", button = "copy_seed", label = { localize("b_copy") }, colour = G.C.BLUE, scale = 0.3, minw = 2.5, maxw = 2.5, minh = 0.4 }),
-									{ n = G.UIT.R, config = { align = "cm", minh = 0.45, minw = 0.1 }, nodes = {} },
-									-- §17.10: every player's deck/jokers/highest PvP score, not just
-									-- the single toggleable nemesis above.
-									UIBox_button({ button = "mp_pvp_open_roster", label = { "Roster" }, colour = G.C.PURPLE, minw = 4, maxw = 4, minh = 0.8, focus_args = { nav = "wide" } }),
-									UIBox_button({ id = "from_game_won", button = "continue_in_singleplayer", label = { localize("b_continue_singleplayer") }, minw = 4, maxw = 4, minh = 0.8, focus_args = { nav = "wide", snap_to = true } }),
-									UIBox_button({ button = "mp_pvp_leave_from_game", label = { localize("b_leave_lobby") }, minw = 4, maxw = 4, minh = 0.8, focus_args = { nav = "wide" } }),
-								},
-							},
-						},
-					},
-				},
-			},
-		},
-	}
+-- Rebuilds PVP.end_game_jokers from PVP._collected_results (pvp_api/actions/
+-- player_result.lua) for whichever player is currently selected -- the same
+-- per-player broadcast SPDRN's own SPDRN._collected_results uses, which is
+-- why MPAPI.rebuild_jokers_area (BalatroMultiplayerAPI/api/end_screen.lua)
+-- can be shared between the two mods outright. Supersedes the old
+-- get_end_game_jokers/load_end_game_jokers request-response pair (still
+-- defined in networking/action_handlers.lua but no longer called from
+-- here) -- that pair only ever tracked a single scalar payload with no
+-- sender id, so in any N>2 lobby whichever response landed last would've
+-- clobbered every other player's data; _collected_results is keyed by
+-- sender id and already had to solve that problem for the Roster screen.
+local function pvp_rebuild_end_game_jokers(player_id, player_name)
+	local result = player_id and PVP._collected_results and PVP._collected_results[player_id]
+	MPAPI.rebuild_jokers_area(PVP.end_game_jokers, result and result.jokers)
+	PVP.end_game_jokers_text = (result and result.jokers) and ((player_name or "Player") .. "'s Jokers")
+		or ((player_name or "Player") .. " -- still playing...")
 end
 
--- Builds the PvP win / game-over screen inside the shared MPAPI.end_screen shell. The
--- async opponent-jokers / nemesis-deck fetches are kicked off here (the body renders
--- them once they arrive). PvP hooks this via the create_UIBox_win/game_over overrides
--- below rather than calling the overlay directly, so it keeps its own paused handling.
-function PVP.UI.create_UIBox_mp_game_end(has_won)
+G.FUNCS.pvp_end_screen_select_player = function(e)
+	if not e then return end
+	local lobby = MPAPI.get_current_lobby()
+	local players = lobby and lobby:get_players()
+	local p = players and players[e.to_key]
+	if not p then return end
+	PVP._end_screen_selected_player_id = p.id
+	PVP._end_screen_selected_player_name = p.displayName or p.id
+	pvp_rebuild_end_game_jokers(p.id, PVP._end_screen_selected_player_name)
+end
+
+-- The jokers + player-selector panel embedded in end_game_body, built via
+-- the shared MPAPI.end_screen_player_panel that SPDRN's own
+-- SPDRN.build_end_game_extras (BalatroMultiplayerSpeed/ui/end_game_panel.lua)
+-- also calls -- replaces the old binary you/nemesis toggle_players_jokers
+-- ("Enemy Jokers"/"Your Jokers"). "View Deck" always opens the existing
+-- nemesis-deck viewer (view_nemesis_deck below), which already tabs between
+-- the nemesis's deck and your own -- PvP is 1v1, so that covers both
+-- selector options without needing a per-player deck fetch.
+function PVP.UI.build_end_game_extras()
 	PVP.end_game_jokers = CardArea(
 		0,
 		0,
@@ -203,13 +94,61 @@ function PVP.UI.create_UIBox_mp_game_end(has_won)
 		G.CARD_H,
 		{ card_limit = G.GAME.starting_params.joker_slots, type = "joker", highlight_limit = 1, fixed_limit = true }
 	)
-	if not PVP.end_game_jokers_received then
-		PVP.ACTIONS.get_end_game_jokers()
-	else
-		G.FUNCS.load_end_game_jokers()
-	end
-	PVP.end_game_jokers_text = localize("k_enemy_jokers")
 
+	local lobby = MPAPI.get_current_lobby()
+	local players, options, current_option = MPAPI.end_screen_default_selection(lobby)
+
+	local selected = players[current_option]
+	PVP._end_screen_selected_player_id = selected and selected.id
+	PVP._end_screen_selected_player_name = selected and (selected.displayName or selected.id)
+	pvp_rebuild_end_game_jokers(PVP._end_screen_selected_player_id, PVP._end_screen_selected_player_name)
+
+	return MPAPI.end_screen_player_panel({
+		jokers_text_ref = { table = PVP, key = "end_game_jokers_text" },
+		jokers_area = PVP.end_game_jokers,
+		options = options,
+		current_option = current_option,
+		opt_callback = "pvp_end_screen_select_player",
+		-- Plain "View Deck" (not localize("b_view_nemesis_deck")) to match
+		-- SPDRN's identically-styled button -- the whole point of sharing
+		-- this panel is that the two screens read as one system.
+		view_deck_button = MPAPI.end_screen_view_deck_button("view_nemesis_deck", "View Deck"),
+	})
+end
+
+-- The lobby-exit buttons on the end screen, via the shared
+-- MPAPI.end_screen_buttons (matching SPDRN.end_screen_buttons's own
+-- per-situation button lists in BalatroMultiplayerSpeed/ui/lose_screen.lua).
+function PVP.end_screen_buttons()
+	return MPAPI.end_screen_buttons({
+		{ button = "continue_in_singleplayer", label = localize("b_continue_singleplayer"), colour = G.C.BLUE },
+		{ button = "mp_pvp_leave_from_game", label = localize("b_leave_lobby"), colour = G.C.RED },
+	})
+end
+
+-- The PvP end screen's body: the shared MPAPI.end_screen_body
+-- (BalatroMultiplayerAPI/api/end_screen.lua), with the nemesis-vs-you score
+-- row as PvP's one extra side row and PvP's own button set. SPDRN's
+-- win_body/lose_body (BalatroMultiplayerSpeed/ui/win_screen.lua,
+-- ui/lose_screen.lua) call the exact same shared body.
+function PVP.UI.end_game_body(has_won)
+	return MPAPI.end_screen_body({
+		player_panel = PVP.UI.build_end_game_extras(),
+		side_rows = { PVP.UI.create_UIBox_round_scores_row_nemesis() },
+		buttons = PVP.end_screen_buttons(),
+	})
+end
+
+-- Builds the PvP win / game-over screen inside the shared MPAPI.end_screen shell. The
+-- nemesis-deck fetch is kicked off here (the body renders it once it arrives) --
+-- jokers no longer need a fetch of their own; PVP.UI.build_end_game_extras (called
+-- from end_game_body, below) reads them straight out of PVP._collected_results,
+-- which is already populated synchronously before this ever runs (see
+-- action_win_game/action_lose_game's PVP.report_roster_result() call in
+-- networking/action_handlers.lua). PvP hooks this via the create_UIBox_win/
+-- game_over overrides below rather than calling the overlay directly, so it keeps
+-- its own paused handling.
+function PVP.UI.create_UIBox_mp_game_end(has_won)
 	PVP.ACTIONS.request_nemesis_stats()
 
 	PVP.nemesis_deck = CardArea(-100, -100, G.CARD_W, G.CARD_H, { type = "deck" })
