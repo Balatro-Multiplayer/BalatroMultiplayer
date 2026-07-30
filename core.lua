@@ -199,6 +199,8 @@ function MP.reset_lobby_config(persist_ruleset_and_gamemode)
 		legacy_smallworld = false,
 		-- Baseline off; start_lobby sets it on for standard-layer rulesets.
 		hide_score_until_played = false,
+		enemy_location_disabled = false,
+		timer_display_threshold = 0,
 	}
 end
 MP.reset_lobby_config()
@@ -226,6 +228,7 @@ function MP.reset_game_states()
 			info_received = false,
 			location = localize("loc_selecting"),
 			skips = 0,
+            skips_before_pvp = 0,
 			lives = MP.LOBBY.config.starting_lives,
 			sells = 0,
 			sells_per_ante = {},
@@ -245,8 +248,10 @@ function MP.reset_game_states()
 		highest_score = MP.INSANE_INT.empty(),
 		timer = MP.UTILS.timer_base(),
 		timer_started = false,
+        timer_was_started = false,
         nemesis_timer_started = false,
         nemesis_timer_was_started = false,
+		timer_threshold_pending = false,
 		timer_consumed = false,
 		pvp_reached = false,
         pvp_reached_first = false,
@@ -268,6 +273,8 @@ function MP.reset_game_states()
 		},
         pvp_timer_order = nil,
         pvp_timer_activated = false,
+        skips_before_pvp = 0,
+        skips_difference = 0,
 	}
 end
 MP.reset_game_states()

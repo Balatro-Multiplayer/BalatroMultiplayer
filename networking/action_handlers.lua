@@ -103,6 +103,7 @@ local function action_rejoinedLobby(p)
 	MP.self_reconnect_countdown = nil
 	MP.GAME.timer_started = false
 	MP.GAME.nemesis_timer_started = false
+	MP.GAME.timer_threshold_pending = false
 	MP.ACTIONS.sync_client()
 	MP.ACTIONS.lobby_info()
 	MP.UI.update_connection_status()
@@ -156,6 +157,7 @@ local function action_enemyDisconnected(p)
 
 	MP.GAME.timer_started = false
 	MP.GAME.nemesis_timer_started = false
+	MP.GAME.timer_threshold_pending = false
 
 	MP.enemy_disconnect_countdown = {
 		end_time = love.timer.getTime() + timeout,
@@ -256,6 +258,7 @@ local function action_reconnecting()
 		MP.LOBBY.connected = false
 		MP.GAME.timer_started = false
 		MP.GAME.nemesis_timer_started = false
+		MP.GAME.timer_threshold_pending = false
 		MP.UI.update_connection_status()
 		sendWarnMessage("Connection lost, attempting to reconnect...", "MULTIPLAYER")
 
@@ -319,9 +322,14 @@ end
 local function begin_pvp_blind()
 	if MP.GAME.next_blind_context then
 		G.FUNCS.select_blind(MP.GAME.next_blind_context)
+        MP.GAME.enemy.skips_before_pvp = 0
+        MP.GAME.skips_before_pvp = 0
+        MP.GAME.skips_difference = 0
         MP.GAME.timer_started = false
+        MP.GAME.timer_was_started = false
         MP.GAME.nemesis_timer_started = false
         MP.GAME.nemesis_timer_was_started = false
+        MP.GAME.timer_threshold_pending = false
         MP.GAME.timer_consumed = false
         MP.GAME.timer = MP.UTILS.pvp_timer_base()
 	else
@@ -338,6 +346,9 @@ local function action_start_blind(p)
 	MP.GAME.enemy.score_text = "0"
 	-- Re-mask the opponent's hands until the first enemyInfo of the new blind.
 	MP.GAME.enemy.info_received = false
+    MP.GAME.enemy.skips_before_pvp = 0
+    MP.GAME.skips_before_pvp = 0
+    MP.GAME.skips_difference = 0
 	MP.GAME.ready_blind = false
 	MP.GAME.pvp_reached = false
     MP.GAME.pvp_timer_order = nil
@@ -356,6 +367,9 @@ local function action_enemy_info(p)
 	if skips and MP.GAME.enemy.skips ~= skips then
 		for i = 1, skips - MP.GAME.enemy.skips do
 			MP.GAME.enemy.spent_in_shop[#MP.GAME.enemy.spent_in_shop + 1] = 0
+            MP.GAME.enemy.skips_before_pvp = (MP.GAME.enemy.skips_before_pvp or 0) + 1
+            MP.UI.update_matching_skip_timer(true)
+
 			if
 				MP.GAME.enemy.skips < skips
 				and MP.LOBBY.config.timer
@@ -377,49 +391,51 @@ local function action_enemy_info(p)
     if score then
         if MP.INSANE_INT.greater_than(score, MP.GAME.enemy.highest_score) then MP.GAME.enemy.highest_score = score end
 
-        G.E_MANAGER:add_event(Event({
-            blockable = false,
-            blocking = false,
-            trigger = "ease",
-            delay = 0.75,
-            timer = "REAL",
-            ref_table = MP.GAME.enemy.score,
-            ref_value = "e_count",
-            ease_to = score.e_count,
-            func = function(t)
-                return math.floor(t)
-            end,
-        }))
-
-        G.E_MANAGER:add_event(Event({
-            blockable = false,
-            blocking = false,
-            trigger = "ease",
-            delay = 0.75,
-            timer = "REAL",
-            ref_table = MP.GAME.enemy.score,
-            ref_value = "coeffiocient", -- why is this misspelled
-            ease_to = score.coeffiocient,
-            func = function(t)
-                local mult = 1
-                if score.exponent > 0 then mult = 100 end
-                return math.floor(t * mult) / mult
-            end,
-        }))
-
-        G.E_MANAGER:add_event(Event({
-            blockable = false,
-            blocking = false,
-            trigger = "ease",
-            delay = 0.75,
-            timer = "REAL",
-            ref_table = MP.GAME.enemy.score,
-            ref_value = "exponent",
-            ease_to = score.exponent,
-            func = function(t)
-                return math.floor(t)
-            end,
-        }))
+        if not MP.INSANE_INT.equal(MP.GAME.enemy.score, score) then
+            G.E_MANAGER:add_event(Event({
+                blockable = false,
+                blocking = false,
+                trigger = "ease",
+                delay = 0.75,
+                timer = "REAL",
+                ref_table = MP.GAME.enemy.score,
+                ref_value = "e_count",
+                ease_to = score.e_count,
+                func = function(t)
+                    return math.floor(t)
+                end,
+            }))
+    
+            G.E_MANAGER:add_event(Event({
+                blockable = false,
+                blocking = false,
+                trigger = "ease",
+                delay = 0.75,
+                timer = "REAL",
+                ref_table = MP.GAME.enemy.score,
+                ref_value = "coeffiocient", -- why is this misspelled
+                ease_to = score.coeffiocient,
+                func = function(t)
+                    local mult = 1
+                    if score.exponent > 0 then mult = 100 end
+                    return math.floor(t * mult) / mult
+                end,
+            }))
+    
+            G.E_MANAGER:add_event(Event({
+                blockable = false,
+                blocking = false,
+                trigger = "ease",
+                delay = 0.75,
+                timer = "REAL",
+                ref_table = MP.GAME.enemy.score,
+                ref_value = "exponent",
+                ease_to = score.exponent,
+                func = function(t)
+                    return math.floor(t)
+                end,
+            }))
+        end
 
         MP.GAME.enemy.real_score = score
         MP.GAME.enemy.info_received = true
@@ -447,7 +463,7 @@ local function action_enemy_info(p)
 		play_sound("holo1", 0.865, 0.9)
 		play_sound("gong", 0.765, 0.4)
 	end
-	if MP.GAME.enemy.skips < skips then
+	if MP.GAME.enemy.skips < skips and not MP.LOBBY.config.enemy_location_disabled then
 		play_sound("negative", 0.865, 0.4)
 		play_sound("gong", 0.765, 0.4)
 	end
@@ -481,8 +497,10 @@ local function action_end_pvp(p)
 	MP.GAME.timer = MP.UTILS.timer_base()
 	MP.GAME.timer_consumed = false
 	MP.GAME.timer_started = false
+    MP.GAME.timer_was_started = false
 	MP.GAME.nemesis_timer_started = false
     MP.GAME.nemesis_timer_was_started = false
+	MP.GAME.timer_threshold_pending = false
 	MP.GAME.ready_blind = false
 	MP.GAME.pvp_reached = false
     MP.GAME.pvp_reached_first = false
@@ -496,9 +514,11 @@ local function action_end_pvp(p)
                 func = function()
                     MP.GAME.timer = MP.UTILS.timer_base()
                     MP.GAME.timer_started = false
+                    MP.GAME.timer_was_started = false
                     MP.GAME.nemesis_timer_started = false
                     MP.GAME.nemesis_timer_was_started = false
                     MP.GAME.pvp_timer_activated = false
+                    MP.GAME.timer_threshold_pending = false
                     return true
                 end,
             }))
@@ -1047,6 +1067,7 @@ local function action_start_ante_timer(p)
         MP.GAME.nemesis_timer_was_started = true
 	else
 		MP.GAME.timer_started = true
+        MP.GAME.timer_was_started = true
 	end
 end
 
@@ -1337,19 +1358,30 @@ end
 
 function MP.ACTIONS.start_ante_timer()
 	local is_pvp = MP.is_pvp_boss() and MP.is_layer_active("pvp_timer")
-	Client.send({
-		action = "startAnteTimer",
-		time = MP.GAME.timer,
-		isPvP = is_pvp or nil,
-	})
+	local threshold = MP.LOBBY.config.timer_display_threshold or 0
+
 	action_start_ante_timer({ time = MP.GAME.timer, fromNemesis = false })
+
+	if threshold > 0 and MP.GAME.timer > threshold then
+		MP.GAME.timer_threshold_pending = true
+	else
+		Client.send({
+			action = "startAnteTimer",
+			time = MP.GAME.timer,
+			isPvP = is_pvp or nil,
+		})
+	end
 end
 
 function MP.ACTIONS.pause_ante_timer()
-	Client.send({
-		action = "pauseAnteTimer",
-		time = MP.GAME.timer,
-	})
+	if MP.GAME.timer_threshold_pending then
+		MP.GAME.timer_threshold_pending = false
+	else
+		Client.send({
+			action = "pauseAnteTimer",
+			time = MP.GAME.timer,
+		})
+	end
 	action_pause_ante_timer({ time = MP.GAME.timer, fromNemesis = false })
 end
 
