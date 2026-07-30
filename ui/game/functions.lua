@@ -116,31 +116,6 @@ G.FUNCS.skip_blind = function(e)
 	end
 end
 
-function G.FUNCS.toggle_players_jokers()
-	if not G.jokers or not PVP.end_game_jokers then return end
-
-	-- Avoid Jokers being removed from activating removal abilities (e.g. Negatives)
-	if PVP.end_game_jokers.cards then
-		for _, card in pairs(PVP.end_game_jokers.cards) do
-			card.added_to_deck = false
-		end
-	end
-
-	if PVP.end_game_jokers_text == localize("k_enemy_jokers") then
-		local your_jokers_save = copy_table(G.jokers:save())
-		PVP.end_game_jokers:load(your_jokers_save)
-		PVP.end_game_jokers_text = localize("k_your_jokers")
-	else
-		if PVP.end_game_jokers_received then
-			G.FUNCS.load_end_game_jokers()
-		else
-			if PVP.end_game_jokers.cards then remove_all(PVP.end_game_jokers.cards) end
-			PVP.end_game_jokers.cards = {}
-		end
-		PVP.end_game_jokers_text = localize("k_enemy_jokers")
-	end
-end
-
 function G.FUNCS.view_nemesis_deck()
 	G.SETTINGS.paused = true
 	if G.deck_preview then
@@ -150,10 +125,6 @@ function G.FUNCS.view_nemesis_deck()
 	G.FUNCS.overlay_menu({
 		definition = G.UIDEF.create_UIBox_view_nemesis_deck(),
 	})
-end
-
-function G.FUNCS.open_kofi(e)
-	love.system.openURL("https://ko-fi.com/virtualized")
 end
 
 -- Screen-wipe teardown (relocated from the removed legacy ui/main_menu/main_menu.lua).

@@ -1,3 +1,9 @@
+-- Thin PvP-specific wrapper over MPAPI.enemy_location (see
+-- BalatroMultiplayerAPI/ui/enemy_location.lua for the shared swap/hover
+-- mechanics and the id contract that keeps this crash-safe). PvP shows a
+-- single opposing nemesis: a blind icon + name in the main slot, and the
+-- same content again in the hover popup.
+
 function PVP.UI.enemy_location_blind_render()
 	local blind_key, blind_object = PVP.GAME.enemy.location_blind, nil
 	if blind_key then blind_object = G.P_BLINDS[blind_key] end
@@ -30,193 +36,92 @@ function PVP.UI.enemy_location_blind_render()
 	return blind_object_render
 end
 
-function PVP.UI.round_score_definition()
+-- The [text location][blind icon] pair shown both in the main HUD slot and
+-- in the hover popup -- the text node carries chip_ui_id per
+-- MPAPI.enemy_location's contract; the icon is a separate sibling node kept
+-- live-updatable by id (mp_enemy_location_render) since it isn't a plain
+-- ref_table/ref_value binding like the text is.
+local function value_nodes(chip_ui_id)
 	return {
-		n = G.UIT.C,
-		config = { align = "cm", padding = 0.1, func = "mp_setup_hover_enemy_location_display" },
-		nodes = {
-			{
-				n = G.UIT.C,
-				config = { align = "cm", minw = 1.3 },
-				nodes = {
-					{
-						n = G.UIT.R,
-						config = { align = "cm", padding = 0, maxw = 1.3 },
-						nodes = {
-							{
-								n = G.UIT.T,
-								config = {
-									text = G.SETTINGS.language == "vi" and localize("k_lower_score")
-										or localize("k_round"),
-									scale = 0.42,
-									colour = G.C.UI.TEXT_LIGHT,
-									shadow = true,
-								},
-							},
-						},
-					},
-					{
-						n = G.UIT.R,
-						config = { align = "cm", padding = 0, maxw = 1.3 },
-						nodes = {
-							{
-								n = G.UIT.T,
-								config = {
-									text = G.SETTINGS.language == "vi" and localize("k_round")
-										or localize("k_lower_score"),
-									scale = 0.42,
-									colour = G.C.UI.TEXT_LIGHT,
-									shadow = true,
-								},
-							},
-						},
-					},
-				},
-			},
-			{
-				n = G.UIT.C,
-				config = { align = "cm", minw = 3.3, minh = 0.7, r = 0.1, colour = G.C.DYN_UI.BOSS_DARK },
-				nodes = {
-					{
-						n = G.UIT.O,
-						config = {
-							w = 0.5,
-							h = 0.5,
-							object = get_stake_sprite(G.GAME.stake or 1, 0.5),
-							hover = true,
-							can_collide = false,
-						},
-					},
-					{ n = G.UIT.B, config = { w = 0.1, h = 0.1 } },
-					{
-						n = G.UIT.T,
-						config = {
-							ref_table = G.GAME,
-							ref_value = "chips_text",
-							lang = G.LANGUAGES["en-us"],
-							scale = 0.85,
-							colour = G.C.WHITE,
-							id = "chip_UI_count",
-							func = "chip_UI_set",
-							shadow = true,
-						},
+		{
+			n = G.UIT.C,
+			config = { maxw = 2.2, align = "cm" },
+			nodes = {
+				{
+					n = G.UIT.T,
+					config = {
+						ref_table = PVP.GAME.enemy,
+						ref_value = "location",
+						scale = 0.35,
+						colour = G.C.WHITE,
+						id = chip_ui_id,
+						shadow = true,
+						maxw = 2.5,
 					},
 				},
 			},
 		},
-	}
-end
-function PVP.UI.enemy_location_definition()
-	return {
-		n = G.UIT.C,
-		config = { align = "cm", padding = 0.1 },
-		nodes = {
-			{
-				n = G.UIT.O,
-				config = {
-					w = 0.5,
-					h = 0.5,
-					object = get_stake_sprite(G.GAME.stake or 1, 0.5),
-					hover = true,
-					can_collide = false,
-				},
-			},
-			{
-				n = G.UIT.C,
-				config = { align = "cm", minw = 1.2 },
-				nodes = {
-					{
-						n = G.UIT.R,
-						config = { align = "cm", padding = 0, maxw = 1.2 },
-						nodes = {
-							{
-								n = G.UIT.T,
-								config = {
-									text = localize("ml_enemy_loc")[1],
-									scale = 0.42,
-									colour = G.C.UI.TEXT_LIGHT,
-									shadow = true,
-								},
-							},
-						},
-					},
-					{
-						n = G.UIT.R,
-						config = { align = "cm", padding = 0, maxw = 1.2 },
-						nodes = {
-							{
-								n = G.UIT.T,
-								config = {
-									text = localize("ml_enemy_loc")[2],
-									scale = 0.42,
-									colour = G.C.UI.TEXT_LIGHT,
-									shadow = true,
-								},
-							},
-						},
-					},
-				},
-			},
-			{
-				n = G.UIT.C,
-				config = { align = "cm", minw = 2.8, minh = 0.7, r = 0.1, colour = G.C.DYN_UI.BOSS_DARK },
-				nodes = {
-					{
-						n = G.UIT.C,
-						config = {
-							maxw = 2.2,
-							align = "cm",
-						},
-						nodes = {
-							{
-								n = G.UIT.T,
-								config = {
-									ref_table = PVP.GAME.enemy,
-									ref_value = "location",
-									scale = 0.35,
-									colour = G.C.WHITE,
-									id = "chip_UI_count",
-									shadow = true,
-									maxw = 2.5,
-								},
-							},
-						},
-					},
-					{ n = G.UIT.B, config = { w = 0.1, h = 0.1 } },
-					{
-						n = G.UIT.O,
-						config = {
-							object = PVP.UI.enemy_location_blind_render(),
-							id = "mp_enemy_location_render",
-						},
-					},
-				},
+		{ n = G.UIT.B, config = { w = 0.1, h = 0.1 } },
+		{
+			n = G.UIT.O,
+			config = {
+				object = PVP.UI.enemy_location_blind_render(),
+				id = "mp_enemy_location_render",
 			},
 		},
 	}
 end
+
+local function popup_rows()
+	return { MPAPI.enemy_location_row(
+		{
+			n = G.UIT.O,
+			config = { w = 0.5, h = 0.5, object = get_stake_sprite(G.GAME.stake or 1, 0.5), hover = true, can_collide = false },
+		},
+		{
+			{ n = G.UIT.R, config = { align = "cm", padding = 0, maxw = 1.2 }, nodes = {
+				{ n = G.UIT.T, config = { text = localize("ml_enemy_loc")[1], scale = 0.42, colour = G.C.UI.TEXT_LIGHT, shadow = true } },
+			} },
+			{ n = G.UIT.R, config = { align = "cm", padding = 0, maxw = 1.2 }, nodes = {
+				{ n = G.UIT.T, config = { text = localize("ml_enemy_loc")[2], scale = 0.42, colour = G.C.UI.TEXT_LIGHT, shadow = true } },
+			} },
+		},
+		-- Fresh value_nodes() here (not the same table reused above) --
+		-- popup content is a separate live UIBox with its own nodes.
+		value_nodes("mp_enemy_location_popup_value"),
+		2.8
+	) }
+end
+
+PVP._enemy_location = MPAPI.enemy_location({
+	label = { localize("ml_enemy_loc")[1], localize("ml_enemy_loc")[2] },
+	build_value_nodes = value_nodes,
+	build_popup_rows = popup_rows,
+	swatch_minw = 2.8,
+	-- Vietnamese reads more naturally with round/score swapped; vanilla
+	-- itself doesn't do this, it's a PvP-specific community fix.
+	round_score_labels = function()
+		if G.SETTINGS.language == "vi" then
+			return { localize("k_lower_score"), localize("k_round") }
+		end
+		return { localize("k_round"), localize("k_lower_score") }
+	end,
+})
 
 function PVP.UI.show_enemy_location()
-    if not G.HUD then return end
-	local row_dollars_chips = G.HUD:get_UIE_by_ID("row_dollars_chips")
-	if row_dollars_chips then
-		row_dollars_chips.children[1]:remove()
-		row_dollars_chips.children[1] = nil
-		G.HUD:add_child(PVP.UI.enemy_location_definition(), row_dollars_chips)
-	end
-end
-function PVP.UI.hide_enemy_location()
-    if not G.HUD then return end
-	local row_dollars_chips = G.HUD:get_UIE_by_ID("row_dollars_chips")
-	if row_dollars_chips then
-		row_dollars_chips.children[1]:remove()
-		row_dollars_chips.children[1] = nil
-		G.HUD:add_child(PVP.UI.round_score_definition(), row_dollars_chips)
-	end
+	PVP._enemy_location.show()
 end
 
+function PVP.UI.hide_enemy_location()
+	PVP._enemy_location.hide()
+end
+
+-- Refreshes the blind-icon renderer(s) in place when a new location update
+-- arrives over the network (networking/action_handlers.lua's `receive`
+-- handler) -- unlike the text, the icon isn't a ref_table/ref_value binding,
+-- so it needs an explicit rebuild-and-swap.
 function PVP.UI.update_enemy_location_render()
-    if not G.HUD then return end
+	if not G.HUD then return end
 	local renderer = G.HUD:get_UIE_by_ID("mp_enemy_location_render")
 	if renderer then
 		local blind_object_render = PVP.UI.enemy_location_blind_render()
@@ -227,7 +132,7 @@ function PVP.UI.update_enemy_location_render()
 		renderer.UIBox:recalculate()
 	end
 
-	local hover_renderer = G.mp_enemy_location_ui and G.mp_enemy_location_ui:get_UIE_by_ID("mp_enemy_location_render")
+	local hover_renderer = PVP._enemy_location.popup and PVP._enemy_location.popup:get_UIE_by_ID("mp_enemy_location_render")
 
 	if hover_renderer then
 		local blind_object_render = PVP.UI.enemy_location_blind_render()
@@ -236,49 +141,5 @@ function PVP.UI.update_enemy_location_render()
 		blind_object_render.parent = hover_renderer
 
 		hover_renderer.UIBox:recalculate()
-	end
-end
-
-G.FUNCS.mp_setup_hover_enemy_location_display = function(e)
-	e.config.func = nil
-	e.states.collide.can = true
-	e.states.hover.can = true
-
-	local old_hover = e.hover
-	function e:hover(...)
-		old_hover(self, ...)
-		if not G.mp_enemy_location_ui then
-			G.mp_enemy_location_ui = UIBox({
-				definition = {
-					n = G.UIT.ROOT,
-					config = { colour = G.C.DYN_UI.BOSS_MAIN, emboss = 0.05, r = 0.25 },
-					nodes = {
-						PVP.UI.enemy_location_definition(),
-					},
-				},
-				config = {
-					align = "tmi",
-					offset = { x = 0, y = self.T.h + 0.15 },
-					major = self,
-					instance_type = "CARD",
-				},
-			})
-		end
-	end
-	local old_stop_hover = e.stop_hover
-	function e:stop_hover(...)
-		old_stop_hover(self, ...)
-		if G.mp_enemy_location_ui then
-			G.mp_enemy_location_ui:remove()
-			G.mp_enemy_location_ui = nil
-		end
-	end
-	local old_remove = e.remove
-	function e:remove(...)
-		old_remove(self, ...)
-		if G.mp_enemy_location_ui then
-			G.mp_enemy_location_ui:remove()
-			G.mp_enemy_location_ui = nil
-		end
 	end
 end
