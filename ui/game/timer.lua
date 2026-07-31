@@ -162,13 +162,15 @@ function MP.UI.nemesis_timer_hud()
 														if not MP.GAME.enemy or not MP.GAME.enemy.last_timer then
 															return "0.0"
 														end
-														-- All numbers bigger then 10 - display as integer
-														-- Also accounting for rounding to prevent 10.0 to be displayed
-														if MP.GAME.enemy.last_timer > 9.95 then
-															return string.format("%d", MP.GAME.enemy.last_timer)
+														local val = MP.GAME.enemy.last_timer
+														local threshold = MP.LOBBY.config.timer_display_threshold or 0
+														if threshold > 0 and val > threshold then
+															val = threshold
 														end
-														-- Less than 10 - display decimal part
-														return string.format("%.1f", MP.GAME.enemy.last_timer)
+														if val > 9.95 then
+															return string.format("%d", val)
+														end
+														return string.format("%.1f", val)
 													end,
 												}),
 												ref_value = "timer",
@@ -496,9 +498,17 @@ function Game:update(dt)
 	end
 end
 
+-- Decrease timer up to specified minimum & juice up timer UI
 function MP.UI.consume_timer(amount, silent, min_timer)
-	if amount > 0 and MP.LOBBY.config.timer and MP.GAME.timer and MP.GAME.timer > (min_timer or 0) then
-		MP.GAME.timer = math.max(0, MP.GAME.timer - amount)
+    if not MP.GAME.timer or not MP.LOBBY.config.timer then return end
+    amount = math.max(0, amount)
+    min_timer = min_timer or 0
+
+    local new_timer = math.max(0, min_timer, MP.GAME.timer - amount)
+    amount = MP.GAME.timer - new_timer
+
+	if amount > 0 then
+		MP.GAME.timer = new_timer
 		if not silent then
 			local timer_ui = G.HUD:get_UIE_by_ID("timer_UI_count")
 			if timer_ui then timer_ui.config.object:juice_up() end
@@ -506,14 +516,67 @@ function MP.UI.consume_timer(amount, silent, min_timer)
 	end
 end
 
+-- Increase timer up to specified maximum & juice up timer UI
 function MP.UI.restore_timer(amount, silent, max_timer)
-	if amount > 0 and MP.LOBBY.config.timer and MP.GAME.timer and (not max_timer or MP.GAME.timer < max_timer) then
-		MP.GAME.timer = math.max(0, MP.GAME.timer + amount)
+    if not MP.GAME.timer or not MP.LOBBY.config.timer then return end
+    amount = math.max(0, amount)
+    max_timer = max_timer or (MP.GAME.timer + amount)
+
+    local new_timer = math.max(0, math.min(MP.GAME.timer + amount, max_timer))
+    amount = new_timer - MP.GAME.timer
+
+	if amount > 0 then
+		MP.GAME.timer = new_timer
 		if not silent then
 			local timer_ui = G.HUD:get_UIE_by_ID("timer_UI_count")
 			if timer_ui then timer_ui.config.object:juice_up() end
 		end
 	end
+end
+
+-- Update skips difference between 2 players.
+-- If value increased - one player skipped even further, add time.
+-- If value decreased - another player catches up, deduct time.
+function MP.UI.update_matching_skip_timer(from_nemesis)
+    if (MP.LOBBY.config.timer_display_threshold or 0) > 0 then
+        if not from_nemesis
+            and MP.LOBBY.config.timer
+            and not MP.GAME.timer_was_started
+            and not MP.GAME.nemesis_timer_was_started
+            and not MP.is_any_layer_active({ "no_animation_timer", "pressure_timer" })
+            and (MP.LOBBY.config.timer_increment_seconds or 0) > 0
+        then
+            MP.UI.restore_timer(MP.LOBBY.config.timer_increment_seconds, false)
+        end
+        return
+    end
+
+    local new_diff = math.abs((MP.GAME.skips_before_pvp or 0) - (MP.GAME.enemy.skips_before_pvp or 0))
+    local skips_dx = new_diff - (MP.GAME.skips_difference or 0)
+    MP.GAME.skips_difference = new_diff
+
+    -- Same implementation twice is in case of future changes how this should work.
+    if skips_dx > 0 then
+        if
+            MP.LOBBY.config.timer
+            and not MP.GAME.timer_was_started
+            and not MP.GAME.nemesis_timer_was_started
+            and not MP.is_any_layer_active({ "no_animation_timer", "pressure_timer" })
+			and (MP.LOBBY.config.timer_increment_seconds or 0) > 0
+        then
+            MP.UI.restore_timer(MP.LOBBY.config.timer_increment_seconds, false)
+		end
+    elseif skips_dx < 0 then
+        if
+            MP.LOBBY.config.timer
+            and not MP.GAME.timer_was_started
+            and not MP.GAME.nemesis_timer_was_started
+            and not MP.is_any_layer_active({ "no_animation_timer", "pressure_timer" })
+			and (MP.LOBBY.config.timer_increment_seconds or 0) > 0
+        then
+            MP.UI.consume_timer(MP.LOBBY.config.timer_increment_seconds, false, 10)
+		end
+    end
 end
 
 local old_play = G.FUNCS.play_cards_from_highlighted
