@@ -35,6 +35,9 @@ function create_UIBox_blind_choice(type, run_info)
 			{ shader = "dissolve", shadow_height = 0.05 },
 			{ shader = "dissolve" },
 		})
+		if MP.BLIND_RAISER and MP.BLIND_RAISER.attach_boss_tooltip then
+			MP.BLIND_RAISER.attach_boss_tooltip(blind_choice.animation, blind_choice.config)
+		end
 		local extras = nil
 		local stake_sprite = get_stake_sprite(G.GAME.stake or 1, 0.5)
 
@@ -162,6 +165,10 @@ function create_UIBox_blind_choice(type, run_info)
 			loc_name = localize({ type = "name_text", key = blind_choice.config.key, set = "Blind" })
 				or blind_choice.config.name
 				or "Blind"
+		end
+
+		if MP.BLIND_RAISER and MP.BLIND_RAISER.display_name then
+			loc_name = MP.BLIND_RAISER.display_name(type, loc_name)
 		end
 
 		local blind_col = get_blind_main_colour(type)
