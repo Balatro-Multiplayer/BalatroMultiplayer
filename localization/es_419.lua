@@ -665,7 +665,7 @@ return {
 			},
 			b_wait_for_guest_ready = {
 				"ESPERANDO",
-				"AL INVITADO",
+				"A #1#",
 			},
 			b_lobby_options = "OPCIONES DE SALA",
 			b_copy_clipboard = "Copiar al portapapeles",

@@ -1183,7 +1183,7 @@ return {
 			},
 			b_wait_for_guest_ready = {
 				"ЖДЁМ",
-				"ГОТОВНОСТИ ГОСТЯ",
+				"ГОТОВНОСТИ #1#",
 			},
 			b_lobby_options = "ПАРАМЕТРЫ ЛОББИ",
 			b_copy_clipboard = "Скопировать",

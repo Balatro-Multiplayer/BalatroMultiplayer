@@ -197,7 +197,7 @@ return {
 			},
 			b_wait_for_guest_ready = {
 				"正在等待",
-				"访客",
+				"#1#",
 			},
 			b_lobby_options = "房间设置",
 			b_copy_clipboard = "复制到剪贴板",
