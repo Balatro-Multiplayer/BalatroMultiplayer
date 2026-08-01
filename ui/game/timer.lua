@@ -551,7 +551,7 @@ function MP.UI.update_matching_skip_timer(from_nemesis)
         return
     end
 
-    local new_diff = math.abs((MP.GAME.skips_before_pvp or 0) - (MP.GAME.enemy.skips_before_pvp or 0))
+    local new_diff = math.max((MP.GAME.skips_before_pvp or 0) - (MP.GAME.enemy.skips_before_pvp or 0), 0)
     local skips_dx = new_diff - (MP.GAME.skips_difference or 0)
     MP.GAME.skips_difference = new_diff
 
