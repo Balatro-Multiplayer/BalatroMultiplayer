@@ -241,6 +241,7 @@ end
 
 G.FUNCS.mp_setup_hover_enemy_location_display = function(e)
 	e.config.func = nil
+	if MP.LOBBY.config.enemy_location_disabled then return end
 	e.states.collide.can = true
 	e.states.hover.can = true
 
