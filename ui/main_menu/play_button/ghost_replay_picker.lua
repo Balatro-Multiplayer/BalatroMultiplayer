@@ -2,6 +2,9 @@
 -- Shown in practice mode to select a past match replay for ghost PvP
 -- Two-column layout: replay list (left) + match details panel (right)
 
+-- Merged replay list cached for the current picker session
+local _picker_replays = nil
+
 local function reopen_practice_menu()
 	G.FUNCS.overlay_menu({
 		definition = G.UIDEF.ruleset_selection_tabs("practice"),
@@ -16,13 +19,12 @@ local function refresh_picker()
 end
 
 function G.FUNCS.open_ghost_replay_picker(e)
+	_picker_replays = nil
 	G.FUNCS.overlay_menu({
 		definition = G.UIDEF.ghost_replay_picker(),
 	})
 end
 
--- Stashed merged replay list so callbacks can index into it
-local _picker_replays = {}
 -- Currently previewed replay (shown in right panel)
 local _preview_idx = nil
 -- Perspective flip for the previewed replay (before loading)
@@ -30,9 +32,7 @@ local _preview_flipped = false
 
 function G.FUNCS.preview_ghost_replay(e)
 	local idx = tonumber(e.config.id:match("ghost_replay_(%d+)"))
-	if idx ~= _preview_idx then
-		_preview_flipped = false
-	end
+	if idx ~= _preview_idx then _preview_flipped = false end
 	_preview_idx = idx
 	refresh_picker()
 end
@@ -56,6 +56,7 @@ function G.FUNCS.load_previewed_ghost(e)
 
 	_preview_idx = nil
 	_preview_flipped = false
+	_picker_replays = nil
 	G.FUNCS.start_practice_run(e)
 end
 
@@ -66,6 +67,7 @@ end
 
 function G.FUNCS.clear_ghost_replay(e)
 	MP.GHOST.clear()
+	_picker_replays = nil
 	_preview_idx = nil
 	_preview_flipped = false
 	reopen_practice_menu()
@@ -81,6 +83,7 @@ function G.FUNCS.flip_ghost_perspective(e)
 end
 
 G.FUNCS.ghost_picker_back = function(e)
+	_picker_replays = nil
 	_preview_idx = nil
 	_preview_flipped = false
 	reopen_practice_menu()
@@ -89,7 +92,6 @@ end
 -------------------------------------------------------------------------------
 -- Helpers
 -------------------------------------------------------------------------------
-
 
 local function text_row(label, value, scale, label_colour, value_colour)
 	scale = scale or 0.3
@@ -115,7 +117,6 @@ local function section_header(title, scale)
 		},
 	}
 end
-
 
 local function build_joker_card_area(jokers, width, base_scale)
 	if not jokers or #jokers == 0 then return nil end
@@ -362,9 +363,7 @@ end
 
 local function build_action_buttons(r, flipped)
 	-- Playing-as flip button + Load button (spans full width)
-	local playing_as = flipped
-		and (r.nemesis_name or "?")
-		or (r.player_name or "?")
+	local playing_as = flipped and (r.nemesis_name or "?") or (r.player_name or "?")
 
 	local supported = MP.GHOST.is_ruleset_supported(r)
 	local action_nodes = {}
@@ -623,8 +622,8 @@ local function build_replay_list(replays, preview_idx)
 end
 
 function G.UIDEF.ghost_replay_picker()
-	local all = load_all_replays()
-	_picker_replays = all
+	if not _picker_replays then _picker_replays = load_all_replays() end
+	local all = _picker_replays
 
 	local replay_nodes = build_replay_list(all, _preview_idx)
 
