@@ -26,9 +26,16 @@ local json = require("json")
 
 Client = {}
 
+local no_log_actions = {
+    dataSync = true,
+    keepAlive = true,
+    keepAliveAck = true,
+}
+
 function Client.send(msg)
+    local should_send_log = not (msg and msg.action and no_log_actions[msg.action])
 	msg = json.encode(msg)
-	if msg ~= '{"action":"keepAliveAck"}' then
+	if should_send_log then
 		sendTraceMessage(string.format("Client sent message: %s", msg), "MULTIPLAYER")
 	end
 	love.thread.getChannel("uiToNetwork"):push(msg)
@@ -94,6 +101,9 @@ local function action_rejoinedLobby(p)
 	reconnectToken = token
 	lastLobbyCode = code
 	MP.self_reconnect_countdown = nil
+	MP.GAME.timer_started = false
+	MP.GAME.nemesis_timer_started = false
+	MP.GAME.timer_threshold_pending = false
 	MP.ACTIONS.sync_client()
 	MP.ACTIONS.lobby_info()
 	MP.UI.update_connection_status()
@@ -144,6 +154,10 @@ end
 local function action_enemyDisconnected(p)
 	local timeout = p.timeout or 60
 	sendWarnMessage("Opponent disconnected, waiting for reconnection...", "MULTIPLAYER")
+
+	MP.GAME.timer_started = false
+	MP.GAME.nemesis_timer_started = false
+	MP.GAME.timer_threshold_pending = false
 
 	MP.enemy_disconnect_countdown = {
 		end_time = love.timer.getTime() + timeout,
@@ -242,6 +256,9 @@ local function action_reconnecting()
 	-- Only show if we were in a lobby and don't already have a countdown running
 	if reconnectToken and lastLobbyCode and not MP.self_reconnect_countdown then
 		MP.LOBBY.connected = false
+		MP.GAME.timer_started = false
+		MP.GAME.nemesis_timer_started = false
+		MP.GAME.timer_threshold_pending = false
 		MP.UI.update_connection_status()
 		sendWarnMessage("Connection lost, attempting to reconnect...", "MULTIPLAYER")
 
@@ -271,6 +288,33 @@ local function action_start_game(p)
 	if not MP.LOBBY.config.different_seeds and MP.LOBBY.config.custom_seed ~= "random" then
 		seed = MP.LOBBY.config.custom_seed
 	end
+
+	-- Open a new replay-log block for this game with everything needed to
+	-- reconstruct it deterministically later. Uses the resolved seed.
+	MP.RLOG.begin_run({
+		seed = seed,
+		stake = stake,
+		deck = MP.LOBBY.config.back,
+		sleeve = MP.LOBBY.config.sleeve,
+		challenge = MP.LOBBY.config.challenge,
+		ruleset = MP.LOBBY.config.ruleset,
+		gamemode = MP.LOBBY.config.gamemode,
+		modifier_layers = MP.LOBBY.config.modifier_layers,
+		lobby_config = MP.LOBBY.config,
+		the_order_enabled = MP.should_use_the_order(),
+		different_seeds = MP.LOBBY.config.different_seeds,
+		mod_version = SMODS.Mods["Multiplayer"] and SMODS.Mods["Multiplayer"].version,
+		mod_hash = MP.MOD_STRING,
+		smods_version = MP.SMODS_VERSION,
+		lovely_version = MP.REQUIRED_LOVELY_VERSION,
+		lobby_code = MP.LOBBY.code,
+		is_host = MP.LOBBY.is_host,
+		player = MP.LOBBY.username,
+		opponent = (MP.LOBBY.is_host and MP.LOBBY.guest and MP.LOBBY.guest.username)
+			or (MP.LOBBY.host and MP.LOBBY.host.username),
+		start_ts = os.date("%Y-%m-%dT%H:%M:%S%z"),
+	})
+
 	G.FUNCS.lobby_start_run(nil, { seed = seed, stake = stake })
 	MP.LOBBY.ready_to_start = false
 end
@@ -278,6 +322,16 @@ end
 local function begin_pvp_blind()
 	if MP.GAME.next_blind_context then
 		G.FUNCS.select_blind(MP.GAME.next_blind_context)
+        MP.GAME.enemy.skips_before_pvp = 0
+        MP.GAME.skips_before_pvp = 0
+        MP.GAME.skips_difference = 0
+        MP.GAME.timer_started = false
+        MP.GAME.timer_was_started = false
+        MP.GAME.nemesis_timer_started = false
+        MP.GAME.nemesis_timer_was_started = false
+        MP.GAME.timer_threshold_pending = false
+        MP.GAME.timer_consumed = false
+        MP.GAME.timer = MP.UTILS.pvp_timer_base()
 	else
 		sendErrorMessage("No next blind context", "MULTIPLAYER")
 	end
@@ -285,19 +339,26 @@ end
 
 local function action_start_blind(p)
 	local first_player = p.firstPlayer
+	-- Reset the stored opponent score each blind so the first frame after we
+	-- play (which lifts the "???" mask) shows 0, not last blind's stale score.
+	MP.GAME.enemy.score = MP.INSANE_INT.empty()
+	MP.GAME.enemy.real_score = MP.INSANE_INT.empty()
+	MP.GAME.enemy.score_text = "0"
+	-- Re-mask the opponent's hands until the first enemyInfo of the new blind.
+	MP.GAME.enemy.info_received = false
+    MP.GAME.enemy.skips_before_pvp = 0
+    MP.GAME.skips_before_pvp = 0
+    MP.GAME.skips_difference = 0
 	MP.GAME.ready_blind = false
 	MP.GAME.pvp_reached = false
-	MP.GAME.timer_started = false
-	MP.GAME.nemesis_timer_started = false
-	MP.GAME.timer_consumed = false
-	MP.GAME.timer = MP.UTILS.pvp_timer_base()
+    MP.GAME.pvp_timer_order = nil
+    MP.GAME.pvp_timer_activated = false
 	MP.GAME.pvp_reached_first = (MP.LOBBY.is_host and "host" or "guest") == first_player
 	MP.UI.start_pvp_countdown(begin_pvp_blind)
 end
 
 local function action_enemy_info(p)
-	local score = MP.INSANE_INT.from_string(p.score)
-
+    local score
 	local hands_left = tonumber(p.handsLeft)
 	local skips = tonumber(p.skips)
 	local lives = tonumber(p.lives)
@@ -306,6 +367,9 @@ local function action_enemy_info(p)
 	if skips and MP.GAME.enemy.skips ~= skips then
 		for i = 1, skips - MP.GAME.enemy.skips do
 			MP.GAME.enemy.spent_in_shop[#MP.GAME.enemy.spent_in_shop + 1] = 0
+            MP.GAME.enemy.skips_before_pvp = (MP.GAME.enemy.skips_before_pvp or 0) + 1
+            MP.UI.update_matching_skip_timer(true)
+
 			if
 				MP.GAME.enemy.skips < skips
 				and MP.LOBBY.config.timer
@@ -320,77 +384,93 @@ local function action_enemy_info(p)
 		end
 	end
 
-	if score == nil or hands_left == nil then
-		sendDebugMessage("Invalid score or hands_left", "MULTIPLAYER")
-		return
-	end
+    if not p.noScore then
+        score = MP.INSANE_INT.from_string(p.score)
+    end
 
-	if MP.INSANE_INT.greater_than(score, MP.GAME.enemy.highest_score) then MP.GAME.enemy.highest_score = score end
+    if score then
+        if MP.INSANE_INT.greater_than(score, MP.GAME.enemy.highest_score) then MP.GAME.enemy.highest_score = score end
 
-	-- PvP timer: stop timer according to score
-	if MP.is_pvp_boss() and MP.is_layer_active("pvp_timer") then
-		if MP.INSANE_INT.greater_than(MP.GAME.score, score) then
-			MP.GAME.nemesis_timer_started = false
-        elseif MP.INSANE_INT.equal(MP.GAME.score, score) and MP.GAME.pvp_reached_first then
+        if not MP.INSANE_INT.equal(MP.GAME.enemy.score, score) then
+            G.E_MANAGER:add_event(Event({
+                blockable = false,
+                blocking = false,
+                trigger = "ease",
+                delay = 0.75,
+                timer = "REAL",
+                ref_table = MP.GAME.enemy.score,
+                ref_value = "e_count",
+                ease_to = score.e_count,
+                func = function(t)
+                    return math.floor(t)
+                end,
+            }))
+    
+            G.E_MANAGER:add_event(Event({
+                blockable = false,
+                blocking = false,
+                trigger = "ease",
+                delay = 0.75,
+                timer = "REAL",
+                ref_table = MP.GAME.enemy.score,
+                ref_value = "coeffiocient", -- why is this misspelled
+                ease_to = score.coeffiocient,
+                func = function(t)
+                    local mult = 1
+                    if score.exponent > 0 then mult = 100 end
+                    return math.floor(t * mult) / mult
+                end,
+            }))
+    
+            G.E_MANAGER:add_event(Event({
+                blockable = false,
+                blocking = false,
+                trigger = "ease",
+                delay = 0.75,
+                timer = "REAL",
+                ref_table = MP.GAME.enemy.score,
+                ref_value = "exponent",
+                ease_to = score.exponent,
+                func = function(t)
+                    return math.floor(t)
+                end,
+            }))
+        end
+
+        MP.GAME.enemy.real_score = score
+        MP.GAME.enemy.info_received = true
+    end
+
+    -- PvP timer: server determines who and when can activate pvp timer
+    if p.pvpTimerOrder ~= nil and MP.is_pvp_boss() and MP.is_layer_active("pvp_timer") then
+        MP.GAME.pvp_timer_order = p.pvpTimerOrder
+        if (MP.LOBBY.is_host and "host" or "guest") == MP.GAME.pvp_timer_order then
             MP.GAME.nemesis_timer_started = false
+            if
+                not MP.GAME.timer_started
+                and MP.UI.can_timer_opponent()
+                and MP.GAME.pvp_timer_activated
+                and SMODS.Mods["Multiplayer"].config.automatic_pvp_timer
+            then
+                MP.ACTIONS.start_ante_timer()
+            end
         else
-			MP.GAME.timer_started = false
-		end
-	end
-
-	G.E_MANAGER:add_event(Event({
-		blockable = false,
-		blocking = false,
-		trigger = "ease",
-		delay = 3,
-		ref_table = MP.GAME.enemy.score,
-		ref_value = "e_count",
-		ease_to = score.e_count,
-		func = function(t)
-			return math.floor(t)
-		end,
-	}))
-
-	G.E_MANAGER:add_event(Event({
-		blockable = false,
-		blocking = false,
-		trigger = "ease",
-		delay = 3,
-		ref_table = MP.GAME.enemy.score,
-		ref_value = "coeffiocient", -- why is this misspelled
-		ease_to = score.coeffiocient,
-		func = function(t)
-			local mult = 1
-			if score.exponent > 0 then mult = 100 end
-			return math.floor(t * mult) / mult
-		end,
-	}))
-
-	G.E_MANAGER:add_event(Event({
-		blockable = false,
-		blocking = false,
-		trigger = "ease",
-		delay = 3,
-		ref_table = MP.GAME.enemy.score,
-		ref_value = "exponent",
-		ease_to = score.exponent,
-		func = function(t)
-			return math.floor(t)
-		end,
-	}))
+            MP.GAME.timer_started = false
+        end
+    end
 
 	if MP.GAME.enemy.lives > lives then
 		play_sound("holo1", 0.865, 0.9)
 		play_sound("gong", 0.765, 0.4)
 	end
-	if MP.GAME.enemy.skips < skips then
+	if MP.GAME.enemy.skips < skips and not MP.LOBBY.config.enemy_location_disabled then
 		play_sound("negative", 0.865, 0.4)
 		play_sound("gong", 0.765, 0.4)
 	end
 
-	MP.GAME.enemy.hands = hands_left
-	MP.GAME.enemy.skips = skips
-	MP.GAME.enemy.lives = lives
+	MP.GAME.enemy.hands = hands_left or 0
+	MP.GAME.enemy.skips = skips or 0
+	MP.GAME.enemy.lives = lives or 0
 	if MP.UI.juice_up_pvp_hud then MP.UI.juice_up_pvp_hud() end
 end
 
@@ -401,6 +481,7 @@ local function action_stop_game()
 		MP.UI.update_connection_status()
 		MP.reset_game_states()
 	end
+	MP.RLOG.end_run({ result = "stop" })
 	MP.UTILS.emit_log_checksum()
 end
 
@@ -416,11 +497,34 @@ local function action_end_pvp(p)
 	MP.GAME.timer = MP.UTILS.timer_base()
 	MP.GAME.timer_consumed = false
 	MP.GAME.timer_started = false
+    MP.GAME.timer_was_started = false
 	MP.GAME.nemesis_timer_started = false
+    MP.GAME.nemesis_timer_was_started = false
+	MP.GAME.timer_threshold_pending = false
 	MP.GAME.ready_blind = false
 	MP.GAME.pvp_reached = false
     MP.GAME.pvp_reached_first = false
+    MP.GAME.pvp_timer_activated = false
 	MP.GAME.score = nil
+
+    -- Sanity check
+    G.E_MANAGER:add_event(Event({
+        func = function()
+            G.E_MANAGER:add_event(Event({
+                func = function()
+                    MP.GAME.timer = MP.UTILS.timer_base()
+                    MP.GAME.timer_started = false
+                    MP.GAME.timer_was_started = false
+                    MP.GAME.nemesis_timer_started = false
+                    MP.GAME.nemesis_timer_was_started = false
+                    MP.GAME.pvp_timer_activated = false
+                    MP.GAME.timer_threshold_pending = false
+                    return true
+                end,
+            }))
+            return true
+        end,
+    }))
 end
 
 local function action_player_info(p)
@@ -445,6 +549,7 @@ local function action_win_game()
 	MP.nemesis_deck_received = false
 	MP.GAME.won = true
 	MP.STATS.record_match(true)
+	MP.RLOG.end_run({ result = "win" })
 	MP.UTILS.log_mem_debug_messages()
 	MP.UTILS.emit_log_checksum()
 	win_game()
@@ -458,6 +563,7 @@ local function action_lose_game()
 	MP.STATS.record_match(false)
 	G.STATE_COMPLETE = false
 	G.STATE = G.STATES.GAME_OVER
+	MP.RLOG.end_run({ result = "loss" })
 	MP.UTILS.log_mem_debug_messages()
 	MP.UTILS.emit_log_checksum()
 end
@@ -527,6 +633,9 @@ end
 
 local function action_send_phantom(p)
 	local key = p.key
+	-- Carbon: exogenous opponent effect. Keyed by content (not a board index),
+	-- logged in received order so a solo re-sim reproduces it faithfully.
+	MP.RLOG.record("net_phantom_add", key, "action:netPhantomAdd,key:" .. tostring(key))
 	local menu = G.OVERLAY_MENU -- we are spoofing a menu here, which disables duplicate protection
 	G.OVERLAY_MENU = G.OVERLAY_MENU or true
 	local new_card = create_card("Joker", MP.shared, false, nil, nil, nil, key)
@@ -537,6 +646,7 @@ local function action_send_phantom(p)
 end
 
 local function action_remove_phantom(p)
+	MP.RLOG.record("net_phantom_remove", p.key, "action:netPhantomRemove,key:" .. tostring(p.key))
 	local card = MP.UTILS.get_phantom_joker(p.key)
 	if card then
 		card:remove_from_deck()
@@ -610,10 +720,14 @@ local function action_version()
 	MP.ACTIONS.version()
 end
 
-local action_asteroid = action_asteroid
+local action_asteroid_ref = action_asteroid
 	or function()
 		if MP.UI.show_asteroid_hand_level_up then MP.UI.show_asteroid_hand_level_up() end
 	end
+local function action_asteroid(p)
+	MP.RLOG.record("net_asteroid", nil, "action:netAsteroid")
+	return action_asteroid_ref(p)
+end
 
 local function action_sold_joker()
 	-- HACK: this action is being sent when any card is being sold, since Taxes is now reworked
@@ -631,6 +745,7 @@ end
 
 local function action_eat_pizza(p)
 	local discards = p.whole -- rename to "discards" when possible
+	MP.RLOG.record("net_pizza", discards, "action:netPizza,discards:" .. tostring(discards))
 	MP.GAME.pizza_discards = MP.GAME.pizza_discards + discards
 	G.GAME.round_resets.discards = G.GAME.round_resets.discards + discards
 	ease_discard(discards)
@@ -641,6 +756,7 @@ local function action_spent_last_shop(p)
 end
 
 local function action_magnet()
+	MP.RLOG.record("net_magnet", nil, "action:netMagnet")
 	local card = nil
 	for _, v in pairs(G.jokers.cards) do
 		if not card or v.sell_cost > card.sell_cost then card = v end
@@ -733,6 +849,12 @@ local function action_magnet_response(p)
 	sendTraceMessage(string.format("Received magnet joker: %s", MP.UTILS.joker_to_string(card)), "MULTIPLAYER")
 end
 
+local function action_data_sync(data)
+    if data.timer then
+        MP.GAME.enemy.last_timer = data.timer or 0
+    end
+end
+
 function G.FUNCS.load_end_game_jokers()
 	local card_area_save, success, err
 
@@ -756,7 +878,7 @@ function G.FUNCS.load_end_game_jokers()
 			0,
 			5 * G.CARD_W,
 			G.CARD_H,
-			{ card_limit = G.GAME.starting_params.joker_slots, type = "joker", highlight_limit = 1 }
+			{ card_limit = G.GAME.starting_params.joker_slots, type = "joker", highlight_limit = 1, fixed_limit = true }
 		)
 		return
 	end
@@ -909,6 +1031,8 @@ end
 -- Dual-call: dispatched from network (fromNemesis defaults to true) or self-triggered
 -- by MP.ACTIONS.start_ante_timer (passes fromNemesis = false explicitly).
 local function action_start_ante_timer(p)
+	if p.isPvP and (MP.GAME.end_pvp or not MP.is_pvp_boss() or G.GAME.current_round.hands_left <= 0) then return end
+
 	local time = p.time
 	local from_nemesis = p.fromNemesis
 	if from_nemesis == nil then from_nemesis = true end
@@ -940,8 +1064,10 @@ local function action_start_ante_timer(p)
 	end
 	if from_nemesis then
 		MP.GAME.nemesis_timer_started = true
+        MP.GAME.nemesis_timer_was_started = true
 	else
 		MP.GAME.timer_started = true
+        MP.GAME.timer_was_started = true
 	end
 end
 
@@ -1099,17 +1225,6 @@ function MP.ACTIONS.play_hand(score, hands_left)
 		MP.GAME.highest_score = insane_int_score
 	end
 
-	-- Stop PvP timers according to score
-	if MP.is_pvp_boss() and MP.is_layer_active("pvp_timer") then
-		if MP.INSANE_INT.greater_than(insane_int_score, MP.GAME.enemy.score) then
-			MP.GAME.nemesis_timer_started = false
-        elseif MP.INSANE_INT.equal(insane_int_score, MP.GAME.enemy.score) and MP.GAME.pvp_reached_first then
-            MP.GAME.nemesis_timer_started = false
-		else
-			MP.GAME.timer_started = false
-		end
-	end
-
 	Client.send({
 		action = "playHand",
 		score = fixed_score,
@@ -1242,18 +1357,31 @@ function MP.ACTIONS.request_nemesis_stats()
 end
 
 function MP.ACTIONS.start_ante_timer()
-	Client.send({
-		action = "startAnteTimer",
-		time = MP.GAME.timer,
-	})
+	local is_pvp = MP.is_pvp_boss() and MP.is_layer_active("pvp_timer")
+	local threshold = MP.LOBBY.config.timer_display_threshold or 0
+
 	action_start_ante_timer({ time = MP.GAME.timer, fromNemesis = false })
+
+	if threshold > 0 and MP.GAME.timer > threshold then
+		MP.GAME.timer_threshold_pending = true
+	else
+		Client.send({
+			action = "startAnteTimer",
+			time = MP.GAME.timer,
+			isPvP = is_pvp or nil,
+		})
+	end
 end
 
 function MP.ACTIONS.pause_ante_timer()
-	Client.send({
-		action = "pauseAnteTimer",
-		time = MP.GAME.timer,
-	})
+	if MP.GAME.timer_threshold_pending then
+		MP.GAME.timer_threshold_pending = false
+	else
+		Client.send({
+			action = "pauseAnteTimer",
+			time = MP.GAME.timer,
+		})
+	end
 	action_pause_ante_timer({ time = MP.GAME.timer, fromNemesis = false })
 end
 
@@ -1272,6 +1400,32 @@ function MP.ACTIONS.sync_client()
 	Client.send({
 		action = "syncClient",
 		isCached = _RELEASE_MODE,
+	})
+end
+
+-- Live carbon-log stream: batches of "MP_RLOG: ..." lines pushed while the game
+-- is in progress, keyed by game_id so the server can group them and drop them
+-- once the final package below lands. See lib/replay_log.lua (MP.RLOG).
+function MP.ACTIONS.stream_log_lines(game_id, lines)
+	Client.send({
+		action = "streamLogLines",
+		gameId = game_id,
+		lines = lines,
+	})
+end
+
+-- End-of-game replay-log fingerprints. The server stores these (keyed by
+-- lobby + seed + game) so a presented log can later be re-hashed and compared
+-- without a line-by-line diff, and uses game_id to delete the live stream in
+-- favour of this complete package. See lib/replay_log.lua (MP.RLOG).
+function MP.ACTIONS.submit_log_hashes(carbon, human, seed, log, game_id)
+	Client.send({
+		action = "submitLogHashes",
+		carbon = carbon,
+		human = human,
+		seed = seed,
+		log = log,
+		gameId = game_id,
 	})
 end
 
@@ -1304,6 +1458,14 @@ function MP.ACTIONS.update_player_usernames()
 		if G.MAIN_MENU_UI then G.MAIN_MENU_UI:remove() end
 		set_main_menu_UI()
 	end
+end
+
+function MP.ACTIONS.data_sync()
+    local timer = (MP.is_layer_active("speedlatro_timer") and MP.speedlatro_timer and MP.speedlatro_timer.real) or MP.GAME.timer
+    Client.send({
+        action = "dataSync",
+        timer = timer
+    })
 end
 
 local function string_to_table(str)
@@ -1364,6 +1526,7 @@ local HANDLERS = {
 	moddedAction = action_modded_action,
 	error = action_error,
 	keepAlive = action_keep_alive,
+    dataSync = action_data_sync,
 }
 
 function MP.register_action(name, cb)
@@ -1377,13 +1540,15 @@ function MP.register_action(name, cb)
 	HANDLERS[name] = cb
 end
 
+local network_to_ui_channel = love.thread.getChannel("networkToUi")
+
 local game_update_ref = Game.update
 ---@diagnostic disable-next-line: duplicate-set-field
 function Game:update(dt)
 	game_update_ref(self, dt)
 
 	repeat
-		local msg = love.thread.getChannel("networkToUi"):pop()
+		local msg = network_to_ui_channel:pop()
 		if msg then
 			-- horribly messy catch
 			if string.sub(msg, 1, 1) == "a" then
@@ -1398,28 +1563,34 @@ function Game:update(dt)
 				return
 			end
 
-			local parsedAction = json.decode(msg)
-
-			if not ((parsedAction.action == "keepAlive") or (parsedAction.action == "keepAliveAck")) then
-				local log = string.format("Client got %s message: ", parsedAction.action)
-				for k, v in pairs(parsedAction) do
-					if parsedAction.action == "startGame" and k == "seed" then
-						last_game_seed = v
-					else
-						log = log .. string.format(" (%s: %s) ", k, v)
-					end
-				end
-				if
-					(parsedAction.action == "receiveEndGameJokers" or parsedAction.action == "stopGame")
-					and last_game_seed
-				then
-					log = log .. string.format(" (seed: %s) ", last_game_seed)
-				end
-				sendTraceMessage(log, "MULTIPLAYER")
-			end
-
-			local handler = HANDLERS[parsedAction.action]
-			if handler then handler(parsedAction) end
+			local ok, parsedAction = pcall(json.decode, msg)
+            if ok then
+                if not no_log_actions[parsedAction.action] then
+                    local log = string.format("Client got %s message: ", parsedAction.action)
+                    for k, v in pairs(parsedAction) do
+                        if parsedAction.action == "startGame" and k == "seed" then
+                            last_game_seed = v
+                        else
+                            log = log .. string.format(" (%s: %s) ", k, v)
+                        end
+                    end
+                    if
+                        (parsedAction.action == "receiveEndGameJokers" or parsedAction.action == "stopGame")
+                        and last_game_seed
+                    then
+                        log = log .. string.format(" (seed: %s) ", last_game_seed)
+                    end
+                    sendTraceMessage(log, "MULTIPLAYER")
+                end
+    
+                local handler = HANDLERS[parsedAction.action]
+                if handler then handler(parsedAction) end
+            else
+                sendWarnMessage(
+                    "Invalid server response: " .. msg,
+                    "MULTIPLAYER"
+                )
+            end
 		end
 	until not msg
 end

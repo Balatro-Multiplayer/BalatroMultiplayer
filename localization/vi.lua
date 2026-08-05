@@ -1,5 +1,5 @@
--- Localization by @theambushingbush
--- Bản dịch của HuyTheKiller, yêu cầu cài thêm VietnameseBalatro
+-- Localization by @theambushingbush and @minotour4869
+-- Bản dịch của HuyTheKiller và Minotour, yêu cầu cài thêm VietnameseBalatro
 -- https://github.com/HuyTheKiller/VietnameseBalatro
 return {
 	descriptions = {
@@ -12,8 +12,122 @@ return {
 					"miễn phí",
 				},
 			},
+			tag_mp_uncommon_release = {
+				name = "Nhãn Ít Phổ Biến",
+				text = {
+					"Shop có một",
+					"{C:green}Joker Ít Phổ Biến",
+				},
+			},
+			tag_mp_rare_release = {
+				name = "Nhãn Hiếm",
+				text = {
+					"Shop có một",
+					"{C:red}Joker Hiếm",
+				},
+			},
+			tag_mp_foil_release = {
+				name = "Nhãn Ánh Kim",
+				text = {
+					"Joker bản chuẩn tiếp theo",
+					"trở thành {C:dark_edition}Ánh Kim",
+				},
+			},
+			tag_mp_holo_release = {
+				name = "Nhãn Lấp Lánh",
+				text = {
+					"Joker bản chuẩn tiếp theo",
+					"trở thành {C:dark_edition}Lấp Lánh",
+				},
+			},
+			tag_mp_poly_release = {
+				name = "Nhãn Đa Sắc",
+				text = {
+					"Joker bản chuẩn tiếp theo",
+					"trở thành {C:dark_edition}Đa Sắc",
+				},
+			},
+			tag_mp_negative_release = {
+				name = "Nhãn Âm Bản",
+				text = {
+					"Joker bản chuẩn tiếp theo",
+					"trở thành {C:dark_edition}Âm Bản",
+				},
+			},
 		},
 		Joker = {
+			j_mp_seltzer = {
+				name = "Khoáng Có Ga",
+                text = {
+                    "Tái kích mọi lá bài",
+                    "đã chơi cho",
+                    "{C:attention}#1#{} tay sắp tới",
+                },
+			},
+			j_mp_turtle_bean = {
+				name = "Đậu Đen",
+                text = {
+                    "{C:attention}+#1#{} lá giữ trong tay,",
+                    "giảm đi {C:red}#2#{} mỗi ván"
+                },
+			},
+			j_mp_idol = {
+				name = "Thần Tượng",
+                text = {
+                    "Mỗi lá {C:attention}#2# {V:1}#3#",
+                    "ghi thêm {X:mult,C:white} X#1# {} Nhân",
+                    "khi ghi điểm",
+                    "{s:0.8}Lá bài thay đổi sau mỗi ván"
+                },
+			},
+			j_mp_idol_rare = {
+				name = "Thần Tượng",
+                text = {
+                    "Mỗi lá {C:attention}#2# {V:1}#3#",
+                    "ghi thêm {X:mult,C:white} X#1# {} Nhân",
+                    "khi ghi điểm",
+                    "{s:0.8}Lá bài thay đổi sau mỗi ván"
+                },
+			},
+			j_mp_ticket = {
+				name = "Tấm Vé Vàng",
+                text = {
+                    "Lá {C:attention}Vàng{} đã chơi nhận",
+                    "thêm {C:money}$#1#{} khi ghi điểm",
+                },
+			},
+			j_mp_ticket_experimental = {
+				name = "Tấm Vé Vàng",
+                text = {
+                    "Lá {C:attention}Vàng{} đã chơi nhận",
+                    "thêm {C:money}$#1#{} khi ghi điểm",
+                },
+			},
+			j_mp_baron = {
+				name = "Nam Tước",
+                text = {
+                    "Mỗi lá {C:attention}Già{} giữ",
+                    "trong tay ghi thêm",
+                    "{X:mult,C:white} X#1# {} Nhân",
+                },
+			},
+			j_mp_mime = {
+				name = "Kịch Câm",
+                text = {
+                    "Tái kích khả năng",
+                    "của mọi lá bài {C:attention}giữ",
+                    "{C:attention}trong tay"
+                },
+			},
+			j_mp_todo_list = {
+				name = "Danh Sách Công Việc",
+                text = {
+                    "Nhận {C:money}$#1#{} nếu {C:attention}tay poker",
+                    "là {C:attention}#2#{},",
+                    "tay poker thay đổi",
+                    "ở cuối ván"
+                },
+			},
 			j_broken = {
 				name = "HỎNG",
 				text = {
@@ -348,6 +462,93 @@ return {
 					-- "{C:inactive}(CURRENTLY {C:money}$7{C:inactive})",
 				},
 			},
+			j_mp_8ball_release = {
+				name = "Bi 8",
+				text = {
+					"Tạo ra một lá {C:planet}Hành Tinh{}",
+					"nếu tay bài chứa",
+					"{C:attention}#1#{} hoặc nhiều hơn lá {C:attention}8{}",
+					"{C:inactive}(Phải có ô trống)",
+				},
+			},
+			j_mp_todo_list_release = {
+				name = "Danh Sách Công Việc",
+				text = {
+					"Nhận {C:money}$#1#{} nếu {C:attention}tay poker{}",
+					"là {C:attention}#2#{},",
+					"tay poker thay đổi",
+					"ở cuối ván",
+				},
+			},
+			j_mp_swashbuckler_release = {
+				name = "Hảo Hán",
+				text = {
+					"Thêm tổng giá bán của các",
+					"{C:attention}Jokers{} khác bên trái",
+					"lá này vào Nhân",
+					"{C:inactive}(Hiện tại là {C:mult}+#1#{C:inactive} Nhân)",
+				},
+			},
+			j_mp_hanging_chad_release = {
+				name = "Phiếu Đục Lỗ",
+				text = {
+					"Tái kích hoạt lá ghi điểm",
+					"{C:attention}đầu tiên{} trong tay bài",
+				},
+			},
+			j_mp_madness_release = {
+				name = "Điên Loạn",
+                text = {
+                    "Khi {C:attention}Blind{} được chọn,",
+                    "thêm {X:mult,C:white} X#1# {} Nhân",
+                    "và {C:attention}phá huỷ{} một Joker ngẫu nhiên",
+                    "{C:inactive}(Hiện tại là {X:mult,C:white} X#2# {C:inactive} Nhân)"
+                }
+            },
+			j_mp_vampire_release = {
+				name = "Ma Cà Rồng",
+                text = {
+                    "Joker này thêm {X:mult,C:white} X#1# {} Nhân",
+                    "mỗi {C:attention}lá Cường Hoá{} đã chơi ghi điểm,",
+                    "loại bỏ {C:attention}Cường Hoá",
+                    "{C:inactive}(Hiện tại là {X:mult,C:white} X#2# {C:inactive} Nhân)"
+                }
+            },
+			j_mp_midas_mask_release = {
+				name = "Mặt Nạ Midas",
+                text = {
+                    "Mọi lá {C:attention}mặt{} đã chơi",
+                    "trở thành lá {C:attention}Vàng",
+                    "khi ghi điểm",
+                }
+            },
+			j_mp_yorick_release = {
+				name = "Yorick",
+				text = {
+					"{X:mult,C:white} X#1# {} Nhân sau khi sử dụng",
+					"using {C:attention}#2#{} lượt bỏ bài",
+					"{C:inactive}(Lượt bỏ còn lại: {C:attention}#3#{C:inactive})",
+				},
+			},
+			j_mp_flower_pot_release = {
+				name = "Bình Hoa",
+                text = {
+                    "{X:mult,C:white} X#1# {} Nhân nếu",
+                    "tay poker chứa một",
+                    "lá {C:diamonds}Rô{}, lá {C:clubs}Tép{},",
+                    "lá {C:hearts}Cơ{} và lá {C:spades}Bích"
+                },
+			},
+		},
+		Tarot = {
+			c_mp_magician_release = {
+				name = "Pháp Sư",
+                text = {
+                    "Cường hoá {C:attention}#1#",
+                    "lá đã chọn thành",
+                    "{C:attention}#2#"
+                }
+			},
 		},
 		Planet = {
 			c_mp_asteroid = {
@@ -423,8 +624,8 @@ return {
 				text = {
 					"Bắt đầu trận với {C:spectral,T:c_medium}Thầy Đồng",
 					"và {C:attention,T:v_clearance_sale}Bán Hạ Giá",
-					"Số dư tối đa chỉ",
-					"còn lại {C:money}$50",
+					"Số dư tối đa chỉ còn lại",
+					"{C:money}$50{} + {C:attention}tổng tiền lãi tối đa",
 				},
 			},
 			b_mp_violet = {
@@ -444,8 +645,95 @@ return {
 					"ở cuối {C:attention}shop",
 				},
 			},
+			b_mp_white = {
+				name = "Bộ Bài Trắng",
+				text = {
+					"Có thể xem bộ bài và Joker",
+					"hiện tại của {X:purple,C:white}Đối Thủ'{}",
+					"{C:inactive}(Làm mới sau mỗi blind Đối Đầu){}",
+				},
+			},
 		},
 		Other = {
+			mp_sticker_balanced = {
+				name = "Cân Bằng",
+				text = {
+					"Lá bài này đã được tái cân bằng",
+				},
+			},
+			mp_sticker_balanced_j_mp_hanging_chad = {
+				name = "Cân Bằng",
+				text = {
+					"Tái kích hoạt {C:attention}2{} lá bài",
+					"thay vì lá đầu tiên 2 lần",
+				},
+			},
+			mp_sticker_balanced_j_mp_ticket = {
+				name = "Cân Bằng",
+				text = {
+					"Trở thành {C:green}Ít Phổ Biến{}",
+					"Không còn yêu cầu bài {C:attention}Vàng{}",
+				},
+			},
+			mp_sticker_balanced_j_mp_seltzer = {
+				name = "Cân Bằng",
+				text = {
+					"Có hiệu lực trong {C:attention}8{} tay bài",
+					"thay vì {C:attention}10{}",
+				},
+			},
+			mp_sticker_balanced_j_mp_turtle_bean = {
+				name = "Cân Bằng",
+				text = {
+					"{C:attention}+4{} lá giữ trong tay",
+					"thay vì {C:attention}+5{}",
+				},
+			},
+			mp_sticker_balanced_j_mp_baron = {
+				name = "Cân Bằng",
+				text = {
+					"Trở thành {C:green}Ít Phổ Biến{} ({C:money}$5{})",
+					"thay vì {C:red}Hiếm{} ({C:money}$8{})",
+				},
+			},
+			mp_sticker_balanced_j_mp_mime = {
+				name = "Cân Bằng",
+				text = {
+					"Trở thành {C:red}Hiếm{} ({C:money}$8{})",
+					"thay vì {C:green}Ít Phổ Biến{} ({C:money}$5{})",
+				},
+			},
+			mp_sticker_balanced_j_mp_todo_list = {
+				name = "Cân Bằng",
+				text = {
+					"Nhận {C:money}$5{} thay vì {C:money}$4{}",
+					"Tay poker được chọn từ {C:attention}tất cả{} các tay poker,",
+					"dù được khám phá hay chưa",
+				},
+			},
+			mp_sticker_balanced_j_mp_bloodstone = {
+				name = "Cân Bằng",
+				text = {
+					"Khi {C:attention}Đối Đầu{}, xác suất {C:green}1 trên 2{}",
+					"đến từ một {C:attention}chuỗi cố định{}",
+					"được tất cả người chơi sử dụng",
+					"và {C:attention}tái sử dụng{} cho mọi tay bài ván đó",
+				},
+			},
+			mp_sticker_balanced_c_mp_ouija_standard = {
+				name = "Balanced",
+				text = {
+					"Phá hủy {C:attention}3{} lá bài thay vì",
+					"biến đổi mọi lá và loại bỏ hiệu ứng",
+					"{C:attention}-1{} lá giữ trong tay",
+				},
+			},
+			mp_sticker_balanced_m_gold = {
+				name = "Cân Bằng",
+				text = {
+					"Nhận {C:money}$4{} thay vì {C:money}$3{}",
+				},
+			},
 			current_nemesis = {
 				name = "Đối Thủ",
 				text = {
@@ -491,6 +779,26 @@ return {
 				},
 			},
 		},
+		Spectral = {
+			c_mp_ouija_standard = {
+				name = "Cầu Cơ",
+				text = {
+					"Phá hủy {C:attention}#1#{} lá bài ngẫu nhiên,",
+					"sau đó biến đổi toàn bộ lá bài còn lại",
+					"trong tay thành một {C:attention}bậc{}",
+					"ngẫu nhiên"
+				},
+			},
+			c_mp_ectoplasm_sandbox = {
+				name = "Ectoplasm",
+				text = {
+					"Add {C:dark_edition}Negative{} to",
+					"a random {C:attention}Joker,",
+					"Randomly apply one of:",
+					"{C:red}-1{} hand, {C:red}-1{} discard, or {C:red}-1{} hand size",
+				},
+			},
+		},
 	},
 	misc = {
 		labels = {
@@ -498,8 +806,13 @@ return {
 		},
 		dictionary = {
 			b_singleplayer = "Chơi Đơn",
+			b_sp_with_ruleset = "Luyện Tập",
 			b_join_lobby = "Vào Phòng",
 			b_join_lobby_clipboard = "Vào Từ Bộ Nhớ Đệm",
+			k_practice_collection_hint = "Suỵt... ngươi chọn gì ta cho nấy. Không hỏi nhiều!",
+			k_unlimited_slots = "Vô Hạn Ô Trống",
+			k_edition_cycling = "Thay Đổi Ấn Bản (Q)",
+			k_practice_options = "Tùy chọn Luyện Tập...",
 			b_return_lobby = "Quay lại Phòng",
 			b_reconnect = "Kết nối lại",
 			b_create_lobby = "Tạo Phòng",
@@ -534,6 +847,7 @@ return {
 			b_opts_lives = "Mạng",
 			b_opts_multiplayer_jokers = "Cho phép Lá Chơi Mạng",
 			b_opts_player_diff_deck = "Bộ bài người chơi khác nhau",
+			b_opts_random_loadout = "Bộ bài và mức cược ngẫu nhiên",
 			b_opts_normal_bosses = "Kích hoạt hiệu ứng Boss Blind",
 			b_opts_timer = "Cho Phép Đếm Ngược",
 			b_opts_disable_preview = "Tắt Xem Trước Điểm",
@@ -559,10 +873,14 @@ return {
 			k_has_multiplayer_content = "Có Vật Phẩm Chơi Mạng",
 			k_forces_lobby_options = "Ép Tuỳ Chỉnh Phòng",
 			k_forces_gamemode = "Ép Chế Độ Chơi",
+			k_may_roll_stickers = "Có thể Gieo lại Nhãn",
 			k_values_are_modifiable = "* Giá trị tuỳ biến",
 			k_rulesets = "Luật Lệ",
 			k_gamemodes = "Chế Độ Chơi",
+			k_matchmaking = "Ghép Trận",
 			k_competitive = "Tranh Đấu",
+			k_tournament = "Giải Đấu",
+			k_custom = "Tùy Chọn",
 			k_other = "Khác",
 			k_battle = "Cuộc Chiến",
 			k_challenge = "Thử Thách",
@@ -574,8 +892,9 @@ return {
 			k_wait_enemy = "Đang chờ đối thủ hoàn thành ván...",
 			k_wait_enemy_reach_this_blind = "Đang chờ đối thủ đến blind này...",
 			k_lives = "Mạng",
+			k_skips = "Bỏ Qua",
 			k_lost_life = "Mất 1 mạng",
-			k_total_lives_lost = " Mạng đã mất ($4 mỗi mạng)",
+			k_total_lives_lost = " Mạng đã mất",
 			k_attrition_name = "Hao Mòn",
 			k_enter_lobby_code = "Nhập Mã Phòng",
 			k_paste = "Dán Từ Bộ Nhớ Đệm",
@@ -591,6 +910,7 @@ return {
 			k_set_name = "Đặt tên của bạn trong menu chính! (Mod > Multiplayer > Tuỳ Chọn)",
 			k_mod_hash_warning = "Người chơi đang có mod hoặc phiên bản mod khác nhau, có thể gây vấn đề khi chơi!",
 			k_steamodded_warning = "Người chơi đang có phiên bản Steamodded khác nhau. Có thể gây chênh lệch giống.",
+			k_mp_version_warning = "Người chơi đang có phiên bản Multiplayer khác nhau! Giống và joker sẽ không khớp nhau - cập nhật cùng phiên bản nhé.",
 			k_warning_unlock_profile = "Hồ sơ bạn đang chơi chưa được mở khoá toàn bộ. Nếu đây là trận xếp hạng/giải đấu, hãy tạo hồ sơ mới và nhấn mở khoá toàn bộ trong cài đặt hồ sơ",
 			k_warning_nemesis_unlock = "Đối thủ của bạn đang chơi trên hồ sơ chưa được mở khoá toàn bộ. Hãy hướng dẫn họ tạo hồ sơ mới và nhấn mở khoá toàn bộ trong cài đặt hồ sơ",
 			k_warning_no_order = "Một người chơi đang bật tích hợo The Order trong khi người kia thì không. Điều nãy sẽ khiến cùng một giống bị khác nhau.",
@@ -618,6 +938,28 @@ return {
 			k_opts_showdown_starting_antes = "Showdown Bắt đầu ở Ante",
 			k_opts_pvp_timer_increment = "Tăng Đếm Ngược",
 			k_opts_pvp_countdown_seconds = "Giây Đếm Ngược Đối Đầu",
+			k_opts_modifier_timer = "Thi Triển Đếm Ngược", -- feel free to fix this text if you don't like huy, i can't find a better word for this
+            k_experimental_modifiers_timers = {
+                "- Mặc định: Đếm ngược {C:chips}150{} {C:inactive}(1x){} giây",
+                " ",
+                "- Không Hiệu ứng: Đếm ngược {C:chips}100{} {C:inactive}(0.67x){} giây {C:attention}trừ hiệu ứng{}",
+                " ",
+                "- Áp lực: Đếm ngược {C:chips}300{} {C:inactive}(2x){} giây {C:attention}trừ hiệu ứng{},",
+                "  bắt đầu {C:attention}ngay lập tức{}",
+                " ",
+                "- Áp lực+: Giống {C:attention}Áp lực{} thêm {C:chips}15{} giây cho mỗi tay bài đã chơi",
+            },
+            b_opts_modifier_pvp_timer = "Đếm Ngược trong Đối Đầu",
+            k_experimental_modifiers_pvp_timer = {
+                "- Đếm ngược được sử dụng trong các ván {C:mult}Đối Đầu{}.",
+                "  {C:chips}90{} giây thêm {C:chips}15{} giây cho mỗi tay bài đã chơi {C:attention}trừ hiệu ứng{}.",
+                "  Chỉ có thể \"đếm ngược\" đối thủ khi bạn có điểm {C:attention}cao hơn{}"
+            },
+            k_experimental_modifiers_smallworld = {
+                "- {C:attention}75%{} joker, lá tiêu thụ, phiếu và nhãn",
+                "bị cấm ngẫu nhiên mỗi trận đấu.",
+                "- Hiệu ứng {C:attention}Ông Bầu{} luôn được kích hoạt.",
+            },
 			k_bl_life = "Sống",
 			k_bl_or = "hoặc",
 			k_bl_death = "Chết",
@@ -630,17 +972,23 @@ return {
 			k_sandbox_description = "Như tiêu chuẩn nhưng mấy lá bài thích tám chuyện với nốc cà phê nhiều quá.",
 			k_vanilla = "Cơ Bản",
 			k_vanilla_description = "Thể thức này bỏ hết vật phẩm Chơi Mạng,\ncho phép bạn chơi game đúng theo thiết kế của nó.\n\nThể thức này vẫn bao gồm tính năng Chơi Mạng như đếm ngược.\n\n(Có thể tắt ở Tuỳ Chỉnh Phòng)",
-			k_blitz = "Blitz",
-			k_blitz_description = "Thể thức này bao gồm lá bài và tính năng khuyến khích chơi nhanh và\ndùng thời gian như một món tài nguyên.\n\nMột só lá bài được cân bằng lại để phù hợp với meta Chơi mạng:\n- Làm lại Phiếu Đục Lỗ\n- Loại bỏ Công Lý\n- Làm lại Lá Kính\n\n(xem mục bị cấm và làm lại để biết thêm thông tin)",
+			k_blitz = "Tiêu Chuẩn",
+			k_blitz_description = "Thể thức cân bằng của Multiplayer,\nvới các lá Joker Multiplayer và các cân bằng\ncùng toàn quyền điểu khiển tùy chỉnh phòng của bạn\n\n(xem mục bị cấm và làm lại để biết thêm thông tin)",
 			k_traditional = "Truyền Thống",
 			k_traditional_description = "Thể thức này loại bỏ cơ chế Chơi Mạng dùng thời gian làm tài nguyên.\n\nThể thức này cho phép bạn chơi với vật phẩn Chơi Mạng,\ntrong khi vẫn giữ vững tính chiến thuật.\n\nMột só lá bài được cân bằng lại để phù hợp với meta Chơi mạng:\n- Làm lại Phiếu Đục Lỗ\n- Loại bỏ Công Lý\n- Làm lại Lá Kính\n\n(xem mục bị cấm và làm lại để biết thêm thông tin)",
 			k_majorleague = "Giải Chính",
 			k_majorleague_description = "Đây là điều lệ chính thức cho Giải Chính Balatro.\n\nThể thức này giống thể thức Cơ Bản với một số ngoại lệ::\n- Bạn phải tắt Tích Hợp The Order\n- Thời gian đếm ngược la 180 giây\n- Lần đầu thời gian chạm mốc 0 giây sẽ không bị mất mạng",
 			k_minorleague = "Giải Phụ",
 			k_minorleague_description = "Đây là điều lệ chính thức cho Giải Phụ Balatro.\n\nThể thức này giống thể thức Cơ Bản với một số ngoại lệ::\n- You phải bật Tích Hợp The Order\n- Thời gian đếm ngược la 180 giây\n- Lần đầu thời gian chạm mốc 0 giây sẽ không bị mất mạng",
-			k_ranked = "Xếp Hạng",
-			k_ranked_description = "Đây là điều lệ chính thức cho Xếp Hạng của Balatro Multiplayer.\n\nThể thức này giống thể thức Blitz với một số ngoại lệ:\n- Bạn phải bật Tích Hợp The Order\n- Bạn phải dùng phiên bản Steamodded được khuyến nghị",
-			k_badlatro = "Badlatro",
+		    k_standard_ranked = "Xếp Hạng Tiêu Chuẩn",
+			k_standard_ranked_description = "Đây là điều lệ chính thức cho Xếp Hạng của Balatro Multiplayer.\n\nThể thức này giống thể thức Tiêu Chuẩn với một số ngoại lệ:\n- Bạn phải bật Tích Hợp The Order\n- Bạn phải dùng phiên bản Steamodded được khuyến nghị",
+			k_legacy_ranked = "Xếp Hạng Cổ Điển",
+			k_legacy_ranked_description = "Đây là điều lệ tranh đấu đã được tối giản.\n\nThể thức này không có sự thay đổi gì của Multiplayer\ntrừ Lá Kính cùng các tùy chỉnh cố định:\n- Chế độ Hao Mòn\n- Bạn phải bật Tích Hợp The Order\n- Bạn phải dùng phiên bản Steamodded được khuyến nghị",
+			k_experimental_standard = "Thử Nghiệm (Tiêu Chuẩn)",
+			k_experimental_description = "Đây là điều lệ thử nghiệm Tiêu Chuẩn.\n\nCác bản cân bằng sẽ liên tục được thử nghiệm tại đây\ntrước khi đưa vào điều lệ Tiêu Chuẩn.\n\n(xem mục bị cấm và làm lại để biết thêm thông tin)",
+			k_experimental_legacy = "Thử Nghiệm (Cổ Điển)",
+			k_experimental_legacy_description = "Đây là điều lệ mang ý kiến cá nhân với Xếp Hạng Truyền Thống.\n\nGiảm sức mạnh Lá Kính, làm lại Phiếu Đục Lỗ, cấm Công Lý,\nCờ bạc là bác thằng đần.",
+            k_badlatro = "Badlatro",
 			k_badlatro_description = "Một thể thức tuần được thiết kế bởi @dr_monty_the_snek trong máy chủ đã được thêm vĩnh viễn vào mod.\n\nThể thức này cấm 48 joker, lá tiêu thụ, nhãn bỏ qua, v.v...",
 			k_attrition = "Hao Mòn",
 			k_attrition_description = "Sau Ante đầu tiên, mọi boss blind đều là Blind Đối Đầu. Không chuẩn bị gì hết. Thể thức này ép bạn phải sẵn sàng ngay từ đầu.",
@@ -651,8 +999,18 @@ return {
 			k_weekly = "Giải Tuần",
 			k_weekly_description = "Một thể thức đặc biệt được thay đổi sau mỗi 1 hoặc 2 tuần. Có vẻ ta phải tự khám phá luật là gì rồi! Hiện tại là: ",
 			k_smallworld = "Small World",
-			k_smallworld_description = "Một thể thức siêu thử nghiệm, 3/4 số vật phẩm trong game\nsẽ bị cấm ngẫu nhiên vì lí do nào đó",
-			k_destabilized = "Phi Ổn Định",
+			k_smallworld_description = "Thế giới nhỏ bé mà, đúng không?\n3/4 số vật phẩm trong game sẽ bị cấm ngẫu nhiên,\nvà sẽ được thay thế thành các vật phẩm còn lại.\nCó tồn tại Trùng Lặp",
+		    k_speedlatro = "Speedlatro",
+			k_speedlatro_description = "147 giây, phóng như bay tới Đối Đầu.\nĂn Mày thoải mái nhé mấy đứa :>",
+			k_chaos = "Hỗn Loạn",
+			k_chaos_description = "Gi gỉ gì gi, cái gì cũng có.\n\nKết hợp Tiêu Chuẩn, Small World, Sandbox/nvà đếm ngược của Speedlatro vào một thể thức. Chúc may mắn.",
+            k_release = "Phiên Bản Ra Mắt",
+			k_release_description = "Allan thông tin đâu?",
+			k_mp_ruleset_tab_general = "Cơ Bản",
+			k_mp_ruleset_tab_tournaments = "Giải Đấu",
+			k_mp_ruleset_tab_experimental = "Thử Nghiệm",
+			k_cost_up = "Tăng Giá",
+            k_destabilized = "Phi Ổn Định",
 			k_oops_ex = "Úi!",
 			k_asteroids = "Thiên Thạch",
 			k_amount_short = "Lượg",
@@ -663,16 +1021,21 @@ return {
 			k_your_jokers = "Joker của bạn",
 			k_nemesis_deck = "Bộ bài của Đối Thủ",
 			k_your_deck = "Bộ bài của bạn",
+			k_customization = "Tùy chỉnh",
 			k_the_order_credit = "*Công nhận cho @MathIsFun_",
 			k_the_order_integration_desc = "Vá quy trình tạo lá bài để không còn bị phụ thuộc vào ante và dùng một tập hợp duy nhất cho mỗi loại/độ hiếm",
 			k_preview_credit = "*Công nhận cho @Fantom, @Divvy",
 			k_preview_integration_desc = "Cái này sẽ bật xem trước điểm trước khi chơi một tay bài",
 			k_requires_restart = "*Yêu cầu khởi động lại để có hiệu lực",
+			k_cocktail_select = "Chọn bộ bài để thêm vào",
+			k_cocktail_shiftclick = "Shift-click để ánh kim bộ bài, bộ bài ánh kim sẽ luôn được chọn",
+			k_cocktail_rightclick = "Chuột Phải để chọn tất cả",
 			k_new_weekly_ruleset = "Một thể thức tuần mới đang khả dụng!",
 			k_currently_colon = "Hiện tại là: ",
 			k_sync_locally = "Đồng bộ cục bộ (Khỏi động lại game)",
 			k_bans = "Cấm",
 			k_reworks = "Thêm vào/Sửa lại",
+			k_edit = "Chỉnh sửa",
 			k_ruleset_disabled_the_order_required = "Bắt Buộc dùng The Order",
 			k_ruleset_disabled_the_order_banned = "Cấm dùng The Order",
 			k_ruleset_not_found = "Thể thức chưa rõ",
@@ -682,6 +1045,17 @@ return {
 			ml_enemy_loc = {
 				"Vị trí",
 				"Đối Thủ",
+			},
+			k_ghost_replays = "Lịch sử đấu",
+			k_no_ghost_replays = "Chưa có lịch sử đấu",
+			k_ghost = "Bóng",
+			k_hide_mp_content = "Ẩn nội dung Multiplayer*",
+			k_applies_singleplayer_vanilla_rulesets = "*Áp dụng với Chơi Đơn và các thể thức cơ bản",
+			k_timer_sfx = "Hiệu ứng âm thanh Đếm Ngược",
+			ml_mp_timersfx_opt = {
+				"Bật",
+				"Một lần mỗi Ante",
+				"Tắt",
 			},
 			ml_mp_kofi_message = {
 				"Mod và máy chủ này được",
@@ -693,10 +1067,19 @@ return {
 				"T.Tin",
 				"Phòng",
 			},
+			ml_mp_modifier_timer_opt = {
+				"Mặc định",
+				"Không Hiệu ứng",
+				"Áp lực",
+				"Áp lực+",
+			},
+			k_sc_title = "PHÍM TẮT",
+			k_sc_hint = "Chọn phím hoặc thả Tab để tắt",
+			b_sc_choose_deck = "Chọn Bộ Bài/Mức Cược",
 			loc_ready = "Sẵn sàng Đối Đầu",
-			loc_selecting = "Đang chọn Blind",
-			loc_shop = "Đang đi chợ",
-			loc_playing = "Đang đánh ",
+			loc_selecting = "Đang chọn",
+			loc_shop = "Đang đi chợ trước",
+			loc_playing = "Đang đánh",
 		},
 		v_dictionary = {
 			a_mp_art = {
@@ -773,6 +1156,9 @@ return {
 			c_mp_lets_go_gambling = "Cờ Bạc Level MAX",
 			c_mp_speed = "Siêu Tốc",
 			c_mp_balancing_act = "Hồi Cân Bằng",
+			c_mp_bacon = "Băng Xanh",
+			c_mp_eeeee = "EEEEE",
+			c_mp_shared_pockets = "Chung Túi",
 		},
 	},
 }

@@ -1,12 +1,22 @@
 MP.CUSTOM = MP.CUSTOM or {}
 
-local CONTENT_SETS = { "Vanilla", "Standard", "Standard (0.2)", "Sandbox", "Experimental" }
+local CONTENT_SETS = { "Vanilla", "Standard", "Sandbox", "Experimental" }
+
+-- Content set (display string) -> base ruleset short key. The custom editor is
+-- "this base + a stack of modifiers", so each set just points at an existing
+-- ruleset whose layers we inherit.
+local CONTENT_SET_RULESET = {
+	Vanilla = "vanilla",
+	Standard = "blitz",
+	Sandbox = "sandbox",
+	Experimental = "experimental",
+}
 
 -- ---------------------------------------------------------------------------
 function MP.CUSTOM.new_draft()
 	return {
 		name = "My Ruleset",
-		base = "standard", -- content_sets
+		base = "Standard", -- key into CONTENT_SETS / CONTENT_SET_RULESET
 		modifiers = {}, -- snapshotted modifiers
 		banned_jokers = {},
 		banned_consumables = {},
@@ -131,6 +141,38 @@ G.FUNCS.mp_custom_set_base = function(args)
 	if MP.CUSTOM.draft and args and args.to_key then MP.CUSTOM.draft.base = CONTENT_SETS[args.to_key] end
 end
 
+-- Launch a custom run: chosen base ruleset + the wall's MP.MODIFIERS.
+-- We set the ruleset directly and deliberately DON'T route through
+-- change_ruleset_selection / apply_default_modifiers, which would wipe the
+-- wall's modifier selections. Modifiers ride to the guest via start_lobby's
+-- modifier_layers serialization, same as the Modifiers overlay.
+G.FUNCS.mp_custom_play = function(e)
+	local d = MP.CUSTOM.draft or MP.CUSTOM.new_draft()
+	local mode = MP.CUSTOM.editor_mode or "mp"
+	local base_short = CONTENT_SET_RULESET[d.base] or "blitz"
+	local base_key = "ruleset_mp_" .. base_short
+
+	if mode == "sp" or mode == "practice" then
+		MP.SP.ruleset = base_key
+	else
+		MP.LOBBY.config.ruleset = base_key
+	end
+
+	-- Materialize reworks for the chosen base. active_layer_chain now folds in
+	-- MP.MODIFIERS (the ruleset is set above), so modifier reworks resolve too.
+	MP.LoadReworks(base_short)
+
+	local ruleset = MP.Rulesets[base_key]
+	if mode == "sp" then
+		G.FUNCS.start_sp_run(e)
+	elseif mode == "practice" then
+		G.FUNCS.start_practice_run(e)
+	elseif ruleset and ruleset.forced_gamemode then
+		G.FUNCS["force_" .. ruleset.forced_gamemode](e)
+	else
+		G.FUNCS.select_gamemode(e)
+	end
+end
 
 G.FUNCS.mp_custom_open_collection = function(e)
 	MP.CUSTOM.editing_bans = true
@@ -141,40 +183,9 @@ end
 -- ---------------------------------------------------------------------------
 -- Tab content
 -- ---------------------------------------------------------------------------
-local function text_row(str, scale, colour)
-	return {
-		n = G.UIT.R,
-		config = { align = "cm", padding = 0.04 },
-		nodes = {
-			{ n = G.UIT.T, config = { text = str, scale = scale or 0.4, colour = colour or G.C.UI.TEXT_LIGHT } },
-		},
-	}
-end
-
 local function knob_row(node)
 	return { n = G.UIT.R, config = { align = "cm", padding = 0.08 }, nodes = { node } }
 end
-
--- COMING SOON banner across the top of the editor.
-local function coming_soon_ribbon()
-	return {
-		n = G.UIT.R,
-		config = { align = "cm", padding = 0.12, r = 0.1, colour = G.C.BOOSTER, emboss = 0.05, minw = 15 },
-		nodes = {
-			{
-				n = G.UIT.R,
-				config = { align = "cm" },
-				nodes = {
-					{
-						n = G.UIT.T,
-						config = { text = "CUSTOM RULESETS - COMING SOON", scale = 0.55, colour = G.C.UI.TEXT_LIGHT, shadow = true },
-					},
-				},
-			},
-		},
-	}
-end
-
 
 local function soon_pill(label)
 	return {
@@ -187,7 +198,21 @@ local function soon_pill(label)
 	}
 end
 
+-- The editor is local-only for now: custom card bans aren't wired into ApplyBans
+-- or the lobby modifier sync yet, so on the lobby (mp) path we stub the tab.
+-- It stays fully functional in sp / practice.
+local function coming_soon_root()
+	return {
+		n = G.UIT.ROOT,
+		config = { align = "cm", colour = G.C.CLEAR, minh = 6, minw = 15 },
+		nodes = {
+			{ n = G.UIT.R, config = { align = "cm" }, nodes = { soon_pill("Custom ruleset") } },
+		},
+	}
+end
+
 function MP.UI.build_custom_ruleset_editor(mode)
+	if mode == "mp" then return coming_soon_root() end
 	MP.CUSTOM.editor_mode = mode -- so the ban picker's Back knows where to return
 	MP.CUSTOM.draft = MP.CUSTOM.draft or MP.CUSTOM.new_draft()
 	local d = MP.CUSTOM.draft
@@ -204,19 +229,8 @@ function MP.UI.build_custom_ruleset_editor(mode)
 		w = 4,
 	}))
 
-	-- edit-bans button
-	knobs[#knobs + 1] = knob_row(UIBox_button({
-		button = "mp_custom_open_collection",
-		label = { "Edit joker bans" },
-		minw = 4,
-		minh = 0.8,
-		scale = 0.45,
-		colour = G.C.RED,
-		hover = true,
-		shadow = true,
-	}))
-	knobs[#knobs + 1] = text_row("Banned jokers: " .. tostring(#d.banned_jokers), 0.32, G.C.UI.TEXT_INACTIVE)
-	knobs[#knobs + 1] = text_row("(hover a card, press DELETE)", 0.28, G.C.UI.TEXT_DARK)
+	-- edit-bans: custom card bans aren't wired into ApplyBans / network sync yet.
+	knobs[#knobs + 1] = knob_row(soon_pill("Edit joker bans"))
 
 	-- Variants strip: option-cycles for graded knobs (timer / glass) plus the PvP
 	-- toggle. Binary twists live on the wall below.
@@ -237,11 +251,38 @@ function MP.UI.build_custom_ruleset_editor(mode)
 		MP.UI.build_mutator_randomize_row(),
 	}
 
+	-- Play button label matches the start flow the base ruleset will take.
+	local base_ruleset = MP.Rulesets["ruleset_mp_" .. (CONTENT_SET_RULESET[d.base] or "blitz")]
+	local play_label
+	if mode == "sp" or mode == "practice" then
+		play_label = localize("b_play_cap")
+	elseif base_ruleset and base_ruleset.forced_gamemode then
+		play_label = localize("b_create_lobby")
+	else
+		play_label = localize("b_next")
+	end
+
 	local actions = {
 		n = G.UIT.R,
 		config = { align = "cm", padding = 0.12 },
 		nodes = {
-			{ n = G.UIT.C, config = { align = "cm", padding = 0.06 }, nodes = { soon_pill("Save & Play") } },
+			{
+				n = G.UIT.C,
+				config = { align = "cm", padding = 0.06 },
+				nodes = {
+					UIBox_button({
+						id = "mp_custom_play_btn",
+						button = "mp_custom_play",
+						label = { play_label },
+						colour = G.C.GREEN,
+						minw = 5,
+						minh = 0.8,
+						scale = 0.5,
+						hover = true,
+						shadow = true,
+					}),
+				},
+			},
 		},
 	}
 
@@ -249,7 +290,6 @@ function MP.UI.build_custom_ruleset_editor(mode)
 		n = G.UIT.ROOT,
 		config = { align = "cm", colour = G.C.CLEAR },
 		nodes = {
-			coming_soon_ribbon(),
 			{
 				n = G.UIT.R,
 				config = { align = "cm" },

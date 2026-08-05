@@ -83,6 +83,11 @@ function MP.UI.create_lobby_options_tab()
 				MP.ACTIONS.update_player_usernames()
 			end),
 			create_lobby_option_toggle("normal_bosses_toggle", "b_opts_normal_bosses", "normal_bosses"),
+			create_lobby_option_toggle(
+				"hide_score_until_played_toggle",
+				"b_opts_hide_score",
+				"hide_score_until_played"
+			),
 		},
 	}
 end

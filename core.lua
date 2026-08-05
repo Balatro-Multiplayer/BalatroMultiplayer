@@ -197,6 +197,10 @@ function MP.reset_lobby_config(persist_ruleset_and_gamemode)
 		forced_config = false,
 		preview_disabled = false,
 		legacy_smallworld = false,
+		-- Baseline off; start_lobby sets it on for standard-layer rulesets.
+		hide_score_until_played = false,
+		enemy_location_disabled = false,
+		timer_display_threshold = 0,
 	}
 end
 MP.reset_lobby_config()
@@ -215,10 +219,16 @@ function MP.reset_game_states()
 		end_pvp = false,
 		enemy = {
 			score = MP.INSANE_INT.empty(),
+			real_score = MP.INSANE_INT.empty(),
 			score_text = "0",
 			hands = 4,
+			hands_text = "4",
+			-- Whether an enemyInfo message has arrived this blind. Used to mask
+			-- the opponent's hands as "?" until we hear from them.
+			info_received = false,
 			location = localize("loc_selecting"),
 			skips = 0,
+            skips_before_pvp = 0,
 			lives = MP.LOBBY.config.starting_lives,
 			sells = 0,
 			sells_per_ante = {},
@@ -238,8 +248,13 @@ function MP.reset_game_states()
 		highest_score = MP.INSANE_INT.empty(),
 		timer = MP.UTILS.timer_base(),
 		timer_started = false,
+        timer_was_started = false,
+        nemesis_timer_started = false,
+        nemesis_timer_was_started = false,
+		timer_threshold_pending = false,
 		timer_consumed = false,
 		pvp_reached = false,
+        pvp_reached_first = false,
 		pvp_countdown = 0,
 		real_money = 0,
 		ce_cache = false,
@@ -256,6 +271,10 @@ function MP.reset_game_states()
 			reroll_cost_total = 0,
 			-- Add more stats here in the future
 		},
+        pvp_timer_order = nil,
+        pvp_timer_activated = false,
+        skips_before_pvp = 0,
+        skips_difference = 0,
 	}
 end
 MP.reset_game_states()

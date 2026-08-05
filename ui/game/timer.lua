@@ -1,13 +1,16 @@
 -- ease_round override moved to game/round.lua
 
-function MP.UI.cam_timer_opponent()
+function MP.UI.can_timer_opponent()
 	if not MP.LOBBY.config.timer then return false end
-    if MP.GAME.pvp_countdown_in_progress then return false end
-    if MP.GAME.timer <= 0 then return false end
+	if MP.GAME.pvp_countdown_in_progress then return false end
+	if MP.GAME.timer <= 0 then return false end
+	if MP.GAME.nemesis_timer_started then return false end
+	if MP.GAME.enemy.location_type == "loc_ready" then return false end
+	if G.STATE == G.STATES.GAME_OVER or MP.GAME.won then return false end
 	if MP.is_pvp_boss() and MP.is_layer_active("pvp_timer") then
+		if MP.GAME.end_pvp then return false end
 		if G.STATE == G.STATES.ROUND_EVAL or G.STATE == G.STATES.NEW_ROUND then return false end
-		if MP.INSANE_INT.greater_than(MP.GAME.score, MP.GAME.enemy.score) then return true end
-        if MP.INSANE_INT.equal(MP.GAME.score, MP.GAME.enemy.score) then return MP.GAME.pvp_reached_first end
+		if (MP.LOBBY.is_host and "host" or "guest") == MP.GAME.pvp_timer_order then return true end
 		return false
 	end
 	return MP.GAME.ready_blind
@@ -17,13 +20,13 @@ function G.FUNCS.mp_timer_button(e)
 	-- Under pressure_timer the local timer auto-ticks regardless of timer_started,
 	-- but the button still needs to fire — pressing it broadcasts startAnteTimer,
 	-- which is what flips the opponent's nemesis_timer_started and triggers 2x.
-	if MP.UI.cam_timer_opponent() then
-		if MP.GAME.timer <= 0 then
-			return
-		elseif not MP.GAME.timer_started then
+	if MP.UI.can_timer_opponent() then
+		if not MP.GAME.timer_started then
 			MP.ACTIONS.start_ante_timer()
+			if MP.is_pvp_boss() and MP.is_layer_active("pvp_timer") then MP.GAME.pvp_timer_activated = true end
 		else
 			MP.ACTIONS.pause_ante_timer()
+			if MP.is_pvp_boss() and MP.is_layer_active("pvp_timer") then MP.GAME.pvp_timer_activated = false end
 		end
 	end
 end
@@ -40,6 +43,8 @@ function MP.UI.timer_hud()
 				colour = G.C.DYN_UI.BOSS_MAIN,
 				emboss = 0.05,
 				r = 0.1,
+				hover = true,
+				collideable = true,
 			},
 			nodes = {
 				{
@@ -68,6 +73,8 @@ function MP.UI.timer_hud()
 						id = "row_round_text",
 						func = "set_timer_box",
 						button = "mp_timer_button",
+						hover = true,
+						collideable = true,
 					},
 					nodes = {
 						{
@@ -79,12 +86,9 @@ function MP.UI.timer_hud()
 											ref_table = setmetatable({}, {
 												__index = function()
 													if not MP.GAME.timer then return 0 end
-													-- All numbers bigger then 10 - display as integer
-													-- Also accounting for rounding to prevent 10.0 to be displayed
 													if MP.GAME.timer > 9.95 then
 														return string.format("%d", MP.GAME.timer)
 													end
-													-- Less than 10 - display decimal part
 													return string.format("%.1f", MP.GAME.timer)
 												end,
 											}),
@@ -104,6 +108,88 @@ function MP.UI.timer_hud()
 		}
 	end
 end
+function MP.UI.nemesis_timer_hud()
+	return {
+		n = G.UIT.ROOT,
+		config = { align = "cm", colour = G.C.CLEAR },
+		nodes = {
+			{
+				n = G.UIT.C,
+				config = {
+					align = "cm",
+					padding = 0.05,
+					minw = 1.45,
+					minh = 1,
+					colour = G.C.DYN_UI.BOSS_MAIN,
+					emboss = 0.05,
+					r = 0.1,
+				},
+				nodes = {
+					{
+						n = G.UIT.R,
+						config = { align = "cm", maxw = 1.35 },
+						nodes = {
+							{
+								n = G.UIT.T,
+								config = {
+									text = localize("k_nemesis_timer"),
+									minh = 0.33,
+									scale = 0.34,
+									colour = G.C.UI.TEXT_LIGHT,
+									shadow = true,
+								},
+							},
+						},
+					},
+					{
+						n = G.UIT.R,
+						config = {
+							align = "cm",
+							r = 0.1,
+							minw = 1.2,
+							colour = G.C.DYN_UI.BOSS_DARK,
+							id = "row_round_text",
+						},
+						nodes = {
+							{
+								n = G.UIT.O,
+								config = {
+									object = DynaText({
+										string = {
+											{
+												ref_table = setmetatable({}, {
+													__index = function()
+														if not MP.GAME.enemy or not MP.GAME.enemy.last_timer then
+															return "0.0"
+														end
+														local val = MP.GAME.enemy.last_timer
+														local threshold = MP.LOBBY.config.timer_display_threshold or 0
+														if threshold > 0 and val > threshold then
+															val = threshold
+														end
+														if val > 9.95 then
+															return string.format("%d", val)
+														end
+														return string.format("%.1f", val)
+													end,
+												}),
+												ref_value = "timer",
+											},
+										}, -- sorry
+										colours = { G.C.IMPORTANT },
+										shadow = true,
+										scale = 0.8,
+									}),
+									id = "timer_UI_count",
+								},
+							},
+						},
+					},
+				},
+			},
+		},
+	}
+end
 
 function MP.UI.start_pvp_countdown(callback)
 	local seconds = countdown_seconds
@@ -111,7 +197,7 @@ function MP.UI.start_pvp_countdown(callback)
 	if MP.LOBBY and MP.LOBBY.config and MP.LOBBY.config.pvp_countdown_seconds then
 		seconds = MP.LOBBY.config.pvp_countdown_seconds
 	end
-    MP.GAME.pvp_countdown_in_progress = true
+	MP.GAME.pvp_countdown_in_progress = true
 	MP.GAME.pvp_countdown = seconds
 
 	G.CONTROLLER.locks.enter_pvp = true
@@ -119,19 +205,19 @@ function MP.UI.start_pvp_countdown(callback)
 	local function show_next()
 		if MP.GAME.pvp_countdown <= 0 then
 			if callback then callback() end
-            G.E_MANAGER:add_event(Event({
-                blocking = false,
-                func = function()
-                    G.E_MANAGER:add_event(Event({
-                        blocking = false,
-                        func = function()
-                            MP.GAME.pvp_countdown_in_progress = nil
-                            return true
-                        end,
-                    }))
-                    return true
-                end,
-            }))
+			G.E_MANAGER:add_event(Event({
+				blocking = false,
+				func = function()
+					G.E_MANAGER:add_event(Event({
+						blocking = false,
+						func = function()
+							MP.GAME.pvp_countdown_in_progress = nil
+							return true
+						end,
+					}))
+					return true
+				end,
+			}))
 			G.E_MANAGER:add_event(Event({
 				no_delete = true,
 				trigger = "after",
@@ -226,7 +312,7 @@ SMODS.Gradient({
 		if #self.colours < 2 or not MP.speedlatro_timer then return end
 		local speedup = MP.current_ruleset().timer_speedup_multiplier or 1
 
-        local timer_value = MP.GAME.ready_blind and 0 or -(MP.speedlatro_timer.real or 0)
+		local timer_value = MP.GAME.ready_blind and 0 or -(MP.speedlatro_timer.real or 0)
 		local timer = (timer_value / speedup) % self.cycle
 		local start_index = math.ceil(timer * #self.colours / self.cycle)
 		if start_index == 0 then start_index = 1 end
@@ -245,6 +331,23 @@ SMODS.Gradient({
 })
 
 function G.FUNCS.set_timer_box(e)
+	if e.states and e.parent and e.parent.states then
+		local is_hovered = e.states.hover.is or e.parent.states.hover.is
+		if is_hovered and not e.parent.children.mp_timer_info then
+			e.parent.children.mp_timer_info = UIBox({
+				definition = MP.UI.nemesis_timer_hud(),
+				config = {
+					parent = e.parent,
+					major = e.parent,
+					align = "tm",
+					offset = { x = 0, y = -0.1 },
+				},
+			})
+		elseif not is_hovered and e.parent.children.mp_timer_info then
+			e.parent.children.mp_timer_info:remove()
+			e.parent.children.mp_timer_info = nil
+		end
+	end
 	if MP.LOBBY.config.timer then
 		if MP.GAME.timer_started or MP.GAME.nemesis_timer_started then
 			e.config.colour = G.C.DYN_UI.BOSS_DARK
@@ -254,17 +357,17 @@ function G.FUNCS.set_timer_box(e)
 			}
 			return
 		end
-		if not MP.GAME.timer_started and MP.UI.cam_timer_opponent() then
+		if not MP.GAME.timer_started and MP.UI.can_timer_opponent() then
 			e.config.colour = G.C.IMPORTANT
 			e.children[1].config.object.colours = { G.C.UI.TEXT_LIGHT }
 			return
 		end
 		e.config.colour = G.C.DYN_UI.BOSS_DARK
-		e.children[1].config.object.colours =
-			{
-                (not MP.is_pvp_boss() and not MP.GAME.pvp_countdown_in_progress and MP.is_layer_active("pressure_timer"))
-                and G.C.IMPORTANT or G.C.UI.TEXT_DARK
-            }
+		e.children[1].config.object.colours = {
+			(not MP.is_pvp_boss() and not MP.GAME.pvp_countdown_in_progress and MP.is_layer_active("pressure_timer"))
+					and G.C.IMPORTANT
+				or G.C.UI.TEXT_DARK,
+		}
 	end
 end
 
@@ -301,10 +404,11 @@ function Game:update(dt)
 		math.min(animation_budget_capacity, MP.TIMER_ANIMATION_BUDGET + timer_dt * animation_budget_restore_rate)
 
 	-- Bail fast: not an MP PvP-timer context
-	if G.STATE == G.STATES.GAME_OVER then return end
+	if G.STATE == G.STATES.GAME_OVER or MP.GAME.won then return end
 	if not MP.LOBBY.code then return end
 	if not MP.LOBBY.config.timer then return end
 	if MP.GAME.timer_consumed then return end
+	if MP.GAME.pvp_countdown_in_progress then return end
 	if not MP.GAME.timer or MP.GAME.timer <= 0 then return end
 	if MP.is_layer_active("speedlatro_timer") then return end
 
@@ -321,24 +425,26 @@ function Game:update(dt)
 	local should_check_animations = false
 
 	if is_pvp_timer then
-        -- PvP timer: tick when opponent timering, stop when animations, state checks, pvp blind only
+		-- PvP timer: tick when opponent timering, stop when animations, state checks, pvp blind only
 		if not MP.GAME.nemesis_timer_started then return end
-        if G.GAME.current_round.hands_left <= 0 then return end
+		if (MP.LOBBY.is_host and "host" or "guest") == MP.GAME.pvp_timer_order then return end
+		if G.GAME.current_round.hands_left <= 0 then return end
 		if G.STATE == G.STATES.NEW_ROUND or G.STATE == G.STATES.ROUND_EVAL then return end
 		should_check_animations = true
 	elseif is_pressure_timer then
-        -- Pressure timer: tick from the start of a game, stop when reached pvp (unless timered) or animations, not in pvp blind
+		-- Pressure timer: tick from the start of a game, stop when reached pvp (unless timered) or animations, not in pvp blind
 		if MP.GAME.pvp_reached and not MP.GAME.nemesis_timer_started then return end
 		if MP.GAME.ready_blind or is_pvp_boss then return end
 		should_check_animations = true
 	elseif is_no_animation_timer then
-        -- No-animation timer: tick when opponen timering, stop when animations, not in pvp
+		-- No-animation timer: tick when opponen timering, stop when animations, not in pvp
 		if not MP.GAME.nemesis_timer_started then return end
 		if MP.GAME.ready_blind or is_pvp_boss then return end
 		should_check_animations = true
 	else
-        -- Old timer: tick when opponent timering, not in pvp
-        if is_pvp_boss then return end
+		-- Old timer: tick when opponent timering, not in pvp
+		if is_pvp_boss then return end
+		if MP.GAME.pvp_reached and MP.GAME.ready_blind and not MP.GAME.timer_started then return end
 		if not (MP.GAME.timer_started or MP.GAME.nemesis_timer_started) then return end
 	end
 
@@ -363,28 +469,46 @@ function Game:update(dt)
 	local tick_mult = MP.GAME.nemesis_timer_started and speedup or 1
 	MP.GAME.timer = math.max(0, MP.GAME.timer - timer_dt * tick_mult)
 
+	if MP.GAME.timer_threshold_pending then
+		local threshold = MP.LOBBY.config.timer_display_threshold or 0
+		if MP.GAME.timer <= threshold then
+			MP.GAME.timer_threshold_pending = false
+			Client.send({
+				action = "startAnteTimer",
+				time = threshold,
+				isPvP = (MP.is_pvp_boss() and MP.is_layer_active("pvp_timer")) or nil,
+			})
+		end
+	end
+
 	if MP.GAME.timer == 0 then
 		MP.GAME.timer_consumed = true
-        -- PvP timer: end PvP immediately as a loss (only when timered by opponent)
-        if is_pvp_timer then
-            if MP.GAME.nemesis_timer_started then
-                MP.ACTIONS.fail_pvp_timer()
-            end
-        -- Old, No-animations: lose a live when timered by opponent
-        -- Pressure timers: lose a live regardless
-        elseif (is_pressure_timer or MP.GAME.nemesis_timer_started) then
-            if MP.GAME.timers_forgiven < MP.LOBBY.config.timer_forgiveness then
-                MP.GAME.timers_forgiven = MP.GAME.timers_forgiven + 1
-            else
-                MP.ACTIONS.fail_timer()
-            end
-        end
+		-- PvP timer: end PvP immediately as a loss (only when timered by opponent)
+		if is_pvp_timer then
+			if MP.GAME.nemesis_timer_started then MP.ACTIONS.fail_pvp_timer() end
+		-- Old, No-animations: lose a live when timered by opponent
+		-- Pressure timers: lose a live regardless
+		elseif is_pressure_timer or MP.GAME.nemesis_timer_started then
+			if MP.GAME.timers_forgiven < MP.LOBBY.config.timer_forgiveness then
+				MP.GAME.timers_forgiven = MP.GAME.timers_forgiven + 1
+			else
+				MP.ACTIONS.fail_timer()
+			end
+		end
 	end
 end
 
+-- Decrease timer up to specified minimum & juice up timer UI
 function MP.UI.consume_timer(amount, silent, min_timer)
-	if amount > 0 and MP.LOBBY.config.timer and MP.GAME.timer and MP.GAME.timer > (min_timer or 0) then
-		MP.GAME.timer = math.max(0, MP.GAME.timer - amount)
+    if not MP.GAME.timer or not MP.LOBBY.config.timer then return end
+    amount = math.max(0, amount)
+    min_timer = min_timer or 0
+
+    local new_timer = math.max(0, min_timer, MP.GAME.timer - amount)
+    amount = MP.GAME.timer - new_timer
+
+	if amount > 0 then
+		MP.GAME.timer = new_timer
 		if not silent then
 			local timer_ui = G.HUD:get_UIE_by_ID("timer_UI_count")
 			if timer_ui then timer_ui.config.object:juice_up() end
@@ -392,33 +516,93 @@ function MP.UI.consume_timer(amount, silent, min_timer)
 	end
 end
 
+-- Increase timer up to specified maximum & juice up timer UI
 function MP.UI.restore_timer(amount, silent, max_timer)
-	if amount > 0 and MP.LOBBY.config.timer and MP.GAME.timer and (not max_timer or MP.GAME.timer < max_timer) then
-		MP.GAME.timer = math.max(0, MP.GAME.timer + amount)
+    if not MP.GAME.timer or not MP.LOBBY.config.timer then return end
+    amount = math.max(0, amount)
+    max_timer = max_timer or (MP.GAME.timer + amount)
+
+    local new_timer = math.max(0, math.min(MP.GAME.timer + amount, max_timer))
+    amount = new_timer - MP.GAME.timer
+
+	if amount > 0 then
+		MP.GAME.timer = new_timer
 		if not silent then
 			local timer_ui = G.HUD:get_UIE_by_ID("timer_UI_count")
 			if timer_ui then timer_ui.config.object:juice_up() end
 		end
 	end
+end
+
+-- Update skips difference between 2 players.
+-- If value increased - one player skipped even further, add time.
+-- If value decreased - another player catches up, deduct time.
+function MP.UI.update_matching_skip_timer(from_nemesis)
+    if (MP.LOBBY.config.timer_display_threshold or 0) > 0 then
+        if not from_nemesis
+            and MP.LOBBY.config.timer
+            and not MP.GAME.timer_was_started
+            and not MP.GAME.nemesis_timer_was_started
+            and not MP.is_any_layer_active({ "no_animation_timer", "pressure_timer" })
+            and (MP.LOBBY.config.timer_increment_seconds or 0) > 0
+        then
+            MP.UI.restore_timer(MP.LOBBY.config.timer_increment_seconds, false)
+        end
+        return
+    end
+
+    local new_diff = math.max((MP.GAME.skips_before_pvp or 0) - (MP.GAME.enemy.skips_before_pvp or 0), 0)
+    local skips_dx = new_diff - (MP.GAME.skips_difference or 0)
+    MP.GAME.skips_difference = new_diff
+
+    -- Same implementation twice is in case of future changes how this should work.
+    if skips_dx > 0 then
+        if
+            MP.LOBBY.config.timer
+            and not MP.GAME.timer_was_started
+            and not MP.GAME.nemesis_timer_was_started
+            and not MP.is_any_layer_active({ "no_animation_timer", "pressure_timer" })
+			and (MP.LOBBY.config.timer_increment_seconds or 0) > 0
+        then
+            MP.UI.restore_timer(MP.LOBBY.config.timer_increment_seconds, false)
+		end
+    elseif skips_dx < 0 then
+        if
+            MP.LOBBY.config.timer
+            and not MP.GAME.timer_was_started
+            and not MP.GAME.nemesis_timer_was_started
+            and not MP.is_any_layer_active({ "no_animation_timer", "pressure_timer" })
+			and (MP.LOBBY.config.timer_increment_seconds or 0) > 0
+        then
+            MP.UI.consume_timer(MP.LOBBY.config.timer_increment_seconds, false, 10)
+		end
+    end
 end
 
 local old_play = G.FUNCS.play_cards_from_highlighted
 function G.FUNCS.play_cards_from_highlighted(...)
-    old_play(...)
-    if G.play and G.play.cards[1] then return end
-    if MP.LOBBY.code and MP.LOBBY.config.timer and not MP.GAME.timer_consumed then
-        if MP.is_pvp_boss() then
-            -- PvP timer: Increment timer when hand is played during pvp
-            if MP.is_layer_active("pvp_timer") then
-                local increment = MP.LOBBY.config.pvp_timer_hand_played_increment_seconds or MP.current_ruleset().pvp_timer_hand_played_increment_seconds or 0
-                MP.UI.restore_timer(increment)
-            end
-        else
-            -- No-animation, Pressure timers: Increment timer when hand is played during regular blinds
-            if MP.is_any_layer_active({ "no_animation_timer", "pressure_timer" }) then
-                local increment = MP.LOBBY.config.timer_hand_played_increment_seconds or MP.current_ruleset().timer_hand_played_increment_seconds or 0
-                MP.UI.restore_timer(increment)
-            end
-        end
-    end
+	-- Carbon: capture which hand slots are played BEFORE old_play consumes them.
+	local played = MP.UTILS.highlighted_hand_indices()
+	old_play(...)
+	if #played > 0 then MP.RLOG.record("play", { played }, "action:play,cards:" .. table.concat(played, ".")) end
+	if G.play and G.play.cards[1] then return end
+	if MP.LOBBY.code and MP.LOBBY.config.timer and not MP.GAME.timer_consumed then
+		if MP.is_pvp_boss() then
+			-- PvP timer: Increment timer when hand is played during pvp
+			if MP.is_layer_active("pvp_timer") then
+				local increment = MP.LOBBY.config.pvp_timer_hand_played_increment_seconds
+					or MP.current_ruleset().pvp_timer_hand_played_increment_seconds
+					or 0
+				MP.UI.restore_timer(increment)
+			end
+		else
+			-- No-animation, Pressure timers: Increment timer when hand is played during regular blinds
+			if MP.is_any_layer_active({ "no_animation_timer", "pressure_timer" }) then
+				local increment = MP.LOBBY.config.timer_hand_played_increment_seconds
+					or MP.current_ruleset().timer_hand_played_increment_seconds
+					or 0
+				MP.UI.restore_timer(increment)
+			end
+		end
+	end
 end

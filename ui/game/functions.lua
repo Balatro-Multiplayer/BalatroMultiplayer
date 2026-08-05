@@ -15,6 +15,7 @@ function G.FUNCS.mp_toggle_ready(e)
 	sendTraceMessage("Toggling Ready", "MULTIPLAYER")
 	MP.GAME.ready_blind = not MP.GAME.ready_blind
 	MP.GAME.ready_blind_text = MP.GAME.ready_blind and localize("b_unready") or localize("b_ready")
+	MP.RLOG.record("ready_blind", MP.GAME.ready_blind and 1 or 0)
 
     MP.GAME.pvp_reached = true
 
@@ -62,6 +63,14 @@ function G.FUNCS.select_blind(e)
 	if MP.is_mp_or_ghost() then
 		MP.GAME.ante_key = tostring(math.random())
 		if not MP.GHOST.is_active() then
+			-- Carbon: log the freshly-rolled (non-deterministic) ante_key first so
+			-- a replay can restore it, then the blind selection itself.
+			MP.RLOG.record("set_ante_key", MP.GAME.ante_key)
+			MP.RLOG.record(
+				"select_blind",
+				0,
+				string.format("action:selectBlind,blind:%s", tostring(e.config.ref_table.key or e.config.ref_table.name))
+			)
 			MP.ACTIONS.play_hand(0, G.GAME.round_resets.hands)
 			MP.ACTIONS.new_round()
 			MP.ACTIONS.set_location("loc_playing", (e.config.ref_table.key or e.config.ref_table.name))
@@ -74,19 +83,11 @@ local skip_blind_ref = G.FUNCS.skip_blind
 G.FUNCS.skip_blind = function(e)
 	skip_blind_ref(e)
 	if MP.LOBBY.code then
-		-- Old timer: add time from skipping to own timer when not timered and not timering
-		if
-            MP.LOBBY.config.timer
-			and not MP.GAME.timer_started
-			and not MP.GAME.nemesis_timer_started
-            and not MP.GAME.timer_consumed
-            and not MP.is_any_layer_active({ "no_animation_timer", "pressure_timer" })
-			and (MP.LOBBY.config.timer_increment_seconds or 0) > 0
-        then
-            MP.UI.restore_timer(MP.LOBBY.config.timer_increment_seconds)
-		end
+        MP.GAME.skips_before_pvp = (MP.GAME.skips_before_pvp or 0) + 1
+        MP.UI.update_matching_skip_timer(false)
 
 		MP.ACTIONS.skip(G.GAME.skips)
+		MP.RLOG.record("skip_blind", 0, "action:skipBlind")
 
 		--Update the furthest blind
 		local temp_furthest_blind = 0
@@ -402,7 +403,50 @@ function MP.UI.show_asteroid_hand_level_up()
 			end
 		end
 	end
-	SMODS.upgrade_poker_hands({ hands = hand_type, level_up = -1 })
+    if to_big(max_level) >= to_big(1) then
+        SMODS.upgrade_poker_hands({ hands = hand_type, level_up = -1 })
+    end
+end
+
+function G.FUNCS.mp_open_log_parser(e)
+    love.system.openURL("https://balatromp.com/log-parser")
+end
+
+function G.FUNCS.mp_get_lovely_log_file(e)
+    local file_path = require("lovely").log_path
+    local os_name = love.system.getOS()
+
+    local function shellQuote(s)
+        return "'" .. tostring(s):gsub("'", "'\\''") .. "'"
+    end
+
+    local function fileUri(path)
+        path = path:gsub("\\", "/")
+        return "file://" .. path:gsub("([^A-Za-z0-9%-%._~/%:/])", function(c)
+            return string.format("%%%02X", c:byte())
+        end)
+    end
+
+    local ok
+    if os_name == "Windows" then
+        ok = os.execute('explorer.exe /select,"' .. file_path:gsub("/", "\\") .. '"')
+    elseif os_name == "OS X" then
+        os.execute("open -R " .. shellQuote(file_path))
+    elseif os_name == "Linux" then
+        local cmd =
+            "dbus-send --session " ..
+            "--dest=org.freedesktop.FileManager1 " ..
+            "--type=method_call " ..
+            "/org/freedesktop/FileManager1 " ..
+            "org.freedesktop.FileManager1.ShowItems " ..
+            "array:string:" .. shellQuote(fileUri(file_path)) .. " string:''"
+
+        ok = os.execute(cmd)
+    end
+    if not ok then
+        local parent_dir = file_path:match("^(.*)[/\\][^/\\]*$") or "."
+        love.system.openURL(fileUri(parent_dir))
+    end
 end
 
 --[[
