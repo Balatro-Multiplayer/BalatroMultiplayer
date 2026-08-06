@@ -21,7 +21,8 @@ function Card:sell_card()
 		local human = string.format("action:soldCard,card:%s", self.ability.name)
 		local area = PVP.UTILS.area_enum(self.area)
 		local idx = PVP.UTILS.index_in_area(self)
-		if area and idx then PVP.RLOG.record("sell", { area, idx }, human) end
+		local ref = PVP.RLOG.card_ref(self)
+		if area and idx then PVP.RLOG.record("sell", { area, idx, ref }, human) end
 	end
 	-- §18.2: tell the opponent a card was sold -- any of their cards watching
 	-- for opponent_selling_card (e.g. Taxes) reacts via their own calculate.
@@ -76,7 +77,8 @@ function G.FUNCS.buy_from_shop(e)
 			elseif set == "Voucher" then
 				opcode = "voucher"
 			end
-			PVP.RLOG.record(opcode, { area, idx }, human)
+			local ref = PVP.RLOG.card_ref(c1)
+			PVP.RLOG.record(opcode, { area, idx, ref }, human)
 		end
 	end
 	return buy_from_shop_ref(e)
@@ -95,13 +97,17 @@ function G.FUNCS.use_card(e, mute, nosave)
 			local idx = PVP.UTILS.index_in_area(card, G.pack_cards)
 			if idx then
 				local targets = PVP.UTILS.highlighted_hand_indices()
-				PVP.RLOG.record("pack_pick", (#targets > 0) and { idx, targets } or { idx }, human)
+				local ref = PVP.RLOG.card_ref(card)
+				local target_refs = PVP.RLOG.card_refs(targets)
+				PVP.RLOG.record("pack_pick", { idx, targets, ref, target_refs }, human)
 			end
 		else
 			local idx = PVP.UTILS.index_in_area(card)
 			if idx then
 				local targets = PVP.UTILS.highlighted_hand_indices()
-				PVP.RLOG.record("use", (#targets > 0) and { idx, targets } or { idx }, human)
+				local ref = PVP.RLOG.card_ref(card)
+				local target_refs = PVP.RLOG.card_refs(targets)
+				PVP.RLOG.record("use", { idx, targets, ref, target_refs }, human)
 			end
 		end
 	end
@@ -122,7 +128,15 @@ end
 if G.FUNCS.skip_booster then
 	local skip_booster_ref = G.FUNCS.skip_booster
 	function G.FUNCS.skip_booster(e)
-		PVP.RLOG.record("pack_skip", 0, "action:skipPack")
+		-- Refs for every card in the pack being passed on -- otherwise a reader
+		-- has no way to know what the player skipped, only what they picked.
+		local refs = {}
+		if G.pack_cards and G.pack_cards.cards then
+			for i = 1, #G.pack_cards.cards do
+				refs[i] = PVP.RLOG.card_ref(G.pack_cards.cards[i])
+			end
+		end
+		PVP.RLOG.record("pack_skip", { refs }, "action:skipPack")
 		return skip_booster_ref(e)
 	end
 end
@@ -170,7 +184,18 @@ function CardArea:update(dt)
 	if prev and #prev == #cur then
 		local perm = PVP.UTILS.reorder_permutation(prev, self.cards)
 		if perm then
-			PVP.RLOG.record("reorder", { area_id, perm }, "action:reorder,area:" .. area_id)
+			-- Sparse "moved" summary: [card_ref, old_position, new_position] for
+			-- every position that actually changed -- states directly which card
+			-- moved where, rather than requiring a reader to diff perm against
+			-- identity themselves. perm itself is untouched (still args[2]) so
+			-- lib/playback_handlers.lua's exact-replay logic needs no changes.
+			local moved = {}
+			for j = 1, #perm do
+				if perm[j] ~= j then
+					moved[#moved + 1] = { PVP.RLOG.card_ref(self.cards[j]), perm[j], j }
+				end
+			end
+			PVP.RLOG.record("reorder", { area_id, perm, moved }, "action:reorder,area:" .. area_id)
 		end
 	end
 end
