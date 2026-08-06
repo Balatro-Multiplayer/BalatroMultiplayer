@@ -60,8 +60,17 @@ function PVP._launch_replay(run_id)
 	end)
 end
 
+-- MPAPI account overlay's Match History tab dispatches here via
+-- MPAPI.playback.launch(run.modId, run.id) (api/playback/registry.lua) --
+-- registered under PVP.id (the SMODS mod id, what run.modId actually is,
+-- since MPAPI.create_lobby/create_local_lobby are always called with PVP.id
+-- as their own mod_id argument), NOT the literal 'pvp' string used above for
+-- mod_id = 'pvp' / register_handler('pvp', ...) -- that's a separate,
+-- unrelated opcode-dispatch namespace this PvP mod happens to also use.
+MPAPI.playback.register_launcher(PVP.id, PVP._launch_replay)
+
 G.FUNCS.mp_pvp_open_replay_browser = function()
-	MPAPI.replay.list_mine(function(err, data)
+	MPAPI.replay.list_mine(nil, function(err, data)
 		if err then
 			MPAPI.sendWarnMessage('[replay] list_mine failed: ' .. tostring(err.message))
 			return
