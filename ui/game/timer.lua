@@ -410,9 +410,10 @@ local old_play = G.FUNCS.play_cards_from_highlighted
 function G.FUNCS.play_cards_from_highlighted(...)
     -- Carbon: capture which hand slots are played BEFORE old_play consumes them.
     local played = PVP.UTILS.highlighted_hand_indices()
+    local played_refs = PVP.RLOG.card_refs(played)
     old_play(...)
     if #played > 0 then
-        PVP.RLOG.record("play", { played }, "action:play,cards:" .. table.concat(played, "."))
+        PVP.RLOG.record("play", { played, played_refs }, "action:play,cards:" .. table.concat(played, "."))
     end
     if G.play and G.play.cards[1] then return end
     if PVP.LOBBY.code and PVP.LOBBY.config.timer and not PVP.GAME.timer_consumed then

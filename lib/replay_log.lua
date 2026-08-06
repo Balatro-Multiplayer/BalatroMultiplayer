@@ -58,7 +58,10 @@ RLOG.HUMAN_PREFIX = "Client sent message:" -- human-readable stream (website-com
 
 -- Schema version of the MANIFEST/event format itself (bump on breaking changes
 -- to what the server/replay-parser needs to understand, independent of mod_version).
-RLOG.SCHEMA_VERSION = 1
+-- v2: card-referencing events (play/discard/sell/buy/open_pack/voucher/
+-- pack_pick/use/pack_skip/reorder) carry full card identity inline -- see
+-- RLOG.card_ref.
+RLOG.SCHEMA_VERSION = 2
 
 -- Required manifest keys; begin_run warns if any are missing. api_version/
 -- mod_version/start_epoch_ms are stamped by begin_run itself (see below), not
@@ -80,6 +83,14 @@ RLOG._structured_events = {}
 RLOG._run_active = false
 RLOG._manifest = nil
 RLOG._force_active = false -- test hook: bypass the lobby gate
+
+-- Per-run card identity dictionary (see RLOG.card_ref below). Keyed by the
+-- Card object's own table reference -- not card.sort_id, which is a per-run
+-- counter unsuitable for cross-referencing (see lib/card_utils.lua's own
+-- comments on reorder_permutation for why sort_id was already rejected for
+-- this purpose there). Reset every begin_run so ids restart at 1 each match.
+RLOG._card_ids = {}
+RLOG._next_card_id = 0
 
 -- Per-run correlation id (embedded in the manifest); not used for batching
 -- anymore (see pvp_api/replay_log_actions.lua -- every event broadcasts live,
@@ -236,6 +247,81 @@ function RLOG.record(opcode, args, human)
 	end
 end
 
+-- Compact, self-describing reference to a card's current identity, for
+-- embedding in card-referencing events' args (play/discard/sell/buy/
+-- open_pack/voucher/pack_pick/use/pack_skip/reorder) -- see the schema-v2
+-- wire-format spec in the module comment. Two shapes, disambiguated by the
+-- SIGN of the first element (no lookahead/length-inference needed):
+--
+--   already-seen : { id, tag, tag, ... }                    -- id > 0
+--   first-seen   : { -id, kind, ident..., tag, tag, ... }    -- id negative
+--
+-- `kind`/`ident` (first-seen only) identify WHAT the card is: "pc" + suit,
+-- value for a playing card; otherwise card.ability.set verbatim (Balatro's
+-- own type name -- "Joker", "Tarot", "Planet", "Spectral", "Voucher"),
+-- falling back to "j" if that's somehow unset, + the card's SMODS center key.
+--
+-- `tag...` (0-3 elements, on EVERY reference, first-seen or not, since
+-- enhancement/edition/seal can mutate mid-run -- Glass Joker, Vampire, Hex,
+-- spectral cards, etc.): "e:"+enhancement key (playing cards only, omitted
+-- when the card has none, i.e. its center is "c_base"), "ed:"+edition type
+-- (omitted when none), "s:"+seal (playing cards only, omitted when none).
+-- Sparse by construction, and reuses Balatro/SMODS' own native vocabulary
+-- rather than a custom enum -- readable without a separate legend, and no
+-- less compressible under gzip (these short strings repeat across thousands
+-- of events; LZ77 turns repeats into cheap back-references either way).
+function RLOG.card_ref(card)
+	if not card then return nil end
+
+	local id = RLOG._card_ids[card]
+	local first_seen = id == nil
+	if first_seen then
+		RLOG._next_card_id = RLOG._next_card_id + 1
+		id = RLOG._next_card_id
+		RLOG._card_ids[card] = id
+	end
+
+	-- Every Card object carries a non-nil `.base` table regardless of type
+	-- (Jokers/Tarots/etc. included) -- suit/value presence is what actually
+	-- distinguishes a playing card, not base's mere existence.
+	local is_playing_card = card.base and card.base.suit and card.base.value
+
+	local ref
+	if not first_seen then
+		ref = { id }
+	elseif is_playing_card then
+		ref = { -id, "pc", card.base.suit, card.base.value }
+	elseif card.config and card.config.center and card.config.center.key then
+		local kind = (card.ability and card.ability.set) or "j"
+		ref = { -id, kind, card.config.center.key }
+	else
+		ref = { -id, "?" } -- defensive; shouldn't happen at any real call site
+	end
+
+	if is_playing_card and card.config and card.config.center and card.config.center.key ~= "c_base" then
+		ref[#ref + 1] = "e:" .. card.config.center.key
+	end
+	if card.edition and card.edition.type then ref[#ref + 1] = "ed:" .. card.edition.type end
+	if card.seal then ref[#ref + 1] = "s:" .. card.seal end
+
+	return ref
+end
+
+-- Parallel-array helper for play/discard/pack_pick-targets/use-targets: given
+-- 1-based `indices` into `area` (defaults to G.hand), returns one
+-- RLOG.card_ref per index, same order. Must be called BEFORE the underlying
+-- vanilla function consumes/moves the cards -- same ordering constraint
+-- PVP.UTILS.highlighted_hand_indices() already requires at each call site.
+function RLOG.card_refs(indices, area)
+	area = area or (G and G.hand)
+	local out = {}
+	for _, i in ipairs(indices or {}) do
+		local card = area and area.cards and area.cards[i]
+		if card then out[#out + 1] = RLOG.card_ref(card) end
+	end
+	return out
+end
+
 -- Start a new game's block: reset counters/buffers and emit the manifest header.
 function RLOG.begin_run(manifest)
 	manifest = manifest or {}
@@ -266,6 +352,8 @@ function RLOG.begin_run(manifest)
 	RLOG._structured_events = {}
 	RLOG._manifest = manifest
 	RLOG._run_active = true
+	RLOG._card_ids = {}
+	RLOG._next_card_id = 0
 
 	-- Friendly local correlation id for this run instance (see the RLOG._game_id
 	-- declaration above -- no longer used for batching).
