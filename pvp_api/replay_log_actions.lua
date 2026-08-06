@@ -1,4 +1,6 @@
--- MPAPI transport for PVP.RLOG (lib/replay_log.lua): replaces the legacy
+-- This mod's live transport for PVP.RLOG (an alias to MPAPI.replay, the
+-- generic recorder in BalatroMultiplayerAPI/api/replay/recorder.lua -- see
+-- lib/replay_log.lua): replaces the legacy
 -- Client.send({action="streamLogLines"/"submitLogHashes"}) calls, which
 -- pvp_api/net.lua's router now silently drops (both are unlisted there --
 -- "owned by the API now, or replay-stream features deferred for the port").
