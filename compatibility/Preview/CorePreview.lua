@@ -137,7 +137,7 @@ function G.FUNCS.discard_cards_from_highlighted(e, is_hook_blind)
 	orig_discard(e, is_hook_blind)
 
 	if not is_hook_blind then
-		if discarded and #discarded > 0 then
+		if discarded and #discarded > 0 and PVP.rlog_active() then
 			PVP.RLOG.record("discard", { discarded, discarded_refs }, "action:discard,cards:" .. table.concat(discarded, "."))
 		end
 		FN.PRE.stop_current_coroutine()

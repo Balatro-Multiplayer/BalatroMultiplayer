@@ -14,7 +14,7 @@ end
 
 local sell_card_ref = Card.sell_card
 function Card:sell_card()
-	if self.ability and self.ability.name then
+	if self.ability and self.ability.name and PVP.rlog_active() then
 		-- record() emits both the carbon line and the human "Client sent message:"
 		-- line. Sell is positional by area + slot, captured before the card leaves
 		-- its area. Area distinguishes selling a joker (4) from a consumable (5).
@@ -35,7 +35,7 @@ end
 -- preceding play/discard events.
 local cash_out_ref = G.FUNCS.cash_out
 function G.FUNCS.cash_out(e)
-	PVP.RLOG.record("cashout", nil, "action:cashOut")
+	if PVP.rlog_active() then PVP.RLOG.record("cashout", nil, "action:cashOut") end
 	-- Confirmed-safe checkpoint for Phase 9's reconnect tail-replay -- drains
 	-- any pending opponent catch-up queued since the last checkpoint.
 	if PVP.RECONNECT_TAIL then PVP.RECONNECT_TAIL.on_checkpoint() end
@@ -47,7 +47,9 @@ function G.FUNCS.reroll_shop(e)
 	-- Reroll has no positional target; the shop contents it produces are
 	-- deterministic from the seed, so the bare opcode is enough to replay.
 	-- record() emits both the carbon line and the human "Client sent message:".
-	PVP.RLOG.record("reroll", nil, string.format("action:rerollShop,cost:%s", G.GAME.current_round.reroll_cost))
+	if PVP.rlog_active() then
+		PVP.RLOG.record("reroll", nil, string.format("action:rerollShop,cost:%s", G.GAME.current_round.reroll_cost))
+	end
 
 	-- Update reroll stats if in a multiplayer game
 	if PVP.LOBBY.code and PVP.GAME.stats then
@@ -61,7 +63,7 @@ end
 local buy_from_shop_ref = G.FUNCS.buy_from_shop
 function G.FUNCS.buy_from_shop(e)
 	local c1 = e.config.ref_table
-	if c1 and c1:is(Card) then
+	if c1 and c1:is(Card) and PVP.rlog_active() then
 		-- record() emits both the carbon line and the human "Client sent message:"
 		-- line. Buy is positional by shop area + slot, captured before the card
 		-- leaves the shop. Booster packs and vouchers get distinct opcodes since
@@ -87,7 +89,7 @@ end
 local use_card_ref = G.FUNCS.use_card
 function G.FUNCS.use_card(e, mute, nosave)
 	local card = e.config and e.config.ref_table
-	if card and card.ability and card.ability.name then
+	if card and card.ability and card.ability.name and PVP.rlog_active() then
 		-- record() emits both the carbon line and the human "Client sent message:".
 		local human = string.format("action:usedCard,card:%s", card.ability.name)
 		-- Pack picks share this hook (a picked card lives in G.pack_cards) but get
@@ -128,15 +130,17 @@ end
 if G.FUNCS.skip_booster then
 	local skip_booster_ref = G.FUNCS.skip_booster
 	function G.FUNCS.skip_booster(e)
-		-- Refs for every card in the pack being passed on -- otherwise a reader
-		-- has no way to know what the player skipped, only what they picked.
-		local refs = {}
-		if G.pack_cards and G.pack_cards.cards then
-			for i = 1, #G.pack_cards.cards do
-				refs[i] = PVP.RLOG.card_ref(G.pack_cards.cards[i])
+		if PVP.rlog_active() then
+			-- Refs for every card in the pack being passed on -- otherwise a reader
+			-- has no way to know what the player skipped, only what they picked.
+			local refs = {}
+			if G.pack_cards and G.pack_cards.cards then
+				for i = 1, #G.pack_cards.cards do
+					refs[i] = PVP.RLOG.card_ref(G.pack_cards.cards[i])
+				end
 			end
+			PVP.RLOG.record("pack_skip", { refs }, "action:skipPack")
 		end
-		PVP.RLOG.record("pack_skip", { refs }, "action:skipPack")
 		return skip_booster_ref(e)
 	end
 end
@@ -171,7 +175,7 @@ function CardArea:update(dt)
 	-- joker/hand areas do any further work, and only during a live PVP game.
 	local area_id = rlog_reorder_area(self)
 	if not area_id or not self.cards or #self.cards == 0 then return end
-	if not (PVP.RLOG and PVP.RLOG.is_active()) then return end
+	if not (PVP.RLOG and PVP.rlog_active()) then return end
 	if rlog_area_dragging(self) then return end -- wait for the drag to settle
 
 	local cur = {}

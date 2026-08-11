@@ -46,11 +46,17 @@ function PVP._launch_replay(run_id)
 				mod_id = 'pvp',
 				pov_player_id = my_id,
 				on_complete = function()
+					-- No `cover` field: confirmed live (via SPDRN's identical
+					-- on_complete call, ported from this one) to crash --
+					-- functions/UI_definitions.lua's attention_text expects a
+					-- real UI target with its own `.T` transform there, not a
+					-- bare {align=...} table. `cover` is optional, so omitting
+					-- it entirely sidesteps that branch.
 					attention_text({
 						text = 'Replay finished',
 						scale = 1,
 						hold = 3,
-						cover = { align = 'cm' },
+						pos = { x = 0, y = 0 },
 					})
 				end,
 			})
@@ -76,7 +82,16 @@ G.FUNCS.mp_pvp_open_replay_browser = function()
 			return
 		end
 
-		local runs = (data and data.runs) or {}
+		-- MPAPI.replay.list_mine returns every run for this player across every
+		-- mod (the server route has no modId filter) -- confirmed live: with
+		-- SPDRN also installed, this list included SPDRN runs too. Filter to
+		-- PvP's own here rather than showing (and mis-launching, via the wrong
+		-- playback engine/opcode vocabulary) another mod's replay.
+		local all_runs = (data and data.runs) or {}
+		local runs = {}
+		for _, run in ipairs(all_runs) do
+			if run.modId == PVP.id then runs[#runs + 1] = run end
+		end
 		local rows = {
 			{ n = G.UIT.R, config = { align = 'cm', padding = 0.1 }, nodes = {
 				{ n = G.UIT.T, config = { text = 'My Replays', scale = 0.6, colour = G.C.UI.TEXT_LIGHT, shadow = true } },

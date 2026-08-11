@@ -412,7 +412,7 @@ function G.FUNCS.play_cards_from_highlighted(...)
     local played = PVP.UTILS.highlighted_hand_indices()
     local played_refs = PVP.RLOG.card_refs(played)
     old_play(...)
-    if #played > 0 then
+    if #played > 0 and PVP.rlog_active() then
         PVP.RLOG.record("play", { played, played_refs }, "action:play,cards:" .. table.concat(played, "."))
     end
     if G.play and G.play.cards[1] then return end
