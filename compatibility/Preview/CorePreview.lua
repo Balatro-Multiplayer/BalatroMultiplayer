@@ -128,18 +128,16 @@ function G.FUNCS.evaluate_play(e)
     }))
 end
 
+-- RLOG's discard opcode is now recorded once, generically, by
+-- BalatroMultiplayerAPI/api/replay/generic_codes.lua's own
+-- G.FUNCS.discard_cards_from_highlighted hook -- this override stays only
+-- for the Preview coroutine-stop below. is_hook_blind means a programmatic
+-- discard (blind effect), not a click.
 local orig_discard = G.FUNCS.discard_cards_from_highlighted
 function G.FUNCS.discard_cards_from_highlighted(e, is_hook_blind)
-	-- Carbon: capture which hand slots are discarded BEFORE orig_discard consumes
-	-- them. is_hook_blind means a programmatic discard (blind effect), not a click.
-	local discarded = (not is_hook_blind) and PVP.UTILS.highlighted_hand_indices() or nil
-	local discarded_refs = discarded and PVP.RLOG.card_refs(discarded) or nil
 	orig_discard(e, is_hook_blind)
 
 	if not is_hook_blind then
-		if discarded and #discarded > 0 and PVP.rlog_active() then
-			PVP.RLOG.record("discard", { discarded, discarded_refs }, "action:discard,cards:" .. table.concat(discarded, "."))
-		end
 		FN.PRE.stop_current_coroutine()
 	end
 end

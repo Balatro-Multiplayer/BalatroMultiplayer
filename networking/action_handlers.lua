@@ -356,31 +356,37 @@ local function action_start_game(p)
 		seed = PVP.LOBBY.config.custom_seed
 	end
 
-	-- Open a new replay-log block for this game with everything needed to
-	-- reconstruct it deterministically later. Uses the resolved seed.
-	PVP.RLOG.begin_run({
-		seed = seed,
-		stake = stake,
-		deck = PVP.LOBBY.config.back,
-		sleeve = PVP.LOBBY.config.sleeve,
-		challenge = PVP.LOBBY.config.challenge,
-		ruleset = PVP.LOBBY.config.ruleset,
-		gamemode = PVP.LOBBY.config.gamemode,
-		modifier_layers = PVP.LOBBY.config.modifier_layers,
-		lobby_config = PVP.LOBBY.config,
-		the_order_enabled = PVP.should_use_the_order(),
-		different_seeds = PVP.LOBBY.config.different_seeds,
-		mod_version = PVP and PVP.version,
-		mod_hash = PVP.MOD_STRING,
-		smods_version = PVP.SMODS_VERSION,
-		lovely_version = PVP.REQUIRED_LOVELY_VERSION,
-		lobby_code = PVP.LOBBY.code,
-		is_host = PVP.LOBBY.is_host,
-		player = PVP.LOBBY.username,
-		opponent = (PVP.LOBBY.is_host and PVP.LOBBY.guest and PVP.LOBBY.guest.username)
-			or (PVP.LOBBY.host and PVP.LOBBY.host.username),
-		start_ts = os.date("%Y-%m-%dT%H:%M:%S%z"),
-	})
+	-- Opens this MATCH's single RLOG block (begin_run is now once-per-match,
+	-- same as SPDRN -- see BalatroMultiplayerAPI/api/replay/recorder.lua).
+	-- match_manifest/lobby_info/run_info all fire immediately, synchronously:
+	-- PvP (unlike SPDRN) already has everything it needs right here, no
+	-- BLIND_SELECT deferral required. lobby_config/version/hash/challenge/
+	-- sleeve/etc fields that used to live directly on the old single manifest
+	-- now ride inside lobby_info's `options` (a mod-shaped catch-all, see
+	-- api/replay/framing_codes.lua), since match_manifest's own shape is
+	-- fixed/shared across mods.
+	PVP.RLOG.begin_run()
+	MPAPI.RLOGCodes.match_manifest:write()
+	do
+		local players = { { id = PVP.LOBBY.host.id, is_host = true } }
+		if PVP.LOBBY.guest and PVP.LOBBY.guest.id then
+			players[#players + 1] = { id = PVP.LOBBY.guest.id, is_host = false }
+		end
+		MPAPI.RLOGCodes.lobby_info:write(PVP.LOBBY.config.gamemode, PVP.LOBBY.config.ruleset, players, {
+			PVP.LOBBY.config.back,
+		}, {
+			sleeve = PVP.LOBBY.config.sleeve,
+			challenge = PVP.LOBBY.config.challenge,
+			modifier_layers = PVP.LOBBY.config.modifier_layers,
+			the_order_enabled = PVP.should_use_the_order(),
+			different_seeds = PVP.LOBBY.config.different_seeds,
+			mod_version = PVP and PVP.version,
+			mod_hash = PVP.MOD_STRING,
+			smods_version = PVP.SMODS_VERSION,
+			lovely_version = PVP.REQUIRED_LOVELY_VERSION,
+		})
+	end
+	MPAPI.RLOGCodes.run_info:write(seed, PVP.LOBBY.config.back, stake)
 
 	G.FUNCS.lobby_start_run(nil, { seed = seed, stake = stake })
 	PVP.LOBBY.ready_to_start = false

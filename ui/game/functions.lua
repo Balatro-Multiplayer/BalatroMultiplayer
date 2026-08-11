@@ -65,14 +65,13 @@ function G.FUNCS.select_blind(e)
 	if PVP.RECONNECT_TAIL then PVP.RECONNECT_TAIL.on_checkpoint() end
 	if PVP.is_mp_or_practice() then
 		PVP.GAME.ante_key = tostring(math.random())
-		-- Carbon: log the freshly-rolled (non-deterministic) ante_key first so
-		-- a replay can restore it, then the blind selection itself.
+		-- Carbon: log the freshly-rolled (non-deterministic) ante_key so a
+		-- replay can restore it -- PvP-only opcode, still recorded directly
+		-- here (not one of the shared generic opcodes). select_blind itself
+		-- is now recorded once, generically, by
+		-- BalatroMultiplayerAPI/api/replay/generic_codes.lua's own
+		-- G.FUNCS.select_blind hook.
 		PVP.RLOG.record("set_ante_key", PVP.GAME.ante_key)
-		PVP.RLOG.record(
-			"select_blind",
-			0,
-			string.format("action:selectBlind,blind:%s", tostring(e.config.ref_table.key or e.config.ref_table.name))
-		)
 		PVP.ACTIONS.play_hand(0, G.GAME.round_resets.hands)
 		PVP.ACTIONS.new_round()
 		PVP.ACTIONS.set_location("loc_playing", (e.config.ref_table.key or e.config.ref_table.name))
@@ -97,7 +96,9 @@ G.FUNCS.skip_blind = function(e)
 		end
 
 		PVP.ACTIONS.skip(G.GAME.skips)
-		PVP.RLOG.record("skip_blind", 0, "action:skipBlind")
+		-- RLOG's skip_blind opcode is now recorded once, generically, by
+		-- BalatroMultiplayerAPI/api/replay/generic_codes.lua's own
+		-- G.FUNCS.skip_blind hook -- nothing left to do here.
 
 		--Update the furthest blind
 		local temp_furthest_blind = 0

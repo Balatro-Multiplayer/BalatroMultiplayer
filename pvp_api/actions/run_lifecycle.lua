@@ -1,6 +1,90 @@
 local A = PVP._pvp_action_helpers.A
 local relay = PVP._pvp_action_helpers.relay
 
+-- Builds the MPAPI.BanPick config for `gm_def`'s deck+stake draft -- shared
+-- between the normal on_receive flow below (a fresh draft, kicked off by
+-- the pvp_start_game broadcast) and ui/lobby/reconnect.lua's crash-relaunch
+-- resume path (MPAPI.BanPick.resume into a draft already in progress) --
+-- both need the exact same shape, so this is the one place it's written.
+function PVP._ban_pick_config_for(gm_def)
+	local bp = gm_def.ban_pick
+	return {
+		pool_size = bp.pool_size,
+		keep = bp.keep,
+		schedule = bp.schedule,
+		-- 9 distinct random deck backs, each paired with a random stake. The stake
+		-- cap mirrors PVP's own (ui/lobby/lobby.lua:346): PVP.DECK.MAX_STAKE when a
+		-- compatibility mod restricts it, else all 8.
+		build_pool = function()
+			local cap = (PVP.DECK and PVP.DECK.MAX_STAKE and PVP.DECK.MAX_STAKE > 0) and PVP.DECK.MAX_STAKE or 8
+			local keys = {}
+			for _, center in ipairs(G.P_CENTER_POOLS.Back or {}) do
+				keys[#keys + 1] = center.key
+			end
+			for i = #keys, 2, -1 do
+				local j = math.random(i)
+				keys[i], keys[j] = keys[j], keys[i]
+			end
+			local pool = {}
+			for i = 1, math.min(bp.pool_size, #keys) do
+				pool[i] = { key = keys[i], stake = math.random(cap) }
+			end
+			return pool
+		end,
+		-- Stamp the stake sticker onto each deck back (see the game's back_sticker DrawStep).
+		decorate_tile = function(card, item)
+			if type(item) == "table" and item.stake then
+				card.sticker = G.sticker_map[SMODS.stake_from_index(item.stake)]
+			end
+		end,
+		state_action = "pvp_ban_pick_state",
+		ban_action = "pvp_ban_pick_ban",
+		on_refresh = function()
+			if PVP.lobby and PVP.lobby.refresh_mm_status then
+				PVP.lobby.refresh_mm_status()
+			end
+		end,
+	}
+end
+
+-- Builds the on_complete callback for `gm_def`'s draft -- also shared with
+-- the reconnect-resume path. `seed`/`fallback_stake` are passed explicitly
+-- rather than closed over a pvp_start_game action message's own params: a
+-- resumed draft has no such message (the reconnecting client crashed before
+-- or during the original broadcast), so it reads net.lua's own
+-- lobby-metadata mirror instead (see that file's ROUTES.startGame) --
+-- passing them in explicitly keeps this one function correct for both
+-- callers instead of needing two near-duplicate versions.
+function PVP._ban_pick_on_complete_for(gm_def, lobby, seed, fallback_stake)
+	return function(survivors)
+		-- picked is a { key, stake } item (deck+stake draft) or nil.
+		local picked = survivors and survivors[1]
+		local deck_ref, stake
+		if type(picked) == "table" then
+			deck_ref, stake = picked.key, picked.stake
+		else
+			deck_ref = picked
+		end
+		if deck_ref then
+			-- Ban-pick survivors are center KEYS (e.g. 'b_red'); PVP's run start wants a deck
+			-- NAME. Resolve either form to a name, and pin it as the lobby deck so PVP's
+			-- copy_host_deck (config.back -> deck.back) doesn't clobber the drafted deck.
+			local center = G.P_CENTERS[deck_ref]
+			local name = (center and center.name) or deck_ref
+			PVP.LOBBY.config.back = name
+			PVP.LOBBY.deck.back = name
+		end
+		if stake then
+			PVP.LOBBY.config.stake = stake
+			PVP.LOBBY.deck.stake = stake
+		end
+		if lobby and lobby.is_host then
+			PVP.referee_reset(PVP.LOBBY.config.starting_lives)
+		end
+		PVP.dispatch_action("startGame", { seed = seed, stake = stake or fallback_stake })
+	end
+end
+
 A("pvp_start_game", function(_at, from, params)
 	if PVP.stop_ready_resync then
 		PVP.stop_ready_resync()
@@ -13,19 +97,6 @@ A("pvp_start_game", function(_at, from, params)
 	local meta = (lobby and lobby:get_metadata()) or {}
 	local gm_def = meta.queue_mode and MPAPI.GameModes[meta.queue_mode]
 
-	-- Ban-pick survivors are center KEYS (e.g. 'b_red'); PVP's run start wants a deck
-	-- NAME. Resolve either form to a name, and pin it as the lobby deck so PVP's
-	-- copy_host_deck (config.back -> deck.back) doesn't clobber the drafted deck.
-	local function apply_deck(ref)
-		if not ref then
-			return
-		end
-		local center = G.P_CENTERS[ref]
-		local name = (center and center.name) or ref
-		PVP.LOBBY.config.back = name
-		PVP.LOBBY.deck.back = name
-	end
-
 	-- picked is a { key, stake } item (deck+stake draft), a plain deck key/name, or nil.
 	local function proceed(picked)
 		local deck_ref, stake
@@ -34,7 +105,12 @@ A("pvp_start_game", function(_at, from, params)
 		else
 			deck_ref = picked
 		end
-		apply_deck(deck_ref)
+		if deck_ref then
+			local center = G.P_CENTERS[deck_ref]
+			local name = (center and center.name) or deck_ref
+			PVP.LOBBY.config.back = name
+			PVP.LOBBY.deck.back = name
+		end
 		if stake then
 			PVP.LOBBY.config.stake = stake
 			PVP.LOBBY.deck.stake = stake
@@ -58,45 +134,11 @@ A("pvp_start_game", function(_at, from, params)
 	local bp = gm_def and gm_def.ban_pick
 	local n_ok = bp and (bp.schedule and n == 2 or (not bp.schedule and n >= 2))
 	if bp and PVP.is_matchmaking and PVP.is_matchmaking() and lobby and n_ok then
-		MPAPI.BanPick.start(lobby, {
-			pool_size = bp.pool_size,
-			keep = bp.keep,
-			schedule = bp.schedule,
-			-- 9 distinct random deck backs, each paired with a random stake. The stake
-			-- cap mirrors PVP's own (ui/lobby/lobby.lua:346): PVP.DECK.MAX_STAKE when a
-			-- compatibility mod restricts it, else all 8.
-			build_pool = function()
-				local cap = (PVP.DECK and PVP.DECK.MAX_STAKE and PVP.DECK.MAX_STAKE > 0) and PVP.DECK.MAX_STAKE or 8
-				local keys = {}
-				for _, center in ipairs(G.P_CENTER_POOLS.Back or {}) do
-					keys[#keys + 1] = center.key
-				end
-				for i = #keys, 2, -1 do
-					local j = math.random(i)
-					keys[i], keys[j] = keys[j], keys[i]
-				end
-				local pool = {}
-				for i = 1, math.min(bp.pool_size, #keys) do
-					pool[i] = { key = keys[i], stake = math.random(cap) }
-				end
-				return pool
-			end,
-			-- Stamp the stake sticker onto each deck back (see the game's back_sticker DrawStep).
-			decorate_tile = function(card, item)
-				if type(item) == "table" and item.stake then
-					card.sticker = G.sticker_map[SMODS.stake_from_index(item.stake)]
-				end
-			end,
-			state_action = "pvp_ban_pick_state",
-			ban_action = "pvp_ban_pick_ban",
-			on_refresh = function()
-				if PVP.lobby and PVP.lobby.refresh_mm_status then
-					PVP.lobby.refresh_mm_status()
-				end
-			end,
-		}, function(survivors)
-			proceed(survivors and survivors[1])
-		end)
+		MPAPI.BanPick.start(
+			lobby,
+			PVP._ban_pick_config_for(gm_def),
+			PVP._ban_pick_on_complete_for(gm_def, lobby, params.seed, params.stake)
+		)
 	else
 		proceed(meta.deck)
 	end

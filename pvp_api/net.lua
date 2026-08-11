@@ -50,6 +50,18 @@ local ROUTES = {
 		-- Host generates the shared seed and starts everyone (host included via loopback).
 		local seed = gen_seed()
 		local stake = PVP.LOBBY.deck.stake or PVP.LOBBY.config.stake or 1
+		-- Mirrored into lobby metadata (persisted server-side, returned again in
+		-- context.reconnected_lobby.metadata on a crash-relaunch reconnect --
+		-- see ui/reconnect_prompt.lua in BalatroMultiplayerAPI) so a player who
+		-- crashes mid-ban-pick-draft can still recover the match seed/stake
+		-- once the resumed draft completes on their client -- the action
+		-- broadcast below only ever reaches clients connected at the moment it
+		-- fires, same reasoning as MPAPI.BanPick.broadcast_state's own
+		-- metadata mirror.
+		local l = lobby()
+		if l and l.is_host then
+			l:set_metadata({ _mp_pending_seed = seed, _mp_pending_stake = stake })
+		end
 		broadcast("pvp_start_game", { seed = seed, stake = tostring(stake) })
 	end,
 	stopGame = function(_msg)
