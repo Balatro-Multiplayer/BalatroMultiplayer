@@ -1,0 +1,53 @@
+-- Card-info provider for MPAPI's Lobby Info overlay (see
+-- BalatroMultiplayerAPI/api/card_info_providers.lua): ranked lobbies show
+-- Elo; PvP has no per-card info of its own for private/casual lobbies today
+-- (returning nil there is valid per the provider contract).
+--
+-- Cached per (gamemode, player) since MPAPI.matchmaking.get_rating is an
+-- async network call and hover callbacks must return synchronously: the
+-- first hover with no cache entry fires the lookup in the background and
+-- shows a placeholder immediately, a later hover shows the resolved value.
+PVP._rating_cache = PVP._rating_cache or {}
+
+local function text_row(text)
+	return { n = G.UIT.R, config = { align = "cm", padding = 0.03 }, nodes = {
+		{ n = G.UIT.T, config = { text = text, scale = 0.35, colour = G.C.UI.TEXT_DARK } },
+	} }
+end
+
+local function elo_row(lobby, player_data)
+	local meta = lobby:get_metadata() or {}
+	local gamemode = meta.gamemode
+	if not gamemode then
+		return text_row("Elo: N/A")
+	end
+
+	local cache_key = gamemode .. ":" .. player_data.id
+	local cached = PVP._rating_cache[cache_key]
+
+	if cached == nil then
+		PVP._rating_cache[cache_key] = false -- in-flight marker, avoids re-firing on every hover
+		MPAPI.matchmaking.get_rating(PVP.id, gamemode, nil, player_data.id, function(err, data)
+			if err then
+				PVP._rating_cache[cache_key] = nil -- allow a retry on the next hover
+				return
+			end
+			PVP._rating_cache[cache_key] = data or { rating = nil }
+		end)
+		return text_row("Elo: ...")
+	end
+
+	if cached == false then
+		return text_row("Elo: ...")
+	end
+
+	return text_row("Elo: " .. tostring(cached.rating or "Placement"))
+end
+
+MPAPI.register_card_info_provider(PVP.id, function(lobby, player_data)
+	local meta = lobby:get_metadata() or {}
+	if meta.kind == PVP.LobbyAccess.RANKED then
+		return { elo_row(lobby, player_data) }
+	end
+	return nil
+end)

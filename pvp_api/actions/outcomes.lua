@@ -11,6 +11,20 @@ end)
 A("pvp_player_lives", function(_at, _from, params)
 	local sid = self_id()
 	local lives = tonumber(params.lives)
+
+	-- Best-effort local cache for ui/game/player_status_provider.lua: a
+	-- non-host client has no local PVP.REF (host-only, in-memory -- see
+	-- referee.lua), so this is the only per-player lives signal it can ever
+	-- see. Only whichever players' deltas actually reach this client (self +
+	-- current 1v1 target reliably; Royale/Manhunt's rotating pairings mean a
+	-- past opponent's cached value can go stale until they're paired again)
+	-- -- still strictly better than no signal at all. The host itself never
+	-- needs this cache; its provider reads PVP.REF directly.
+	if params.player_id and params.player_id ~= "*all*" then
+		PVP._player_lives_cache = PVP._player_lives_cache or {}
+		PVP._player_lives_cache[params.player_id] = lives
+	end
+
 	if params.player_id == "*all*" then
 		PVP.GAME.lives = lives
 		if PVP.GAME.enemy then
