@@ -62,8 +62,15 @@ end
 -- Broadcasts one event live. No-ops cleanly with no lobby (e.g. practice mode,
 -- or the headless test harness) -- the local carbon/human text lines this
 -- pairs with (lib/replay_log.lua) are unaffected either way.
-function PVP.RLOG.broadcast_event(t, opcode, args)
+--
+-- Registered by mod id (MPAPI.replay.register_broadcaster), not assigned
+-- directly to MPAPI.replay.broadcast_event: that's a single shared singleton
+-- across every consuming mod, so a second consumer (e.g. SPDRN) loading its
+-- own transport wiring would otherwise silently clobber this one (or vice
+-- versa, depending on load order) for every game afterward, regardless of
+-- which mod's lobby was actually live.
+MPAPI.replay.register_broadcaster(PVP.id, function(t, opcode, args)
 	local lobby = MPAPI.get_current_lobby()
 	if not lobby then return end
 	lobby:action(PVP.RLOG_EVENT_ACTION):broadcast({ t = t, opcode = opcode, args = normalize_args(args) })
-end
+end)
