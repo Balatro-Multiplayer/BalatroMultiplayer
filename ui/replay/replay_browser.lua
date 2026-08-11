@@ -12,17 +12,43 @@ local function format_run_label(run)
 	return date .. '  ' .. tostring(run.lobbyCode or '??????') .. '  [' .. tostring(run.status or '?') .. ']'
 end
 
--- Finds the manifest event for `player_id` in an already-built timeline
--- (MPAPI.playback.build_timeline) -- the manifest event's own args ARE the
--- full {seed, deck, sleeve, challenge, stake, ruleset, gamemode, ...} table
--- PVP.RLOG.begin_run recorded, exactly what PVP._start_playback needs.
-local function find_manifest(timeline, player_id)
+-- Finds this player's own bootstrap data in an already-built timeline
+-- (MPAPI.playback.build_timeline) -- merges the first match_manifest (for
+-- schema_version) + first lobby_info (gamemode/ruleset/sleeve/challenge,
+-- the latter two now riding in lobby_info's options dict, see
+-- networking/action_handlers.lua's action_start_game) + first run_info
+-- (seed/deck/stake) event, replacing the old single 'manifest' event's args
+-- now that match framing is split across three events fired at three
+-- different scopes (see BalatroMultiplayerAPI/api/replay/framing_codes.lua).
+-- Returns the same {seed, deck, sleeve, challenge, stake, ruleset, gamemode}
+-- shape PVP._start_playback already expects, plus schema_version for the
+-- compatibility gate below.
+local function find_bootstrap(timeline, player_id)
+	local bootstrap = {}
+	local found = {}
 	for _, entry in ipairs(timeline) do
-		if entry.player_id == player_id and entry.opcode == 'manifest' then
-			return entry.args
+		if entry.player_id == player_id then
+			if not found.match_manifest and entry.opcode == 'match_manifest' then
+				found.match_manifest = true
+				bootstrap.schema_version = entry.args.schema_version
+			elseif not found.lobby_info and entry.opcode == 'lobby_info' then
+				found.lobby_info = true
+				bootstrap.gamemode = entry.args.gamemode
+				bootstrap.ruleset = entry.args.ruleset
+				local options = entry.args.options or {}
+				bootstrap.sleeve = options.sleeve
+				bootstrap.challenge = options.challenge
+			elseif not found.run_info and entry.opcode == 'run_info' then
+				found.run_info = true
+				bootstrap.seed = entry.args.seed
+				bootstrap.deck = entry.args.deck
+				bootstrap.stake = entry.args.stake
+			end
+			if found.match_manifest and found.lobby_info and found.run_info then break end
 		end
 	end
-	return nil
+	if not (found.lobby_info and found.run_info) then return nil end
+	return bootstrap
 end
 
 function PVP._launch_replay(run_id)
@@ -35,16 +61,24 @@ function PVP._launch_replay(run_id)
 		local timeline = MPAPI.playback.build_timeline(data.logs)
 		local conn = MPAPI.get_connection()
 		local my_id = conn and conn.player_id
-		local manifest = find_manifest(timeline, my_id)
-		if not manifest then
-			MPAPI.sendWarnMessage('[replay] no manifest found for our own player in run ' .. tostring(run_id))
+		local bootstrap = find_bootstrap(timeline, my_id)
+		if not bootstrap then
+			MPAPI.sendWarnMessage('[replay] no bootstrap data found for our own player in run ' .. tostring(run_id))
+			return
+		end
+		if not MPAPI.replay.is_schema_compatible(bootstrap.schema_version) then
+			MPAPI.sendWarnMessage(
+				'[replay] recording schema_version ' .. tostring(bootstrap.schema_version)
+				.. ' is newer than this client understands (' .. tostring(MPAPI.replay.SCHEMA_VERSION) .. '); refusing to play'
+			)
 			return
 		end
 
-		PVP._start_playback(manifest, function()
+		PVP._start_playback(bootstrap, function()
 			local driver = MPAPI.playback.new_driver(timeline, {
 				mod_id = 'pvp',
 				pov_player_id = my_id,
+				schema_version = bootstrap.schema_version,
 				on_complete = function()
 					-- No `cover` field: confirmed live (via SPDRN's identical
 					-- on_complete call, ported from this one) to crash --

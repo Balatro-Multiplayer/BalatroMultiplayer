@@ -1,12 +1,9 @@
 local ease_dollars_ref = ease_dollars
 function ease_dollars(mod, instant)
 	sendTraceMessage(string.format("Client sent message: action:moneyMoved,amount:%s", tostring(mod)), "MULTIPLAYER")
-	-- Carbon: every balance change, whatever the cause (buy/sell/reroll cost,
-	-- blind reward, interest, joker trigger, ...) -- independent of the
-	-- itemized `cost` now carried on buy/open_pack/voucher's own args, so a
-	-- viewer can cross-check "sum of individual purchase costs" against
-	-- "total observed balance decrease" instead of trusting either alone.
-	if PVP.rlog_active() then PVP.RLOG.record("money_delta", mod) end
+	-- RLOG's money_delta opcode is now recorded once, generically, by
+	-- BalatroMultiplayerAPI/api/replay/generic_codes.lua's own ease_dollars
+	-- hook (wrapping the same underlying global) -- nothing left to do here.
 	return ease_dollars_ref(mod, instant)
 end
 
@@ -20,28 +17,20 @@ end
 
 local sell_card_ref = Card.sell_card
 function Card:sell_card()
-	if self.ability and self.ability.name and PVP.rlog_active() then
-		-- record() emits both the carbon line and the human "Client sent message:"
-		-- line. Sell is positional by area + slot, captured before the card leaves
-		-- its area. Area distinguishes selling a joker (4) from a consumable (5).
-		local human = string.format("action:soldCard,card:%s", self.ability.name)
-		local area = PVP.UTILS.area_enum(self.area)
-		local idx = PVP.UTILS.index_in_area(self)
-		local ref = PVP.RLOG.card_ref(self)
-		if area and idx then PVP.RLOG.record("sell", { area, idx, ref }, human) end
-	end
+	-- RLOG's sell opcode is now recorded once, generically, by
+	-- BalatroMultiplayerAPI/api/replay/generic_codes.lua's own Card:sell_card
+	-- hook (wrapping the same underlying method) -- nothing left to do here.
 	-- §18.2: tell the opponent a card was sold -- any of their cards watching
 	-- for opponent_selling_card (e.g. Taxes) reacts via their own calculate.
 	if PVP.LOBBY.code then MPAPI.broadcast_opponent_context({ opponent_selling_card = true }) end
 	return sell_card_ref(self)
 end
 
--- Carbon: cashing out of round-eval into the shop. Bare opcode like reroll --
--- no useful positional target, the outcome is already fully determined by the
--- preceding play/discard events.
+-- Carbon: cashing out of round-eval into the shop is now recorded once,
+-- generically, by generic_codes.lua's own G.FUNCS.cash_out hook -- this
+-- override stays only for the reconnect-tail checkpoint below.
 local cash_out_ref = G.FUNCS.cash_out
 function G.FUNCS.cash_out(e)
-	if PVP.rlog_active() then PVP.RLOG.record("cashout", nil, "action:cashOut") end
 	-- Confirmed-safe checkpoint for Phase 9's reconnect tail-replay -- drains
 	-- any pending opponent catch-up queued since the last checkpoint.
 	if PVP.RECONNECT_TAIL then PVP.RECONNECT_TAIL.on_checkpoint() end
@@ -50,12 +39,9 @@ end
 
 local reroll_shop_ref = G.FUNCS.reroll_shop
 function G.FUNCS.reroll_shop(e)
-	-- Reroll has no positional target; the shop contents it produces are
-	-- deterministic from the seed, so the bare opcode is enough to replay.
-	-- record() emits both the carbon line and the human "Client sent message:".
-	if PVP.rlog_active() then
-		PVP.RLOG.record("reroll", nil, string.format("action:rerollShop,cost:%s", G.GAME.current_round.reroll_cost))
-	end
+	-- RLOG's reroll opcode is now recorded once, generically, by
+	-- generic_codes.lua's own G.FUNCS.reroll_shop hook -- this override stays
+	-- only for PvP's own reroll stats tracking below.
 
 	-- Update reroll stats if in a multiplayer game
 	if PVP.LOBBY.code and PVP.GAME.stats then
@@ -66,64 +52,11 @@ function G.FUNCS.reroll_shop(e)
 	return reroll_shop_ref(e)
 end
 
-local buy_from_shop_ref = G.FUNCS.buy_from_shop
-function G.FUNCS.buy_from_shop(e)
-	local c1 = e.config.ref_table
-	if c1 and c1:is(Card) and PVP.rlog_active() then
-		-- record() emits both the carbon line and the human "Client sent message:"
-		-- line. Buy is positional by shop area + slot, captured before the card
-		-- leaves the shop. Booster packs and vouchers get distinct opcodes since
-		-- they branch the game differently, but all reference an area + slot.
-		local human = string.format("action:boughtCardFromShop,card:%s,cost:%s", c1.ability.name, c1.cost)
-		local area = PVP.UTILS.area_enum(c1.area)
-		local idx = PVP.UTILS.index_in_area(c1)
-		if area and idx then
-			local opcode = "buy"
-			local set = c1.ability and c1.ability.set
-			if set == "Booster" then
-				opcode = "open_pack"
-			elseif set == "Voucher" then
-				opcode = "voucher"
-			end
-			local ref = PVP.RLOG.card_ref(c1)
-			-- cost trails the existing {area, idx, ref} positions -- appended, not
-			-- inserted, so playback_handlers.lua's existing args[1]/args[2] reads
-			-- (area/idx) are untouched.
-			PVP.RLOG.record(opcode, { area, idx, ref, c1.cost }, human)
-		end
-	end
-	return buy_from_shop_ref(e)
-end
-
-local use_card_ref = G.FUNCS.use_card
-function G.FUNCS.use_card(e, mute, nosave)
-	local card = e.config and e.config.ref_table
-	if card and card.ability and card.ability.name and PVP.rlog_active() then
-		-- record() emits both the carbon line and the human "Client sent message:".
-		local human = string.format("action:usedCard,card:%s", card.ability.name)
-		-- Pack picks share this hook (a picked card lives in G.pack_cards) but get
-		-- their own opcode. Both reference a slot plus any highlighted hand targets
-		-- (e.g. a Tarot from an Arcana pack applied to selected cards).
-		if card.area == (G and G.pack_cards) then
-			local idx = PVP.UTILS.index_in_area(card, G.pack_cards)
-			if idx then
-				local targets = PVP.UTILS.highlighted_hand_indices()
-				local ref = PVP.RLOG.card_ref(card)
-				local target_refs = PVP.RLOG.card_refs(targets)
-				PVP.RLOG.record("pack_pick", { idx, targets, ref, target_refs }, human)
-			end
-		else
-			local idx = PVP.UTILS.index_in_area(card)
-			if idx then
-				local targets = PVP.UTILS.highlighted_hand_indices()
-				local ref = PVP.RLOG.card_ref(card)
-				local target_refs = PVP.RLOG.card_refs(targets)
-				PVP.RLOG.record("use", { idx, targets, ref, target_refs }, human)
-			end
-		end
-	end
-	return use_card_ref(e, mute, nosave)
-end
+-- buy_from_shop/use_card/skip_booster/reorder(CardArea:update) had no
+-- PvP-specific side effect beyond their own RLOG capture -- all four are now
+-- covered purely by generic_codes.lua's own hooks (buy/open_pack/voucher,
+-- use/pack_pick, pack_skip, reorder respectively), so those overrides are
+-- removed entirely rather than kept as no-op pass-throughs.
 
 -- Hook for end of pvp context (slightly scuffed)
 local evaluate_round_ref = G.FUNCS.evaluate_round
@@ -133,82 +66,4 @@ G.FUNCS.evaluate_round = function()
 		SMODS.calculate_context({ mp_end_of_pvp = true })
 	end
 	evaluate_round_ref()
-end
-
--- Carbon: skipping a booster pack.
-if G.FUNCS.skip_booster then
-	local skip_booster_ref = G.FUNCS.skip_booster
-	function G.FUNCS.skip_booster(e)
-		if PVP.rlog_active() then
-			-- Refs for every card in the pack being passed on -- otherwise a reader
-			-- has no way to know what the player skipped, only what they picked.
-			local refs = {}
-			if G.pack_cards and G.pack_cards.cards then
-				for i = 1, #G.pack_cards.cards do
-					refs[i] = PVP.RLOG.card_ref(G.pack_cards.cards[i])
-				end
-			end
-			PVP.RLOG.record("pack_skip", { refs }, "action:skipPack")
-		end
-		return skip_booster_ref(e)
-	end
-end
-
--- Carbon: joker / hand / consumable reordering (drag-drop). There is no
--- discrete base-game callback for a reorder, so we diff each area's card order
--- on update. This is intentionally independent of the Preview integration
--- (which has its own, Preview-gated order tracker) so reorders are always
--- logged. Detection is debounced until no card in the area is mid-drag, so one
--- drag emits one event, and reorder_permutation only fires on a pure
--- permutation (the card set is unchanged) -- draws, plays and discards change
--- the set and are ignored here.
-local function rlog_reorder_area(cardarea)
-	if cardarea == G.jokers then return PVP.UTILS.AREA.jokers end
-	if cardarea == G.hand then return PVP.UTILS.AREA.hand end
-	if cardarea == G.consumeables then return PVP.UTILS.AREA.consumeables end
-	return nil
-end
-
-local function rlog_area_dragging(cardarea)
-	for _, c in ipairs(cardarea.cards) do
-		if c.states and c.states.drag and c.states.drag.is then return true end
-	end
-	return false
-end
-
-local cardarea_update_ref = CardArea.update
-function CardArea:update(dt)
-	cardarea_update_ref(self, dt)
-
-	-- Cheap area check first (runs for every CardArea every frame); only the
-	-- joker/hand areas do any further work, and only during a live PVP game.
-	local area_id = rlog_reorder_area(self)
-	if not area_id or not self.cards or #self.cards == 0 then return end
-	if not (PVP.RLOG and PVP.rlog_active()) then return end
-	if rlog_area_dragging(self) then return end -- wait for the drag to settle
-
-	local cur = {}
-	for i = 1, #self.cards do
-		cur[i] = self.cards[i].sort_id
-	end
-	local prev = self._rlog_order
-	self._rlog_order = cur
-
-	if prev and #prev == #cur then
-		local perm = PVP.UTILS.reorder_permutation(prev, self.cards)
-		if perm then
-			-- Sparse "moved" summary: [card_ref, old_position, new_position] for
-			-- every position that actually changed -- states directly which card
-			-- moved where, rather than requiring a reader to diff perm against
-			-- identity themselves. perm itself is untouched (still args[2]) so
-			-- lib/playback_handlers.lua's exact-replay logic needs no changes.
-			local moved = {}
-			for j = 1, #perm do
-				if perm[j] ~= j then
-					moved[#moved + 1] = { PVP.RLOG.card_ref(self.cards[j]), perm[j], j }
-				end
-			end
-			PVP.RLOG.record("reorder", { area_id, perm, moved }, "action:reorder,area:" .. area_id)
-		end
-	end
 end

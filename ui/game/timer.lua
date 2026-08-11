@@ -406,15 +406,13 @@ function PVP.UI.restore_timer(amount, silent, max_timer)
 	end
 end
 
+-- RLOG's play opcode is now recorded once, generically, by
+-- BalatroMultiplayerAPI/api/replay/generic_codes.lua's own
+-- G.FUNCS.play_cards_from_highlighted hook -- this override stays only for
+-- PvP's own timer-increment logic below.
 local old_play = G.FUNCS.play_cards_from_highlighted
 function G.FUNCS.play_cards_from_highlighted(...)
-    -- Carbon: capture which hand slots are played BEFORE old_play consumes them.
-    local played = PVP.UTILS.highlighted_hand_indices()
-    local played_refs = PVP.RLOG.card_refs(played)
     old_play(...)
-    if #played > 0 and PVP.rlog_active() then
-        PVP.RLOG.record("play", { played, played_refs }, "action:play,cards:" .. table.concat(played, "."))
-    end
     if G.play and G.play.cards[1] then return end
     if PVP.LOBBY.code and PVP.LOBBY.config.timer and not PVP.GAME.timer_consumed then
         if PVP.is_pvp_boss() then
