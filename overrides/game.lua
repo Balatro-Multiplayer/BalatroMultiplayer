@@ -1,6 +1,12 @@
 local ease_dollars_ref = ease_dollars
 function ease_dollars(mod, instant)
 	sendTraceMessage(string.format("Client sent message: action:moneyMoved,amount:%s", tostring(mod)), "MULTIPLAYER")
+	-- Carbon: every balance change, whatever the cause (buy/sell/reroll cost,
+	-- blind reward, interest, joker trigger, ...) -- independent of the
+	-- itemized `cost` now carried on buy/open_pack/voucher's own args, so a
+	-- viewer can cross-check "sum of individual purchase costs" against
+	-- "total observed balance decrease" instead of trusting either alone.
+	if PVP.rlog_active() then PVP.RLOG.record("money_delta", mod) end
 	return ease_dollars_ref(mod, instant)
 end
 
@@ -80,7 +86,10 @@ function G.FUNCS.buy_from_shop(e)
 				opcode = "voucher"
 			end
 			local ref = PVP.RLOG.card_ref(c1)
-			PVP.RLOG.record(opcode, { area, idx, ref }, human)
+			-- cost trails the existing {area, idx, ref} positions -- appended, not
+			-- inserted, so playback_handlers.lua's existing args[1]/args[2] reads
+			-- (area/idx) are untouched.
+			PVP.RLOG.record(opcode, { area, idx, ref, c1.cost }, human)
 		end
 	end
 	return buy_from_shop_ref(e)
