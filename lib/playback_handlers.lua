@@ -94,6 +94,13 @@ MPAPI.playback.register_handler('pvp', 'chk', function(args, _ctx)
 	-- Framing event (hash trailer) -- nothing to apply during playback.
 end)
 
+MPAPI.playback.register_handler('pvp', 'money_delta', function(_args, _ctx)
+	-- Pure bookkeeping (see overrides/game.lua's ease_dollars hook) -- the
+	-- real dollar change already happens as a side effect of whatever action
+	-- caused it (buy/sell/etc, each already replayed by its own handler),
+	-- nothing to apply.
+end)
+
 -- §22.2/§22.3 full-fidelity: navigation into a blind. Real vanilla state
 -- transition is `new_round()`, reached via the real (PvP-wrapped)
 -- G.FUNCS.select_blind -- NOT a from-scratch reimplementation, so every real
