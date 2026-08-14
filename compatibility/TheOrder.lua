@@ -222,7 +222,7 @@ function reset_idol_card()
 		local W_MAIN    = 2.2     -- Tier B: reward per existing copy (progress toward 5)
 		local W_OFF     = 0.8     -- Tier B: suit-changer potential, capped by need
 		local W_STR     = 0.7    -- Tier B: Strength potential, capped by need
-j
+		
 		-- ----------------------------------------------------------------
 		-- Step 7: Compute total score for each distinct (rank, suit) entry
 		-- ----------------------------------------------------------------
