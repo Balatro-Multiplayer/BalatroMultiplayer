@@ -121,8 +121,8 @@ function reset_mail_rank()
 			if v.ability.effect ~= "Stone Card" then
 				local val = v.base.value
 				if not count_map[val] then
-					count_map[val] = { count = 0, example_card = v }
-					table.insert(valid_ranks, { value = val, count = 0, example_card = v })
+					count_map[val] = { value = val, count = 0, example_card = v }
+					table.insert(valid_ranks, count_map[val])
 				end
 				count_map[val].count = count_map[val].count + 1
 			end
