@@ -45,7 +45,9 @@ payload = '''--if there is at least one joker$pre local copyable_jokers = {}
       for k, v in pairs(copyable_jokers) do'''
 times = 1
 
-# Sets the balanced sticker on reworked cards
+# Sets the balanced sticker on reworked cards.
+# ReworkCenter mutation should automatically set card.config.mp_balanced if applicable
+# Custom localization is unsupported as of now
 [[patches]]
 [patches.pattern]
 target = "card.lua"
@@ -53,14 +55,9 @@ pattern = '''if center.consumeable then'''
 position = 'before'
 payload = '''
 if old_center ~= center or initial then
-	if MP.LOBBY.config.ruleset then
-		local ruleset = string.sub(MP.LOBBY.config.ruleset, 12, #MP.LOBBY.config.ruleset)
-		
-		if center.mp_reworks and center.mp_reworks[ruleset] and ruleset ~= 'vanilla' then
-			if not center.mp_silent[ruleset] then
-				self.ability.mp_sticker_balanced = true
-			end
-		end
+	self.ability.mp_sticker_balanced = false
+	if center.config.mp_balanced then
+		self.ability.mp_sticker_balanced = true
 	end
 end'''
 match_indent = true
@@ -73,15 +70,5 @@ target = "card.lua"
 pattern = '''if self.ability.name == 'Baseball Card' and self ~= context.other_joker and context.other_joker:is_rarity("Uncommon") then'''
 position = 'after'
 payload = '''if context.other_joker.edition and context.other_joker.edition.type == 'mp_phantom' then return end'''
-match_indent = true
-times = 1
-
-# align sixth sense trigger behaviour with vanilla - STEAMODDED BUG
-[[patches]]
-[patches.pattern]
-target = "card.lua"
-pattern = '''if self.ability.name == 'Sixth Sense' and #context.full_hand == 1 and context.full_hand[1]:get_id() == 6 and G.GAME.current_round.hands_played == 0 then'''
-position = 'after'
-payload = '''if ( SMODS.find_card('j_sixth_sense') )[1] ~= self then return end'''
 match_indent = true
 times = 1

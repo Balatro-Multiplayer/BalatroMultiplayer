@@ -15,7 +15,7 @@ SMODS.Joker({
 	perishable_compat = false,
 	rarity = 2,
 	cost = 6,
-	config = { extra = { Xmult_gain = 0.25, Xmult = 1 }, mp_sticker_balanced = true },
+	config = { extra = { Xmult_gain = 0.25, Xmult = 1 }, mp_balanced = true },
 	loc_vars = function(self, info_queue, card)
 		info_queue[#info_queue + 1] = G.P_CENTERS.m_lucky
 
@@ -42,6 +42,7 @@ SMODS.Joker({
 			xmult = card.ability.extra.Xmult,
 		} end
 	end,
+	mp_credits = { code = { "steph" } },
 	mp_include = function(self)
 		return MP.SANDBOX.is_joker_allowed(self.key)
 	end,

@@ -40,4 +40,3 @@ function G.UIDEF.create_UIBox_join_lobby_button()
 		})
 	)
 end
-

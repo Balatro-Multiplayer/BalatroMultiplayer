@@ -25,8 +25,121 @@ return {
 					"{C:inactive}(Currently {C:money}$#3#{C:inactive})",
 				},
 			},
+			tag_mp_uncommon_release = {
+				name = "Uncommon Tag",
+				text = {
+					"Shop has an",
+					"{C:green}Uncommon Joker",
+				},
+			},
+			tag_mp_rare_release = {
+				name = "Rare Tag",
+				text = {
+					"Shop has a",
+					"{C:red}Rare Joker",
+				},
+			},
+			tag_mp_foil_release = {
+				name = "Foil Tag",
+				text = {
+					"Next base edition shop",
+					"Joker becomes {C:dark_edition}Foil",
+				},
+			},
+			tag_mp_holo_release = {
+				name = "Holographic Tag",
+				text = {
+					"Next base edition shop",
+					"Joker becomes {C:dark_edition}Holographic",
+				},
+			},
+			tag_mp_poly_release = {
+				name = "Polychrome Tag",
+				text = {
+					"Next base edition shop",
+					"Joker becomes {C:dark_edition}Polychrome",
+				},
+			},
+			tag_mp_negative_release = {
+				name = "Negative Tag",
+				text = {
+					"Next base edition shop",
+					"Joker becomes {C:dark_edition}Negative",
+				},
+			},
 		},
 		Joker = {
+			j_mp_seltzer = {
+				name = "Seltzer",
+				text = {
+					"Retrigger all",
+					"cards played for",
+					"the next {C:attention}#1#{} hands",
+				},
+			},
+			j_mp_turtle_bean = {
+				name = "Turtle Bean",
+				text = {
+					"{C:attention}+#1#{} hand size,",
+					"reduces by",
+					"{C:red}#2#{} every round",
+				},
+			},
+			j_mp_idol = {
+				name = "The Idol",
+				text = {
+					"Each played {C:attention}#2#",
+					"of {V:1}#3#{} gives",
+					"{X:mult,C:white} X#1# {} Mult when scored",
+					"{s:0.8}Card changes every round",
+				},
+			},
+			j_mp_idol_rare = {
+				name = "The Idol",
+				text = {
+					"Each played {C:attention}#2#",
+					"of {V:1}#3#{} gives",
+					"{X:mult,C:white} X#1# {} Mult when scored",
+					"{s:0.8}Card changes every round",
+				},
+			},
+			j_mp_ticket = {
+				name = "Golden Ticket",
+				text = {
+					"Played {C:attention}Gold{} cards",
+					"earn {C:money}$#1#{} when scored",
+				},
+			},
+			j_mp_ticket_experimental = {
+				name = "Golden Ticket",
+				text = {
+					"Played {C:attention}Gold{} cards",
+					"earn {C:money}$#1#{} when scored",
+				},
+			},
+			j_mp_baron = {
+				name = "Baron",
+				text = {
+					"Each {C:attention}King{} held in hand",
+					"gives {X:mult,C:white} X#1# {} Mult",
+				},
+			},
+			j_mp_mime = {
+				name = "Mime",
+				text = {
+					"Retrigger all card",
+					"{C:attention}held in hand{} abilities",
+				},
+			},
+			j_mp_todo_list = {
+				name = "To Do List",
+				text = {
+					"Earn {C:money}$#1#{} if {C:attention}poker hand",
+					"played is a {C:attention}#2#{},",
+					"poker hand changes",
+					"at end of round",
+				},
+			},
 			j_broken = {
 				name = "BROKEN",
 				text = {
@@ -74,7 +187,7 @@ return {
 				name = "SPEEDRUN",
 				text = {
 					"If you reach a {C:attention}PvP Blind",
-					"before your {X:purple,C:white}Nemesis{},",
+					"within {C:attention}30s{} of your {X:purple,C:white}Nemesis{},",
 					"create a random {C:spectral}Spectral{} card",
 					"{C:inactive}(Must have room)",
 				},
@@ -121,7 +234,7 @@ return {
 					"not in a {C:attention}PvP Blind{}",
 				},
 			},
-			j_mp_hanging_chad_standard = {
+			j_mp_hanging_chad = {
 				name = "Hanging Chad",
 				text = {
 					"Retrigger {C:attention}first{} and {C:attention}second{}",
@@ -222,7 +335,7 @@ return {
 			j_mp_castle_sandbox = {
 				name = "Castle",
 				text = {
-					"This Joker gains {C:chips}#3{} Chips",
+					"This Joker gains {C:chips}+#3#{} Chips",
 					"per discarded {V:1}#1#{}",
 					"Suit locked on purchase",
 					"{C:inactive}(Currently {C:chips}+#2#{C:inactive} Chips)",
@@ -324,6 +437,14 @@ return {
 					"are {C:attention}retriggered{}",
 				},
 			},
+			j_mp_golden_ticket_sandbox = {
+				name = "Golden Ticket",
+				text = {
+					"{C:green}#2# in #3#{} chance for",
+					"{C:attention}Gold{} cards to earn",
+					"{C:money}$#1#{} when played",
+				},
+			},
 			j_mp_satellite_sandbox = {
 				name = "Satellite",
 				text = {
@@ -333,7 +454,7 @@ return {
 					"{C:inactive}(Currently {C:money}$#1#{C:inactive})",
 				},
 			},
-			j_mp_idol_sandbox_bw = {
+			j_mp_idol_sandbox_zealot = {
 				name = "Zealot Idol",
 				text = {
 					"Each played {C:attention}#1#{}",
@@ -342,17 +463,8 @@ return {
 					"{s:0.8}Card changes every round",
 				},
 			},
-			j_mp_idol_sandbox_color = {
-				name = "Tantrum Idol",
-				text = {
-					"DEVOTIONAL PRESSURE COOKER",
-					"building STEAM for {C:attention}#1#{} of {V:1}#3#{}",
-					"until EXPLOSIVE RELEASE!!!!",
-					"{C:inactive}(Currently {X:mult,C:white} X#2# {C:inactive} Mult)",
-				},
-			},
-			j_mp_idol_sandbox_fantom = {
-				name = "Meta Idol",
+			j_mp_idol_sandbox_collector = {
+				name = "Collector's Idol",
 				text = {
 					"Most common card gives",
 					"{X:mult,C:white}X#3#{} Mult when scored",
@@ -363,11 +475,306 @@ return {
 			j_mp_error_sandbox = {
 				name = "????",
 				text = {
-					-- "PREVIEW DISABLED",
 					"{X:purple,C:white,s:0.85}something's{} {X:purple,C:white,s:0.85}wrong",
-					-- "PREVIEW DISABLED",
-					-- "PREVIEW DISABLED",
-					-- "{C:inactive}(CURRENTLY {C:money}$7{C:inactive})",
+				},
+			},
+			j_mp_clowncollege_sandbox = {
+				name = "Clown College",
+				text = {
+					"{C:attention}Fill{} consumable slots with",
+					"{C:tarot}The Fool{} after",
+					"{C:attention}Boss Blind{} is defeated",
+					"{C:inactive}(Must have room)",
+				},
+			},
+			j_mp_alloy_sandbox = {
+				name = "Alloy",
+				text = {
+					"{C:attention}Gold Cards{} are also",
+					"considered {C:attention}Steel Cards{}",
+					"{C:attention}Steel Cards{} are also",
+					"considered {C:attention}Gold Cards{}",
+				},
+			},
+			j_mp_ambrosia_sandbox = {
+				name = "Ambrosia",
+				text = {
+					"{C:attention}Fill{} consumable slots with",
+					"{C:spectral}Spectral Cards{} whenever a",
+					"{C:attention}blind{} is {C:attention}skipped{}, destroyed",
+					"when any {C:spectral}Spectral Card{} is {C:attention}sold",
+					"{C:inactive}(Must have room)",
+				},
+			},
+			j_mp_bobby_sandbox = {
+				name = "Bobby",
+				text = {
+					"When {C:attention}Blind{} is selected,",
+					"lose {C:attention}#1#{} Hands and gain",
+					"{C:red}+#1#{} Discards for each Hand lost",
+				},
+			},
+			j_mp_candynecklace_sandbox = {
+				name = "Candy Necklace",
+				text = {
+					"At end of {C:attention}shop{}, create",
+					"a random {C:attention}Booster Pack Tag",
+					"{C:inactive}(#1# uses left){C:inactive}",
+				},
+			},
+			j_mp_chainlightning_sandbox = {
+				name = "Chain Lightning",
+				text = {
+					"Played {C:attention}Mult Cards{} give",
+					"{X:mult,C:white}X#1#{} Mult when scored,",
+					"then increase this by {X:mult,C:white}X#2#",
+					"{C:inactive}(Resets each hand)",
+				},
+			},
+			j_mp_clowncar_sandbox = {
+				name = "Clown Car",
+				text = {
+					"{C:mult}+#1#{} Mult and {C:money}-$#2#",
+					"{C:attention}before{} cards are scored",
+				},
+			},
+			j_mp_couponsheet_sandbox = {
+				name = "Coupon Sheet",
+				text = {
+					"Create a {C:attention}Coupon Tag",
+					"and a {C:attention}Voucher Tag",
+					"after {C:attention}Boss Blind{} is defeated",
+				},
+			},
+			j_mp_doublerainbow_sandbox = {
+				name = "Double Rainbow",
+				text = {
+					"{C:attention}Retrigger{} all {C:attention}Lucky Cards{}",
+				},
+			},
+			j_mp_espresso_sandbox = {
+				name = "Espresso",
+				text = {
+					"Gain {C:money}$#1#{} and destroy this",
+					"card when {C:attention}Blind{} is skipped",
+					"Decreases by {C:money}$#2#{} at end of round",
+				},
+			},
+			j_mp_farmer_sandbox = {
+				name = "Farmer",
+				text = {
+					"Cards with {V:1}#2#{} suit",
+					"held in hand give {C:money}$#1#",
+					"at end of round",
+					"{s:0.8}suit changes at end of round",
+				},
+			},
+			j_mp_forklift_sandbox = {
+				name = "Forklift",
+				text = {
+					"{C:attention}+#1#{} Consumable Slots",
+				},
+			},
+			j_mp_gofish_sandbox = {
+				name = "Go Fish",
+				text = {
+					"The {C:attention}first time{} that a",
+					"{C:attention}played hand{} contains any",
+					"scoring {C:attention}#1#s{}, destroy them",
+					"{s:0.8}rank changes at end of round",
+				},
+			},
+			j_mp_hoarder_sandbox = {
+				name = "Hoarder",
+				text = {
+					"This Joker gains {C:money}$#1#{} of sell value",
+					"whenever {C:money}money{} is earned",
+				},
+			},
+			j_mp_jokalisa_sandbox = {
+				name = "Joka Lisa",
+				text = {
+					"Gains {X:mult,C:white}X#2#{} Mult for",
+					"each {C:attention}unique enhancement",
+					"in scoring hand",
+					"{C:inactive}(Currently {X:mult,C:white}X#1#{C:inactive})",
+				},
+			},
+			j_mp_jokeroftheyear_sandbox = {
+				name = "Joker of the Year",
+				text = {
+					"If played hand has",
+					"{C:attention}5{} scoring cards,",
+					"{C:attention}retrigger{} played cards",
+				},
+			},
+			j_mp_lucky7_sandbox = {
+				name = "Lucky 7",
+				text = {
+					"If played hand contains",
+					"a scoring {C:attention}7{}, all played",
+					"cards count as {C:attention}Lucky Cards",
+				},
+			},
+			j_mp_montehaul_sandbox = {
+				name = "Monte Haul",
+				text = {
+					"After {C:attention}1 round{}, sell this card",
+					"to gain {C:attention}2{} random {C:attention}Joker Tags",
+					"{C:inactive}(Currently {C:attention}#1#{C:inactive} rounds)",
+				},
+			},
+			j_mp_pocketaces_sandbox = {
+				name = "Pocket Aces",
+				text = {
+					"Earn {C:money}$#1#{} at end of round",
+					"Played {C:attention}Aces{} increase payout",
+					"by {C:money}$#2#{}, resets each {C:attention}Ante",
+				},
+			},
+			j_mp_pyromancer_sandbox = {
+				name = "Pyromancer",
+				text = {
+					"{C:mult}+#1#{} Mult if",
+					"remaining {C:attention}Hands{} are less",
+					"than or equal to {C:attention}Discards",
+				},
+			},
+			j_mp_shipoftheseus_sandbox = {
+				name = "Ship of Theseus",
+				text = {
+					"Whenever a {C:attention}Playing Card{} is {C:attention}destroyed",
+					"add a {C:attention}copy{} of it to your {C:attention}deck",
+					"and this joker gains {X:mult,C:white}X#2#{} Mult",
+					"{C:inactive}(Currently {X:mult,C:white}X#1#{C:inactive} Mult)",
+				},
+			},
+			j_mp_starfruit_sandbox = {
+				name = "Starfruit",
+				text = {
+					"{C:attention}First played hand{} each round",
+					"has a {C:green}#2# in #3#{} chance",
+					"to gain {C:attention}1{} level",
+					"{C:inactive}({}{C:attention}#1#{}{C:inactive} rounds remaining)",
+				},
+			},
+			j_mp_trafficlight_sandbox = {
+				name = "Traffic Light",
+				text = {
+					"{X:mult,C:white}X#1#{} Mult",
+					"Decreases by {X:mult,C:white}X#2#{} after",
+					"each hand, resets after {X:mult,C:white}X0.5",
+				},
+			},
+			j_mp_tuxedo_sandbox = {
+				name = "Tuxedo",
+				text = {
+					"{C:attention}Retrigger{} all cards",
+					"with {V:1}#1#{} suit",
+					"{s:0.8}suit changes at end of round",
+				},
+			},
+			j_mp_warlock_sandbox = {
+				name = "Warlock",
+				text = {
+					"{C:green}#1# in #2#{} chance for played",
+					"{C:attention}Lucky Cards{} to be {C:red}destroyed",
+					"and spawn a {C:spectral}Spectral Card",
+					"{C:inactive}(Must have room)",
+				},
+			},
+			j_mp_werewolf_sandbox = {
+				name = "Werewolf",
+				text = {
+					"Played cards that are",
+					"{C:attention}enhanced{} become {C:attention}Wild Cards",
+				},
+			},
+			j_mp_8ball_release = {
+				name = "8 Ball",
+				text = {
+					"Create a {C:planet}Planet{} card",
+					"if played hand contains",
+					"{C:attention}#1#{} or more {C:attention}8s{}",
+					"{C:inactive}(Must have room)",
+				},
+			},
+			j_mp_todo_list_release = {
+				name = "To Do List",
+				text = {
+					"Earn {C:money}$#1#{} if {C:attention}poker hand{}",
+					"is a {C:attention}#2#{},",
+					"poker hand changes",
+					"on every payout",
+				},
+			},
+			j_mp_swashbuckler_release = {
+				name = "Swashbuckler",
+				text = {
+					"Adds the sell value of",
+					"all owned {C:attention}Jokers{} left",
+					"of this card to Mult",
+					"{C:inactive}(Currently {C:mult}+#1#{C:inactive} Mult)",
+				},
+			},
+			j_mp_hanging_chad_release = {
+				name = "Hanging Chad",
+				text = {
+					"Retrigger {C:attention}first{} played",
+					"card used in scoring",
+				},
+			},
+			j_mp_madness_release = {
+				name = "Madness",
+				text = {
+					"When {C:attention}Blind{} is selected,",
+					"gain {X:mult,C:white} X#1# {} Mult and",
+					"{C:attention}destroy{} a random Joker",
+					"{C:inactive}(Currently {X:mult,C:white} X#2# {} Mult)",
+				},
+			},
+			j_mp_vampire_release = {
+				name = "Vampire",
+				text = {
+					"This Joker gains {X:mult,C:white} X#1# {} Mult",
+					"per {C:attention}Enhanced card{} played,",
+					"removes card {C:attention}Enhancement",
+					"{C:inactive}(Currently {X:mult,C:white} X#2# {C:inactive} Mult)",
+				},
+			},
+			j_mp_midas_mask_release = {
+				name = "Midas Mask",
+				text = {
+					"All {C:attention}face{} cards",
+					"become {C:attention}Gold{} cards",
+					"when played",
+				},
+			},
+			j_mp_yorick_release = {
+				name = "Yorick",
+				text = {
+					"{X:mult,C:white} X#1# {} Mult only after",
+					"using {C:attention}#2#{} discards",
+					"{C:inactive}(Discards left: {C:attention}#3#{C:inactive})",
+				},
+			},
+			j_mp_flower_pot_release = {
+				name = "Flower Pot",
+				text = {
+					"{X:mult,C:white} X#1# {} Mult if played",
+					"hand has a scoring",
+					"{C:diamonds}Diamond{} card, {C:clubs}Club{} card,",
+					"{C:hearts}Heart{} card, and {C:spades}Spade{} card",
+				},
+			},
+		},
+		Tarot = {
+			c_mp_magician_release = {
+				name = "The Magician",
+				text = {
+					"Enhances {C:attention}#1#{} selected",
+					"card into a",
+					"{C:attention}#2#",
 				},
 			},
 		},
@@ -396,20 +803,12 @@ return {
 				name = "Phantom",
 				text = {
 					"{C:attention}Eternal{} and {C:dark_edition}Negative{}",
-					"Created and destroyed by your {X:purple,C:white}Nemesis{}",
+					"Created when your {X:purple,C:white}Nemesis{} has this Joker",
+					"Only affects your {X:purple,C:white}Nemesis{} and is destroyed by them.",
 				},
 			},
 		},
-		Enhanced = {
-			m_mp_glass = {
-				name = "Glass Card",
-				text = {
-					"{X:mult,C:white} X#1# {} Mult",
-					"{C:green}#2# in #3#{} chance to",
-					"destroy card",
-				},
-			},
-		},
+		Enhanced = {},
 		Back = {
 			b_mp_cocktail = {
 				name = "Cocktail Deck",
@@ -465,8 +864,9 @@ return {
 				name = "Violet Deck",
 				text = {
 					"{C:attention}+1{} Voucher in shop",
-					"During Ante {C:attention}1{}, Vouchers",
-					"are {C:attention}50%{} off",
+					"Vouchers are {C:attention}50%{} off ",
+					"during Ante {C:attention}1{}, and {C:attention}30%{} off",
+					"during Ante {C:attention}2",
 				},
 			},
 			b_mp_white = {
@@ -479,6 +879,100 @@ return {
 			},
 		},
 		Other = {
+			mp_sticker_extra_credit = {
+				name = "Extra Credit",
+				text = {
+					"Made with friends from",
+					"Balatro University!",
+				},
+			},
+			mp_sticker_balanced = {
+				name = "Balanced",
+				text = {
+					"This card has been rebalanced",
+				},
+			},
+			mp_sticker_balanced_j_mp_hanging_chad = {
+				name = "Balanced",
+				text = {
+					"Retriggers first {C:attention}2{} cards",
+					"instead of first card twice",
+				},
+			},
+			mp_sticker_balanced_j_mp_ticket = {
+				name = "Balanced",
+				text = {
+					"Now {C:green}Uncommon{}",
+					"No {C:attention}Gold{} card requirement",
+				},
+			},
+			mp_sticker_balanced_j_mp_seltzer = {
+				name = "Balanced",
+				text = {
+					"Lasts {C:attention}8{} hands",
+					"instead of {C:attention}10{}",
+				},
+			},
+			mp_sticker_balanced_j_mp_turtle_bean = {
+				name = "Balanced",
+				text = {
+					"{C:attention}+4{} hand size",
+					"instead of {C:attention}+5{}",
+				},
+			},
+			mp_sticker_balanced_j_mp_baron = {
+				name = "Balanced",
+				text = {
+					"Now {C:green}Uncommon{} ({C:money}$5{})",
+					"instead of {C:red}Rare{} ({C:money}$8{})",
+				},
+			},
+			mp_sticker_balanced_j_mp_mime = {
+				name = "Balanced",
+				text = {
+					"Now {C:red}Rare{} ({C:money}$8{})",
+					"instead of {C:green}Uncommon{} ({C:money}$5{})",
+				},
+			},
+			mp_sticker_balanced_j_mp_todo_list = {
+				name = "Balanced",
+				text = {
+					"Earns {C:money}$5{} instead of {C:money}$4{}",
+					"Picks from {C:attention}all{} poker hands,",
+					"not just discovered ones",
+				},
+			},
+			mp_sticker_balanced_j_mp_bloodstone = {
+				name = "Balanced",
+				text = {
+					"In {C:attention}PvP{}, the {C:green}1 in 2{} rolls",
+					"come from a {C:attention}fixed sequence{}",
+					"shared between both players and",
+					"{C:attention}reused{} every hand of the round",
+				},
+			},
+			mp_sticker_balanced_c_mp_ouija_standard = {
+				name = "Balanced",
+				text = {
+					"Destroys {C:attention}3{} cards instead of",
+					"converting all cards and losing",
+					"{C:attention}-1{} hand size",
+				},
+			},
+			mp_sticker_balanced_c_mp_wraith = {
+				name = "Balanced",
+				text = {
+					"Creates an {C:green}Uncommon{} instead of a",
+					"{C:red}Rare{}, and gains {C:money}$5{} instead of",
+					"setting your money to {C:money}$0{}",
+				},
+			},
+			mp_sticker_balanced_m_gold = {
+				name = "Balanced",
+				text = {
+					"Earns {C:money}$4{} instead of {C:money}$3{}",
+				},
+			},
 			current_nemesis = {
 				name = "Nemesis",
 				text = {
@@ -527,6 +1021,14 @@ return {
 				name = "Draining",
 				text = {
 					"{X:mult,C:white}X0.75{} Mult",
+				},
+			},
+			mp_blue_seal_release = {
+				name = "Blue Seal",
+				text = {
+					"Creates a {C:planet}Planet{} card",
+					"if this card is {C:attention}held{} in",
+					"hand at end of round",
 				},
 			},
 		},
@@ -614,9 +1116,24 @@ return {
 					"{s:0.8}Applies Crystal Stake",
 				},
 			},
+			stake_mp_orange_release = {
+				name = "Orange Stake",
+				text = {
+					"{C:attention}Booster Packs{} cost",
+					"{C:money}$1{} more per Ante",
+					"{s:0.8}Applies all previous Stakes",
+				},
+			},
+			stake_mp_gold_release = {
+				name = "Gold Stake",
+				text = {
+					"{C:red}-1{} hand size",
+					"{s:0.8}Applies all previous Stakes",
+				},
+			},
 		},
 		Spectral = {
-			c_mp_ouija_sandbox = {
+			c_mp_ouija_standard = {
 				name = "Ouija",
 				text = {
 					"Destroy {C:attention}#1#{} random cards,",
@@ -633,11 +1150,20 @@ return {
 					"{C:red}-1{} hand, {C:red}-1{} discard, or {C:red}-1{} hand size",
 				},
 			},
+			c_mp_wraith = {
+				name = "Wraith",
+				text = {
+					"Creates a random {C:green}Uncommon{} Joker",
+					"Gain {C:money}$#1#{}",
+				},
+			},
 		},
 	},
 	misc = {
 		labels = {
 			mp_phantom = "Phantom",
+			mp_sticker_balanced = "Balanced",
+			mp_sticker_extra_credit = "Extra Credit",
 			mp_sticker_persistent = "Persistent",
 			mp_sticker_unreliable = "Unreliable",
 			mp_sticker_draining = "Draining",
@@ -645,6 +1171,11 @@ return {
 		dictionary = {
 			b_singleplayer = "Singleplayer",
 			b_sp_with_ruleset = "Practice Mode",
+			b_practice = "Practice",
+			k_practice_collection_hint = "Psst... click a card and it's yours. No questions asked!",
+			k_unlimited_slots = "Unlimited Slots",
+			k_edition_cycling = "Edition Cycling (Q)",
+			k_practice_options = "Practice Options...",
 			b_join_lobby = "Join Lobby",
 			b_join_lobby_clipboard = "Join From Clipboard",
 			b_return_lobby = "Return to Lobby",
@@ -681,13 +1212,16 @@ return {
 			b_opts_lives = "Lives",
 			b_opts_multiplayer_jokers = "Enable Multiplayer Cards",
 			b_opts_player_diff_deck = "Players have different decks",
+			b_opts_random_loadout = "Randomize deck & stake",
 			b_opts_normal_bosses = "Enable Boss Blind effects",
+			b_opts_hide_score = "Hide opponent score until you play",
 			b_opts_timer = "Enable Timer",
 			b_opts_disable_preview = "Disable Score Preview",
 			b_opts_the_order = "Enable The Order",
 			b_opts_legacy_smallworld = "Legacy Small World mechanics",
 			b_reset = "Reset",
 			b_set_custom_seed = "Set Custom Seed",
+			b_opts_modifier_smallworld = "Small World",
 			b_mp_kofi_button = "Supporting me on Ko-fi",
 			b_unstuck = "Unstuck",
 			b_unstuck_blind = "Stuck Outside PvP",
@@ -706,6 +1240,7 @@ return {
 			k_has_multiplayer_content = "Has Multiplayer Content",
 			k_forces_lobby_options = "Forces Lobby Options",
 			k_forces_gamemode = "Forces Gamemode",
+			k_may_roll_stickers = "May Roll Stickers",
 			k_values_are_modifiable = "* Values are modifiable",
 			k_rulesets = "Rulesets",
 			k_gamemodes = "Gamemodes",
@@ -723,8 +1258,9 @@ return {
 			k_wait_enemy = "Waiting for enemy to finish...",
 			k_wait_enemy_reach_this_blind = "Waiting for enemy to reach this blind...",
 			k_lives = "Lives",
+			k_skips = "Skips",
 			k_lost_life = "Lost a life",
-			k_total_lives_lost = " Total Lives Lost ($4 each)",
+			k_total_lives_lost = " Total Lives Lost",
 			k_comeback_money_sandbox = " Comeback Money ($3 × ante cleared)",
 			k_attrition_name = "Attrition",
 			k_enter_lobby_code = "Enter Lobby Code",
@@ -741,6 +1277,7 @@ return {
 			k_set_name = "Set your username in the main menu! (Mods > Multiplayer > Config)",
 			k_mod_hash_warning = "Players have different mods or mod versions! This can cause problems!",
 			k_steamodded_warning = "Players have different versions of Steamodded installed. This may cause the seeds to differ.",
+			k_mp_version_warning = "Players are on different Multiplayer versions! Seeds and jokers will desync - update so you both match.",
 			k_warning_unlock_profile = "The profile you are playing on is not fully unlocked. If this is a ranked/tournament game, please create a new profile and hit unlock all in the profile settings",
 			k_warning_nemesis_unlock = "Your opponent is playing on a profile that is not fully unlocked. Please instruct them to create a new profile and hit unlock all in the profile settings",
 			k_warning_no_order = "One player has The Order integration enabled while the other does not. This will cause the seeds to differ.",
@@ -768,6 +1305,28 @@ return {
 			k_opts_showdown_starting_antes = "Showdown Starts at Ante",
 			k_opts_pvp_timer_increment = "Timer Increment",
 			k_opts_pvp_countdown_seconds = "PvP Countdown Seconds",
+			k_opts_modifier_timer = "Timer Implementation",
+            k_experimental_modifiers_timers = {
+                "- Default: regular {C:chips}150{} {C:inactive}(1x){} seconds timer",
+                " ",
+                "- No Animations: {C:chips}100{} {C:inactive}(0.67x){} seconds timer {C:attention}minus animations{}",
+                " ",
+                "- Pressure: {C:chips}300{} {C:inactive}(2x){} seconds timer {C:attention}minus animations{}",
+                "  which starts {C:attention}immediately{}",
+                " ",
+                "- Pressure+: Same as {C:attention}Pressure{} plus {C:chips}15{} seconds per hand played",
+            },
+            b_opts_modifier_pvp_timer = "PvP Timer",
+            k_experimental_modifiers_pvp_timer = {
+                "- Timer which available during {C:mult}PvP{} rounds.",
+                "  {C:chips}90{} seconds plus {C:chips}15{} seconds per hand played {C:attention}minus animations{}.",
+                "  Can \"timer\" opponent only when you have {C:attention}higher{} score"
+            },
+            k_experimental_modifiers_smallworld = {
+                "- {C:attention}75%{} of jokers, consumables, vouchers and tags",
+                "  are randomly banned each game.",
+                "- {C:attention}Showman{} effect always active.",
+            },
 			k_bl_life = "Life",
 			k_bl_or = "or",
 			k_bl_death = "Death",
@@ -775,20 +1334,29 @@ return {
 			k_current_seed = "Current seed: ",
 			k_random = "Random",
 			k_standard = "Standard",
-			k_sandbox = "Sandbox",
-			k_sandbox_description = "Three jealous Idols now compete for your run!\nTwelve jokers replaced with personality disorders.\nOuija destroys cards instead of hand size.\nScore preview disabled. No flowcharts.\nEverything else you knew? Check the wiki!",
+			k_sandbox = "Sandbox: Extra Credit",
+			k_sandbox_description = "26 new jokers from Extra Credit join the roster.\nIdol splits into two: Zealot and Collector's. You pick one, the other's gone.\nNew Spectrals, reworked comeback gold, no score preview.\nThe meta's wide open. Built with friends at Balatro University.\n",
 			k_vanilla = "Vanilla",
 			k_vanilla_description = "The original Balatro experience.\n\nNo Multiplayer jokers, no balance changes.\nJust the base game as it was designed.\n\nMultiplayer features like the timer are still available\nbut can be disabled in Lobby Options.",
 			k_blitz = "Standard",
-			k_blitz_description = "The balanced Multiplayer ruleset.\n\nIncludes Multiplayer jokers and balance changes\nwith full control over your lobby settings.\n\nBalance changes:\n- Hanging Chad reworked\n- Glass reworked\n- Justice removed\n\n(See bans and reworks tabs for details)",
+			k_blitz_description = "The balanced Multiplayer ruleset.\n\nIncludes Multiplayer jokers and balance changes\nwith full control over your lobby settings.\n\n(See bans and reworks tabs for details)",
+			k_experimental = "Experimental",
 			k_traditional = "Traditional",
 			k_traditional_description = "Multiplayer content without time pressure.\n\nIncludes Multiplayer jokers and balance changes,\nbut removes time-based mechanics for methodical play.\n\nTime-based jokers are banned.\nTimer is disabled.\n\n(See bans and reworks tabs for details)",
 			k_majorleague = "Major League",
-			k_majorleague_description = "Official Major League Balatro ruleset.\n\nVanilla cards with competitive settings:\n- 180 second timer\n- The Order disabled\n- First timeout forgiven\n- Attrition gamemode",
+			k_majorleague_description = "Official Major League Balatro ruleset.\n\nVanilla cards with competitive settings:\n- 180+60 second timer, but it is hidden above 180\n- No Enemy Locations\n- The Order disabled except for Vouchers, Bloodstone, and The Idol\n- Attrition gamemode",
 			k_minorleague = "Minor League",
 			k_minorleague_description = "Official Minor League Balatro ruleset.\n\nVanilla cards with competitive settings:\n- 210 second timer\n- The Order enabled\n- First timeout forgiven\n- Attrition gamemode",
-			k_ranked = "Ranked",
-			k_ranked_description = "The official competitive ruleset.\n\nStandard ruleset with locked settings:\n- Attrition gamemode\n- The Order enabled\n- Requires recommended Steamodded version",
+			k_wsob = "WSOB",
+			k_wsob_description = "World Series of Balatro ruleset.\n\nNear-vanilla card pool with minimal balance changes:\n- Hanging Chad, Bloodstone, and Glass reworked\n- Justice banned\n- No Multiplayer-original content\n\n(See bans and reworks tabs for details)",
+			k_standard_ranked = "Standard Ranked",
+			k_standard_ranked_description = "The official competitive ruleset.\n\nStandard ruleset with locked settings:\n- Attrition gamemode\n- The Order enabled\n- Requires recommended Steamodded version",
+			k_legacy_ranked = "Legacy Ranked",
+			k_legacy_ranked_description = "A minimal competitive ruleset.\n\nNo Multiplayer cards or balance changes\nexcept Glass. Has locked settings:\n- Attrition gamemode\n- The Order enabled\n- Requires recommended Steamodded version",
+			k_experimental_standard = "Experimental (Standard)",
+			k_experimental_description = "Standard's bleeding edge.\n\nHeavier balance changes being trialed\nfor a future Standard ruleset.\n\n(See bans and reworks tabs for details)",
+			k_experimental_legacy = "Experimental (Classic)",
+			k_experimental_legacy_description = "An opinionated take on Legacy Ranked.\n\nGlass nerfed, Hanging Chad reworked, Justice banned,\nLet's Go Gambling.",
 			k_badlatro = "Badlatro",
 			k_badlatro_description = "A weekly ruleset designed by @dr_monty_the_snek on the discord server\nthat has been added to the mod permanently.\n\nThis ruleset bans 48 jokers, consumables, tags, etc.",
 			k_attrition = "Attrition",
@@ -803,6 +1371,13 @@ return {
 			k_smallworld_description = "It's a small world after all.\n\n75% of jokers, consumables, vouchers, and tags\nare randomly banned each game.\n\nBanned items get replaced with what's available.\nDuplicates allowed.",
 			k_speedlatro = "Speedlatro",
 			k_speedlatro_description = "Up the pace with an uncomfortably fast 147 second timer between\neach PvP blind. Good luck using Vagabond",
+			k_chaos = "Chaos",
+			k_chaos_description = "Everything, everywhere, all at once.\n\nCombines Standard, Small World, Sandbox, and Speedlatro timer\ninto one ruleset. Good luck.",
+			k_release = "Release Ver.",
+			k_release_description = "Allan please add details",
+			k_mp_ruleset_tab_general = "General",
+			k_mp_ruleset_tab_tournaments = "Tournaments",
+			k_mp_ruleset_tab_experimental = "Experimental",
 			k_cost_up = "Cost Up",
 			k_destabilized = "Destabilized",
 			k_oops_ex = "Oops!",
@@ -810,6 +1385,7 @@ return {
 			k_amount_short = "Amt.",
 			k_filed_ex = "Filed!",
 			k_timer = "Timer",
+			k_nemesis_timer = "Nemesis",
 			k_mods_list = "Mods List",
 			k_enemy_jokers = "Enemy Jokers",
 			k_your_jokers = "Your Jokers",
@@ -837,12 +1413,20 @@ return {
 				"Enemy",
 				"location",
 			},
+			k_ghost_replays = "Match Replays",
+			k_no_ghost_replays = "No replays yet",
+			k_ghost = "Ghost",
 			k_hide_mp_content = "Hide Multiplayer content*",
 			k_applies_singleplayer_vanilla_rulesets = "*Applies in singleplayer and vanilla rulesets",
+            k_automatic_pvp_timer = "Automatic PvP timer",
+            k_automatic_pvp_timer_description = {
+                "Reactivate PvP timer when became available",
+                "(Must be activated manually first)"
+            },
 			k_timer_sfx = "Timer Sound Effects",
 			ml_mp_kofi_message = {
 				"This mod and game server is",
-				"developed and maintained by ",
+				"developed and maintained by",
 				"one person, if",
 				"you like it consider",
 			},
@@ -855,10 +1439,21 @@ return {
 				"Once per Ante",
 				"Off",
 			},
+			ml_mp_modifier_timer_opt = {
+				"Default",
+				"No Animations",
+				"Pressure",
+				"Pressure+",
+			},
+			k_sc_title = "SHORTCUTS",
+			k_sc_hint = "Press key or release TAB to close",
+			b_sc_choose_deck = "Choose Deck/Stake",
 			loc_ready = "Ready for PvP",
-			loc_selecting = "Selecting a Blind",
-			loc_shop = "Shopping",
-			loc_playing = "Playing ",
+			loc_selecting = "Selecting",
+			loc_shop = "Shopping before",
+			loc_playing = "Playing",
+            b_get_log_file = "Get Logs",
+            b_open_log_parser = "Log Parser",
 		},
 		v_dictionary = {
 			a_mp_art = {
@@ -884,6 +1479,7 @@ return {
 			k_reworked_objs = "Reworked #1#",
 			k_no_reworked_objs = "No Reworked #1#",
 			k_ruleset_disabled_smods_version = "SMODS Version #1# Required",
+			k_ruleset_disabled_lovely_version = "Lovely #1# Required",
 			k_failed_to_join_lobby = "Failed to join lobby: #1#",
 			k_ante_number = "Ante #1#",
 			k_ante_range = "Ante #1#-#2#", -- For example, "Ante 1-2"
@@ -933,6 +1529,27 @@ return {
 			ch_c_mp_polymorph_spam_EXTENDED2 = {
 				"where {C:attention}N{} is its current position in slots",
 			},
+			ch_c_mp_vantablack_CREDITS = {
+				"{C:inactive}(Art by {C:attention}aura!{C:inactive})",
+			},
+			ch_c_mp_indigo = {
+				"Played on {C:attention}Indigo Deck{}",
+			},
+			ch_c_mp_shop_planets = {
+				"{C:planet}Planet{} cards appear",
+			},
+			ch_c_mp_shop_planets_EXTENDED = {
+				"{C:attention}40X{} more frequently in the shop",
+			},
+			ch_c_mp_planet_tycoon_CREDITS = {
+				"{C:inactive}(Idea by {C:attention}BlockAttack{C:inactive})",
+			},
+			ch_c_mp_eeeee = {
+				"Some randomly selected RNG queues are {C:attention}bugged{} each Ante",
+			},
+			ch_c_mp_shared_pockets = {
+				"{C:attention}Hand size{}, {C:attention}Joker Slots{}, and {C:attention}Consumable Slots{} are shared",
+			},
 		},
 		challenge_names = {
 			c_mp_standard = "Standard",
@@ -959,6 +1576,11 @@ return {
 			c_mp_salvaged_sibyl = "Salvaged Sibyl",
 			c_mp_polymorph_spam = "Polymorph Spam",
 			c_mp_all_must_go = "All Must Go",
+			c_mp_vantablack = "Vantablack",
+			c_mp_planet_tycoon = "Planet Tycoon",
+			c_mp_bacon = "Blue Ice",
+			c_mp_eeeee = "EEEEE",
+			c_mp_shared_pockets = "Shared Pockets",
 		},
 	},
 }

@@ -14,7 +14,7 @@ SMODS.Joker({
 	rarity = 2,
 	cost = 6,
 	atlas = "satellite_sandbox",
-	config = { extra = { dollars = 1 }, mp_sticker_balanced = true },
+	config = { extra = { dollars = 1 }, mp_balanced = true },
 	loc_vars = function(self, info_queue, card)
 		return { vars = { card.ability.extra.dollars } }
 	end,
@@ -42,6 +42,7 @@ SMODS.Joker({
 	calc_dollar_bonus = function(self, card)
 		return card.ability.extra.dollars > 0 and card.ability.extra.dollars or nil
 	end,
+	mp_credits = { code = { "steph" } },
 	mp_include = function(self)
 		return MP.SANDBOX.is_joker_allowed(self.key)
 	end,

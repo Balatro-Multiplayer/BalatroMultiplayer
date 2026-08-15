@@ -140,7 +140,7 @@ return {
 					"{C:attention}#1#{} veces adicionales",
 				},
 			},
-			j_mp_hanging_chad_standard = {
+			j_mp_hanging_chad = {
 				name = "Papel perforado",
 				text = {
 					"Reactiva la {C:attention}primera{} y {C:attention}segunda{}",
@@ -353,7 +353,7 @@ return {
 					"{C:inactive}(Actualmente {C:money}$#1#{C:inactive})",
 				},
 			},
-			j_mp_idol_sandbox_bw = {
+			j_mp_idol_sandbox_zealot = {
 				name = "Ídolo fanático",
 				text = {
 					"Cada {C:attention}#1#{} jugada",
@@ -362,16 +362,7 @@ return {
 					"{s:0.8}La carta cambia cada ronda",
 				},
 			},
-			j_mp_idol_sandbox_color = {
-				name = "Ídolo berrinche",
-				text = {
-					"OLLA DE PRESIÓN DEVOCIONAL",
-					"acumulando VAPOR para {C:attention}#1#{} de {V:1}#3#{}",
-					"hasta una LIBERACIÓN EXPLOSIVA!!!!",
-					"{C:inactive}(Actualmente {X:mult,C:white} X#2# {C:inactive} multi)",
-				},
-			},
-			j_mp_idol_sandbox_fantom = {
+			j_mp_idol_sandbox_collector = {
 				name = "Ídolo meta",
 				text = {
 					"La carta más común da",
@@ -413,16 +404,6 @@ return {
 				text = {
 					"{C:attention}Eterno{} y {C:dark_edition}negativo{}",
 					"Creado y destruido por tu {X:purple,C:white}némesis{}",
-				},
-			},
-		},
-		Enhanced = {
-			m_mp_glass = {
-				name = "Carta de vidrio",
-				text = {
-					"{X:mult,C:white} X#1# {} multi",
-					"{C:green}#2# en #3#{} probabilidades",
-					"de destruir la carta",
 				},
 			},
 		},
@@ -581,7 +562,7 @@ return {
 			},
 		},
 		Spectral = {
-			c_mp_ouija_sandbox = {
+			c_mp_ouija_standard = {
 				name = "Ouija",
 				text = {
 					"Destruye {C:attention}#1#{} cartas al azar,",
@@ -860,7 +841,7 @@ return {
 			},
 			ml_mp_kofi_message = {
 				"Este mod y sus servidores son",
-				"desarrollados y mantenidos por ",
+				"desarrollados y mantenidos por",
 				"una sola persona, si te gusta",
 				"puedes considerar",
 			},

@@ -1,7 +1,7 @@
 -- small file because it feels wrong to add it somewhere else
 
 function MP.should_hide_mp_content()
-	if (not MP.LOBBY.code) or not MP.Rulesets[MP.LOBBY.config.ruleset].multiplayer_content then -- check for vanilla context
+	if (not MP.LOBBY.code) or not MP.current_ruleset().multiplayer_content then -- check for vanilla context
 		if SMODS.Mods["Multiplayer"].config.hide_mp_content then return true end
 	end
 	return false
@@ -18,8 +18,8 @@ function SMODS.injectItems()
 			if not v.mod or v.mod.id ~= "Multiplayer" then table.insert(G.P_CENTER_POOLS[hidden .. "_non_mp"], v) end
 		end
 	end
+	G.CHALLENGES_non_mp = {}
 	for i, v in ipairs(G.CHALLENGES) do
-		G.CHALLENGES_non_mp = {}
 		if not v.mod or v.mod.id ~= "Multiplayer" then table.insert(G.CHALLENGES_non_mp, v) end
 	end
 	return ret

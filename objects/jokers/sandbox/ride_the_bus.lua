@@ -16,7 +16,7 @@ SMODS.Joker({
 	rarity = 1,
 	cost = 6,
 	atlas = "ride_the_bus_sandbox",
-	config = { extra = { mult_gain = 1, mult = 0, max_gain = 5 }, mp_sticker_balanced = true },
+	config = { extra = { mult_gain = 1, mult = 0, max_gain = 5 }, mp_balanced = true },
 	loc_vars = function(self, info_queue, card)
 		return { vars = { card.ability.extra.mult } }
 	end,
@@ -63,6 +63,7 @@ SMODS.Joker({
 			mult = card.ability.extra.mult,
 		} end
 	end,
+	mp_credits = { code = { "steph" } },
 	mp_include = function(self)
 		return MP.SANDBOX.is_joker_allowed(self.key)
 	end,

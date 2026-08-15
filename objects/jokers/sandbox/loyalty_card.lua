@@ -15,7 +15,7 @@ SMODS.Joker({
 	rarity = 2,
 	cost = 5,
 	atlas = "loyalty_card_sandbox",
-	config = { extra = { Xmult = 6, every = 4, loyalty_remaining = 4, poker_hand = "???" }, mp_sticker_balanced = true },
+	config = { extra = { Xmult = 6, every = 4, loyalty_remaining = 4, poker_hand = "???" }, mp_balanced = true },
 	loc_vars = function(self, info_queue, card)
 		return {
 			vars = {
@@ -65,6 +65,7 @@ SMODS.Joker({
 			end
 		end
 	end,
+	mp_credits = { code = { "steph" } },
 	mp_include = function(self)
 		return MP.SANDBOX.is_joker_allowed(self.key)
 	end,

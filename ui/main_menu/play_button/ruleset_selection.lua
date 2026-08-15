@@ -1,55 +1,152 @@
-function G.UIDEF.ruleset_selection_options(mode)
+local rulesets_tabs = {
+	default = {
+		{
+			name = "k_mp_ruleset_tab_general",
+			data = {
+				{
+					name = "k_matchmaking",
+					buttons = {
+						{ button_id = "standard_ranked_ruleset_button", button_localize_key = "k_standard_ranked" },
+						{ button_id = "legacy_ranked_ruleset_button", button_localize_key = "k_legacy_ranked" },
+						{ button_id = "smallworld_ruleset_button", button_localize_key = "k_smallworld" },
+						{ button_id = "sandbox_ruleset_button", button_localize_key = "k_sandbox" },
+					},
+				},
+				{
+					name = "k_custom",
+					buttons = {
+						{ button_id = "blitz_ruleset_button", button_localize_key = "k_blitz" },
+						{ button_id = "traditional_ruleset_button", button_localize_key = "k_traditional" },
+						{ button_id = "vanilla_ruleset_button", button_localize_key = "k_vanilla" },
+					},
+				},
+			},
+		},
+		{
+			name = "k_mp_ruleset_tab_tournaments",
+			data = {
+				{
+					name = "k_tournament",
+					buttons = {
+						{ button_id = "majorleague_ruleset_button", button_localize_key = "k_majorleague" },
+						{ button_id = "minorleague_ruleset_button", button_localize_key = "k_minorleague" },
+						{ button_id = "wsob_ruleset_button", button_localize_key = "k_wsob" },
+					},
+				},
+				{
+					name = "k_custom",
+					buttons = {
+						{ button_id = "speedlatro_ruleset_button", button_localize_key = "k_speedlatro" },
+						{ button_id = "badlatro_ruleset_button", button_localize_key = "k_badlatro" },
+						{ button_id = "chaos_ruleset_button", button_localize_key = "k_chaos" },
+					},
+				},
+			},
+		},
+		{
+			name = "k_mp_ruleset_tab_experimental",
+			data = {
+				{
+					name = "k_experimental",
+					buttons = {
+						{ button_id = "experimental_ruleset_button", button_localize_key = "k_experimental_standard" },
+						{ button_id = "experimental_legacy_ruleset_button", button_localize_key = "k_experimental_legacy" },
+					},
+				},
+			},
+		},
+	},
+}
+
+function G.UIDEF.ruleset_selection_tabs(mode, chosen_label)
+	local tabs_schema = rulesets_tabs[mode] or rulesets_tabs.default
+	local tabs = {}
+	for _, item in ipairs(tabs_schema) do
+		table.insert(tabs, {
+			label = localize(item.name),
+			tab_definition_function = function()
+				return G.UIDEF.ruleset_selection_options(mode, item.data)
+			end,
+		})
+	end
+	-- Bespoke custom-ruleset editor tab (raw strings, no loc keys yet).
+	if MP.UI.build_custom_ruleset_editor then
+		table.insert(tabs, {
+			label = "Custom",
+			tab_definition_function = function()
+				return MP.UI.build_custom_ruleset_editor(mode)
+			end,
+		})
+	end
+	-- Open on a specific tab when asked (e.g. returning from the ban picker),
+	-- otherwise default to the first.
+	local chose = false
+	if chosen_label then
+		for _, tab in ipairs(tabs) do
+			tab.chosen = tab.label == chosen_label
+			if tab.chosen then chose = true end
+		end
+	end
+	if not chose then tabs[1].chosen = true end
+	local t = create_UIBox_generic_options({
+		back_func = "play_options",
+		contents = {
+			{
+				n = G.UIT.R,
+				config = { align = "cm", padding = 0 },
+				nodes = {
+					create_tabs({
+						tabs = tabs,
+						colour = G.C.BOOSTER,
+					}),
+				},
+			},
+		},
+	})
+	return t
+end
+
+-- sp/practice selections stay local on MP.SP.ruleset; mp writes the shared
+-- MP.LOBBY.config.ruleset. Every writer routes through here so practice can't
+-- touch the MP global.
+local function set_selected_ruleset(mode, ruleset_key)
+	if mode == "sp" or mode == "practice" then
+		MP.SP.ruleset = ruleset_key
+	else
+		MP.LOBBY.config.ruleset = ruleset_key
+	end
+end
+
+function G.UIDEF.ruleset_selection_options(mode, buttons)
 	mode = mode or "mp"
 	MP.LOBBY.fetched_weekly = "smallworld" -- temp
 
-	-- SP defaults to vanilla, MP defaults to ranked
-	local default_ruleset = "ranked"
-	local default_button = default_ruleset .. "_ruleset_button"
-	local ruleset_name = "ruleset_mp_" .. default_ruleset
+	-- If ghost is active, preserve the replay's ruleset instead of resetting to default
+	local default_ruleset
+	if mode == "practice" and MP.GHOST.is_active() and MP.SP.ruleset then
+		default_ruleset = MP.SP.ruleset:gsub("^ruleset_mp_", "")
+	else
+		default_ruleset = string.match(buttons[1].buttons[1].button_id, "(.+)_ruleset_button$")
+	end
+
+	set_selected_ruleset(mode, "ruleset_mp_" .. default_ruleset)
+
+	-- Modifiers are per-ruleset; reset on (re)entry to a tab so a previous
+	-- ruleset's toggles can't bleed into the new one. Rulesets with
+	-- `default_modifiers` get those pre-checked.
+	-- i'm not a huge fan of any of this living here but
+	-- here we are
+	MP.apply_default_modifiers(default_ruleset)
 
 	MP.LoadReworks(default_ruleset)
+	MP.UI.ruleset_selection_mode = mode
+	MP.UI.ruleset_selection_default_button = default_ruleset .. "_ruleset_button"
 
 	local default_ruleset_area = UIBox({
 		definition = G.UIDEF.ruleset_info(default_ruleset, mode),
 		config = { align = "cm" },
 	})
-
-	local ruleset_buttons_data = {
-		{
-			name = "k_matchmaking",
-			buttons = {
-				{ button_id = "ranked_ruleset_button", button_localize_key = "k_ranked" },
-				{ button_id = "vanilla_ruleset_button", button_localize_key = "k_vanilla" },
-				{ button_id = "smallworld_ruleset_button", button_localize_key = "k_smallworld" },
-				{ button_id = "sandbox_ruleset_button", button_localize_key = "k_sandbox" },
-			},
-		},
-		{
-			name = "k_custom",
-			buttons = {
-				{ button_id = "blitz_ruleset_button", button_localize_key = "k_blitz" },
-				{ button_id = "traditional_ruleset_button", button_localize_key = "k_traditional" },
-				{ button_id = "badlatro_ruleset_button", button_localize_key = "k_badlatro" },
-			},
-		},
-		{
-			name = "k_tournament",
-			buttons = {
-				{ button_id = "majorleague_ruleset_button", button_localize_key = "k_majorleague" },
-				{ button_id = "minorleague_ruleset_button", button_localize_key = "k_minorleague" },
-			},
-		},
-	}
-
-	MP.UI.ruleset_selection_mode = mode
-
-	return MP.UI.Main_Lobby_Options(
-		"ruleset_area",
-		default_ruleset_area,
-		"change_ruleset_selection",
-		ruleset_buttons_data,
-		default_button
-	)
+	return MP.UI.Main_Lobby_Options("ruleset_area", default_ruleset_area, "change_ruleset_selection", buttons)
 end
 
 function G.FUNCS.change_ruleset_selection(e)
@@ -59,7 +156,9 @@ function G.FUNCS.change_ruleset_selection(e)
 		if G.FUNCS.weekly_interrupt(e) then return end
 	end
 
-	local default_button = mode == "sp" and "vanilla_ruleset_button" or "ranked_ruleset_button"
+	-- this currently doesn't work properly
+	-- local default_button = mode == "sp" and "vanilla_ruleset_button" or "standard_ranked_ruleset_button"
+	local default_button = MP.UI.ruleset_selection_default_button or "standard_ranked_ruleset_button"
 
 	MP.UI.Change_Main_Lobby_Options(
 		e,
@@ -69,11 +168,8 @@ function G.FUNCS.change_ruleset_selection(e)
 		end,
 		default_button,
 		function(ruleset_name)
-			if mode == "sp" then
-				MP.SP.ruleset = "ruleset_mp_" .. ruleset_name
-			else
-				MP.LOBBY.config.ruleset = "ruleset_mp_" .. ruleset_name
-			end
+			set_selected_ruleset(mode, "ruleset_mp_" .. ruleset_name)
+			MP.apply_default_modifiers(ruleset_name)
 			MP.LoadReworks(ruleset_name)
 		end
 	)
@@ -90,25 +186,17 @@ function G.UIDEF.ruleset_info(ruleset_name, mode)
 		config = { align = "cm" },
 	})
 
-	local ruleset_disabled = ruleset.is_disabled()
+	local content_nodes = {
+		{
+			n = G.UIT.R,
+			config = { align = "cm" },
+			nodes = {
+				{ n = G.UIT.O, config = { object = ruleset_info_banned_rework_tabs } },
+			},
+		},
+	}
 
-	-- Different button config for SP vs MP
-	local button_config
-	if mode == "sp" then
-		button_config = {
-			id = "start_sp_button",
-			button = "start_sp_run",
-			label = { localize("b_play_cap") },
-			colour = G.C.GREEN,
-		}
-	else
-		button_config = {
-			id = "select_gamemode_button",
-			button = ruleset.forced_gamemode and "force_" .. ruleset.forced_gamemode or "select_gamemode",
-			label = { ruleset.forced_gamemode and localize("b_create_lobby") or localize("b_next") },
-			colour = G.C.BLUE,
-		}
-	end
+	content_nodes[#content_nodes + 1] = MP.UI.build_action_row(ruleset, mode)
 
 	return {
 		n = G.UIT.ROOT,
@@ -117,38 +205,7 @@ function G.UIDEF.ruleset_info(ruleset_name, mode)
 			{
 				n = G.UIT.C,
 				config = { align = "tm", padding = 0.2, r = 0.1, colour = G.C.BLACK },
-				nodes = {
-					{
-						n = G.UIT.R,
-						config = { align = "cm" },
-						nodes = {
-							{ n = G.UIT.O, config = { object = ruleset_info_banned_rework_tabs } },
-						},
-					},
-					{
-						n = G.UIT.R,
-						config = { align = "cm" },
-						nodes = {
-							MP.UI.Disableable_Button({
-								id = button_config.id,
-								button = button_config.button,
-								align = "cm",
-								padding = 0.05,
-								r = 0.1,
-								minw = 8,
-								minh = 0.8,
-								colour = button_config.colour,
-								hover = true,
-								shadow = true,
-								label = button_config.label,
-								scale = 0.5,
-								enabled_ref_table = { val = not ruleset_disabled },
-								enabled_ref_value = "val",
-								disabled_text = { ruleset_disabled },
-							}),
-						},
-					},
-				},
+				nodes = content_nodes,
 			},
 		},
 	}
@@ -206,23 +263,23 @@ function G.FUNCS.ruleset_switch_tabs(args)
 	local active_tab = tabs_wrap.UIBox:get_UIE_by_ID("ruleset_active_tab")
 	local active_tab_idx = active_tab and active_tab.config.tab_idx or 1
 
+	local mode = MP.UI.ruleset_selection_mode or "mp"
 	local tab_type = (args.to_key == 2 and "banned") or (args.to_key == 3 and "rework") or "info"
 	local def = nil
+
+	set_selected_ruleset(mode, callback_args.ruleset.key)
 
 	if tab_type == "banned" then
 		def = G.UIDEF.lobby_setup_tabs_definition(callback_args.ruleset, "banned", active_tab_idx, true)
 		tabs_object.config.tab_type = "banned"
-		MP.LOBBY.config.ruleset = callback_args.ruleset.key
 		MP.LOBBY.ruleset_preview = false
 	elseif tab_type == "rework" then
 		def = G.UIDEF.lobby_setup_tabs_definition(callback_args.ruleset, "rework", active_tab_idx, true)
 		tabs_object.config.tab_type = "rework"
-		MP.LOBBY.config.ruleset = callback_args.ruleset.key
 		MP.LOBBY.ruleset_preview = true
 	else
 		def = G.UIDEF.lobby_setup_tabs_definition(callback_args.ruleset, "info", active_tab_idx, true)
 		tabs_object.config.tab_type = "info"
-		MP.LOBBY.config.ruleset = callback_args.ruleset.key
 		MP.LOBBY.ruleset_preview = false
 	end
 
@@ -238,25 +295,12 @@ end
 local function create_bans_and_reworks_tabs(ruleset_or_gamemode, is_banned_tab, chosen_tab_idx)
 	local banned_cards_tabs = {}
 
-	local function copy_all_banned_ids(global_bans, ruleset_bans, gamemode_bans)
+	local function merge_lists(lists)
 		local seen = {}
 		local ret = {}
-		for v, _ in pairs(global_bans) do
-			if not seen[v] then
-				seen[v] = true
-				ret[#ret + 1] = v
-			end
-		end
-		if ruleset_bans then
-			for _, v in ipairs(ruleset_bans) do
-				if not seen[v] then
-					seen[v] = true
-					table.insert(ret, v)
-				end
-			end
-		end
-		if gamemode_bans then
-			for _, v in ipairs(gamemode_bans) do
+		for _, tbl in pairs(lists) do
+			tbl = tbl or {}
+			for _, v in ipairs(tbl) do
 				if not seen[v] then
 					seen[v] = true
 					table.insert(ret, v)
@@ -266,100 +310,53 @@ local function create_bans_and_reworks_tabs(ruleset_or_gamemode, is_banned_tab, 
 		return ret
 	end
 
-	local function merge_lists(list1, list2)
-		local seen = {}
-		local ret = {}
-		if list1 then
-			for _, v in ipairs(list1) do
-				if not seen[v] then
-					seen[v] = true
-					table.insert(ret, v)
-				end
-			end
-		end
-		if list2 then
-			for _, v in ipairs(list2) do
-				if not seen[v] then
-					seen[v] = true
-					table.insert(ret, v)
-				end
-			end
-		end
-		return ret
-	end
-
-	local forced_gamemode = nil
+	local forced_gamemode = {}
 	if ruleset_or_gamemode.forced_gamemode then forced_gamemode = MP.Gamemodes[ruleset_or_gamemode.forced_gamemode] end
 
-	for k, v in ipairs({
-		{
-			type = localize("b_jokers"),
-			obj_ids = is_banned_tab
-					and copy_all_banned_ids(
-						MP.DECK.BANNED_JOKERS,
-						ruleset_or_gamemode.banned_jokers,
-						forced_gamemode and forced_gamemode.banned_jokers
-					)
-				or merge_lists(ruleset_or_gamemode.reworked_jokers, forced_gamemode and forced_gamemode.reworked_jokers),
-		},
-		{
-			type = localize("b_stat_consumables"),
-			obj_ids = is_banned_tab and copy_all_banned_ids(
-				MP.DECK.BANNED_CONSUMABLES,
-				ruleset_or_gamemode.banned_consumables,
-				forced_gamemode and forced_gamemode.banned_consumables
-			) or merge_lists(
-				ruleset_or_gamemode.reworked_consumables,
-				forced_gamemode and forced_gamemode.reworked_consumables
-			),
-		},
-		{
-			type = localize("b_vouchers"),
-			obj_ids = is_banned_tab and copy_all_banned_ids(
-				MP.DECK.BANNED_VOUCHERS,
-				ruleset_or_gamemode.banned_vouchers,
-				forced_gamemode and forced_gamemode.banned_vouchers
-			) or merge_lists(
-				ruleset_or_gamemode.reworked_vouchers,
-				forced_gamemode and forced_gamemode.reworked_vouchers
-			),
-		},
-		{
-			type = localize("b_enhanced_cards"),
-			obj_ids = is_banned_tab and copy_all_banned_ids(
-				MP.DECK.BANNED_ENHANCEMENTS,
-				ruleset_or_gamemode.banned_enhancements,
-				forced_gamemode and forced_gamemode.banned_enhancements
-			) or merge_lists(
-				ruleset_or_gamemode.reworked_enhancements,
-				forced_gamemode and forced_gamemode.reworked_enhancements
-			),
-		},
-		{
-			type = localize("k_other"),
-			obj_ids = is_banned_tab and {
-				tags = copy_all_banned_ids(
-					MP.DECK.BANNED_TAGS,
-					ruleset_or_gamemode.banned_tags,
-					forced_gamemode and forced_gamemode.banned_tags
-				),
-				blinds = copy_all_banned_ids(
-					MP.DECK.BANNED_BLINDS,
-					ruleset_or_gamemode.banned_blinds,
-					forced_gamemode and forced_gamemode.banned_blinds
-				),
-			} or {
-				tags = merge_lists(
-					ruleset_or_gamemode.reworked_tags or {},
-					forced_gamemode and forced_gamemode.reworked_tags
-				),
-				blinds = merge_lists(
-					ruleset_or_gamemode.reworked_blinds or {},
-					forced_gamemode and forced_gamemode.reworked_blinds
-				),
-			},
-		},
-	}) do
+	local tabs = {}
+	local loc_keys = {
+		jokers = "b_jokers",
+		consumables = "b_stat_consumables",
+		vouchers = "b_vouchers",
+		enhancements = "b_enhanced_cards",
+		other = "k_other",
+	}
+	local function copy_list(key)
+		local lists
+		if is_banned_tab then
+			lists = {
+				MP.DECK["BANNED_" .. string.upper(key)],
+				ruleset_or_gamemode["banned_" .. key],
+				forced_gamemode["banned_" .. key],
+			}
+			for _, mod_name in ipairs(MP.MODIFIERS) do
+				local layer = MP.Layers[mod_name]
+				if layer then lists[#lists + 1] = layer["banned_" .. key] end
+			end
+		else
+			lists = { ruleset_or_gamemode["reworked_" .. key], forced_gamemode["reworked_" .. key] }
+			for _, mod_name in ipairs(MP.MODIFIERS) do
+				local layer = MP.Layers[mod_name]
+				if layer then lists[#lists + 1] = layer["reworked_" .. key] end
+			end
+		end
+		return merge_lists(lists)
+	end
+	for _, v in ipairs({ "jokers", "consumables", "vouchers", "enhancements", "other" }) do
+		local entry = { type = localize(loc_keys[v]) }
+		if v ~= "other" then
+			entry.obj_ids = copy_list(v)
+		else
+			entry.obj_ids = {
+				blinds = copy_list("blinds"),
+				tags = copy_list("tags"),
+			}
+		end
+
+		tabs[#tabs + 1] = entry
+	end
+
+	for k, v in ipairs(tabs) do
 		v.idx = k
 		v.is_banned_tab = is_banned_tab
 		local tab_def = {
@@ -402,7 +399,7 @@ function G.UIDEF.lobby_setup_tabs_definition(ruleset_or_gamemode, tab_type, chos
 			{
 				n = G.UIT.C,
 				config = { align = "tm", padding = 0.2, r = 0.1, minw = 10.7, maxw = 10.7, minh = 5.75, maxh = 5.75 },
-				nodes = ruleset_or_gamemode.create_info_menu(),
+				nodes = ruleset_or_gamemode:create_info_menu(),
 			},
 		},
 	}
@@ -620,4 +617,107 @@ function G.UIDEF.ruleset_cardarea_definition(args)
 			},
 		}
 	end
+end
+
+function MP.UI.build_modifier_button(ruleset, mode)
+	if ruleset.forced_lobby_options then return nil end
+	if type(ruleset.get_modifiers_ui) == "function" then return ruleset:get_modifiers_ui(mode) end
+	return MP.UI.Disableable_Button({
+		button = "mp_open_modifiers_overlay",
+		align = "cm",
+		padding = 0.05,
+		r = 0.1,
+		minw = 3.5,
+		minh = 0.8,
+		colour = G.C.ORANGE,
+		hover = true,
+		shadow = true,
+		label = { "Modifiers..." },
+		scale = 0.4,
+		enabled_ref_table = { val = true },
+		enabled_ref_value = "val",
+		ref_table = {
+			ruleset = ruleset,
+			mode = mode,
+		},
+	})
+end
+
+function MP.UI.get_continue_button(ruleset, mode)
+	local ruleset_disabled = ruleset.is_disabled()
+	local button_config
+	if mode == "sp" then
+		button_config = {
+			id = "start_sp_button",
+			button = "start_sp_run",
+			label = { localize("b_play_cap") },
+			colour = G.C.GREEN,
+		}
+	elseif mode == "practice" then
+		button_config = {
+			id = "start_practice_button",
+			button = "start_practice_run",
+			label = { localize("b_play_cap") },
+			colour = G.C.GREEN,
+		}
+	else
+		button_config = {
+			id = "select_gamemode_button",
+			button = ruleset.forced_gamemode and "force_" .. ruleset.forced_gamemode or "select_gamemode",
+			label = { ruleset.forced_gamemode and localize("b_create_lobby") or localize("b_next") },
+			colour = G.C.BLUE,
+		}
+	end
+	return MP.UI.Disableable_Button({
+		id = button_config.id,
+		button = button_config.button,
+		align = "cm",
+		padding = 0.05,
+		r = 0.1,
+		minw = 5,
+		minh = 0.8,
+		colour = button_config.colour,
+		hover = true,
+		shadow = true,
+		label = button_config.label,
+		scale = 0.5,
+		enabled_ref_table = { val = not ruleset_disabled },
+		enabled_ref_value = "val",
+		disabled_text = { ruleset_disabled },
+	})
+end
+
+function MP.UI.build_practice_options_button()
+	return UIBox_button({
+		id = "practice_options_button",
+		button = "mp_open_practice_options_overlay",
+		label = { localize("k_practice_options") },
+		minw = 3.5,
+		minh = 0.8,
+		scale = 0.4,
+		colour = G.C.ORANGE,
+		hover = true,
+		shadow = true,
+	})
+end
+
+function MP.UI.build_action_row(ruleset, mode)
+	local columns = {}
+	local function add_col(button)
+		columns[#columns + 1] = {
+			n = G.UIT.C,
+			config = { align = "cm", padding = 0.05 },
+			nodes = { button },
+		}
+	end
+	if mode == "practice" then
+		-- In practice, the Modifiers button is folded into Practice Options to
+		-- keep the action row to two buttons regardless of ruleset.
+		add_col(MP.UI.build_practice_options_button())
+	elseif mode == "mp" then
+		local modifier_btn = MP.UI.build_modifier_button(ruleset, mode)
+		if modifier_btn then add_col(modifier_btn) end
+	end
+	add_col(MP.UI.get_continue_button(ruleset, mode))
+	return { n = G.UIT.R, config = { align = "cm" }, nodes = columns }
 end

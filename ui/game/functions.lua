@@ -15,14 +15,24 @@ function G.FUNCS.mp_toggle_ready(e)
 	sendTraceMessage("Toggling Ready", "MULTIPLAYER")
 	MP.GAME.ready_blind = not MP.GAME.ready_blind
 	MP.GAME.ready_blind_text = MP.GAME.ready_blind and localize("b_unready") or localize("b_ready")
+	MP.RLOG.record("ready_blind", MP.GAME.ready_blind and 1 or 0)
+
+    MP.GAME.pvp_reached = true
 
 	if MP.GAME.ready_blind then
 		MP.ACTIONS.set_location("loc_ready")
 		MP.ACTIONS.ready_blind(e)
 	else
 		MP.ACTIONS.set_location("loc_selecting")
+		MP.ACTIONS.pause_ante_timer()
 		MP.ACTIONS.unready_blind()
 	end
+end
+
+local old_skip_blind = G.FUNCS.skip_blind
+function G.FUNCS.skip_blind(...)
+	old_skip_blind(...)
+	MP.ACTIONS.update_location()
 end
 
 local can_play_ref = G.FUNCS.can_play
@@ -50,12 +60,22 @@ function G.FUNCS.select_blind(e)
 	MP.GAME.end_pvp = false
 	MP.GAME.prevent_eval = false
 	select_blind_ref(e)
-	if MP.LOBBY.code then
+	if MP.is_mp_or_ghost() then
 		MP.GAME.ante_key = tostring(math.random())
-		MP.ACTIONS.play_hand(0, G.GAME.round_resets.hands)
-		MP.ACTIONS.new_round()
-		MP.ACTIONS.set_location("loc_playing-" .. (e.config.ref_table.key or e.config.ref_table.name))
-		if MP.UI.hide_enemy_location then MP.UI.hide_enemy_location() end
+		if not MP.GHOST.is_active() then
+			-- Carbon: log the freshly-rolled (non-deterministic) ante_key first so
+			-- a replay can restore it, then the blind selection itself.
+			MP.RLOG.record("set_ante_key", MP.GAME.ante_key)
+			MP.RLOG.record(
+				"select_blind",
+				0,
+				string.format("action:selectBlind,blind:%s", tostring(e.config.ref_table.key or e.config.ref_table.name))
+			)
+			MP.ACTIONS.play_hand(0, G.GAME.round_resets.hands)
+			MP.ACTIONS.new_round()
+			MP.ACTIONS.set_location("loc_playing", (e.config.ref_table.key or e.config.ref_table.name))
+			if MP.UI.hide_enemy_location then MP.UI.hide_enemy_location() end
+		end
 	end
 end
 
@@ -63,8 +83,11 @@ local skip_blind_ref = G.FUNCS.skip_blind
 G.FUNCS.skip_blind = function(e)
 	skip_blind_ref(e)
 	if MP.LOBBY.code then
-		if not MP.GAME.timer_started then MP.GAME.timer = MP.GAME.timer + MP.LOBBY.config.timer_increment_seconds end
+        MP.GAME.skips_before_pvp = (MP.GAME.skips_before_pvp or 0) + 1
+        MP.UI.update_matching_skip_timer(false)
+
 		MP.ACTIONS.skip(G.GAME.skips)
+		MP.RLOG.record("skip_blind", 0, "action:skipBlind")
 
 		--Update the furthest blind
 		local temp_furthest_blind = 0
@@ -310,9 +333,10 @@ function G.FUNCS.overlay_endgame_menu()
 	}))
 end
 
-function MP.UI.ease_lives(mod)
+function MP.UI.ease_lives(mod, instant)
 	G.E_MANAGER:add_event(Event({
 		trigger = "immediate",
+        blockable = not instant,
 		func = function()
 			if not G.hand_text_area then return end
 
@@ -321,7 +345,7 @@ function MP.UI.ease_lives(mod)
 			end
 
 			local lives_UI = G.hand_text_area.ante
-			if not lives_UI then return true end
+			if not lives_UI or not lives_UI.config.object then return true end
 
 			mod = mod or 0
 			local text = "+"
@@ -367,6 +391,9 @@ function MP.UI.show_asteroid_hand_level_up()
 
 	for k, v in pairs(G.GAME.hands) do
 		if SMODS.is_poker_hand_visible(k) then
+			if hand_priority[k] == nil then
+				hand_priority[k] = 0 -- Safeguard for modded hands
+			end
 			if
 				to_big(v.level) > to_big(max_level)
 				or (to_big(v.level) == to_big(max_level) and hand_priority[k] < hand_priority[hand_type])
@@ -376,17 +403,50 @@ function MP.UI.show_asteroid_hand_level_up()
 			end
 		end
 	end
-	update_hand_text({ sound = "button", volume = 0.7, pitch = 0.8, delay = 0.3 }, {
-		handname = localize(hand_type, "poker_hands"),
-		chips = G.GAME.hands[hand_type].chips,
-		mult = G.GAME.hands[hand_type].mult,
-		level = G.GAME.hands[hand_type].level,
-	})
-	level_up_hand(nil, hand_type, false, -1)
-	update_hand_text(
-		{ sound = "button", volume = 0.7, pitch = 1.1, delay = 0 },
-		{ mult = 0, chips = 0, handname = "", level = "" }
-	)
+    if to_big(max_level) >= to_big(1) then
+        SMODS.upgrade_poker_hands({ hands = hand_type, level_up = -1 })
+    end
+end
+
+function G.FUNCS.mp_open_log_parser(e)
+    love.system.openURL("https://balatromp.com/log-parser")
+end
+
+function G.FUNCS.mp_get_lovely_log_file(e)
+    local file_path = require("lovely").log_path
+    local os_name = love.system.getOS()
+
+    local function shellQuote(s)
+        return "'" .. tostring(s):gsub("'", "'\\''") .. "'"
+    end
+
+    local function fileUri(path)
+        path = path:gsub("\\", "/")
+        return "file://" .. path:gsub("([^A-Za-z0-9%-%._~/%:/])", function(c)
+            return string.format("%%%02X", c:byte())
+        end)
+    end
+
+    local ok
+    if os_name == "Windows" then
+        ok = os.execute('explorer.exe /select,"' .. file_path:gsub("/", "\\") .. '"')
+    elseif os_name == "OS X" then
+        os.execute("open -R " .. shellQuote(file_path))
+    elseif os_name == "Linux" then
+        local cmd =
+            "dbus-send --session " ..
+            "--dest=org.freedesktop.FileManager1 " ..
+            "--type=method_call " ..
+            "/org/freedesktop/FileManager1 " ..
+            "org.freedesktop.FileManager1.ShowItems " ..
+            "array:string:" .. shellQuote(fileUri(file_path)) .. " string:''"
+
+        ok = os.execute(cmd)
+    end
+    if not ok then
+        local parent_dir = file_path:match("^(.*)[/\\][^/\\]*$") or "."
+        love.system.openURL(fileUri(parent_dir))
+    end
 end
 
 --[[

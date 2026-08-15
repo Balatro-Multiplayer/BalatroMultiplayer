@@ -66,19 +66,19 @@ function MP.UI.Main_Lobby_Options(info_area_id, default_info_area, button_func, 
 		categories[#categories + 1] = MP.UI.BackgroundGrouping(localize(category.name), buttons)
 	end
 
-	return create_UIBox_generic_options({
-		back_func = "play_options",
-		contents = {
-			{ n = G.UIT.C, config = { align = "tm", minh = 8, minw = 4, padding = 0.1 }, nodes = categories },
-			{
-				n = G.UIT.C,
-				config = { align = "cm", minh = 8, maxh = 8, minw = 11 },
-				nodes = {
-					{ n = G.UIT.O, config = { id = info_area_id, object = default_info_area } },
-				},
-			},
-		},
-	})
+	return  {
+        n = G.UIT.ROOT, config = { colour = G.C.CLEAR },
+        nodes = {
+            { n = G.UIT.C, config = { align = "tm", minh = 8, minw = 4, padding = 0.1 }, nodes = categories },
+            {
+                n = G.UIT.C,
+                config = { align = "cm", minh = 8, maxh = 8, minw = 11 },
+                nodes = {
+                    { n = G.UIT.O, config = { id = info_area_id, object = default_info_area } },
+                },
+            },
+        }
+    }
 end
 
 function MP.UI.Change_Main_Lobby_Options(e, info_area_id, info_area_func, default_button_id, update_lobby_config_func)
@@ -96,7 +96,7 @@ function MP.UI.Change_Main_Lobby_Options(e, info_area_id, info_area_func, defaul
 	end
 	e.config.chosen = "vert" -- Special setting to show 'chosen' indicator on the side
 
-	local info_obj_name = string.match(e.config.id, "([^_]+)")
+	local info_obj_name = string.match(e.config.id, "(.+)_%w+_button")
 	update_lobby_config_func(info_obj_name)
 
 	if info_area.config.object then info_area.config.object:remove() end

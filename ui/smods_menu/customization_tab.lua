@@ -214,4 +214,3 @@ function MP.UI.create_extra_tabs()
 		},
 	}
 end
-

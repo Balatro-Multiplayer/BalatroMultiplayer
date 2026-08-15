@@ -14,7 +14,7 @@ SMODS.Joker({
 	rarity = 3,
 	cost = 8,
 	atlas = "order_sandbox",
-	config = { extra = { Xmult = 3, Xmult_mod = 0.5, type = "Straight" }, mp_sticker_balanced = true },
+	config = { extra = { Xmult = 3, Xmult_mod = 0.5, type = "Straight" }, mp_balanced = true },
 	loc_vars = function(self, info_queue, card)
 		return { vars = { card.ability.extra.Xmult_mod, card.ability.extra.Xmult } }
 	end,
@@ -42,6 +42,7 @@ SMODS.Joker({
 			}
 		end
 	end,
+	mp_credits = { code = { "steph" } },
 	mp_include = function(self)
 		return MP.SANDBOX.is_joker_allowed(self.key)
 	end,

@@ -6,6 +6,29 @@ priority = 2147483600
 [[patches]]
 [patches.pattern]
 target = 'functions/UI_definitions.lua'
+pattern = '''local customize = nil'''
+position = 'after'
+payload = '''
+local unstuck_button = nil
+local return_to_lobby = nil
+local leave_lobby = nil
+
+if MP.LOBBY.code and G.STATE == G.STATES.MENU then
+    your_collection = UIBox_button({
+        label = { localize("b_collection") },
+        button = "your_collection",
+        minw = 5,
+        id = "your_collection",
+    })
+    mods = UIBox_button{ id = "mods_button", label = {localize('b_mods')}, button = "mods_button", minw = 5}
+end
+'''
+match_indent = true
+times = 1
+
+[[patches]]
+[patches.pattern]
+target = 'functions/UI_definitions.lua'
 pattern = '''main_menu = UIBox_button{ label = {localize('b_main_menu')}, button = "go_to_menu", minw = 5}'''
 position = 'after'
 payload = '''unstuck_button = UIBox_button{ label = {localize('b_unstuck')}, button = "mp_unstuck", minw = 5}

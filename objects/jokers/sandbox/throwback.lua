@@ -54,7 +54,7 @@ SMODS.Joker({
 			owned_skip_mult = 0,
 			skipped_this_round = false,
 		},
-		mp_sticker_balanced = true,
+		mp_balanced = true,
 	},
 	loc_vars = function(self, info_queue, card)
 		return {
@@ -85,6 +85,7 @@ SMODS.Joker({
 			}
 		end
 	end,
+	mp_credits = { code = { "steph" } },
 	mp_include = function(self)
 		return MP.SANDBOX.is_joker_allowed(self.key)
 	end,

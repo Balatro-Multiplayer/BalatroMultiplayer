@@ -134,16 +134,6 @@ return {
 				},
 			},
 		},
-		Enhanced = {
-			m_mp_glass = {
-				name = "Glass Karte",
-				text = {
-					"{X:mult,C:white} X#1# {} Mult",
-					"{C:green}#2# in #3#{} Chance diese",
-					"Karte zu zerstören",
-				},
-			},
-		},
 		Other = {
 			current_nemesis = {
 				name = "Erzfeind",

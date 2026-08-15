@@ -1,14 +1,12 @@
 SMODS.Consumable({
 	key = "ectoplasm_sandbox",
 	set = "Spectral",
+	cost = 4,
 	pos = { x = 8, y = 4 },
 	config = { mp_sticker_balanced = true },
 	loc_vars = function(self, info_queue, card)
 		info_queue[#info_queue + 1] = G.P_CENTERS.e_negative
 		return { vars = { G.GAME.ecto_minus or 1 } }
-	end,
-	in_pool = function(self)
-		return MP.is_ruleset_active("sandbox")
 	end,
 	use = function(self, card, area, copier)
 		local editionless_jokers = SMODS.Edition:get_edition_cards(G.jokers, true)
@@ -30,7 +28,7 @@ SMODS.Consumable({
 				end
 
 				-- positive effect: negative joker
-				if #editionless_jokers then
+				if #editionless_jokers > 0 then
 					local eligible_card = pseudorandom_element(editionless_jokers, "ectoplasm")
 					eligible_card:set_edition({ negative = true })
 				end
@@ -41,9 +39,7 @@ SMODS.Consumable({
 		}))
 	end,
 	can_use = function(self, card)
-		return true
-		-- return G.GAME.round_resets.hands >= 1 and G.GAME.round_resets.discards >= 0
-		-- return next(SMODS.Edition:get_edition_cards(G.jokers, true))
+		return next(SMODS.Edition:get_edition_cards(G.jokers, true))
 	end,
 	-- draw = function(self, card, layer)
 	-- 	-- This is for the Spectral shader. You don't need this with `set = "Spectral"`

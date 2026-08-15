@@ -99,13 +99,15 @@ target = "functions/misc_functions.lua"
 pattern = '''if G.SETTINGS.paused and key ~= 'to_do' then return math.random() end'''
 position = "at"
 payload = '''
--- disabled by Multiplayer because of voucher rng calls while paused 
+-- disabled by Multiplayer because of voucher rng calls while paused
 -- if G.SETTINGS.paused and key ~= 'to_do' then return math.random() end
 '''
 match_indent = true
 
-# mp_exclude function
-# avoids UNAVAILABLE substitution for rng preservation
+# Pool exclusion hook for RNG-safe removal:
+# pop the just-added entry, but only decrement _pool_size when it was a real key
+# banned keys hit the 'UNAVAILABLE' branch and need their slot preserved so the pseudorandom pool
+# queue stays aligned across clients and versions
 # unfortunate timing but lua doesn't have continue, so this is an uninvasive patch
 [[patches]]
 [patches.pattern]
@@ -116,13 +118,63 @@ end
 '''
 position = "after"
 payload = '''
-if v.mp_include and type(v.mp_include) == 'function' then
-	if not v:mp_include() then
-		table.remove(_pool) -- remove whatever was just done
-		if add and not G.GAME.banned_keys[v.key] then
-			_pool_size = _pool_size - 1
-		end
+if MP.should_exclude_from_pool(v) then
+	table.remove(_pool) -- remove whatever was just done
+	if add and not G.GAME.banned_keys[v.key] then
+		_pool_size = _pool_size - 1
 	end
 end
 '''
 match_indent = true
+
+# STEAMODDED BUG - hackfix for deck flashing in incorrect position for one frame when switching (caused due to set_sprites drawing jank)
+[[patches]]
+[patches.pattern]
+target = "functions/button_callbacks.lua"
+pattern = "val:set_ability(val.config.center, true)"
+position = 'at'
+payload = '''
+local temp_x, temp_y = val.T.x, val.T.y
+val:set_ability(val.config.center, true)
+val.children.back.VT.x, val.children.back.VT.y = temp_x, temp_y
+val.children.center.VT.x, val.children.center.VT.y = temp_x, temp_y
+'''
+match_indent = true
+times = 1
+
+# cocktail deck - compatibility with patchwork deck
+[[patches]]
+[patches.pattern]
+target = "game.lua"
+pattern = '''if (G.GAME.selected_back and G.GAME.selected_back.name == 'b_aij_patchwork') or (G.GAME.selected_sleeve and G.GAME.selected_sleeve == 'sleeve_aij_patchwork') then'''
+position = 'at'
+payload = '''
+if (G.GAME.selected_back and G.GAME.selected_back.name == 'b_aij_patchwork') or (G.GAME.selected_sleeve and G.GAME.selected_sleeve == 'sleeve_aij_patchwork') or G.GAME.modifiers.b_aij_patchwork then
+'''
+match_indent = true
+times = 1
+
+# fix magic trick suit+rank desync
+# this fix should become obsolete in a later steamodded version (currently 1620a)
+[[patches]]
+[patches.pattern]
+target = "functions/UI_definitions.lua"
+pattern = "local flags = SMODS.calculate_context({create_shop_card = true, set = v.type})"
+position = 'before'
+payload = '''
+args.front = false
+'''
+match_indent = true
+times = 1
+
+# log any panic collects
+[[patches]]
+[patches.pattern]
+target = "functions/misc_functions.lua"
+pattern = '''collectgarbage("collect")'''
+position = 'before'
+payload = '''
+MP._DEBUG_PANIC_COLLECTS = (MP._DEBUG_PANIC_COLLECTS or 0) + 1
+'''
+match_indent = true
+times = 1

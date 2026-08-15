@@ -33,7 +33,9 @@ function MP:generate_hash()
 	local mod_string = table.concat(mod_data, ";")
 	MP.MOD_STRING = mod_string
 	MP.MOD_HASH = hash(mod_string) or "0000"
-	MP.ACTIONS.set_username(MP.LOBBY.username)
+    if MP.ACTIONS.set_username then
+        MP.ACTIONS.set_username(MP.LOBBY.username)
+    end
 end
 
 local hash_generated = false
@@ -174,6 +176,73 @@ function MP.UTILS.parse_modlist(mod_entries)
 	end
 
 	return mods
+end
+
+function MP.UTILS.resolve_mod_name_and_version(mod_name, mod_version)
+    local fullname = mod_name .. "-" .. (mod_version or "")
+    local new_mod_name, new_mod_version = fullname:match("^(.*)%-([^~]+~.*)$")
+    mod_name = new_mod_name or mod_name
+    mod_version = new_mod_version or mod_version
+    return mod_name, mod_version
+end
+
+-- "0.4.0~pre1-DEV" -> "0.4.0". nil if no leading numeric version.
+function MP.UTILS.version_prefix(version)
+	if type(version) ~= "string" then return nil end
+	return version:match("^(%d+%.%d+%.%d+)") or version:match("^(%d+%.%d+)")
+end
+
+-- Reads from hash_str, not the parsed Mods table: parse_modlist splits on the last dash
+-- and would mangle versions that contain dashes (e.g. the -DEV suffix).
+function MP.UTILS.player_mod_version(player, mod_name)
+	if not player or not player.hash_str then return nil end
+	return (";" .. player.hash_str):match(";" .. mod_name .. "%-([^;]+)")
+end
+
+function MP.UTILS.mp_version_mismatch()
+	local other = MP.LOBBY.is_host and MP.LOBBY.guest or MP.LOBBY.host
+	local their_version = other and MP.UTILS.player_mod_version(other, "Multiplayer")
+	if not their_version then return false end
+	local our_version = SMODS.Mods["Multiplayer"].version
+	local our_prefix = MP.UTILS.version_prefix(our_version)
+	local their_prefix = MP.UTILS.version_prefix(their_version)
+	if our_prefix and their_prefix and our_prefix ~= their_prefix then
+		return true, our_version, their_version
+	end
+	return false
+end
+
+-- Multiplayer compares on the X.Y.Z prefix (clean semver); Steamodded on the full string
+-- (its ~BETA-<build> suffix makes any difference worth flagging).
+local VERSION_CHECKS = {
+	{ name = "Multiplayer", prefix = true },
+	{ name = "Steamodded", prefix = false },
+}
+
+-- Returns { mod, our, their } for each checked mod whose version differs from the opponent's.
+function MP.UTILS.version_mismatches()
+	local other = MP.LOBBY.is_host and MP.LOBBY.guest or MP.LOBBY.host
+	if not other then return {} end
+
+	local results = {}
+	for _, check in ipairs(VERSION_CHECKS) do
+		local their_version = MP.UTILS.player_mod_version(other, check.name)
+		local our_version = SMODS.Mods[check.name] and SMODS.Mods[check.name].version
+		if their_version and our_version then
+			local mismatch
+			if check.prefix then
+				local op = MP.UTILS.version_prefix(our_version)
+				local tp = MP.UTILS.version_prefix(their_version)
+				mismatch = op and tp and op ~= tp
+			else
+				mismatch = our_version ~= their_version
+			end
+			if mismatch then
+				table.insert(results, { mod = check.name, our = our_version, their = their_version })
+			end
+		end
+	end
+	return results
 end
 
 function MP.UTILS.get_banned_mods(mods)

@@ -33,7 +33,7 @@ function MP.UI.create_credits_tab()
 					localize({
 						type = "variable",
 						key = "k_credits_list",
-						vars = { "TGMM, Senfinbrare, CUexter, Brawmario, Divvy, Andy, Steph," },
+						vars = { "TGMM, Senfinbrare, CUexter, Brawmario, Divvy, Andy, Steph, SleepyG11," },
 					}),
 					{
 						scale = scale * 0.8,

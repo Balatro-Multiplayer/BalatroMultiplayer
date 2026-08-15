@@ -29,18 +29,6 @@ if SMODS.Mods["upgrademod"] and SMODS.Mods["upgrademod"].can_load then
 			end
 		end
 
-		update_hand_text({ sound = "button", volume = 0.7, pitch = 0.8, delay = 0.3 }, {
-			handname = localize(hand_type, "poker_hands"),
-			chips = G.GAME.hands[hand_type].chips,
-			mult = G.GAME.hands[hand_type].mult,
-			level = G.GAME.hands[hand_type].level,
-		})
-
-		level_up_hand(nil, hand_type, false, -((asteroid_factor or 1) * (planet_level or 1)))
-
-		update_hand_text(
-			{ sound = "button", volume = 0.7, pitch = 1.1, delay = 0 },
-			{ mult = 0, chips = 0, handname = "", level = "" }
-		)
+		SMODS.upgrade_poker_hands({ hands = hand_type, level_up = -((asteroid_factor or 1) * (planet_level or 1)) })
 	end
 end

@@ -1,38 +1,100 @@
-function MP.UI.update_blind_HUD()
-	if MP.LOBBY.code then
-		G.HUD_blind.alignment.offset.y = -10
-		G.E_MANAGER:add_event(Event({
-			trigger = "after",
-			delay = 0.3,
-			blockable = false,
-			func = function()
-				G.HUD_blind:get_UIE_by_ID("HUD_blind_count").config.ref_table = MP.GAME.enemy
-				G.HUD_blind:get_UIE_by_ID("HUD_blind_count").config.ref_value = "score_text"
-				G.HUD_blind:get_UIE_by_ID("HUD_blind_count").config.func = "multiplayer_blind_chip_UI_scale"
-				G.HUD_blind:get_UIE_by_ID("HUD_blind").children[2].children[2].children[2].children[1].children[1].config.text =
-					localize("k_enemy_score")
-				G.HUD_blind:get_UIE_by_ID("HUD_blind").children[2].children[2].children[2].children[3].children[1].config.text =
-					localize("k_enemy_hands")
-				G.HUD_blind:get_UIE_by_ID("dollars_to_be_earned").config.object.config.string =
-					{ { ref_table = MP.GAME.enemy, ref_value = "hands" } }
-				G.HUD_blind:get_UIE_by_ID("dollars_to_be_earned").config.object:update_text()
-				G.HUD_blind.alignment.offset.y = 0
-				if G.GAME.blind.config.blind.key == "bl_mp_nemesis" then -- this was just the first place i thought of to implement this sprite swapping, change if inappropriate
-					G.GAME.blind.children.animatedSprite.atlas = G.ANIMATION_ATLAS["mp_player_blind_col"]
-					local nemesis_blind_col = MP.UTILS.get_nemesis_key()
-					G.GAME.blind.children.animatedSprite:set_sprite_pos(G.P_BLINDS[nemesis_blind_col].pos)
-				end
-				return true
-			end,
-		}))
-	end
+function MP.UI.update_blind_HUD(blind, reset, silent)
+    if MP.is_mp_or_ghost() then
+        -- Prepare blind name
+        local blind_name_string
+        if MP.GHOST.is_active() then
+            blind_name_string = MP.GHOST.get_blind_name_ui()
+        else
+            blind_name_string = {
+                {
+                    ref_table = MP.LOBBY.is_host and MP.LOBBY.guest or MP.LOBBY.host,
+                    ref_value = "username",
+                },
+            }
+        end
+        -- Setup blind name display
+        local name_element = G.HUD_blind:get_UIE_by_ID("HUD_blind_name")
+        name_element.config.object.config.string =  {
+            {
+                ref_table = MP.LOBBY.is_host and MP.LOBBY.guest or MP.LOBBY.host,
+                ref_value = "username",
+            },
+        }
+        name_element.config.object.config.old_maxw = name_element.config.object.config.maxw
+        name_element.config.object.config.mp_maxw = true
+        name_element.config.object.config.maxw = 4.5
+        name_element.config.object.scale = name_element.config.object.config.scale
+        name_element.config.object:update_text(true)
+        if name_element.config.object.config.maxw then
+            name_element.config.object.scale = name_element.config.object.scale * math.min(1, name_element.config.object.config.maxw/name_element.config.object.config.W)
+        end
+        name_element.config.object:update_text(true)
+        name_element.states.visible = false
+        -- Setup enemy score text
+        G.HUD_blind:get_UIE_by_ID("HUD_blind_count").config.ref_table = MP.GAME.enemy
+        G.HUD_blind:get_UIE_by_ID("HUD_blind_count").config.ref_value = "score_text"
+        G.HUD_blind:get_UIE_by_ID("HUD_blind_count").config.func = "multiplayer_blind_chip_UI_scale"
+        -- Setup labels
+        -- Casual balala UI experience right here
+        G.HUD_blind:get_UIE_by_ID("HUD_blind").children[2].children[2].children[2].children[1].children[1].config.text =
+            localize("k_enemy_score")
+        G.HUD_blind:get_UIE_by_ID("HUD_blind").children[2].children[2].children[2].children[3].children[1].config.text =
+            localize("k_enemy_hands")
+        -- Setup enemy hands
+        G.HUD_blind:get_UIE_by_ID("dollars_to_be_earned").parent.parent.states.visible = false
+        G.HUD_blind:get_UIE_by_ID("dollars_to_be_earned").config.object.config.string =
+            { { ref_table = MP.GAME.enemy, ref_value = "hands_text" } }
+        G.HUD_blind:get_UIE_by_ID("dollars_to_be_earned").config.object:update_text()
+
+        G.HUD_blind.alignment.offset.y = 0
+        G.E_MANAGER:add_event(Event({
+            trigger = 'after',
+            delay = 0.15,
+            blockable = false,
+            func = (function()
+                local self = G.GAME.blind
+
+                if self.config.blind.key == "bl_mp_nemesis" then
+                    -- Setup blind atlas and pos
+                    self.children.animatedSprite.atlas = G.ANIMATION_ATLAS["mp_player_blind_col"]
+                    local nemesis_blind_col = MP.UTILS.get_nemesis_key()
+                    self.children.animatedSprite:set_sprite_pos(G.P_BLINDS[nemesis_blind_col].pos)
+                end
+
+                G.HUD_blind:get_UIE_by_ID("HUD_blind_name").states.visible = true
+                G.HUD_blind:get_UIE_by_ID("dollars_to_be_earned").parent.parent.states.visible = true
+                G.HUD_blind:get_UIE_by_ID("dollars_to_be_earned").config.object:pop_in(0)
+                G.HUD_blind:get_UIE_by_ID("HUD_blind_name").config.object:pop_in(0)
+                G.HUD_blind:get_UIE_by_ID("HUD_blind_count"):juice_up()
+                self.dissolve = 0
+                self.blind_set = true
+                G.ROOM.jiggle = G.ROOM.jiggle + 3
+                if not reset and not silent then
+                    self:juice_up()
+                    if blind then play_sound('chips1', math.random()*0.1 + 0.55, 0.42);play_sound('gold_seal', math.random()*0.1 + 1.85, 0.26)--play_sound('cancel')
+                    end
+                end
+                return true
+            end)
+        }))
+    end
 end
 
 function MP.UI.reset_blind_HUD()
-	if MP.LOBBY.code then
-		G.HUD_blind:get_UIE_by_ID("HUD_blind_name").config.object.config.string =
+	if MP.is_mp_or_ghost() then
+        local name_element = G.HUD_blind:get_UIE_by_ID("HUD_blind_name")
+		name_element.config.object.config.string =
 			{ { ref_table = G.GAME.blind, ref_value = "loc_name" } }
-		G.HUD_blind:get_UIE_by_ID("HUD_blind_name").config.object:update_text()
+        if  name_element.config.object.config.mp_maxw then            
+            name_element.config.object.config.maxw = name_element.config.object.config.old_maxw
+            name_element.config.object.config.old_maxw = nil
+            name_element.config.object.scale = name_element.config.object.config.scale
+            name_element.config.object:update_text(true)
+            if name_element.config.object.config.maxw then
+                name_element.config.object.scale = name_element.config.object.scale * math.min(1, name_element.config.object.config.maxw/name_element.config.object.config.W)
+            end
+            name_element.config.object:update_text(true)
+        end
 		G.HUD_blind:get_UIE_by_ID("HUD_blind_count").config.ref_table = G.GAME.blind
 		G.HUD_blind:get_UIE_by_ID("HUD_blind_count").config.ref_value = "chip_text"
 		G.HUD_blind:get_UIE_by_ID("HUD_blind").children[2].children[2].children[2].children[1].children[1].config.text =
@@ -72,12 +134,14 @@ local blind_set_blindref = Blind.set_blind
 function Blind:set_blind(blind, reset, silent) -- hacking in proper spirals, far from good but whatever
 	blind_set_blindref(self, blind, reset, silent)
 	if (blind and blind.key == "bl_mp_nemesis") or (self and self.name and self.name == "bl_mp_nemesis") then -- this shouldn't break and this fix shouldn't work
-		local boss = true
+		local boss = false
 		local showdown = false
 		local blind_key = MP.UTILS.get_nemesis_key()
-		if blind_key == "bl_small" or blind_key == "bl_big" then boss = false end
-		if blind_key == "bl_final_heart" then -- should be made generic
-			showdown = true
+		if G.P_BLINDS[blind_key].boss then
+			boss = true
+			if G.P_BLINDS[blind_key].boss.showdown then
+				showdown = true
+			end
 		end
 		G.ARGS.spin.real = (G.SETTINGS.reduced_motion and 0 or 1) * (boss and (showdown and 0.5 or 0.25) or 0)
 	end
@@ -122,7 +186,7 @@ end
 local blind_defeat_ref = Blind.defeat
 function Blind:defeat(silent)
 	blind_defeat_ref(self, silent)
-	if MP.LOBBY.code and MP.UI.reset_blind_HUD then MP.UI.reset_blind_HUD() end
+	if MP.is_mp_or_ghost() and MP.UI.reset_blind_HUD then MP.UI.reset_blind_HUD() end
 end
 
 local blind_disable_ref = Blind.disable
@@ -134,6 +198,22 @@ function Blind:disable()
 end
 
 G.FUNCS.multiplayer_blind_chip_UI_scale = function(e)
+	MP.GAME.enemy.hands_text = tostring(MP.GAME.enemy.hands)
+
+	-- Hide the opponent's score until we have played a hand this PvP blind, so
+	-- a player can't watch the enemy score before committing their own hand.
+	-- (The server also withholds the score, this is the matching display.)
+	-- Gated by the hide_score_until_played lobby option (on by default only on
+	-- standard-layer rulesets; host-toggleable in non-forcing lobbies).
+	if
+		MP.LOBBY.config.hide_score_until_played
+		and MP.is_pvp_boss()
+		and G.GAME.current_round
+		and G.GAME.current_round.hands_played == 0
+	then
+		MP.GAME.enemy.score_text = "???"
+		return
+	end
 	local new_score_text = MP.INSANE_INT.to_string(MP.GAME.enemy.score)
 	if G.GAME.blind and MP.GAME.enemy.score and MP.GAME.enemy.score_text ~= new_score_text then
 		if not MP.INSANE_INT.greater_than(MP.GAME.enemy.score, MP.INSANE_INT.create(0, G.E_SWITCH_POINT, 0)) then

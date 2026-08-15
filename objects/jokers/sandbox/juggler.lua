@@ -14,7 +14,7 @@ SMODS.Joker({
 	rarity = 1,
 	cost = 4,
 	atlas = "juggler_sandbox",
-	config = { extra = { h_size = 3 }, mp_sticker_balanced = true },
+	config = { extra = { h_size = 3 }, mp_balanced = true },
 	loc_vars = function(self, info_queue, card)
 		return { vars = { card.ability.extra.h_size } }
 	end,
@@ -58,6 +58,7 @@ SMODS.Joker({
 			end
 		end
 	end,
+	mp_credits = { code = { "steph" } },
 	mp_include = function(self)
 		return MP.SANDBOX.is_joker_allowed(self.key)
 	end,

@@ -138,16 +138,6 @@ return {
 				},
 			},
 		},
-		Enhanced = {
-			m_mp_glass = {
-				name = "Carte Verre",
-				text = {
-					"{X:mult,C:white} X#1# {} Multi",
-					"{C:green}#2# chance(s) sur #3#{} de",
-					"détruire la carte",
-				},
-			},
-		},
 		Other = {
 			current_nemesis = {
 				name = "Némésis",
@@ -296,7 +286,7 @@ return {
 			},
 			ml_mp_kofi_message = {
 				"Ce mod et serveur de jeu est",
-				"développé et maintenu par ",
+				"développé et maintenu par",
 				"une seule personne, si",
 				"vous l'aimez, n'hésitez pas à",
 			},

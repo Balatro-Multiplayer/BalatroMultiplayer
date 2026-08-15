@@ -1,0 +1,87 @@
+[manifest]
+version = "1.0.0"
+dump_lua = true
+priority = 2147483600
+
+# Practice mode: give cards from collection via key "3" or left-click.
+# Also: edition cycling.
+
+# Shared helper function for giving a hovered card to the player
+[[patches]]
+[patches.pattern]
+target = "engine/controller.lua"
+pattern = '''function Controller:key_press_update(key, dt)'''
+position = 'before'
+payload = '''
+function Controller:practice_give_card()
+    if not (MP and MP.is_practice_mode()) then return end
+    if MP.LOBBY.code then return end
+    if not (self.hovering.target and self.hovering.target:is(Card)) then return end
+    if not G.OVERLAY_MENU then return end
+    local _card = self.hovering.target
+    if _card.ability.set == 'Joker' and G.jokers then
+        if MP.SP.unlimited_slots or #G.jokers.cards < G.jokers.config.card_limit then
+            if MP.SP.unlimited_slots and #G.jokers.cards >= G.jokers.config.card_limit then
+                G.jokers.config.card_limit = G.jokers.config.card_limit + 1
+            end
+            add_joker(_card.config.center.key)
+            _card:set_sprites(_card.config.center)
+        end
+    end
+    if _card.ability.consumeable and G.consumeables then
+        if MP.SP.unlimited_slots or #G.consumeables.cards < G.consumeables.config.card_limit then
+            if MP.SP.unlimited_slots and #G.consumeables.cards >= G.consumeables.config.card_limit then
+                G.consumeables.config.card_limit = G.consumeables.config.card_limit + 1
+            end
+            add_joker(_card.config.center.key)
+            _card:set_sprites(_card.config.center)
+        end
+    end
+end
+'''
+match_indent = true
+times = 1
+
+# Key "3" triggers give in practice mode
+[[patches]]
+[patches.pattern]
+target = "engine/controller.lua"
+pattern = '''if not _RELEASE_MODE then'''
+position = 'before'
+payload = '''
+if MP and MP.is_practice_mode() and not MP.LOBBY.code then
+    if key == "3" then
+        self:practice_give_card()
+    end
+    if key == "q" and MP.SP.edition_cycling then
+        if self.hovering.target and self.hovering.target:is(Card) then
+            local _card = self.hovering.target
+            if _card.ability.set == 'Joker' or _card.playing_card or _card.area then
+                local _edition = {
+                    foil = not _card.edition,
+                    holo = _card.edition and _card.edition.foil,
+                    polychrome = _card.edition and _card.edition.holo,
+                    negative = _card.edition and _card.edition.polychrome,
+                }
+                _card:set_edition(_edition, true, true)
+            end
+        end
+    end
+end
+'''
+match_indent = true
+times = 1
+
+# Left-click on hovered card in collection triggers give in practice mode
+[[patches]]
+[patches.pattern]
+target = "main.lua"
+pattern = '''G.CONTROLLER:queue_L_cursor_press(x, y)'''
+position = 'before'
+payload = '''
+        if MP and MP.is_practice_mode() then
+            G.CONTROLLER:practice_give_card()
+        end
+'''
+match_indent = true
+times = 1

@@ -19,6 +19,11 @@ function Card:set_cost()
 				1,
 				math.floor(0.5 * (self.base_cost + self.extra_cost + 0.5) * (100 - G.GAME.discount_percent) / 100)
 			)
+		elseif G.GAME.round_resets.ante == 2 then
+			self.cost = math.max(
+				1,
+				math.floor(0.7 * (self.base_cost + self.extra_cost + 0.5) * (100 - G.GAME.discount_percent) / 100)
+			)
 		end
 	end
 end

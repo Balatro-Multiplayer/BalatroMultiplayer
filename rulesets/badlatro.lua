@@ -52,6 +52,9 @@ MP.Ruleset({
 	banned_enhancements = {
 		"m_glass",
 	},
+	spectral_banned_enhancements = {
+		"m_glass",
+	},
 	banned_tags = {
 		"tag_uncommon",
 		"tag_meteor",
@@ -66,11 +69,4 @@ MP.Ruleset({
 	reworked_enhancements = {},
 	reworked_tags = {},
 	reworked_blinds = {},
-	create_info_menu = function()
-		return MP.UI.CreateRulesetInfoMenu({
-			multiplayer_content = true,
-			forced_lobby_options = false,
-			description_key = "k_badlatro_description",
-		})
-	end,
 }):inject()

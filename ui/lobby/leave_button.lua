@@ -11,4 +11,3 @@ function MP.UI.create_lobby_leave_button(text_scale)
 		col = true,
 	})
 end
-

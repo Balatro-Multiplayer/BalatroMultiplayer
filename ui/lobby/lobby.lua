@@ -14,12 +14,15 @@ function G.UIDEF.get_connection_status_ui()
 				colour = G.C.UI.TRANSPARENT_DARK,
 			},
 			nodes = {
-				MP.UI.UTILS.create_text_node((MP.LOBBY.code and localize("k_in_lobby")) or (MP.LOBBY.connected and localize(
-					"k_connected"
-				)) or localize("k_warn_service"), {
-					scale = 0.3,
-					colour = G.C.UI.TEXT_LIGHT,
-				}),
+				MP.UI.UTILS.create_text_node(
+					(MP.LOBBY.code and localize("k_in_lobby"))
+						or (MP.LOBBY.connected and localize("k_connected"))
+						or localize("k_warn_service"),
+					{
+						scale = 0.3,
+						colour = G.C.UI.TEXT_LIGHT,
+					}
+				),
 			},
 		},
 		config = {
@@ -186,10 +189,13 @@ function G.UIDEF.create_UIBox_view_hash(type)
 	return (
 		create_UIBox_generic_options({
 			contents = {
-				MP.UI.UTILS.create_column({ padding = 0.07, align = "cm" }, MP.UI.modlist_to_view(
-					type == "host" and MP.LOBBY.host.config.Mods or MP.LOBBY.guest.config.Mods,
-					G.C.UI.TEXT_LIGHT
-				)),
+				MP.UI.UTILS.create_column(
+					{ padding = 0.07, align = "cm" },
+					MP.UI.modlist_to_view(
+						type == "host" and MP.LOBBY.host.config.Mods or MP.LOBBY.guest.config.Mods,
+						G.C.UI.TEXT_LIGHT
+					)
+				),
 			},
 		})
 	)
@@ -198,29 +204,84 @@ end
 function MP.UI.modlist_to_view(mods, text_colour)
 	local t = {}
 
-	if not mods then return t end
+	if not mods then
+		return t
+	end
 
+    local special_mods_targets = {
+        "Steamodded",
+        "Lovely",
+        "Multiplayer",
+        "Preview",
+    }
+    local special_mods_found = {}
+	local other_mods = {}
 	for mod_name, mod_version in pairs(mods) do
-		local display_text = mod_version and (mod_name .. "-" .. mod_version) or mod_name
-		local color = MP.BANNED_MODS[mod_name] and G.C.RED or text_colour
+        local found = false
+        for _, id in ipairs(special_mods_targets) do
+            if not special_mods_found[id] and MP.UTILS.string_starts(mod_name, id) then
+                special_mods_found[id] = { name = mod_name, version = mod_version }
+                found = true
+                break
+            end
+        end
+        if not found then
+            table.insert(other_mods, { name = mod_name, version = mod_version })
+        end
+	end
+
+	table.sort(other_mods, function(a, b)
+		return a.name < b.name
+	end)
+
+	local function add_mod_row(mod)
+		local mod_name, mod_version = MP.UTILS.resolve_mod_name_and_version(mod.name, mod.version)
+		local color = MP.BANNED_MODS[mod.name] and G.C.RED or text_colour
 		table.insert(t, {
 			n = G.UIT.R,
 			config = {
-				padding = 0.02,
-				align = "cm",
+				padding = 0.025,
 			},
 			nodes = {
 				{
 					n = G.UIT.T,
 					config = {
-						text = display_text,
-						shadow = true,
-						scale = 0.4,
+						text = mod_name,
+						scale = 0.32,
 						colour = color,
 					},
 				},
+				mod_version and {
+					n = G.UIT.T,
+					config = {
+						text = " " .. mod_version,
+						scale = 0.32,
+						colour = adjust_alpha(color, 0.6),
+					},
+				} or nil,
 			},
 		})
+	end
+	local function add_separator()
+		table.insert(t, {
+			n = G.UIT.R,
+			config = {
+				minh = 0.025,
+				colour = adjust_alpha(text_colour, 0.25),
+			},
+		})
+	end
+
+	for _, mod in pairs({ special_mods_found.Lovely, special_mods_found.Steamodded }) do
+		add_mod_row(mod)
+	end
+	add_separator()
+	for _, mod in pairs({ special_mods_found.Multiplayer, special_mods_found.Preview }) do
+		add_mod_row(mod)
+	end
+	add_separator()
+	for _, mod in ipairs(other_mods) do
+		add_mod_row(mod)
 	end
 	return t
 end
@@ -252,9 +313,49 @@ function G.FUNCS.get_lobby_main_menu_UI(e)
 	})
 end
 
+local function get_random_back_pool()
+	local names, seen = {}, {}
+	local cocktail_keys = MP.get_cocktail_decks(false)
+	for i = 1, #cocktail_keys do
+		local key = cocktail_keys[i]
+		if G.P_CENTERS[key] and not seen[key] then
+			seen[key] = true
+			names[#names + 1] = G.P_CENTERS[key].name
+		end
+	end
+	if G.P_CENTERS["b_mp_cocktail"] and not seen["b_mp_cocktail"] then
+		names[#names + 1] = G.P_CENTERS["b_mp_cocktail"].name
+	end
+	return names
+end
+
+local function scoped_random(seed, salt, max)
+	if seed then
+		math.randomseed(pseudohash(seed .. "_mp_random_" .. salt))
+	end
+	return math.random(1, max)
+end
+
+local function roll_random_back_name(seed, salt)
+	local names = get_random_back_pool()
+	if #names == 0 then return "Red Deck" end
+	return names[scoped_random(seed, "deck_" .. (salt or ""), #names)]
+end
+
+local function roll_random_stake(seed, salt)
+	local cap = MP.DECK.MAX_STAKE > 0 and MP.DECK.MAX_STAKE or 8
+	return scoped_random(seed, "stake_" .. (salt or ""), cap)
+end
+
 ---@type fun(e: table | nil, args: { deck: string, stake: number | nil, seed: string | nil })
 function G.FUNCS.lobby_start_run(e, args)
 	if MP.LOBBY.config.different_decks == false then G.FUNCS.copy_host_deck() end
+
+	if MP.LOBBY.config.different_decks and MP.LOBBY.config.random_loadout then
+		MP.LOBBY.deck.back = roll_random_back_name(args.seed, MP.LOBBY.username)
+		MP.LOBBY.deck.challenge = ""
+		MP.LOBBY.deck.stake = roll_random_stake(args.seed, MP.LOBBY.username)
+	end
 
 	local challenge = nil
 	if MP.LOBBY.deck.back == "Challenge Deck" then
@@ -299,10 +400,21 @@ function G.FUNCS.copy_host_deck()
 end
 
 function G.FUNCS.lobby_start_game(e)
+	if MP.LOBBY.config.random_loadout then
+		MP.LOBBY.config.back = roll_random_back_name()
+		MP.LOBBY.config.challenge = ""
+		MP.LOBBY.config.stake = roll_random_stake()
+		send_lobby_options()
+	end
 	MP.ACTIONS.start_game()
 end
 
 function G.FUNCS.lobby_ready_up(e)
+	-- On the first ready-up with a version mismatch, show the modal and bail without readying;
+	-- the guest must dismiss and press Ready again. Keeps the host's Start (gated on
+	-- ready_to_start) disabled until the mismatch is acknowledged.
+	if not MP.LOBBY.ready_to_start and MP.UI.show_version_mismatch_if_needed() then return end
+
 	MP.LOBBY.ready_to_start = not MP.LOBBY.ready_to_start
 
 	e.config.colour = MP.LOBBY.ready_to_start and G.C.GREEN or G.C.RED
@@ -340,12 +452,16 @@ function G.FUNCS.lobby_leave(e)
 			MP.LOBBY.code = nil
 			MP.ACTIONS.leave_lobby()
 			MP.UI.update_connection_status()
+			MP.MODIFIERS = {}
+			MP._version_mismatch_shown = false
 			G.STATE = G.STATES.MENU
 		end)
 	else
 		MP.LOBBY.code = nil
 		MP.ACTIONS.leave_lobby()
 		MP.UI.update_connection_status()
+		MP.MODIFIERS = {}
+		MP._version_mismatch_shown = false
 		G.STATE = G.STATES.MENU
 	end
 end
@@ -432,6 +548,9 @@ function set_main_menu_UI()
 	end
 end
 
+local data_sync_interval = 5
+local data_sync_delay = data_sync_interval
+
 local in_lobby = false
 local gameUpdateRef = Game.update
 ---@diagnostic disable-next-line: duplicate-set-field
@@ -445,6 +564,14 @@ function Game:update(dt)
 			MP.reset_game_states()
 		end
 	end
+    -- Data sync every 5 seconds
+    if MP.LOBBY.code and G.STAGE == G.STAGES.RUN then
+        data_sync_delay = data_sync_delay - dt
+        if data_sync_delay < 0 then
+            data_sync_delay = data_sync_interval
+            MP.ACTIONS.data_sync()
+        end
+    end
 	gameUpdateRef(self, dt)
 end
 
@@ -495,8 +622,8 @@ end
 local gameMainMenuRef = Game.main_menu
 ---@diagnostic disable-next-line: duplicate-set-field
 function Game:main_menu(change_context)
-	MP.UI.update_connection_status()
 	gameMainMenuRef(self, change_context)
+	MP.UI.update_connection_status()
 end
 
 function G.FUNCS.copy_to_clipboard(e)

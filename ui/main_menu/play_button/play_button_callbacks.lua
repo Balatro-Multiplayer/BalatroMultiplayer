@@ -1,14 +1,14 @@
--- Singleplayer ruleset state (parallels MP.LOBBY.config.ruleset for multiplayer)
-MP.SP = { ruleset = nil }
-
 function G.FUNCS.setup_run_singleplayer(e)
 	G.SETTINGS.paused = true
 	MP.LOBBY.config.ruleset = nil
 	MP.LOBBY.config.gamemode = nil
 	MP.SP.ruleset = nil
+	MP.SP.practice = false
+	MP.GHOST.clear()
+	MP.MODIFIERS = {}
 
 	G.FUNCS.overlay_menu({
-		definition = G.UIDEF.ruleset_selection_options("sp"),
+		definition = G.UIDEF.ruleset_selection_tabs("sp"),
 	})
 end
 
@@ -21,6 +21,8 @@ function G.FUNCS.start_vanilla_sp(e)
 	MP.LOBBY.config.ruleset = nil
 	MP.LOBBY.config.gamemode = nil
 	MP.SP.ruleset = nil
+	MP.SP.practice = false
+	MP.GHOST.clear()
 	G.FUNCS.setup_run(e)
 end
 
@@ -35,8 +37,13 @@ end
 function G.FUNCS.create_lobby(e)
 	G.SETTINGS.paused = true
 
+	-- Clear practice/ghost state so it can't shadow MP reads during lobby setup.
+	MP.SP.practice = false
+	MP.GHOST.clear()
+	MP.MODIFIERS = {}
+
 	G.FUNCS.overlay_menu({
-		definition = G.UIDEF.ruleset_selection_options("mp"),
+		definition = G.UIDEF.ruleset_selection_tabs("mp"),
 	})
 end
 
@@ -44,12 +51,16 @@ function G.FUNCS.select_gamemode(e)
 	G.SETTINGS.paused = true
 
 	G.FUNCS.overlay_menu({
-		definition = G.UIDEF.gamemode_selection_options(),
+        definition =  G.UIDEF.gamemode_selection_tabs(),
 	})
 end
 
 function G.FUNCS.join_lobby(e)
 	G.SETTINGS.paused = true
+
+	-- Same isolation as create_lobby; modifiers arrive from the host.
+	MP.SP.practice = false
+	MP.GHOST.clear()
 
 	G.FUNCS.overlay_menu({
 		definition = G.UIDEF.create_UIBox_join_lobby_button(),
@@ -92,11 +103,20 @@ end
 function G.FUNCS.start_lobby(e)
 	G.SETTINGS.paused = false
 
+	MP.SP.practice = false
+	MP.GHOST.clear()
+
 	MP.reset_lobby_config(true)
 
-	MP.LOBBY.config.multiplayer_jokers = MP.Rulesets[MP.LOBBY.config.ruleset].multiplayer_content
+	MP.LOBBY.config.multiplayer_jokers = MP.current_ruleset().multiplayer_content
 
-	MP.LOBBY.config.forced_config = MP.Rulesets[MP.LOBBY.config.ruleset].force_lobby_options()
+	-- Hide opponent score until you play: default on for standard-layer rulesets
+	-- only. Set before force_lobby_options() so a forcing ruleset can override it.
+	MP.LOBBY.config.hide_score_until_played = MP.current_ruleset().standard == true
+
+	MP.LOBBY.config.forced_config = MP.current_ruleset():force_lobby_options()
+
+	MP.LOBBY.config.modifier_layers = MP.modifiers_serialize()
 
 	if MP.LOBBY.config.gamemode == "gamemode_mp_survival" then
 		MP.LOBBY.config.starting_lives = 1

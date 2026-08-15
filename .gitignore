@@ -4,3 +4,9 @@
 .lovelyignore
 .vs
 .DS_Store
+.env
+.claude/
+dist/
+CLAUDE.local.md
+replays/*
+!replays/.gitkeep

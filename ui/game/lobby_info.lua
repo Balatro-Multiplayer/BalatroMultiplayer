@@ -156,15 +156,17 @@ function MP.UI.create_UIBox_player_row(type)
 	local player_name = type == "host" and MP.LOBBY.host.username or MP.LOBBY.guest.username
 	local lives = MP.GAME.enemy.lives
 	local highest_score = MP.GAME.enemy.highest_score
+	local skips = MP.GAME.enemy.skips or 0
 	if (type == "host" and MP.LOBBY.is_host) or (type == "guest" and not MP.LOBBY.is_host) then
 		lives = MP.GAME.lives
 		highest_score = MP.GAME.highest_score
+		skips = G.GAME.skips or 0
 	end
 	return {
 		n = G.UIT.R,
 		config = {
 			align = "cm",
-			padding = 0.05,
+			padding = 0.1,
 			r = 0.1,
 			colour = darken(G.C.JOKER_GREY, 0.1),
 			emboss = 0.05,
@@ -178,39 +180,27 @@ function MP.UI.create_UIBox_player_row(type)
 		nodes = {
 			{
 				n = G.UIT.C,
-				config = { align = "cl", padding = 0, minw = 5 },
+				config = { align = "cm" },
 				nodes = {
 					{
 						n = G.UIT.C,
 						config = {
 							align = "cm",
-							padding = 0.02,
+							padding = 0.05,
 							r = 0.1,
-							colour = G.C.RED,
+							colour = G.C.MULT,
 							minw = 2,
-							outline = 0.8,
-							outline_colour = G.C.RED,
+							maxw = 2,
+							outline = 0.5,
+							outline_colour = G.C.MULT,
+							emboss = 0.07,
 						},
 						nodes = {
 							{
 								n = G.UIT.T,
 								config = {
 									text = tostring(lives) .. " " .. localize("k_lives"),
-									scale = 0.4,
-									colour = G.C.UI.TEXT_LIGHT,
-								},
-							},
-						},
-					},
-					{
-						n = G.UIT.C,
-						config = { align = "cm", minw = 4.5, maxw = 4.5 },
-						nodes = {
-							{
-								n = G.UIT.T,
-								config = {
-									text = " " .. player_name,
-									scale = 0.45,
+									scale = 0.375,
 									colour = G.C.UI.TEXT_LIGHT,
 									shadow = true,
 								},
@@ -221,49 +211,96 @@ function MP.UI.create_UIBox_player_row(type)
 			},
 			{
 				n = G.UIT.C,
-				config = { align = "cm", padding = 0.05, colour = G.C.BLACK, r = 0.1 },
+				config = { align = "cl", padding = 0, minw = 4 },
 				nodes = {
 					{
 						n = G.UIT.C,
-						config = { align = "cr", padding = 0.01, r = 0.1, colour = G.C.CHIPS, minw = 1.1 },
+						config = { align = "cm", minw = 4.5, maxw = 4.5 },
 						nodes = {
 							{
 								n = G.UIT.T,
 								config = {
-									text = "???", -- Will be hands in the future
+									text = "" .. player_name,
 									scale = 0.45,
 									colour = G.C.UI.TEXT_LIGHT,
-								},
-							},
-							{ n = G.UIT.B, config = { w = 0.08, h = 0.01 } },
-						},
-					},
-					{
-						n = G.UIT.C,
-						config = { align = "cl", padding = 0.01, r = 0.1, colour = G.C.MULT, minw = 1.1 },
-						nodes = {
-							{ n = G.UIT.B, config = { w = 0.08, h = 0.01 } },
-							{
-								n = G.UIT.T,
-								config = {
-									text = "???", -- Will be discards in the future
-									scale = 0.45,
-									colour = G.C.UI.TEXT_LIGHT,
+									shadow = true,
 								},
 							},
 						},
 					},
 				},
 			},
+			(MP.LOBBY.config.timer_display_threshold or 0) <= 0 and {
+				n = G.UIT.C,
+				config = { align = "cm" },
+				nodes = {
+					{
+						n = G.UIT.C,
+						config = {
+							align = "cm",
+							padding = 0.05,
+							r = 0.1,
+							colour = G.C.PURPLE,
+							minw = 1.75,
+							maxw = 1.75,
+							outline = 0.5,
+							outline_colour = G.C.PURPLE,
+							emboss = 0.07,
+						},
+						nodes = {
+							{
+								n = G.UIT.T,
+								config = {
+									text = tostring(skips) .. " " .. localize("k_skips"),
+									scale = 0.375,
+									colour = G.C.UI.TEXT_LIGHT,
+                                    shadow = true,
+								},
+							},
+						},
+					},
+                    -- Let's keep it for future, just in case
+					-- {
+					-- 	n = G.UIT.C,
+					-- 	config = { align = "cr", padding = 0.01, r = 0.1, colour = G.C.CHIPS, minw = 1.1 },
+					-- 	nodes = {
+					-- 		{
+					-- 			n = G.UIT.T,
+					-- 			config = {
+					-- 				text = "???", -- Will be hands in the future
+					-- 				scale = 0.45,
+					-- 				colour = G.C.UI.TEXT_LIGHT,
+					-- 			},
+					-- 		},
+					-- 		{ n = G.UIT.B, config = { w = 0.08, h = 0.01 } },
+					-- 	},
+					-- },
+					-- {
+					-- 	n = G.UIT.C,
+					-- 	config = { align = "cl", padding = 0.01, r = 0.1, colour = G.C.MULT, minw = 1.1 },
+					-- 	nodes = {
+					-- 		{ n = G.UIT.B, config = { w = 0.08, h = 0.01 } },
+					-- 		{
+					-- 			n = G.UIT.T,
+					-- 			config = {
+					-- 				text = "???", -- Will be discards in the future
+					-- 				scale = 0.45,
+					-- 				colour = G.C.UI.TEXT_LIGHT,
+					-- 			},
+					-- 		},
+					-- 	},
+					-- },
+				},
+			} or nil,
 			{
 				n = G.UIT.C,
-				config = { align = "cm", padding = 0.05, colour = G.C.L_BLACK, r = 0.1, minw = 1.5 },
+				config = { align = "cm", padding = 0.05, colour = G.C.L_BLACK, r = 0.1, minw = 3, maxw = 3 },
 				nodes = {
 					{
 						n = G.UIT.T,
 						config = {
 							text = MP.INSANE_INT.to_string(highest_score),
-							scale = 0.45,
+							scale = 0.425,
 							colour = G.C.FILTER,
 							shadow = true,
 						},

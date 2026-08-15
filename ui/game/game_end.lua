@@ -1,10 +1,53 @@
+function MP.UI.create_UIBox_round_scores_row_nemesis()
+    local label = localize({ type = "name_text", set = "Blind", key = "bl_mp_nemesis" })
+    local score_tab = {}
+    local label_w, score_w, h = 2.9, 1, 0.5
+
+    local blind_name_string
+    if MP.GHOST.is_active() then
+        blind_name_string = MP.GHOST.get_blind_name_ui() or "ERROR"
+    else
+        blind_name_string = (MP.LOBBY.is_host and MP.LOBBY.guest or MP.LOBBY.host or {})["username"] or "ERROR"
+    end
+
+    local nemesis_blind_col = MP.UTILS.get_nemesis_key()
+    local blind_choice = {}
+    blind_choice.animation = AnimatedSprite(0,0, 0.5, 0.5, G.ANIMATION_ATLAS["mp_player_blind_col"], G.P_BLINDS[nemesis_blind_col].pos)
+    blind_choice.animation:define_draw_steps({
+        {shader = 'dissolve', shadow_height = 0.05},
+        {shader = 'dissolve'}
+    })
+
+    score_tab = {
+        {n=G.UIT.C, config={align = "cm", minh = 0.7, padding = 0.1}, nodes={
+            {n=G.UIT.O, config={object = DynaText({string = blind_name_string, colours = {G.C.WHITE}, shadow = true, bump = true,maxw = 2.9, scale = 0.45})}}
+        }},
+        {n=G.UIT.C, config={align = "cm"}, nodes={
+            {n=G.UIT.O, config={object = blind_choice.animation}}
+        }},
+    }
+
+    local label_scale = 0.5
+
+    return {n=G.UIT.R, config={align = "cm", padding = 0.05, r = 0.1, colour = darken(G.C.JOKER_GREY, 0.1), emboss = 0.05, id = "mp_score_nemesis"}, nodes={
+        {n=G.UIT.R, config={align = "cm", padding = 0.02, minw = label_w, maxw = label_w}, nodes={
+            {n=G.UIT.T, config={text = label, scale = label_scale, colour = G.C.UI.TEXT_LIGHT, shadow = true}},
+        }},
+        {n=G.UIT.R, config={align = "cr"}, nodes={
+            {n=G.UIT.C, config={align = "cm", minh = h, r = 0.1, minw = label_w + 0.9, colour = G.C.BLACK, emboss = 0.05}, nodes={
+                {n=G.UIT.C, config={align = "cm", padding = 0.05, r = 0.1, minw = score_w}, nodes=score_tab},
+            }}
+        }},
+    }}
+end
+
 function MP.UI.create_UIBox_mp_game_end(has_won)
 	MP.end_game_jokers = CardArea(
 		0,
 		0,
 		5 * G.CARD_W,
 		G.CARD_H,
-		{ card_limit = G.GAME.starting_params.joker_slots, type = "joker", highlight_limit = 1 }
+		{ card_limit = G.GAME.starting_params.joker_slots, type = "joker", highlight_limit = 1, fixed_limit = true }
 	)
 	if not MP.end_game_jokers_received then
 		MP.ACTIONS.get_end_game_jokers()
@@ -185,13 +228,49 @@ function MP.UI.create_UIBox_mp_game_end(has_won)
 								nodes = {
 									{
 										n = G.UIT.C,
-										config = { align = "cm", padding = 0.08 },
+										config = { padding = 0.08 },
 										nodes = {
 											create_UIBox_round_scores_row("hand"),
 											create_UIBox_round_scores_row("poker_hand"),
+                                            {
+                                                n = G.UIT.R,
+                                                config = {},
+                                                nodes = {
+                                                    {
+                                                        n = G.UIT.C,
+                                                        nodes = {
+                                                            create_UIBox_round_scores_row('cards_purchased', G.C.MONEY),
+                                                            {
+                                                                n = G.UIT.R,
+                                                                config = { minh = 0.08 },
+                                                            },
+                                                            create_UIBox_round_scores_row('times_rerolled', G.C.GREEN),
+                                                        }
+                                                    },
+                                                    {
+                                                        n = G.UIT.C,
+                                                        config = {minw = 0.08}
+                                                    },
+                                                    {
+                                                        n = G.UIT.C,
+                                                        nodes = {
+                                                            create_UIBox_round_scores_row('furthest_ante', G.C.FILTER),
+                                                            {
+                                                                n = G.UIT.R,
+                                                                config = { minh = 0.08 },
+                                                            },
+                                                            create_UIBox_round_scores_row('furthest_round', G.C.FILTER),
+                                                        }
+                                                    },
+                                                }
+                                            },
+                                            {
+                                                n = G.UIT.R,
+                                                config = { minh = 0.01 },
+                                            },
 											{
 												n = G.UIT.R,
-												config = { align = "cm", padding = 0.08, minw = 2 },
+												config = { align = "cm", minw = 2 },
 												nodes = {
 													{
 														n = G.UIT.T,
@@ -206,7 +285,7 @@ function MP.UI.create_UIBox_mp_game_end(has_won)
 											},
 											{
 												n = G.UIT.R,
-												config = { align = "cm", padding = 0.08, minw = 2 },
+												config = { align = "cm", minw = 2 },
 												nodes = {
 													{
 														n = G.UIT.T,
@@ -221,12 +300,12 @@ function MP.UI.create_UIBox_mp_game_end(has_won)
 											},
 											{
 												n = G.UIT.R,
-												config = { align = "cm", padding = 0.08, minw = 2 },
+												config = { align = "cm", minw = 2 },
 												nodes = {
 													{
 														n = G.UIT.T,
 														config = {
-															text = localize("ml_mp_kofi_message")[3],
+															text = localize("ml_mp_kofi_message")[3] .. (localize("ml_mp_kofi_message")[4] and (" " .. localize("ml_mp_kofi_message")[4]) or ""),
 															scale = 0.35,
 															colour = G.C.UI.TEXT_LIGHT,
 															col = true,
@@ -234,21 +313,12 @@ function MP.UI.create_UIBox_mp_game_end(has_won)
 													},
 												},
 											},
-											{
-												n = G.UIT.R,
-												config = { align = "cm", padding = 0.08, minw = 2 },
-												nodes = {
-													{
-														n = G.UIT.T,
-														config = {
-															text = localize("ml_mp_kofi_message")[4],
-															scale = 0.35,
-															colour = G.C.UI.TEXT_LIGHT,
-															col = true,
-														},
-													},
-												},
-											},
+                                            {
+                                                n = G.UIT.R,
+                                                config = {
+                                                    minh = 0.08
+                                                }
+                                            },
 											{
 												n = G.UIT.R,
 												config = {
@@ -302,8 +372,7 @@ function MP.UI.create_UIBox_mp_game_end(has_won)
 										n = G.UIT.C,
 										config = { align = "tr", padding = 0.08 },
 										nodes = {
-											create_UIBox_round_scores_row("furthest_ante", G.C.FILTER),
-											create_UIBox_round_scores_row("furthest_round", G.C.FILTER),
+											MP.UI.create_UIBox_round_scores_row_nemesis(),
 											create_UIBox_round_scores_row("seed", G.C.WHITE),
 											UIBox_button({
 												id = "copy_seed_button",
@@ -311,29 +380,56 @@ function MP.UI.create_UIBox_mp_game_end(has_won)
 												label = { localize("b_copy") },
 												colour = G.C.BLUE,
 												scale = 0.3,
-												minw = 2.3,
+												minw = 2.5, maxw = 2.5,
 												minh = 0.4,
 											}),
 											{
 												n = G.UIT.R,
-												config = { align = "cm", minh = 0.4, minw = 0.1 },
-												nodes = {},
+												config = { align = "cm", minh = 0.45, minw = 0.1 },
+												nodes = {
+                                                    UIBox_button({
+                                                        button = "mp_open_log_parser",
+                                                        label = { localize("b_open_log_parser") },
+                                                        minw = 1.75,
+                                                        maxw = 1.75,
+                                                        minh = 0.5,
+                                                        maxh = 0.5,
+                                                        col = true,
+                                                        colour = G.C.CHIPS,
+                                                        padding = 0.1,
+                                                        scale = 0.4
+                                                    }),
+                                                    { n = G.UIT.C, config = { minw = 0.1 } },
+                                                    UIBox_button({
+                                                        id = "from_game_won",
+                                                        button = "mp_get_lovely_log_file",
+                                                        label = { localize("b_get_log_file") },
+                                                        minw = 1.75,
+                                                        maxw = 1.75,
+                                                        minh = 0.5,
+                                                        maxh = 0.5,
+                                                        col = true,
+                                                        colour = G.C.CHIPS,
+                                                        padding = 0.1,
+                                                        scale = 0.4
+                                                    }),
+                                                },
 											},
 											UIBox_button({
 												id = "from_game_won",
 												button = "mp_return_to_lobby",
 												label = { localize("b_return_lobby") },
-												minw = 2.5,
-												maxw = 2.5,
-												minh = 1,
+												minw = 4,
+												maxw = 4,
+												minh = 0.75,
 												focus_args = { nav = "wide", snap_to = true },
 											}),
 											UIBox_button({
 												button = "lobby_leave",
 												label = { localize("b_leave_lobby") },
-												minw = 2.5,
-												maxw = 2.5,
-												minh = 1,
+												minw = 4,
+												maxw = 4,
+												minh = 0.75,
 												focus_args = { nav = "wide" },
 											}),
 										},
@@ -442,10 +538,8 @@ end
 
 function G.UIDEF.multiplayer_deck()
 	return G.UIDEF.challenge_description(
-		get_challenge_int_from_id(MP.Rulesets[MP.LOBBY.config.ruleset].challenge_deck),
+		get_challenge_int_from_id(MP.current_ruleset().challenge_deck),
 		nil,
 		false
 	)
 end
-
-

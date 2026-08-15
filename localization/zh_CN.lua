@@ -106,7 +106,7 @@ return {
 					"{X:mult,C:white}X#1#{}倍率",
 				},
 			},
-			j_mp_hanging_chad_standard = {
+			j_mp_hanging_chad = {
 				name = "未断选票",
 				text = {
 					"打出的牌中{C:attention}第一张{}和{C:attention}第二张{}",
@@ -158,16 +158,6 @@ return {
 				text = {
 					"拥有{C:attention}永恒{}和{C:dark_edition}负片{}属性",
 					"由你的{X:purple,C:white}宿敌{}创建被并摧毁",
-				},
-			},
-		},
-		Enhanced = {
-			m_mp_glass = {
-				name = "玻璃牌",
-				text = {
-					"{X:mult,C:white}X#1#{}倍率",
-					"有{C:green}#2#/#3#{}几率",
-					"摧毁此牌",
 				},
 			},
 		},

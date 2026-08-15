@@ -6,6 +6,7 @@ return [[
 local CONFIG_URL, CONFIG_PORT = ...
 
 require("love.filesystem")
+local json = require("json")
 local socket = require("socket")
 
 local DEBUGGING = false
@@ -30,8 +31,13 @@ end
 
 Networking = {}
 local isSocketClosed = true
+local hasGivenUp = false -- true after all reconnect attempts failed
 local networkToUiChannel = love.thread.getChannel("networkToUi")
 local uiToNetworkChannel = love.thread.getChannel("uiToNetwork")
+
+-- Reconnection settings
+local maxReconnectAttempts = 3
+local reconnectDelays = { 2, 4, 8 } -- seconds, exponential backoff
 
 function Networking.connect()
 	-- TODO: Check first if Networking.Client is not null
@@ -54,11 +60,34 @@ function Networking.connect()
 			action = "error",
 			message = "Failed to connect to multiplayer server",
 		}))
+		return false
 	else
 		isSocketClosed = false
+		hasGivenUp = false
 	end
 
 	Networking.Client:settimeout(0)
+	return true
+end
+
+-- Attempt automatic reconnection with exponential backoff.
+-- Returns true if reconnected, false if all attempts failed.
+function Networking.tryReconnect()
+	SEND_THREAD_DEBUG_MESSAGE("Connection lost, attempting automatic reconnection...")
+
+	for attempt = 1, maxReconnectAttempts do
+		local delay = reconnectDelays[attempt] or reconnectDelays[#reconnectDelays]
+		SEND_THREAD_DEBUG_MESSAGE(string.format("Reconnect attempt %d/%d in %ds...", attempt, maxReconnectAttempts, delay))
+		socket.sleep(delay)
+
+		if Networking.connect() then
+			SEND_THREAD_DEBUG_MESSAGE("Reconnected successfully!")
+			return true
+		end
+	end
+
+	SEND_THREAD_DEBUG_MESSAGE("All reconnection attempts failed.")
+	return false
 end
 
 -- Check for messages from the main thread
@@ -71,6 +100,7 @@ local mainThreadMessageQueue = function()
 			local msg = uiToNetworkChannel:pop()
 			if msg then
 				if msg == "{\"action\":\"connect\"}" then
+					hasGivenUp = false
 					Networking.connect()
 				else
 					Networking.Client:send(msg .. "\n")
@@ -97,9 +127,9 @@ end
 local timerCoroutine = coroutine.create(timer)
 
 -- All values are in seconds
-local keepAliveInitialTimeout = 7
-local keepAliveRetryTimeout = 3
-local keepAliveRetryCount = 3
+local keepAliveInitialTimeout = 20
+local keepAliveRetryTimeout = 5
+local keepAliveRetryCount = 4
 
 local isRetry = false
 local retryCount = 0
@@ -108,7 +138,7 @@ local retryCount = 0
 local networkPacketQueue = function()
 	local packetsPerCycle = 25
 	while true do
-		if Networking.Client then
+		if Networking.Client and not hasGivenUp then
 			-- Tries to fetch a packet a max of packetsPerCycle times
 			-- and then yields
 			for _ = 1, packetsPerCycle do
@@ -120,16 +150,27 @@ local networkPacketQueue = function()
 					-- Also reset timer
 					timerCoroutine = coroutine.create(timer)
 
-					-- For now, we just send the string as is to the main thread
+					-- Respond to server keepAlive directly on the socket
+					-- to avoid latency from routing through the UI thread
+					if string.find(data, '"keepAlive"') and not string.find(data, 'Ack') then
+						Networking.Client:send('{"action":"keepAliveAck"}\n')
+					end
+
+					-- Send the string as is to the main thread
 					networkToUiChannel:push(data)
 				elseif error == "close" then
-					-- Handle connection closed gracefully
+					-- Connection closed, attempt automatic reconnection
 					isSocketClosed = true
 					retryCount = 0
 					isRetry = false
-
 					timerCoroutine = coroutine.create(timer)
-					networkToUiChannel:push("{\"action\":\"disconnected\"}")
+
+					networkToUiChannel:push("{\"action\":\"reconnecting\"}")
+					if not Networking.tryReconnect() then
+						hasGivenUp = true
+						networkToUiChannel:push("{\"action\":\"disconnected\"}")
+					end
+					break
 				else
 					-- If there are no more packets, yield
 					coroutine.yield()
@@ -162,14 +203,17 @@ while true do
 		if retryCount > keepAliveRetryCount then
 			Networking.Client:close()
 
-			-- Connection closed, restart everything
+			-- Keepalive failed, attempt automatic reconnection
 			isSocketClosed = true
 			retryCount = 0
 			isRetry = false
-
 			timerCoroutine = coroutine.create(timer)
 
-			networkToUiChannel:push("{\"action\":\"disconnected\"}")
+			networkToUiChannel:push("{\"action\":\"reconnecting\"}")
+			if not Networking.tryReconnect() then
+				hasGivenUp = true
+				networkToUiChannel:push("{\"action\":\"disconnected\"}")
+			end
 		end
 
 		if isRetry then
@@ -183,7 +227,7 @@ while true do
 		end
 	end
 
-	-- Sleeps for 200 milliseconds
-	socket.sleep(0.2)
+	-- Sleeps for 50 milliseconds
+	socket.sleep(0.05)
 end
 ]]

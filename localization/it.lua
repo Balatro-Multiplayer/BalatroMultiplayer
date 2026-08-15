@@ -84,16 +84,6 @@ return {
 					"{C:inactive}(Attualmente {C:mult}+#2#{C:inactive} Molt)",
 				},
 			},
-			j_mp_magnet = {
-				name = "Magnete",
-				text = {
-					"Dopo {C:attention}#1#{} round,",
-					"vendi questa carta per {C:attention}Copiare{}",
-					"il {C:attention}Jolly{} più costoso",
-					"della tua {X:purple,C:white}Nemesi",
-					"{C:inactive}(Attualmente {C:attention}#2#{C:inactive}/#3# round)",
-				},
-			},
 			j_mp_pizza = {
 				name = "Pizza",
 				text = {
@@ -358,16 +348,6 @@ return {
 				text = {
 					"{C:attention}Eterna{} e {C:dark_edition}Negativa{}",
 					"Creata e distrutta dalla tua {X:purple,C:white}Nemesi{}",
-				},
-			},
-		},
-		Enhanced = {
-			m_mp_glass = {
-				name = "Carta di vetro",
-				text = {
-					"{X:mult,C:white} X#1#{} Molt",
-					"{C:green}#2# probabilità su #3#{} di",
-					"distruggere la carta",
 				},
 			},
 		},
@@ -666,7 +646,6 @@ return {
 				"nemico",
 			},
 			ml_mp_kofi_message = {
-				" ",
 				" ",
 				"Questa mod e server è sviluppata e mantenuta",
 				"da una persona, se ti è piaciuta considera",

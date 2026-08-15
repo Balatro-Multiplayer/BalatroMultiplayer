@@ -2,12 +2,15 @@ local function create_player_info_row(player, player_type, text_scale)
 	if not player or not player.username then return nil end
 
 	return MP.UI.UTILS.create_row({ padding = 0.1, align = "cm" }, {
-		MP.UI.UTILS.create_text_node(nil, {
-			ref_table = player,
-			ref_value = "username",
-			scale = text_scale * 0.8,
-			colour = G.C.UI.TEXT_LIGHT,
-		}),
+        MP.UI.UTILS.create_column({ align = "cm", maxw = 3 }, {
+            MP.UI.UTILS.create_text_node(nil, {
+                ref_table = player,
+                ref_value = "username",
+                scale = text_scale * 0.8,
+                colour = G.C.UI.TEXT_LIGHT,
+                maxw = 3.5
+            }),
+        }),
 		MP.UI.UTILS.create_blank(0.1, 0.1),
 		player.hash and UIBox_button({
 			id = player_type .. "_hash",

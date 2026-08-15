@@ -48,4 +48,3 @@ function G.UIDEF.weekly_interrupt(loaded)
 		})
 	)
 end
-

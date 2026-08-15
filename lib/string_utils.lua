@@ -24,3 +24,7 @@ function MP.UTILS.string_split(inputstr, sep)
 	end
 	return t
 end
+
+function MP.UTILS.string_starts(str, prefix)
+    return str:sub(1, #prefix) == prefix
+end

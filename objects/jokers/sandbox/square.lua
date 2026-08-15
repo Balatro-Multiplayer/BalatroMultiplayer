@@ -17,7 +17,7 @@ SMODS.Joker({
 	cost = 4,
 	atlas = "square_sandbox",
 	pixel_size = { h = 71 },
-	config = { extra = { chips = 64, chip_mod = 16 }, mp_sticker_balanced = true },
+	config = { extra = { chips = 64, chip_mod = 16 }, mp_balanced = true },
 	loc_vars = function(self, info_queue, card)
 		return { vars = { card.ability.extra.chips, card.ability.extra.chip_mod } }
 	end,
@@ -33,7 +33,7 @@ SMODS.Joker({
 			chips = card.ability.extra.chips,
 		} end
 	end,
-	mp_credits = { idea = { "Owen" } },
+	mp_credits = { idea = { "Owen" }, code = { "steph" } },
 	mp_include = function(self)
 		return MP.SANDBOX.is_joker_allowed(self.key)
 	end,

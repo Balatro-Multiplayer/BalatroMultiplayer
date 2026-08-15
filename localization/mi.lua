@@ -133,16 +133,6 @@ return {
 				},
 			},
 		},
-		Enhanced = {
-			m_mp_glass = {
-				name = "Kāri Karāhe",
-				text = {
-					"{X:mult,C:white} X#1# {} Rea",
-					"He {C:green}#2#/#3#{} te tūpono ka",
-					"pakaru te kāri",
-				},
-			},
-		},
 		Other = {
 			current_nemesis = {
 				name = "Te Hoariri",
@@ -253,7 +243,7 @@ return {
 			},
 			ml_mp_kofi_message = {
 				"Kōtahi anake te tāngata e",
-				"whakahaere, e tuarā ana ",
+				"whakahaere, e tuarā ana",
 				"i te Balatro Multiplayer.",
 				"Mēnā e pīrangi ana,",
 			},
