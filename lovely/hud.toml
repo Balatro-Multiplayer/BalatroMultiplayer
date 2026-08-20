@@ -3,13 +3,11 @@ version = "1.0.0"
 dump_lua = true
 priority = 2147483600
 
-[[patches]]
-[patches.regex]
-target = "functions/UI_definitions.lua"
-pattern = '''contents\.buttons = \{(?<pre>[\s\S]*?)minh = 1\.75(?<between>[\s\S]*?)minh = 1\.75'''
-position = 'at'
-payload = '''contents.buttons = {$pre minh = (PVP.LOBBY.code or (PVP.is_practice_mode and PVP.is_practice_mode())) and 1.2 or 1.75$between minh = (PVP.LOBBY.code or (PVP.is_practice_mode and PVP.is_practice_mode())) and 1.2 or 1.75'''
-times = 1
+# Run Info/Options minh-shrink patch used to live here -- moved to
+# BalatroMultiplayerAPI's own lovely/hud.toml (generalized to
+# MPAPI.get_current_lobby(), with a PVP.is_practice_mode() fallback for this
+# mod's own practice mode) so SPDRN gets the same consistent HUD button
+# heights instead of only PvP.
 
 [[patches]]
 [patches.regex]
