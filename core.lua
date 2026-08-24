@@ -373,12 +373,28 @@ PVP.load_mp_dir("objects/vouchers")
 -- MPAPI.ActionType. The menus here are placeholders — Phase 6 builds the real
 -- Find Game / Leaderboard / Practice / Join / Create layout.
 MPAPI.on_loaded(function()
+	MPAPI.Page({
+		key = 'pvp_main_menu',
+		category = 'mod_menu',
+		build = function(self)
+			return PVP.build_pre_lobby_ui()
+		end,
+	})
+
+	MPAPI.Page({
+		key = 'pvp_lobby',
+		category = 'lobby_menu',
+		build = function(self)
+			return PVP.build_in_lobby_ui()
+		end,
+	})
+
 	MPAPI.register_mod({
 		id = PVP.id,
 		name = "PvP",
 		colour = G.C.RED,
-		main_menu_ui = PVP.build_pre_lobby_ui,
-		lobby_ui = PVP.build_in_lobby_ui,
+		main_menu_ui = 'pvp_main_menu',
+		lobby_ui = 'pvp_lobby',
 		-- Custom in-run pause menu (Settings + Seed Change + Forfeit), built by the API's
 		-- options_builder hook instead of the vanilla options box (see ui/pvp_run_options.lua).
 		prevent_pause = true,
