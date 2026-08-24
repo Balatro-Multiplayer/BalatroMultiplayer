@@ -163,6 +163,7 @@ function PVP.UI.create_UIBox_mp_game_end(has_won)
 
 	return MPAPI.end_screen_uibox({
 		won = has_won,
+		draw = PVP.GAME.draw,
 		id = has_won and "you_win_UI" or nil,
 		body = PVP.UI.end_game_body,
 	})

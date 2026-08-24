@@ -9,6 +9,12 @@ G.FUNCS.mp_pvp_seed_change = function()
 	PVP.cast_seed_vote()
 end
 
+G.FUNCS.mp_pvp_draw_vote = function()
+	G.FUNCS.exit_overlay_menu()
+	-- A unanimous vote ends the match as a draw (see pvp_draw_vote action).
+	PVP.cast_draw_vote()
+end
+
 G.FUNCS.mp_pvp_forfeit = function()
 	G.FUNCS.exit_overlay_menu()
 	PVP.pvp_forfeit()
@@ -52,6 +58,18 @@ PVP.create_run_options = function()
 			minw = 5,
 			enabled = within_window,
 		}).node)
+	end
+
+	-- Draw vote: hidden entirely when the gamemode sets draw_vote_allowed = false.
+	-- No time window, unlike Seed Change above -- a draw ending the match outright
+	-- is a different risk profile than reseeding mid-run.
+	if not gm or gm.draw_vote_allowed ~= false then
+		add_row(UIBox_button({
+			button = "mp_pvp_draw_vote",
+			label = { localize("k_draw_vote") },
+			colour = G.C.BLUE,
+			minw = 5,
+		}))
 	end
 
 	add_row(UIBox_button({ button = "mp_pvp_forfeit", label = { "Forfeit" }, minw = 5, colour = G.C.RED }))

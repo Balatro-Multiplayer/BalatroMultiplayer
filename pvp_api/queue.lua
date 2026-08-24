@@ -83,10 +83,13 @@ end
 
 -- Host-only: report the finished match's placements to the server (ELO for ranked,
 -- plain resolve for casual). One-shot per match. metric = each player's best PvP
--- score (the leaderboard's season-best column).
-function PVP.report_match_result(winner_id)
+-- score (the leaderboard's season-best column). `opts.draw` (a drawn match, see
+-- pvp_api/actions/outcomes.lua's pvp_win handler) skips reporting entirely -- a
+-- draw has no winner for ELO/leaderboard placement to rate.
+function PVP.report_match_result(winner_id, opts)
+	opts = opts or {}
 	local handle = PVP._match_handle
-	if not handle or not handle.report_result or winner_id == "*draw*" then
+	if not handle or not handle.report_result or opts.draw then
 		return
 	end
 	if PVP._result_reported then

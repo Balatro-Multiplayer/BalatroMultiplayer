@@ -264,6 +264,9 @@ PVP.setup_lobby_mirror = function(lobby)
 		if PVP.lobby and PVP.lobby.seed_votes then
 			PVP.lobby.seed_votes:remove(player_id)
 		end
+		if PVP.lobby and PVP.lobby.draw_votes then
+			PVP.lobby.draw_votes:remove(player_id)
+		end
 		mirror_players(lobby)
 		-- The gamemode's forfeit hook (host-authoritative) handles a mid-match leave.
 		local gm = lobby.get_gamemode_instance and lobby:get_gamemode_instance()

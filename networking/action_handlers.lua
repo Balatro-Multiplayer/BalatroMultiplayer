@@ -350,6 +350,9 @@ local function action_start_game(p)
 	if PVP.lobby and PVP.lobby.seed_votes then
 		PVP.lobby.seed_votes:reset()
 	end
+	if PVP.lobby and PVP.lobby.draw_votes then
+		PVP.lobby.draw_votes:reset()
+	end
 	local stake = tonumber(p.stake)
 	PVP.ACTIONS.set_ante(0)
 	if not PVP.LOBBY.config.different_seeds and PVP.LOBBY.config.custom_seed ~= "random" then
@@ -505,6 +508,26 @@ local function action_lose_game()
 	G.STATE_COMPLETE = false
 	G.STATE = G.STATES.GAME_OVER
 	PVP.RLOG.end_run({ result = "loss" })
+	PVP.UTILS.log_mem_debug_messages()
+	PVP.UTILS.emit_log_checksum()
+	PVP.report_roster_result()
+end
+
+-- A draw is neither a win nor a loss -- same game-over-shaped state transition as
+-- action_lose_game (PVP.GAME.won stays unset, so create_UIBox_game_over is what
+-- vanilla's own win/game-over dichotomy calls, see game_end.lua's overrides), but
+-- PVP.GAME.draw flags it so PVP.UI.create_UIBox_mp_game_end shows the real draw
+-- screen instead, and PVP.STATS.record_match is skipped entirely (a draw counts as
+-- neither a win nor a loss in the match-history stats).
+local function action_draw_game()
+	PVP.end_game_jokers_payload = ""
+	PVP.nemesis_deck_string = ""
+	PVP.end_game_jokers_received = false
+	PVP.nemesis_deck_received = false
+	PVP.GAME.draw = true
+	G.STATE_COMPLETE = false
+	G.STATE = G.STATES.GAME_OVER
+	PVP.RLOG.end_run({ result = "draw" })
 	PVP.UTILS.log_mem_debug_messages()
 	PVP.UTILS.emit_log_checksum()
 	PVP.report_roster_result()
@@ -1173,6 +1196,7 @@ local HANDLERS = {
 	playerInfo = action_player_info,
 	winGame = action_win_game,
 	loseGame = action_lose_game,
+	drawGame = action_draw_game,
 	lobbyOptions = action_lobby_options,
 	enemyLocation = enemyLocation,
 	speedrun = action_speedrun,

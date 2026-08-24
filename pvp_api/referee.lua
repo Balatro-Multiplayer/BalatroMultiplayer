@@ -111,11 +111,17 @@ local function alive_ids()
 end
 
 -- Declares pvp_win once exactly one player remains alive (Royale's N-player analog
--- of the 2-player "opponent hit 0 lives" check). Returns true if it fired.
+-- of the 2-player "opponent hit 0 lives" check) -- or a draw if the last life(ves)
+-- lost eliminated everyone still standing simultaneously (no single survivor).
+-- Returns true if it fired.
 local function check_alive_win()
 	local alive = alive_ids()
-	if #alive <= 1 then
-		broadcast("pvp_win", { winner_id = alive[1] or "*draw*" })
+	if #alive == 0 then
+		broadcast("pvp_win", { draw = true })
+		return true
+	end
+	if #alive == 1 then
+		broadcast("pvp_win", { winner_id = alive[1] })
 		return true
 	end
 	return false

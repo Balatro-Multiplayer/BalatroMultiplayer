@@ -44,6 +44,19 @@ A("pvp_player_lives", function(_at, _from, params)
 end)
 
 A("pvp_win", function(_at, _from, params)
+	local lobby = MPAPI.get_current_lobby()
+	-- A draw (a unanimous vote, or referee.lua's check_alive_win seeing everyone
+	-- eliminated at once) has no winner to resolve against -- both routes here
+	-- converge on the same drawGame dispatch/MMR-skip, see pvp_api/run_actions.lua's
+	-- PVP.register_draw_vote for why this reuses pvp_win instead of a separate action.
+	if params.draw then
+		PVP.dispatch_action("drawGame")
+		if lobby and lobby.is_host and PVP.report_match_result then
+			PVP.report_match_result(nil, { draw = true })
+		end
+		return
+	end
+
 	local sid = self_id()
 	local i_won
 	if params.winner_team_id then
@@ -51,14 +64,11 @@ A("pvp_win", function(_at, _from, params)
 		-- empty, see referee.lua) -- resolve against my own roster assignment
 		-- instead of comparing player ids.
 		i_won = PVP.LOBBY.roster and PVP.LOBBY.roster[sid] == params.winner_team_id
-	elseif params.winner_id == "*draw*" then
-		i_won = true
 	else
 		i_won = params.winner_id == sid
 	end
 	PVP.dispatch_action(i_won and "winGame" or "loseGame")
 	-- Host reports the matchmaking result (ELO + leaderboard) once per match.
-	local lobby = MPAPI.get_current_lobby()
 	if lobby and lobby.is_host and PVP.report_match_result then
 		PVP.report_match_result(params.winner_team_id or params.winner_id)
 	end

@@ -7,6 +7,8 @@ PVP.lobby = PVP.lobby or { buttons = {} }
 PVP.lobby.ready = PVP.lobby.ready or MPAPI.ReadyTracker()
 -- Unanimous seed-change vote tracker (pause menu -> pvp_seed_vote); see pvp_api/run_actions.lua.
 PVP.lobby.seed_votes = PVP.lobby.seed_votes or MPAPI.VoteTracker()
+-- Unanimous draw vote tracker (pause menu -> pvp_draw_vote); see pvp_api/run_actions.lua.
+PVP.lobby.draw_votes = PVP.lobby.draw_votes or MPAPI.VoteTracker()
 
 function PVP.get_lobby_kind()
 	return PVP._pvp_kind

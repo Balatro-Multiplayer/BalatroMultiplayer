@@ -1,4 +1,4 @@
--- Pause-menu run actions: Forfeit + Seed-change vote (mirrors Speed's
+-- Pause-menu run actions: Forfeit + Seed-change vote + Draw vote (mirrors Speed's
 -- objects/actions/forfeit.lua + objects/actions/seed_vote.lua + ui/lobby/seed_vote.lua).
 -- Loaded inside MPAPI.on_loaded (pvp_api dir) so the ActionTypes are tagged to this mod.
 -- prefix_config.key = false keeps the literal pvp_* keys (see actions.lua for why).
@@ -98,5 +98,54 @@ function PVP.register_seed_vote(voter_id)
 	if lobby.is_host and unanimous and MPAPI.ActionTypes["pvp_reseed"] then
 		PVP.lobby.seed_votes:reset()
 		lobby:action(MPAPI.ActionTypes["pvp_reseed"]):broadcast({ seed = PVP.generate_seed() })
+	end
+end
+
+-- ── Draw vote ────────────────────────────────────────────────────────────────
+-- A unanimous vote ends the match as a draw. Each client tallies the vote
+-- independently (broadcast reaches all); the host declares the draw on unanimity.
+MPAPI.ActionType({
+	key = "pvp_draw_vote",
+	prefix_config = { key = false },
+	on_receive = function(_at, from_player_id, _params)
+		PVP.register_draw_vote(from_player_id)
+	end,
+})
+
+function PVP.cast_draw_vote()
+	local lobby = MPAPI.get_current_lobby()
+	if not lobby or not MPAPI.ActionTypes["pvp_draw_vote"] then
+		return
+	end
+	lobby:action(MPAPI.ActionTypes["pvp_draw_vote"]):broadcast({})
+end
+
+-- Runs on every client when any vote arrives. Tallies via the lobby VoteTracker, shows
+-- progress in chat, and (host only) declares the draw once the vote is unanimous.
+--
+-- Reuses the existing pvp_win action (params.draw = true) rather than a dedicated
+-- resolution ActionType: pvp_win is already the one authoritative "match outcome"
+-- broadcast every client reacts to (see pvp_api/actions/outcomes.lua), and
+-- referee.lua's check_alive_win declares a simultaneous-elimination draw through
+-- that exact same action -- reusing it here means both ways a match can end in a
+-- draw converge on one on_receive handler instead of two parallel copies of the
+-- same "show the draw screen, skip MMR" logic.
+function PVP.register_draw_vote(voter_id)
+	local lobby = MPAPI.get_current_lobby()
+	if not lobby or not PVP.lobby or not PVP.lobby.draw_votes then
+		return
+	end
+	local count, total, unanimous = PVP.lobby.draw_votes:record(voter_id)
+
+	if MPAPI.chat and MPAPI.chat.addMessage then
+		MPAPI.chat.addMessage(
+			(localize("k_draw_vote") or "Vote for Draw") .. ": " .. count .. "/" .. total,
+			G.C.BLUE
+		)
+	end
+
+	if lobby.is_host and unanimous and MPAPI.ActionTypes["pvp_win"] then
+		PVP.lobby.draw_votes:reset()
+		lobby:action(MPAPI.ActionTypes["pvp_win"]):broadcast({ draw = true })
 	end
 end
