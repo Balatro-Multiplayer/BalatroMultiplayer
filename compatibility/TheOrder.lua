@@ -50,28 +50,28 @@ function reset_idol_card()
 		local function edition_weight(card)
 			local e = card.edition
 			if not e then return 0.0 end
-			if e.polychrome then return 1.05 end
-			if e.glass then return 0.95 end -- some mods track glass as an edition, not enhancement
-			if e.holo then return 0.15 end
-			if e.foil then return 0.15 end
+			if e.polychrome then return 0.50 end
+			if e.glass then return 0.50 end -- some mods track glass as an edition, not enhancement
+			if e.holo then return 0.25 end
+			if e.foil then return 0.25 end
 			return 0.0
 		end
 
 		local function enhancement_weight(card)
 			local eff = card.ability and card.ability.effect
-			if eff == "Glass Card" then return 0.95 end
-			if eff == "Lucky Card" then return 0.15 end
+			if eff == "Glass Card" then return 0.50 end
+			if eff == "Lucky Card" then return 0.01 end
 			--if eff == "Steel Card" then return 0.15 end
 			--if eff == "Wild Card" then return 0.05 end
-			if eff == "Bonus Card" then return 0.10 end
-			if eff == "Mult Card" then return 0.10 end
+			if eff == "Bonus Card" then return 0.01 end
+			if eff == "Mult Card" then return 0.01 end
 			--if eff == "Gold Card" then return 0.05 end
 			return 0.0
 		end
 
 		local function seal_weight(card)
 			local s = card.seal
-			if s == "Red" then return 1.2 end
+			if s == "Red" then return 1.0 end
 			--if s == "Purple" then return 0.15 end
 			--if s == "Gold" then return 0.30 end
 			--if s == "Blue" then return 0.05 end
@@ -216,10 +216,10 @@ function reset_idol_card()
 		-- ----------------------------------------------------------------
 		local TARGET_COPIES = 5   -- how many exact copies we're trying to reach
 
-		local W_EDITION_A = 1.3   -- Tier A: extra effect of enhanced cards (quality-dominant tier)
-		local W_EDITION_B = 0.7   -- Tier B: cares less about this bonus and more about quantity
-		local W_COUNT_A = 0.5     -- Tier A: reward per existing copy (quality-dominant tier)
-		local W_MAIN    = 2.2     -- Tier B: reward per existing copy (progress toward 5)
+		local W_EDITION_A = 1.0   -- Tier A: extra effect of enhanced cards (quality-dominant tier)
+		local W_EDITION_B = 0.5   -- Tier B: cares less about this bonus and more about quantity
+		local W_COUNT_A = 1.0     -- Tier A: reward per existing copy (quality-dominant tier)
+		local W_MAIN    = 2.0     -- Tier B: reward per existing copy (progress toward 5)
 		local W_OFF     = 0.8     -- Tier B: suit-changer potential, capped by need
 		local W_STR     = 0.7    -- Tier B: Strength potential, capped by need
 		
