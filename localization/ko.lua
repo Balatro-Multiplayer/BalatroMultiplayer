@@ -705,7 +705,7 @@ return {
 			},
 			b_wait_for_guest_ready = {
 				"대기 중:",
-				"게스트 준비",
+				"#1# 준비",
 			},
 			b_lobby_options = "로비 옵션",
 			b_copy_clipboard = "클립보드로 복사",

@@ -831,8 +831,8 @@ return {
 				"NGƯỜI CHƠI",
 			},
 			b_wait_for_guest_ready = {
-				"ĐANG CHỜ NGƯỜI CHƠI",
-				"KHÁC SẴN SÀNG",
+				"ĐANG CHỜ #1#",
+				"SẴN SÀNG",
 			},
 			b_lobby_options = "TUỲ CHỈNH PHÒNG",
 			b_copy_clipboard = "Sao chép vào bộ nhớ đệm",
