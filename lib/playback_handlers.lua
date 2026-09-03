@@ -44,7 +44,16 @@ local function area_object(area_id)
 	return nil
 end
 
+-- Confirmed live in MPAPI/SPDRN's own copy of this function (see
+-- BalatroMultiplayerAPI/api/replay/generic_codes.lua's 'play'-area comment
+-- for the reproduced crash trace): G.hand can be nil, not just empty, at the
+-- moment a recorded opcode fires (it's torn down and rebuilt across round/run
+-- transitions) -- indexing G.hand.cards below would crash outright before any
+-- per-index lookup even ran. Not separately reproduced against a PvP
+-- recording, but ported the same guard rather than waiting for a PvP-specific
+-- crash to prove an already-unambiguous gap.
 local function highlight_hand_indices(indices)
+	if not (G.hand and G.hand.cards) then return end
 	for _, i in ipairs(indices or {}) do
 		local card = G.hand.cards[i]
 		if card then G.hand:add_to_highlighted(card) end
@@ -163,6 +172,17 @@ MPAPI.playback.register_handler('pvp', 'skip_blind', function(args, ctx)
 	end
 end)
 
+-- Same crash class as MPAPI/SPDRN's own play/discard handlers (see
+-- BalatroMultiplayerAPI/api/replay/generic_codes.lua's 'play' comment for the
+-- reproduced-live crash trace): highlight_hand_indices is purely positional
+-- here (no ref-based resolution in this port yet), so a desynced replay
+-- pointing at out-of-range/stale indices can silently highlight nothing at
+-- all, and calling play_cards_from_highlighted()/discard_cards_from_highlighted()
+-- with an empty G.hand.highlighted crashes vanilla's evaluate_play (no
+-- empty-hand guard exists outside the real UI's disabled Play button). Not
+-- separately reproduced against a PvP recording, but the exact same
+-- unconditional-call structure is unambiguously present, so ported the same
+-- guard rather than waiting for a PvP-specific crash to prove it.
 MPAPI.playback.register_handler('pvp', 'play', function(args, ctx)
 	if not ctx.is_pov then
 		return
@@ -172,6 +192,13 @@ MPAPI.playback.register_handler('pvp', 'play', function(args, ctx)
 		return
 	end
 	highlight_hand_indices(indices)
+	local highlighted = G.hand and G.hand.highlighted
+	if not highlighted or #highlighted == 0 then
+		if G.hand then
+			MPAPI.sendWarnMessage('[replay] play: no cards resolved out of ' .. #indices .. ' -- replay has desynced from the recording, skipping this play entirely')
+		end
+		return
+	end
 	G.FUNCS.play_cards_from_highlighted()
 end)
 
@@ -184,6 +211,13 @@ MPAPI.playback.register_handler('pvp', 'discard', function(args, ctx)
 		return
 	end
 	highlight_hand_indices(indices)
+	local highlighted = G.hand and G.hand.highlighted
+	if not highlighted or #highlighted == 0 then
+		if G.hand then
+			MPAPI.sendWarnMessage('[replay] discard: no cards resolved out of ' .. #indices .. ' -- replay has desynced from the recording, skipping this discard entirely')
+		end
+		return
+	end
 	G.FUNCS.discard_cards_from_highlighted(nil, false)
 end)
 
@@ -201,6 +235,17 @@ MPAPI.playback.register_handler('pvp', 'sell', function(args, ctx)
 	end
 end)
 
+-- Vanilla's own G.FUNCS.buy_from_shop calls G.FUNCS.check_for_buy_space(c1)
+-- unless e.config.id == 'buy_and_use' -- and that check only recognizes
+-- Voucher/Enhanced/Default/Joker/consumeable cards. A Booster Pack is none of
+-- those (card.ability.set == 'Booster'), so the check unconditionally fails
+-- and buy_from_shop silently returns false -- no error, nothing bought --
+-- unless buy_and_use is set, which is how the real "BUY" button on a pack
+-- card is actually wired (functions/UI_definitions.lua). Same bug found and
+-- fixed in SPDRN's own copy of this handler (BalatroMultiplayerSpeed/objects/
+-- replay_log/playback_handlers.lua) and MPAPI's generic baseline (api/replay/
+-- generic_codes.lua) -- every replayed open_pack here was silently buying
+-- nothing.
 local function replay_buy(args, ctx)
 	if not ctx.is_pov then
 		return
@@ -209,7 +254,8 @@ local function replay_buy(args, ctx)
 	local area = area_object(area_id)
 	local card = area and area.cards and area.cards[idx]
 	if card then
-		G.FUNCS.buy_from_shop({ config = { ref_table = card } })
+		local id = card.ability and card.ability.set == 'Booster' and 'buy_and_use' or nil
+		G.FUNCS.buy_from_shop({ config = { id = id, ref_table = card } })
 	end
 end
 MPAPI.playback.register_handler('pvp', 'buy', replay_buy)
@@ -274,6 +320,17 @@ MPAPI.playback.register_handler('pvp', 'reorder', function(args, ctx)
 		return
 	end
 	local old_cards = area.cards
+	-- PVP.UTILS.reorder_permutation only ever produces a perm when the
+	-- recorder's own old/new card counts matched exactly, so any mismatch
+	-- here means this replay has already desynced from the recording.
+	-- Splicing anyway either writes nils into area.cards (old_cards shorter
+	-- than perm) or silently drops every card beyond #perm (old_cards
+	-- longer) -- same class of bug found and fixed in SPDRN's and MPAPI's
+	-- own copies of this handler. Skip the whole opcode rather than corrupt
+	-- the area.
+	if not old_cards or #old_cards ~= #perm then
+		return
+	end
 	local new_cards = {}
 	for j = 1, #perm do
 		new_cards[j] = old_cards[perm[j]]
