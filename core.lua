@@ -389,6 +389,29 @@ MPAPI.on_loaded(function()
 		end,
 	})
 
+	-- Pillar-based Find Game screen (ui/main_menu/find_game.lua), mirroring SPDRN's
+	-- spdrn_game_select page/pillar-row setup one-for-one -- see that file's own core.lua
+	-- registration for the on_enter offset-nudge/logo-position reasoning this copies.
+	MPAPI.Page({
+		key = 'pvp_find_game',
+		category = 'game_select',
+		build = function(self)
+			self._pillar_row = PVP.build_find_game_ui()
+			return self._pillar_row.definition
+		end,
+		on_enter = function(self)
+			if G.MAIN_MENU_UI then
+				G.MAIN_MENU_UI.alignment.offset.y = 1.5
+				G.MAIN_MENU_UI:align_to_major()
+			end
+		end,
+		dispose = function(self)
+			if self._pillar_row then
+				self._pillar_row:dispose()
+			end
+		end,
+	})
+
 	MPAPI.register_mod({
 		id = PVP.id,
 		name = "PvP",
