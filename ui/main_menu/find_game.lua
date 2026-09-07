@@ -2,15 +2,22 @@
 -- layout (BalatroMultiplayerAPI/api/ui_pillar_row.lua) -- same shape SPDRN's gamemode-select
 -- page uses (BalatroMultiplayerSpeed/ui/main_menu/game_select.lua). Replaces the old two-step
 -- Find Game -> Ranked/Casual -> ruleset grid overlay (pvp_api/queue.lua's now-removed
--- mp_pvp_find_game_ranked/_casual) with a single screen showing every queueable mode as a
--- pillar, grouped Ranked-then-Casual via each item's `group`.
+-- mp_pvp_find_game_ranked/_casual).
 --
--- WIP per user request 2026-09-08: visual layout pass only. Chip art is a single placeholder
--- frame reused across every pillar (no per-mode art exists yet), and MLBa Ranked has no
--- matchmaking gamemode-key registered in PVP.PVP_GAMEMODES yet, so its SELECT button is
--- disabled rather than wired to a queue call that would fail. Everything else routes straight
--- to the existing mp_pvp_queue_ranked_*/mp_pvp_queue_casual_* handlers (pvp_api/queue.lua),
--- unchanged.
+-- Ranked (5 pillars) and Casual (4 pillars) are two separate screens now, not one 9-pillar row
+-- -- too many to read comfortably on one page (2026-09-08 user feedback on the first pass).
+-- self.params.category (set by the tab buttons below, read in core.lua's page registration)
+-- picks which list PVP.build_find_game_ui builds; the tab row at the top of the page switches
+-- between them via a normal MPAPI.pages.show() re-navigation (same page, new params), same
+-- mechanism SPDRN's practice/create_lobby/find_game intents already use -- not a separate
+-- widget/mechanism of its own.
+--
+-- WIP: chip art is a single placeholder frame reused across every pillar (no per-mode art
+-- exists yet), and MLBa Ranked has no matchmaking gamemode-key registered in PVP.PVP_GAMEMODES
+-- yet, so its SELECT button is disabled rather than wired to a queue call that would fail.
+-- Everything else routes straight to the existing mp_pvp_queue_ranked_*/mp_pvp_queue_casual_*
+-- handlers (pvp_api/queue.lua), unchanged.
+
 -- No new atlas registered here -- reuses objects/blinds/nemesis.lua's already-registered
 -- "player_blind_chip" (G.ANIMATION_ATLAS['mp_player_blind_chip'], SMODS auto-prefixes the key)
 -- as a generic placeholder chip for every pillar, rather than adding a second atlas just to
@@ -21,6 +28,17 @@
 -- input), so the atlas is always registered by the time this runs.
 local PLACEHOLDER_CHIP_ROW = 0
 
+-- uses_order reflects PVP.LOBBY.config.the_order as core.lua's reset_lobby_config default
+-- (true) and each ruleset's own force_lobby_options override actually resolve it, not a
+-- hand-picked guess: rulesets/majorleague.lua explicitly forces false; chocolate_ranked's
+-- "ranked" layer (layers/ranked.lua) explicitly forces true (redundant with the default, but
+-- explicit); strawberry/smallworld have no override, so they inherit the true default.
+-- KNOWN MISMATCH: rulesets/vanilla.lua has no force_lobby_options at all, so it also inherits
+-- the true default -- Vanilla Ranked is listed here as false (no Order) per the content this
+-- was requested with, but as of this commit the ruleset itself doesn't actually turn the_order
+-- off. Flagged, not silently "fixed" -- changing vanilla.lua's actual lobby behavior wasn't
+-- part of this visual pass.
+--
 -- Ranked: always exactly 2 players (matchmaking.service.ts's forfeit/ELO resolution is
 -- hardcoded for a 2-player result) -- see pvp_api/queue.lua's own comment on this. MLBa has no
 -- gamemode_key of its own in PVP.PVP_GAMEMODES yet (only a ruleset, rulesets/majorleague.lua),
@@ -28,19 +46,19 @@ local PLACEHOLDER_CHIP_ROW = 0
 -- queue call that would silently misresolve.
 local RANKED_MODES = {
 	{ key = "pvp_vanilla", name = { "Vanilla", "Ranked" },
-		desc = { "Normal Balatro with", "PvP blinds" }, caption = "No Order button",
+		desc = { "Normal Balatro with", "PvP blinds" }, uses_order = false,
 		queue_button = "mp_pvp_queue_ranked_vanilla", colour = G.C.GREEN },
 	{ key = "pvp_chocolate", name = { "Chocolate", "Ranked" },
-		desc = { "Minor MP Balance", "Changes" }, caption = "Uses The Order",
+		desc = { "Minor MP Balance", "Changes" }, uses_order = true,
 		queue_button = "mp_pvp_queue_ranked_chocolate", colour = G.C.BLUE },
 	{ key = "pvp_strawberry", name = { "Strawberry", "Ranked" },
-		desc = { "Standardized and", "Balanced for MP" }, caption = "Uses The Order",
+		desc = { "Standardized and", "Balanced for MP" }, uses_order = true,
 		queue_button = "mp_pvp_queue_ranked_strawberry", colour = G.C.PURPLE },
 	{ key = "pvp_majorleague", name = { "MLBa", "Ranked" },
-		desc = { "Follows the MLBa", "Rules" }, caption = "No Order button",
+		desc = { "Follows the MLBa", "Rules" }, uses_order = false,
 		queue_button = nil, colour = G.C.BLACK },
 	{ key = "pvp_smallworld_ranked", name = { "Smallworld", "Ranked" },
-		desc = { "75% of cards are", "banned at random" },
+		desc = { "75% of cards are", "banned at random" }, uses_order = true,
 		queue_button = "mp_pvp_queue_ranked_smallworld", colour = G.C.RED },
 }
 
@@ -48,19 +66,21 @@ local RANKED_MODES = {
 -- see pvp_api/queue.lua's own §17.4 comment: casual Nemesis was always just Chocolate under a
 -- different label, never a fifth independent ruleset choice. Manhunt has an existing casual
 -- queue handler (mp_pvp_queue_casual_manhunt) but wasn't in the requested pillar set, so it's
--- left reachable only via Create Lobby for now, not duplicated here.
+-- left reachable only via Create Lobby for now, not duplicated here. All four resolve to a
+-- ruleset with no the_order override (Chocolate's "ranked" layer forces it true regardless of
+-- matchmaking kind; Smallworld inherits the true default), so all four use The Order.
 local CASUAL_MODES = {
 	{ key = "pvp_nemesis", name = "Nemesis",
-		desc = { "Face a different", "Nemesis every ante" },
+		desc = { "Face a different", "Nemesis every ante" }, uses_order = true,
 		queue_button = "mp_pvp_queue_casual_chocolate", colour = G.C.BLUE },
 	{ key = "pvp_royale", name = { "Battle", "Royale" },
-		desc = { "Everyone for themselves,", "bottom half of scores lose" },
+		desc = { "Everyone for themselves,", "bottom half of scores lose" }, uses_order = true,
 		queue_button = "mp_pvp_queue_casual_royale", colour = G.C.PURPLE },
 	{ key = "pvp_teams", name = "Teams",
-		desc = { "One team against another,", "best collective score wins" },
+		desc = { "One team against another,", "best collective score wins" }, uses_order = true,
 		queue_button = "mp_pvp_queue_casual_teams", colour = G.C.GREEN },
 	{ key = "pvp_smallworld_casual", name = "Smallworld",
-		desc = { "75% of cards are", "banned at random" },
+		desc = { "75% of cards are", "banned at random" }, uses_order = true,
 		queue_button = "mp_pvp_queue_casual_smallworld", colour = G.C.RED },
 }
 
@@ -82,12 +102,31 @@ local function build_stat_box(players)
 	return MPAPI.ui_pillar_stat_box({ label = "Players", value = players, value_colour = G.C.MONEY })
 end
 
-local function build_items(modes, group, players)
+-- Mirrors SPDRN's game_select.lua build_order_card exactly (same the_order_open button,
+-- MPAPI's own G.FUNCS handler, ui/the_order.lua) -- reused as-is, not reimplemented.
+local function build_order_card()
+	return MPAPI.ui_embossed_box({ minw = 2.4, nodes = {
+		{ n = G.UIT.R, config = { align = "cm" }, nodes = {
+			{ n = G.UIT.C, config = {
+				align = "cm", minw = 2.2, minh = 0.6, padding = 0.06, r = 0.1,
+				colour = G.C.BLUE, shadow = true, hover = true, one_press = true, button = "the_order_open",
+			}, nodes = {
+				{ n = G.UIT.R, config = { align = "cm" }, nodes = {
+					{ n = G.UIT.T, config = { text = "Uses", scale = 0.32, colour = G.C.UI.TEXT_LIGHT, shadow = true } },
+				} },
+				{ n = G.UIT.R, config = { align = "cm" }, nodes = {
+					{ n = G.UIT.T, config = { text = "The Order", scale = 0.32, colour = G.C.UI.TEXT_LIGHT, shadow = true } },
+				} },
+			} },
+		} },
+	} })
+end
+
+local function build_items(modes, players)
 	local items = {}
 	for _, mode in ipairs(modes) do
 		items[#items + 1] = {
 			id = mode.key,
-			group = group,
 			icon = build_chip_sprite(),
 			select = build_select(mode),
 			name_plate = MPAPI.ui_pillar_name_plate({
@@ -95,25 +134,71 @@ local function build_items(modes, group, players)
 				bg_colour = mix_colours(mode.colour, G.C.BLACK, 0.3),
 				outline_colour = mode.colour,
 			}),
-			description = MPAPI.ui_pillar_description_box({ lines = mode.desc, caption = mode.caption }),
+			description = MPAPI.ui_pillar_description_box({ lines = mode.desc }),
 			stat_box = build_stat_box(players),
+			extra = mode.uses_order and build_order_card() or nil,
 		}
 	end
 	return items
 end
 
--- Builds the pillar-row controller (MPAPI.ui_pillar_row's return value: {definition, row_node,
--- dispose}). The caller (pvp_find_game's MPAPI.Page registration, core.lua) owns the controller
--- for this page's lifetime: hand `.definition` to build(), and call `:dispose()` from the page's
--- own dispose() hook so the tracked chip icons get :remove()'d -- see api/ui_pillar_row.lua's
--- header comment for why that's required.
-function PVP.build_find_game_ui()
-	local items = {}
-	for _, item in ipairs(build_items(RANKED_MODES, "ranked", "2")) do
-		items[#items + 1] = item
+local TABS = {
+	{ key = "ranked", label = "RANKED", colour = G.C.RED },
+	{ key = "casual", label = "CASUAL", colour = G.C.BLUE },
+}
+
+local function build_tab_row(category)
+	local nodes = {}
+	for _, tab in ipairs(TABS) do
+		local is_active = tab.key == category
+		nodes[#nodes + 1] = { n = G.UIT.C, config = { align = "cm", padding = 0.08 }, nodes = {
+			UIBox_button({
+				button = "mp_pvp_find_game_tab",
+				ref_table = { category = tab.key },
+				label = { tab.label },
+				colour = is_active and tab.colour or G.C.UI.BACKGROUND_INACTIVE,
+				minw = 3.0,
+				minh = 0.6,
+				scale = 0.4,
+			}),
+		} }
 	end
-	for _, item in ipairs(build_items(CASUAL_MODES, "casual", "2-16")) do
-		items[#items + 1] = item
+	return { n = G.UIT.R, config = { align = "cm", padding = 0.1 }, nodes = nodes }
+end
+
+-- Re-navigates to this same page key with different params (category), same mechanism
+-- SPDRN's practice/create_lobby/find_game intents already use to switch content on
+-- spdrn_game_select -- verified live, repeatedly, in both directions with no stale content
+-- left behind. (An earlier version of this handler appeared to leave stale pillar nodes behind
+-- when hot-patched via cctl eval mid-session for testing -- did not reproduce at all across
+-- several full Ranked<->Casual cycles on a freshly launched instance, so that was very likely
+-- an artifact of repeatedly redefining this function on one long-running process while
+-- iterating, not a real bug in this code path.)
+G.FUNCS.mp_pvp_find_game_tab = function(e)
+	local rt = e.config.ref_table
+	if not rt or not rt.category then
+		return
 	end
-	return MPAPI.ui_pillar_row({ items = items, group_gap = 0.9 })
+	MPAPI.pages.show("pvp_find_game", { category = rt.category })
+end
+
+-- Builds this page's full definition (tab row + pillar row) for the given category ("ranked" or
+-- "casual", default "ranked"). The caller (pvp_find_game's MPAPI.Page registration, core.lua)
+-- owns the returned pillar_row controller for this page's lifetime: call :dispose() from the
+-- page's own dispose() hook so the tracked chip icons get :remove()'d -- see
+-- api/ui_pillar_row.lua's header comment for why that's required.
+function PVP.build_find_game_ui(category)
+	category = category or "ranked"
+	local modes, players = RANKED_MODES, "2"
+	if category == "casual" then
+		modes, players = CASUAL_MODES, "2-16"
+	end
+
+	local pillar_row = MPAPI.ui_pillar_row({ items = build_items(modes, players) })
+	local definition = {
+		n = G.UIT.ROOT,
+		config = { align = "tm", colour = G.C.CLEAR },
+		nodes = { build_tab_row(category), pillar_row.row_node },
+	}
+	return { definition = definition, dispose = function(self) pillar_row:dispose() end }
 end

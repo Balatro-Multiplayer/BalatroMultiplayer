@@ -396,7 +396,7 @@ MPAPI.on_loaded(function()
 		key = 'pvp_find_game',
 		category = 'game_select',
 		build = function(self)
-			self._pillar_row = PVP.build_find_game_ui()
+			self._pillar_row = PVP.build_find_game_ui(self.params and self.params.category)
 			return self._pillar_row.definition
 		end,
 		on_enter = function(self)
