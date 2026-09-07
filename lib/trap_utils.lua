@@ -31,7 +31,22 @@ end
 -- CardArea uses the same config.type='joker' selling gate jokers do -- see the can_sell_card
 -- wrap below), so this needs an explicit block, not just a worthless sell_cost.
 function PVP.TRAP.disguise(card)
+	-- CONFIRMED LIVE BUG, fixed by the sprite_facing line: Card:draw() branches on
+	-- sprite_facing, not facing -- facing only feeds sprite_facing via Card:flip()'s
+	-- animated transition (see Card:update()'s f2b/b2f handling) or Card:load()'s
+	-- save-data round-trip, neither of which runs here. rebuild_card() constructs
+	-- this card fresh with the Card:init() default sprite_facing='front', so without
+	-- this line the trap silently keeps rendering its real front art (fully revealing
+	-- which trap it is, and that it's a trap at all) despite facing already reading
+	-- 'back' -- reproduced live over a real multiplayer connection: the holder's
+	-- client showed "TRAP" with the drafted card's actual icon in plain view. Set
+	-- directly rather than via card:flip(), which would toggle facing back to
+	-- 'front' (it inspects the already-'back' facing set above and flips the other
+	-- way) and play a visible reveal animation -- this needs to silently already BE
+	-- face-down the moment it lands, the same way Card:load()'ing a saved back-facing
+	-- card would look, not animate a flip that would itself tip off the holder.
 	card.facing = "back"
+	card.sprite_facing = "back"
 	card.ability.mp_trap_hidden = true
 end
 
