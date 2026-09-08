@@ -379,6 +379,14 @@ MPAPI.on_loaded(function()
 		build = function(self)
 			return PVP.build_pre_lobby_ui()
 		end,
+		-- Fixes the logo back to its normal spot regardless of which page was previously
+		-- showing -- entering from pvp_find_game (which nudges it up via
+		-- MPAPI.set_logo_offset(-1, true)) would otherwise leave it shifted here too, since
+		-- nothing else resets it on the way out. Same defensive reasoning as SPDRN's
+		-- spdrn_game_select on_enter (BalatroMultiplayerSpeed/core.lua)'s own comment on this.
+		on_enter = function(self)
+			MPAPI.set_logo_offset(0, true)
+		end,
 	})
 
 	MPAPI.Page({
@@ -404,6 +412,16 @@ MPAPI.on_loaded(function()
 				G.MAIN_MENU_UI.alignment.offset.y = 1.5
 				G.MAIN_MENU_UI:align_to_major()
 			end
+			-- The title logo sits where it always does regardless of which page is showing
+			-- (it's not part of G.MAIN_MENU_UI's own tree), so without this it renders behind
+			-- this page's tab row (2026-09-08 user feedback -- "about half cut off"). -2.5, not
+			-- SPDRN's -1: PvP's own title (ui/pvp_title.lua) is a single diagonal "PLAYER ..
+			-- (VS) .. PLAYER" composition -- pvp_title_base.png bakes BOTH words into one image,
+			-- second lower-right of the first -- not one word per sprite the way -1 (clearing
+			-- just the first word) was tuned for elsewhere. -1 fully cleared the first PLAYER
+			-- but left the second still sitting on the tab row; -2.5 (coincidentally the same
+			-- value SPDRN's own main-menu cleanup uses for unrelated reasons) clears both.
+			MPAPI.set_logo_offset(-2.5, true)
 		end,
 		dispose = function(self)
 			if self._pillar_row then

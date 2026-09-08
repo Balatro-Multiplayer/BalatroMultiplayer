@@ -44,18 +44,23 @@ local PLACEHOLDER_CHIP_ROW = 0
 -- gamemode_key of its own in PVP.PVP_GAMEMODES yet (only a ruleset, rulesets/majorleague.lua),
 -- so it has no queue_button -- build_select below disables its SELECT rather than wiring a
 -- queue call that would silently misresolve.
+-- desc lines are hand-wrapped to roughly Nemesis's own second line ("Nemesis every ante", 19
+-- chars) rather than left as whatever length the source description happened to be -- a couple
+-- (Battle Royale, Teams) were 25+ chars per line before this and visibly overran their card
+-- (2026-09-08 user feedback). No code-level truncation/wrapping added; this is just each string
+-- rewritten by hand to fit.
 local RANKED_MODES = {
 	{ key = "pvp_vanilla", name = { "Vanilla", "Ranked" },
-		desc = { "Normal Balatro with", "PvP blinds" }, uses_order = false,
+		desc = { "Normal Balatro", "with PvP blinds" }, uses_order = false,
 		queue_button = "mp_pvp_queue_ranked_vanilla", colour = G.C.GREEN },
 	{ key = "pvp_chocolate", name = { "Chocolate", "Ranked" },
-		desc = { "Minor MP Balance", "Changes" }, uses_order = true,
+		desc = { "Minor balance", "changes for MP" }, uses_order = true,
 		queue_button = "mp_pvp_queue_ranked_chocolate", colour = G.C.BLUE },
 	{ key = "pvp_strawberry", name = { "Strawberry", "Ranked" },
-		desc = { "Standardized and", "Balanced for MP" }, uses_order = true,
+		desc = { "Standardized and", "balanced for MP" }, uses_order = true,
 		queue_button = "mp_pvp_queue_ranked_strawberry", colour = G.C.PURPLE },
 	{ key = "pvp_majorleague", name = { "MLBa", "Ranked" },
-		desc = { "Follows the MLBa", "Rules" }, uses_order = false,
+		desc = { "Follows the MLBa", "ruleset" }, uses_order = false,
 		queue_button = nil, colour = G.C.BLACK },
 	{ key = "pvp_smallworld_ranked", name = { "Smallworld", "Ranked" },
 		desc = { "75% of cards are", "banned at random" }, uses_order = true,
@@ -74,10 +79,10 @@ local CASUAL_MODES = {
 		desc = { "Face a different", "Nemesis every ante" }, uses_order = true,
 		queue_button = "mp_pvp_queue_casual_chocolate", colour = G.C.BLUE },
 	{ key = "pvp_royale", name = { "Battle", "Royale" },
-		desc = { "Everyone for themselves,", "bottom half of scores lose" }, uses_order = true,
+		desc = { "Free for all;", "bottom half lose" }, uses_order = true,
 		queue_button = "mp_pvp_queue_casual_royale", colour = G.C.PURPLE },
 	{ key = "pvp_teams", name = "Teams",
-		desc = { "One team against another,", "best collective score wins" }, uses_order = true,
+		desc = { "Team vs team;", "best score wins" }, uses_order = true,
 		queue_button = "mp_pvp_queue_casual_teams", colour = G.C.GREEN },
 	{ key = "pvp_smallworld_casual", name = "Smallworld",
 		desc = { "75% of cards are", "banned at random" }, uses_order = true,
@@ -134,7 +139,12 @@ local function build_items(modes, players)
 				bg_colour = mix_colours(mode.colour, G.C.BLACK, 0.3),
 				outline_colour = mode.colour,
 			}),
-			description = MPAPI.ui_pillar_description_box({ lines = mode.desc }),
+			-- minh reserves room for 3 lines regardless of how many an individual mode's desc
+			-- actually has (every current one is 2) -- ui_embossed_box centers its content
+			-- ('cm' align) within whatever minh it's given, same as the name plate above, so
+			-- this is what makes a 2-line description sit centered with breathing room instead
+			-- of the box just shrinking to hug the text (2026-09-08 user feedback).
+			description = MPAPI.ui_pillar_description_box({ lines = mode.desc, minh = 1.3 }),
 			stat_box = build_stat_box(players),
 			extra = mode.uses_order and build_order_card() or nil,
 		}
