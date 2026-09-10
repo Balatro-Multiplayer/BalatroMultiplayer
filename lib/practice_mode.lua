@@ -32,6 +32,12 @@ function G.FUNCS.start_practice_run(e)
 		local deck_key = MP.UTILS.get_deck_key_from_name(r.deck)
 		if deck_key then G.GAME.viewed_back = G.P_CENTERS[deck_key] end
 		G.FUNCS.start_run(e, { seed = r.seed, stake = r.stake or 1 })
+		-- Same reasoning as the live-MP start_run override in ui/lobby/lobby.lua:
+		-- this stake is whatever the replayed match was played at, not the
+		-- player's own unlocked progress, and MP.GHOST.resolve_pvp_* calls
+		-- win_game() directly on a win. Without seeded=true that overwrites
+		-- the player's real singleplayer stake progress on this deck.
+		G.GAME.seeded = true
 		local active_short = (MP.get_active_ruleset() or ""):gsub("^ruleset_mp_", "")
 		sendDebugMessage(
 			string.format(
