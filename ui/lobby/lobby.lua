@@ -506,6 +506,12 @@ G.FUNCS.start_run = function(e, args)
 				stake = tonumber(MP.LOBBY.deck.stake),
 				seed = args.seed,
 			})
+			-- The lobby (host, random loadout, or the deck-stake cap) picks this
+			-- run's stake, not the player's own unlocked progress. Vanilla's
+			-- career-stat/stake-unlock writers only skip seeded runs, so without
+			-- this an MP win at a stake below what the player already cleared
+			-- would overwrite their real singleplayer progress on that deck.
+			G.GAME.seeded = true
 		end
 	else
 		start_run_ref(e, args)
