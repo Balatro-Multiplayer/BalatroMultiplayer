@@ -315,12 +315,26 @@ if not SMODS.current_mod.lovely then
 		blocking = false,
 		func = function()
 			if G.MAIN_MENU_UI then
-				PVP.UI.UTILS.overlay_message(
-					PVP.UTILS.wrapText(
-						"Your Multiplayer Mod is not loaded correctly, make sure the Multiplayer folder does not have an extra Multiplayer folder around it.",
-						50
+				-- PVP.UI.UTILS is only populated by PVP.load_mp_dir("ui", true)
+				-- below (line ~358) -- unreachable from here, since this whole
+				-- branch only runs when SMODS.current_mod.lovely is falsy (the
+				-- misconfigured-nesting case this message warns about) and
+				-- returns before that load_mp_dir call ever runs. Calling
+				-- PVP.UI.UTILS.overlay_message directly crashed with "attempt
+				-- to index field 'UTILS' (a nil value)" every time this
+				-- warning path was actually hit (confirmed live 2026-09-12).
+				-- Fall back to a plain print so a genuinely misconfigured
+				-- install still gets a visible message instead of a crash.
+				if PVP.UI.UTILS then
+					PVP.UI.UTILS.overlay_message(
+						PVP.UTILS.wrapText(
+							"Your Multiplayer Mod is not loaded correctly, make sure the Multiplayer folder does not have an extra Multiplayer folder around it.",
+							50
+						)
 					)
-				)
+				else
+					print("[MultiplayerPvP] Your Multiplayer Mod is not loaded correctly, make sure the Multiplayer folder does not have an extra Multiplayer folder around it.")
+				end
 				return true
 			end
 		end,
