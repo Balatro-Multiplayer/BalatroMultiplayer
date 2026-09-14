@@ -9,8 +9,8 @@
 -- ruleset-picker overlay's own style (ui/pvp_main_menu.lua) rather than inventing
 -- localization keys ahead of a later polish pass.
 
-local RULESET_LABELS = { "Vanilla", "Chocolate", "Strawberry", "Small World" }
-local RULESET_KEYS = { "ruleset_mp_vanilla", "ruleset_mp_chocolate_ranked", "ruleset_mp_strawberry", "ruleset_mp_smallworld" }
+local RULESET_LABELS = { "Vanilla", "Balanced", "Expanded", "Small World" }
+local RULESET_KEYS = { "ruleset_mp_vanilla", "ruleset_mp_balanced", "ruleset_mp_expanded", "ruleset_mp_smallworld" }
 
 local function current_ruleset_option()
 	for i, key in ipairs(RULESET_KEYS) do
@@ -18,7 +18,7 @@ local function current_ruleset_option()
 			return i
 		end
 	end
-	return 2 -- Chocolate, the default every gamemode key creates a lobby on.
+	return 2 -- Balanced, the default every gamemode key creates a lobby on.
 end
 
 function PVP.build_lobby_options()

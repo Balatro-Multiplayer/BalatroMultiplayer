@@ -207,7 +207,7 @@ function PVP.reset_lobby_config(persist_ruleset_and_gamemode)
 		timer_base_seconds = 150,
 		timer_increment_seconds = 60,
 		pvp_countdown_seconds = 3,
-		ruleset = persist_ruleset_and_gamemode and PVP.LOBBY.config.ruleset or "ruleset_mp_strawberry",
+		ruleset = persist_ruleset_and_gamemode and PVP.LOBBY.config.ruleset or "ruleset_mp_expanded",
 		gamemode = persist_ruleset_and_gamemode and PVP.LOBBY.config.gamemode or "gamemode_mp_attrition",
 		weekly = nil,
 		custom_seed = "random",

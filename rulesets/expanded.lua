@@ -1,4 +1,4 @@
 PVP.Ruleset({
-	key = "strawberry",
+	key = "expanded",
 	layers = { "standard" },
 }):inject()

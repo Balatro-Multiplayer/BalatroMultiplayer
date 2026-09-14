@@ -1,9 +1,11 @@
 -- Bridge GameModes: thin MPAPI.GameMode entry points that delegate into PVP's own
 -- ruleset/gamemode/pool-gating machinery (the BRIDGE approach — PVP's composition
 -- system stays authoritative; see the plan). Each maps a server/website game-mode
--- key (pvp_chocolate/pvp_vanilla/pvp_strawberry/pvp_smallworld/pvp_royale/
--- pvp_manhunt/pvp_teams — the exact keys the matchmaking server + web leaderboard
--- expect, queried as `ranked:<key>`) onto a PVP ruleset + shape.
+-- key (pvp_nemesis/pvp_smallworld/pvp_royale/pvp_manhunt/pvp_teams — the exact
+-- keys the matchmaking server + web leaderboard expect, queried as `ranked:<key>`)
+-- onto a PVP ruleset + shape. Ranked queueing is ruleset-scoped instead
+-- (pvp_api/queue.lua's PVP._join_ranked_ruleset), not routed through a per-ruleset
+-- gamemode key.
 --
 -- These MUST be loaded inside MPAPI.on_loaded so their GameObjects are tagged to
 -- this mod (per-lobby action/gamemode routing depends on the owning mod id).
@@ -30,7 +32,7 @@ end)
 -- sites can't drift from this table's actual key. Also the default ruleset every
 -- shape (Nemesis/Royale/Manhunt/Teams) creates a private lobby on, overridable
 -- afterward via the in-lobby ruleset picker (ui/lobby/lobby_options.lua).
-PVP.GamemodeKey = { PVP_CHOCOLATE = "pvp_chocolate" }
+PVP.GamemodeKey = { PVP_NEMESIS = "pvp_nemesis" }
 
 -- There is no separate "plain 1v1" shape: Nemesis's rotating pairing degenerates
 -- identically to a plain pairwise 1v1 at exactly 2 players (see referee.lua's
@@ -39,17 +41,22 @@ PVP.GamemodeKey = { PVP_CHOCOLATE = "pvp_chocolate" }
 -- ELO/forfeit resolution -- BalatroMultiplayerServer's autoForfeitMatch -- is
 -- hardcoded for a 2-player result and would tie multiple players for 1st with
 -- more); casual/private both go up to 16 (§17.4).
+--
+-- pvp_nemesis/pvp_smallworld are the only two ruleset-only entries left as
+-- MPAPI.GameMode registrations. pvp_nemesis (the renamed former pvp_chocolate)
+-- is the private-lobby/practice-mode fallback and casual Nemesis's queue key;
+-- ranked queues by ruleset directly (PVP._join_ranked_ruleset,
+-- pvp_api/queue.lua) rather than through this gamemode key. Every casual
+-- queue plays its gamemode key's own default ruleset.
 PVP.PVP_GAMEMODES = {
-	pvp_chocolate = { ruleset = "ruleset_mp_chocolate_ranked", gamemode = "gamemode_mp_attrition", display = "Chocolate", has_ranked = true, custom_bridge = true, nemesis_pairing = true },
-	pvp_strawberry = { ruleset = "ruleset_mp_strawberry", gamemode = "gamemode_mp_attrition", display = "Strawberry", has_ranked = true, custom_bridge = true, nemesis_pairing = true },
-	pvp_vanilla = { ruleset = "ruleset_mp_vanilla", gamemode = "gamemode_mp_attrition", display = "Vanilla", has_ranked = true, custom_bridge = true, nemesis_pairing = true },
+	pvp_nemesis = { ruleset = "ruleset_mp_balanced", gamemode = "gamemode_mp_attrition", display = "Nemesis", has_ranked = true, custom_bridge = true, nemesis_pairing = true },
 	pvp_smallworld = { ruleset = "ruleset_mp_smallworld", gamemode = "gamemode_mp_attrition", display = "Small World", has_ranked = true, custom_bridge = true, nemesis_pairing = true },
 	-- Royale/Manhunt/Teams (2-16 players): never ranked (no per-ruleset ELO ladder
-	-- for these), default to the Chocolate ruleset like everything else (swappable
+	-- for these), default to the Balanced ruleset like everything else (swappable
 	-- in Lobby Options for private lobbies), casual-queueable at up to 16 players.
-	pvp_royale = { ruleset = "ruleset_mp_chocolate_ranked", gamemode = "gamemode_mp_attrition", display = "Royale", has_ranked = false, custom_bridge = true },
-	pvp_manhunt = { ruleset = "ruleset_mp_chocolate_ranked", gamemode = "gamemode_mp_attrition", display = "Manhunt", has_ranked = false, custom_bridge = true, manhunt = true },
-	pvp_teams = { ruleset = "ruleset_mp_chocolate_ranked", gamemode = "gamemode_mp_attrition", display = "Teams", has_ranked = false, custom_bridge = true, team_based = true },
+	pvp_royale = { ruleset = "ruleset_mp_balanced", gamemode = "gamemode_mp_attrition", display = "Royale", has_ranked = false, custom_bridge = true },
+	pvp_manhunt = { ruleset = "ruleset_mp_balanced", gamemode = "gamemode_mp_attrition", display = "Manhunt", has_ranked = false, custom_bridge = true, manhunt = true },
+	pvp_teams = { ruleset = "ruleset_mp_balanced", gamemode = "gamemode_mp_attrition", display = "Teams", has_ranked = false, custom_bridge = true, team_based = true },
 	-- §17.6/§17.3: Experimental is a real, working ruleset (rulesets/experimental/
 	-- experimental.lua) that was never wired into any player-facing picker at all --
 	-- not a matchmaking gap, an everywhere gap. Deliberately NOT added to the
@@ -63,7 +70,7 @@ PVP.PVP_GAMEMODES = {
 -- run_lifecycle.lua's ban_pick gate): 9 random deck+stake pairs. A random player
 -- bans 1, the other bans 3, the first bans 3, then the other PICKS one of the
 -- final 2 to play on. Rendered in the matchmaking lobby status panel. Shared by
--- all four ranked-eligible (Nemesis-shaped) entries below.
+-- the two ranked-eligible (Nemesis-shaped) entries below.
 local BAN_PICK = {
 	pool_size = 9,
 	schedule = {
@@ -90,10 +97,11 @@ local ROTATING_BAN_PICK = {
 	keep = 1,
 }
 
--- The four ruleset-only (Nemesis-shaped) entries: identical registration shape,
--- parameterized per ruleset. Round-robin pairing degenerates to plain pairwise at
--- 2 players (ranked) and behaves as real rotating Nemesis at N>2 (casual/private).
-for _, key in ipairs({ "pvp_chocolate", "pvp_strawberry", "pvp_vanilla", "pvp_smallworld" }) do
+-- The two remaining ruleset-only (Nemesis-shaped) entries: identical registration
+-- shape, parameterized per ruleset. Round-robin pairing degenerates to plain
+-- pairwise at 2 players (ranked) and behaves as real rotating Nemesis at N>2
+-- (casual/private).
+for _, key in ipairs({ "pvp_nemesis", "pvp_smallworld" }) do
 	local def = PVP.PVP_GAMEMODES[key]
 	MPAPI.GameMode({
 		key = key,

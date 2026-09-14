@@ -24,7 +24,7 @@
 -- overrides/hide_content.lua's own multiplayer_content check -- still had all 9 of
 -- those jokers eligible in the shop pool (get_current_pool('Joker') actually drew 4 of
 -- them). multiplayer_content resolves correctly through the ruleset's layer chain
--- (confirmed live for chocolate_ranked/strawberry/smallworld, all inheriting `true`
+-- (confirmed live for balanced/expanded/smallworld, all inheriting `true`
 -- from the "standard" layer) via PVP.current_ruleset(), which -- unlike checking
 -- PVP.LOBBY.config.ruleset directly -- also already knows about practice mode's
 -- separate resolution path (see rulesets/_rulesets.lua's own comment on why PvP keeps
@@ -35,8 +35,8 @@
 -- (lobby.suppress_lobby_view = true, a client-only local lobby) -- so this gate, keyed
 -- on LOBBY.code alone, evaluated false for the ENTIRE duration of every practice run
 -- regardless of ruleset, wrongly excluding those same 9 core jokers from ever naturally
--- appearing in a Practice shop even on Chocolate (reproduced live: should_exclude_from_pool
--- returned true -- excluded -- for defensive_joker/conjoined_joker in a live Chocolate
+-- appearing in a Practice shop even on Balanced (reproduced live: should_exclude_from_pool
+-- returned true -- excluded -- for defensive_joker/conjoined_joker in a live Balanced
 -- practice run, while a layer-gated card like hanging_chad correctly stayed included).
 -- That's backwards from bug #1: not a leak, an unwanted suppression of a ruleset's own
 -- real content in the one mode whose entire purpose is letting a player try that content

@@ -19,22 +19,22 @@ PVP.LobbyAccess = {
 -- module-load's own hardcoded default or a leftover from an unrelated lobby
 -- browsed earlier this session.
 function PVP.reset_ruleset_to_gamemode_default(gamemode_key)
-	local def = PVP.PVP_GAMEMODES[gamemode_key] or PVP.PVP_GAMEMODES.pvp_chocolate
+	local def = PVP.PVP_GAMEMODES[gamemode_key] or PVP.PVP_GAMEMODES.pvp_nemesis
 	PVP.LOBBY.config.ruleset = def.ruleset
 	PVP.LOBBY.config.gamemode = def.gamemode
 end
 
 -- Host-authored shared lobby metadata. `gamemode`/`ruleset` are MPAPI's own content
--- keys (e.g. "gamemode_mp_attrition" / "ruleset_mp_chocolate_ranked") so MPAPI.ApplyBans/
+-- keys (e.g. "gamemode_mp_attrition" / "ruleset_mp_balanced") so MPAPI.ApplyBans/
 -- MPAPI.get_active_gamemode() resolve directly to the banned_*-bearing object, no
 -- translation needed. `queue_mode` carries the separate API/queue/bridge key (e.g.
--- "pvp_chocolate") that the matchmaking taxonomy, ban_pick draft, and per-lobby
+-- "pvp_nemesis") that the matchmaking taxonomy, ban_pick draft, and per-lobby
 -- MPAPI.GameModes[...] instance (forfeit handling) still need.
 --
 -- ruleset/gamemode prefer the ALREADY-current PVP.LOBBY.config value over the
 -- gamemode key's own default -- see PVP.reset_ruleset_to_gamemode_default above.
 function PVP.pvp_lobby_metadata(gamemode_key, kind)
-	local def = PVP.PVP_GAMEMODES[gamemode_key] or PVP.PVP_GAMEMODES.pvp_chocolate
+	local def = PVP.PVP_GAMEMODES[gamemode_key] or PVP.PVP_GAMEMODES.pvp_nemesis
 	return {
 		gamemode = PVP.LOBBY.config.gamemode or def.gamemode,
 		ruleset = PVP.LOBBY.config.ruleset or def.ruleset,
@@ -49,17 +49,17 @@ function PVP.pvp_lobby_metadata(gamemode_key, kind)
 end
 
 function PVP.pvp_create_private_lobby(gamemode_key)
-	gamemode_key = gamemode_key or PVP.GamemodeKey.PVP_CHOCOLATE
+	gamemode_key = gamemode_key or PVP.GamemodeKey.PVP_NEMESIS
 	-- Reject an unregistered gamemode key up front instead of silently
 	-- degrading: PVP.reset_ruleset_to_gamemode_default/pvp_lobby_metadata
-	-- both quietly fall back to the chocolate ruleset's config for an
+	-- both quietly fall back to the nemesis ruleset's config for an
 	-- unknown key, but PVP._pvp_gamemode itself keeps the bogus literal
 	-- string -- so round.lua's reset_blinds (PVP.Gamemodes[gamemode_key])
 	-- never finds a match and the nemesis/PvP boss blind mechanism never
 	-- engages for the whole match, with no error shown to either player.
 	-- Confirmed live with "pvp_standard" (not a real key -- valid ones are
-	-- pvp_chocolate/strawberry/vanilla/smallworld/royale/manhunt/teams/
-	-- experimental): the match proceeded normally through a full ante with
+	-- pvp_nemesis/smallworld/royale/manhunt/teams/experimental): the match
+	-- proceeded normally through a full ante with
 	-- zero PvP scoring/lives, indistinguishable from a working match until
 	-- someone noticed nothing PvP-shaped ever happened.
 	if not PVP.PVP_GAMEMODES[gamemode_key] then
@@ -131,7 +131,7 @@ function PVP.pvp_start_match()
 		PVP.UI.UTILS.overlay_message("Waiting for an opponent...")
 		return
 	end
-	local queue_mode = (lobby:get_metadata() or {}).queue_mode or PVP._pvp_gamemode or PVP.GamemodeKey.PVP_CHOCOLATE
+	local queue_mode = (lobby:get_metadata() or {}).queue_mode or PVP._pvp_gamemode or PVP.GamemodeKey.PVP_NEMESIS
 	local gm_def = MPAPI.GameModes[queue_mode]
 	if gm_def and gm_def.new_instance then
 		lobby._gamemode_instance = gm_def:new_instance()

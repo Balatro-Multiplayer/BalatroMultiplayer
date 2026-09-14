@@ -1,8 +1,9 @@
 -- PvP leaderboard overlay, built on the generic MPAPI.ui_leaderboard. Tabs are the
--- four server/web PvP gamemode keys; the metric is season-best single-blind score
--- (kind='score', higher is better). Pagination / own-rank footer / tabs live in MPAPI.
+-- four ruleset-scoped ranked ticket strings (pvp_api/queue.lua's PVP._join_ranked_ruleset
+-- builds these same "pvp_ranked_<ruleset>" strings); the metric is season-best single-blind
+-- score (kind='score', higher is better). Pagination / own-rank footer / tabs live in MPAPI.
 
-local DEFAULT_TAB = "pvp_chocolate"
+local DEFAULT_TAB = "pvp_ranked_balanced"
 
 -- Built lazily on first open (G.C colours + localization must be ready; this file
 -- loads during the mod's main_file pass, before the game is fully up).
@@ -13,10 +14,10 @@ local function get_leaderboard()
 	end
 	_leaderboard = MPAPI.ui_leaderboard({
 		tabs = {
-			{ key = "pvp_chocolate", label = "Chocolate", colour = G.C.RED },
-			{ key = "pvp_strawberry", label = "Strawberry", colour = G.C.ORANGE },
-			{ key = "pvp_vanilla", label = "Vanilla", colour = G.C.BLUE },
-			{ key = "pvp_smallworld", label = "Small World", colour = G.C.GREEN },
+			{ key = "pvp_ranked_balanced", label = "Balanced", colour = G.C.RED },
+			{ key = "pvp_ranked_expanded", label = "Expanded", colour = G.C.ORANGE },
+			{ key = "pvp_ranked_vanilla", label = "Vanilla", colour = G.C.BLUE },
+			{ key = "pvp_ranked_smallworld", label = "Small World", colour = G.C.GREEN },
 		},
 		columns = {
 			{ header = function() return localize("k_rating_cap") end, colour = G.C.BLUE, width = 0.95, value = function(e) return tostring(e.rating or "?") end },
@@ -26,9 +27,14 @@ local function get_leaderboard()
 		},
 		empty_text = "No ranked players yet.",
 		web_url = "https://new.balatromp.com/leaderboards",
-		-- Leaderboards are the rated queue, so they carry the server's ranked prefix.
+		-- The tab key IS the exact ranked matchmaking ticket string ranked queueing
+		-- passes as `game_mode` (PVP._join_ranked_ruleset, pvp_api/queue.lua's
+		-- "pvp_ranked_<ruleset>" tickets, e.g. "pvp_ranked_balanced") -- no separate
+		-- "ranked:" prefix needed here, unlike the old per-gamemode-key ranked queue
+		-- convention this replaced (game_mode was a bare gamemode key there, so the
+		-- prefix was the only thing distinguishing it as ranked).
 		fetch = function(tab_key, cb)
-			MPAPI.matchmaking.get_leaderboard(PVP.id, PVP.LobbyAccess.RANKED_PREFIX .. tab_key, nil, {}, cb)
+			MPAPI.matchmaking.get_leaderboard(PVP.id, tab_key, nil, {}, cb)
 		end,
 	})
 	return _leaderboard

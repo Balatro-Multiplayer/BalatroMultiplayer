@@ -16,16 +16,20 @@ function PVP.is_mp_or_practice()
 end
 
 -- Client-only practice lobby: no server lobby is ever allocated (MPAPI.create_local_lobby),
--- so there's nothing to be orphaned if the run is abandoned. `gamemode_key` is one of
--- PVP.PVP_GAMEMODES's 1v1 keys (pvp_chocolate/pvp_strawberry/pvp_vanilla/pvp_smallworld) -- Royale
--- and Nemesis are intentionally not offered here: both resolve to the same ruleset_mp_vanilla +
--- gamemode_mp_attrition as plain Vanilla, and their whole distinguishing mechanic (N-player
--- rank-and-cut / rotating pairing) has no meaning with a single practice player.
+-- so there's nothing to be orphaned if the run is abandoned. `ruleset_key` is a plain
+-- ruleset id (e.g. "ruleset_mp_balanced"/"ruleset_mp_expanded"/"ruleset_mp_vanilla"/
+-- "ruleset_mp_smallworld"), not a PVP.PVP_GAMEMODES gamemode key -- practice was always
+-- 1v1-only by design (see below), so it needs no format/shape choice, only a ruleset.
+-- Royale and Nemesis-as-a-distinct-shape are intentionally not offered here: both
+-- resolve to the same ruleset + gamemode_mp_attrition as plain Vanilla/whatever ruleset
+-- is picked, and their whole distinguishing mechanic (N-player rank-and-cut / rotating
+-- pairing) has no meaning with a single practice player. The match format itself is
+-- hardcoded to Nemesis's 1v1 shape below.
 --
 -- Reuses the exact same primitives the real private-lobby flow uses (PVP.pvp_create_private_lobby
 -- in pvp_api/flow.lua): PVP.setup_lobby_mirror to bridge the API lobby into PVP.LOBBY.*, and
 -- PVP.pvp_lobby_metadata to resolve gamemode/ruleset/deck/stake/starting_lives/pvp_start_round
--- from PVP.PVP_GAMEMODES -- so practice can't drift from what a real lobby using that gamemode key
+-- -- so practice can't drift from what a real lobby using the pvp_nemesis gamemode key
 -- would set up.
 --
 -- The PvP boss ("nemesis") blind still spawns and plays out normally from ante
@@ -35,19 +39,22 @@ end
 -- lost. Ante 8 ends the run naturally (see game_state.lua's update_new_round: the "prevent
 -- player from winning" override that lets real matches continue past ante 8 via lives is
 -- skipped in practice, so vanilla's own win_ante=8 default fires win_game() as normal).
-function PVP._start_practice(gamemode_key)
-	gamemode_key = gamemode_key or PVP.GamemodeKey.PVP_CHOCOLATE
-	local def = PVP.PVP_GAMEMODES[gamemode_key] or PVP.PVP_GAMEMODES.pvp_chocolate
+function PVP._start_practice(ruleset_key)
+	ruleset_key = ruleset_key or PVP.PVP_GAMEMODES.pvp_nemesis.ruleset
+	local gamemode_key = PVP.GamemodeKey.PVP_NEMESIS
 
 	-- Clean slate: don't inherit deck/stake/ruleset leftovers from whatever the player
 	-- was doing before entering practice (e.g. a private lobby with different_decks set).
 	PVP.reset_lobby_config()
-	-- reset_lobby_config() above stamps its own hardcoded default (strawberry), not
-	-- this practice gamemode's -- reset again to the actual requested ruleset.
-	PVP.reset_ruleset_to_gamemode_default(gamemode_key)
+	-- reset_lobby_config() above stamps its own hardcoded default (expanded), not
+	-- this practice run's -- set the actual requested ruleset directly (bypassing
+	-- PVP.reset_ruleset_to_gamemode_default, which resolves off a gamemode key, not
+	-- a bare ruleset key).
+	PVP.LOBBY.config.ruleset = ruleset_key
+	PVP.LOBBY.config.gamemode = "gamemode_mp_attrition"
 
 	PVP.SP.practice = true
-	PVP.SP.ruleset = def.ruleset
+	PVP.SP.ruleset = ruleset_key
 
 	local lobby = MPAPI.create_local_lobby(PVP.id, { max_players = 1 })
 	if not lobby then

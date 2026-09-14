@@ -30,9 +30,9 @@ local PLACEHOLDER_CHIP_ROW = 0
 
 -- uses_order reflects PVP.LOBBY.config.the_order as core.lua's reset_lobby_config default
 -- (true) and each ruleset's own force_lobby_options override actually resolve it, not a
--- hand-picked guess: rulesets/majorleague.lua explicitly forces false; chocolate_ranked's
+-- hand-picked guess: rulesets/majorleague.lua explicitly forces false; balanced's
 -- "ranked" layer (layers/ranked.lua) explicitly forces true (redundant with the default, but
--- explicit); strawberry/smallworld have no override, so they inherit the true default.
+-- explicit); expanded/smallworld have no override, so they inherit the true default.
 -- KNOWN MISMATCH: rulesets/vanilla.lua has no force_lobby_options at all, so it also inherits
 -- the true default -- Vanilla Ranked is listed here as false (no Order) per the content this
 -- was requested with, but as of this commit the ruleset itself doesn't actually turn the_order
@@ -49,44 +49,52 @@ local PLACEHOLDER_CHIP_ROW = 0
 -- (Battle Royale, Teams) were 25+ chars per line before this and visibly overran their card
 -- (2026-09-08 user feedback). No code-level truncation/wrapping added; this is just each string
 -- rewritten by hand to fit.
+-- ruleset_key is the exact string PVP._join_ranked_ruleset stamps onto PVP.LOBBY.config.ruleset
+-- and PVP._active_queue_id.key (pvp_api/queue.lua) -- build_select below compares against it to
+-- decide whether this exact pillar's queue is the one currently active. MLBa has none (nil):
+-- it's never wired to a real queue call (see this file's header WIP comment), so it can never be
+-- the active queue and is unconditionally disabled below.
 local RANKED_MODES = {
-	{ key = "pvp_vanilla", name = { "Vanilla", "Ranked" },
+	{ key = "pvp_ranked_vanilla", name = { "Vanilla", "Ranked" },
 		desc = { "Normal Balatro", "with PvP blinds" }, uses_order = false,
-		queue_button = "mp_pvp_queue_ranked_vanilla", colour = G.C.GREEN },
-	{ key = "pvp_chocolate", name = { "Chocolate", "Ranked" },
+		queue_button = "mp_pvp_queue_ranked_vanilla", ruleset_key = "ruleset_mp_vanilla", colour = G.C.GREEN },
+	{ key = "pvp_ranked_balanced", name = { "Balanced", "Ranked" },
 		desc = { "Minor balance", "changes for MP" }, uses_order = true,
-		queue_button = "mp_pvp_queue_ranked_chocolate", colour = G.C.BLUE },
-	{ key = "pvp_strawberry", name = { "Strawberry", "Ranked" },
+		queue_button = "mp_pvp_queue_ranked_balanced", ruleset_key = "ruleset_mp_balanced", colour = G.C.BLUE },
+	{ key = "pvp_ranked_expanded", name = { "Expanded", "Ranked" },
 		desc = { "Standardized and", "balanced for MP" }, uses_order = true,
-		queue_button = "mp_pvp_queue_ranked_strawberry", colour = G.C.PURPLE },
+		queue_button = "mp_pvp_queue_ranked_expanded", ruleset_key = "ruleset_mp_expanded", colour = G.C.PURPLE },
 	{ key = "pvp_majorleague", name = { "MLBa", "Ranked" },
 		desc = { "Follows the MLBa", "ruleset" }, uses_order = false,
-		queue_button = nil, colour = G.C.BLACK },
+		queue_button = nil, ruleset_key = nil, colour = G.C.BLACK },
 	{ key = "pvp_smallworld_ranked", name = { "Smallworld", "Ranked" },
 		desc = { "75% of cards are", "banned at random" }, uses_order = true,
-		queue_button = "mp_pvp_queue_ranked_smallworld", colour = G.C.RED },
+		queue_button = "mp_pvp_queue_ranked_smallworld", ruleset_key = "ruleset_mp_smallworld", colour = G.C.RED },
 }
 
--- Casual: 2-16 players. "Nemesis" here is the shared-default-ruleset casual queue (Chocolate) --
--- see pvp_api/queue.lua's own §17.4 comment: casual Nemesis was always just Chocolate under a
--- different label, never a fifth independent ruleset choice. Manhunt has an existing casual
--- queue handler (mp_pvp_queue_casual_manhunt) but wasn't in the requested pillar set, so it's
--- left reachable only via Create Lobby for now, not duplicated here. All four resolve to a
--- ruleset with no the_order override (Chocolate's "ranked" layer forces it true regardless of
--- matchmaking kind; Smallworld inherits the true default), so all four use The Order.
+-- Casual: 2-16 players. Each pillar plays its gamemode key's own default ruleset
+-- (PVP.reset_ruleset_to_gamemode_default, pvp_api/queue.lua). Manhunt has an existing
+-- casual queue handler (mp_pvp_queue_casual_manhunt) but wasn't in the requested pillar
+-- set, so it's left reachable only via Create Lobby for now, not duplicated here. None
+-- has a the_order override, so all four inherit the default and use The Order here.
+-- gamemode_key is the exact PVP.GamemodeKey value PVP._join_queue's second argument (and
+-- PVP._active_queue_id.key) uses -- see the ruleset_key comment on RANKED_MODES above for why
+-- build_select needs it. Note these deliberately differ from a couple of the pillar `key` ids
+-- above (e.g. "pvp_smallworld_casual" vs. gamemode_key "pvp_smallworld") -- `key` is just this
+-- page's own UI item id, unrelated to the wire gamemode key.
 local CASUAL_MODES = {
 	{ key = "pvp_nemesis", name = "Nemesis",
 		desc = { "Face a different", "Nemesis every ante" }, uses_order = true,
-		queue_button = "mp_pvp_queue_casual_chocolate", colour = G.C.BLUE },
+		queue_button = "mp_pvp_queue_casual_nemesis", gamemode_key = "pvp_nemesis", colour = G.C.BLUE },
 	{ key = "pvp_royale", name = { "Battle", "Royale" },
 		desc = { "Free for all;", "bottom half lose" }, uses_order = true,
-		queue_button = "mp_pvp_queue_casual_royale", colour = G.C.PURPLE },
+		queue_button = "mp_pvp_queue_casual_royale", gamemode_key = "pvp_royale", colour = G.C.PURPLE },
 	{ key = "pvp_teams", name = "Teams",
 		desc = { "Team vs team;", "best score wins" }, uses_order = true,
-		queue_button = "mp_pvp_queue_casual_teams", colour = G.C.GREEN },
+		queue_button = "mp_pvp_queue_casual_teams", gamemode_key = "pvp_teams", colour = G.C.GREEN },
 	{ key = "pvp_smallworld_casual", name = "Smallworld",
 		desc = { "75% of cards are", "banned at random" }, uses_order = true,
-		queue_button = "mp_pvp_queue_casual_smallworld", colour = G.C.RED },
+		queue_button = "mp_pvp_queue_casual_smallworld", gamemode_key = "pvp_smallworld", colour = G.C.RED },
 }
 
 -- Plain Sprite, not AnimatedSprite -- see SPDRN's game_select.lua build_chip_sprite for why
@@ -95,12 +103,77 @@ local function build_chip_sprite()
 	return Sprite(0, 0, 1.1, 1.1, G.ANIMATION_ATLAS["mp_player_blind_chip"], { x = PLACEHOLDER_CHIP_ROW, y = 0 })
 end
 
+-- Every currently-built pillar's SELECT button, keyed by mode.key -- reset at the start of each
+-- build_items call (a fresh page build, e.g. a Ranked<->Casual tab switch) and refreshed live by
+-- PVP._refresh_find_game_queue_ui (called from pvp_api/queue.lua's PVP._show_searching any time
+-- PvP's single active queue starts, ends, or targets a different pillar).
+local _select_els = {}
+
+function PVP._refresh_find_game_queue_ui()
+	for _, el in pairs(_select_els) do
+		el:update()
+	end
+end
+
+-- The single handler behind every pillar's SELECT/CANCEL button. Whether this joins or cancels
+-- depends on ref_table.cancel's presence, not any state read here -- the button that was
+-- actually clicked already encoded, at the moment it was rendered, which action it means (see
+-- build_select) -- so this can't race against a queue state change that happens between click
+-- and handling. Mirrors SPDRN's spdrn_game_select_toggle_queue.
+G.FUNCS.mp_pvp_find_game_toggle_queue = function(e)
+	local rt = e.config.ref_table
+	if not rt then
+		return
+	end
+	-- Preserves the exact behavior of the old per-mode mp_pvp_queue_ranked_*/_casual_*
+	-- handlers this replaces (pvp_api/queue.lua), which all called this before queuing.
+	G.FUNCS.exit_overlay_menu()
+	if rt.cancel then
+		PVP._cancel_queue()
+	elseif rt.ruleset_key then
+		PVP._join_ranked_ruleset(rt.ruleset_key)
+	elseif rt.gamemode_key then
+		PVP._join_queue(PVP.LobbyAccess.CASUAL, rt.gamemode_key)
+	end
+end
+
+-- Reactive SELECT button: QUEUE (orange) when idle or a different pillar is the active queue,
+-- CANCEL (red) while this exact pillar's own queue is PvP's one active queue
+-- (PVP._active_queue_matches, pvp_api/queue.lua). A Ranked pillar with no launcher-verified
+-- anti-cheat session (MPAPI.is_launcher_verified) is disabled outright, matching SPDRN's own
+-- ranked gating (BalatroMultiplayerSpeed/ui/main_menu/find_game.lua's _ranked_queue_available) --
+-- PvP had never applied this check at all before now. Every OTHER pillar is also disabled while
+-- one queue is active: PvP tracks only a single matchmaking handle at a time
+-- (PVP._match_handle), unlike SPDRN's per-mode _queue_handles table, so queuing a second pillar
+-- here would silently orphan the first handle instead of joining both.
 local function build_select(mode)
-	return MPAPI.ui_pillar_select_button({
-		label = "QUEUE",
-		button = mode.queue_button,
-		disabled = mode.queue_button == nil,
-	})
+	local el = MPAPI.ui_element(function()
+		local this_queued = (mode.ruleset_key and PVP._active_queue_matches(PVP.LobbyAccess.RANKED, mode.ruleset_key))
+			or (mode.gamemode_key and PVP._active_queue_matches(PVP.LobbyAccess.CASUAL, mode.gamemode_key))
+			or false
+		local other_active = PVP._is_queue_active() and not this_queued
+		local unavailable = mode.queue_button == nil
+			or other_active
+			or (mode.ruleset_key ~= nil and not MPAPI.is_launcher_verified())
+		local config = {
+			align = "cm", minh = 0.5, minw = 2.2, padding = 0.06, r = 0.1,
+			colour = unavailable and G.C.UI.BACKGROUND_INACTIVE or (this_queued and G.C.RED or G.C.ORANGE),
+		}
+		if not unavailable then
+			config.shadow = true
+			config.hover = true
+			config.one_press = true
+			config.button = "mp_pvp_find_game_toggle_queue"
+			config.ref_table = this_queued
+				and { cancel = true }
+				or { ruleset_key = mode.ruleset_key, gamemode_key = mode.gamemode_key }
+		end
+		return { nodes = { { n = G.UIT.R, config = config, nodes = {
+			{ n = G.UIT.T, config = { text = this_queued and "CANCEL" or "QUEUE", scale = 0.4, colour = unavailable and G.C.UI.TEXT_INACTIVE or G.C.UI.TEXT_LIGHT, shadow = not unavailable } },
+		} } } }
+	end)
+	_select_els[mode.key] = el
+	return el.node
 end
 
 local function build_stat_box(players)
@@ -128,6 +201,7 @@ local function build_order_card()
 end
 
 local function build_items(modes, players)
+	_select_els = {}
 	local items = {}
 	for _, mode in ipairs(modes) do
 		items[#items + 1] = {
@@ -210,5 +284,8 @@ function PVP.build_find_game_ui(category)
 		config = { align = "tm", colour = G.C.CLEAR },
 		nodes = { build_tab_row(category), pillar_row.row_node },
 	}
-	return { definition = definition, dispose = function(self) pillar_row:dispose() end }
+	return { definition = definition, dispose = function(self)
+		pillar_row:dispose()
+		_select_els = {}
+	end }
 end

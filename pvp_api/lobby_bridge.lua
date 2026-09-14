@@ -138,10 +138,10 @@ end
 local function mirror_metadata(lobby)
 	local meta = lobby:get_metadata() or {}
 	-- `gamemode`/`ruleset` in metadata are already MPAPI's own content keys
-	-- ("gamemode_mp_attrition" / "ruleset_mp_chocolate_ranked"), so they pass straight
+	-- ("gamemode_mp_attrition" / "ruleset_mp_balanced"), so they pass straight
 	-- through -- MPAPI.get_active_gamemode()/get_active_ruleset() read this same
 	-- metadata directly and need no translation. `queue_mode` carries the separate
-	-- API/queue/bridge key (e.g. "pvp_chocolate") only nemesis_pairing derivation below
+	-- API/queue/bridge key (e.g. "pvp_nemesis") only nemesis_pairing derivation below
 	-- still needs.
 	local def = meta.queue_mode and PVP.PVP_GAMEMODES and PVP.PVP_GAMEMODES[meta.queue_mode]
 	for k, v in pairs(meta) do

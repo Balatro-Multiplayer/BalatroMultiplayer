@@ -90,22 +90,6 @@ function PVP.main_menu.create_buttons()
 			return MPAPI.is_connected()
 		end,
 	})
-	-- §22.2/§22.3: replay is fully local playback once the run/lobby list is
-	-- fetched, but the list fetch itself needs a real connection, same as
-	-- Leaderboard.
-	b.replay = MPAPI.disableable_button({
-		id = "mp_pvp_replay",
-		button = "mp_pvp_open_replay_menu",
-		colour = { 0.55, 0.35, 0.75, 1 },
-		minw = 2.65,
-		minh = 1.35,
-		label = { "Replay" },
-		scale = 0.54,
-		col = true,
-		enabled = function()
-			return MPAPI.is_connected()
-		end,
-	})
 	M.initialized = true
 end
 
@@ -119,7 +103,6 @@ PVP.update_main_menu_buttons = function()
 	M.buttons.join_by_code:update()
 	M.buttons.join_from_clipboard:update()
 	M.buttons.leaderboard:update()
-	M.buttons.replay:update()
 end
 
 -- Swap the Find Game button between search / cancel (called by queue.lua).
@@ -164,7 +147,6 @@ PVP.build_pre_lobby_ui = function()
 									{ n = G.UIT.R, config = { align = "cm" }, nodes = {
 										{ n = G.UIT.C, config = { align = "cm", padding = 0.05 }, nodes = { b.leaderboard.node } },
 										{ n = G.UIT.C, config = { align = "cm", padding = 0.05 }, nodes = { b.practice.node } },
-										{ n = G.UIT.C, config = { align = "cm", padding = 0.05 }, nodes = { b.replay.node } },
 									} },
 								},
 							},
@@ -202,7 +184,7 @@ end
 -- Gamemode (shape) picker, same grid-of-buttons style as the Practice overlay
 -- below. Nemesis IS the 1v1 shape (its rotating pairing degenerates identically
 -- to plain pairwise at exactly 2 players, see referee.lua) so there's no separate
--- "1v1" option. Ruleset (default Chocolate) is picked afterward, once inside the
+-- "1v1" option. Ruleset (default Balanced) is picked afterward, once inside the
 -- lobby, via Lobby Options (ui/lobby/lobby_options.lua) -- not here.
 G.FUNCS.mp_pvp_create_lobby = function()
 	G.FUNCS.overlay_menu({
@@ -242,7 +224,7 @@ end
 
 G.FUNCS.mp_pvp_create_lobby_nemesis = function()
 	G.FUNCS.exit_overlay_menu()
-	PVP.pvp_create_private_lobby("pvp_chocolate")
+	PVP.pvp_create_private_lobby(PVP.GamemodeKey.PVP_NEMESIS)
 end
 
 G.FUNCS.mp_pvp_create_lobby_royale = function()
@@ -333,10 +315,10 @@ G.FUNCS.mp_pvp_practice = function()
 					config = { align = "cm", padding = 0.1 },
 					nodes = {
 						{ n = G.UIT.C, config = { align = "cm", padding = 0.08 }, nodes = {
-							UIBox_button({ button = "mp_pvp_practice_chocolate", label = { "Chocolate" }, colour = G.C.BLUE, minw = 2.5, minh = 2.0, scale = 0.5, col = true }),
+							UIBox_button({ button = "mp_pvp_practice_balanced", label = { "Balanced" }, colour = G.C.BLUE, minw = 2.5, minh = 2.0, scale = 0.5, col = true }),
 						} },
 						{ n = G.UIT.C, config = { align = "cm", padding = 0.08 }, nodes = {
-							UIBox_button({ button = "mp_pvp_practice_strawberry", label = { "Strawberry" }, colour = G.C.PURPLE, minw = 2.5, minh = 2.0, scale = 0.5, col = true }),
+							UIBox_button({ button = "mp_pvp_practice_expanded", label = { "Expanded" }, colour = G.C.PURPLE, minw = 2.5, minh = 2.0, scale = 0.5, col = true }),
 						} },
 					},
 				},
@@ -368,29 +350,32 @@ G.FUNCS.mp_pvp_practice = function()
 	})
 end
 
-G.FUNCS.mp_pvp_practice_chocolate = function()
+G.FUNCS.mp_pvp_practice_balanced = function()
 	G.FUNCS.exit_overlay_menu()
-	PVP._start_practice("pvp_chocolate")
+	PVP._start_practice("ruleset_mp_balanced")
 end
 
-G.FUNCS.mp_pvp_practice_strawberry = function()
+G.FUNCS.mp_pvp_practice_expanded = function()
 	G.FUNCS.exit_overlay_menu()
-	PVP._start_practice("pvp_strawberry")
+	PVP._start_practice("ruleset_mp_expanded")
 end
 
 G.FUNCS.mp_pvp_practice_vanilla = function()
 	G.FUNCS.exit_overlay_menu()
-	PVP._start_practice("pvp_vanilla")
+	PVP._start_practice("ruleset_mp_vanilla")
 end
 
 G.FUNCS.mp_pvp_practice_smallworld = function()
 	G.FUNCS.exit_overlay_menu()
-	PVP._start_practice("pvp_smallworld")
+	PVP._start_practice("ruleset_mp_smallworld")
 end
 
 G.FUNCS.mp_pvp_practice_experimental = function()
 	G.FUNCS.exit_overlay_menu()
-	PVP._start_practice("pvp_experimental")
+	-- PVP._start_practice now takes a ruleset key directly (see its own header
+	-- comment), not the pvp_experimental gamemode-table entry's key -- that entry
+	-- was never registered as an MPAPI.GameMode anyway (§17.6/§17.3).
+	PVP._start_practice("ruleset_mp_experimental")
 end
 
 -- ── Replay/Spectate overlay ───────────────────────────────────────────────

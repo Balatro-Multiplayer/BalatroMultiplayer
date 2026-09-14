@@ -1,7 +1,7 @@
 -- Thin delegating wrapper around MPAPI.GameMode. PvP's internal Gamemode objects
 -- (survival/showdown/attrition) are content/blind-selection profiles, not run-
 -- starters -- run-starting for the public matchmaking surface is owned by the
--- separate bridge GameModes in pvp_api/gamemodes.lua (keys like "pvp_chocolate").
+-- separate bridge GameModes in pvp_api/gamemodes.lua (keys like "pvp_nemesis").
 -- MPAPI.GameMode requires `start_run`; none of these three ever call it, so
 -- default it to a no-op rather than forcing every gamemode file to define one it
 -- doesn't need.
