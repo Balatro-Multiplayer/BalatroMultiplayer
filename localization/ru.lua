@@ -2,6 +2,28 @@
 return {
 	descriptions = {
 		Tag = {
+			tag_mp_investment_blind_raiser = {
+				name = "Инвестиционный тег",
+				text = {
+					"Даёт {C:money}$#1#{} за каждый улучшенный",
+					"{C:attention}блайнд{} в этом забеге",
+					"{C:inactive}(Даст {C:money}$#2#{C:inactive})",
+				},
+			},
+			tag_mp_negative_blind_raiser = {
+				name = "Негативный тег",
+				text = {
+					"Следующий обычный джокер",
+					"базового издания в магазине станет {C:dark_edition}Негативным",
+				},
+			},
+			tag_mp_rare_blind_raiser = {
+				name = "Редкий тег",
+				text = {
+					"В магазине есть бесплатный {C:red}Редкий Джокер{}",
+					"при покупке деньги становятся {C:money}$0{}",
+				},
+			},
 			tag_mp_gambling_sandbox = {
 				name = "Азартный тег",
 				text = {
@@ -1312,6 +1334,10 @@ return {
 			},
 			k_bl_life = "Жизнь",
 			k_bl_or = "или",
+			mp_upgrade_blind = "Улучшить блайнд",
+			mp_blind_raiser_tooltip_title = "Повышение блайндов",
+			mp_blind_raiser_tooltip_upgrades = "Улучшений блайндов за игру: #1#",
+			mp_blind_raiser_tooltip_score = "Счёт после улучшения: #1#",
 			k_bl_death = "Смерть",
 			k_bl_mostchips = "Больше фишек — победа",
 			k_current_seed = "Текущий сид: ",
@@ -1338,6 +1364,8 @@ return {
 			k_experimental_description = "Передовой край Стандартного.\n\nБолее серьёзные изменения баланса, тестируемые\nдля будущего Стандартного набора правил.\nОжидайте изменений между версиями.\n\n(Смотрите вкладки с банами и изменениями)",
 			k_experimental_legacy = "Экспериментальный (Классический)",
 			k_experimental_legacy_description = "Субъективный взгляд на Устаревший рейтинг.\n\nСтекло ослаблено, Ещё разок переработан, Правосудие запрещено,\nВращайте барабан.",
+			k_experimental_blind_raiser = "Экспериментальный (Blind Raiser)",
+			k_experimental_blind_raiser_description = "Стандартный рейтинг с Blind Raiser.\n\nУлучшите текущий малый или большой блайнд до случайного\nнефинального босс-блайнда и получите награду его тега пропуска.\nN-е улучшение использует обычный счёт блайнда x 2^N.\nФункция доступна на любой ставке.",
 			k_badlatro = "Плохлатро",
 			k_badlatro_description = "Еженедельный набор правил от @dr_monty_the_snek с discord-сервера,\nдобавленный в мод на постоянной основе.\n\nЭтот набор правил запрещает 48 джокеров, расходников, тегов и т.д.",
 			k_attrition = "Истощение",

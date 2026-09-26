@@ -1,7 +1,15 @@
 local create_UIBox_blind_choice_ref = create_UIBox_blind_choice
 ---@diagnostic disable-next-line: lowercase-global
 function create_UIBox_blind_choice(type, run_info)
-	if MP.is_mp_or_ghost() then
+	-- Blind Raiser can be played through Multiplayer or the local Practice
+	-- ruleset runner. Practice has no lobby code, so MP.is_mp_or_ghost() is
+	-- false even though the Blind Raiser ruleset is active. In that case the
+	-- old code delegated to vanilla's UI and displayed the replacement Boss
+	-- multiplier instead of the stored physical-slot score x 2^N.
+	local blind_raiser_ui = MP.BLIND_RAISER
+		and MP.BLIND_RAISER.is_active
+		and MP.BLIND_RAISER.is_active()
+	if MP.is_mp_or_ghost() or blind_raiser_ui then
 		if not G.GAME.blind_on_deck then G.GAME.blind_on_deck = "Small" end
 		if not run_info then G.GAME.round_resets.blind_states[G.GAME.blind_on_deck] = "Select" end
 
@@ -27,6 +35,9 @@ function create_UIBox_blind_choice(type, run_info)
 			{ shader = "dissolve", shadow_height = 0.05 },
 			{ shader = "dissolve" },
 		})
+		if MP.BLIND_RAISER and MP.BLIND_RAISER.attach_boss_tooltip then
+			MP.BLIND_RAISER.attach_boss_tooltip(blind_choice.animation, blind_choice.config)
+		end
 		local extras = nil
 		local stake_sprite = get_stake_sprite(G.GAME.stake or 1, 0.5)
 
@@ -139,10 +150,25 @@ function create_UIBox_blind_choice(type, run_info)
 			if MP.GHOST.is_active() then
 				loc_name = MP.GHOST.get_nemesis_name()
 			else
-				loc_name = MP.LOBBY.is_host and MP.LOBBY.guest.username or MP.LOBBY.host.username
+				-- Blind-select can be rebuilt during round-end events before a
+				-- lobby username is available (for example immediately after an
+				-- Investment Tag payout). Never pass nil to DynaText.
+				local lobby = MP.LOBBY or {}
+				local opponent = lobby.is_host and lobby.guest or lobby.host
+				loc_name = opponent and opponent.username
 			end
+			loc_name = loc_name
+				or localize({ type = "name_text", key = "bl_mp_nemesis", set = "Blind" })
+				or localize("k_nemesis_timer")
+				or "Nemesis"
 		else
 			loc_name = localize({ type = "name_text", key = blind_choice.config.key, set = "Blind" })
+				or blind_choice.config.name
+				or "Blind"
+		end
+
+		if MP.BLIND_RAISER and MP.BLIND_RAISER.display_name then
+			loc_name = MP.BLIND_RAISER.display_name(type, loc_name)
 		end
 
 		local blind_col = get_blind_main_colour(type)
@@ -151,6 +177,14 @@ function create_UIBox_blind_choice(type, run_info)
 		local blind_amt = get_blind_amount(G.GAME.round_resets.blind_ante)
 			* blind_choice.config.mult
 			* G.GAME.starting_params.ante_scaling
+
+		if MP.BLIND_RAISER and MP.BLIND_RAISER.preview_score_for_slot then
+			-- Use the stored score for this physical Small/Big slot. The replacement
+			-- Boss multiplier is only a fallback for non-upgraded Blinds.
+			blind_amt = MP.BLIND_RAISER.preview_score_for_slot(type, blind_amt)
+		elseif MP.BLIND_RAISER and MP.BLIND_RAISER.score_for_slot then
+			blind_amt = MP.BLIND_RAISER.score_for_slot(type, blind_amt, G.GAME.round_resets.blind_ante)
+		end
 
 		if
 			G.GAME.round_resets.blind_choices[type] == "bl_mp_nemesis" or G.GAME.round_resets.pvp_blind_choices[type]

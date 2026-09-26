@@ -1,0 +1,138 @@
+[manifest]
+version = "1.0.0"
+dump_lua = true
+priority = 2147483600
+
+# A Boss Blind definition can occupy a Small/Big slot through Blind Raiser.
+# While this ruleset is active, round progression follows the physical slot
+# being played rather than the Blind definition's intrinsic Boss type.
+
+[[patches]]
+[patches.pattern]
+target = "functions/state_events.lua"
+pattern = "if G.GAME.blind:get_type() == 'Boss' then"
+position = "at"
+match_indent = true
+times = 1
+payload = "if MP.BLIND_RAISER.slot_matches('Boss', G.GAME.blind:get_type() == 'Boss') then"
+
+# A second vanilla Boss branch advances the Ante after cashout. The generic
+# patch above intentionally changes the first occurrence only, so explicitly
+# gate the progression branch by the physical slot as well. Without this, an
+# upgraded Ante 1 Small Blind advances the internal Ante to 2 and makes an
+# upgraded Big Blind use 1200 x 2^2 = 4800 instead of 450 x 2^2 = 1800.
+[[patches]]
+[patches.pattern]
+target = "functions/state_events.lua"
+pattern = '''
+                if G.GAME.blind:get_type() == 'Boss' then
+                    G.GAME.voucher_restock = nil
+'''
+position = "at"
+match_indent = true
+times = 1
+payload = '''
+                if MP.BLIND_RAISER.slot_matches('Boss', G.GAME.blind:get_type() == 'Boss') then
+                    G.GAME.voucher_restock = nil
+'''
+
+# Do not count a Boss definition occupying a Small/Big slot as a completed
+# natural Boss Blind for the vanilla boss-streak statistic.
+[[patches]]
+[patches.pattern]
+target = "functions/state_events.lua"
+pattern = "if G.GAME.blind:get_type() == 'Boss' and not G.GAME.seeded and not G.GAME.challenge  then"
+position = "at"
+match_indent = true
+times = 1
+payload = "if MP.BLIND_RAISER.slot_matches('Boss', G.GAME.blind:get_type() == 'Boss') and not G.GAME.seeded and not G.GAME.challenge then"
+
+[[patches]]
+[patches.pattern]
+target = "functions/state_events.lua"
+pattern = "if G.GAME.round_resets.ante == G.GAME.win_ante and G.GAME.blind:get_type() == 'Boss' then"
+position = "at"
+match_indent = true
+times = 1
+payload = "if G.GAME.round_resets.ante == G.GAME.win_ante and MP.BLIND_RAISER.slot_matches('Boss', G.GAME.blind:get_type() == 'Boss') then"
+
+[[patches]]
+[patches.pattern]
+target = "functions/state_events.lua"
+pattern = "if G.GAME.round_resets.blind == G.P_BLINDS.bl_small then"
+position = "at"
+match_indent = true
+times = 1
+payload = "if MP.BLIND_RAISER.slot_matches('Small', G.GAME.round_resets.blind == G.P_BLINDS.bl_small) then"
+
+[[patches]]
+[patches.pattern]
+target = "functions/state_events.lua"
+pattern = "elseif G.GAME.round_resets.blind == G.P_BLINDS.bl_big then"
+position = "at"
+match_indent = true
+times = 1
+payload = "elseif MP.BLIND_RAISER.slot_matches('Big', G.GAME.round_resets.blind == G.P_BLINDS.bl_big) then"
+
+# Vanilla updates the current tag/Skip UI by child index. Synchronize the
+# extra Upgrade row immediately after that block has completed.
+[[patches]]
+[patches.pattern]
+target = "functions/button_callbacks.lua"
+pattern = '''
+    if _top_button then 
+        _top_button.config.colour = G.C.UI.BACKGROUND_INACTIVE
+        _top_button.config.button = nil
+        _top_button.config.hover = false
+        _top_button.children[1].config.colour = G.C.UI.TEXT_INACTIVE
+    end
+end
+'''
+position = "after"
+match_indent = true
+times = 1
+payload = '''
+if MP and MP.BLIND_RAISER and MP.BLIND_RAISER.sync_tag_ui then
+    MP.BLIND_RAISER.sync_tag_ui(e)
+end
+'''
+
+# Prevent vanilla from re-enabling Skip for a slot that was upgraded.
+[[patches]]
+[patches.pattern]
+target = "functions/button_callbacks.lua"
+pattern = "G.GAME.round_resets.blind_states[e.config.id] == 'Defeated' then"
+position = "before"
+match_indent = true
+times = 1
+payload = "(MP.BLIND_RAISER and MP.BLIND_RAISER.skip_is_locked(e.config.id)) or"
+
+# UI disabling is not sufficient against stale controller focus or a queued
+# click. Reject Skip at the callback itself after the current slot is upgraded.
+[[patches]]
+[patches.pattern]
+target = "functions/button_callbacks.lua"
+pattern = "G.FUNCS.skip_blind = function(e)"
+position = "after"
+match_indent = true
+times = 1
+payload = '''
+if MP and MP.BLIND_RAISER and MP.BLIND_RAISER.skip_is_locked(G.GAME.blind_on_deck) then
+    return
+end
+'''
+
+# The Nth upgraded Blind uses the physical slot's normal score requirement
+# multiplied by 2^N, rather than the replacement Boss Blind's multiplier.
+[[patches]]
+[patches.pattern]
+target = "blind.lua"
+pattern = "self.chips = get_blind_amount(G.GAME.round_resets.ante)*self.mult*G.GAME.starting_params.ante_scaling"
+position = "after"
+match_indent = true
+times = 1
+payload = '''
+if MP and MP.BLIND_RAISER and MP.BLIND_RAISER.score_for_blind then
+    self.chips = MP.BLIND_RAISER.score_for_blind(blind, G.GAME.blind_on_deck, self.chips, G.GAME.round_resets.blind_ante or G.GAME.round_resets.ante)
+end
+'''

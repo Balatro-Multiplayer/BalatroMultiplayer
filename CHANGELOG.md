@@ -1,5 +1,14 @@
 # Changelog
 
+## Blind Raiser Experimental Ruleset
+
+- Added **Experimental (Blind Raiser)** to the Experimental ruleset tab.
+- Uses the full **Standard Ranked** ruleset configuration.
+- Adds **Upgrade Blind** to every Stake: claim the current Small/Big Blind's Skip Tag and replace that slot with a random non-Showdown Boss Blind without skipping it.
+- Blind Raiser boss rolls use separate bookkeeping so choosing an upgrade does not alter future normal Boss rolls in Multiplayer.
+- Escalating score requirement: the Nth Blind upgraded this run uses the physical slot's regular score multiplied by **2^N**.
+- Ruleset-only Tag reworks are listed under **Reworks → Other**: Investment scales with upgraded Blinds, Negative targets the next base-edition Common shop Joker, and Rare creates a free Rare Joker that empties your money when bought (and cannot roll in Ante 1).
+
 ## Ranked Update 0.4.0
 
 ### Standard Ranked
