@@ -63,13 +63,19 @@ MPAPI.ActionType({
 	key = "pvp_reseed",
 	prefix_config = { key = false },
 	on_receive = function(_at, _from, params)
-		local lobby = MPAPI.get_current_lobby()
-		if lobby and lobby.is_host then
-			PVP.referee_reset(PVP.LOBBY.config.starting_lives)
-		end
-		PVP.dispatch_action("startGame", { seed = params.seed, stake = PVP.LOBBY.deck.stake })
+		PVP.on_reseed(params.seed)
 	end,
 })
+
+-- Every client's restart on a new seed: off pvp_reseed, or off a restarted
+-- GAME_STARTED in a server-refereed lobby (see pvp_api/lobby_bridge.lua).
+function PVP.on_reseed(seed)
+	local lobby = MPAPI.get_current_lobby()
+	if lobby and lobby.is_host then
+		PVP.referee_reset(PVP.LOBBY.config.starting_lives)
+	end
+	PVP.dispatch_action("startGame", { seed = seed, stake = PVP.LOBBY.deck.stake })
+end
 
 function PVP.cast_seed_vote()
 	local lobby = MPAPI.get_current_lobby()
@@ -95,7 +101,16 @@ function PVP.register_seed_vote(voter_id)
 		)
 	end
 
-	if lobby.is_host and unanimous and MPAPI.ActionTypes["pvp_reseed"] then
+	if lobby.is_host and unanimous and MPAPI.has_server_referee(lobby) then
+		-- The server finishes this game (kept as 'restarted') and starts the next
+		-- on its own seed: GAME_STARTED with restarted = true.
+		PVP.lobby.seed_votes:reset()
+		lobby:restart_game(function(err)
+			if err then
+				sendWarnMessage("restart_game error: " .. tostring(err), "MULTIPLAYER")
+			end
+		end)
+	elseif lobby.is_host and unanimous and MPAPI.ActionTypes["pvp_reseed"] then
 		PVP.lobby.seed_votes:reset()
 		lobby:action(MPAPI.ActionTypes["pvp_reseed"]):broadcast({ seed = PVP.generate_seed() })
 	end

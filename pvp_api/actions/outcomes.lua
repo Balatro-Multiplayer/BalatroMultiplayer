@@ -49,9 +49,12 @@ A("pvp_win", function(_at, _from, params)
 	-- eliminated at once) has no winner to resolve against -- both routes here
 	-- converge on the same drawGame dispatch/MMR-skip, see pvp_api/run_actions.lua's
 	-- PVP.register_draw_vote for why this reuses pvp_win instead of a separate action.
+	local refereed = MPAPI.has_server_referee(lobby)
 	if params.draw then
 		PVP.dispatch_action("drawGame")
-		if lobby and lobby.is_host and PVP.report_match_result then
+		if refereed then
+			PVP.report_server_result(lobby, nil, { draw = true })
+		elseif lobby and lobby.is_host and PVP.report_match_result then
 			PVP.report_match_result(nil, { draw = true })
 		end
 		return
@@ -68,8 +71,11 @@ A("pvp_win", function(_at, _from, params)
 		i_won = params.winner_id == sid
 	end
 	PVP.dispatch_action(i_won and "winGame" or "loseGame")
-	-- Host reports the matchmaking result (ELO + leaderboard) once per match.
-	if lobby and lobby.is_host and PVP.report_match_result then
+	-- A server-refereed lobby: everyone reports. Otherwise the host reports the
+	-- matchmaking result (ELO + leaderboard) once per match.
+	if refereed then
+		PVP.report_server_result(lobby, params.winner_team_id or params.winner_id, { team = params.winner_team_id ~= nil })
+	elseif lobby and lobby.is_host and PVP.report_match_result then
 		PVP.report_match_result(params.winner_team_id or params.winner_id)
 	end
 end)

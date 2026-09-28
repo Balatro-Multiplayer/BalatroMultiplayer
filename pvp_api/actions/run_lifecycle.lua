@@ -85,7 +85,10 @@ function PVP._ban_pick_on_complete_for(gm_def, lobby, seed, fallback_stake)
 	end
 end
 
-A("pvp_start_game", function(_at, from, params)
+-- Every client's start of a game (params = { seed, stake }): run off the
+-- pvp_start_game broadcast (host-refereed lobbies) or off GAME_STARTED
+-- (server-refereed lobbies, see pvp_api/lobby_bridge.lua) -- the same body.
+function PVP.on_game_start(params)
 	if PVP.stop_ready_resync then
 		PVP.stop_ready_resync()
 	end
@@ -142,6 +145,10 @@ A("pvp_start_game", function(_at, from, params)
 	else
 		proceed(meta.deck)
 	end
+end
+
+A("pvp_start_game", function(_at, from, params)
+	PVP.on_game_start(params)
 end)
 
 relay("pvp_stop_game", "stopGame")

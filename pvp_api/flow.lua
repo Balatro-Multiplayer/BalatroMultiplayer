@@ -136,6 +136,19 @@ function PVP.pvp_start_match()
 	if gm_def and gm_def.new_instance then
 		lobby._gamemode_instance = gm_def:new_instance()
 	end
+	if MPAPI.has_server_referee(lobby) then
+		-- The server checks who's ready and picks the seed; everyone starts off
+		-- GAME_STARTED (pvp_api/lobby_bridge.lua), where referee_reset runs host-side.
+		lobby:start_game({
+			stake = tonumber(PVP.LOBBY.deck.stake or PVP.LOBBY.config.stake or 1),
+			options = { queue_mode = queue_mode },
+		}, function(err)
+			if err then
+				PVP.UI.UTILS.overlay_message("Start refused: " .. tostring(err))
+			end
+		end)
+		return
+	end
 	-- referee_reset runs host-side inside the pvp_start_game handler (loopback).
 	PVP.ACTIONS.start_game()
 end

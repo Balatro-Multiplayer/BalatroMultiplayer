@@ -138,17 +138,57 @@ function PVP.report_match_result(winner_id, opts)
 	if not lobby then
 		return
 	end
-	local placements = {}
+	local ids = {}
 	for _, p in ipairs(lobby:get_players()) do
+		ids[#ids + 1] = p.id
+	end
+	handle:report_result(PVP.build_placements(ids, winner_id), function()
+		PVP._match_handle = nil
+	end)
+end
+
+-- The finished match's placements for `player_ids`: the winner first, everyone else
+-- second. `opts.team` makes `winner` a team id (Manhunt/Teams, resolved through
+-- PVP.LOBBY.roster); `opts.draw` places everyone first. metric = each player's best
+-- PvP score (the leaderboard's season-best column).
+function PVP.build_placements(player_ids, winner, opts)
+	opts = opts or {}
+	local placements = {}
+	for _, id in ipairs(player_ids) do
+		local won
+		if opts.draw then
+			won = true
+		elseif opts.team then
+			won = PVP.LOBBY.roster and PVP.LOBBY.roster[id] == winner
+		else
+			won = id == winner
+		end
 		placements[#placements + 1] = {
-			playerId = p.id,
-			place = (p.id == winner_id) and 1 or 2,
-			performance = (p.id == winner_id) and 1 or 0,
-			metric = (PVP.pvp_score_metric and PVP.pvp_score_metric(p.id)) or 0,
+			playerId = id,
+			place = won and 1 or 2,
+			performance = (won and not opts.draw) and 1 or 0,
+			metric = (PVP.pvp_score_metric and PVP.pvp_score_metric(id)) or 0,
 		}
 	end
-	handle:report_result(placements, function()
-		PVP._match_handle = nil
+	return placements
+end
+
+-- A server-refereed lobby: every client reports the same placements for the players
+-- the game started with. Once per game.
+function PVP.report_server_result(lobby, winner, opts)
+	local started = lobby._game.started
+	if not started or PVP._reported_run_id == started.run_id then
+		return
+	end
+	PVP._reported_run_id = started.run_id
+	local ids = {}
+	for _, p in ipairs(started.players or {}) do
+		ids[#ids + 1] = p.id
+	end
+	lobby:report_result(PVP.build_placements(ids, winner, opts), function(err)
+		if err then
+			sendWarnMessage("report_result error: " .. tostring(err), "MULTIPLAYER")
+		end
 	end)
 end
 

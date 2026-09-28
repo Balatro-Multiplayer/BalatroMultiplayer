@@ -326,4 +326,28 @@ PVP.setup_lobby_mirror = function(lobby)
 	lobby:on(MPAPI.LobbyEvent.ERROR, function(err)
 		sendWarnMessage("Lobby error: " .. tostring(err), "MULTIPLAYER")
 	end)
+
+	-- Server-refereed lobbies: ready, start, restart and the end of a game come from
+	-- the server rather than from PVP's own actions (whose handlers do the same work).
+	lobby:on(MPAPI.LobbyEvent.PLAYER_READY_CHANGED, function(player_id, ready)
+		if MPAPI.has_server_referee(lobby) then
+			PVP.set_player_ready(player_id, ready)
+		end
+	end)
+
+	lobby:on(MPAPI.LobbyEvent.GAME_STARTED, function(started)
+		if started.restarted then
+			PVP.on_reseed(started.seed)
+		else
+			PVP.on_game_start({ seed = started.seed, stake = tostring(started.stake or 1) })
+		end
+	end)
+
+	lobby:on(MPAPI.LobbyEvent.GAME_ENDED, function(ended)
+		sendDebugMessage("[pvp] game ended: " .. tostring(ended.status), "MULTIPLAYER")
+		PVP.last_game_ended = ended
+		if PVP.reset_ready_state then
+			PVP.reset_ready_state()
+		end
+	end)
 end

@@ -32,13 +32,20 @@ MPAPI.register_lobby_reconnect(PVP.id, function(lobby)
 	if not lobby._ban_pick and meta._mp_ban_pick_state then
 		lobby._ban_pick = meta._mp_ban_pick_state
 	end
+	-- The started game's seed/stake: the server's (restored from the snapshot) in a
+	-- server-refereed lobby, otherwise net.lua's metadata mirror.
+	local started = lobby._game and lobby._game.started
+	local seed, stake = meta._mp_pending_seed, meta._mp_pending_stake
+	if MPAPI.has_server_referee(lobby) and started then
+		seed, stake = started.seed, tostring(started.stake or 1)
+	end
 	if lobby._ban_pick and not lobby._ban_pick.complete then
 		local gm_def = meta.queue_mode and MPAPI.GameModes[meta.queue_mode]
 		if gm_def and gm_def.ban_pick then
 			MPAPI.BanPick.resume(
 				lobby,
 				PVP._ban_pick_config_for(gm_def),
-				PVP._ban_pick_on_complete_for(gm_def, lobby, meta._mp_pending_seed, meta._mp_pending_stake)
+				PVP._ban_pick_on_complete_for(gm_def, lobby, seed, stake)
 			)
 		end
 	end

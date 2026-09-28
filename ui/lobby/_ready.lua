@@ -18,9 +18,19 @@ function PVP.is_matchmaking()
 	return PVP._pvp_kind == PVP.LobbyAccess.RANKED or PVP._pvp_kind == PVP.LobbyAccess.CASUAL
 end
 
+-- A server-refereed lobby keeps ready on the server; its PLAYER_READY_CHANGED feeds
+-- the same tally (pvp_api/lobby_bridge.lua).
 function PVP.signal_ready(ready)
 	local lobby = PVP.lobby.ref
 	if not lobby then
+		return
+	end
+	if MPAPI.has_server_referee(lobby) then
+		lobby:set_ready(ready, function(err)
+			if err then
+				sendWarnMessage("Ready failed: " .. tostring(err), "MULTIPLAYER")
+			end
+		end)
 		return
 	end
 	lobby:action(MPAPI.ActionTypes["pvp_player_ready"]):broadcast({ ready = ready and true or false })
