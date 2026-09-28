@@ -81,11 +81,17 @@ A("pvp_win", function(_at, _from, params)
 end)
 
 -- Opponent-forfeit win (broadcast from the gamemode's on_player_forfeit).
+-- A server-refereed lobby: whoever is still in reports it (the forfeiter has
+-- left, so the server settles the run as partial).
 A("pvp_player_won", function(_at, _from, params)
 	local sid = self_id()
 	if params.player_id == sid then
 		PVP.dispatch_action("winGame")
 	else
 		PVP.dispatch_action("loseGame")
+	end
+	local lobby = MPAPI.get_current_lobby()
+	if MPAPI.has_server_referee(lobby) then
+		PVP.report_server_result(lobby, params.player_id)
 	end
 end)
