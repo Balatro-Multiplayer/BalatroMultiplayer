@@ -18,8 +18,7 @@
 -- already this player's own buffered stream (server-side getTail against
 -- the live in-memory buffer), so no second fetch is needed at all.
 function PVP._launch_rejoin(active)
-	local conn = MPAPI.get_connection()
-	local my_id = conn and conn.player_id
+	local my_id = MPAPI.get_replay_player_id()
 
 	-- Merges the first match_manifest (schema_version) + first lobby_info
 	-- (gamemode/ruleset/sleeve/challenge) + first run_info (seed/deck/stake)

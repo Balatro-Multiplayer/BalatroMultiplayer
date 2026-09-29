@@ -59,8 +59,7 @@ function PVP._launch_replay(run_id)
 		end
 
 		local timeline = MPAPI.playback.build_timeline(data.logs)
-		local conn = MPAPI.get_connection()
-		local my_id = conn and conn.player_id
+		local my_id = MPAPI.get_replay_player_id()
 		local bootstrap = find_bootstrap(timeline, my_id)
 		if not bootstrap then
 			MPAPI.sendWarnMessage('[replay] no bootstrap data found for our own player in run ' .. tostring(run_id))
