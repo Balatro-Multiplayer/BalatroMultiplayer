@@ -212,6 +212,11 @@ G.FUNCS.multiplayer_blind_chip_UI_scale = function(e)
 		and G.GAME.current_round.hands_played == 0
 	then
 		MP.GAME.enemy.score_text = "???"
+		-- Fidget a little while hidden, like it's dying to tell you
+		if not G.SETTINGS.reduced_motion and G.TIMERS.REAL - (e.config.mp_last_fidget or 0) > 2.2 then
+			e.config.mp_last_fidget = G.TIMERS.REAL
+			e:juice_up(0.05, 0.03)
+		end
 		return
 	end
 	local new_score_text = MP.INSANE_INT.to_string(MP.GAME.enemy.score)
@@ -219,8 +224,18 @@ G.FUNCS.multiplayer_blind_chip_UI_scale = function(e)
 		if not MP.INSANE_INT.greater_than(MP.GAME.enemy.score, MP.INSANE_INT.create(0, G.E_SWITCH_POINT, 0)) then
 			e.config.scale = scale_number(MP.GAME.enemy.score.coeffiocient, 0.7, 100000)
 		end
+		local revealing = MP.GAME.enemy.score_text == "???"
 		MP.GAME.enemy.score_text = new_score_text
+		if revealing then MP.UI.reveal_enemy_score(e) end
 	end
+end
+
+-- The "???" -> real score moment: a card-flip-ish pop so the reveal lands
+function MP.UI.reveal_enemy_score(e)
+	e:juice_up(0.6, 0.15)
+	play_sound("card1", 0.85, 0.6)
+	play_sound("chips2", 1.1, 0.35)
+	G.ROOM.jiggle = G.ROOM.jiggle + 1
 end
 
 function MP.UI.juice_up_pvp_hud()
