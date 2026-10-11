@@ -69,6 +69,7 @@ local vanilla = {} -- [table_id][key][prop] = deep copy | ABSENT
 local patches = {} -- [table_id][key][layer] = { props, silent }
 local pool_snapshot = {} -- [bucket] = { center, ... } for buckets a rarity rework touches
 local locked_chain = nil -- set for the length of a run
+local written_chain = {} -- what the live tables currently hold
 
 ---@param key string e.g. "m_glass"
 ---@param opts table { layers, center_table?, loc_key?, silent?, ...center properties }
@@ -260,6 +261,7 @@ local function write(chain)
 		end
 	end
 	apply_rarity_pools()
+	written_chain = copy(chain)
 end
 
 local function same_chain(a, b)
@@ -350,7 +352,10 @@ function MP.rework_fingerprint()
 	return digest
 end
 
--- Drain after the real injectItems, once every center exists.
+-- Drain after the real injectItems, once every center exists. SMODS runs it
+-- again whenever Game:init_item_prototypes rebuilds G.P_* (profile switch,
+-- language change): fresh vanilla tables and pools, so re-snapshot the pools and
+-- put the current chain back.
 local inject_ref = SMODS.injectItems
 function SMODS.injectItems(...)
 	local ret = inject_ref(...)
@@ -358,7 +363,9 @@ function SMODS.injectItems(...)
 		ingest(entry.key, entry.opts)
 	end
 	pending = {}
+	pool_snapshot = {}
 	snapshot_pools()
+	if drained then write(written_chain) end
 	drained = true
 	return ret
 end

@@ -216,6 +216,34 @@ MP.ApplyReworks({ "release" })
 check("WIP joker reworked to rare stays out of the pools", not pool_keys(3):find("j_wip"))
 check("untargeted bucket untouched", G.P_JOKER_RARITY_POOLS[2][1] == G.P_CENTERS.j_a)
 
+-- Game:init_item_prototypes (profile switch, language change) rebuilds every
+-- center and pool table, and SMODS re-runs injectItems.
+local function reinit()
+	local old = G.P_CENTERS
+	G.P_CENTERS = {}
+	for key, center in pairs(old) do
+		G.P_CENTERS[key] = { key = key, set = center.set, order = center.order, rarity = 1, config = { extra = {} } }
+	end
+	G.P_CENTERS.m_glass = { key = "m_glass", set = "Enhanced", config = { Xmult = 2, extra = 5 } }
+	G.P_CENTERS.j_c.rarity, G.P_CENTERS.j_d.rarity = 3, 3
+	G.P_CENTERS.j_greedy.config.extra = { s_mult = 3, suit = "Diamonds" }
+	G.P_CENTERS.j_wip.wip = true
+	local n = G.P_CENTERS
+	G.P_JOKER_RARITY_POOLS = { { n.j_a, n.j_b, n.j_sixth_sense, n.j_greedy }, {}, { n.j_c, n.j_d }, {} }
+	SMODS.injectItems()
+end
+fresh()
+register_basic()
+SMODS.injectItems()
+MP.ApplyReworks({ "release" })
+reinit()
+check("re-inject puts the written chain back", G.P_CENTERS.j_sixth_sense.rarity == 3)
+check("re-inject moves the fresh center, not the stale one", G.P_JOKER_RARITY_POOLS[3][1] == G.P_CENTERS.j_sixth_sense)
+MP.ApplyReworks({})
+check("after re-inject, {} restores the fresh pools", pool_keys(1) == "j_a j_b j_sixth_sense j_greedy" and pool_keys(3) == "j_c j_d")
+MP.ApplyReworks({ "standard" })
+check("after re-inject, config reworks hit the fresh center", glass() == "1.5/4")
+
 -- ─── Absent props, loc_key, silent ──────────────────────────────────────────
 fresh()
 local my_loc_vars = function()
