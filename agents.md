@@ -133,9 +133,9 @@ Solo endurance — 1 life, no PvP blinds at all (all vanilla). Bans MP jokers an
 
 The runtime view of "what's active right now" is bigger than a single ruleset — modifier layers compose on top. Two abstractions:
 
-**`MP.current_ruleset()`** — a metatable proxy that resolves any field as (ruleset + active modifiers). Arrays union; scalars last-wins; modifiers beat the ruleset's own scalars. This is the canonical read site for ban lists, timer scalars, preview flags, etc. — `ApplyBans`, `LoadReworks`, lobby code all go through it. Safe with no active ruleset (arrays read as `{}`, scalars as `nil`).
+**`MP.current_ruleset()`** — a metatable proxy that resolves any field as (ruleset + active modifiers). Arrays union; scalars last-wins; modifiers beat the ruleset's own scalars. This is the canonical read site for ban lists, timer scalars, preview flags, etc. — `ApplyBans` and lobby code go through it. Safe with no active ruleset (arrays read as `{}`, scalars as `nil`).
 
-**`MP.active_layer_chain(target?)`** — single source of truth for the deduped, ordered list of active layer names: ruleset's `_layer_order` → ruleset's self-name → modifiers. Powers `is_layer_active`, `RunLayerHooks`, and `LoadReworks` resolution. Dedup matters because not every hook is idempotent (smallworld's 75% cull would re-cull survivors if the ruleset's self-name re-fired the layer hook).
+**`MP.active_layer_chain(target?)`** — single source of truth for the deduped, ordered list of active layer names: ruleset's `_layer_order` → ruleset's self-name → modifiers. Powers `is_layer_active`, `RunLayerHooks`, and rework resolution (`MP.rework_chain`). Dedup matters because not every hook is idempotent (smallworld's 75% cull would re-cull survivors if the ruleset's self-name re-fired the layer hook).
 
 **`MP.MODIFIERS`** — runtime-only ordered list of modifier-layer names. Picked from the Modifiers overlay in lobby (host) or in practice mode (player). Reset to `{}` on lobby leave / practice exit. Helpers: `MP.has_modifier`, `MP.add_modifier`, `MP.remove_modifier`, `MP.modifiers_serialize`, `MP.modifiers_parse`. Modifiers are *not* materialized onto the ruleset — they're queried at read time via `current_ruleset()`.
 
@@ -195,13 +195,13 @@ Then `MP.RunLayerHooks("on_apply_bans")` fires each layer's hook in `active_laye
 
 ### The Rework System
 
-There are **two paths** for reworking a card. They serve different purposes.
+There are **two paths** for reworking a card. Prefer Path B wherever it can express the change; Path A is for cards that are new in substance (a different card wearing a vanilla name), or that need a fresh key for another reason.
 
 #### Path A: Full reimplementation (SMODS.Joker / SMODS.Consumable / etc.)
 
 You write a brand-new card with its own key, logic, and loc_txt. The vanilla card is silently banned; yours takes its place in the pool.
 
-**This is what we use for joker reworks.** `ReworkCenter` mutates center properties on the existing card, which can desync the shop queue — Balatro's RNG pool system has already indexed the original center by the time reworks load, so mutating joker config mid-run risks desyncing the pseudorandom joker ordering between clients. Reimplementing as a new card with a fresh key avoids this entirely.
+Historically this was the only safe way to rework a joker, because the old `ReworkCenter` mutated centers in a history-dependent way. The current engine (below) no longer has that problem, so new joker reworks should use Path B unless they need a new key.
 
 Steps:
 1. Create the new card via `SMODS.Joker({ key = "hanging_chad", ... })`
@@ -212,23 +212,29 @@ Auto-gating is driven by reverse indices `MP._JOKER_LAYERS` / `MP._CONSUMABLE_LA
 
 #### Path B: `ReworkCenter` (property patching)
 
-Overrides config, loc text, and/or logic on an existing center without creating a new key. Cleaner API, less boilerplate — good for enhancements, consumables, tags, stakes, blinds, and poker hands.
+Overrides config, rarity, cost, loc text, atlas, and/or logic on an existing object without creating a new key. Works on jokers, enhancements, consumables, vouchers, tags (`center_table = "P_TAGS"`), seals, stakes, blinds, and poker hands (`center_table = SMODS.PokerHands`).
 
 ```lua
 MP.ReworkCenter("m_glass", {
     layers = "standard",           -- string or array of strings
-    config = { Xmult = 1.5, extra = 4 },
+    config = { Xmult = 1.5, extra = 4 },  -- deep-merged onto vanilla config
+    -- silent = true,              -- rework without the Balanced sticker
+    -- loc_key = "...",            -- swap the description
 })
 ```
 
-Registration stores properties as `mp_<layer>_<prop>` on the center. `MP.LoadReworks(ruleset)` resolves in `MP.active_layer_chain(ruleset)` order: vanilla → composed layers → ruleset self-name → modifiers. Later entries override earlier ones.
-
-**Why not for jokers:** `ReworkCenter` mutates `G.P_CENTERS[key]` properties. Balatro's shop pool generation reads center config during pseudorandom selection. If you change a joker's rarity or config after pool generation has already used the original values, the two clients can diverge. Enhancements/consumables/tags don't go through the same shop queue machinery, so they're safe.
+Engine (`rulesets/_reworks.lua`):
+- Declarations queue at load and drain after `SMODS.injectItems`, snapshotting the vanilla value of every property they touch.
+- Every apply rebuilds each reworked property from that snapshot and folds the layer chain on top (`MP.active_layer_chain` order; later layers win). Live state depends only on the chain, never on what ran before.
+- `MP.BeginRunReworks(chain)` at `Game:start_run` applies the run's chain and locks it. `MP.EndRunReworks()` at `Game:main_menu` unlocks and restores vanilla. `MP.ApplyReworks(chain)` is the menu-time preview; it refuses (with a warning) to change the chain mid-run.
+- Rarity reworks move only the affected jokers between `G.P_JOKER_RARITY_POOLS` buckets, at their `(order, key)` slot. Under a chain with no rarity changes every bucket is exactly as loaded, so the shop draws what vanilla would.
+- Reworking the same key twice for the same layer is a load-time error.
+- `MP.rework_fingerprint()` hashes every snapshot and patch. It rides in the mod string and shows up as a "Reworks" row in the version mismatch modal when two clients disagree.
 
 ### Wiring: when the layer entry is enough vs. when you need more
 
 - **Path A jokers / consumables / tags** (`reworked_jokers`, `reworked_consumables`, `reworked_tags`): the layer entry *does* drive runtime gating — auto-mp_include kicks in. You still write the `SMODS.Joker`/`SMODS.Consumable`/`SMODS.Tag` definition and the `banned_silent` entry for the vanilla version (if reskinning one), but no manual `mp_include` or `in_pool` is needed for layer-only gates. `tag_mp_*` is default-deny: a tag must be listed in some layer's `reworked_tags` (or define its own `mp_include`) to appear anywhere.
-- **Path B centers** (`reworked_enhancements`, `reworked_vouchers`, `reworked_blinds`): the layer entry is **display metadata only**. Runtime patching needs a separate `MP.ReworkCenter(key, { layers = "..." })` call. Auto-gating doesn't apply because Path B doesn't go through `register`.
+- **Path B centers** (`reworked_enhancements`, `reworked_vouchers`, `reworked_blinds`, and vanilla keys in `reworked_jokers`): the layer entry is **display metadata only**. Runtime patching needs a separate `MP.ReworkCenter(key, { layers = "..." })` call. Auto-gating doesn't apply because Path B doesn't go through `register`, and there is no vanilla card to `banned_silent`.
 
 ### Ruleset Details
 

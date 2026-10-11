@@ -158,10 +158,6 @@ G.FUNCS.mp_custom_play = function(e)
 		MP.LOBBY.config.ruleset = base_key
 	end
 
-	-- Materialize reworks for the chosen base. active_layer_chain now folds in
-	-- MP.MODIFIERS (the ruleset is set above), so modifier reworks resolve too.
-	MP.LoadReworks(base_short)
-
 	local ruleset = MP.Rulesets[base_key]
 	if mode == "sp" then
 		G.FUNCS.start_sp_run(e)

@@ -30,6 +30,7 @@ function MP:generate_hash()
 	SMODS.Mods["Multiplayer"].config.unlocked = MP.UTILS.unlock_check()
 	table.insert(mod_data, 1, "unlocked=" .. tostring(SMODS.Mods["Multiplayer"].config.unlocked))
 	table.insert(mod_data, 1, "preview=" .. tostring(SMODS.Mods["Multiplayer"].config.integrations.Preview))
+	table.insert(mod_data, 1, "reworks=" .. MP.rework_fingerprint())
 	local mod_string = table.concat(mod_data, ";")
 	MP.MOD_STRING = mod_string
 	MP.MOD_HASH = hash(mod_string) or "0000"
@@ -127,6 +128,8 @@ function MP.UTILS.parse_Hash(hash)
 			config.encryptID = tonumber(val)
 		elseif key == "unlocked" then
 			config.unlocked = val == "true"
+		elseif key == "reworks" then
+			config.reworks = val
 		elseif key ~= "serversideConnectionID" then
 			table.insert(mod_data, part)
 		end
@@ -241,6 +244,13 @@ function MP.UTILS.version_mismatches()
 				table.insert(results, { mod = check.name, our = our_version, their = their_version })
 			end
 		end
+	end
+	-- Same version, different rework data: a dev build or a mod that edits vanilla
+	-- centers. Clients that predate the fingerprint don't send one; skip those.
+	local their_reworks = other.config and other.config.reworks
+	local our_reworks = MP.rework_fingerprint()
+	if their_reworks and their_reworks ~= our_reworks then
+		table.insert(results, { mod = "Reworks", our = our_reworks, their = their_reworks })
 	end
 	return results
 end

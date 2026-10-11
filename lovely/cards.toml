@@ -46,7 +46,7 @@ payload = '''--if there is at least one joker$pre local copyable_jokers = {}
 times = 1
 
 # Sets the balanced sticker on reworked cards.
-# ReworkCenter mutation should automatically set card.config.mp_balanced if applicable
+# ReworkCenter sets center.mp_balanced; full reimplementations put mp_balanced in config.
 # Custom localization is unsupported as of now
 [[patches]]
 [patches.pattern]
@@ -56,7 +56,7 @@ position = 'before'
 payload = '''
 if old_center ~= center or initial then
 	self.ability.mp_sticker_balanced = false
-	if center.config.mp_balanced then
+	if center.mp_balanced or center.config.mp_balanced then
 		self.ability.mp_sticker_balanced = true
 	end
 end'''

@@ -51,7 +51,6 @@ function G.FUNCS.load_previewed_ghost(e)
 		MP.SP.ruleset = ruleset_key
 		local ruleset_name = ruleset_key:gsub("^ruleset_mp_", "")
 		MP.apply_default_modifiers(ruleset_name)
-		MP.LoadReworks(ruleset_name)
 	end
 
 	_preview_idx = nil

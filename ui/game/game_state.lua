@@ -350,11 +350,17 @@ function Game:update_blind_select(dt)
 	update_blind_select_ref(self, dt)
 end
 
+local main_menu_ref_reworks = Game.main_menu
+function Game:main_menu(change_context)
+	MP.EndRunReworks()
+	return main_menu_ref_reworks(self, change_context)
+end
+
 local start_run_ref = Game.start_run
 function Game:start_run(args)
 	-- Not get_active_ruleset(): the sp run flow leaves practice=false but still
 	-- sets MP.SP.ruleset, which get_active_ruleset() only honours in practice.
-	MP.LoadReworks(MP.LOBBY.config.ruleset or MP.SP.ruleset)
+	MP.BeginRunReworks(MP.rework_chain(MP.LOBBY.config.ruleset or MP.SP.ruleset))
 
 	start_run_ref(self, args)
 

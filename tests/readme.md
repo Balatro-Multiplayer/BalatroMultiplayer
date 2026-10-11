@@ -67,3 +67,26 @@ changes it.
 Play one real multiplayer match, then open the Lovely log. Filter the `MP_RLOG:`
 (positional) and `Client sent message:` (human) lines and confirm they mirror
 each action event-for-event.
+
+## ReworkCenter engine
+
+`test_reworks.lua` loads `rulesets/_reworks.lua` against stub `G` / `SMODS`
+tables, registers reworks, drains them through a fake `SMODS.injectItems`, and
+asserts on the live tables.
+
+```bash
+lua tests/test_reworks.lua
+```
+
+What it pins:
+- Resolution per chain: later layers win, `config` deep-merges, tags and poker
+  hands resolve through `center_table`
+- History independence: three different apply histories land byte-identical
+  for every target chain, and `{}` restores the pre-drain tables exactly
+- Rarity pools: a config-only chain leaves every pool as loaded; a rarity
+  rework moves only that joker, to its `(order, key)` slot, in place
+- `silent` suppresses the Balanced flag; absent props are removed again
+- Load-time errors: duplicate `(key, layer)` errors, unknown keys warn
+- Run lock: a different chain mid-run is refused, run end restores vanilla
+- Fingerprint: stable across registration order and applies, changes with
+  any patch or with a different vanilla baseline

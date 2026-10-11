@@ -138,7 +138,7 @@ function G.UIDEF.ruleset_selection_options(mode, buttons)
 	-- here we are
 	MP.apply_default_modifiers(default_ruleset)
 
-	MP.LoadReworks(default_ruleset)
+	MP.ApplyReworks(MP.rework_chain(default_ruleset))
 	MP.UI.ruleset_selection_mode = mode
 	MP.UI.ruleset_selection_default_button = default_ruleset .. "_ruleset_button"
 
@@ -170,7 +170,7 @@ function G.FUNCS.change_ruleset_selection(e)
 		function(ruleset_name)
 			set_selected_ruleset(mode, "ruleset_mp_" .. ruleset_name)
 			MP.apply_default_modifiers(ruleset_name)
-			MP.LoadReworks(ruleset_name)
+			MP.ApplyReworks(MP.rework_chain(ruleset_name))
 		end
 	)
 
@@ -720,4 +720,12 @@ function MP.UI.build_action_row(ruleset, mode)
 	end
 	add_col(MP.UI.get_continue_button(ruleset, mode))
 	return { n = G.UIT.R, config = { align = "cm" }, nodes = columns }
+end
+
+-- Previewing a ruleset writes its reworks to the live centers. Closing any
+-- overlay on the main menu puts vanilla back so the collection never shows them.
+local exit_overlay_menu_ref_reworks = G.FUNCS.exit_overlay_menu
+function G.FUNCS:exit_overlay_menu()
+	exit_overlay_menu_ref_reworks(self)
+	if G.STAGE == G.STAGES.MAIN_MENU then MP.ApplyReworks({}) end
 end
