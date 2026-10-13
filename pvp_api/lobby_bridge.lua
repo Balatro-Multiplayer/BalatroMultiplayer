@@ -290,6 +290,17 @@ PVP.setup_lobby_mirror = function(lobby)
 		end
 	end)
 
+	-- The same catch-up on a Nakama lobby: the tail comes with the rejoin
+	-- itself, and the server tells only the others that we're back.
+	lobby:on(MPAPI.LobbyEvent.REPLAY_TAIL, function(tails)
+		PVP.RECONNECT_TAIL.receive_pushed_tails(tails)
+		if G.STAGE ~= G.STAGES.RUN then return end
+		local opponent_id = PVP.get_opponent_id()
+		if opponent_id then
+			PVP.RECONNECT_TAIL.catch_up(opponent_id)
+		end
+	end)
+
 	lobby:on(MPAPI.LobbyEvent.METADATA_CHANGED, function(metadata)
 		mirror_metadata(lobby)
 		MPAPI.refresh_current_view()
