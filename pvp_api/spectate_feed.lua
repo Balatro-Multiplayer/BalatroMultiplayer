@@ -38,6 +38,11 @@ PVP.SPECTATE = PVP.SPECTATE or {}
 local S = PVP.SPECTATE
 S._mqtt = nil
 S._driver = nil
+-- On Nakama the feed comes from MPAPI.replay.spectate_lobby's own handlers
+-- (a spectator match on the one socket) instead of a second MQTT client.
+-- Events that arrive while the local run is still starting wait here.
+S._nakama = false
+S._pending = nil
 
 local function self_player_id()
 	local conn = MPAPI.get_connection()
@@ -106,9 +111,26 @@ end
 -- pvp_log_event broadcasts arrive. Bootstraps its own seeded local run first
 -- (see file header) -- this can take a moment (a real run start), unlike
 -- Phase 4's original version which assumed a run already existed.
+-- The Nakama feed's handlers: entries are already driver-ready.
+local nakama_handlers = {
+	event = function(entry)
+		if S._driver then
+			S._driver:push_event(entry)
+		elseif S._pending then
+			S._pending[#S._pending + 1] = entry
+		end
+	end,
+	ended = function(reason)
+		if S._nakama then
+			S.stop()
+			MPAPI.sendWarnMessage('[spectate] stopped: ' .. tostring(reason))
+		end
+	end,
+}
+
 function S.start(code, on_ready)
 	MPAPI.replay.spectate_lobby(code, function(err, data)
-		if err or not data or not data.token then
+		if err or not data or not (data.token or data.nakama) then
 			if on_ready then
 				on_ready((err and err.message) or 'spectate_lobby failed')
 			end
@@ -118,16 +140,36 @@ function S.start(code, on_ready)
 		local snapshot = data.snapshot or {}
 		local manifest = snapshot[1] and snapshot[1].manifest
 		if not manifest then
+			if data.nakama then
+				MPAPI.replay.stop_spectating()
+			end
 			if on_ready then
 				on_ready('spectate: no manifest available yet for this lobby (no buffered run)')
 			end
 			return
 		end
 
+		if data.nakama then
+			S._nakama = true
+			S._pending = {}
+		end
+
 		PVP._start_playback(manifest, function()
 			local pov_player_id = S._apply_snapshot(snapshot)
 			S._driver = MPAPI.playback.new_driver({}, { mod_id = 'pvp', pov_player_id = pov_player_id })
 			S._driver:play()
+
+			if data.nakama then
+				local pending = S._pending or {}
+				S._pending = nil
+				for _, entry in ipairs(pending) do
+					S._driver:push_event(entry)
+				end
+				if on_ready then
+					on_ready(nil)
+				end
+				return
+			end
 
 			local conn = MPAPI.get_connection()
 			local mqtt = MPAPI.networking.mqtt_client.new({
@@ -153,10 +195,15 @@ function S.start(code, on_ready)
 
 			mqtt:connect()
 		end)
-	end)
+	end, nakama_handlers)
 end
 
 function S.stop()
+	if S._nakama then
+		S._nakama = false
+		S._pending = nil
+		MPAPI.replay.stop_spectating()
+	end
 	if S._driver then
 		S._driver:stop()
 		S._driver = nil
@@ -168,7 +215,7 @@ function S.stop()
 end
 
 function S.is_active()
-	return S._mqtt ~= nil
+	return S._mqtt ~= nil or S._nakama
 end
 
 -- Drives the spectator's second MQTT client every frame. Game:update is
