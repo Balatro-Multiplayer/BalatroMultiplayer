@@ -23,7 +23,7 @@ function PVP._start_playback(manifest, on_ready)
 	-- confirmed live to hang the whole instance: creating a local lobby
 	-- (below) while the real lobby's own leave/teardown is still an
 	-- in-flight async API call (see PVP.pvp_leave_lobby -> lobby:leave(),
-	-- api/lobby/state.lua) leaves two lobby objects/MQTT subscriptions
+	-- api/lobby/state.lua) leaves two lobby objects
 	-- fighting over MPAPI's current-lobby state at once. The real UI entry
 	-- points (replay/spectate browsers) are only menu-reachable, never
 	-- mid-match, so refusing here is a pure safety net, not a real-world

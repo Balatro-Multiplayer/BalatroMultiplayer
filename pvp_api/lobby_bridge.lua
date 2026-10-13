@@ -278,7 +278,7 @@ PVP.setup_lobby_mirror = function(lobby)
 
 	-- Phase 9: reconnect tail-replay. PLAYER_RECONNECTED fires to every lobby
 	-- member (including the reconnecting player's own client, once it
-	-- re-subscribes to lobby/{code}/events) -- only act when the reconnecting
+	-- rejoins the match) -- only act when the reconnecting
 	-- player IS us; the opponent's own client needs no catch-up, it never
 	-- disconnected. See pvp_api/reconnect_tail.lua.
 	lobby:on(MPAPI.LobbyEvent.PLAYER_RECONNECTED, function(player_id)
@@ -324,8 +324,8 @@ PVP.setup_lobby_mirror = function(lobby)
 			PVP.stop_ready_resync()
 		end
 		-- Drop the matchmaking handle for a matchmade lobby. Its match_id keeps it lingering
-		-- in mm.handles until the server's MATCH_RESOLVED; leaving before that would otherwise
-		-- leak the handle (stale MQTT subscription + confused re-queue). Idempotent.
+		-- in mm.handles until the game ends (MATCH_RESOLVED); leaving before that would
+		-- otherwise leak the handle (confused re-queue). Idempotent.
 		if PVP._match_handle then
 			PVP._match_handle:leave()
 			PVP._match_handle = nil

@@ -2,14 +2,13 @@
 --
 -- Display-only catch-up for the OPPONENT's HUD state after this client's own
 -- network reconnect -- NOT a rebuild of this client's own game state, which
--- is assumed to have stayed intact throughout (a mere MQTT/network drop, not
--- a crash; MPAPI/MQTT-level reconnect already handles that case today). What
+-- is assumed to have stayed intact throughout (a mere network drop, not a
+-- crash; MPAPI's lobby rejoin already handles that case). What
 -- this covers: while disconnected, this client missed any pvp_log_event
 -- broadcasts the opponent sent, so its view of the opponent's score/hands is
--- stale until the opponent's next live sync. The server pushes the missed
--- events over MQTT (player/{id}/replay-tail, see connection.lua's
--- _handle_player_notification) the instant it detects this client is back --
--- no REST pull needed -- and this applies them once it's safe to do so.
+-- stale until the opponent's next live sync. The server sends the missed
+-- events (the lobby match's REPLAY_TAIL, see pvp_api/lobby_bridge.lua) the
+-- instant this client rejoins, and this applies them once it's safe to do so.
 --
 -- Deliberately NOT routed through the referee/nemesis-blind live-sync
 -- pipeline (objects/blinds/nemesis.lua's `receive`) -- that path expects a
@@ -73,8 +72,8 @@ local function apply_tail(opponent_id, events)
 	end
 end
 
--- Called via MPAPI.on_connection_state_change (registered below) the moment
--- the server pushes a §22.5 catch-up over MQTT -- may arrive before or after
+-- Called from the lobby's REPLAY_TAIL event (pvp_api/lobby_bridge.lua) the
+-- moment the server sends a §22.5 catch-up -- may arrive before or after
 -- PLAYER_RECONNECTED, so this only stores; on_checkpoint decides when it's
 -- safe to actually apply.
 function PVP.RECONNECT_TAIL.receive_pushed_tails(tails)
@@ -112,9 +111,3 @@ function PVP.RECONNECT_TAIL.on_checkpoint()
 		apply_tail(opponent_id, events)
 	end
 end
-
-MPAPI.on_connection_state_change(function(new_state, context)
-	if context and context.replay_tail then
-		PVP.RECONNECT_TAIL.receive_pushed_tails(context.replay_tail.tails)
-	end
-end)

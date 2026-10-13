@@ -69,8 +69,8 @@ function PVP._launch_rejoin(active)
 				-- pvp_api/flow.lua's own "Leave Queue & Continue" path re-enters
 				-- this function rather than calling MPAPI.join_lobby directly
 				-- (see that file's comment) -- needed so PvP's own opponent
-				-- mirror/UI wiring is live again, not just the bare MQTT
-				-- subscription.
+				-- mirror/UI wiring is live again, not just the bare lobby
+				-- match.
 				PVP.pvp_join_lobby(active.lobbyCode)
 				local lobby = MPAPI.get_current_lobby()
 				-- Opt out of on_lobby_connected's "match formed while practicing,

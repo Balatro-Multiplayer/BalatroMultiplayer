@@ -54,8 +54,6 @@ A("pvp_win", function(_at, _from, params)
 		PVP.dispatch_action("drawGame")
 		if refereed then
 			PVP.report_server_result(lobby, nil, { draw = true })
-		elseif lobby and lobby.is_host and PVP.report_match_result then
-			PVP.report_match_result(nil, { draw = true })
 		end
 		return
 	end
@@ -71,12 +69,10 @@ A("pvp_win", function(_at, _from, params)
 		i_won = params.winner_id == sid
 	end
 	PVP.dispatch_action(i_won and "winGame" or "loseGame")
-	-- A server-refereed lobby: everyone reports. Otherwise the host reports the
-	-- matchmaking result (ELO + leaderboard) once per match.
+	-- A server-refereed lobby: everyone reports (the server rates it). An
+	-- offline lobby has nothing to report to.
 	if refereed then
 		PVP.report_server_result(lobby, params.winner_team_id or params.winner_id, { team = params.winner_team_id ~= nil })
-	elseif lobby and lobby.is_host and PVP.report_match_result then
-		PVP.report_match_result(params.winner_team_id or params.winner_id)
 	end
 end)
 

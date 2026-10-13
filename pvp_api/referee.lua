@@ -2,8 +2,8 @@
 --
 -- In the old TCP model the server was the referee: it tracked both players' state,
 -- decided who reached the blind first, compared scores, decremented lives, and
--- declared win/loss. In the peer MQTT model there is no server adjudicator, so the
--- HOST client runs that logic. This file is a faithful Lua port of the legacy
+-- declared win/loss. The Nakama lobby relays actions but doesn't run PvP's rules, so
+-- the HOST client runs that logic. This file is a faithful Lua port of the legacy
 -- server's src/actionHandlers.ts + Client.ts resolution rules, operating on a
 -- per-player-id table (PVP.REF). Every function is a no-op on non-host clients.
 --
@@ -334,7 +334,6 @@ function PVP.referee_reset(starting_lives)
 	PVP.REF.team_lives = {}
 	PVP.REF.team_card_target = {}
 	PVP.REF.team_card_ante_computed_for = 0
-	PVP._result_reported = false
 	local lives = starting_lives or PVP.LOBBY.config.starting_lives or 4
 	local total = both_players()
 	for _, id in ipairs(total) do

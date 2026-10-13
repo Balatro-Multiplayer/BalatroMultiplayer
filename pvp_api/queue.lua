@@ -100,7 +100,7 @@ function PVP._join_queue(kind, gamemode_key)
 		end
 		-- lobby_ready fires from inside the lobby's own 'connected' handler, so signal
 		-- ready now; the host auto-starts once every client has reported in (see
-		-- PVP.maybe_autostart). Re-announce a few times to cover the subscribe race.
+		-- PVP.maybe_autostart). Re-announce a few times to cover the match-join race.
 		PVP.signal_ready(true)
 		PVP.start_ready_resync()
 		PVP._active_queue_id = nil
@@ -116,34 +116,6 @@ function PVP._join_queue(kind, gamemode_key)
 		PVP._pvp_kind = nil
 		PVP._active_queue_id = nil
 		PVP._show_searching(false)
-	end)
-end
-
--- Host-only: report the finished match's placements to the server (ELO for ranked,
--- plain resolve for casual). One-shot per match. metric = each player's best PvP
--- score (the leaderboard's season-best column). `opts.draw` (a drawn match, see
--- pvp_api/actions/outcomes.lua's pvp_win handler) skips reporting entirely -- a
--- draw has no winner for ELO/leaderboard placement to rate.
-function PVP.report_match_result(winner_id, opts)
-	opts = opts or {}
-	local handle = PVP._match_handle
-	if not handle or not handle.report_result or opts.draw then
-		return
-	end
-	if PVP._result_reported then
-		return
-	end
-	PVP._result_reported = true
-	local lobby = MPAPI.get_current_lobby()
-	if not lobby then
-		return
-	end
-	local ids = {}
-	for _, p in ipairs(lobby:get_players()) do
-		ids[#ids + 1] = p.id
-	end
-	handle:report_result(PVP.build_placements(ids, winner_id), function()
-		PVP._match_handle = nil
 	end)
 end
 
