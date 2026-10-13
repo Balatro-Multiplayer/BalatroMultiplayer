@@ -2,8 +2,8 @@
 -- Casual queues by FORMAT (gamemode key, e.g. "pvp_nemesis"/"pvp_royale") via
 -- PVP._join_queue below. Ranked queues by RULESET instead (always Nemesis-shaped)
 -- via PVP._join_ranked_ruleset, with a ruleset-scoped ticket string (e.g.
--- "pvp_ranked_balanced") so the server's ELO ladder is per-ruleset. On
--- match_found the API auto-joins and fires lobby_ready; the host stamps
+-- "pvp_ranked_balanced") so the server's ELO ladder is per-ruleset. On a
+-- match MPAPI auto-joins the matched lobby and fires lobby_ready; the host stamps
 -- metadata and, after a short settle delay, starts the match.
 
 -- Searching-state flag drives the Find Game button label (see the menu).

@@ -39,9 +39,8 @@ local PLACEHOLDER_CHIP_ROW = 0
 -- off. Flagged, not silently "fixed" -- changing vanilla.lua's actual lobby behavior wasn't
 -- part of this visual pass.
 --
--- Ranked: always exactly 2 players (matchmaking.service.ts's forfeit/ELO resolution is
--- hardcoded for a 2-player result) -- see pvp_api/queue.lua's own comment on this. MLBa has no
--- gamemode_key of its own in PVP.PVP_GAMEMODES yet (only a ruleset, rulesets/majorleague.lua),
+-- Ranked: always exactly 2 players -- see pvp_api/queue.lua's own comment on this. MLBa has
+-- no gamemode_key of its own in PVP.PVP_GAMEMODES yet (only a ruleset, rulesets/majorleague.lua),
 -- so it has no queue_button -- build_select below disables its SELECT rather than wiring a
 -- queue call that would silently misresolve.
 -- desc lines are hand-wrapped to roughly Nemesis's own second line ("Nemesis every ante", 19

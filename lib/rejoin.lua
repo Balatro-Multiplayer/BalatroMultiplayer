@@ -5,8 +5,8 @@
 -- real lobby instead of ending in a "replay finished" toast. Opponent
 -- catch-up (whatever they did while this player was disconnected) is NOT
 -- triggered manually here -- it already fires automatically once
--- MPAPI.join_lobby reconnects: the server's grace-period cancel pushes a
--- replay-tail (grace-period.service.ts's pushReplayCatchUp), and
+-- MPAPI.join_lobby reconnects: the lobby match sends the rejoining player a
+-- REPLAY_TAIL of what the others did meanwhile, and
 -- pvp_api/reconnect_tail.lua already applies it off that same
 -- connection-state event chain, unrelated to this file.
 --
