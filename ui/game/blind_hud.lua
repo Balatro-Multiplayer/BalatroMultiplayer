@@ -1,10 +1,22 @@
+-- The PvP blind's on-HUD name. Read through __index so the DynaText re-reads it every
+-- frame: the opponent slot is re-mirrored (a new table) whenever the roster or target
+-- changes. Before a target latches (the Manhunt Runner, Royale before pairing) that slot
+-- has no username, so fall back to the same gamemode name the blind-choice screen shows
+-- rather than rendering a literal "nil".
+local hud_opponent_name = setmetatable({}, {
+    __index = function()
+        local opponent = PVP.LOBBY.is_host and PVP.LOBBY.guest or PVP.LOBBY.host
+        return (opponent and opponent.username) or PVP.pvp_blind_opponent_name()
+    end,
+})
+
 function PVP.UI.update_blind_HUD(blind, reset, silent)
     if PVP.is_mp_or_practice() then
         -- Setup blind name display
         local name_element = G.HUD_blind:get_UIE_by_ID("HUD_blind_name")
         name_element.config.object.config.string =  {
             {
-                ref_table = PVP.LOBBY.is_host and PVP.LOBBY.guest or PVP.LOBBY.host,
+                ref_table = hud_opponent_name,
                 ref_value = "username",
             },
         }
