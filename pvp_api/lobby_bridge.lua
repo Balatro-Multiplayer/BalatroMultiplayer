@@ -160,6 +160,14 @@ local function mirror_metadata(lobby)
 	-- lobby-options picker, since none of them ride the generic per-key loop above.
 	PVP.LOBBY.config.manhunt = (def and def.manhunt) or nil
 	PVP.LOBBY.config.team_based = (def and def.team_based) or nil
+	-- A ruleset's default_modifiers (Experimental's pvp_timer + pressure_timer) are
+	-- layers on top of it for the whole lobby. Every client derives them from the
+	-- mirrored ruleset, so they follow a Lobby Options ruleset change and agree
+	-- without a metadata field of their own. Nothing else adds modifiers.
+	if PVP.LOBBY.config.ruleset then
+		MPAPI.apply_default_modifiers(PVP.LOBBY.config.ruleset)
+		PVP.LOBBY.config.modifier_layers = MPAPI.modifiers_serialize()
+	end
 	if meta.deck then
 		PVP.LOBBY.deck.back = meta.deck
 	end
