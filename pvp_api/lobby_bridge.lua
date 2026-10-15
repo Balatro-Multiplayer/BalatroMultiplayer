@@ -248,6 +248,17 @@ PVP.setup_lobby_mirror = function(lobby)
 	lobby:on(MPAPI.LobbyEvent.CONNECTED, function()
 		PVP.LOBBY.connected = true
 		PVP.LOBBY.code = lobby.code
+		-- A joiner's first Nakama snapshot fires only CONNECTED, not
+		-- METADATA_CHANGED (api/lobby/nakama.lua apply_snapshot announces
+		-- nothing on the first one), and the mirror call above ran before that
+		-- snapshot arrived. Without this the joiner kept the module-default
+		-- ruleset (Expanded) and no queue_mode/nemesis_pairing/manhunt/
+		-- team_based for the whole match, while the host played the real one.
+		-- Skipped while the metadata is still empty (a fresh lobby's host,
+		-- whose own metadata write follows in flow.lua).
+		if next(lobby:get_metadata() or {}) ~= nil then
+			mirror_metadata(lobby)
+		end
 		mirror_players(lobby)
 		refresh()
 	end)
