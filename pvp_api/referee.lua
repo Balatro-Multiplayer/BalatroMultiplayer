@@ -654,6 +654,19 @@ function PVP.referee_rank_royale(players)
 
 	local cutoff_idx = math.max(1, math.floor(#ranked / 2))
 	local cutoff_score = ranked[cutoff_idx].score
+	-- A tie at the cutoff that reaches the top score would fold every player into
+	-- the losers, which try_resolve_round treats as a full tie (nobody loses) --
+	-- letting a lone low scorer escape just because the others tied above it.
+	-- Then the cut sits just under the top score: everyone strictly below it loses.
+	local top_score = ranked[#ranked].score
+	if not PVP.INSANE_INT.greater_than(top_score, cutoff_score) then
+		for i = #ranked, 1, -1 do
+			if PVP.INSANE_INT.greater_than(top_score, ranked[i].score) then
+				cutoff_idx, cutoff_score = i, ranked[i].score
+				break
+			end
+		end
+	end
 	local losers, is_loser = {}, {}
 	for _, pl in ipairs(ranked) do
 		if not PVP.INSANE_INT.greater_than(pl.score, cutoff_score) then
