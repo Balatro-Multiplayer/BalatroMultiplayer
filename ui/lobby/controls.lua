@@ -35,6 +35,12 @@ local function build_private_controls()
 		row_nodes[#row_nodes + 1] = b.lobby_options.node
 	else
 		row_nodes[#row_nodes + 1] = b.ready.node
+		-- Manhunt's role and Teams' team are each player's own pick (the options
+		-- screen keeps the ruleset and Hunter Lives rows host-only); without this
+		-- a guest could never open the picker and always got the host's default.
+		if PVP.LOBBY.config.manhunt or PVP.LOBBY.config.team_based then
+			row_nodes[#row_nodes + 1] = b.lobby_options.node
+		end
 	end
 	row_nodes[#row_nodes + 1] = deck_panel()
 	row_nodes[#row_nodes + 1] = code_panel()
