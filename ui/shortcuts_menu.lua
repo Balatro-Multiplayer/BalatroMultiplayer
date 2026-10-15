@@ -10,7 +10,9 @@ PVP.SHORTCUTS = {
 local function get_shortcuts()
 	local shortcuts = {}
 	local in_lobby = PVP.LOBBY.code ~= nil
-	local connected = PVP.LOBBY.connected
+	-- PVP.LOBBY.connected is only set inside a lobby (lobby_bridge.lua); out of one,
+	-- the server connection itself is what the join/create shortcuts need.
+	local connected = MPAPI.is_connected()
 	local in_menu = G.STAGE == G.STAGES.MAIN_MENU
 
 	if in_menu then
