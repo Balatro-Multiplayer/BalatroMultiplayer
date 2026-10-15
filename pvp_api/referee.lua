@@ -34,6 +34,9 @@ PVP.REF = PVP.REF
 		-- single target id at all.
 		team_card_target = {},
 		team_card_ante_computed_for = 0,
+		-- eliminated[id] = true once that player has been told it is out (see
+		-- announce_eliminations), so each player is told exactly once.
+		eliminated = {},
 	}
 
 local function is_host()
@@ -110,6 +113,20 @@ local function alive_ids()
 	return ids
 end
 
+-- A match with more than two players goes on after someone loses their last
+-- life. Only pvp_win used to end a client's run, so an eliminated player kept
+-- playing (and kept reporting hands) until the whole match was over. Tells each
+-- newly eliminated player once, through pvp_eliminated, that it is out.
+local function announce_eliminations()
+	PVP.REF.eliminated = PVP.REF.eliminated or {}
+	for _, id in ipairs(both_players()) do
+		if ref_player(id).lives <= 0 and not PVP.REF.eliminated[id] then
+			PVP.REF.eliminated[id] = true
+			broadcast("pvp_eliminated", { player_id = id })
+		end
+	end
+end
+
 -- Declares pvp_win once exactly one player remains alive (Royale's N-player analog
 -- of the 2-player "opponent hit 0 lives" check) -- or a draw if the last life(ves)
 -- lost eliminated everyone still standing simultaneously (no single survivor).
@@ -124,6 +141,7 @@ local function check_alive_win()
 		broadcast("pvp_win", { winner_id = alive[1] })
 		return true
 	end
+	announce_eliminations()
 	return false
 end
 
@@ -150,6 +168,7 @@ local function check_team_win()
 			broadcast("pvp_win", { winner_id = "", winner_team_id = "RUNNER" })
 			return true
 		end
+		announce_eliminations()
 		return false
 	end
 	if PVP.LOBBY.config.team_based then
@@ -367,6 +386,7 @@ function PVP.referee_reset(starting_lives)
 	PVP.REF.team_lives = {}
 	PVP.REF.team_card_target = {}
 	PVP.REF.team_card_ante_computed_for = 0
+	PVP.REF.eliminated = {}
 	local lives = starting_lives or PVP.LOBBY.config.starting_lives or 4
 	local total = both_players()
 	for _, id in ipairs(total) do
@@ -461,7 +481,7 @@ end
 -- loseLife(): decrement once per round (guarded by lives_blocker, re-armed by
 -- newRound). Broadcasts the loser's new life count to everyone.
 local function lose_life(pl)
-	if pl.lives_blocker then
+	if pl.lives_blocker or pl.lives <= 0 then
 		return
 	end
 	pl.lives = pl.lives - 1
@@ -963,13 +983,18 @@ function PVP.referee_on_play_hand(from, params)
 	if not is_host() then
 		return
 	end
+	local known = PVP.REF.players[from] ~= nil
 	local pl = ref_player(from)
 	pl.score = PVP.INSANE_INT.from_string(tostring(params.score or "0"))
 	pl.hands_left = math.floor(tonumber(params.handsLeft) or pl.hands_left)
 	if params.skips then
 		pl.skips = tonumber(params.skips) or pl.skips
 	end
-	if params.lives then
+	-- Lives are the referee's own record (referee_reset, lose_life), never the
+	-- sender's: a reported value used to overwrite it, so a client could restore
+	-- its own lives, and a rejoined client reporting its reset 0 lost them all.
+	-- A report is only taken for a player the referee has no record of yet.
+	if params.lives and not known then
 		pl.lives = tonumber(params.lives) or pl.lives
 	end
 	if PVP.INSANE_INT.greater_than(pl.score, PVP.INSANE_INT.empty()) then
@@ -1145,6 +1170,39 @@ function PVP.referee_on_fail_pvp_timer(from)
 	broadcast("pvp_timer_hand_lost", { player_id = from })
 	broadcast_live_targets()
 	try_resolve_round()
+end
+
+-- Royale / N-player Nemesis on_player_forfeit: a player who forfeits or leaves
+-- a match that started with more than two players is out, like a player who
+-- lost their last life. check_single_survivor only counts lobby members, so a
+-- forfeiter still sitting in the lobby (pause-menu forfeit), or an eliminated
+-- player still watching, kept the match from ever ending, and the referee went
+-- on waiting for the forfeiter's hands. Returns true when it handled the
+-- forfeit (host, more than two players at the start), so the caller skips
+-- the two-player check_single_survivor path.
+function PVP.referee_n_player_forfeit(player_id)
+	if not is_host() then
+		return false
+	end
+	local started = 0
+	for _ in pairs(PVP.REF.players) do
+		started = started + 1
+	end
+	if started <= 2 or not PVP.REF.players[player_id] then
+		return false
+	end
+	local pl = ref_player(player_id)
+	if pl.lives > 0 then
+		pl.lives = 0
+		broadcast("pvp_player_lives", { player_id = player_id, lives = 0 })
+	end
+	pl.hands_left = 0
+	if check_alive_win() then
+		return true
+	end
+	broadcast_live_targets()
+	try_resolve_round()
+	return true
 end
 
 -- Manhunt's on_player_forfeit: the Runner leaving ends the match immediately in

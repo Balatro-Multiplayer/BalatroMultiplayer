@@ -131,6 +131,11 @@ for _, key in ipairs({ "pvp_nemesis", "pvp_smallworld" }) do
 		-- Host-authoritative: when the opponent forfeits/leaves, the last player
 		-- standing wins. The registered winner handler above performs the broadcast.
 		on_player_forfeit = function(self, player_id)
+			-- More than two players at the start: the referee knocks the
+			-- forfeiter out and ends the match once one player is left.
+			if PVP.referee_n_player_forfeit(player_id) then
+				return
+			end
 			local winner_id = self:check_single_survivor(player_id)
 			if not winner_id then
 				return
@@ -162,6 +167,11 @@ do
 			return nil, nil, nil
 		end,
 		on_player_forfeit = function(self, player_id)
+			-- More than two players at the start: the referee knocks the
+			-- forfeiter out and ends the match once one player is left.
+			if PVP.referee_n_player_forfeit(player_id) then
+				return
+			end
 			local winner_id = self:check_single_survivor(player_id)
 			if not winner_id then
 				return

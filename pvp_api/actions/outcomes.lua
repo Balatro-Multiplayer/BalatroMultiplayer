@@ -3,6 +3,10 @@ local self_id = PVP._pvp_action_helpers.self_id
 
 -- Authoritative outcomes (host -> all).
 A("pvp_end_pvp", function(_at, _from, params)
+	-- An eliminated player's run is over; the rounds the others play on aren't its.
+	if PVP.GAME.eliminated then
+		return
+	end
 	local sid = self_id()
 	local lost = params.loser_id ~= nil and params.loser_id ~= "" and params.loser_id == sid
 	PVP.dispatch_action("endPvP", { lost = lost, pvpTimerLost = params.pvp_timer_lost and true or false })
@@ -43,6 +47,18 @@ A("pvp_player_lives", function(_at, _from, params)
 	end
 end)
 
+-- The referee's "you are out" for a match that goes on without this player
+-- (Royale and N-player Nemesis/Manhunt; see announce_eliminations in
+-- referee.lua): the player gets its lose screen now instead of playing on.
+-- The match's own pvp_win still arrives later, and is then only reported.
+A("pvp_eliminated", function(_at, _from, params)
+	if params.player_id ~= self_id() or PVP.GAME.eliminated then
+		return
+	end
+	PVP.GAME.eliminated = true
+	PVP.dispatch_action("loseGame")
+end)
+
 A("pvp_win", function(_at, _from, params)
 	local lobby = MPAPI.get_current_lobby()
 	-- A draw (a unanimous vote, or referee.lua's check_alive_win seeing everyone
@@ -68,7 +84,10 @@ A("pvp_win", function(_at, _from, params)
 	else
 		i_won = params.winner_id == sid
 	end
-	PVP.dispatch_action(i_won and "winGame" or "loseGame")
+	-- An eliminated player already has its lose screen (pvp_eliminated).
+	if not PVP.GAME.eliminated then
+		PVP.dispatch_action(i_won and "winGame" or "loseGame")
+	end
 	-- A server-refereed lobby: everyone reports (the server rates it). An
 	-- offline lobby has nothing to report to.
 	if refereed then
@@ -83,7 +102,7 @@ A("pvp_player_won", function(_at, _from, params)
 	local sid = self_id()
 	if params.player_id == sid then
 		PVP.dispatch_action("winGame")
-	else
+	elseif not PVP.GAME.eliminated then
 		PVP.dispatch_action("loseGame")
 	end
 	local lobby = MPAPI.get_current_lobby()

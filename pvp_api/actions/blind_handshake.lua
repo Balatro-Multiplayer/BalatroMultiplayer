@@ -11,7 +11,8 @@ end)
 
 A("pvp_start_blind", function(_at, _from, params)
 	local lobby = MPAPI.get_current_lobby()
-	if not lobby then
+	-- An eliminated player sits out the blinds the others still play.
+	if not lobby or PVP.GAME.eliminated then
 		return
 	end
 	-- action_start_blind compares firstPlayer to (is_host and "host" or "guest");
