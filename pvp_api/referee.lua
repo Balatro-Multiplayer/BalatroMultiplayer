@@ -313,7 +313,20 @@ function PVP.pvp_score_metric(player_id)
 	if not pl or not pl.score then
 		return 0
 	end
-	return tonumber(PVP.INSANE_INT.to_string(pl.highest_score or pl.score)) or 0
+	-- Numeric, not via INSANE_INT.to_string: that is a display string with
+	-- thousands separators ("2,832"), which tonumber rejects, so every score of
+	-- 1,000+ was reported as 0. Capped at the server's score bound (1e15,
+	-- nakama/src/rating/metrics.ts), above which it drops the value entirely.
+	local s = pl.highest_score or pl.score
+	local cap = 1e15
+	if (tonumber(s.e_count) or 0) > 0 then
+		return cap
+	end
+	local v = (tonumber(s.coeffiocient) or 0) * 10 ^ (tonumber(s.exponent) or 0)
+	if v ~= v or v < 0 then
+		return 0
+	end
+	return math.min(math.floor(v), cap)
 end
 
 -- Reset all referee state at game start and stamp starting lives (option override
