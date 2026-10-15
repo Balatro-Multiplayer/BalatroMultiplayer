@@ -331,6 +331,26 @@ end
 
 -- Reset all referee state at game start and stamp starting lives (option override
 -- else the gamemode default). Mirrors Lobby.setPlayersLives + resetPlayers.
+-- A player who crashed and rejoined rebuilt its run from its own replay
+-- stream, which leaves its PVP.GAME.lives at reset_game_states' 0. Its next
+-- hand reports that 0 back here (referee_on_play_hand trusts it), so without
+-- a resend a rejoin silently costs every remaining life. Re-send its lives.
+function PVP.referee_on_player_reconnected(player_id)
+	if not is_host() then
+		return
+	end
+	local pl = PVP.REF.players[player_id]
+	if not (pl and pl.lives) then
+		return
+	end
+	broadcast("pvp_player_lives", { player_id = player_id, lives = pl.lives })
+	if PVP.LOBBY.config.team_based then
+		for team_id, lives in pairs(PVP.REF.team_lives or {}) do
+			broadcast("pvp_team_lives", { team_id = team_id, lives = lives })
+		end
+	end
+end
+
 function PVP.referee_reset(starting_lives)
 	if not is_host() then
 		return

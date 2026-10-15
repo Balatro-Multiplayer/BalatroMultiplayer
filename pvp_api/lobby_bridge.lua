@@ -293,7 +293,10 @@ PVP.setup_lobby_mirror = function(lobby)
 	-- player IS us; the opponent's own client needs no catch-up, it never
 	-- disconnected. See pvp_api/reconnect_tail.lua.
 	lobby:on(MPAPI.LobbyEvent.PLAYER_RECONNECTED, function(player_id)
-		if player_id ~= lobby.player_id then return end
+		if player_id ~= lobby.player_id then
+			PVP.referee_on_player_reconnected(player_id)
+			return
+		end
 		if G.STAGE ~= G.STAGES.RUN then return end
 		local opponent_id = PVP.get_opponent_id()
 		if opponent_id then
