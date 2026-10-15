@@ -71,6 +71,10 @@ function PVP._launch_rejoin(active)
 				-- (see that file's comment) -- needed so PvP's own opponent
 				-- mirror/UI wiring is live again, not just the bare lobby
 				-- match.
+				-- _start_playback ran the fast-forward as a practice session;
+				-- left set, the resumed run stays in practice mode and its PvP
+				-- blinds never reach the referee, so the round never resolves.
+				PVP.SP.practice = false
 				PVP.pvp_join_lobby(active.lobbyCode)
 				local lobby = MPAPI.get_current_lobby()
 				-- Opt out of on_lobby_connected's "match formed while practicing,
