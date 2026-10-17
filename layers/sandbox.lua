@@ -85,16 +85,83 @@ function MP.SANDBOX.get_vanilla_bans()
 	return bans
 end
 
+-- Sandbox jokers split into groups that can be layered onto any base ruleset
+-- from the mutators wall (layers/sandbox_mutators.lua). The sandbox layer itself
+-- still brings rotation + idol + extra credit, as before.
+MP.SANDBOX.GROUP_LAYERS = {
+	rotation = "sandbox_rotation",
+	retired = "sandbox_retired",
+	extra_credit = "sandbox_extra_credit",
+}
+
+MP.SANDBOX.IDOLS = { zealot = "j_mp_idol_sandbox_zealot", collector = "j_mp_idol_sandbox_collector" }
+
+--- "rotation" | "retired" | "extra_credit" | "idol"
+function MP.SANDBOX.group_of(mapping)
+	if mapping.vanilla == "j_idol" then return "idol" end
+	if mapping.group == "extra_credit" then return "extra_credit" end
+	return mapping.active and "rotation" or "retired"
+end
+
+--- Mappings in one group, mapping order.
+function MP.SANDBOX.mappings_in(group)
+	local out = {}
+	for _, mapping in ipairs(MP.SANDBOX.joker_mappings) do
+		if MP.SANDBOX.group_of(mapping) == group then out[#out + 1] = mapping end
+	end
+	return out
+end
+
+--- Vanilla keys a group replaces (for that group layer's banned_silent).
+function MP.SANDBOX.vanilla_bans_for(group)
+	local bans, seen = {}, {}
+	for _, mapping in ipairs(MP.SANDBOX.mappings_in(group)) do
+		if mapping.vanilla and not seen[mapping.vanilla] then
+			bans[#bans + 1] = mapping.vanilla
+			seen[mapping.vanilla] = true
+		end
+	end
+	return bans
+end
+
+--- Explicit idol pick from the wall, or nil when the seeded random pick applies.
+--- @return string|nil "zealot" | "collector" | "both" | "none"
+function MP.SANDBOX.idol_override()
+	for _, v in ipairs({ "none", "both", "zealot", "collector" }) do
+		if MP.is_layer_active("idol_" .. v) then return v end
+	end
+	return nil
+end
+
+-- Extra Credit's own jokers take over when that mod is loaded, so the sandbox
+-- copies stand down.
+function MP.SANDBOX.ban_extra_credit_if_loaded()
+	if not (SMODS.Mods["extracredit"] and SMODS.Mods["extracredit"].can_load) then return end
+	for _, mapping in ipairs(MP.SANDBOX.mappings_in("extra_credit")) do
+		G.GAME.banned_keys[mapping.sandbox] = true
+	end
+end
+
+local function idol_allowed(mapping)
+	local override = MP.SANDBOX.idol_override()
+	if override == "none" then return false end
+	if override == "both" then return true end
+	if override then return mapping.sandbox == MP.SANDBOX.IDOLS[override] end
+	return mapping.active and MP.is_layer_active("sandbox")
+end
+
 --- Centralized allowlist check for sandbox jokers
 --- @param joker_key string The key of the joker to check (e.g., "j_mp_mail_sandbox")
---- @return boolean true if the joker is allowed in the sandbox ruleset and in a multiplayer lobby
+--- @return boolean true if the active ruleset or a sandbox mutator brings this joker in
 function MP.SANDBOX.is_joker_allowed(joker_key)
-	if not MP.is_layer_active("sandbox") then return false end
-
 	for _, mapping in ipairs(MP.SANDBOX.joker_mappings) do
-		if mapping.active and mapping.sandbox == joker_key then return true end
+		if mapping.sandbox == joker_key then
+			local group = MP.SANDBOX.group_of(mapping)
+			if group == "idol" then return idol_allowed(mapping) end
+			if MP.is_layer_active(MP.SANDBOX.GROUP_LAYERS[group]) then return true end
+			return mapping.active and MP.is_layer_active("sandbox")
+		end
 	end
-
 	return false
 end
 
@@ -168,14 +235,8 @@ MP.Layer("sandbox", {
 	reworked_enhancements = { "m_glass" },
 	reworked_tags = { "tag_mp_gambling_sandbox", "tag_mp_juggle_sandbox", "tag_mp_investment_sandbox" },
 	on_apply_bans = function()
-		select_random_idol()
-
-		if SMODS.Mods["extracredit"] and SMODS.Mods["extracredit"].can_load then
-			print("Banning sandbox jokers")
-			for _, mapping in ipairs(MP.SANDBOX.joker_mappings) do
-				if mapping.group == "extra_credit" then G.GAME.banned_keys[mapping.sandbox] = true end
-			end
-		end
+		if not MP.SANDBOX.idol_override() then select_random_idol() end
+		MP.SANDBOX.ban_extra_credit_if_loaded()
 	end,
 })
 

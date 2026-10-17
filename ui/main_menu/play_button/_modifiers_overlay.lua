@@ -1,20 +1,13 @@
 G.FUNCS.mp_open_modifiers_overlay = function(e)
 	local timer_cycle = MP.UI.build_timer_modifier_cycle()
-	local pvp_timer_toggle = MP.UI.build_pvp_timer_toggle()
-
-	local smallworld_toggle = create_toggle({
-		id = "modifier_smallworld_toggle",
-		label = localize("b_opts_modifier_smallworld"),
-		ref_table = { val = MP.has_modifier("smallworld") },
-		ref_value = "val",
-		callback = function(new_val)
-			if new_val then
-				MP.add_modifier("smallworld")
-			else
-				MP.remove_modifier("smallworld")
-			end
-		end,
-	})
+	local pvp_timer_toggle = MP.UI.modifier_toggle(
+		"pvp_timer",
+		{ id = "modifier_pvp_timer_toggle", label = localize("b_opts_modifier_pvp_timer") }
+	)
+	local smallworld_toggle = MP.UI.modifier_toggle(
+		"smallworld",
+		{ id = "modifier_smallworld_toggle", label = localize("b_opts_modifier_smallworld") }
+	)
 
 	local function create_entry(option, loc_key)
 		local message_table = localize(loc_key)

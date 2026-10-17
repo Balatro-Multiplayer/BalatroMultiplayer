@@ -990,9 +990,9 @@ return {
 				},
 			},
 			mp_transmutations = {
-				name = "Transmutations",
+				name = "Next transformation",
 				text = {
-					"{C:purple,s:1.1}Will transmute into:",
+					"{C:purple,s:1.1}Transforms into:",
 				},
 			},
 			mp_internal_sell_value = {
@@ -1305,7 +1305,7 @@ return {
 			k_opts_showdown_starting_antes = "Showdown Starts at Ante",
 			k_opts_pvp_timer_increment = "Timer Increment",
 			k_opts_pvp_countdown_seconds = "PvP Countdown Seconds",
-			k_opts_modifier_timer = "Timer Implementation",
+			k_opts_modifier_timer = "Timer Mode",
             k_experimental_modifiers_timers = {
                 "- Default: regular {C:chips}150{} {C:inactive}(1x){} seconds timer",
                 " ",
