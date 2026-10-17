@@ -35,7 +35,7 @@ local function parse_got_kv(line)
 	local action, kv_str = line:match("Client got (%w+) message:%s*(.-)%s*$")
 	if not action then return nil end
 	local pairs_t = {}
-	for key, val in kv_str:gmatch("%((%w+):%s*([^)]*)%)") do
+	for key, val in kv_str:gmatch("%(([%w_]+):%s*([^)]*)%)") do
 		val = val:match("^%s*(.-)%s*$")
 		if val == "true" then
 			pairs_t[key] = true
@@ -269,6 +269,8 @@ function LOG_PARSER.process_log(content)
 				if ts then game.game_start_ts = game.game_start_ts or ts end
 				if last_lobby_options then
 					game.ruleset = last_lobby_options.ruleset
+					game.modifier_layers = last_lobby_options.modifier_layers
+					game.multiplayer_jokers = last_lobby_options.multiplayer_jokers
 					game.gamemode = last_lobby_options.gamemode
 					game.deck = last_lobby_options.back or "Red Deck"
 					game.stake = last_lobby_options.stake or 1
@@ -422,6 +424,8 @@ function LOG_PARSER.to_replay(game)
 	if game.player_name then replay.player_name = game.player_name end
 	if game.nemesis_name then replay.nemesis_name = game.nemesis_name end
 	if game.lobby_code then replay.lobby_code = game.lobby_code end
+	if game.modifier_layers ~= nil then replay.modifier_layers = game.modifier_layers end
+	if game.multiplayer_jokers ~= nil then replay.multiplayer_jokers = game.multiplayer_jokers end
 
 	if game.game_start_ts and game.game_end_ts then
 		local dur = format_duration(game.game_start_ts, game.game_end_ts)

@@ -39,6 +39,7 @@ function G.FUNCS.create_lobby(e)
 
 	-- Clear practice/ghost state so it can't shadow MP reads during lobby setup.
 	MP.SP.practice = false
+	MP.SP.ruleset = nil
 	MP.GHOST.clear()
 	MP.MODIFIERS = {}
 
@@ -60,6 +61,7 @@ function G.FUNCS.join_lobby(e)
 
 	-- Same isolation as create_lobby; modifiers arrive from the host.
 	MP.SP.practice = false
+	MP.SP.ruleset = nil
 	MP.GHOST.clear()
 
 	G.FUNCS.overlay_menu({
@@ -108,7 +110,7 @@ function G.FUNCS.start_lobby(e)
 
 	MP.reset_lobby_config(true)
 
-	MP.LOBBY.config.multiplayer_jokers = MP.current_ruleset().multiplayer_content
+	MP.LOBBY.config.multiplayer_jokers = MP.multiplayer_jokers_enabled()
 
 	-- Hide opponent score until you play: default on for standard-layer rulesets
 	-- only. Set before force_lobby_options() so a forcing ruleset can override it.

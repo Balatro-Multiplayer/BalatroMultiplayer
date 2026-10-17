@@ -1,5 +1,5 @@
 MP.Ruleset({
 	key = "speedlatro",
-	layers = { "standard", "speedlatro_timer" },
+	layers = { "multiplayer_jokers", "standard", "speedlatro_timer" },
 	forced_gamemode = "gamemode_mp_attrition",
 }):inject()

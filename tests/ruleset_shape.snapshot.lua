@@ -56,6 +56,7 @@ return {
       "j_vagabond",
       "j_yorick",
     },
+    ["banned_silent"] = {},
     ["banned_tags"] = {
       "tag_garbage",
       "tag_handy",

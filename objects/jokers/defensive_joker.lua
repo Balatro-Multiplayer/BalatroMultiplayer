@@ -20,9 +20,6 @@ SMODS.Joker({
 		local chips = G.GAME.stake >= 6 and card.ability.extra.highstake or card.ability.extra.extra
 		return { vars = { chips, card.ability.t_chips } }
 	end,
-	mp_include = function(self)
-		return MP.LOBBY.code and MP.LOBBY.config.multiplayer_jokers
-	end,
 	update = function(self, card, dt)
 		if not MP.LOBBY.code then
 			card.ability.t_chips = 0

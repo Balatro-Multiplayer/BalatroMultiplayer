@@ -73,11 +73,24 @@ function MP.UI.create_lobby_options_tab()
 				MP.LOBBY.config.starting_lives,
 				"change_starting_lives"
 			),
-			create_lobby_option_toggle("multiplayer_jokers_toggle", "b_opts_multiplayer_jokers", "multiplayer_jokers"),
-			create_lobby_option_toggle("different_decks_toggle", "b_opts_player_diff_deck", "different_decks", function()
-				send_lobby_options()
-				MP.ACTIONS.update_player_usernames()
-			end),
+			create_lobby_option_toggle(
+				"multiplayer_jokers_toggle",
+				"b_opts_multiplayer_jokers",
+				"multiplayer_jokers",
+				function()
+					MP.set_multiplayer_jokers(MP.LOBBY.config.multiplayer_jokers)
+					MP.ACTIONS.lobby_options()
+				end
+			),
+			create_lobby_option_toggle(
+				"different_decks_toggle",
+				"b_opts_player_diff_deck",
+				"different_decks",
+				function()
+					send_lobby_options()
+					MP.ACTIONS.update_player_usernames()
+				end
+			),
 			create_lobby_option_toggle("random_loadout_toggle", "b_opts_random_loadout", "random_loadout", function()
 				send_lobby_options()
 				MP.ACTIONS.update_player_usernames()

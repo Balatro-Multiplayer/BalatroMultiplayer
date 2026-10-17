@@ -225,7 +225,6 @@ local sandbox_reworked_jokers = (function()
 end)()
 
 MP.Layer("sandbox", {
-	multiplayer_content = true,
 	banned_jokers = { "j_hanging_chad" },
 	banned_silent = MP.SANDBOX.get_vanilla_bans(),
 	banned_consumables = { "c_ouija", "c_ectoplasm" },

@@ -19,6 +19,18 @@ function MP.GHOST.load(replay)
 	MP.GHOST._hands = {}
 	MP.GHOST._hand_idx = 0
 	MP.GHOST._advancing = false
+
+	-- Reconstruct the recorded pool before the run is created. Older replays
+	-- without these fields inherit the ruleset's native content defaults.
+	local ruleset_key = replay and (replay.ruleset or MP.SP.ruleset)
+	if ruleset_key then
+		MP.SP.ruleset = ruleset_key
+		local short = ruleset_key:gsub("^ruleset_mp_", "")
+		MP.apply_default_modifiers(short)
+		if replay.modifier_layers ~= nil then MP.modifiers_parse(replay.modifier_layers) end
+		MP.import_multiplayer_jokers(replay.multiplayer_jokers)
+		MP.LoadReworks(short)
+	end
 end
 
 function MP.GHOST.clear()

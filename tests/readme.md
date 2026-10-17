@@ -70,6 +70,15 @@ each action event-for-event.
 
 ## Mutator registry
 
+`test_multiplayer_content.lua` registers the original MP cards and checks native
+layer gating, Base/On/Off overrides, and exact pool-slot parity between live,
+solo, and practice contexts. It also exercises the lobby checkbox, wire
+round-trip, legacy booleans, and recorded pool settings through replay loading.
+
+```bash
+luajit tests/test_multiplayer_content.lua
+```
+
 `test_mutator_registry.lua` loads every layer and checks the custom editor's
 wall (`MP.MUTATORS`, filled by `mutator = {...}` on each layer) against the
 layers behind it: known category, label + desc, unique `(category, order)`

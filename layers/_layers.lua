@@ -7,6 +7,23 @@ MP._JOKER_LAYERS = {}
 MP._CONSUMABLE_LAYERS = {}
 MP._TAG_LAYERS = {}
 
+-- Original content and reworks share pool gating, but only reworks belong in
+-- the rework info panels. Called for layers and rulesets before cards register.
+function MP.index_layer_content(name, definition)
+	for field, index in pairs({
+		included_jokers = MP._JOKER_LAYERS,
+		reworked_jokers = MP._JOKER_LAYERS,
+		included_consumables = MP._CONSUMABLE_LAYERS,
+		reworked_consumables = MP._CONSUMABLE_LAYERS,
+		reworked_tags = MP._TAG_LAYERS,
+	}) do
+		for _, key in ipairs(definition[field] or {}) do
+			index[key] = index[key] or {}
+			table.insert(index[key], name)
+		end
+	end
+end
+
 function MP.Layer(name, definition)
 	MP.Layers[name] = definition
 	-- MP.Mutator lives in _mutators.lua, which loads before any layer is defined.
@@ -14,30 +31,24 @@ function MP.Layer(name, definition)
 		definition.mutator.key = name
 		MP.Mutator(definition.mutator)
 	end
-	if definition.reworked_jokers then
-		for _, joker_key in ipairs(definition.reworked_jokers) do
-			MP._JOKER_LAYERS[joker_key] = MP._JOKER_LAYERS[joker_key] or {}
-			table.insert(MP._JOKER_LAYERS[joker_key], name)
-		end
-	end
-	if definition.reworked_consumables then
-		for _, consumable_key in ipairs(definition.reworked_consumables) do
-			MP._CONSUMABLE_LAYERS[consumable_key] = MP._CONSUMABLE_LAYERS[consumable_key] or {}
-			table.insert(MP._CONSUMABLE_LAYERS[consumable_key], name)
-		end
-	end
-	if definition.reworked_tags then
-		for _, tag_key in ipairs(definition.reworked_tags) do
-			MP._TAG_LAYERS[tag_key] = MP._TAG_LAYERS[tag_key] or {}
-			table.insert(MP._TAG_LAYERS[tag_key], name)
-		end
-	end
+	MP.index_layer_content(name, definition)
 end
 
--- Build an mp_include closure that returns true iff any of the named layers is active.
+-- A content layer can be inherited while an explicit Off modifier suppresses
+-- its pool. Exclusion must still use mp_include: bans leave RNG pool slots.
+function MP.pool_layer_active(name)
+	if not MP.is_layer_active(name) then return false end
+	local layer = MP.Layers[name]
+	return not layer or not layer.pool_enabled or layer.pool_enabled()
+end
+
+-- Build an mp_include closure for the layers that own this card.
 local function layer_membership_include(owning_layers)
 	return function(_)
-		return MP.is_any_layer_active(owning_layers)
+		for _, name in ipairs(owning_layers) do
+			if MP.pool_layer_active(name) then return true end
+		end
+		return false
 	end
 end
 
@@ -59,18 +70,16 @@ local function warn_if_ungated(key, kind, prefix)
 				.. kind
 				.. " "
 				.. key
-				.. " has no mp_include and is not in any reworked list. "
+				.. " has no mp_include and is not in any included/reworked list. "
 				.. "Under default-deny it will be excluded from every ruleset's pool. "
-				.. "Either add the key to a layer/ruleset's reworked_"
-				.. kind
-				.. "s, or define an explicit mp_include.",
+				.. "Either declare the key in a layer/ruleset content list, or define an explicit mp_include.",
 			"MULTIPLAYER"
 		)
 	end
 end
 
 -- A small graft on SMODS.Joker:register. Any joker whose full key appears in some
--- layer's reworked_jokers gets a default mp_include stitched on when none is
+-- layer's included_jokers or reworked_jokers gets an mp_include when none is
 -- provided. By the time register runs the key is already prefixed, so we can look
 -- it up directly. is_layer_active fails closed outside a live ruleset context, and
 -- bespoke mp_include slips past untouched.
@@ -132,6 +141,8 @@ MP._LAYER_ARRAY_FIELDS = {
 	"banned_tags",
 	"banned_blinds",
 	"banned_silent",
+	"included_jokers",
+	"included_consumables",
 	"reworked_jokers",
 	"reworked_consumables",
 	"reworked_vouchers",

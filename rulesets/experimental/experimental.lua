@@ -1,6 +1,6 @@
 MP.Ruleset({
 	key = "experimental",
-	layers = { "experimental" },
+	layers = { "multiplayer_jokers", "experimental" },
 	default_modifiers = { "pvp_timer", "pressure_timer" },
 	forced_gamemode = "gamemode_mp_attrition",
 	force_lobby_options = function(self)

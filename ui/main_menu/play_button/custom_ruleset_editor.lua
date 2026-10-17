@@ -40,8 +40,7 @@ function MP.CUSTOM.base_has_layer(name, base)
 end
 
 -- Does a content set already bring a wall cell in? `implied_by` is a layer name
--- the base composes, or a predicate on the base ruleset (MP Jokers reads
--- multiplayer_content).
+-- the base composes, or a predicate on the base ruleset.
 function MP.CUSTOM.base_implies(implied_by, base)
 	if type(implied_by) ~= "function" then return MP.CUSTOM.base_has_layer(implied_by, base) end
 	local _, ruleset = base_ruleset(base)

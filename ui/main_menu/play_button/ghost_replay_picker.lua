@@ -45,15 +45,6 @@ function G.FUNCS.load_previewed_ghost(e)
 	MP.GHOST.load(replay)
 	MP.GHOST.flipped = _preview_flipped
 
-	-- Replay's ruleset, else the picker's current selection.
-	local ruleset_key = replay.ruleset or MP.SP.ruleset
-	if ruleset_key then
-		MP.SP.ruleset = ruleset_key
-		local ruleset_name = ruleset_key:gsub("^ruleset_mp_", "")
-		MP.apply_default_modifiers(ruleset_name)
-		MP.LoadReworks(ruleset_name)
-	end
-
 	_preview_idx = nil
 	_preview_flipped = false
 	G.FUNCS.start_practice_run(e)
