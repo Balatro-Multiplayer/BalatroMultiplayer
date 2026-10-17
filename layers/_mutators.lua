@@ -1,12 +1,6 @@
--- Mutators: the registry behind the custom editor's wall, and the runtime side
--- of mutator layers (G.GAME.modifiers wiring, plus switching a layer on and off
--- mid-run for the Chaos Clock, layers/chaos_clock.lua).
-
--- Mutator registry: one entry per cell on the custom editor's mutators wall.
--- A layer describes its own cell via `mutator = { category, order, label, desc,
--- credits? }`; MP.Layer registers it under the layer's name. Cells that
--- aren't a single layer (e.g. the idol picker, which drives several) call
--- MP.Mutator directly with `variants`.
+-- Registry shared by the custom editor and Chaos Clock. MP.Layer registers
+-- each layer's `mutator` metadata under its layer name. Controls spanning
+-- several layers register directly with MP.Mutator and define `variants`.
 MP.MUTATORS = {}
 local by_category = {} -- mutators_in cache; the wall reads it every frame
 
@@ -31,10 +25,9 @@ function MP.mutators_in(category)
 	return out
 end
 
--- A layer can be switched on and off mid-run (so the Chaos Clock can draw it)
--- only if its whole effect is state: `flag` / `game_modifiers` /
--- `round_deltas`. Bans and start-of-run setup can't be undone, so those layers
--- stay plain on/off cells.
+-- Only reversible runtime state can expire with a clock window. Ban lists,
+-- reworks, content lists and on_apply_bans hooks require run setup, so any of
+-- those disqualifies a layer even if it also declares runtime modifiers.
 function MP.is_switchable(name)
 	local layer = MP.Layers[name]
 	if not layer then return false end
@@ -95,12 +88,10 @@ function MP.set_variant(cycle, chosen)
 	end
 end
 
--- `round_deltas` nudge G.GAME.round_resets (hands, discards) by a fixed amount
--- rather than setting them, so they stack with the deck: Glass Cannon's -2 hands
--- on Black Deck leaves 1. What was actually applied is recorded per layer, so a
--- second "on" is a no-op and "off" undoes exactly that, even when a floor
--- clipped it. Mid-round (the Chaos Clock switching a layer at blind start) the
--- current round's count moves too, since new_round already copied it.
+-- Store the actual delta after clamping, so disabling a layer restores only
+-- what it removed. Repeated enables must not apply the delta again.
+-- At blind start, new_round has already copied round_resets into current_round;
+-- mid_round updates both counts so the effect includes the current blind.
 local ROUND_DELTA_FLOOR = { hands = 1, discards = 0 }
 local ROUND_DELTA_EASE = { hands = "ease_hands_played", discards = "ease_discard" }
 
@@ -131,12 +122,10 @@ local function write_round_deltas(name, layer, on, mid_round)
 	end
 end
 
--- Write (or clear) one layer's G.GAME.modifiers state. `flag` is the layer's own
--- boolean (read by its hooks); `game_modifiers` are vanilla challenge modifiers
--- (inflation, no_interest, discard_cost, ...) that vanilla already reads.
--- Table values (no_blind_reward = { Small = true }) merge key-by-key so a stake
--- that already set Small isn't clobbered. Turning off restores the value from
--- MP.snapshot_baseline rather than nil.
+-- `flag` controls layer hooks; `game_modifiers` controls vanilla challenge
+-- behavior. Merge table entries to preserve unrelated stake/deck settings.
+-- Disabling restores the captured baseline. Switchable layers must not share
+-- game_modifier keys: restoring one would overwrite the other's active value.
 function MP.write_layer_modifiers(name, on, mid_round)
 	local layer = MP.Layers[name]
 	local baseline = G.GAME.mp_switch_baseline
@@ -162,9 +151,9 @@ function MP.write_layer_modifiers(name, on, mid_round)
 	end
 end
 
--- Values the run had before any switched layer touched them, so turning a layer
--- off restores the deck/stake value rather than nil. Boxed as { v = ... } so
--- "was nil" survives the save file. Call before the first switch.
+-- Capture deck/stake values before the first clock activation. The wrapper
+-- table distinguishes a captured nil from a key that has not been captured,
+-- including after saving and loading the run.
 function MP.snapshot_baseline(names)
 	G.GAME.mp_switch_baseline = G.GAME.mp_switch_baseline or {}
 	local base = G.GAME.mp_switch_baseline

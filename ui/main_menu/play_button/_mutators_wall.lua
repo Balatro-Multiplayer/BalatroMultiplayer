@@ -54,10 +54,9 @@ G.FUNCS.mp_glass_blurb = function(e)
 	MP.UI.set_blurb(e, (MP.variant_of(GLASS)).blurb)
 end
 
--- Wall columns, left to right. Cells come from the mutator registry
--- (MP.MUTATORS, filled by `mutator = {...}` on each layer); this table only
--- owns presentation. `content` columns change which cards exist rather than
--- how the run plays, so Randomize / Mystery Mix leave them as the player set them.
+-- Column order and styling; cell definitions come from MP.MUTATORS.
+-- Randomize and Mystery Mix preserve `content` columns so they cannot change
+-- the player's chosen card pool.
 local CATEGORIES = {
 	{ name = "ECONOMY", colour = G.C.MONEY },
 	{ name = "MAYHEM", colour = G.C.PURPLE },
@@ -107,10 +106,8 @@ G.FUNCS.mp_toggle_mutator = function(e)
 	e:juice_up(0.2, 0.1)
 end
 
--- Cell palettes. On = solid category fill + white pip; off = outline-only in the
--- category tint, so "on" is the only loud state on the wall. Implied = on, but dimmed,
--- because the base ruleset already owns it. Hidden = one neutral look for every
--- cell, so a Mystery Mix reads as hidden rather than as all-off.
+-- Implied cells inherit their effect from the base ruleset and render dimmed.
+-- Hidden cells share one palette to conceal Mystery Mix selections.
 local function cell_palette(colour)
 	return {
 		on = { fill = colour, outline = colour, text = G.C.UI.TEXT_LIGHT, pip = G.C.WHITE },
@@ -146,9 +143,10 @@ local HIDDEN_PALETTE = {
 	pip = G.C.CLEAR,
 }
 
--- Live recolour of cell fill / outline / pip / label. Children: pip, gap, label.
+-- Forward declaration: the live colour callback also refreshes tooltips.
 local cell_tooltip
 
+-- Child positions are fixed by mutator_cell: pip, gap, label.
 G.FUNCS.mp_mutator_cell_colour = function(e)
 	local rt = e.config.ref_table
 	local preset = MP.CHAOS_CLOCK.preset_key()
@@ -217,9 +215,8 @@ local function clear_mutators(skip_content)
 	MP.set_variant(MP.CHAOS_CLOCK.CYCLE, nil)
 end
 
--- Roll a fresh random loadout: ~1 in 3 toggle cells on (content columns
--- untouched), and a uniform pick of Chaos Clock preset. The roll seed is logged so a surprising loadout can be
--- reproduced.
+-- Preserve content selections, enable each other toggle with probability 1/3,
+-- and choose a clock preset uniformly. Log the seed to reproduce the loadout.
 local roll_count = 0
 local function roll_mutators()
 	clear_mutators(true)
@@ -260,8 +257,7 @@ G.FUNCS.mp_mystery_mix = function(e)
 	e:juice_up(0.3, 0.1)
 end
 
--- TODO(rewire): fold this and mod_badges.lua's inline builder into one shared
--- MP.UI.credit_badge(credits) so we can use it anywhere we like :)
+-- TODO: share the credit badge builder with mod_badges.lua.
 local function mutator_credit_badge(credits)
 	credits.art = credits.art or {}
 	credits.idea = credits.idea or {}
@@ -656,8 +652,7 @@ local function small_button(id, func, label, colour, description)
 	}
 end
 
--- Clear / Randomize / Mystery Mix (operate on MP.MODIFIERS via the global FUNCS).
--- Kept small so the editor's Play button is the one loud action.
+-- These callbacks update MP.MODIFIERS; live controls refresh from that state.
 function MP.UI.build_mutator_actions()
 	return {
 		n = G.UIT.C,
@@ -681,9 +676,7 @@ function MP.UI.build_mutator_actions()
 	}
 end
 
--- Chaos Clock: a setting on the action row, not a wall cell, because it draws
--- from the wall's Off cells. Shaped as a small knob (label / cycle / pool
--- readout) so it doesn't read as a fourth button.
+-- The clock preset is a variant cycle stored in MP.MODIFIERS for lobby sync.
 local CLOCK = MP.CHAOS_CLOCK.CYCLE
 
 -- Off cells the clock can switch on, plus its own one-shot events.

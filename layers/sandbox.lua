@@ -85,9 +85,8 @@ function MP.SANDBOX.get_vanilla_bans()
 	return bans
 end
 
--- Sandbox jokers split into groups that can be layered onto any base ruleset
--- from the mutators wall (layers/sandbox_mutators.lua). The sandbox layer itself
--- still brings rotation + idol + extra credit, as before.
+-- Group layers select subsets independently; the sandbox base layer enables
+-- rotation, idol and extra_credit together.
 MP.SANDBOX.GROUP_LAYERS = {
 	rotation = "sandbox_rotation",
 	retired = "sandbox_retired",

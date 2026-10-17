@@ -1,32 +1,21 @@
--- Chaos Clock: draws Off mutator cells (plus a few one-shot events of its own)
--- into the run. Design notes: .context/wild_tiers_design.md (not tracked).
+-- Chaos Clock forecasts effects for an ante, then applies each blind's picks
+-- only when that blind starts. Skipping a blind leaves its effects unapplied.
+-- Rolls use the run seed, ante and named blind slot; play/skip counts cannot
+-- affect another player's forecast.
 --
--- An entry opts in with `mutator = { clock = { at, lasts, severity } }`:
---   at        "blind" | "ante"   when it can be drawn: each blind start, or the
---                                ante going up (after the boss, so the ante's
---                                first shop is covered)
---   lasts     "instant"          fires once (needs `run`)
---             "blind" | "ante"   switches the layer on until the next blind /
---                                ante starts, so it covers the shop after it
---   severity  1 | 2 | 3          rarity only; the preset sets each one's chance
---   preset    optional preset key restricting which setting can draw it
--- Ante instants run immediately; blind instants wait for the first hand.
--- On Mayhem, severity 3 windows last the rest of the run instead.
---
--- Cells that are On, or that the ruleset already brings in, are skipped:
--- they're running anyway. Every roll is keyed on (run seed, ante, blind slot)
--- via MP.rng, so both players get the same draw at the same point. The slot
--- (Small / Big / Boss), not a counter, so skipping a blind doesn't shift later
--- rolls.
---
--- The whole ante is rolled as it starts (the forecast): the ante draw applies
--- at once, each blind's draw when that blind starts. Blind select shows each
--- blind's draw, instants as "?". Skipping a blind dodges its draw.
-
+-- A mutator opts in with `clock = { at, lasts, severity, preset? }`:
+--   at: "ante" or "blind", the point at which the forecast pick applies.
+--   lasts: "instant" calls `run`; "ante"/"blind" enables a reversible layer
+--          until the next boundary of that type, including the intervening shop.
+--   severity: 1..3, selects the preset's independent draw probability.
+--   preset: optional restriction to one preset.
+-- Ante instants execute before the shop; blind instants wait for a drawn hand.
+-- Mayhem keeps severity-3 layer effects active for the rest of the run.
+-- Layers already active at run start are excluded from the clock pool.
 MP.CHAOS_CLOCK = {}
 
--- Chance per roll that each severity draws one entry. Placeholders until
--- playtested. severe_for_run: severity 3 windows last the rest of the run.
+-- Each rate is an independent chance to draw one effect of that severity.
+-- severe_for_run extends severity-3 layer effects, but not instant events.
 local PRESETS = {
 	calm = {
 		label = "Calm",
@@ -209,8 +198,9 @@ function MP.CHAOS_CLOCK.eligible(key, spec)
 	return MP.is_switchable(key)
 end
 
--- Pure (exposed for tests): at -> "s<severity>" -> sorted keys. `skip(key)` says
--- a cell is already running (On, or brought in by the ruleset).
+-- Returns pool[at]["s" .. severity] = sorted effect keys. Sorting removes Lua
+-- table iteration order from seeded selection. skip(key) excludes active layers;
+-- one-shot events are always included.
 function MP.CHAOS_CLOCK.build_pool(skip)
 	local pool = {}
 	for at in pairs(MP.CHAOS_CLOCK.AT) do
@@ -233,9 +223,9 @@ function MP.CHAOS_CLOCK.build_pool(skip)
 	return pool
 end
 
--- Pure schedule (exposed for tests): one roll at a roll point. Each severity
--- draws one entry from its list with the preset's chance. Coordinates after
--- `at` key the roll (ante, or ante + blind slot).
+-- Roll each severity independently, selecting at most one eligible effect
+-- from each list. Extra arguments identify the ante and, for blind rolls, slot.
+-- This only selects keys; applying effects is deferred to the matching boundary.
 function MP.CHAOS_CLOCK.roll(rng, preset, by_sev, at, ...)
 	local picks = {}
 	for sev, rate in ipairs(PRESETS[preset].rates) do
@@ -315,9 +305,9 @@ local function log_picks(coord, picks)
 	sendDebugMessage("Chaos Clock " .. coord .. ": " .. table.concat(keys, ","), "MULTIPLAYER")
 end
 
--- The whole ante, rolled up front: the ante draw plus one per blind slot, in a
--- fixed order so every player gets the same forecast. Blind draws only apply
--- when their blind starts, so skipping a blind dodges its draw.
+-- Reserve run-long picks in ante, Small, Big, Boss order. draw() removes each
+-- reserved key from later draws, even if the player eventually skips its blind.
+-- Forecasting all slots here keeps those exclusions identical across clients.
 local function forecast_ante(ante)
 	local clock = G.GAME.mp_clock
 	local f = { ante = ante, ante_picks = draw("ante", ante), blinds = {} }

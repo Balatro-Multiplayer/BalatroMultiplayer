@@ -66,14 +66,14 @@ function create_UIBox_blind_choice(type, run_info)
 	return t
 end
 
--- HUD readout: live windows and when each ends. Rebuilt whenever a window
--- switches (MP.CHAOS_CLOCK calls this) and when the run's HUD is built.
 local function ends_text(window)
 	if window == "blind" then return "Until next Blind" end
 	if window == "ante" then return "Until Ante " .. (G.GAME.round_resets.ante + 1) end
 	return "Rest of run"
 end
 
+-- Rebuild after a clock transition or HUD creation. Remove the old UIBox
+-- first so expired effects cannot remain visible.
 function MP.UI.refresh_chaos_clock_hud()
 	if G.MP_CLOCK_HUD then
 		G.MP_CLOCK_HUD:remove()
