@@ -118,6 +118,8 @@ game, log `MP_SCENARIO PASS|FAIL ...` lines to the Lovely log and save
 screenshots to `.context/scenarios/<name>/`.
 
 ```bash
+bash scripts/run_scenario.sh custom_wall   # editor wall: states, counts, idol, Mystery Mix
+bash scripts/run_scenario.sh chaos_run     # practice run: Chaos Clock on Mayhem, On cell skipped, sandbox groups
 bash scripts/run_scenario.sh glass_cannon  # Black Deck + Glass Cannon: 1 hand
 ```
 
