@@ -17,6 +17,13 @@ end
 
 G.FUNCS.mp_pvp_forfeit = function()
 	G.FUNCS.exit_overlay_menu()
+	-- Practice is solo: there is no opponent or host referee to resolve a forfeit
+	-- broadcast, so pressing Forfeit did nothing. It ends the practice run instead
+	-- (go_to_menu also leaves practice, see lib/practice_mode.lua).
+	if PVP.is_practice_mode() and not PVP.LOBBY.code then
+		G.FUNCS.go_to_menu()
+		return
+	end
 	PVP.pvp_forfeit()
 end
 
@@ -63,7 +70,9 @@ PVP.create_run_options = function()
 	-- Draw vote: hidden entirely when the gamemode sets draw_vote_allowed = false.
 	-- No time window, unlike Seed Change above -- a draw ending the match outright
 	-- is a different risk profile than reseeding mid-run.
-	if not gm or gm.draw_vote_allowed ~= false then
+	-- Also hidden in practice: with no opponent the 1/1 vote "won", and vanilla's game
+	-- over screen came up outside any blind, reading "Defeated By ERROR".
+	if (not gm or gm.draw_vote_allowed ~= false) and not PVP.is_practice_mode() then
 		add_row(UIBox_button({
 			button = "mp_pvp_draw_vote",
 			label = { localize("k_draw_vote") },
