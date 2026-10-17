@@ -81,3 +81,33 @@ function PVP._start_practice(ruleset_key)
 		G.FUNCS.lobby_start_run(nil, {})
 	end)
 end
+
+-- Practice has no lobby code, so its end screens are vanilla's (create_UIBox_game_over/win
+-- only switch to the PvP end screen when PVP.LOBBY.code is set), and their Main Menu and
+-- New Run buttons never left the practice session: the next plain singleplayer run was
+-- still a practice run of the old ruleset (Lobby Info button, ruleset pool rules, modifiers).
+-- Leaving here, at the two vanilla exits, puts the player back in plain singleplayer.
+local function leave_practice()
+	if not PVP.is_practice_mode() or PVP.LOBBY.code then
+		return
+	end
+	local lobby = MPAPI.get_current_lobby()
+	if lobby then
+		lobby:leave()
+	end
+	MPAPI.MODIFIERS = {}
+	PVP.SP.practice = false
+	PVP.SP.ruleset = nil
+end
+
+local go_to_menu_ref = G.FUNCS.go_to_menu
+G.FUNCS.go_to_menu = function(e)
+	leave_practice()
+	return go_to_menu_ref(e)
+end
+
+local start_setup_run_ref = G.FUNCS.start_setup_run
+G.FUNCS.start_setup_run = function(e)
+	leave_practice()
+	return start_setup_run_ref(e)
+end
