@@ -3,9 +3,13 @@
 -- dead spectral in the pool
 MP.Layer("no_red_seals", {
 	banned_consumables = { "c_deja_vu" },
-	on_apply_bans = function()
-		G.GAME.modifiers.mp_no_red_seals = true
-	end,
+	flag = "mp_no_red_seals",
+	mutator = {
+		category = "HAZARDS",
+		order = 3,
+		label = "No Red Seals",
+		desc = { "Cards cannot gain Red Seals.", "Deja Vu cannot appear." },
+	},
 })
 
 -- the "clean" way is to yank Red out of the seal pool. sure. except deja vu hardcodes

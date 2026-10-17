@@ -17,6 +17,12 @@ MP.Layer("shared_pockets", {
 	on_apply_bans = function()
 		MP.setup_shared_pockets()
 	end,
+	mutator = {
+		category = "MAYHEM",
+		order = 5,
+		label = "Shared Pockets",
+		desc = { "Cards in hand, Jokers, and", "consumables share one slot limit." },
+	},
 })
 
 -- just copy what vanilla does

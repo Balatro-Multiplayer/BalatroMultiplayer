@@ -1,8 +1,14 @@
 -- Eeeee: ~40% of RNG poll keys per ante return a fixed value, not the seed-derived one.
 MP.Layer("eeeee", {
-	on_apply_bans = function()
-		G.GAME.modifiers.mp_eeeee = true
-	end,
+	flag = "mp_eeeee",
+	mutator = {
+		category = "CHAOS",
+		order = 6,
+		label = "Eeeee",
+		clock = { at = "ante", lasts = "ante", severity = 2 },
+		desc = { "Luck gets stuck on repeat.", "Some rolls give the same result", "until the next Ante." },
+		credits = { code = { "Toneblock" } },
+	},
 })
 
 local pseudoseed_ref = pseudoseed

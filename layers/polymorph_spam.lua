@@ -1,9 +1,4 @@
 -- Polymorph Spam: every blind, your jokers and consumables re-roll into other centers.
-MP.Layer("polymorph_spam", {
-	on_apply_bans = function()
-		G.GAME.modifiers.mp_polymorph_spam = true
-	end,
-})
 
 local function get_area(card)
 	if not card then return end
@@ -91,6 +86,28 @@ local function mass_polymorph(area)
 		end
 	end
 end
+
+MP.Layer("polymorph_spam", {
+	flag = "mp_polymorph_spam",
+	mutator = {
+		category = "CHAOS",
+		order = 5,
+		label = "Polymorph",
+		-- Random draws transform existing cards as the ante starts, before the shop.
+		clock = {
+			at = "ante",
+			lasts = "instant",
+			severity = 3,
+			preset = "mayhem",
+			run = function()
+				mass_polymorph(G.jokers and G.jokers.cards or {})
+				mass_polymorph(G.consumeables and G.consumeables.cards or {})
+			end,
+		},
+		desc = { "At the start of each Blind,", "transform all your Jokers", "and consumables." },
+		clock_desc = { "Transform all your Jokers", "and consumables once." },
+	},
+})
 
 local calculate_context_ref = SMODS.calculate_context
 function SMODS.calculate_context(context, return_table, no_resolve)
