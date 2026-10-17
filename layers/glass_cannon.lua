@@ -13,10 +13,12 @@ MP.Layer("glass_cannon", {
 	},
 })
 
--- Apply XMult after the deck's final scoring adjustment, including Plasma's
--- chip/mult rebalance. Decks that return no replacement Mult use args.mult.
+-- final_scoring_step called after jokers to let the deck rebalance chips/mult
+-- (it's where Plasma does its math)
+-- so we wrap that burrito and then scale the mult on top
 local _back_trigger_effect = Back.trigger_effect
 function Back:trigger_effect(args)
+	-- magic. don't ask
 	local nu_chip, nu_mult = _back_trigger_effect(self, args)
 	if args and args.context == "final_scoring_step" and G.GAME.modifiers.mp_glass_cannon then
 		local base_mult = nu_mult or args.mult
