@@ -99,6 +99,9 @@ function add_joker() end
 -- Stub SMODS.showman
 SMODS.showman = function() return false end
 
+-- Remaining hook targets that layer files wrap at load time
+dofile(ROOT .. "/tests/_stubs.lua")
+
 -- ─── Load layers and rulesets ───────────────────────────────────────────────
 
 local function lua_files_in(dir)

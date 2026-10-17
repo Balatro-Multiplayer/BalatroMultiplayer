@@ -338,6 +338,9 @@ MP.load_mp_dir("objects/consumables/sandbox")
 MP.load_mp_dir("objects/boosters")
 MP.load_mp_dir("objects/challenges")
 
+-- Scripted in-game checks: MP_SCENARIO=<name> (see tests/scenarios/_runner.lua)
+if os.getenv("MP_SCENARIO") then MP.load_mp_file("tests/scenarios/_runner.lua") end
+
 local SOCKET = MP.load_mp_file("networking/socket.lua")
 MP.NETWORKING_THREAD = love.thread.newThread(SOCKET)
 local server_url = MP.ENV.server_url or SMODS.Mods["Multiplayer"].config.server_url
