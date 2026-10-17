@@ -1,8 +1,20 @@
 -- Score Instability: after scoring, chips and mult are dragged toward each other.
 MP.Layer("score_instability", {
-	on_apply_bans = function()
-		G.GAME.modifiers.mp_score_instability = true
-	end,
+	flag = "mp_score_instability",
+	mutator = {
+		category = "MAYHEM",
+		order = 6,
+		label = "Instability",
+		clock = { at = "blind", lasts = "blind", severity = 2 },
+		desc = {
+			"Before scoring, move the",
+			"difference between Chips and Mult",
+			"from the lower value to the higher.",
+			"Cannot reduce Chips below 0",
+			"or Mult below 1.",
+		},
+		credits = { code = { "Toneblock" } },
+	},
 })
 
 -- put hook here ig

@@ -47,6 +47,18 @@ MP.Layer("smallworld", {
 		end
 		if G.GAME.banned_keys["j_gros_michel"] then G.GAME.banned_keys["j_cavendish"] = true end
 	end,
+	mutator = {
+		category = "CHAOS",
+		order = 2,
+		label = "Small World",
+		desc = {
+			"Randomly bans about 75% of Jokers,",
+			"consumables, Vouchers, and Tags.",
+			"Duplicate Jokers, Tarot cards,",
+			"and Planet cards can appear.",
+		},
+		credits = { code = { "Toneblock" } },
+	},
 })
 
 local showman_ref = SMODS.showman

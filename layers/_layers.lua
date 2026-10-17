@@ -9,6 +9,11 @@ MP._TAG_LAYERS = {}
 
 function MP.Layer(name, definition)
 	MP.Layers[name] = definition
+	-- MP.Mutator lives in _mutators.lua, which loads before any layer is defined.
+	if definition.mutator then
+		definition.mutator.key = name
+		MP.Mutator(definition.mutator)
+	end
 	if definition.reworked_jokers then
 		for _, joker_key in ipairs(definition.reworked_jokers) do
 			MP._JOKER_LAYERS[joker_key] = MP._JOKER_LAYERS[joker_key] or {}
@@ -32,7 +37,7 @@ end
 -- Build an mp_include closure that returns true iff any of the named layers is active.
 local function layer_membership_include(owning_layers)
 	return function(_)
-        return MP.is_any_layer_active(owning_layers)
+		return MP.is_any_layer_active(owning_layers)
 	end
 end
 
@@ -220,6 +225,16 @@ function MP.remove_modifier(name)
 	end
 end
 
+-- Flips one modifier; returns true if it's now on.
+function MP.toggle_modifier(name)
+	if MP.has_modifier(name) then
+		MP.remove_modifier(name)
+		return false
+	end
+	MP.add_modifier(name)
+	return true
+end
+
 function MP.modifiers_serialize()
 	return table.concat(MP.MODIFIERS, ",")
 end
@@ -256,7 +271,7 @@ function MP.RunLayerHooks(hook_name)
 end
 
 function MP.is_layer_active(layer_name)
-    if not layer_name then return false end
+	if not layer_name then return false end
 	for _, name in ipairs(MP.active_layer_chain()) do
 		if name == layer_name then return true end
 	end
@@ -264,8 +279,8 @@ function MP.is_layer_active(layer_name)
 end
 
 function MP.is_any_layer_active(layers)
-    for _, layer_name in pairs(layers) do
-        if MP.is_layer_active(layer_name) then return true end
-    end
-    return false
+	for _, layer_name in pairs(layers) do
+		if MP.is_layer_active(layer_name) then return true end
+	end
+	return false
 end

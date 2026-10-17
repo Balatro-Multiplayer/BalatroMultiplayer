@@ -6,4 +6,11 @@ MP.Layer("wraith_rework", {
 	banned_silent = {
 		"c_wraith",
 	},
+	mutator = {
+		category = "ECONOMY",
+		order = 5,
+		label = "Kind Wraith",
+		desc = { "Wraith creates a random", "Uncommon Joker and gives $5.", "Keeps your current money." },
+		credits = { code = { "steph" } },
+	},
 })

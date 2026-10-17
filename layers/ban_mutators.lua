@@ -12,9 +12,27 @@ MP.Layer("gambling_opportunity", {
 		"m_gold",
 		"m_lucky",
 	},
+	mutator = {
+		category = "HAZARDS",
+		order = 1,
+		label = "No Easy Money",
+		desc = { "Gold and Lucky Cards", "cannot appear." },
+		credits = { idea = { "Kars" } },
+	},
 })
 
-
+-- Rarity isn't known until every mod's jokers are registered, so the ban list is
+-- built at run start instead of as a static array.
 MP.Layer("no_uncommons", {
-    banned_jokers = {},
+	on_apply_bans = function()
+		for key, center in pairs(G.P_CENTERS) do
+			if center.set == "Joker" and center.rarity == 2 then G.GAME.banned_keys[key] = true end
+		end
+	end,
+	mutator = {
+		category = "HAZARDS",
+		order = 2,
+		label = "No Uncommons",
+		desc = { "Uncommon Jokers cannot appear." },
+	},
 })

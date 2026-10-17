@@ -67,3 +67,74 @@ changes it.
 Play one real multiplayer match, then open the Lovely log. Filter the `MP_RLOG:`
 (positional) and `Client sent message:` (human) lines and confirm they mirror
 each action event-for-event.
+
+## Mutator registry
+
+`test_mutator_registry.lua` loads every layer and checks the custom editor's
+wall (`MP.MUTATORS`, filled by `mutator = {...}` on each layer) against the
+layers behind it: known category, label + desc, unique `(category, order)`
+slot, live cells whose layer actually does something, every `flag` read
+somewhere, variant cells pointing at real layers, Chaos Clock specs
+(`at` / `lasts` / `severity`) valid and present on every switchable cell, the
+clock pool skipping On cells, and on state plus the clock preset surviving the `modifier_layers`
+sync string.
+
+```bash
+luajit tests/test_mutator_registry.lua
+```
+
+## RNG determinism
+
+`test_rng_determinism.lua` simulates two clients on one seed that do different
+amounts of unrelated RNG work and query in a different order, and asserts that
+`MP.rng` rolls and the Chaos Clock schedule (ante and per-blind rolls) all
+agree. Also checks each preset's per-severity rate, and that Calm never draws
+severity 3. LuaJIT only — vanilla
+`pseudorandom` seeds `math.random` with a fraction.
+
+```bash
+luajit tests/test_rng_determinism.lua
+```
+
+## Round deltas
+
+`test_round_deltas.lua` covers layer `round_deltas` through Glass Cannon's -2
+hands: stacking with the deck (Black Deck 3 -> 1), the 1-hand floor, and the
+Chaos Clock drawing it per ante: applied once, restored when not drawn, moving
+the live round's `hands_left`, and leaving an On cell alone.
+
+```bash
+luajit tests/test_round_deltas.lua
+```
+
+`_stubs.lua` holds the hook-target globals layer files wrap at load time; the
+shape test and the tests above load it.
+
+## In-game scenarios
+
+`scenarios/_runner.lua` is loaded by `core.lua` only when `MP_SCENARIO` is set.
+A scenario (`scenarios/<name>.lua`) is a list of timed steps that drive the
+game, log `MP_SCENARIO PASS|FAIL ...` lines to the Lovely log and save
+screenshots to `.context/scenarios/<name>/`.
+
+```bash
+bash scripts/run_scenario.sh glass_cannon  # Black Deck + Glass Cannon: 1 hand
+```
+
+macOS only, needs the `Mods/BalatroMultiplayer` symlink pointing at the
+checkout and an unlocked screen (LÖVE blocks in `present()` behind the lock
+screen and never leaves the loading screen).
+
+## Chaos Clock forecast
+
+`test_chaos_forecast.lua` runs the clock over 8 antes for 30 seeds on Mayhem
+(plus one on Normal) as two clients: one plays every blind, one skips every
+Small. It checks that what goes live at a blind is exactly that slot's forecast,
+that a skipped blind's draw never goes live, that both clients get the same
+forecast every ante, that a run-long pick is never drawn twice, and that
+instants show as `?`. A test-only severity 3 blind window (`test_storm`) makes
+the skip checks bite: the live pool has none.
+
+```bash
+luajit tests/test_chaos_forecast.lua
+```
