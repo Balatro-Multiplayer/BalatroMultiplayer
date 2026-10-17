@@ -19,9 +19,6 @@ SMODS.Joker({
 		MP.UTILS.add_nemesis_info(info_queue)
 		return { vars = {} }
 	end,
-	mp_include = function(self)
-		return MP.LOBBY.code and MP.LOBBY.config.multiplayer_jokers
-	end,
 	calculate = function(self, card, context)
 		if
 			context.mp_speedrun

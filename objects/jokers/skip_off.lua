@@ -34,9 +34,6 @@ SMODS.Joker({
 			},
 		}
 	end,
-	mp_include = function(self)
-		return MP.LOBBY.code and MP.LOBBY.config.multiplayer_jokers
-	end,
 	update = function(self, card, dt)
 		if G.STAGE == G.STAGES.RUN and G.GAME.skips ~= nil and MP.GAME.enemy.skips ~= nil then
 			local skip_diff = (math.max(G.GAME.skips - MP.GAME.enemy.skips, 0))

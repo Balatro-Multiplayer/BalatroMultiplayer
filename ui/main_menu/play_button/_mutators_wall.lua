@@ -76,7 +76,8 @@ end
 local function cell_state(def)
 	if def.variants then
 		local _, i = MP.variant_of(def)
-		return i == 1 and "off" or "on"
+		if i == 1 then return implied(def) and "implied" or "off" end
+		return "on"
 	end
 	if MP.has_modifier(def.key) then return "on" end
 	return implied(def) and "implied" or "off"

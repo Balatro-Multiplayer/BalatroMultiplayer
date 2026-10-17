@@ -1,9 +1,8 @@
 MP.Ruleset({
 	key = "experimental_legacy",
-	layers = { "classic" },
+	layers = { "classic", "multiplayer_jokers" },
 	forced_gamemode = "gamemode_mp_attrition",
 	-- Let MP jokers through but ban everything but LGG
-	multiplayer_content = true,
 	banned_silent = {
 		"j_mp_pizza",
 		"j_mp_penny_pincher",
@@ -21,7 +20,6 @@ MP.Ruleset({
 	},
 	reworked_jokers = {
 		"j_mp_hanging_chad",
-		"j_mp_lets_go_gambling",
 	},
 	force_lobby_options = function(self)
 		MP.LOBBY.config.the_order = true

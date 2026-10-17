@@ -1,6 +1,6 @@
 MP.Ruleset({
 	key = "sandbox",
-	layers = { "sandbox" },
+	layers = { "multiplayer_jokers", "sandbox" },
 
 	forced_lobby_options = true,
 

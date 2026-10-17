@@ -102,6 +102,6 @@ SMODS.Joker({
 		code = { "Virtualized" },
 	},
 	mp_include = function(self)
-		return MP.SANDBOX.is_joker_allowed(self.key) and MP.LOBBY.config.multiplayer_jokers
+		return MP.SANDBOX.is_joker_allowed(self.key) and MP.multiplayer_jokers_enabled()
 	end,
 })

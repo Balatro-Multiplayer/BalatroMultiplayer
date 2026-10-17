@@ -54,7 +54,10 @@ return {
 			toggle(S, "multiplayer_jokers")
 			S.check(MP.current_ruleset().multiplayer_content == true, "MP Jokers cell turns multiplayer_content on")
 			toggle(S, "multiplayer_jokers")
-			S.check(not MP.has_modifier("multiplayer_jokers"), "MP Jokers on -> off")
+			S.check(MP.has_modifier("no_multiplayer_jokers"), "MP Jokers On -> Off overrides the base")
+			S.check(not MP.multiplayer_jokers_enabled(), "MP Jokers Off suppresses the native pool")
+			toggle(S, "multiplayer_jokers")
+			S.check(not MP.has_modifier("no_multiplayer_jokers"), "MP Jokers Off -> Base clears the override")
 			-- Secret idol: shift-click can't be faked through love.keyboard, so set it directly.
 			MP.add_modifier("idol_none")
 			MP.remove_modifier("idol_collector")

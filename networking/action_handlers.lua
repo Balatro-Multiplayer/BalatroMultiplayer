@@ -625,6 +625,11 @@ local function action_lobby_options(options)
 		if MP.UI.update_lobby_option_toggle then MP.UI.update_lobby_option_toggle(k) end
 		::continue::
 	end
+	-- Import legacy booleans after modifier_layers, regardless of pairs order.
+	MP.import_multiplayer_jokers(options.multiplayer_jokers)
+	MP.LOBBY.config.multiplayer_jokers = MP.multiplayer_jokers_enabled()
+	MP.LOBBY.config.modifier_layers = MP.modifiers_serialize()
+	if MP.UI.update_lobby_option_toggle then MP.UI.update_lobby_option_toggle("multiplayer_jokers") end
 	if different_decks_before ~= MP.LOBBY.config.different_decks then
 		G.FUNCS.exit_overlay_menu() -- throw out guest from any menu.
 	end
@@ -1233,6 +1238,9 @@ function MP.ACTIONS.play_hand(score, hands_left)
 end
 
 function MP.ACTIONS.lobby_options()
+	-- Keep the old wire/UI fields as a view of the native layer selection.
+	MP.LOBBY.config.multiplayer_jokers = MP.multiplayer_jokers_enabled()
+	MP.LOBBY.config.modifier_layers = MP.modifiers_serialize()
 	---@type table<string, any>
 	local msg = {
 		action = "lobbyOptions",

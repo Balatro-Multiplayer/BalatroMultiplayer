@@ -1,6 +1,6 @@
 MP.Ruleset({
 	key = "badlatro",
-	multiplayer_content = true,
+	layers = { "multiplayer_jokers" },
 	banned_jokers = {
 		"j_caino",
 		"j_perkeo",

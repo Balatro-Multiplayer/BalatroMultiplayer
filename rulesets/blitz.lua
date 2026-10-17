@@ -1,4 +1,4 @@
 MP.Ruleset({
 	key = "blitz",
-	layers = { "standard" },
+	layers = { "multiplayer_jokers", "standard" },
 }):inject()

@@ -33,9 +33,6 @@ SMODS.Joker({
 		MP.UTILS.add_nemesis_info(info_queue)
 		return { vars = { card.ability.extra.mult_gain, card.ability.extra.mult } }
 	end,
-	mp_include = function(self)
-		return MP.LOBBY.code and MP.LOBBY.config.multiplayer_jokers
-	end,
 	calculate = function(self, card, context)
 		if context.cardarea == G.jokers and context.joker_main then
 			return {
