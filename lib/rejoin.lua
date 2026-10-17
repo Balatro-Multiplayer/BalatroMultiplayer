@@ -59,7 +59,8 @@ function PVP._launch_rejoin(active)
 	end
 
 	PVP._start_playback(bootstrap, function()
-		local driver = MPAPI.playback.new_driver(timeline, {
+		local driver
+		driver = MPAPI.playback.new_driver(timeline, {
 			mod_id = 'pvp',
 			pov_player_id = my_id,
 			schema_version = bootstrap.schema_version,
@@ -84,6 +85,23 @@ function PVP._launch_rejoin(active)
 				-- callback fires. Confirmed live: without this, rejoin silently
 				-- exited the just-restored run back to the main menu.
 				if lobby then lobby._skip_run_exit_on_connect = true end
+				-- This relaunched process has no recording block, so nothing the player
+				-- did after the rejoin reached their replay log, and it never got its
+				-- closing chk (left 'partial'). Resume it from the stream just replayed,
+				-- once the last replayed action's own animations have drained (an event
+				-- they still emit is already in that stream). Non-blocking, so it never
+				-- holds up the queue it waits on.
+				local resolver = driver and driver._card_resolvers[my_id]
+				G.E_MANAGER:add_event(Event({
+					blocking = false,
+					blockable = false,
+					no_delete = true,
+					func = function()
+						if not MPAPI.playback._queues_empty() then return false end
+						PVP.RLOG.resume_run(active.events, resolver and resolver.by_id)
+						return true
+					end,
+				}))
 			end,
 		})
 		driver:finish()
