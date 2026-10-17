@@ -130,6 +130,7 @@ screenshots to `.context/scenarios/<name>/`.
 bash scripts/run_scenario.sh custom_wall   # editor wall: states, counts, idol, Mystery Mix
 bash scripts/run_scenario.sh chaos_run     # practice run: Chaos Clock on Mayhem, On cell skipped, sandbox groups
 bash scripts/run_scenario.sh glass_cannon  # Black Deck + Glass Cannon: 1 hand
+bash scripts/run_scenario.sh mp_content    # MP Jokers Base/On/Off pools in practice, every MP Joker through a solo round
 ```
 
 macOS only, needs the `Mods/BalatroMultiplayer` symlink pointing at the
