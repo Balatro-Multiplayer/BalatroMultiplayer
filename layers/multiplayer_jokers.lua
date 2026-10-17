@@ -1,5 +1,5 @@
--- Pool ownership is local run configuration. A live opponent is only needed
--- by the cards' effects, not to reproduce the same shops in a replay.
+-- Pool membership follows run configuration in multiplayer, practice and
+-- replays alike. Card effects handle whether an opponent is present.
 MP.Layer("multiplayer_jokers", {
 	multiplayer_content = true,
 	included_jokers = {
@@ -35,8 +35,9 @@ MP.Layer("multiplayer_jokers", {
 	},
 })
 
--- A scalar override keeps inherited content switchable without changing the
--- ban list (and therefore the shape of Balatro's pseudorandom pool).
+-- Override inherited content through pool_enabled/mp_include. Exclusion
+-- removes these cards' pool slots; banning them would leave UNAVAILABLE slots
+-- and change the seeded selection of the remaining cards.
 MP.Layer("no_multiplayer_jokers", { multiplayer_content = false })
 
 function MP.multiplayer_jokers_enabled()

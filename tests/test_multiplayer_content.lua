@@ -126,8 +126,8 @@ local function pool()
 	return table.concat(slots, ",")
 end
 
--- Before this change, every original used the same lobby boolean; Conjoined
--- also excluded Sandbox. Preserve that exact slot shape when content is On.
+-- Reference pool for legacy MP-content-enabled runs: all original cards except
+-- Conjoined in Sandbox. Slot order must match to preserve seeded shop selection.
 local function legacy_pool(sandbox)
 	local slots = { "j_joker" }
 	for _, key in ipairs(keys) do

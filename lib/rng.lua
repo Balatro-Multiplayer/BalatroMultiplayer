@@ -1,20 +1,12 @@
--- Stateless, keyed randomness for mod features that both clients must agree on.
+-- Stateless rolls keyed by run seed and caller-supplied coordinates.
+-- Unlike pseudoseed(string), this does not advance a per-key counter: repeated
+-- coordinates give the same result regardless of call order or skipped blinds.
 --
--- Vanilla's pseudoseed(key) advances a per-key counter in G.GAME.pseudorandom, so
--- the Nth call depends on how many calls came before it. That's fine for shop
--- queues, but a feature like "roll once per (ante, blind, hand)" wants the same
--- answer for the same coordinates no matter what else either player did first.
---
--- A stream hashes (seed | part1 | part2 ...) into a number and feeds it to
--- vanilla pseudorandom(number), which is how vanilla turns a hash into a roll.
--- Nothing is stored, so the order of calls can't drift between clients.
---
---   local r = MP.rng.game()                    -- seeded from the run seed
---   if r:chance(0.2, "chaos_clock", ante, hand) then ... end
---   local suit = r:element(SUITS, "suit_storm", ante, hand)
---
---   local r = MP.rng.stream("lobby-ABCDE")     -- explicit seed (menus, tests)
-
+-- Use a feature name plus its event coordinates to separate independent rolls:
+--   MP.rng.game():chance(0.2, "chaos_clock", ante, blind_slot)
+-- Use MP.rng.stream(seed) when no run exists (menus or tests).
+-- Key parts are joined with "|"; callers must avoid ambiguous combinations
+-- such as ("a|b", "c") and ("a", "b|c").
 MP.rng = MP.rng or {}
 
 local Stream = {}

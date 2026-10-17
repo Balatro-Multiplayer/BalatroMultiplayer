@@ -54,15 +54,12 @@ end
 
 function MP.should_exclude_from_pool(v)
 	if v.mp_include and type(v.mp_include) == "function" then return not v:mp_include() end
-	-- User reports they got a joker that shouldn’t exist in their ruleset.
-	-- I check, confidently. Tell them no, that’s impossible, I disabled it.
-	-- Then I read my own code.
+	-- MP cards default to excluded unless registration or the card supplies a gate.
 	if v.key and v.key:match("^%a+_mp_") then return true end
 	return false
 end
 
--- After auto-gating, we warn if an MP-prefixed card still has no mp_include and
--- isn't in any reworked_jokers list.
+-- Missing content ownership and a missing explicit gate leave MP cards excluded.
 local function warn_if_ungated(key, kind, prefix)
 	if key and key:sub(1, #prefix) == prefix then
 		sendDebugMessage(
@@ -78,11 +75,8 @@ local function warn_if_ungated(key, kind, prefix)
 	end
 end
 
--- A small graft on SMODS.Joker:register. Any joker whose full key appears in some
--- layer's included_jokers or reworked_jokers gets an mp_include when none is
--- provided. By the time register runs the key is already prefixed, so we can look
--- it up directly. is_layer_active fails closed outside a live ruleset context, and
--- bespoke mp_include slips past untouched.
+-- SMODS has prefixed the key before register runs, so it matches the reverse
+-- index. Attach a layer gate only when the card has no explicit mp_include.
 local _original_joker_register = SMODS.Joker.register
 function SMODS.Joker:register()
 	if not self.mp_include and MP._JOKER_LAYERS[self.key] then

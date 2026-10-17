@@ -1,8 +1,5 @@
--- Sandbox joker groups as wall mutators, so they stack on any base ruleset.
--- Gating runs through MP.SANDBOX.is_joker_allowed (layers/sandbox.lua); these
--- layers only need to exist, describe their cell, and hide the vanilla cards
--- their jokers replace.
-
+-- Each group enables its sandbox cards through MP.SANDBOX.is_joker_allowed
+-- and silently bans the vanilla cards they replace.
 MP.Layer("sandbox_rotation", {
 	banned_silent = MP.SANDBOX.vanilla_bans_for("rotation"),
 	mutator = {
