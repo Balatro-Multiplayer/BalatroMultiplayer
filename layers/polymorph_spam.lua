@@ -106,6 +106,7 @@ MP.Layer("polymorph_spam", {
 		},
 		desc = { "At the start of each Blind,", "transform all your Jokers", "and consumables." },
 		clock_desc = { "Transform all your Jokers", "and consumables once." },
+		credits = { code = { "Toneblock" } },
 	},
 })
 

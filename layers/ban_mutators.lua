@@ -17,7 +17,7 @@ MP.Layer("gambling_opportunity", {
 		order = 1,
 		label = "No Easy Money",
 		desc = { "Gold and Lucky Cards", "cannot appear." },
-		credits = { idea = { "Kars" } },
+		credits = { idea = { "Kars" }, code = { "steph" } },
 	},
 })
 
@@ -34,5 +34,6 @@ MP.Layer("no_uncommons", {
 		order = 2,
 		label = "No Uncommons",
 		desc = { "Uncommon Jokers cannot appear." },
+		credits = { code = { "steph" } },
 	},
 })

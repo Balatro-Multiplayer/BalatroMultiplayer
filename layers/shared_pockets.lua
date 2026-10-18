@@ -22,6 +22,7 @@ MP.Layer("shared_pockets", {
 		order = 5,
 		label = "Shared Pockets",
 		desc = { "Cards in hand, Jokers, and", "consumables share one slot limit." },
+		credits = { code = { "Toneblock" } },
 	},
 })
 

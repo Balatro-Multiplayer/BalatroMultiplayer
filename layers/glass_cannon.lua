@@ -10,6 +10,7 @@ MP.Layer("glass_cannon", {
 		label = "Glass Cannon",
 		clock = { at = "ante", lasts = "ante", severity = 2 },
 		desc = { "X4 Mult.", "-2 hands each round,", "down to a minimum of 1." },
+		credits = { code = { "steph" } },
 	},
 })
 
