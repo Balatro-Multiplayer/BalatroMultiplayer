@@ -354,6 +354,10 @@ end
 -- stream, which leaves its PVP.GAME.lives at reset_game_states' 0. Its next
 -- hand reports that 0 back here (referee_on_play_hand trusts it), so without
 -- a resend a rejoin silently costs every remaining life. Re-send its lives.
+-- Its client also starts over with nobody's lives known (both sides of its
+-- Lives box read 0) and with nothing readied, so every player's lives go out,
+-- and the readiness the referee still holds for it is dropped: left set, the
+-- opponent's ready would start the PvP blind under a player still in its shop.
 function PVP.referee_on_player_reconnected(player_id)
 	if not is_host() then
 		return
@@ -362,7 +366,13 @@ function PVP.referee_on_player_reconnected(player_id)
 	if not (pl and pl.lives) then
 		return
 	end
-	broadcast("pvp_player_lives", { player_id = player_id, lives = pl.lives })
+	pl.is_ready = false
+	if PVP.REF.ready_tracker then
+		PVP.REF.ready_tracker:set(player_id, false)
+	end
+	for id, other in pairs(PVP.REF.players) do
+		broadcast("pvp_player_lives", { player_id = id, lives = other.lives })
+	end
 	if PVP.LOBBY.config.team_based then
 		for team_id, lives in pairs(PVP.REF.team_lives or {}) do
 			broadcast("pvp_team_lives", { team_id = team_id, lives = lives })
@@ -1243,4 +1253,264 @@ function PVP.referee_teams_on_forfeit(player_id)
 	local winner = (team == "A") and "B" or "A"
 	broadcast("pvp_win", { winner_id = "", winner_team_id = winner })
 	return winner
+end
+
+-- ── Hand-over ───────────────────────────────────────────────────────────────
+-- The referee lives in the host's memory, but the host can crash. The server
+-- then makes another player host (transferHostFrom in the Nakama lobby), whose
+-- PVP.REF knew nobody: the crashed player came back with no lives, and nothing
+-- could end the match. So after every referee entry point the host keeps a copy
+-- of PVP.REF in the lobby metadata (CHECKPOINT_KEY). The server holds that
+-- metadata for the lobby's whole life, hands it to every player in each
+-- snapshot, and keeps it across a server restart, so whoever is made host
+-- next finds the referee as the old host last left it and carries on
+-- (PVP.referee_take_over, run off HOST_CHANGED in lobby_bridge.lua).
+--
+-- The host stays the rules engine; the server only stores. Moving the rules
+-- themselves into the server (it is mod-agnostic, and the rules are
+-- PvP's, with five modes and the InsaneInt scores) is the larger change this
+-- leaves open.
+
+local CHECKPOINT_KEY = "_pvp_ref"
+PVP.REF_CHECKPOINT_KEY = CHECKPOINT_KEY
+
+-- Ties a checkpoint to the run it was taken in, so a checkpoint left in the
+-- metadata by an earlier match in the same lobby is never restored.
+local function run_tag()
+	local lobby = MPAPI.get_current_lobby()
+	local started = lobby and lobby._game and lobby._game.started
+	if started and started.run_id then
+		return tostring(started.run_id)
+	end
+	local seed = G.GAME and G.GAME.pseudorandom and G.GAME.pseudorandom.seed
+	return seed and ("seed:" .. tostring(seed)) or nil
+end
+
+local function int_out(v)
+	v = v or PVP.INSANE_INT.empty()
+	return { v.coeffiocient or 0, v.exponent or 0, v.e_count or 0 }
+end
+
+local function int_in(v)
+	if type(v) ~= "table" then
+		return PVP.INSANE_INT.empty()
+	end
+	return PVP.INSANE_INT.create(v[1], v[2], v[3])
+end
+
+-- Booleans as 0/1 and nil-able fields left out: the snapshot crosses JSON.
+local function flag(b)
+	return b and 1 or 0
+end
+
+local function snapshot()
+	local players = {}
+	for id, pl in pairs(PVP.REF.players) do
+		players[id] = {
+			score = int_out(pl.score),
+			highest = int_out(pl.highest_score),
+			hands = pl.hands_left,
+			lives = pl.lives,
+			skips = pl.skips,
+			ante = pl.ante,
+			furthest = pl.furthest_blind,
+			played = flag(pl.played_this_blind),
+			ready = flag(pl.is_ready),
+			first = flag(pl.first_ready),
+			blocker = flag(pl.lives_blocker),
+			team = pl.team_id,
+			tracked_ready = flag(PVP.REF.ready_tracker and PVP.REF.ready_tracker:is_ready(id)),
+		}
+	end
+	return {
+		v = 1,
+		tag = run_tag(),
+		players = players,
+		nemesis_of = PVP.REF.nemesis_of or {},
+		used_pairs = PVP.REF.used_pairs or {},
+		nemesis_ante = PVP.REF.nemesis_ante_computed_for or 0,
+		last_bye = PVP.REF.last_bye_id,
+		team_lives = PVP.REF.team_lives or {},
+		team_card_target = PVP.REF.team_card_target or {},
+		team_card_ante = PVP.REF.team_card_ante_computed_for or 0,
+		eliminated = PVP.REF.eliminated or {},
+	}
+end
+
+local function restore(snap)
+	PVP.REF.players = {}
+	PVP.REF.ready_tracker = MPAPI.ReadyTracker()
+	for id, s in pairs(snap.players or {}) do
+		PVP.REF.players[id] = {
+			id = id,
+			score = int_in(s.score),
+			highest_score = int_in(s.highest),
+			hands_left = tonumber(s.hands) or 4,
+			lives = tonumber(s.lives) or (PVP.LOBBY.config.starting_lives or 4),
+			skips = tonumber(s.skips) or 0,
+			ante = tonumber(s.ante) or 1,
+			furthest_blind = tonumber(s.furthest) or 0,
+			played_this_blind = s.played == 1,
+			is_ready = s.ready == 1,
+			first_ready = s.first == 1,
+			lives_blocker = s.blocker == 1,
+			team_id = s.team,
+		}
+		if s.tracked_ready == 1 then
+			PVP.REF.ready_tracker:set(id, true)
+		end
+	end
+	PVP.REF.first_ready_at = nil
+	PVP.REF.nemesis_of = snap.nemesis_of or {}
+	PVP.REF.used_pairs = snap.used_pairs or {}
+	PVP.REF.nemesis_ante_computed_for = tonumber(snap.nemesis_ante) or 0
+	PVP.REF.last_bye_id = snap.last_bye
+	PVP.REF.team_lives = snap.team_lives or {}
+	PVP.REF.team_card_target = snap.team_card_target or {}
+	PVP.REF.team_card_ante_computed_for = tonumber(snap.team_card_ante) or 0
+	PVP.REF.eliminated = snap.eliminated or {}
+end
+
+-- No checkpoint to take over (an old host on an older build, or one that
+-- crashed before its first write): rebuild what this client saw itself. Lives
+-- are the part that decides the match, and every client hears every change to
+-- its own and its opponent's (pvp_player_lives). Scores and hands come back as
+-- each player plays its next hand.
+local function rebuild_from_local(lobby)
+	PVP.REF.players = {}
+	PVP.REF.ready_tracker = MPAPI.ReadyTracker()
+	PVP.REF.eliminated = {}
+	local target = PVP.current_target_id()
+	for _, p in ipairs(lobby:get_players()) do
+		local pl = ref_player(p.id)
+		pl.team_id = PVP.LOBBY.roster and PVP.LOBBY.roster[p.id] or nil
+		local lives
+		if p.id == lobby.player_id then
+			lives = PVP.GAME.lives
+		elseif PVP._player_lives_cache and PVP._player_lives_cache[p.id] then
+			lives = PVP._player_lives_cache[p.id]
+		elseif p.id == target and PVP.GAME.enemy then
+			lives = PVP.GAME.enemy.lives
+		end
+		if tonumber(lives) and tonumber(lives) > 0 then
+			pl.lives = tonumber(lives)
+		end
+		pl.ante = (G.GAME and G.GAME.round_resets and G.GAME.round_resets.ante) or pl.ante
+	end
+	if PVP.LOBBY.config.team_based and PVP.GAME.team_lives then
+		for team, lives in pairs(PVP.GAME.team_lives) do
+			PVP.REF.team_lives[team] = tonumber(lives)
+		end
+	end
+end
+
+local last_written
+
+-- Writes the referee into the lobby metadata when it changed since the last
+-- write. Host-only.
+function PVP.referee_checkpoint()
+	if not is_host() then
+		return
+	end
+	local lobby = MPAPI.get_current_lobby()
+	if not lobby or not next(PVP.REF.players or {}) then
+		return
+	end
+	local snap = snapshot()
+	local ok, encoded = pcall(MPAPI.json_encode, snap)
+	if not ok then
+		sendWarnMessage("[pvp] referee checkpoint not encodable: " .. tostring(encoded), "MULTIPLAYER")
+		return
+	end
+	if encoded == last_written then
+		return
+	end
+	last_written = encoded
+	lobby:set_metadata({ [CHECKPOINT_KEY] = snap })
+end
+
+-- Run on the player the server has just made host, mid-run. Returns how the
+-- referee was rebuilt ("checkpoint" or "local"), or nil when nothing was done.
+function PVP.referee_take_over()
+	if not is_host() or G.STAGE ~= G.STAGES.RUN then
+		return nil
+	end
+	-- The match is already decided (the old host left from the end screen).
+	if PVP.GAME.won or PVP.GAME.eliminated or G.STATE == G.STATES.GAME_OVER then
+		return nil
+	end
+	local lobby = MPAPI.get_current_lobby()
+	if not lobby then
+		return nil
+	end
+	local snap = (lobby:get_metadata() or {})[CHECKPOINT_KEY]
+	local source
+	if type(snap) == "table" and snap.v == 1 and snap.tag ~= nil and snap.tag == run_tag() then
+		restore(snap)
+		source = "checkpoint"
+	else
+		rebuild_from_local(lobby)
+		source = "local"
+	end
+	PVP.ensure_gamemode_instance(lobby)
+	sendDebugMessage("[pvp] took over the referee from " .. source, "MULTIPLAYER")
+	PVP._ref_takeover = { source = source, at = love.timer and love.timer.getTime() or os.time() }
+	-- Everyone's Lives box reads the referee's record from here on.
+	for id, pl in pairs(PVP.REF.players) do
+		broadcast("pvp_player_lives", { player_id = id, lives = pl.lives })
+	end
+	if PVP.LOBBY.config.team_based then
+		for team_id, lives in pairs(PVP.REF.team_lives or {}) do
+			broadcast("pvp_team_lives", { team_id = team_id, lives = lives })
+		end
+	end
+	last_written = nil
+	PVP.referee_checkpoint()
+	return source
+end
+
+-- The per-run gamemode instance (forfeit/leave handling) was only ever made on
+-- the host that started the match, so a host that took over had none and a
+-- forfeit did nothing. Made here from the lobby's queue_mode when missing.
+function PVP.ensure_gamemode_instance(lobby)
+	lobby = lobby or MPAPI.get_current_lobby()
+	if not lobby then
+		return nil
+	end
+	if lobby._gamemode_instance then
+		return lobby._gamemode_instance
+	end
+	local queue_mode = (lobby:get_metadata() or {}).queue_mode or PVP._pvp_gamemode
+	local gm_def = queue_mode and MPAPI.GameModes[queue_mode]
+	if gm_def and gm_def.new_instance then
+		lobby._gamemode_instance = gm_def:new_instance()
+	end
+	return lobby._gamemode_instance
+end
+
+-- Every entry point that changes the referee checkpoints after it runs.
+for _, name in ipairs({
+	"referee_reset",
+	"referee_on_player_reconnected",
+	"referee_on_ready_blind",
+	"referee_on_unready_blind",
+	"referee_on_play_hand",
+	"referee_on_skip",
+	"referee_on_set_ante",
+	"referee_on_redeem_ante_voucher",
+	"referee_on_set_furthest_blind",
+	"referee_on_new_round",
+	"referee_on_fail_round",
+	"referee_on_fail_timer",
+	"referee_on_fail_pvp_timer",
+	"referee_n_player_forfeit",
+	"referee_manhunt_on_forfeit",
+	"referee_teams_on_forfeit",
+}) do
+	local inner = PVP[name]
+	PVP[name] = function(...)
+		local result = inner(...)
+		PVP.referee_checkpoint()
+		return result
+	end
 end

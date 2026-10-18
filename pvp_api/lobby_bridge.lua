@@ -145,7 +145,8 @@ local function mirror_metadata(lobby)
 	-- still needs.
 	local def = meta.queue_mode and PVP.PVP_GAMEMODES and PVP.PVP_GAMEMODES[meta.queue_mode]
 	for k, v in pairs(meta) do
-		if k ~= "deck" and k ~= "kind" then
+		-- The referee's own checkpoint (referee.lua) isn't lobby config.
+		if k ~= "deck" and k ~= "kind" and k ~= PVP.REF_CHECKPOINT_KEY then
 			PVP.LOBBY.config[k] = v
 		end
 	end
@@ -330,6 +331,11 @@ PVP.setup_lobby_mirror = function(lobby)
 
 	lobby:on(MPAPI.LobbyEvent.HOST_CHANGED, function()
 		mirror_players(lobby)
+		-- The host left mid-run (a crash, a dropped connection) and the server
+		-- made us host: the referee is ours now.
+		if lobby.is_host and G.STAGE == G.STAGES.RUN and not PVP.is_practice_mode() then
+			PVP.referee_take_over()
+		end
 		MPAPI.refresh_current_view()
 	end)
 
