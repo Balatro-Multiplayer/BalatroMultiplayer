@@ -95,6 +95,7 @@ G.FUNCS.mp_custom_play = function(e)
 	elseif ruleset and ruleset.forced_gamemode then
 		G.FUNCS["force_" .. ruleset.forced_gamemode](e)
 	else
+		MP.CUSTOM.selecting_gamemode = true
 		G.FUNCS.select_gamemode(e)
 	end
 end
@@ -102,50 +103,6 @@ end
 -- ---------------------------------------------------------------------------
 -- Tab content
 -- ---------------------------------------------------------------------------
-local function unavailable_pill(label)
-	return {
-		n = G.UIT.C,
-		config = {
-			align = "cm",
-			minw = 4.5,
-			minh = 0.85,
-			padding = 0.08,
-			r = 0.1,
-			emboss = 0.05,
-			colour = G.C.UI.BACKGROUND_INACTIVE,
-		},
-		nodes = {
-			{
-				n = G.UIT.R,
-				config = { align = "cm" },
-				nodes = { { n = G.UIT.T, config = { text = label, scale = 0.45, colour = G.C.UI.TEXT_INACTIVE } } },
-			},
-			{
-				n = G.UIT.R,
-				config = { align = "cm" },
-				nodes = {
-					{
-						n = G.UIT.T,
-						config = { text = "Available in Solo and Practice", scale = 0.3, colour = G.C.UI.TEXT_INACTIVE },
-					},
-				},
-			},
-		},
-	}
-end
-
--- The editor is local-only for now, so on the lobby (mp) path we stub the tab.
--- It stays fully functional in sp / practice.
-local function unavailable_root()
-	return {
-		n = G.UIT.ROOT,
-		config = { align = "cm", colour = G.C.CLEAR, minh = 6, minw = 15 },
-		nodes = {
-			{ n = G.UIT.R, config = { align = "cm" }, nodes = { unavailable_pill("Custom Rulesets") } },
-		},
-	}
-end
-
 local BASE_DESCRIPTIONS = {
 	Vanilla = "Original cards and balance",
 	Standard = "Multiplayer cards and balance changes",
@@ -232,7 +189,8 @@ local function divider()
 end
 
 function MP.UI.build_custom_ruleset_editor(mode)
-	if mode == "mp" then return unavailable_root() end
+	-- Mystery Mix is local-only; multiplayer always exposes the selected rules.
+	if mode == "mp" then MP.MUTATORS_HIDDEN = false end
 	MP.CUSTOM.editor_mode = mode -- so Play knows which start flow to take
 	MP.CUSTOM.draft = MP.CUSTOM.draft or MP.CUSTOM.new_draft()
 	local d = MP.CUSTOM.draft
@@ -274,7 +232,7 @@ function MP.UI.build_custom_ruleset_editor(mode)
 		n = G.UIT.R,
 		config = { align = "cm", padding = 0.06 },
 		nodes = {
-			MP.UI.build_mutator_actions(),
+			MP.UI.build_mutator_actions(mode),
 			{ n = G.UIT.B, config = { w = 0.4, h = 0.1 } },
 			MP.UI.build_chaos_clock_control(),
 			{ n = G.UIT.B, config = { w = 0.4, h = 0.1 } },

@@ -42,6 +42,8 @@ function G.FUNCS.create_lobby(e)
 	MP.SP.ruleset = nil
 	MP.GHOST.clear()
 	MP.MODIFIERS = {}
+	if MP.CUSTOM then MP.CUSTOM.selecting_gamemode = false end
+	MP.MUTATORS_HIDDEN = false
 
 	G.FUNCS.overlay_menu({
 		definition = G.UIDEF.ruleset_selection_tabs("mp"),
@@ -53,6 +55,16 @@ function G.FUNCS.select_gamemode(e)
 
 	G.FUNCS.overlay_menu({
         definition =  G.UIDEF.gamemode_selection_tabs(),
+	})
+end
+
+-- Returning from gamemode selection is not a fresh lobby setup: preserve the
+-- custom base and ordered modifiers instead of routing through create_lobby.
+function G.FUNCS.mp_gamemode_back(e)
+	if not (MP.CUSTOM and MP.CUSTOM.selecting_gamemode) then return G.FUNCS.create_lobby(e) end
+	MP.CUSTOM.selecting_gamemode = false
+	G.FUNCS.overlay_menu({
+		definition = G.UIDEF.ruleset_selection_tabs("mp", "Custom"),
 	})
 end
 

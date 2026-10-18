@@ -653,7 +653,7 @@ local function small_button(id, func, label, colour, description)
 end
 
 -- These callbacks update MP.MODIFIERS; live controls refresh from that state.
-function MP.UI.build_mutator_actions()
+function MP.UI.build_mutator_actions(mode)
 	return {
 		n = G.UIT.C,
 		config = { align = "cm" },
@@ -667,17 +667,47 @@ function MP.UI.build_mutator_actions()
 				"and a Chaos Clock setting.",
 				"Keeps your Joker selections.",
 			}),
-			small_button("mp_mystery_mix_btn", "mp_mystery_mix", "Mystery Mix", G.C.PURPLE, {
+			mode ~= "mp" and small_button("mp_mystery_mix_btn", "mp_mystery_mix", "Mystery Mix", G.C.PURPLE, {
 				"Choose a random setup",
 				"and keep it hidden.",
 				"Change any house rule to reveal it.",
-			}),
+			}) or nil,
 		},
 	}
 end
 
 -- The clock preset is a variant cycle stored in MP.MODIFIERS for lobby sync.
 local CLOCK = MP.CHAOS_CLOCK.CYCLE
+
+-- Shared by the lobby readout. Use the same cycles and registry as the editor,
+-- but never its local draft or hidden state. Compound variants appear once.
+function MP.UI.selected_modifier_labels()
+	local labels, described = {}, {}
+	local function cycle_label(cycle, prefix, options, include_default)
+		local variant, i = MP.variant_of(cycle)
+		if i == 1 and not include_default then return end
+		labels[#labels + 1] = (prefix or "") .. (options and options[i] or variant.label)
+		local mods = type(variant.mod) == "table" and variant.mod or { variant.mod }
+		for _, name in ipairs(mods) do
+			described[name] = true
+		end
+	end
+	cycle_label(TIMER, "Timer: ", localize("ml_mp_modifier_timer_opt"), true)
+	cycle_label(GLASS, "Glass: ", nil, true)
+	cycle_label(CLOCK, "Chaos Clock: ", nil, true)
+	each_live_cell(function(def)
+		if def.variants then cycle_label(def) end
+	end)
+	for _, name in ipairs(MP.MODIFIERS) do
+		if not described[name] then
+			local def = MP.MUTATORS[name]
+			labels[#labels + 1] = def and def.label
+				or (name == "pvp_timer" and localize("b_opts_modifier_pvp_timer"))
+				or name
+		end
+	end
+	return labels
+end
 
 -- Off cells the clock can switch on, plus its own one-shot events.
 function MP.UI.chaos_clock_pool()
