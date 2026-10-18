@@ -597,6 +597,7 @@ local function action_lobby_options(options)
 			goto continue
 		end
 		if k == "modifier_layers" then
+			v = MP.modifiers_wire_decode(v)
 			MP.LOBBY.config.modifier_layers = v
 			MP.modifiers_parse(v)
 			goto continue
@@ -1248,6 +1249,7 @@ function MP.ACTIONS.lobby_options()
 	for k, v in pairs(MP.LOBBY.config) do
 		msg[tostring(k)] = v
 	end
+	msg.modifier_layers = MP.modifiers_wire_encode()
 	Client.send(msg)
 end
 
