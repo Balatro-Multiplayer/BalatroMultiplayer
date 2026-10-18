@@ -269,6 +269,11 @@ PVP.setup_lobby_mirror = function(lobby)
 			mirror_metadata(lobby)
 		end
 		mirror_players(lobby)
+		-- A crash-rejoin resumes a run that was rebuilt with no lobby, so its
+		-- HUD has no Lives or Timer box until the lobby is back.
+		if G.STAGE == G.STAGES.RUN and PVP.UI and PVP.UI.apply_lobby_hud then
+			pcall(PVP.UI.apply_lobby_hud)
+		end
 		refresh()
 	end)
 

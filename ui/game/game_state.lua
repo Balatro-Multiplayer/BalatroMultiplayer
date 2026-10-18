@@ -336,11 +336,50 @@ function Game:start_run(args)
 	-- lives (practice has no life system, see update_new_round's practice branch) and
 	-- doing it synchronously at run start raced with other HUD setup in local-lobby
 	-- testing (no risk in a real lobby, which has natural network pacing beforehand).
-	local show_lives_hud = PVP.LOBBY.connected and PVP.LOBBY.code
-	if not show_lives_hud or PVP.LOBBY.config.disable_live_and_timer_hud then return end
+	PVP.UI.apply_lives_hud()
+end
+
+local function lobby_hud_shown()
+	return PVP.LOBBY.connected and PVP.LOBBY.code and not PVP.LOBBY.config.disable_live_and_timer_hud
+end
+
+-- The run HUD gets its Timer box (lovely/hud.toml) only when it is built
+-- inside a lobby. A crash-rejoin rebuilds the run with no lobby and joins it
+-- afterwards, so the box is put in then, in place of the Round box.
+function PVP.UI.apply_timer_hud()
+	if not (G.HUD and lobby_hud_shown()) or G.HUD:get_UIE_by_ID("timer_UI_count") then
+		return
+	end
+	local definition = PVP.UI.timer_hud()
+	local hud_ante = G.HUD:get_UIE_by_ID("hud_ante")
+	local row = hud_ante and hud_ante.parent
+	if not (definition and row and #row.children >= 3) then
+		return
+	end
+	-- The Round box is the row's last child (Ante box, spacer, Round box).
+	local round_box = row.children[#row.children]
+	round_box:remove()
+	row.children[#row.children] = nil
+	G.HUD:add_child(definition, row)
+	if G.hand_text_area then
+		G.hand_text_area.round = nil
+	end
+end
+
+-- Lobby-only HUD pieces, for a run that was built before its lobby was joined.
+function PVP.UI.apply_lobby_hud()
+	PVP.UI.apply_timer_hud()
+	PVP.UI.apply_lives_hud()
+end
+
+-- Turns the Ante box into the Lives box. Reads PVP.GAME by reference, so it is
+-- built again whenever PVP.GAME is replaced (PVP.reset_game_states).
+function PVP.UI.apply_lives_hud()
+	if not (G.HUD and lobby_hud_shown()) then return end
 
 	local scale = 0.4
 	local hud_ante = G.HUD:get_UIE_by_ID("hud_ante")
+	if not hud_ante then return end
 	hud_ante.children[1].children[1].config.text = localize("k_lives")
 
 	-- Set lives number
