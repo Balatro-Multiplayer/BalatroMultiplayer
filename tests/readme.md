@@ -1,186 +1,113 @@
 # Tests
 
-## Ruleset Shape Snapshot
+Run commands from the repository root. Headless tests use stubbed game globals;
+they do not require Balatro. Use LuaJIT unless a command below specifies `lua`.
+Shared stubs are in `_stubs.lua`.
 
-`test_ruleset_shape.lua` guards the data shape of every ruleset against accidental drift during refactors. It stubs minimal game globals, loads all ruleset files, and diffs each ruleset's ban lists, rework lists, scalars, and function hook presence against a checked-in baseline (`ruleset_shape.snapshot.lua`).
+## Headless tests
 
-The snapshot is **committed to the repo** — treat it like a lock file. Regenerate it only when you intentionally change ruleset structure (adding a ruleset, changing a ban list, etc.). If the test fails and you didn't mean to change anything, something broke.
+| Command | Coverage |
+| --- | --- |
+| `luajit tests/test_mutator_registry.lua` | Mutator metadata, category/order uniqueness, layer flags, variants, and Chaos Clock eligibility. |
+| `luajit tests/test_multiplayer_content.lua` | MP card pool gating; Base/On/Off overrides; pool-slot parity across multiplayer, solo, and practice; lobby options; modifier encoding; replay pool reconstruction. |
+| `luajit tests/test_custom_multiplayer.lua` | Custom editor navigation, lobby creation, variant labels, host/guest rule readouts, and live overlay updates. Also runs the multiplayer-content tests. |
+| `luajit tests/test_rng_determinism.lua` | Seeded RNG and Chaos Clock schedules across clients with different query orders and unrelated RNG work; preset severity rates. |
+| `luajit tests/test_round_deltas.lua` | Glass Cannon hand-count changes, deck stacking, the one-hand minimum, and application/restoration of temporary clock effects. |
+| `luajit tests/test_chaos_forecast.lua` | Forecast/application agreement across seeds and antes, divergent blind skips, run-long effects, and hidden instant effects. |
+| `lua tests/test_rlog_roundtrip.lua` | Replay-log framing, action sequence, positional arguments, paired human-readable lines, and checksum round-trip. |
+| `lua tests/test_rlog_checksum.lua` | Carbon-stream checksum recomputation and detection of edited opcodes. |
+| `lua tests/test_rlog_stream.lua` | Replay-log batching, complete delivery, and consistent game IDs across streamed lines and final hash submission. |
+| `lua tests/test_serialization_guard.lua` | Reject oversized or non-string payloads before decoding; round-trip a small payload with stubbed codecs. |
 
-Requires Lua 5.4+ (or LuaJIT). Run from the repo root.
+The multiplayer tests exercise the client sender and guest dispatcher with
+mocked transport. Modifier tests simulate the relay's 64-character field limit,
+including selections taken from truncated lobby messages. They do not connect
+to a server or start a game.
 
-### Workflow
+The RNG test requires LuaJIT because vanilla `pseudorandom` seeds `math.random`
+with a fraction.
+
+### Ruleset snapshot
 
 ```bash
-# Run the test — exits 0 if shapes match, 1 with a diff on mismatch
 lua tests/test_ruleset_shape.lua test
+```
 
-# Regenerate the snapshot after intentional structural changes
+Compares ruleset ban/rework lists, scalar fields, and function-hook presence
+against `tests/ruleset_shape.snapshot.lua`. It does not compare function bodies,
+run hooks, or check `MP.ReworkCenter` definitions.
+
+The snapshot currently has known failures from stale expectations and the
+loader not finding nested ruleset files. Do not regenerate it merely to clear
+those failures.
+
+After an intentional ruleset structure change:
+
+```bash
 lua tests/test_ruleset_shape.lua capture
 ```
 
-After `capture`, review the diff in `tests/ruleset_snapshot.lua` before committing — it should reflect exactly the changes you intended and nothing else.
-
-### What it checks
-
-- All `banned_*` and `reworked_*` arrays (sorted for stable comparison)
-- Scalars: `key`, `multiplayer_content`, `standard`, `forced_gamemode`, `forced_lobby_options`
-- Presence of function hooks: `create_info_menu`, `force_lobby_options`, `is_disabled`
-- Missing or unexpected rulesets
-
-### What it does not check
-
-- Function bodies (only whether a function is defined)
-- Runtime behavior (ApplyBans hook chains, smallworld cull logic, speedlatro timer)
-- Rework center definitions (`MP.ReworkCenter` calls)
-
-## Replay Log (MP.RLOG)
-
-`test_rlog_roundtrip.lua` and `test_rlog_checksum.lua` exercise the dual-stream
-replay logger (`lib/replay_log.lua`). They stub the game globals, capture the
-lines it emits to the Lovely log, and assert on them — no files are written.
-
-Both streams live in the ordinary Lovely log, distinguished by prefix:
-- **Carbon (positional/replay):** `MP_RLOG:` — e.g. `MP_RLOG: 5 buy 1 2`, plus
-  `MP_RLOG: MANIFEST {...}` and the `MP_RLOG: CHK v1 carbon=… human=… bytes=…`
-  trailer.
-- **Human-readable:** `Client sent message:` — the existing website-parser
-  format, e.g. `Client sent message: action:boughtCardFromShop,card:Blueprint,cost:4`.
-
-```bash
-lua tests/test_rlog_roundtrip.lua   # streams well-formed + hashes round-trip
-lua tests/test_rlog_checksum.lua    # editing one opcode changes the stored hash
-```
-
-`test_rlog_roundtrip.lua` asserts: `MP_RLOG: MANIFEST` header + `END`/`CHK`
-trailer; carbon action lines with a gapless, monotonic sequence; positional args
-including ordered index-lists (e.g. `play 1.3.5.7.8`, `use 1 2.4`) intact; a
-paired `Client sent message:` line per action; and `CHK` per-stream hashes that
-equal a recompute over the captured lines and match what `submit_log_hashes`
-sends.
-
-`test_rlog_checksum.lua` confirms the `CHK` carbon hash equals a hash of the
-carbon stream (re-extracted by prefix) and that tampering with one opcode
-changes it.
-
-### Manual end-to-end check
-
-Play one real multiplayer match, then open the Lovely log. Filter the `MP_RLOG:`
-(positional) and `Client sent message:` (human) lines and confirm they mirror
-each action event-for-event.
-
-## Mutator registry
-
-### Custom multiplayer lobby flow
-
-```bash
-luajit tests/test_custom_multiplayer.lua
-bash scripts/run_scenario.sh custom_multiplayer
-```
-
-The LuaJIT test extends the content/network harness with custom editor
-navigation, lobby creation callbacks, compound-variant labels, and the live
-read-only rules overlay. It checks a host options payload through the actual
-client sender/guest dispatcher, including a guest with a different local draft.
-It does **not** exercise the relay or a running game.
-
-The opt-in scenario checks the actual editor, gamemode Back navigation, and
-rules overlay (including live changes and a full wall). It does not create a
-network lobby. The installed mod must point to the checkout under test.
-
-Before calling the feature multiplayer-playtested:
-
-1. Host: Create Lobby → Custom. Choose a base, MP Jokers On/Off, timer/glass
-   variants, several rules, and a Chaos Clock preset.
-2. Go Next → Back; verify the base and selections survive. Create the lobby
-   with the desired gamemode. Also try Experimental's forced Attrition route.
-3. Guest: join from a second client. Open View Rules on both clients; compare
-   base, gamemode, content selection, timer/glass variants, and clock preset.
-4. While the guest keeps View Rules open, toggle MP Jokers in the host's
-   existing lobby options. Verify the guest readout updates.
-5. Start a seeded match. Compare forecasts, take different skip paths, and
-   confirm future forecasts remain aligned and selected effects actually run.
-6. Check an ordinary preset lobby still creates/starts normally. For a locked
-   ruleset, View Rules should remain available even without Lobby Options.
-
-`test_multiplayer_content.lua` registers the original MP cards and checks native
-layer gating, Base/On/Off overrides, and exact pool-slot parity between live,
-solo, and practice contexts. It also exercises the lobby checkbox, wire
-round-trip, legacy booleans, and recorded pool settings through replay loading.
-
-```bash
-luajit tests/test_multiplayer_content.lua
-```
-
-`test_mutator_registry.lua` loads every layer and checks the custom editor's
-wall (`MP.MUTATORS`, filled by `mutator = {...}` on each layer) against the
-layers behind it: known category, label + desc, unique `(category, order)`
-slot, live cells whose layer actually does something, every `flag` read
-somewhere, variant cells pointing at real layers, Chaos Clock specs
-(`at` / `lasts` / `severity`) valid and present on every switchable cell, the
-clock pool skipping On cells, and on state plus the clock preset surviving the `modifier_layers`
-sync string.
-
-```bash
-luajit tests/test_mutator_registry.lua
-```
-
-## RNG determinism
-
-`test_rng_determinism.lua` simulates two clients on one seed that do different
-amounts of unrelated RNG work and query in a different order, and asserts that
-`MP.rng` rolls and the Chaos Clock schedule (ante and per-blind rolls) all
-agree. Also checks each preset's per-severity rate, and that Calm never draws
-severity 3. LuaJIT only — vanilla
-`pseudorandom` seeds `math.random` with a fraction.
-
-```bash
-luajit tests/test_rng_determinism.lua
-```
-
-## Round deltas
-
-`test_round_deltas.lua` covers layer `round_deltas` through Glass Cannon's -2
-hands: stacking with the deck (Black Deck 3 -> 1), the 1-hand floor, and the
-Chaos Clock drawing it per ante: applied once, restored when not drawn, moving
-the live round's `hands_left`, and leaving an On cell alone.
-
-```bash
-luajit tests/test_round_deltas.lua
-```
-
-`_stubs.lua` holds the hook-target globals layer files wrap at load time; the
-shape test and the tests above load it.
+Review the diff in `tests/ruleset_shape.snapshot.lua` before committing.
 
 ## In-game scenarios
 
-`scenarios/_runner.lua` is loaded by `core.lua` only when `MP_SCENARIO` is set.
-A scenario (`scenarios/<name>.lua`) is a list of timed steps that drive the
-game, log `MP_SCENARIO PASS|FAIL ...` lines to the Lovely log and save
-screenshots to `.context/scenarios/<name>/`.
-The runner suppresses the development-warning modal for that process only;
-no `.env` override is needed.
+Requirements:
+
+- macOS with Balatro, Lovely, and the mod's dependencies installed.
+- `Mods/BalatroMultiplayer` points to the checkout being tested.
+- Balatro is closed before starting a scenario.
+- The screen stays unlocked and awake; LÖVE can block in `present()` otherwise.
 
 ```bash
-bash scripts/run_scenario.sh custom_wall   # editor wall: states, counts, idol, Mystery Mix
-bash scripts/run_scenario.sh chaos_run     # practice run: Chaos Clock on Mayhem, On cell skipped, sandbox groups
-bash scripts/run_scenario.sh glass_cannon  # Black Deck + Glass Cannon: 1 hand
-bash scripts/run_scenario.sh mp_content    # MP Jokers Base/On/Off pools in practice, every MP Joker through a solo round
+bash scripts/run_scenario.sh custom_wall
+bash scripts/run_scenario.sh custom_multiplayer
+bash scripts/run_scenario.sh chaos_run
+bash scripts/run_scenario.sh glass_cannon
+bash scripts/run_scenario.sh mp_content
 ```
 
-macOS only, needs the `Mods/BalatroMultiplayer` symlink pointing at the
-checkout and an unlocked screen (LÖVE blocks in `present()` behind the lock
-screen and never leaves the loading screen).
+| Scenario | Coverage |
+| --- | --- |
+| `custom_wall` | Editor states, selection counts, Idol variants, and Mystery Mix. |
+| `custom_multiplayer` | Multiplayer editor, gamemode Back navigation, and rules overlay updates/layout. Does not create a network lobby. |
+| `chaos_run` | Mayhem clock in practice, exclusion of already-selected effects, and sandbox groups. |
+| `glass_cannon` | Black Deck plus Glass Cannon reaching the one-hand minimum. |
+| `mp_content` | MP Jokers Base/On/Off pools in practice and MP Jokers through a solo round. |
 
-## Chaos Clock forecast
+The script launches the game, waits for it to exit, and reports `MP_SCENARIO`
+lines from the Lovely log. Exit status is zero only when the scenario reports
+`DONE` with no failures. Screenshots are saved to `.context/scenarios/<name>/`.
 
-`test_chaos_forecast.lua` runs the clock over 8 antes for 30 seeds on Mayhem
-(plus one on Normal) as two clients: one plays every blind, one skips every
-Small. It checks that what goes live at a blind is exactly that slot's forecast,
-that a skipped blind's draw never goes live, that both clients get the same
-forecast every ante, that a run-long pick is never drawn twice, and that
-instants show as `?`. A test-only severity 3 blind window (`test_storm`) makes
-the skip checks bite: the live pool has none.
+Set `BALATRO_DIR` to override the Steam game directory or `SCENARIO_TIMEOUT`
+to override the default 120-second timeout.
 
-```bash
-luajit tests/test_chaos_forecast.lua
-```
+Scenarios live in `tests/scenarios/`. `core.lua` loads `_runner.lua` only when
+`MP_SCENARIO` is set. The runner suppresses the development-warning modal for
+that process without changing `.env`.
+
+## Manual multiplayer checks
+
+Use two clients running the same mod revision.
+
+1. Create Lobby → Custom. Select a base, MP Jokers setting, timer/glass
+   variants, several modifiers, and a Chaos Clock preset.
+2. Go Next → Back and check that selections are preserved. Create the lobby
+   with the chosen gamemode. Also check Experimental's forced Attrition route.
+3. Join with the second client. Compare View Rules on both clients, including
+   a selection whose comma-separated names would exceed 64 characters.
+4. Leave View Rules open on the guest. Toggle MP Jokers in the host's Lobby
+   Options and check that the guest readout updates.
+5. Start a seeded match. Compare forecasts, take different skip paths, and
+   check that future forecasts agree and selected effects run.
+6. Create and start a preset lobby. Check that View Rules is also available
+   for locked rulesets without Lobby Options.
+
+### Replay logs
+
+After a match, compare the action streams in the Lovely log:
+
+- Positional: `MP_RLOG:`, including the `MANIFEST` header and `END`/`CHK` trailer.
+- Human-readable: `Client sent message:`, for example
+  `action:boughtCardFromShop,card:Blueprint,cost:4`.
+
+Each recorded action should have a corresponding entry in both streams.
