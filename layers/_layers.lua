@@ -244,6 +244,56 @@ function MP.modifiers_serialize()
 	return table.concat(MP.MODIFIERS, ",")
 end
 
+-- The server grants us 64 characters to describe a ruleset.
+-- Put the modifiers in the tiny clown car in the same order.
+-- IDs are append-only wire protocol; keep readable names everywhere else.
+-- v1:NN carries a count so truncation fails loudly
+-- instead of quietly giving the guest a different game.
+-- stylua: ignore
+local wire_names = {
+	"no_animation_timer", "pressure_timer", "pressure_timer_plus", "pvp_timer",
+	"speedlatro_timer", "glass_vanilla", "glass_standard", "glass_legacy",
+	"glass_experimental", "multiplayer_jokers", "no_multiplayer_jokers",
+	"inflation", "no_interest", "discard_tax", "frugal", "spartan", "pricey_packs",
+	"bigger_shop", "gambling_opportunity", "no_uncommons", "flipped_cards",
+	"debuff_played_cards", "all_eternal", "chip_cap", "shrinking_hand",
+	"glass_cannon", "no_red_seals", "eeeee", "polymorph_spam", "shared_pockets",
+	"score_instability", "wraith_rework", "sandbox_rotation", "sandbox_retired",
+	"sandbox_extra_credit", "idol_zealot", "idol_collector", "idol_both", "idol_none",
+	"clock_calm", "clock_normal", "clock_mayhem", "smallworld", "sandbox",
+	"standard", "experimental", "classic", "ranked", "release",
+}
+local wire_alphabet = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"
+local wire_ids = {}
+for i, name in ipairs(wire_names) do
+	wire_ids[name] = wire_alphabet:sub(i, i)
+end
+
+function MP.modifiers_wire_encode()
+	local ids = {}
+	for i, name in ipairs(MP.MODIFIERS) do
+		ids[i] = assert(wire_ids[name], "No wire ID for modifier: " .. name)
+	end
+	local encoded = ("v1:%02d%s"):format(#ids, table.concat(ids))
+	assert(#encoded <= 64, "Modifier selection exceeds the server's 64-character limit")
+	return encoded
+end
+
+function MP.modifiers_wire_decode(s)
+	if not s or s:sub(1, 3) ~= "v1:" then
+		assert(not s or not s:match("^v%d+:"), "Unsupported modifier wire version")
+		return s -- Old clients and recorded lobby messages use comma-separated names.
+	end
+	local count = tonumber(s:sub(4, 5))
+	assert(count and #s == count + 5, "Truncated or malformed modifier payload")
+	local names = {}
+	for i = 6, #s do
+		local id = wire_alphabet:find(s:sub(i, i), 1, true)
+		names[#names + 1] = assert(id and wire_names[id], "Unknown modifier wire ID")
+	end
+	return table.concat(names, ",")
+end
+
 function MP.modifiers_parse(s)
 	MP.MODIFIERS = {}
 	if not s or s == "" then return end

@@ -27,7 +27,7 @@ function MP.GHOST.load(replay)
 		MP.SP.ruleset = ruleset_key
 		local short = ruleset_key:gsub("^ruleset_mp_", "")
 		MP.apply_default_modifiers(short)
-		if replay.modifier_layers ~= nil then MP.modifiers_parse(replay.modifier_layers) end
+		if replay.modifier_layers ~= nil then MP.modifiers_parse(MP.modifiers_wire_decode(replay.modifier_layers)) end
 		MP.import_multiplayer_jokers(replay.multiplayer_jokers)
 		MP.LoadReworks(short)
 	end

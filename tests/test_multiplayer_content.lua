@@ -258,7 +258,7 @@ MP.set_multiplayer_jokers(false)
 MP.ACTIONS.lobby_options()
 local sent = json.decode(channels.uiToNetwork:pop())
 check(sent.multiplayer_jokers == false, "wire boolean must reflect native Off")
-check(sent.modifier_layers == "no_multiplayer_jokers", "wire modifiers lost Off")
+check(MP.modifiers_wire_decode(sent.modifier_layers) == "no_multiplayer_jokers", "wire modifiers lost Off")
 context("vanilla", "live")
 channels.networkToUi:push(json.encode(sent))
 Game:update(0)
@@ -279,6 +279,51 @@ receive({ modifier_layers = "pvp_timer,multiplayer_jokers,glass_vanilla", multip
 check(MP.modifiers_serialize() == "pvp_timer,multiplayer_jokers,glass_vanilla", "import changed modifier ordering")
 receive({ modifier_layers = "no_multiplayer_jokers,pvp_timer" })
 check(not MP.LOBBY.config.multiplayer_jokers, "native-only update did not refresh the legacy view")
+
+-- Every registered layer fits in one server-capped field, in either order.
+-- This also catches new layers missing an explicit, stable wire ID.
+local all_layers = {}
+for name in pairs(MP.Layers) do
+	all_layers[#all_layers + 1] = name
+end
+table.sort(all_layers)
+MP.MODIFIERS = all_layers
+local readable = MP.modifiers_serialize()
+local packed = MP.modifiers_wire_encode()
+check(#packed <= 64, "full layer registry exceeds the relay limit")
+check(MP.modifiers_wire_decode(packed:sub(1, 64)) == readable, "relay cap changed the selection")
+check(MP.modifiers_wire_decode("v1:00") == "", "empty compact selection failed")
+check(MP.modifiers_wire_decode(readable) == readable, "legacy names no longer accepted")
+check(not pcall(MP.modifiers_wire_decode, packed:sub(1, -2)), "truncated payload accepted")
+check(not pcall(MP.modifiers_wire_decode, "v1:01!"), "unknown ID accepted")
+check(not pcall(MP.modifiers_wire_decode, "v2:00"), "unknown version accepted")
+MP.MODIFIERS = { "bigger_shop", "wraith_rework", "debuff_played_cards", "eeeee", "smallworld" }
+local ordered = MP.modifiers_serialize()
+MP.ACTIONS.lobby_options()
+local compact_options = json.decode(channels.uiToNetwork:pop())
+check(#compact_options.modifier_layers <= 64, "sender did not compact modifiers")
+check(MP.LOBBY.config.modifier_layers == ordered, "sender compacted local state")
+MP.MODIFIERS = {}
+receive(compact_options)
+check(MP.modifiers_serialize() == ordered, "guest lost modifier order through actual dispatch")
+check(MP.LOBBY.config.modifier_layers == ordered, "guest retained compact wire state")
+for _, selection in ipairs({
+	"inflation,discard_tax,frugal,bigger_shop,smallworld,pricey_packs,sandbox_retired,sandbox_extra_credit,idol_collector,wraith_rework,polymorph_spam",
+	"no_interest,gambling_opportunity,no_red_seals,smallworld,eeeee,debuff_played_cards,wraith_rework,bigger_shop",
+}) do
+	MP.modifiers_parse(selection)
+	MP.ACTIONS.lobby_options()
+	local options = json.decode(channels.uiToNetwork:pop())
+	options.modifier_layers = options.modifier_layers:sub(1, 64)
+	MP.MODIFIERS = {}
+	receive(options)
+	check(MP.modifiers_serialize() == selection, "recorded lobby selection did not survive relay cap")
+end
+MP.MODIFIERS = { "no_animation_timer", "pressure_timer" }
+check(MP.modifiers_wire_encode() == "v1:0201", "stable wire IDs changed")
+MP.GHOST.load({ ruleset = "ruleset_mp_vanilla", modifier_layers = "v1:0201" })
+check(MP.modifiers_serialize() == "no_animation_timer,pressure_timer", "compact lobby logs broke ghost replay")
+context("blitz", "live")
 
 -- The existing checkbox now edits the same native choice as the wall.
 MP.UI.Disableable_Toggle = function(args)
