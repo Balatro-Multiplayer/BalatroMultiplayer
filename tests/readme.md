@@ -70,6 +70,38 @@ each action event-for-event.
 
 ## Mutator registry
 
+### Custom multiplayer lobby flow
+
+```bash
+luajit tests/test_custom_multiplayer.lua
+bash scripts/run_scenario.sh custom_multiplayer
+```
+
+The LuaJIT test extends the content/network harness with custom editor
+navigation, lobby creation callbacks, compound-variant labels, and the live
+read-only rules overlay. It checks a host options payload through the actual
+client sender/guest dispatcher, including a guest with a different local draft.
+It does **not** exercise the relay or a running game.
+
+The opt-in scenario checks the actual editor, gamemode Back navigation, and
+rules overlay (including live changes and a full wall). It does not create a
+network lobby. The installed mod must point to the checkout under test.
+
+Before calling the feature multiplayer-playtested:
+
+1. Host: Create Lobby → Custom. Choose a base, MP Jokers On/Off, timer/glass
+   variants, several rules, and a Chaos Clock preset.
+2. Go Next → Back; verify the base and selections survive. Create the lobby
+   with the desired gamemode. Also try Experimental's forced Attrition route.
+3. Guest: join from a second client. Open View Rules on both clients; compare
+   base, gamemode, content selection, timer/glass variants, and clock preset.
+4. While the guest keeps View Rules open, toggle MP Jokers in the host's
+   existing lobby options. Verify the guest readout updates.
+5. Start a seeded match. Compare forecasts, take different skip paths, and
+   confirm future forecasts remain aligned and selected effects actually run.
+6. Check an ordinary preset lobby still creates/starts normally. For a locked
+   ruleset, View Rules should remain available even without Lobby Options.
+
 `test_multiplayer_content.lua` registers the original MP cards and checks native
 layer gating, Base/On/Off overrides, and exact pool-slot parity between live,
 solo, and practice contexts. It also exercises the lobby checkbox, wire
@@ -125,6 +157,8 @@ shape test and the tests above load it.
 A scenario (`scenarios/<name>.lua`) is a list of timed steps that drive the
 game, log `MP_SCENARIO PASS|FAIL ...` lines to the Lovely log and save
 screenshots to `.context/scenarios/<name>/`.
+The runner suppresses the development-warning modal for that process only;
+no `.env` override is needed.
 
 ```bash
 bash scripts/run_scenario.sh custom_wall   # editor wall: states, counts, idol, Mystery Mix

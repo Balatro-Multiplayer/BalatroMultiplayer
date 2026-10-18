@@ -20,6 +20,10 @@ local name = os.getenv("MP_SCENARIO")
 local S = { name = name, pass = 0, fail = 0 }
 MP.SCENARIO = S
 
+-- This runner is loaded only for an opt-in scenario boot. Suppress the modal
+-- before the main menu opens, without changing .env or persistent settings.
+MP.EXPERIMENTAL.suppress_dev_warning = true
+
 local function emit(msg)
 	sendInfoMessage("MP_SCENARIO " .. msg, "MULTIPLAYER")
 end

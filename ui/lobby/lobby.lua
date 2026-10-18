@@ -74,6 +74,16 @@ function G.UIDEF.create_UIBox_lobby_menu()
 									align = "cm",
 								},
 								nodes = {
+									UIBox_button({
+										button = "mp_view_lobby_rules",
+										colour = G.C.BLUE,
+										minw = 3.15,
+										minh = 0.6,
+										label = { "View Rules" },
+										scale = text_scale,
+										col = true,
+									}),
+									MP.UI.create_spacer(),
 									not MP.LOBBY.config.forced_config and UIBox_button({
 										button = "lobby_options",
 										colour = G.C.ORANGE,

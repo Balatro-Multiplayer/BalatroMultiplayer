@@ -41,7 +41,7 @@ function G.UIDEF.gamemode_selection_tabs()
         }
     }
     local t = create_UIBox_generic_options({
-		back_func = "create_lobby",
+		back_func = "mp_gamemode_back",
 		contents = {
 			{
 				n = G.UIT.R,
