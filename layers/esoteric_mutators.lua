@@ -9,6 +9,7 @@ MP.Layer("flipped_cards", {
 		label = "Blind Poker",
 		clock = { at = "blind", lasts = "blind", severity = 2 },
 		desc = { "All cards are drawn face down." },
+		credits = { code = { "steph" } },
 	},
 })
 
@@ -21,6 +22,7 @@ MP.Layer("debuff_played_cards", {
 		clock = { at = "ante", lasts = "ante", severity = 3 },
 		desc = { "After scoring, cards become", "debuffed for the rest of the run." },
 		clock_note = { "Cards already debuffed", "stay debuffed." },
+		credits = { code = { "steph" } },
 	},
 })
 
@@ -33,6 +35,7 @@ MP.Layer("all_eternal", {
 		clock = { at = "ante", lasts = "ante", severity = 3 },
 		desc = { "All newly created Jokers", "are Eternal." },
 		clock_note = { "Jokers already made Eternal", "stay Eternal." },
+		credits = { code = { "steph" } },
 	},
 })
 
@@ -44,6 +47,7 @@ MP.Layer("chip_cap", {
 		label = "Cash Ceiling",
 		clock = { at = "blind", lasts = "blind", severity = 2 },
 		desc = { "Before multiplying, Chips", "cannot exceed your money." },
+		credits = { code = { "steph" } },
 	},
 })
 
@@ -55,6 +59,7 @@ MP.Layer("shrinking_hand", {
 		label = "Heavy Pockets",
 		clock = { at = "ante", lasts = "ante", severity = 2 },
 		desc = { "-1 hand size for every", "$10 you have." },
+		credits = { code = { "steph" } },
 	},
 })
 

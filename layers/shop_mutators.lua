@@ -7,5 +7,6 @@ MP.Layer("bigger_shop", {
 		order = 6,
 		label = "Bigger Shop",
 		desc = { "+1 card slot in the shop." },
+		credits = { code = { "steph" } },
 	},
 })

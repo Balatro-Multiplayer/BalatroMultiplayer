@@ -12,7 +12,7 @@ MP.Layer("inflation", {
 		label = "Inflation",
 		clock = { at = "ante", lasts = "ante", severity = 2 },
 		desc = { "Each purchase increases", "shop prices by $1." },
-		credits = { idea = { "Kars" } },
+		credits = { idea = { "Kars" }, code = { "steph" } },
 	},
 })
 
@@ -25,6 +25,7 @@ MP.Layer("no_interest", {
 		label = "No Interest",
 		clock = { at = "ante", lasts = "ante", severity = 2 },
 		desc = { "Earn no interest." },
+		credits = { code = { "steph" } },
 	},
 })
 
@@ -37,6 +38,7 @@ MP.Layer("discard_tax", {
 		label = "Discard Tax",
 		clock = { at = "blind", lasts = "blind", severity = 1 },
 		desc = { "Each discard costs $1." },
+		credits = { code = { "steph" } },
 	},
 })
 
@@ -49,6 +51,7 @@ MP.Layer("frugal", {
 		label = "Waste Not",
 		clock = { at = "blind", lasts = "blind", severity = 1 },
 		desc = { "Earn $1 for each unused discard", "at end of round." },
+		credits = { code = { "steph" } },
 	},
 })
 
@@ -62,6 +65,7 @@ MP.Layer("spartan", {
 		label = "Spartan",
 		clock = { at = "ante", lasts = "ante", severity = 1 },
 		desc = { "Small and Big Blinds", "give no reward money." },
+		credits = { code = { "steph" } },
 	},
 })
 
@@ -75,5 +79,6 @@ MP.Layer("pricey_packs", {
 		label = "Pricey Packs",
 		clock = { at = "ante", lasts = "ante", severity = 1 },
 		desc = { "Booster Packs cost $1 extra", "for each Ante after Ante 1." },
+		credits = { code = { "steph" } },
 	},
 })

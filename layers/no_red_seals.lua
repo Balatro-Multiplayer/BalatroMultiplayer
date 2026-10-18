@@ -9,6 +9,7 @@ MP.Layer("no_red_seals", {
 		order = 3,
 		label = "No Red Seals",
 		desc = { "Cards cannot gain Red Seals.", "Deja Vu cannot appear." },
+		credits = { idea = { "Kars" }, code = { "steph" } },
 	},
 })
 

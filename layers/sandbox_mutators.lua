@@ -9,6 +9,7 @@ MP.Layer("sandbox_rotation", {
 		desc = { "Adds the current Sandbox Jokers", "and replaces their original versions." },
 		implied_by = "sandbox",
 		count = #MP.SANDBOX.mappings_in("rotation"),
+		credits = { code = { "steph" } },
 	},
 })
 
@@ -20,6 +21,7 @@ MP.Layer("sandbox_retired", {
 		label = "Encore",
 		desc = { "Brings back retired Sandbox Jokers", "and their balance changes." },
 		count = #MP.SANDBOX.mappings_in("retired"),
+		credits = { code = { "steph" } },
 	},
 })
 
@@ -36,6 +38,7 @@ MP.Layer("sandbox_extra_credit", {
 		unavailable_desc = { "Unavailable while", "Extra Credit is enabled." },
 		implied_by = "sandbox",
 		count = #MP.SANDBOX.mappings_in("extra_credit"),
+		credits = { idea = { "CampfireCollective" }, code = { "steph" } },
 	},
 })
 
@@ -51,6 +54,7 @@ MP.Mutator({
 	order = 5,
 	label = "Idol",
 	desc = { "Choose which Sandbox Idol", "can appear. Random chooses", "one for the run." },
+	credits = { code = { "steph" } },
 	variants = {
 		{ label = "Idol: Random", mod = nil },
 		{ label = "Idol: Zealot", mod = "idol_zealot" },
