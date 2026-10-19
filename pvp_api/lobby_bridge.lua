@@ -217,6 +217,16 @@ end
 PVP.mirror_players = mirror_players
 
 PVP.setup_lobby_mirror = function(lobby)
+	-- Who was out of the last lobby's match (the referee's lives, the lives
+	-- cache) means nothing in another lobby: a group back home from its public
+	-- match otherwise showed whoever lost there crossed out on the home
+	-- lobby's cards (ui/game/player_status_provider.lua).
+	if PVP.LOBBY.code ~= lobby.code then
+		PVP._player_lives_cache = nil
+		if PVP.REF then
+			PVP.REF.players = {}
+		end
+	end
 	PVP.CURRENT_LOBBY = lobby
 	PVP.LOBBY.code = lobby.code
 	PVP.LOBBY.connected = true
