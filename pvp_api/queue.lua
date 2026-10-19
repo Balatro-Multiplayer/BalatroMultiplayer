@@ -66,6 +66,9 @@ function PVP._join_queue(kind, gamemode_key)
 		-- already fixed on the SPDRN side (BalatroMultiplayerSpeed/objects/
 		-- matchmaking/queue.lua) but never ported here.
 		ranked = kind == PVP.LobbyAccess.RANKED,
+		-- A Teams ticket says so, so a group queueing Teams can match it
+		-- (MPAPI's _nakama_ticket: teams=1, even counts).
+		teams = (PVP.PVP_GAMEMODES[gamemode_key] or {}).team_based or nil,
 	})
 	if not handle then
 		sendWarnMessage("[pvp] failed to create matchmaking handle", "MULTIPLAYER")

@@ -18,6 +18,10 @@ function PVP.lobby.create_buttons()
 			if not lobby or not lobby.is_host then
 				return false
 			end
+			-- Queued as a group: the lobby plays its match elsewhere.
+			if lobby.group_queue then
+				return false
+			end
 			local players = lobby:get_players()
 			if #players < 2 then
 				return false

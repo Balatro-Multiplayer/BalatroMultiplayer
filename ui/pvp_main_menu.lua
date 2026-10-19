@@ -127,6 +127,24 @@ PVP.build_pre_lobby_ui = function()
 	PVP.main_menu.create_buttons()
 	MPAPI.set_logo_offset(0, true)
 	local b = PVP.main_menu.buttons
+	-- Back from a group queue's public match without having made it home
+	-- (still in a run, or the automatic return gave up): offer it here.
+	local Group = MPAPI.matchmaking and MPAPI.matchmaking.group
+	local pending = Group and Group.pending_return and Group.pending_return(PVP.id)
+	local return_row = { n = G.UIT.R, config = { align = "cm" }, nodes = {} }
+	if pending then
+		return_row = { n = G.UIT.R, config = { align = "cm", padding = 0.1 }, nodes = {
+			UIBox_button({
+				id = "mp_pvp_group_return",
+				button = "mp_pvp_group_return",
+				label = { localize("b_group_return_to_lobby") .. " " .. tostring(pending.home_code) },
+				colour = G.C.GREEN,
+				minw = 5,
+				minh = 0.8,
+				scale = 0.5,
+			}),
+		} }
+	end
 	return {
 		n = G.UIT.ROOT,
 		config = { align = "cm", colour = G.C.CLEAR },
@@ -135,6 +153,7 @@ PVP.build_pre_lobby_ui = function()
 				n = G.UIT.C,
 				config = { align = "bm" },
 				nodes = {
+					return_row,
 					{
 						n = G.UIT.R,
 						config = { align = "cm", padding = 0.1, r = 0.1, emboss = 0.1, colour = G.C.L_BLACK, mid = true },

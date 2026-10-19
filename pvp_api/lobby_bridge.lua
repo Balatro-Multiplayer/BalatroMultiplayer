@@ -334,6 +334,13 @@ PVP.setup_lobby_mirror = function(lobby)
 		MPAPI.refresh_current_view()
 	end)
 
+	-- The group queue panel (ui/lobby/group_panel.lua) follows the queue.
+	if MPAPI.LobbyEvent.GROUP_QUEUE then
+		lobby:on(MPAPI.LobbyEvent.GROUP_QUEUE, function()
+			refresh()
+		end)
+	end
+
 	lobby:on(MPAPI.LobbyEvent.HOST_CHANGED, function()
 		mirror_players(lobby)
 		-- The host left mid-run (a crash, a dropped connection) and the server
