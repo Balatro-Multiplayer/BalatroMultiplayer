@@ -1285,8 +1285,12 @@ function PVP.referee_teams_on_forfeit(player_id)
 	if not team then
 		return nil
 	end
+	-- A pause-menu forfeit leaves the forfeiter in the lobby: without this a
+	-- team whose players all forfeited one after another never lost (each
+	-- forfeit still found the earlier forfeiter as "a teammate remains").
+	pl.forfeited = true
 	for _, id in ipairs(both_players()) do
-		if id ~= player_id and ref_player(id).team_id == team then
+		if id ~= player_id and ref_player(id).team_id == team and not ref_player(id).forfeited then
 			return nil -- a teammate remains
 		end
 	end
