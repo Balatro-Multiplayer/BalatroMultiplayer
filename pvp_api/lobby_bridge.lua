@@ -220,8 +220,9 @@ PVP.setup_lobby_mirror = function(lobby)
 	-- Who was out of the last lobby's match (the referee's lives, the lives
 	-- cache) means nothing in another lobby: a group back home from its public
 	-- match otherwise showed whoever lost there crossed out on the home
-	-- lobby's cards (ui/game/player_status_provider.lua).
-	if PVP.LOBBY.code ~= lobby.code then
+	-- lobby's cards (ui/game/player_status_provider.lua). By the lobby object,
+	-- not its code: a join by code has no code until its first snapshot.
+	if PVP.CURRENT_LOBBY ~= lobby then
 		PVP._player_lives_cache = nil
 		if PVP.REF then
 			PVP.REF.players = {}
