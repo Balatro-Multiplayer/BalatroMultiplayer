@@ -1217,10 +1217,13 @@ end
 
 -- Manhunt's on_player_forfeit: the Runner leaving ends the match immediately in
 -- the Hunters' favor (there is nothing left to "escape" against). A Hunter
--- leaving doesn't end the match by itself -- try_resolve_round's own
--- hunters-all-eliminated check (via check_team_win) handles "last Hunter left"
--- naturally once the remaining Hunters' next round resolves. Returns the winning
--- team_id if this call ended the match, else nil.
+-- who forfeits is out, like a Hunter who lost their last life: a pause-menu
+-- forfeit leaves them in the lobby, so with their lives untouched they were
+-- still "alive" to check_team_win -- the button did nothing and they played on
+-- (in a 2-player match the Runner could never win by it). The last Hunter out
+-- hands the Runner the match; otherwise the forfeiter gets its lose screen
+-- (announce_eliminations) and the round resolves without its hands. Returns
+-- the winning team_id if this call ended the match, else nil.
 function PVP.referee_manhunt_on_forfeit(player_id)
 	if not is_host() then
 		return nil
@@ -1230,6 +1233,19 @@ function PVP.referee_manhunt_on_forfeit(player_id)
 		broadcast("pvp_win", { winner_id = "", winner_team_id = "HUNTER" })
 		return "HUNTER"
 	end
+	if pl.team_id ~= "HUNTER" then
+		return nil
+	end
+	if pl.lives > 0 then
+		pl.lives = 0
+		broadcast("pvp_player_lives", { player_id = player_id, lives = 0 })
+	end
+	pl.hands_left = 0
+	if check_team_win() then
+		return "RUNNER"
+	end
+	broadcast_live_targets()
+	try_resolve_round()
 	return nil
 end
 
