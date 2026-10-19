@@ -33,6 +33,16 @@ function PVP._start_playback(manifest, on_ready)
 		return
 	end
 
+	-- Queued for matchmaking: lobby_start_run below would be refused by MPAPI's
+	-- start_run queue guard only AFTER this function had already set
+	-- PVP.SP.practice, made a local lobby, and armed the BLIND_SELECT waiter --
+	-- all left behind, so the waiter fired on the next BLIND_SELECT (the real
+	-- matched run's) and started the replay there. Gate before touching anything;
+	-- "Leave Queue & Continue" re-enters this whole function.
+	if MPAPI.matchmaking.guard_queued(function() return PVP._start_playback(manifest, on_ready) end) then
+		return
+	end
+
 	PVP.reset_lobby_config()
 	PVP.SP.practice = true
 	PVP.SP.ruleset = manifest.ruleset

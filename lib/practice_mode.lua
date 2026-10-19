@@ -43,6 +43,13 @@ function PVP._start_practice(ruleset_key)
 	ruleset_key = ruleset_key or PVP.PVP_GAMEMODES.pvp_nemesis.ruleset
 	local gamemode_key = PVP.GamemodeKey.PVP_NEMESIS
 
+	-- Same queue gate as PVP._start_playback (lib/playback_launch.lua): without it
+	-- the start_run guard blocks only after PVP.SP.practice and a local lobby are
+	-- already set up, leaking practice state into the match the queue then forms.
+	if MPAPI.matchmaking.guard_queued(function() return PVP._start_practice(ruleset_key) end) then
+		return
+	end
+
 	-- Clean slate: don't inherit deck/stake/ruleset leftovers from whatever the player
 	-- was doing before entering practice (e.g. a private lobby with different_decks set).
 	PVP.reset_lobby_config()
