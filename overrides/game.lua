@@ -34,6 +34,14 @@ function G.FUNCS.cash_out(e)
 	-- Confirmed-safe checkpoint for Phase 9's reconnect tail-replay -- drains
 	-- any pending opponent catch-up queued since the last checkpoint.
 	if PVP.RECONNECT_TAIL then PVP.RECONNECT_TAIL.on_checkpoint() end
+	-- The round-eval total actually paid. Part of it comes from the live match
+	-- only (the comeback bonus after a referee life loss, no_gold_on_round_loss),
+	-- which a replay or crash-rejoin fast-forward runs without; its cashout
+	-- handler pays this instead (lib/playback_handlers.lua). Recorded here, the
+	-- outer wrapper, so it lands just before MPAPI's own `cashout` event.
+	if PVP.rlog_active() and G.GAME.current_round then
+		PVP.RLOG.record("round_dollars", G.GAME.current_round.dollars or 0)
+	end
 	return cash_out_ref(e)
 end
 

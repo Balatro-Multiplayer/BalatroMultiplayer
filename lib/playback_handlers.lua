@@ -379,8 +379,25 @@ MPAPI.playback.register_handler('pvp', 'hand_result', function(args, ctx)
 	end
 end)
 
+-- The live round-eval total (overrides/game.lua's cash_out wrapper), kept for
+-- the cashout that follows it.
+local recorded_round_dollars = nil
+MPAPI.playback.register_handler('pvp', 'round_dollars', function(args, ctx)
+	if ctx.is_pov then
+		recorded_round_dollars = tonumber(type(args) == 'table' and args[1] or args)
+	end
+end)
+
 MPAPI.playback.register_handler('pvp', 'cashout', function(_args, ctx)
 	if ctx.is_pov then
+		-- Pay what the live player was paid: playback runs as practice, with no
+		-- referee life loss, so its own round eval misses the comeback bonus
+		-- (and pays a blind no_gold_on_round_loss withheld). Recordings from
+		-- before round_dollars existed keep the replay's own total.
+		if recorded_round_dollars and G.GAME.current_round then
+			G.GAME.current_round.dollars = recorded_round_dollars
+		end
+		recorded_round_dollars = nil
 		G.FUNCS.cash_out({ config = {} })
 	end
 end)
