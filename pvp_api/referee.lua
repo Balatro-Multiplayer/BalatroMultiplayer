@@ -489,14 +489,16 @@ function PVP.referee_reset(starting_lives)
 end
 
 -- loseLife(): decrement once per round (guarded by lives_blocker, re-armed by
--- newRound). Broadcasts the loser's new life count to everyone.
+-- newRound). Broadcasts the loser's new life count to everyone. `lost` marks a
+-- real loss (as opposed to the setup/restore/takeover broadcasts of a count),
+-- so the loser's client can log life_lost for the achievements.
 local function lose_life(pl)
 	if pl.lives_blocker or pl.lives <= 0 then
 		return
 	end
 	pl.lives = pl.lives - 1
 	pl.lives_blocker = true
-	broadcast("pvp_player_lives", { player_id = pl.id, lives = pl.lives })
+	broadcast("pvp_player_lives", { player_id = pl.id, lives = pl.lives, lost = 1 })
 end
 
 -- Teams-aware life loss for the fail_round/fail_timer/fail_pvp_timer paths below
@@ -521,7 +523,7 @@ local function team_lose_life(pl)
 		local other = ref_player(id)
 		if other.team_id == team then
 			other.lives = PVP.REF.team_lives[team]
-			broadcast("pvp_player_lives", { player_id = id, lives = other.lives })
+			broadcast("pvp_player_lives", { player_id = id, lives = other.lives, lost = 1 })
 		end
 	end
 end
@@ -783,7 +785,7 @@ local function resolve_teams_round(alive)
 			local pl = ref_player(id)
 			if pl.team_id == loser then
 				pl.lives = PVP.REF.team_lives[loser]
-				broadcast("pvp_player_lives", { player_id = id, lives = pl.lives })
+				broadcast("pvp_player_lives", { player_id = id, lives = pl.lives, lost = 1 })
 			end
 		end
 	end

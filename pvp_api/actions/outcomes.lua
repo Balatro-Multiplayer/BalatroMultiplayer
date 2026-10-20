@@ -36,6 +36,13 @@ A("pvp_player_lives", function(_at, _from, params)
 		end
 		PVP.dispatch_action("playerInfo", { lives = lives })
 	elseif params.player_id == sid then
+		-- Only a broadcast that marks a loss counts (an older host never marks
+		-- one, so nothing is logged): Teams logs it for each teammate, since
+		-- each of them lost a life from the shared pool.
+		local lost = tonumber(params.lost)
+		if lost and lost > 0 and PVP.RLOG then
+			PVP.RLOG.record("life_lost", { lost = lost, lives = lives })
+		end
 		PVP.dispatch_action("playerInfo", { lives = lives })
 	elseif params.player_id == PVP.current_target_id() then
 		if PVP.GAME.enemy then

@@ -407,3 +407,7 @@ end)
 -- vanilla core loop above.
 MPAPI.playback.register_handler('pvp', 'net_pizza', function(_args, _ctx) end)
 MPAPI.playback.register_handler('pvp', 'net_magnet', function(_args, _ctx) end)
+
+-- life_lost {lost, lives}: bookkeeping for the server's achievements (Mr Bones).
+-- The lives themselves replay through the referee's own events.
+MPAPI.playback.register_handler('pvp', 'life_lost', function(_args, _ctx) end)
