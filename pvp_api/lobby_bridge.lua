@@ -355,11 +355,13 @@ PVP.setup_lobby_mirror = function(lobby)
 	end)
 
 	-- The group panel (the waiting room's) also names a player whose standing
-	-- refuses the group. Not once a game is on: a rejoin's playback starts
-	-- from the main menu, and a rebuild under it replays its first actions
-	-- twice.
-	lobby:on(MPAPI.LobbyEvent.PLAYER_STANDING_CHANGED, function()
-		if not lobby:is_game_started() then
+	-- refuses the group, so a change that moves that verdict rebuilds it.
+	-- Only those: a joiner's first standing lands just after the join, and a
+	-- rebuild then would close an overlay the host had just opened. Not once
+	-- a game is on: a rejoin's playback starts from the main menu, and a
+	-- rebuild under it replays its first actions twice.
+	lobby:on(MPAPI.LobbyEvent.PLAYER_STANDING_CHANGED, function(_, standing, before)
+		if MPAPI.matchmaking.group.changes_refusal(before, standing) and not lobby:is_game_started() then
 			refresh()
 		end
 	end)
