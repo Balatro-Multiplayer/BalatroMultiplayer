@@ -46,10 +46,17 @@ local function build_private_controls()
 	row_nodes[#row_nodes + 1] = code_panel()
 	row_nodes[#row_nodes + 1] = b.leave.node
 
+	local rows = { { n = G.UIT.R, config = { align = "cm", padding = 0.1 }, nodes = row_nodes } }
+	-- Queue the whole lobby for a casual match (ui/lobby/group_panel.lua).
+	local group_panel = PVP.lobby.build_group_panel and PVP.lobby.build_group_panel()
+	if group_panel then
+		rows[#rows + 1] = { n = G.UIT.R, config = { align = "cm", padding = 0.05 }, nodes = { group_panel } }
+	end
+
 	return {
 		n = G.UIT.C,
 		config = { align = "cm", padding = 0.1, r = 0.1, emboss = 0.1, colour = G.C.L_BLACK, mid = true },
-		nodes = { { n = G.UIT.R, config = { align = "cm", padding = 0.1 }, nodes = row_nodes } },
+		nodes = rows,
 	}
 end
 

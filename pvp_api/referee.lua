@@ -380,6 +380,22 @@ function PVP.referee_on_player_reconnected(player_id)
 	end
 end
 
+-- The team each player of a server team plan ({ {ids}, {ids} }, a matchmade
+-- Teams lobby's snapshot.teamPlan) plays on: { [id] = "A" | "B" }; empty for
+-- no plan. Pure.
+function PVP.roster_from_team_plan(plan)
+	local roster = {}
+	if type(plan) ~= "table" then
+		return roster
+	end
+	for i, team in ipairs({ "A", "B" }) do
+		for _, id in ipairs(type(plan[i]) == "table" and plan[i] or {}) do
+			roster[id] = team
+		end
+	end
+	return roster
+end
+
 function PVP.referee_reset(starting_lives)
 	if not is_host() then
 		return
@@ -431,6 +447,14 @@ function PVP.referee_reset(starting_lives)
 			broadcast("pvp_player_lives", { player_id = id, lives = pl.lives })
 		end
 	elseif PVP.LOBBY.config.team_based then
+		-- A matchmade Teams lobby with groups in it comes with the server's team
+		-- plan (each group kept whole on one team): it overrides any pick.
+		local planned = PVP.roster_from_team_plan(PVP.CURRENT_LOBBY and PVP.CURRENT_LOBBY.team_plan)
+		for _, id in ipairs(total) do
+			if planned[id] then
+				ref_player(id).team_id = planned[id]
+			end
+		end
 		-- Anyone who never opened the picker (pl.team_id nil) needs a default --
 		-- unlike Manhunt's single-Runner fallback, "or 'A'" here left EVERY unpicked
 		-- player on the same team (confirmed live: a 4-player lobby with nobody
@@ -1263,8 +1287,12 @@ function PVP.referee_teams_on_forfeit(player_id)
 	if not team then
 		return nil
 	end
+	-- A pause-menu forfeit leaves the forfeiter in the lobby: without this a
+	-- team whose players all forfeited one after another never lost (each
+	-- forfeit still found the earlier forfeiter as "a teammate remains").
+	pl.forfeited = true
 	for _, id in ipairs(both_players()) do
-		if id ~= player_id and ref_player(id).team_id == team then
+		if id ~= player_id and ref_player(id).team_id == team and not ref_player(id).forfeited then
 			return nil -- a teammate remains
 		end
 	end

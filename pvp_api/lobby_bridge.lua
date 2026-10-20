@@ -217,6 +217,17 @@ end
 PVP.mirror_players = mirror_players
 
 PVP.setup_lobby_mirror = function(lobby)
+	-- Who was out of the last lobby's match (the referee's lives, the lives
+	-- cache) means nothing in another lobby: a group back home from its public
+	-- match otherwise showed whoever lost there crossed out on the home
+	-- lobby's cards (ui/game/player_status_provider.lua). By the lobby object,
+	-- not its code: a join by code has no code until its first snapshot.
+	if PVP.CURRENT_LOBBY ~= lobby then
+		PVP._player_lives_cache = nil
+		if PVP.REF then
+			PVP.REF.players = {}
+		end
+	end
 	PVP.CURRENT_LOBBY = lobby
 	PVP.LOBBY.code = lobby.code
 	PVP.LOBBY.connected = true
@@ -306,7 +317,16 @@ PVP.setup_lobby_mirror = function(lobby)
 	-- rejoins the match) -- only act when the reconnecting
 	-- player IS us; the opponent's own client needs no catch-up, it never
 	-- disconnected. See pvp_api/reconnect_tail.lua.
+	-- The group panel (ui/lobby/group_panel.lua) refuses while a player is
+	-- away, so it follows players dropping and coming back: a group member
+	-- back from a public match after its host left the host's panel saying
+	-- "every player must be connected".
+	lobby:on(MPAPI.LobbyEvent.PLAYER_DISCONNECTED, function()
+		refresh()
+	end)
+
 	lobby:on(MPAPI.LobbyEvent.PLAYER_RECONNECTED, function(player_id)
+		refresh()
 		if player_id ~= lobby.player_id then
 			PVP.referee_on_player_reconnected(player_id)
 			return
@@ -333,6 +353,13 @@ PVP.setup_lobby_mirror = function(lobby)
 		mirror_metadata(lobby)
 		MPAPI.refresh_current_view()
 	end)
+
+	-- The group queue panel (ui/lobby/group_panel.lua) follows the queue.
+	if MPAPI.LobbyEvent.GROUP_QUEUE then
+		lobby:on(MPAPI.LobbyEvent.GROUP_QUEUE, function()
+			refresh()
+		end)
+	end
 
 	lobby:on(MPAPI.LobbyEvent.HOST_CHANGED, function()
 		mirror_players(lobby)
