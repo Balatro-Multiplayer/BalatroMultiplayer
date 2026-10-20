@@ -317,7 +317,16 @@ PVP.setup_lobby_mirror = function(lobby)
 	-- rejoins the match) -- only act when the reconnecting
 	-- player IS us; the opponent's own client needs no catch-up, it never
 	-- disconnected. See pvp_api/reconnect_tail.lua.
+	-- The group panel (ui/lobby/group_panel.lua) refuses while a player is
+	-- away, so it follows players dropping and coming back: a group member
+	-- back from a public match after its host left the host's panel saying
+	-- "every player must be connected".
+	lobby:on(MPAPI.LobbyEvent.PLAYER_DISCONNECTED, function()
+		refresh()
+	end)
+
 	lobby:on(MPAPI.LobbyEvent.PLAYER_RECONNECTED, function(player_id)
+		refresh()
 		if player_id ~= lobby.player_id then
 			PVP.referee_on_player_reconnected(player_id)
 			return
