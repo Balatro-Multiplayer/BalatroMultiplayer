@@ -41,16 +41,26 @@ function PVP.lobby.group_panel_rows(lobby)
 	end
 	if not lobby.is_host then
 		rows[#rows + 1] = text_row(localize("k_group_member_hint"), 0.28)
+		local refused = Group.member_standing_refusal(Group.facts_from_lobby(lobby))
+		if refused then
+			rows[#rows + 1] = text_row(Group.refusal_text(refused), 0.28, G.C.RED)
+		end
 		return rows
 	end
 	local eligible, refusal = PVP.group_queue_options(lobby)
-	if refusal then
+	-- A member's standing greys the button but leaves it pressable: the
+	-- server's refusal names the mods (MPAPI api/matchmaking/group/queue.lua).
+	local standing_refused = refusal and refusal.code == Group.Refusal.MEMBER_REFUSED
+	if refusal and not standing_refused then
 		rows[#rows + 1] = text_row(Group.refusal_text(refusal), 0.28, G.C.UI.TEXT_INACTIVE)
 		return rows
 	end
 	if #eligible == 0 then
 		rows[#rows + 1] = text_row(localize("k_group_no_modes"), 0.28, G.C.UI.TEXT_INACTIVE)
 		return rows
+	end
+	if standing_refused then
+		rows[#rows + 1] = text_row(Group.refusal_text(refusal), 0.28, G.C.RED)
 	end
 	local names = {}
 	for i, mode in ipairs(eligible) do
@@ -68,7 +78,7 @@ function PVP.lobby.group_panel_rows(lobby)
 			scale = 0.7,
 			colour = G.C.ORANGE,
 		}),
-		UIBox_button({ id = "mp_pvp_group_queue", button = "mp_pvp_group_queue", label = { localize("b_group_queue") }, colour = G.C.BLUE, minw = 2.6, minh = 0.8, scale = 0.45 }),
+		UIBox_button({ id = "mp_pvp_group_queue", button = "mp_pvp_group_queue", label = { localize("b_group_queue") }, colour = standing_refused and G.C.UI.BACKGROUND_INACTIVE or G.C.BLUE, minw = 2.6, minh = 0.8, scale = 0.45 }),
 	} }
 	return rows
 end

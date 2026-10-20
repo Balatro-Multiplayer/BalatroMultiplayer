@@ -114,6 +114,13 @@ function PVP._refresh_find_game_queue_ui()
 	end
 end
 
+-- The pillars grey out by the account's standing, which the server can change at any time.
+if MPAPI.on_standing_changed then
+	MPAPI.on_standing_changed(function()
+		PVP._refresh_find_game_queue_ui()
+	end)
+end
+
 -- The single handler behind every pillar's SELECT/CANCEL button. Whether this joins or cancels
 -- depends on ref_table.cancel's presence, not any state read here -- the button that was
 -- actually clicked already encoded, at the moment it was rendered, which action it means (see
@@ -136,12 +143,26 @@ G.FUNCS.mp_pvp_find_game_toggle_queue = function(e)
 	end
 end
 
+-- A blocked pillar's press: says why the account's standing refuses that queue (MPAPI's
+-- ui/mods_not_allowed_overlay.lua) instead of queueing.
+G.FUNCS.mp_pvp_find_game_standing_refused = function(e)
+	local rt = e.config.ref_table
+	if rt and rt.refusal then
+		MPAPI.show_standing_refusal(rt.refusal)
+	end
+end
+
+-- The queue kind a pillar is (MPAPI.QueueKind): Ranked pillars carry a ruleset_key.
+local function queue_kind(mode)
+	return mode.ruleset_key ~= nil and MPAPI.QueueKind.RANKED or MPAPI.QueueKind.CASUAL
+end
+
 -- Reactive SELECT button: QUEUE (orange) when idle or a different pillar is the active queue,
 -- CANCEL (red) while this exact pillar's own queue is PvP's one active queue
--- (PVP._active_queue_matches, pvp_api/queue.lua). A Ranked pillar with no launcher-verified
--- anti-cheat session (MPAPI.is_launcher_verified) is disabled outright, matching SPDRN's own
--- ranked gating (BalatroMultiplayerSpeed/ui/main_menu/find_game.lua's _ranked_queue_available) --
--- PvP had never applied this check at all before now. Every OTHER pillar is also disabled while
+-- (PVP._active_queue_matches, pvp_api/queue.lua). A pillar the account's standing refuses
+-- (MPAPI.can_queue: Casual needs a valid or verified account, Ranked a launcher-verified one,
+-- matching SPDRN's own gating in BalatroMultiplayerSpeed/ui/main_menu/game_select.lua) is
+-- greyed, and pressing it says why. Every OTHER pillar is also disabled while
 -- one queue is active: PvP tracks only a single matchmaking handle at a time
 -- (PVP._match_handle), unlike SPDRN's per-mode _queue_handles table, so queuing a second pillar
 -- here would silently orphan the first handle instead of joining both.
@@ -151,13 +172,20 @@ local function build_select(mode)
 			or (mode.gamemode_key and PVP._active_queue_matches(PVP.LobbyAccess.CASUAL, mode.gamemode_key))
 			or false
 		local other_active = PVP._is_queue_active() and not this_queued
+		local may_queue, refusal = MPAPI.can_queue(queue_kind(mode))
+		local standing_refused = not this_queued and not may_queue
 		local unavailable = mode.queue_button == nil
 			or other_active
-			or (mode.ruleset_key ~= nil and not MPAPI.is_launcher_verified())
+			or standing_refused
 		local config = {
 			align = "cm", minh = 0.5, minw = 2.2, padding = 0.06, r = 0.1,
 			colour = unavailable and G.C.UI.BACKGROUND_INACTIVE or (this_queued and G.C.RED or G.C.ORANGE),
 		}
+		if standing_refused and mode.queue_button ~= nil and not other_active then
+			config.hover = true
+			config.button = "mp_pvp_find_game_standing_refused"
+			config.ref_table = { refusal = refusal }
+		end
 		if not unavailable then
 			config.shadow = true
 			config.hover = true

@@ -354,6 +354,16 @@ PVP.setup_lobby_mirror = function(lobby)
 		MPAPI.refresh_current_view()
 	end)
 
+	-- The group panel (the waiting room's) also names a player whose standing
+	-- refuses the group. Not once a game is on: a rejoin's playback starts
+	-- from the main menu, and a rebuild under it replays its first actions
+	-- twice.
+	lobby:on(MPAPI.LobbyEvent.PLAYER_STANDING_CHANGED, function()
+		if not lobby:is_game_started() then
+			refresh()
+		end
+	end)
+
 	-- The group queue panel (ui/lobby/group_panel.lua) follows the queue.
 	if MPAPI.LobbyEvent.GROUP_QUEUE then
 		lobby:on(MPAPI.LobbyEvent.GROUP_QUEUE, function()

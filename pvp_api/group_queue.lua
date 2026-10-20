@@ -29,12 +29,14 @@ function PVP.group_queue_modes()
 end
 
 -- The modes this lobby may queue as a group now (each with its refusal, nil
--- = may queue), and the first refusal that applies whatever the mode.
+-- = may queue), and the first refusal that applies whatever the mode. A
+-- member refused for their standing (MEMBER_REFUSED) still leaves the modes
+-- listed: the panel greys the button and names them.
 function PVP.group_queue_options(lobby)
 	local Group = MPAPI.matchmaking.group
 	local facts = Group.facts_from_lobby(lobby)
 	local lobby_refusal = Group.eligibility(facts, nil)
-	local ranked = Group.rank_modes(facts, PVP.group_queue_modes())
+	local ranked = Group.rank_modes(Group.without_standings(facts), PVP.group_queue_modes())
 	local eligible = {}
 	for _, entry in ipairs(ranked) do
 		if not entry.refusal then
