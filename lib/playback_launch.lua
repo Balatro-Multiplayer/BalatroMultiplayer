@@ -43,6 +43,7 @@ function PVP._start_playback(manifest, on_ready)
 		return
 	end
 
+	PVP._drop_playback_waiters()
 	PVP.reset_lobby_config()
 	PVP.SP.practice = true
 	PVP.SP.ruleset = manifest.ruleset
@@ -92,13 +93,36 @@ function PVP._playback_wait_for(predicate, callback)
 	PVP._playback_waiters[#PVP._playback_waiters + 1] = { predicate = predicate, callback = callback }
 end
 
+-- A waiter belongs to the playback run it was made in: a fresh playback run,
+-- or leaving the run for the main menu, drops the rest. Left in, one acts on
+-- whatever run shows the blind-select screen next. The driver dispatches the
+-- next entry once the event queue is idle, without waiting on a deferred blind
+-- handler, so it can run ahead of one: a recorded skip whose tag opens a pack,
+-- then the select_blind after it, left the select's waiter polling inside the
+-- pack, and after the player left, it selected the next run's Small Blind on
+-- its own (e2e/pvp_live/playback_waiters.sh in ClaudeControl).
+function PVP._drop_playback_waiters()
+	PVP._playback_waiters = {}
+end
+
+local go_to_menu_ref = G.FUNCS.go_to_menu
+G.FUNCS.go_to_menu = function(e)
+	PVP._drop_playback_waiters()
+	return go_to_menu_ref(e)
+end
+
 local _playback_launch_update_ref = Game.update
 function Game:update(dt)
 	_playback_launch_update_ref(self, dt)
-	for i = #PVP._playback_waiters, 1, -1 do
-		local w = PVP._playback_waiters[i]
+	local waiters = PVP._playback_waiters
+	for i = #waiters, 1, -1 do
+		-- A callback that started a fresh run or left this one dropped the rest.
+		if waiters ~= PVP._playback_waiters then
+			break
+		end
+		local w = waiters[i]
 		if w.predicate() then
-			table.remove(PVP._playback_waiters, i)
+			table.remove(waiters, i)
 			w.callback()
 		end
 	end
