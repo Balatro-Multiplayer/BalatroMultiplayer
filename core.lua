@@ -411,6 +411,29 @@ MPAPI.on_loaded(function()
 		end,
 	})
 
+	-- Practice / Create Lobby pillar pages (ui/main_menu/game_select.lua), same page setup as
+	-- pvp_find_game below.
+	MPAPI.Page({
+		key = 'pvp_game_select',
+		category = 'game_select',
+		build = function(self)
+			self._pillar_row = PVP.build_game_select_ui(self.params and self.params.intent)
+			return self._pillar_row.definition
+		end,
+		on_enter = function(self)
+			if G.MAIN_MENU_UI then
+				G.MAIN_MENU_UI.alignment.offset.y = 1.5
+				G.MAIN_MENU_UI:align_to_major()
+			end
+			MPAPI.set_logo_offset(-2.5, true)
+		end,
+		dispose = function(self)
+			if self._pillar_row then
+				self._pillar_row:dispose()
+			end
+		end,
+	})
+
 	-- Pillar-based Find Game screen (ui/main_menu/find_game.lua), mirroring SPDRN's
 	-- spdrn_game_select page/pillar-row setup one-for-one -- see that file's own core.lua
 	-- registration for the on_enter offset-nudge/logo-position reasoning this copies.
@@ -436,11 +459,13 @@ MPAPI.on_loaded(function()
 			-- but left the second still sitting on the tab row; -2.5 (coincidentally the same
 			-- value SPDRN's own main-menu cleanup uses for unrelated reasons) clears both.
 			MPAPI.set_logo_offset(-2.5, true)
+			PVP.start_find_game_polling()
 		end,
 		dispose = function(self)
 			if self._pillar_row then
 				self._pillar_row:dispose()
 			end
+			PVP.stop_find_game_polling()
 		end,
 	})
 

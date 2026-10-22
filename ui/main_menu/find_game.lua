@@ -203,8 +203,73 @@ local function build_select(mode)
 	return el.node
 end
 
-local function build_stat_box(players)
-	return MPAPI.ui_pillar_stat_box({ label = "Players", value = players, value_colour = G.C.MONEY })
+-- Live In Queue / In Game counts, polled from the server's queue_counts RPC while this page
+-- is shown (PVP.start/stop_find_game_polling, called from the page's on_enter/dispose in
+-- core.lua). Same shape as SPDRN's find_game counts (BalatroMultiplayerSpeed/ui/main_menu/
+-- game_select.lua).
+local FIND_GAME_POLL_INTERVAL_SECONDS = 5
+local _poller = nil
+local _latest_counts = nil
+local _stat_els = {}
+
+-- The key the server counts a pillar's players under: its queue ticket's game_mode, as
+-- pvp_api/queue.lua builds it (and the matchmade lobby's label carries). MLBa has no queue.
+local function count_key(mode)
+	if mode.ruleset_key then
+		return PVP.LobbyAccess.RANKED_PREFIX .. "pvp_ranked_" .. mode.ruleset_key:gsub("^ruleset_mp_", "")
+	end
+	return mode.gamemode_key
+end
+
+local function stop_poller_only()
+	if _poller then
+		_poller.stop()
+		_poller = nil
+	end
+end
+
+-- From on_enter, which runs after build() filled _stat_els, so only the old poller goes.
+function PVP.start_find_game_polling()
+	stop_poller_only()
+	_latest_counts = nil
+	_poller = MPAPI.matchmaking.create_queue_counts_poller(PVP.id, FIND_GAME_POLL_INTERVAL_SECONDS, function(err, game_modes)
+		_latest_counts = game_modes or {}
+		for _, el in pairs(_stat_els) do
+			el:update()
+		end
+	end)
+	_poller.start()
+end
+
+function PVP.stop_find_game_polling()
+	stop_poller_only()
+	_stat_els = {}
+end
+
+-- One half (In Queue or In Game): a label above a darker inset value, like the HUD's Ante box.
+local function build_count_half(label, value)
+	return { n = G.UIT.C, config = { align = "cm", padding = 0.02, minw = 1.0, minh = 0.85, colour = mix_colours(G.C.BLACK, G.C.L_BLACK, 0.5), emboss = 0.05, r = 0.1 }, nodes = {
+		{ n = G.UIT.R, config = { align = "cm" }, nodes = {
+			{ n = G.UIT.T, config = { text = label, scale = 0.24, colour = G.C.UI.TEXT_LIGHT, shadow = true } },
+		} },
+		{ n = G.UIT.R, config = { align = "cm" }, nodes = {
+			{ n = G.UIT.T, config = { text = tostring(value), scale = 0.5, colour = G.C.IMPORTANT, shadow = true } },
+		} },
+	} }
+end
+
+local function build_stat_box(mode)
+	local key = count_key(mode)
+	local el = MPAPI.ui_element(function()
+		local counts = key and _latest_counts and _latest_counts[key]
+		return { nodes = { MPAPI.ui_embossed_box({ minw = 2.4, nodes = {
+			build_count_half("In Queue", counts and counts.queued or 0),
+			{ n = G.UIT.C, config = { minw = 0.06 }, nodes = {} },
+			build_count_half("In Game", counts and counts.inMatch or 0),
+		} }) } }
+	end)
+	_stat_els[mode.key] = el
+	return el.node
 end
 
 -- Mirrors SPDRN's game_select.lua build_order_card exactly (same the_order_open button,
@@ -227,8 +292,9 @@ local function build_order_card()
 	} })
 end
 
-local function build_items(modes, players)
+local function build_items(modes)
 	_select_els = {}
+	_stat_els = {}
 	local items = {}
 	for _, mode in ipairs(modes) do
 		items[#items + 1] = {
@@ -246,7 +312,7 @@ local function build_items(modes, players)
 			-- this is what makes a 2-line description sit centered with breathing room instead
 			-- of the box just shrinking to hug the text (2026-09-08 user feedback).
 			description = MPAPI.ui_pillar_description_box({ lines = mode.desc, minh = 1.3 }),
-			stat_box = build_stat_box(players),
+			stat_box = build_stat_box(mode),
 			extra = mode.uses_order and build_order_card() or nil,
 		}
 	end
@@ -300,12 +366,9 @@ end
 -- api/ui_pillar_row.lua's header comment for why that's required.
 function PVP.build_find_game_ui(category)
 	category = category or "ranked"
-	local modes, players = RANKED_MODES, "2"
-	if category == "casual" then
-		modes, players = CASUAL_MODES, "2-16"
-	end
+	local modes = category == "casual" and CASUAL_MODES or RANKED_MODES
 
-	local pillar_row = MPAPI.ui_pillar_row({ items = build_items(modes, players) })
+	local pillar_row = MPAPI.ui_pillar_row({ items = build_items(modes) })
 	local definition = {
 		n = G.UIT.ROOT,
 		config = { align = "tm", colour = G.C.CLEAR },

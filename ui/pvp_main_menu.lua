@@ -205,40 +205,9 @@ end
 -- to plain pairwise at exactly 2 players, see referee.lua) so there's no separate
 -- "1v1" option. Ruleset (default Balanced) is picked afterward, once inside the
 -- lobby, via Lobby Options (ui/lobby/lobby_options.lua) -- not here.
+-- Pillar page: ui/main_menu/game_select.lua; each pillar presses the per-mode handler below.
 G.FUNCS.mp_pvp_create_lobby = function()
-	G.FUNCS.overlay_menu({
-		definition = create_UIBox_generic_options({
-			contents = {
-				{ n = G.UIT.R, config = { align = "cm", padding = 0.1 }, nodes = {
-					{ n = G.UIT.T, config = { text = "Create Lobby", scale = 0.6, colour = G.C.UI.TEXT_LIGHT, shadow = true } },
-				} },
-				{
-					n = G.UIT.R,
-					config = { align = "cm", padding = 0.1 },
-					nodes = {
-						{ n = G.UIT.C, config = { align = "cm", padding = 0.08 }, nodes = {
-							UIBox_button({ button = "mp_pvp_create_lobby_nemesis", label = { "Nemesis" }, colour = G.C.BLUE, minw = 2.5, minh = 2.0, scale = 0.5, col = true }),
-						} },
-						{ n = G.UIT.C, config = { align = "cm", padding = 0.08 }, nodes = {
-							UIBox_button({ button = "mp_pvp_create_lobby_royale", label = { "Royale" }, colour = G.C.PURPLE, minw = 2.5, minh = 2.0, scale = 0.5, col = true }),
-						} },
-					},
-				},
-				{
-					n = G.UIT.R,
-					config = { align = "cm", padding = 0.1 },
-					nodes = {
-						{ n = G.UIT.C, config = { align = "cm", padding = 0.08 }, nodes = {
-							UIBox_button({ button = "mp_pvp_create_lobby_manhunt", label = { "Manhunt" }, colour = G.C.RED, minw = 2.5, minh = 2.0, scale = 0.5, col = true }),
-						} },
-						{ n = G.UIT.C, config = { align = "cm", padding = 0.08 }, nodes = {
-							UIBox_button({ button = "mp_pvp_create_lobby_teams", label = { "Teams" }, colour = G.C.GREEN, minw = 2.5, minh = 2.0, scale = 0.5, col = true }),
-						} },
-					},
-				},
-			},
-		}),
-	})
+	MPAPI.pages.show("pvp_game_select", { intent = "create_lobby" })
 end
 
 G.FUNCS.mp_pvp_create_lobby_nemesis = function()
@@ -322,51 +291,9 @@ end
 -- ruleset_mp_vanilla + gamemode_mp_attrition as plain Vanilla and have no distinguishing
 -- mechanic with a single practice player (see PVP._start_practice's header comment), so
 -- they're intentionally not offered here.
+-- Pillar page: ui/main_menu/game_select.lua; each pillar presses the per-mode handler below.
 G.FUNCS.mp_pvp_practice = function()
-	G.FUNCS.overlay_menu({
-		definition = create_UIBox_generic_options({
-			contents = {
-				{ n = G.UIT.R, config = { align = "cm", padding = 0.1 }, nodes = {
-					{ n = G.UIT.T, config = { text = "Practice", scale = 0.6, colour = G.C.UI.TEXT_LIGHT, shadow = true } },
-				} },
-				{
-					n = G.UIT.R,
-					config = { align = "cm", padding = 0.1 },
-					nodes = {
-						{ n = G.UIT.C, config = { align = "cm", padding = 0.08 }, nodes = {
-							UIBox_button({ button = "mp_pvp_practice_balanced", label = { "Balanced" }, colour = G.C.BLUE, minw = 2.5, minh = 2.0, scale = 0.5, col = true }),
-						} },
-						{ n = G.UIT.C, config = { align = "cm", padding = 0.08 }, nodes = {
-							UIBox_button({ button = "mp_pvp_practice_expanded", label = { "Expanded" }, colour = G.C.PURPLE, minw = 2.5, minh = 2.0, scale = 0.5, col = true }),
-						} },
-					},
-				},
-				{
-					n = G.UIT.R,
-					config = { align = "cm", padding = 0.1 },
-					nodes = {
-						{ n = G.UIT.C, config = { align = "cm", padding = 0.08 }, nodes = {
-							UIBox_button({ button = "mp_pvp_practice_vanilla", label = { "Vanilla" }, colour = G.C.GREEN, minw = 2.5, minh = 2.0, scale = 0.5, col = true }),
-						} },
-						{ n = G.UIT.C, config = { align = "cm", padding = 0.08 }, nodes = {
-							UIBox_button({ button = "mp_pvp_practice_smallworld", label = { "Small", "World" }, colour = G.C.RED, minw = 2.5, minh = 2.0, scale = 0.5, col = true }),
-						} },
-					},
-				},
-				-- §17.6/§17.3: the 5th real ruleset -- was never wired into any
-				-- player-facing picker at all (not practice-specific, project-wide).
-				{
-					n = G.UIT.R,
-					config = { align = "cm", padding = 0.1 },
-					nodes = {
-						{ n = G.UIT.C, config = { align = "cm", padding = 0.08 }, nodes = {
-							UIBox_button({ button = "mp_pvp_practice_experimental", label = { "Experimental" }, colour = G.C.ORANGE, minw = 2.5, minh = 2.0, scale = 0.5, col = true }),
-						} },
-					},
-				},
-			},
-		}),
-	})
+	MPAPI.pages.show("pvp_game_select", { intent = "practice" })
 end
 
 G.FUNCS.mp_pvp_practice_balanced = function()
