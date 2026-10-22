@@ -108,7 +108,7 @@ fi
     ':(exclude).github' \
     ':(exclude).gitignore' \
     ':(exclude)stylua.toml' \
-    ':(exclude)agents.md' \
+    ':(exclude)AGENTS.md' \
     ':(exclude)CONTRIBUTING.md' \
     ':(exclude)tests' \
     ':(exclude)scripts' \

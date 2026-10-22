@@ -6,17 +6,19 @@ This little guide will help ensure consistency and quality across the codebase. 
 
 Let's build something that would make Jimbo proud.
 
+For architecture notes, gotchas and code conventions, read [AGENTS.md](AGENTS.md) (written for coding agents, useful for everyone).
+
 ## Quick Start
 
 **Prerequisites**: Install [Steamodded 1.0.0~BETA-1620a](https://github.com/Steamodded/smods/releases/tag/1.0.0-beta-1620a) and [Lovely Injector](https://github.com/ethangreen-dev/lovely-injector) (>=0.9)
 
 ```bash
 # 1. Fork on GitHub, then clone
-git clone https://github.com/YOUR_USERNAME/BalatroMultiplayer.git
-cd BalatroMultiplayer
+git clone https://github.com/YOUR_USERNAME/BalatroMultiplayerPvP.git
+cd BalatroMultiplayerPvP
 
 # 2. Set up remotes and install stylua
-git remote add upstream https://github.com/Balatro-Multiplayer/BalatroMultiplayer.git
+git remote add upstream https://github.com/Balatro-Multiplayer/BalatroMultiplayerPvP.git
 # Install stylua from: https://github.com/JohnnyMorganz/StyLua
 
 # 3. Ready to develop!
@@ -85,7 +87,7 @@ end
 |  |  |
 |------|-------------|
 | [`ui/_common/`](ui/_common/) | Shared components. Config toggles, spacers, etc. |
-| [`ui/utils.lua`](ui/utils.lua) | Home of `PVP.UI.UTILS`. Utils for creating UI nodes |
+| [`ui/node_builders.lua`](ui/node_builders.lua) | Home of `PVP.UI.UTILS`. Utils for creating UI nodes |
 | [`ui/game/`](ui/game/) | UI inside the pvp match |
 | [`ui/lobby/`](ui/lobby/) | Lobby UI |
 | [`ui/main_menu/`](ui/main_menu/) | Main menu UI |
@@ -93,7 +95,7 @@ end
 
 **Mod Injection**:
 - The entrypoint is in [`core.lua`](core.lua)
-- Files/dirs prefixed with `_` are loaded first in [`PVP.load_mp_dir`](core.lua#L72)
+- Files/dirs prefixed with `_` are loaded first in [`PVP.load_mp_dir`](core.lua#L161)
 
 ## Contribution Guidelines
 
@@ -119,5 +121,5 @@ All contributions go through code review. Reviewers will check for:
 
 ## Questions?
 
-- Check existing [GitHub Issues](https://github.com/Balatro-Multiplayer/BalatroMultiplayer/issues)
+- Check existing [GitHub Issues](https://github.com/Balatro-Multiplayer/BalatroMultiplayerPvP/issues)
 - Join the [Discord server](https://discord.gg/balatromp) for discussion
