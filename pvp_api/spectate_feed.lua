@@ -122,7 +122,7 @@ function S.start(code, on_ready)
 				on_ready(nil)
 			end
 		end)
-	end, feed_handlers)
+	end, feed_handlers, PVP.id)
 end
 
 function S.stop()
