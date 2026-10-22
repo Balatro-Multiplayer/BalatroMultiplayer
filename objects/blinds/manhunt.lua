@@ -4,7 +4,7 @@
 -- bl_mp_nemesis depending on role. Bare SMODS.Blind (not MPAPI.Blind: these are
 -- never actually played, so they need none of MPAPI.Blind's sync-bus/phantom
 -- plumbing), never in_pool, discovered so the collection screen doesn't nag about
--- them. Art from /home/virtualized/Projects/Fiverr/Nightmare-Manhunt (same author's
+-- them. Art from the Nightmare-Manhunt commission (same author's
 -- earlier Manhunt mod).
 SMODS.Atlas({
 	key = "manhunt_hunter_blind_chip",
