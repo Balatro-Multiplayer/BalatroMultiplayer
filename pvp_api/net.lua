@@ -10,8 +10,14 @@
 --
 -- Loaded inside MPAPI.on_loaded, after action_handlers.lua, so this override wins.
 
+-- Only PvP's own lobby: PvP code on vanilla hooks (skip_blind, set_location,
+-- ...) can fire while the player sits in another mod's lobby.
 local function lobby()
-	return MPAPI.get_current_lobby()
+	local current = MPAPI.get_current_lobby()
+	if current and current.mod_id == PVP.id then
+		return current
+	end
+	return nil
 end
 
 local function broadcast(key, params)
