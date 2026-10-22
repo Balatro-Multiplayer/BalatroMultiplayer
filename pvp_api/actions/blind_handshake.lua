@@ -1,4 +1,5 @@
 local A = PVP._pvp_action_helpers.A
+local A_host = PVP._pvp_action_helpers.A_host
 
 -- Blind handshake (host-authoritative).
 A("pvp_ready_blind", function(_at, from, _params)
@@ -9,7 +10,7 @@ A("pvp_unready_blind", function(_at, from, _params)
 	PVP.referee_on_unready_blind(from)
 end)
 
-A("pvp_start_blind", function(_at, _from, params)
+A_host("pvp_start_blind", function(_at, _from, params)
 	local lobby = MPAPI.get_current_lobby()
 	-- An eliminated player sits out the blinds the others still play.
 	if not lobby or PVP.GAME.eliminated then
