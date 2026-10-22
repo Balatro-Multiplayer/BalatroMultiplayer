@@ -15,14 +15,22 @@ local function code_panel()
 	}
 end
 
--- Read-only deck label (host deck picker is a later addition).
+-- Read-only deck box (host deck picker is a later addition), purple and button-sized like
+-- SPDRN's lobby deck box (BalatroMultiplayerSpeed/ui/lobby/controls.lua) so it lines up
+-- with the rest of the bar.
 local function deck_panel()
 	local lobby = PVP.lobby.ref
 	local meta = (lobby and lobby:get_metadata()) or {}
-	local deck_name = meta.deck or "Red Deck"
-	return { n = G.UIT.C, config = { align = "cm", padding = 0.05, r = 0.1, colour = G.C.L_BLACK, minw = 2.65, minh = 1.35, emboss = 0.05 }, nodes = {
-		{ n = G.UIT.R, config = { align = "cm" }, nodes = { { n = G.UIT.T, config = { text = "Deck", scale = 0.32, colour = G.C.UI.TEXT_INACTIVE } } } },
-		{ n = G.UIT.R, config = { align = "cm" }, nodes = { { n = G.UIT.T, config = { text = deck_name, scale = 0.42, colour = G.C.UI.TEXT_LIGHT, shadow = true } } } },
+	local rows = {}
+	for _, line in ipairs({ "Deck", meta.deck or "Red Deck" }) do
+		rows[#rows + 1] = { n = G.UIT.R, config = { align = "cm", minw = 2.65, maxw = 2.45 }, nodes = {
+			{ n = G.UIT.T, config = { text = line, scale = 0.4, colour = G.C.UI.TEXT_LIGHT } },
+		} }
+	end
+	return { n = G.UIT.C, config = { align = "cm", padding = 0.05 }, nodes = {
+		{ n = G.UIT.C, config = { align = "cm" }, nodes = {
+			{ n = G.UIT.C, config = { align = "cm", r = 0.1, colour = G.C.PURPLE, minh = 1.35, shadow = true }, nodes = rows },
+		} },
 	} }
 end
 
