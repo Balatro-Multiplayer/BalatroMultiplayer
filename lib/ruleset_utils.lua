@@ -44,12 +44,13 @@ end
 
 function MP.UTILS.check_lovely_version()
 	local lovely_ver = SMODS.Mods["Lovely"] and SMODS.Mods["Lovely"].version or ""
-	if not lovely_ver:match("^" .. MP.REQUIRED_LOVELY_VERSION:gsub("%.", "%%.")) then
-		return localize({
-			type = "variable",
-			key = "k_ruleset_disabled_lovely_version",
-			vars = { MP.REQUIRED_LOVELY_VERSION },
-		})
+	local major_minor = lovely_ver:match("^(%d+%.%d+)")
+	for _, supported in ipairs(MP.SUPPORTED_LOVELY_VERSIONS) do
+		if major_minor == supported then return false end
 	end
-	return false
+	return localize({
+		type = "variable",
+		key = "k_ruleset_disabled_lovely_version",
+		vars = { table.concat(MP.SUPPORTED_LOVELY_VERSIONS, "/") },
+	})
 end

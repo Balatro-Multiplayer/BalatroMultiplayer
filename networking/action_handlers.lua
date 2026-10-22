@@ -306,7 +306,7 @@ local function action_start_game(p)
 		mod_version = SMODS.Mods["Multiplayer"] and SMODS.Mods["Multiplayer"].version,
 		mod_hash = MP.MOD_STRING,
 		smods_version = MP.SMODS_VERSION,
-		lovely_version = MP.REQUIRED_LOVELY_VERSION,
+		lovely_version = SMODS.Mods["Lovely"] and SMODS.Mods["Lovely"].version,
 		lobby_code = MP.LOBBY.code,
 		is_host = MP.LOBBY.is_host,
 		player = MP.LOBBY.username,
