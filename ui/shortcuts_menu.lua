@@ -9,6 +9,11 @@ PVP.SHORTCUTS = {
 -- Build the list of available shortcuts based on current state
 local function get_shortcuts()
 	local shortcuts = {}
+	-- PvP's own menu only: elsewhere (the vanilla menu, another mod's menu or
+	-- lobby) TAB stays the game's, and "C" must not open a PvP lobby.
+	if MPAPI.get_focused_mod() ~= PVP.id then
+		return shortcuts
+	end
 	local in_lobby = PVP.LOBBY.code ~= nil
 	-- PVP.LOBBY.connected is only set inside a lobby (lobby_bridge.lua); out of one,
 	-- the server connection itself is what the join/create shortcuts need.
