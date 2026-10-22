@@ -432,29 +432,7 @@ function PVP.UI.apply_lives_hud()
                                 scale = 2 * scale * 0.8,
                                 colour = G.C.IMPORTANT,
                                 shadow = true,
-                                maxw = 0.5,
-                            }
-                        },
-                        { n = G.UIT.B, config = { w = 0.05, h = 0.05 } },
-                        {
-                            n = G.UIT.T,
-                            config = {
-                                text = "vs", -- not localized intentionally
-                                scale = scale * 0.8,
-                                colour = G.C.UI.TEXT_DARK,
-                                shadow = true,
-                            }
-                        },
-                        { n = G.UIT.B, config = { w = 0.05, h = 0.05 } },
-                        {
-                            n = G.UIT.T,
-                            config = {
-                                ref_table = PVP.GAME.enemy,
-                                ref_value = "lives",
-                                scale = 2 * scale * 0.8,
-                                colour = G.C.RED,
-                                shadow = true,
-                                maxw = 0.5,
+                                maxw = 1.1,
                             }
                         },
                     }
