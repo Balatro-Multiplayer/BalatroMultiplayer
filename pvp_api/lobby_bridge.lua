@@ -383,10 +383,9 @@ PVP.setup_lobby_mirror = function(lobby)
 		MPAPI.refresh_current_view()
 	end)
 
+	-- The session state itself was already ended by the lobby's teardown
+	-- (lib/session.lua), which knows whether a newer PvP lobby has taken over.
 	lobby:on(MPAPI.LobbyEvent.DISCONNECTED, function()
-		PVP.LOBBY.connected = false
-		PVP.LOBBY.code = nil
-		PVP.CURRENT_LOBBY = nil
 		if PVP.lobby then
 			PVP.lobby.ref = nil
 			PVP.lobby.ui_ref = nil

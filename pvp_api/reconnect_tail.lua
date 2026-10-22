@@ -101,6 +101,12 @@ end
 -- nothing to apply this checkpoint -- it's harmless: whatever's missed stays
 -- pending in _received_tails until it does arrive (or the next reconnect
 -- replaces pending_opponent_id entirely).
+-- A session's pushed tails and its pending catch-up end with it.
+function PVP.RECONNECT_TAIL.forget()
+	pending_opponent_id = nil
+	PVP.RECONNECT_TAIL._received_tails = {}
+end
+
 function PVP.RECONNECT_TAIL.on_checkpoint()
 	if not pending_opponent_id then return end
 	local opponent_id = pending_opponent_id

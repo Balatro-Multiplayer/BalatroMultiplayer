@@ -102,9 +102,7 @@ local function leave_practice()
 	if lobby then
 		lobby:leave()
 	end
-	MPAPI.MODIFIERS = {}
-	PVP.SP.practice = false
-	PVP.SP.ruleset = nil
+	PVP.end_session()
 end
 
 local go_to_menu_ref = G.FUNCS.go_to_menu

@@ -153,39 +153,18 @@ function PVP.pvp_start_match()
 	PVP.ACTIONS.start_game()
 end
 
--- The single leave-lobby teardown path (the legacy G.FUNCS.lobby_leave was folded in
--- here). Leaves the API lobby and resets the PVP-side state the in-game leave needs:
--- clears modifiers + the version-mismatch latch and returns to the menu. Callers: the
--- lobby view, the shortcuts menu, the end screen, and the join-failure bailout.
---
--- CONFIRMED LIVE BUG, fixed by the PVP.SP.practice reset below: this was the only
--- normal way to leave a practice run, and it never cleared PVP.SP.practice --
--- networking/action_handlers.lua's action_start_game has its own "Clear any stale
--- practice state so it can't leak into real PVP" reset, but that only fires on
--- starting a NEW real match, not on leaving. Reproduced live: called this function to
--- leave an active practice run, then checked PVP.SP.practice -- still true, so
--- PVP.is_mp_or_practice() (is_mp_or_practice = LOBBY.code or is_practice_mode())
--- stayed true too, with no active run or lobby of any kind. That's the exact
--- content-isolation gate layers/_layers.lua's register_mod_isolation callback checks
--- to decide whether PvP's own jokers/consumables/tags/vouchers/enhancements/blinds
--- are eligible -- left stale, it would have kept PvP content active in whatever the
--- player did next (a plain singleplayer run, or an SPDRN match), not just harmlessly
--- inert. lib/playback_launch.lua's replay playback sets PVP.SP.practice = true the
--- same way practice mode does (its own local-lobby creation-failure rollback has the
--- same "set true, then false again on failure" shape) but has no separate leave path
--- of its own -- it shares this same function per its own header comment above, so
--- this one fix covers both.
+-- The single leave-lobby path (the legacy G.FUNCS.lobby_leave was folded in here).
+-- Leaves the API lobby, ends the PvP session (lib/session.lua; also reached through
+-- the lobby's own teardown, which for a server lobby lands only once the leave
+-- round-trip returns) and returns to the menu. Callers: the lobby view, the
+-- shortcuts menu, the end screen, and the join-failure bailout.
 function PVP.pvp_leave_lobby()
 	local lobby = MPAPI.get_current_lobby()
 	if lobby then
 		lobby:leave()
 	end
-	PVP.LOBBY.connected = false
-	PVP.LOBBY.code = nil
-	PVP.CURRENT_LOBBY = nil
-	MPAPI.MODIFIERS = {}
+	PVP.end_session()
 	PVP._version_mismatch_shown = false
-	PVP.SP.practice = false
 	if G.STATE ~= G.STATES.MENU then
 		G.STATE = G.STATES.MENU
 	end
