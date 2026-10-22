@@ -5,7 +5,7 @@ local orig_hud = create_UIBox_HUD
 function create_UIBox_HUD()
 	local contents = orig_hud()
 
-	if not PVP.INTEGRATIONS.Preview then return contents end
+	if not FN.PRE.in_play() then return contents end
 
 	-- Check if preview is disabled in lobby options
 	if PVP.LOBBY.config and PVP.LOBBY.config.preview_disabled then return contents end

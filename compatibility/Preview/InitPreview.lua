@@ -68,8 +68,15 @@ function FN.PRE.start_new_coroutine()
     end
 end
 
+-- Preview is a PvP feature: switched on, it still only runs inside a PvP
+-- session, never in a vanilla run or another mod's game (an SPDRN race,
+-- where racers without it would be at a disadvantage).
+function FN.PRE.in_play()
+    return PVP.INTEGRATIONS.Preview and PVP.in_session()
+end
+
 function FN.PRE.stop_current_coroutine(no_interrupt)
-    if not PVP.INTEGRATIONS.Preview then return end
+    if not FN.PRE.in_play() then return end
     if no_interrupt and FN.PRE.lock_updates then return end
     if FN.PRE.show_preview then
         FN.PRE.show_preview = false

@@ -7,6 +7,7 @@ function FN.PRE.cleanup()
 end
 
 function FN.PRE.simulate()
+	if not FN.PRE.in_play() then return FN.PRE.cleanup() end
 	-- Guard against simulating in redundant places:
 	if FN.PRE.five_second_coroutine and coroutine.status(FN.PRE.five_second_coroutine) == "suspended" then
 		coroutine.resume(FN.PRE.five_second_coroutine)
@@ -65,7 +66,7 @@ function CardArea:update(dt)
 end
 
 function FN.PRE.update_on_card_order_change(cardarea)
-    if not PVP.INTEGRATIONS.Preview then return end
+    if not FN.PRE.in_play() then return end
     if not (cardarea == G.joker or cardarea == G.hand) then return end
 	if
         not cardarea.cards
