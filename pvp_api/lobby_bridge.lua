@@ -331,6 +331,8 @@ PVP.setup_lobby_mirror = function(lobby)
 			PVP.referee_on_player_reconnected(player_id)
 			return
 		end
+		-- The host may have changed while we were away.
+		PVP._pvp_action_helpers.forget_host(lobby)
 		if G.STAGE ~= G.STAGES.RUN then return end
 		local opponent_id = PVP.get_opponent_id()
 		if opponent_id then
@@ -373,7 +375,9 @@ PVP.setup_lobby_mirror = function(lobby)
 		end)
 	end
 
-	lobby:on(MPAPI.LobbyEvent.HOST_CHANGED, function()
+	lobby:on(MPAPI.LobbyEvent.HOST_CHANGED, function(host_id)
+		-- Host-only actions are taken from this player now (pvp_api/actions/_helpers.lua).
+		PVP._pvp_action_helpers.note_host(lobby, host_id)
 		mirror_players(lobby)
 		-- The host left mid-run (a crash, a dropped connection) and the server
 		-- made us host: the referee is ours now.

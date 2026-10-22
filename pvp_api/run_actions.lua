@@ -62,9 +62,10 @@ MPAPI.ActionType({
 MPAPI.ActionType({
 	key = "pvp_reseed",
 	prefix_config = { key = false },
-	on_receive = function(_at, _from, params)
+	-- Host-only (pvp_api/actions/_helpers.lua): a guest can't restart the match.
+	on_receive = PVP._pvp_action_helpers.host_only("pvp_reseed", function(_at, _from, params)
 		PVP.on_reseed(params.seed)
-	end,
+	end),
 })
 
 -- Every client's restart on a new seed: off pvp_reseed, or off a restarted

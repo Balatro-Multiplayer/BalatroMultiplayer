@@ -7,6 +7,7 @@
 -- authoritative; this roster is a best-effort UI mirror, not the source of truth.
 local A = PVP._pvp_action_helpers.A
 local self_id = PVP._pvp_action_helpers.self_id
+local host_only = PVP._pvp_action_helpers.host_only
 
 function PVP.pvp_set_team(team_id)
 	local lobby = MPAPI.get_current_lobby()
@@ -31,13 +32,13 @@ MPAPI.ActionType({
 	key = "pvp_team_roster",
 	prefix_config = { key = false },
 	parameters = { { key = "roster", type = "table", required = true } },
-	on_receive = function(_at, _from, params)
+	on_receive = host_only("pvp_team_roster", function(_at, _from, params)
 		PVP.LOBBY.roster = params.roster or {}
 		local sid = self_id()
 		if sid then
 			PVP.LOBBY.team_id = PVP.LOBBY.roster[sid]
 		end
-	end,
+	end),
 })
 
 -- Exactly one Runner allowed per Manhunt lobby: true once some OTHER player has
@@ -67,10 +68,10 @@ MPAPI.ActionType({
 		{ key = "team_id", type = "string", required = true },
 		{ key = "lives", type = "number", required = true },
 	},
-	on_receive = function(_at, _from, params)
+	on_receive = host_only("pvp_team_lives", function(_at, _from, params)
 		PVP.GAME.team_lives = PVP.GAME.team_lives or {}
 		PVP.GAME.team_lives[params.team_id] = tonumber(params.lives)
-	end,
+	end),
 })
 
 -- Teams' score-DISPLAY board (host -> all): the true summed opposing-team score,
@@ -83,7 +84,7 @@ MPAPI.ActionType({
 	key = "pvp_team_score_board",
 	prefix_config = { key = false },
 	parameters = { { key = "team_scores", type = "table", required = true } },
-	on_receive = function(_at, _from, params)
+	on_receive = host_only("pvp_team_score_board", function(_at, _from, params)
 		if not PVP.LOBBY.config.team_based or not PVP.LOBBY.team_id then
 			return
 		end
@@ -96,7 +97,7 @@ MPAPI.ActionType({
 		PVP.UI.ease_enemy_score(score)
 		PVP.GAME.enemy.real_score = score
 		PVP.GAME.enemy.info_received = true
-	end,
+	end),
 })
 
 -- Teams' card-targeting rotation (host -> all, re-picked once per ante): a flat
@@ -107,11 +108,11 @@ MPAPI.ActionType({
 	key = "pvp_team_card_target",
 	prefix_config = { key = false },
 	parameters = { { key = "pairing", type = "table", required = true } },
-	on_receive = function(_at, _from, params)
+	on_receive = host_only("pvp_team_card_target", function(_at, _from, params)
 		local sid = self_id()
 		local target = params.pairing and params.pairing[sid]
 		PVP.GAME.team_card_target_id = (target and target ~= "") and target or nil
-	end,
+	end),
 })
 
 -- Manhunt Runner's live target (host -> all): whichever Hunter currently holds
@@ -122,12 +123,12 @@ MPAPI.ActionType({
 	key = "pvp_manhunt_target",
 	prefix_config = { key = false },
 	parameters = { { key = "target_id", type = "string", required = false } },
-	on_receive = function(_at, _from, params)
+	on_receive = host_only("pvp_manhunt_target", function(_at, _from, params)
 		if PVP.LOBBY.team_id ~= "RUNNER" then
 			return
 		end
 		PVP.GAME.manhunt_target_id = (params.target_id and params.target_id ~= "") and params.target_id or nil
-	end,
+	end),
 })
 
 -- Manhunt's Hieroglyph/Petroglyph replacements (objects/vouchers/manhunt_vouchers.lua)

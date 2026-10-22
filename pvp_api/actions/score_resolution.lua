@@ -1,5 +1,7 @@
 local A = PVP._pvp_action_helpers.A
 local self_id = PVP._pvp_action_helpers.self_id
+local host_only = PVP._pvp_action_helpers.host_only
+local A_host = PVP._pvp_action_helpers.A_host
 
 -- Score / state resolution (referee). The opponent-facing DISPLAY of
 -- score/hands/skips/lives is synced separately via the nemesis blind's
@@ -43,12 +45,12 @@ MPAPI.ActionType({
 	key = "pvp_nemesis_pairing",
 	prefix_config = { key = false },
 	parameters = { { key = "pairing", type = "table", required = true } },
-	on_receive = function(_at, _from, params)
+	on_receive = host_only("pvp_nemesis_pairing", function(_at, _from, params)
 		local sid = self_id()
 		local partner = params.pairing and params.pairing[sid]
 		PVP.GAME.nemesis_partner_id = (partner and partner ~= "") and partner or nil
 		if PVP.CURRENT_LOBBY then PVP.mirror_players(PVP.CURRENT_LOBBY) end
-	end,
+	end),
 })
 
 -- Royale live targeting: host -> all, a flat id -> target-id-or-"" map,
@@ -61,12 +63,12 @@ MPAPI.ActionType({
 	key = "pvp_royale_target",
 	prefix_config = { key = false },
 	parameters = { { key = "targets", type = "table", required = true } },
-	on_receive = function(_at, _from, params)
+	on_receive = host_only("pvp_royale_target", function(_at, _from, params)
 		local sid = self_id()
 		local target = params.targets and params.targets[sid]
 		PVP.GAME.royale_target_id = (target and target ~= "") and target or nil
 		if PVP.CURRENT_LOBBY then PVP.mirror_players(PVP.CURRENT_LOBBY) end
-	end,
+	end),
 })
 
 A("pvp_set_furthest_blind", function(_at, from, params)
@@ -89,7 +91,7 @@ end)
 -- timeout, and re-reporting it here would risk a lossy round-trip through
 -- play_hand's own to_big() conversion (PVP.GAME.score is an INSANE_INT, a
 -- different big-number representation).
-A("pvp_timer_hand_lost", function(_at, _from, params)
+A_host("pvp_timer_hand_lost", function(_at, _from, params)
 	if not params or params.player_id ~= self_id() then
 		return
 	end
