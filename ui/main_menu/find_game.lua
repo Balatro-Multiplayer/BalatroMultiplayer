@@ -203,6 +203,33 @@ local function build_select(mode)
 	return el.node
 end
 
+-- In group mode (opened from a private lobby's Group Queue button, ui/lobby/group_panel.lua)
+-- a pillar's QUEUE queues the whole lobby for its mode instead (pvp_api/group_queue.lua). A
+-- mode the lobby doesn't fit is greyed; one a member's standing refuses is greyed but still
+-- pressable, so the server's refusal says which mods.
+local function build_group_select(mode)
+	local el = MPAPI.ui_element(function()
+		local available, standing_refused = PVP.group_mode_available(MPAPI.get_current_lobby(), mode.gamemode_key)
+		local lit = available and not standing_refused
+		local config = {
+			align = "cm", minh = 0.5, minw = 2.2, padding = 0.06, r = 0.1,
+			colour = lit and G.C.ORANGE or G.C.UI.BACKGROUND_INACTIVE,
+		}
+		if available then
+			config.shadow = lit
+			config.hover = true
+			config.one_press = true
+			config.button = "mp_pvp_group_queue_mode"
+			config.ref_table = { gamemode_key = mode.gamemode_key }
+		end
+		return { nodes = { { n = G.UIT.R, config = config, nodes = {
+			{ n = G.UIT.T, config = { text = "QUEUE", scale = 0.4, colour = lit and G.C.UI.TEXT_LIGHT or G.C.UI.TEXT_INACTIVE, shadow = lit } },
+		} } } }
+	end)
+	_select_els[mode.key] = el
+	return el.node
+end
+
 -- Live In Queue / In Game counts, polled from the server's queue_counts RPC while this page
 -- is shown (PVP.start/stop_find_game_polling, called from the page's on_enter/dispose in
 -- core.lua). Same shape as SPDRN's find_game counts (BalatroMultiplayerSpeed/ui/main_menu/
@@ -292,7 +319,7 @@ local function build_order_card()
 	} })
 end
 
-local function build_items(modes)
+local function build_items(modes, group)
 	_select_els = {}
 	_stat_els = {}
 	local items = {}
@@ -300,7 +327,7 @@ local function build_items(modes)
 		items[#items + 1] = {
 			id = mode.key,
 			icon = build_chip_sprite(),
-			select = build_select(mode),
+			select = group and build_group_select(mode) or build_select(mode),
 			name_plate = MPAPI.ui_pillar_name_plate({
 				lines = mode.name,
 				bg_colour = mix_colours(mode.colour, G.C.BLACK, 0.3),
@@ -343,6 +370,18 @@ local function build_tab_row(category)
 	return { n = G.UIT.R, config = { align = "cm", padding = 0.1 }, nodes = nodes }
 end
 
+-- Group mode's header: the way back to the lobby instead of the Ranked/Casual tabs.
+local function build_group_header()
+	return { n = G.UIT.R, config = { align = "cm", padding = 0.1 }, nodes = {
+		{ n = G.UIT.C, config = { align = "cm", padding = 0.08 }, nodes = {
+			UIBox_button({ button = "mp_pvp_group_queue_back", label = { localize("b_back") }, colour = G.C.ORANGE, minw = 2.4, minh = 0.6, scale = 0.4 }),
+		} },
+		{ n = G.UIT.C, config = { align = "cm", padding = 0.08 }, nodes = {
+			UIBox_button({ button = "nil", label = { localize("k_group_queue") }, colour = G.C.BLUE, minw = 3.0, minh = 0.6, scale = 0.4 }),
+		} },
+	} }
+end
+
 -- Re-navigates to this same page key with different params (category), same mechanism
 -- SPDRN's practice/create_lobby/find_game intents already use to switch content on
 -- spdrn_game_select -- verified live, repeatedly, in both directions with no stale content
@@ -360,19 +399,20 @@ G.FUNCS.mp_pvp_find_game_tab = function(e)
 end
 
 -- Builds this page's full definition (tab row + pillar row) for the given category ("ranked" or
--- "casual", default "ranked"). The caller (pvp_find_game's MPAPI.Page registration, core.lua)
+-- "casual", default "ranked"). `group` builds the casual pillars for queueing the current
+-- private lobby as a group, with a back-to-lobby header in place of the tabs. The caller (pvp_find_game's MPAPI.Page registration, core.lua)
 -- owns the returned pillar_row controller for this page's lifetime: call :dispose() from the
 -- page's own dispose() hook so the tracked chip icons get :remove()'d -- see
 -- api/ui_pillar_row.lua's header comment for why that's required.
-function PVP.build_find_game_ui(category)
-	category = category or "ranked"
+function PVP.build_find_game_ui(category, group)
+	category = group and "casual" or category or "ranked"
 	local modes = category == "casual" and CASUAL_MODES or RANKED_MODES
 
-	local pillar_row = MPAPI.ui_pillar_row({ items = build_items(modes) })
+	local pillar_row = MPAPI.ui_pillar_row({ items = build_items(modes, group) })
 	local definition = {
 		n = G.UIT.ROOT,
 		config = { align = "tm", colour = G.C.CLEAR },
-		nodes = { build_tab_row(category), pillar_row.row_node },
+		nodes = { group and build_group_header() or build_tab_row(category), pillar_row.row_node },
 	}
 	return { definition = definition, dispose = function(self)
 		pillar_row:dispose()

@@ -8,7 +8,6 @@
 PVP.GROUP_QUEUE_MODES = { "pvp_nemesis", "pvp_royale", "pvp_teams", "pvp_smallworld" }
 
 -- The host's pick in the group panel (index into the eligible list).
-PVP._group_mode_choice = PVP._group_mode_choice or 1
 
 -- Every group-queueable mode: { key, display, max_players, teams }.
 function PVP.group_queue_modes()
@@ -157,22 +156,42 @@ if MPAPI.matchmaking.group and MPAPI.matchmaking.group.register then
 	})
 end
 
-G.FUNCS.mp_pvp_group_queue = function()
-	local lobby = MPAPI.get_current_lobby()
-	local eligible = PVP.group_queue_options(lobby)
-	local mode = eligible[math.max(1, math.min(PVP._group_mode_choice or 1, #eligible))]
-	if not mode then
-		return
+-- Whether the host may queue the lobby for `key` now, and whether a member's
+-- standing refuses it. A refused standing leaves the mode pressable: the
+-- server's refusal names the mods (MPAPI api/matchmaking/group/queue.lua).
+function PVP.group_mode_available(lobby, key)
+	local eligible, refusal = PVP.group_queue_options(lobby)
+	local standing_refused = refusal and refusal.code == MPAPI.matchmaking.group.Refusal.MEMBER_REFUSED
+	if refusal and not standing_refused then
+		return false
 	end
-	PVP._join_group_queue(mode.key)
+	for _, mode in ipairs(eligible) do
+		if mode.key == key then
+			return true, standing_refused and true or false
+		end
+	end
+	return false
+end
+
+-- The lobby's Group Queue button: pick a mode from the casual pillars.
+G.FUNCS.mp_pvp_group_queue = function()
+	MPAPI.pages.show("pvp_find_game", { category = "casual", group = true })
+end
+
+-- A pillar's group QUEUE: queue the lobby for that mode and go back to it.
+G.FUNCS.mp_pvp_group_queue_mode = function(e)
+	local rt = e.config.ref_table
+	if rt and rt.gamemode_key and PVP._join_group_queue(rt.gamemode_key) then
+		MPAPI.pages.show_deferred("pvp_lobby")
+	end
+end
+
+G.FUNCS.mp_pvp_group_queue_back = function()
+	MPAPI.pages.show_deferred("pvp_lobby")
 end
 
 G.FUNCS.mp_pvp_group_cancel = function()
 	PVP._cancel_group_queue()
-end
-
-G.FUNCS.mp_pvp_group_mode_cycle = function(args)
-	PVP._group_mode_choice = args.to_key
 end
 
 G.FUNCS.mp_pvp_group_return = function()
