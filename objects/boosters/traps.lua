@@ -9,6 +9,15 @@ SMODS.Atlas({
 	py = 95,
 })
 
+-- Out of the pack pool unless "traps" is active. The ban source in
+-- layers/traps.lua only runs with an MPAPI ruleset, so in a vanilla run (or
+-- another mod's) both packs stayed in SMODS get_pack's weight sum: a Trap pack
+-- could show in the shop, and every shop pack roll on a seed shifted whenever
+-- PvP was installed (Ghost Deck CXGHOST1: Standard pack -> Jumbo Standard).
+local function traps_in_pool(self)
+	return PVP.is_layer_active("traps")
+end
+
 -- Normal: 1 choose from 3 (matches vanilla Arcana/Celestial normal sizing).
 SMODS.Booster({
 	key = "trap_normal",
@@ -21,6 +30,7 @@ SMODS.Booster({
 	mp_include = function(self)
 		return PVP.is_layer_active("traps")
 	end,
+	in_pool = traps_in_pool,
 	create_card = function(self, card, i)
 		return {
 			set = "Trap",
@@ -44,6 +54,7 @@ SMODS.Booster({
 	mp_include = function(self)
 		return PVP.is_layer_active("traps")
 	end,
+	in_pool = traps_in_pool,
 	create_card = function(self, card, i)
 		return {
 			set = "Trap",
