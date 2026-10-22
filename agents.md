@@ -2,7 +2,7 @@
 
 > This is an `agents.md` — a repo-level orientation doc written for coding agents (Claude Code, Cursor, etc.) but perfectly readable by humans too. It's the "what is this project and how does it fit together" briefing you'd give a new contributor on day one.
 >
-> **The mod**: head-to-head (and co-op, solo endurance) Balatro. Two players, same seed, same shops, same packs — but at boss blinds you play against the opponent's live chip score. Built as a Steamodded mod with Lovely patches on top of vanilla Balatro. Server is a thin TCP relay; both clients simulate the game locally and only sync opponent scores.
+> **The mod**: head-to-head (and solo endurance) Balatro. Two players, same seed, same shops, same packs — but at boss blinds you play against the opponent's live chip score. Built as a Steamodded mod with Lovely patches on top of vanilla Balatro. Server is a thin TCP relay; both clients simulate the game locally and only sync opponent scores.
 
 ## Stack
 
