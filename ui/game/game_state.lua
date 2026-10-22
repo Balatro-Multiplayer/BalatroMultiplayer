@@ -324,11 +324,27 @@ function Game:update_blind_select(dt)
 	update_blind_select_ref(self, dt)
 end
 
+-- Whether the centers still carry the reworks of the last PvP session's run.
+local session_reworks_loaded = false
+
+-- Reworks go on before the run body makes its cards (MPAPI's own pass runs
+-- after it). Outside a PvP session MPAPI alone owns them; a session's
+-- leftovers come off first so this run's cards aren't made from them.
+local function load_run_reworks()
+	if PVP.in_session() then
+		PVP.LoadReworks(PVP.get_active_ruleset())
+		session_reworks_loaded = true
+	elseif session_reworks_loaded then
+		PVP.LoadReworks(nil)
+		session_reworks_loaded = false
+	end
+end
+
 local start_run_ref = Game.start_run
 function Game:start_run(args)
-	-- Not get_active_ruleset(): the sp run flow leaves practice=false but still
-	-- sets PVP.SP.ruleset, which get_active_ruleset() only honours in practice.
-	PVP.LoadReworks(PVP.LOBBY.config.ruleset or PVP.SP.ruleset)
+	load_run_reworks()
+	-- prevent_eval only ever spans one PvP round; a run starts without it.
+	PVP.GAME.prevent_eval = nil
 
 	start_run_ref(self, args)
 

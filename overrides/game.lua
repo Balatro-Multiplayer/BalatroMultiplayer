@@ -33,7 +33,7 @@ local cash_out_ref = G.FUNCS.cash_out
 function G.FUNCS.cash_out(e)
 	-- Confirmed-safe checkpoint for Phase 9's reconnect tail-replay -- drains
 	-- any pending opponent catch-up queued since the last checkpoint.
-	if PVP.RECONNECT_TAIL then PVP.RECONNECT_TAIL.on_checkpoint() end
+	if PVP.RECONNECT_TAIL and PVP.in_session() then PVP.RECONNECT_TAIL.on_checkpoint() end
 	-- The round-eval total actually paid. Part of it comes from the live match
 	-- only (the comeback bonus after a referee life loss, no_gold_on_round_loss),
 	-- which a replay or crash-rejoin fast-forward runs without; its cashout

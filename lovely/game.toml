@@ -8,8 +8,8 @@ priority = 2147483600
 target = "game.lua"
 pattern = '''function Game:update_round_eval\(dt\)(?<pre>[\s\S]+?)if not G.STATE_COMPLETE then'''
 position = 'at'
-payload = '''function Game:update_round_eval(dt)$pre if not G.STATE_COMPLETE and not PVP.GAME.prevent_eval then
-        PVP.GAME.prevent_eval = true'''
+payload = '''function Game:update_round_eval(dt)$pre if not G.STATE_COMPLETE and not (PVP.in_session() and PVP.GAME.prevent_eval) then
+        PVP.GAME.prevent_eval = PVP.in_session() or nil'''
 times = 1
 
 [[patches]]
@@ -19,7 +19,7 @@ pattern = '''dollars = dollars + G.GAME.interest_amount*math.min(math.floor(G.GA
     end'''
 position = 'after'
 payload = '''
-  if not PVP.GAME.comeback_bonus_given then
+  if PVP.in_session() and not PVP.GAME.comeback_bonus_given then
 		PVP.GAME.comeback_bonus_given = true
 		local comeback_bonus
 

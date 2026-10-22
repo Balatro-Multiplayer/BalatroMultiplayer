@@ -32,12 +32,14 @@ end
 local old_skip_blind = G.FUNCS.skip_blind
 function G.FUNCS.skip_blind(...)
 	old_skip_blind(...)
-	PVP.ACTIONS.update_location()
+	if PVP.LOBBY.code then
+		PVP.ACTIONS.update_location()
+	end
 end
 
 local can_play_ref = G.FUNCS.can_play
 G.FUNCS.can_play = function(e)
-	if G.GAME.current_round.hands_left <= 0 then
+	if PVP.in_session() and G.GAME.current_round.hands_left <= 0 then
 		e.config.colour = G.C.UI.BACKGROUND_INACTIVE
 		e.config.button = nil
 	else
@@ -47,7 +49,7 @@ end
 
 local can_open_ref = G.FUNCS.can_open
 G.FUNCS.can_open = function(e)
-	if PVP.GAME.ready_blind then
+	if PVP.in_session() and PVP.GAME.ready_blind then
 		e.config.colour = G.C.UI.BACKGROUND_INACTIVE
 		e.config.button = nil
 		return
@@ -62,7 +64,7 @@ function G.FUNCS.select_blind(e)
 	select_blind_ref(e)
 	-- Confirmed-safe checkpoint for Phase 9's reconnect tail-replay -- drains
 	-- any pending opponent catch-up queued since the last checkpoint.
-	if PVP.RECONNECT_TAIL then PVP.RECONNECT_TAIL.on_checkpoint() end
+	if PVP.RECONNECT_TAIL and PVP.in_session() then PVP.RECONNECT_TAIL.on_checkpoint() end
 	if PVP.is_mp_or_practice() then
 		PVP.GAME.ante_key = tostring(math.random())
 		-- Carbon: log the freshly-rolled (non-deterministic) ante_key so a

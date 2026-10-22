@@ -83,25 +83,28 @@ G._MP_SET_SEED = args.seed
 '''
 match_indent = true
 
-# relevant only for small world
+# relevant only for small world (its fake starting consumables need their own set);
+# outside a PvP session the deck's consumables are created exactly as vanilla does
+# (Ghost Deck's c_hex as a 'Tarot').
 [[patches]]
 [patches.pattern]
 target = "back.lua"
 pattern = '''local card = create_card('Tarot', G.consumeables, nil, nil, nil, nil, v, 'deck')'''
 position = "at"
-payload = '''local card = create_card(PVP.legacy_smallworld() and 'Tarot' or G.P_CENTERS[v].set, G.consumeables, nil, nil, nil, nil, v, 'deck')'''
+payload = '''local card = create_card((PVP.in_session() and not PVP.legacy_smallworld()) and G.P_CENTERS[v].set or 'Tarot', G.consumeables, nil, nil, nil, nil, v, 'deck')'''
 match_indent = true
 
-# i was the one who pred this line, i guess it became a problem
+# Added in 0a583263 ("fix voucher desync", BalatroMultiplayer, 2025-08-28): The
+# Order rolls the next voucher with pseudoseed("Voucher0"), and a roll made while
+# paused took vanilla's math.random() branch on one client only, desyncing the two
+# players' shops. That only matters inside a PvP session; everywhere else (vanilla,
+# SPDRN, whose racers may not have PvP installed at all) vanilla's guard stays.
 [[patches]]
 [patches.pattern]
 target = "functions/misc_functions.lua"
 pattern = '''if G.SETTINGS.paused and key ~= 'to_do' then return math.random() end'''
 position = "at"
-payload = '''
--- disabled by Multiplayer because of voucher rng calls while paused
--- if G.SETTINGS.paused and key ~= 'to_do' then return math.random() end
-'''
+payload = '''if G.SETTINGS.paused and key ~= 'to_do' and not PVP.in_session() then return math.random() end'''
 match_indent = true
 
 # Pool exclusion hook (RNG-safe removal from get_current_pool) moved to
@@ -135,7 +138,8 @@ if (G.GAME.selected_back and G.GAME.selected_back.name == 'b_aij_patchwork') or 
 match_indent = true
 times = 1
 
-# fix magic trick suit+rank desync
+# fix magic trick suit+rank desync between PvP players; outside a PvP session the
+# shop rolls its playing cards as vanilla does.
 # this fix should become obsolete in a later steamodded version (currently 1620a)
 [[patches]]
 [patches.pattern]
@@ -143,7 +147,7 @@ target = "functions/UI_definitions.lua"
 pattern = "local flags = SMODS.calculate_context({create_shop_card = true, set = v.type})"
 position = 'before'
 payload = '''
-args.front = false
+if PVP.in_session() then args.front = false end
 '''
 match_indent = true
 times = 1
